@@ -88,6 +88,11 @@ class AnimPlayer:
         self.play_single(names[0])
         return True
 
+    @property
+    def blocking(self):
+        """AnimationControllerBase.IsPlayingBlockingAnimation"""
+        return self.anim.blocking
+
     def waiting(self):
         """diagnostic only: parked on something that cannot finish"""
         return (self.anim.infinite or self.mode == 'looping') and not self.queue
@@ -188,6 +193,19 @@ class Pawn:
         self.can_decrease_angry = True
         self.angry_count_ticks = 0
         self.sneaking = False
+        self.sneak_toggle = False        # Woody.MbSneakToggle
+        self.in_urgent = False           # Pawn.InUrgentMove
+        self.hiding = False              # Woody.Hiding (SetHidden override)
+        self.hiding_item = None
+        self.is_warping = False          # Pawn.IsWarping, set by door transit
+        self.is_sleeping = spec.get('is_sleeping') or False
+        self.ignore_woody = spec.get('ignore_woody') or False
+        self.fear_left = spec.get('fear_left') or 'FearLeft'
+        self.fear_right = spec.get('fear_right') or 'FearRight'
+        self.win_animation = spec.get('win_animation')
+        self.run_force = spec.get('run_force') or 0.0
+        self.run_door_force = spec.get('run_door_force') or 0.0
+        self.hit_action = spec.get('hit_action') or {}
         self.stand = spec.get('stand') or {}
         self.default_anim = spec.get('default')
         self.state = self.IDLE
@@ -240,6 +258,38 @@ class Pawn:
         return abs(self.sprite.y - obj.y) < self.item_threshold + obj.delta_use_height
 
     # -- commands ----------------------------------------------------------
+    def start_move_flags(self):
+        """Woody.StartMoveToLocation: sneak comes from the toggle, a plain
+        click is an urgent (running) move, and moving leaves a hiding spot."""
+        self.sneaking = self.sneak_toggle
+        self.in_urgent = not self.sneaking
+        if self.hiding:
+            self.unhide()
+
+    def hide(self, item):
+        """Woody.Hide + HideItem.InternalUse"""
+        self.hiding = True
+        self.hiding_item = item
+        if item.hide_woody:
+            self.sprite.hidden = True
+        p = self.world.players.get(id(item.sprite)) \
+            if self.world and item.sprite else None
+        if p is not None and item.hide_anim and p.has(item.hide_anim):
+            p.play_single(item.hide_anim)
+
+    def unhide(self):
+        """Woody.Unhide + HideItem.Leave"""
+        self.hiding = False
+        self.sprite.hidden = False
+        item, self.hiding_item = self.hiding_item, None
+        if item is None or self.world is None:
+            return
+        p = self.world.players.get(id(item.sprite)) if item.sprite else None
+        if p is not None and item.hide_idle and p.has(item.hide_idle):
+            p.play_single(item.hide_idle)
+        if item.leave_animation and self.anim.has(item.leave_animation):
+            self.anim.play_single(item.leave_animation)
+
     def goto(self, x, y, on_arrive=None):
         dest = self.level.zone_at(x, y)
         if dest is None:
@@ -364,6 +414,7 @@ class Pawn:
     def _transit_animations(self, door, other, sequential):
         self.state = self.DOOR_ANIM
         self.hidden = True                # PlayDoorLeaveAnimation: SetHidden(true)
+        self.is_warping = True            # PlayDoorLeaveAnimation: IsWarping
         self._exit_door = other
         door.passing = other.passing = self
         if self.world:
@@ -411,6 +462,7 @@ class Pawn:
         self.sprite.y = d.y + self.door_delta[1]
         self.zone = self.level.zone_by_pid(d.zone) or self.zone
         self.hidden = False
+        self.is_warping = False           # OnDoorEnterAnimationFinished
         if d.exit_anim and self.anim.has(d.exit_anim):
             self.anim.play_looping(d.exit_anim)
         if d.should_walk_up and self.steps:
@@ -458,13 +510,16 @@ class Pawn:
                     self._next_step()
                 return
             nx, ny = dx / mag, dy / mag
-            # WalkOnPath: dominant axis picks the force and the animation
+            # WalkOnPath: dominant axis picks the force and the animation, and
+            # IsInUrgentMove switches to the Running magnitudes
             if abs(nx) >= abs(ny):
-                vx, vy = nx * self.force, ny * self.force
+                f = self.run_force if self.in_urgent else self.force
+                vx, vy = nx * f, ny * f
                 self._face_towards(nx)
                 self.anim.play_looping('Walk_' + self.facing)
             else:
-                vx, vy = nx * self.door_force, ny * self.door_force
+                f = self.run_door_force if self.in_urgent else self.door_force
+                vx, vy = nx * f, ny * f
                 self.anim.play_looping('Walk_Up' if ny > 0 else 'Walk_Down')
             self.sprite.x += vx * scale
             self.sprite.y += vy * scale
@@ -539,6 +594,10 @@ class GameState:
         self.linked_trick = False
         self.compound_tricks = 0
         self.log = []
+        self.got_caught = False          # GameInfo.gotCaught
+        self.ending = False              # GameInfo.GameEnding (FinishGame)
+        self.ended = False               # GameInfo.GameEnded (FinishAnimationEnded)
+        self.win_timer = None            # WinGameOnCompleteAllTricks' 2.5s wait
 
     def trick_done(self, score):
         """GameInfo.TrickDone (GameInfo.cs:467)"""
@@ -829,8 +888,9 @@ class World:
     # -- Woody using items -------------------------------------------------
     def woody_use(self, item):
         """Click on an item: walk to it, then the Woody.TryUseItem chain."""
-        if self.woody is None:
+        if self.woody is None or self.game.ending:
             return False
+        self.woody.start_move_flags()
         return self.woody.goto_item(item,
                                     on_arrive=lambda: self._woody_try_use(item))
 
@@ -883,6 +943,13 @@ class World:
             return
         # WoodyUse: remember what was held for the later decrement
         item_used_inventory = self.inventory.used
+        if item.kind == 'HideItem':
+            # HideItem.InternalUse runs at once (ShouldUseAfterAnimationFinishes
+            # is UseAfterAnimation, normally false), then Woody plays Hide_In
+            self.woody.hide(item)
+            if item.animation and self.woody.anim.has(item.animation):
+                self.woody.anim.play_single(item.animation)
+            return
         seq = list(item.animation_sequence) if item.use_woody_sequence \
             else ([item.animation] if item.animation else [])
         seq = [a for a in seq if self.woody.anim.has(a)]
@@ -991,6 +1058,88 @@ class World:
             r.start()
         return self.routines
 
+    def can_rottweiler_see_woody(self):
+        """GameInfo.CanRottweilerSeeWoody (GameInfo.cs:181-192), the Classic
+        detection predicate. Pure zone containment; the Bed special case swaps
+        the sleep term for a movement term."""
+        rott = self.pawns.get('Rottweiler')
+        woody = self.woody
+        if rott is None or woody is None:
+            return False
+        # both branches of the original require ActionManager.CurrentAction
+        routine = next((r for r in self.routines if r.pawn is rott), None)
+        if routine is None:
+            return False
+        common = (woody.zone is not None and rott.zone is not None
+                  and woody.zone.pid == rott.zone.pid
+                  and not woody.is_warping and not rott.is_warping
+                  and not rott.ignore_woody and not woody.hiding
+                  and (not rott.anim.blocking or not woody.sneaking)
+                  and not woody.anim.blocking)
+        if not common:
+            return False
+        it = routine.item if routine else None
+        if it is not None and it.name == 'Bed':
+            moving = woody.state in (woody.WALK, woody.DOOR_CLIMB,
+                                     woody.DESCEND, woody.ITEM_CLIMB)
+            return moving                 # the Bed case demands Velocity > 0
+        return not rott.is_sleeping
+
+    def _catch(self):
+        """GameInfo.OnNeighborCaughtWoody + FinishGame + Rottweiler.HitWoody +
+        RoutineActionHitWoody.OnActionStarted."""
+        import random
+        self.game.got_caught = True
+        self.game.won = False
+        self.game.ending = True           # FinishGame: input locked
+        rott = self.pawns.get('Rottweiler')
+        woody = self.woody
+        # Woody.PlayFearAnimation(Rottweiler): face the neighbour
+        fear = woody.fear_left if rott.sprite.x < woody.sprite.x else woody.fear_right
+        if woody.anim.has(fear):
+            woody.anim.play_single(fear)
+        woody.steps = []
+        woody.state = woody.IDLE
+        # Rottweiler.HitWoody: stop the routine, walk to Woody, then the hit
+        for r in self.routines:
+            if r.pawn is rott:
+                r.frozen = True           # ActionManager.Freeze in the action
+        rott.steps = []
+        rott.in_urgent = False            # HitWoodyAction.Urgent = false
+
+        def hit():
+            seqs = [q for q in rott.hit_action.get('sequences', [])
+                    if all(rott.anim.has(a) for a in q)]
+            woody.sprite.hidden = True    # the hit sheets contain Woody
+            if seqs:
+                rott.anim.play_sequence(random.choice(seqs),
+                                        on_end=self._finish_animation_ended)
+            else:
+                self._finish_animation_ended()
+        if not rott.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
+            hit()
+
+    def _finish_animation_ended(self):
+        """GameInfo.FinishAnimationEnded: everything freezes"""
+        self.game.ended = True
+        for r in self.routines:
+            r.frozen = True
+
+    def _win(self):
+        """GameInfo.PlayWinAnimations: FinishGame, Woody's win animation,
+        freeze the neighbour."""
+        self.game.ending = True
+        for r in self.routines:
+            r.frozen = True
+        w = self.woody
+        if w is not None and w.win_animation and w.anim.has(w.win_animation):
+            w.steps = []
+            w.state = w.IDLE
+            w.anim.play_sequence([w.win_animation],
+                                 on_end=self._finish_animation_ended)
+        else:
+            self._finish_animation_ended()
+
     def tick(self, dt):
         for p in self.players.values():
             p.tick(dt)
@@ -1001,3 +1150,17 @@ class World:
             r.tick(dt)
         if self.woody:
             self.woody.tick(dt)
+        # GameInfo.Update, the Classic win/lose checks (GameInfo.cs:203-232)
+        if self.game.ending or self.game.ended:
+            return
+        if self.can_rottweiler_see_woody():
+            if not self.game.got_caught:
+                self._catch()
+        elif self.game.all_done():
+            # WinGameOnCompleteAllTricks waits 2.5 seconds before the win pose
+            if self.game.win_timer is None:
+                self.game.win_timer = 2.5
+            else:
+                self.game.win_timer -= dt
+                if self.game.win_timer <= 0.0:
+                    self._win()

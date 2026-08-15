@@ -24,7 +24,7 @@ UNITY_PLANE_SIZE = 10.0
 class Anim:
     __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
                  'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern',
-                 'infinite', 'type_looping', 'sounds')
+                 'infinite', 'type_looping', 'sounds', 'blocking')
 
     def __init__(self, d, base_path=''):
         self.name = d.get('Name')
@@ -49,6 +49,7 @@ class Anim:
         self.type_looping = d.get('Type') == 'Looping'
         self.loop = self.infinite or self.type_looping
         self.hold = bool(d.get('HoldOnLastFrame'))
+        self.blocking = bool(d.get('Blocking'))     # AnimationInstance.Blocking
         self.pattern = d.get('Pattern') or None
         self.sounds = [(sd.get('Frame'), sd.get('FileName'))
                        for sd in (d.get('Sounds') or []) if sd.get('FileName')]
@@ -133,6 +134,7 @@ class Item:
                  'activate_item_trick', 'set_tricked_on_item',
                  'linked_item_trick', 'fix_item_trick', 'depends_on_2',
                  'use_depends_on_when_tricked', 'force_fix_original',
+                 'hide_anim', 'hide_idle', 'leave_animation', 'hide_woody',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
@@ -217,6 +219,11 @@ class Item:
         self.fix_item_trick = (d.get('FixItemTrick') or {}).get('path')
         self.use_depends_on_when_tricked = bool(d.get('UseDependsOnWhenTricked'))
         self.force_fix_original = bool(d.get('ForceFixOriginal'))
+        # HideItem: the wardrobe's own animations and whether Woody vanishes
+        self.hide_anim = _anim_name(d.get('HideAnim'))
+        self.hide_idle = _anim_name(d.get('IdleAnim'))
+        self.leave_animation = _anim_name(d.get('LeaveAnimation'))
+        self.hide_woody = bool(d.get('HideWoody'))
         self.collider = None                # (cx, cy, w, h), for click hit-tests
         self.delta_olga_x = (d.get('DeltaOlgaLocation') or {}).get('x', 0.0)
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
@@ -695,7 +702,7 @@ class Level:
                                   ('Transition', 'IdleAnimation'),
                                   ('TrickItem', 'IdleNormal'),
                                   ('SearchItem', 'IdleNormal'),
-                                  ('HideItem', 'IdleNormal'),
+                                  ('HideItem', 'IdleAnim'),
                                   ('GroundItem', 'IdleNormal'),
                                   ('Alerter', 'IdleNormal'),
                                   ('InspectItem', 'IdleNormal')):
@@ -788,6 +795,21 @@ class Level:
                 'portal_down': _anim_name(pd.get('PortalDownAnimation')),
                 'angry_decay': pd.get('AngryMeterDecay') or 0.0,
                 'angry_max': pd.get('AngryMeterMaximum') or 100.0,
+                'fear_left': _anim_name(pd.get('FearAnimationLeft')) or 'FearLeft',
+                'fear_right': _anim_name(pd.get('FearAnimationRight')) or 'FearRight',
+                'win_animation': _anim_name(pd.get('WinAnimation')),
+                'is_sleeping': bool(pd.get('IsSleeping')),
+                'ignore_woody': bool(pd.get('IgnoreWoody')),
+                # RoutineActionHitWoody is serialized inline on the Rottweiler
+                'hit_action': {
+                    'sequences': [q for q in (
+                        (pd.get('HitWoodyAction') or {}).get('Sequence1') or [],
+                        (pd.get('HitWoodyAction') or {}).get('Sequence2') or [],
+                        (pd.get('HitWoodyAction') or {}).get('Sequence3') or [],
+                        (pd.get('HitWoodyAction') or {}).get('Sequence4') or []) if q],
+                    'max_distance': (pd.get('HitWoodyAction') or {}).get(
+                        'MaximumPawnDistanceToAction') or 0.03,
+                },
                 'default': pd.get('DefaultAnimation'),
             }
 

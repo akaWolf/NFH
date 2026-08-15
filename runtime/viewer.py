@@ -88,10 +88,17 @@ class Viewer:
     def _print_state(self):
         inv = self.world.inventory
         g = self.world.game
+        tail = ''
+        if g.got_caught:
+            tail = '  CAUGHT'
+        elif g.all_done():
+            tail = '  LEVEL COMPLETE'
+        elif g.won:
+            tail = '  WON (exit enabled)'
         print('inventory: %s  used=%s | tricks %d/%d%s' % (
             [i['type'] for i in inv.items],
             inv.used['type'] if inv.used else None,
-            g.completed, g.total, '  WON' if g.won else ''))
+            g.completed, g.total, tail))
 
     def draw(self):
         sdl2.SDL_SetRenderDrawColor(self.rnd, 20, 22, 28, 255)
@@ -159,6 +166,11 @@ class Viewer:
                         self.screenshot('/tmp/nfh-%s.png' % self.level.name)
                     elif k == sdl2.SDLK_f:
                         self.follow = not self.follow
+                    elif k == sdl2.SDLK_TAB and self.woody:
+                        # Woody.ToggleSneak
+                        self.woody.sneak_toggle = not self.woody.sneak_toggle
+                        self.woody.sneaking = self.woody.sneak_toggle
+                        print('sneak:', self.woody.sneaking)
                     elif sdl2.SDLK_0 <= k <= sdl2.SDLK_9:
                         idx = (k - sdl2.SDLK_1) if k != sdl2.SDLK_0 else -1
                         self.world.inventory.select(idx)
@@ -166,15 +178,20 @@ class Viewer:
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
                     wx, wy = self.cam.screen_to_world(ev.button.x, ev.button.y,
                                                       WIDTH, HEIGHT)
-                    it = self._item_at(wx, wy)
-                    if it is not None:
-                        used = self.world.inventory.used
-                        print('use %s%s' % (it.name,
-                              ' with ' + used['type'] if used else ''))
-                        self.world.woody_use(it)
-                    elif not self.woody.goto(wx, wy):
-                        print('no route to (%.2f, %.2f)' % (wx, wy))
-                    self._print_state()
+                    if self.world.game.ending:
+                        pass              # FinishGame: input is locked
+                    else:
+                        it = self._item_at(wx, wy)
+                        if it is not None:
+                            used = self.world.inventory.used
+                            print('use %s%s' % (it.name,
+                                  ' with ' + used['type'] if used else ''))
+                            self.world.woody_use(it)
+                        else:
+                            self.woody.start_move_flags()
+                            if not self.woody.goto(wx, wy):
+                                print('no route to (%.2f, %.2f)' % (wx, wy))
+                        self._print_state()
             now = time.time()
             dt = now - last; last = now
             if not self.paused:
