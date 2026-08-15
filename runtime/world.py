@@ -5,6 +5,9 @@ The references in comments are to src/Assembly-CSharp: AnimationControllerBase
 Item (use range), ActionManager / RoutineAction* (the routine), Door, Zone.
 """
 
+# `this is TrickItem` in C# is true for the subclasses too
+TRICK_KINDS = ('TrickItem', 'Drawing', 'Rake', 'Toilet', 'Television')
+
 
 class AnimPlayer:
     """AnimationControllerBase.Refresh, one animation controller.
@@ -832,17 +835,11 @@ class Routine:
             self._pending = 'advance'
             self.state = self.IDLE
             return
-        # RoutineActionUse.OnActionStarted releases the named infinite loops
-        # right at action start, before any movement (RoutineActionUse.cs:152-171)
-        self._infinite_flags_on_start(a, it)
         if self.pawn.at_use_range(it):
             self._use()
         else:
             self.state = self.MOVING
             if not self.pawn.goto_item(it, on_arrive=self._use):
-                # port-side failure path (the original's pathing cannot fail
-                # on shipped data): keep the flags symmetric
-                self._action_stopped()
                 self._pending = 'advance'
                 self.state = self.IDLE
 
@@ -851,6 +848,10 @@ class Routine:
         a = self.action
         if it is None:
             self._pending = 'advance'; self.state = self.IDLE; return
+        # RoutineActionUse.OnActionStarted fires on arrival (ActionManager.
+        # StartAction interposes a MoveAction when the pawn is away); the
+        # ignore-loop release opens it (RoutineActionUse.cs:152-171)
+        self._infinite_flags_on_start(a, it)
         if a.get('mutex'):
             # MutexAction parks on its looping animation until another action's
             # PawnToAbortMutexOnFinish releases it (RoutineActionUse.cs:172-179)
@@ -861,6 +862,43 @@ class Routine:
             if a.get('mutex_anim'):
                 self.pawn.anim.play_looping(a['mutex_anim'])
             return
+        w = self.pawn.world
+        # Item.Use's Rottweiler branch (Item.cs:1056-1095): a toggles-prime
+        # item alternates prime / use; RequireUnprime makes it three-phase
+        # (prime, use, unprime). The PigKeys and Pipe name-hacks are skipped.
+        if self.role == 'Rottweiler' and it.rott_toggles_prime and w is not None:
+            leg = None
+            if it.require_unprime:
+                if not it.primed:
+                    w.set_primed(it, True)
+                    leg = it.rott_prime_anim
+                elif not it.is_using:
+                    it.is_using = True    # falls through to the plain use
+                else:
+                    w.set_primed(it, False)
+                    it.is_using = False
+                    leg = it.rott_unprime_anim
+            else:
+                was = it.primed
+                w.set_primed(it, not it.primed)
+                if not was:
+                    leg = it.rott_prime_anim
+            if leg is not None:
+                seq = [x for x in leg if self.pawn.anim.has(x)]
+                self.state = self.USING
+                self.timer = a['duration']
+                if a.get('hide_owner'):
+                    self.pawn.hidden = True
+                self._after_use_side_effects(a, it)
+                if seq:
+                    self.pawn.anim.play_sequence(seq, on_end=self._finish)
+                else:
+                    # no prime animation: StopCurrentAction(canPostponeStop:
+                    # false) — no angry postpone (Item.cs RottweilerPrime tail)
+                    self._action_stopped()
+                    self._pending = 'advance'
+                    self.state = self.IDLE
+                return
         tricked = it.is_tricked(self.level.items)
         seq = it.sequence_for(self.role, tricked)
         if not seq:
@@ -873,12 +911,42 @@ class Routine:
         self.timer = a['duration']
         if a.get('hide_owner'):
             self.pawn.hidden = True       # HideOwnerDuringUse, cs:213-216
+        self._after_use_side_effects(a, it)
         self.log.append((it.name, tricked))
         if tricked and self.role == 'Rottweiler':
             it.got_tricked = True          # Item.RottweilerUse (Item.cs:838)
         if self.on_use:
             self.on_use(it, tricked)
         self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
+
+    def _after_use_side_effects(self, a, it):
+        """the prime/trick-after-use tail of RoutineActionUse.OnActionStarted
+        (RoutineActionUse.cs:262-301): each named target toggles its Primed —
+        at once on a zero delay, else on a GameInfo.Invoke timer; the trick
+        target just flips its Tricked field."""
+        w = self.pawn.world
+        if w is None:
+            return
+        tgt = self.level.items.get(a.get('prime_after_use_tricked')) \
+            if a.get('prime_after_use_tricked') else None
+        if tgt is not None and it.tricked:
+            d = a.get('prime_tricked_delay') or 0.0
+            if d == 0.0:
+                w.set_primed(tgt, not tgt.primed)
+            else:
+                w.call_later(d, lambda t=tgt: w.set_primed(t, not t.primed))
+        tgt = self.level.items.get(a.get('prime_after_use')) \
+            if a.get('prime_after_use') else None
+        if tgt is not None:
+            d = a.get('prime_delay') or 0.0
+            if d == 0.0:
+                w.set_primed(tgt, not tgt.primed)
+            else:
+                w.call_later(d, lambda t=tgt: w.set_primed(t, not t.primed))
+        tgt = self.level.items.get(a.get('trick_after_use')) \
+            if a.get('trick_after_use') else None
+        if tgt is not None:
+            tgt.tricked = not tgt.tricked  # RoutineActionUse.cs:298-301
 
     def _tricked_item(self, it):
         """RoutineActionUse.GetTrickedItem"""
@@ -1149,6 +1217,15 @@ class World:
         for it in level.items.values():
             if it.notice_enter:
                 self.notice_items.setdefault(it.zone, []).append(it)
+        self._delayed = []               # (seconds left, fn) Invoke timers
+        # Item.Start ends in SetPrimed(Primed): the initial primed visibility
+        # (Item.cs:697, 1219-1235)
+        for it in level.items.values():
+            if it.sprite is not None:
+                if it.show_only_when_primed:
+                    it.sprite.hidden = not it.primed
+                if it.hide_when_primed and it.primed:
+                    it.sprite.hidden = True
 
     def play_angry(self, pawn, item, on_done=None):
         """Rottweiler.PlayAngryAnimation, GameMode.Classic branch
@@ -1237,7 +1314,10 @@ class World:
             return
         if item.fucked_up:
             return
-        name = item.idle_tricked if item.is_tricked(self.level.items) else item.idle
+        tricked = item.is_tricked(self.level.items)
+        if not tricked and item.primed and item.force_primed_on_start:
+            return          # TrickItem.cs:705: hold the primed pose instead
+        name = item.idle_tricked if tricked else item.idle
         if name and p.has(name):
             p.play_single(name)
 
@@ -1304,6 +1384,65 @@ class World:
         return self.players.get(id(sprite))
 
     # -- Woody using items -------------------------------------------------
+    def call_later(self, delay, fn):
+        """MonoBehaviour.Invoke, as GameInfo.InvokeMethodForSetPrime uses it"""
+        self._delayed.append([delay, fn])
+
+    def set_primed(self, item, primed):
+        """Item.SetPrimed (Item.cs:1169-1243) + the TrickItem override that
+        plays the primed idle (TrickItem.cs:996-1010, 483-491). PrimedOffset
+        is zero throughout the shipped data and the WaterPuddle name-hack is
+        not ported."""
+        if item.dont_prime_while_tricked and item.tricked:
+            return
+        item.primed = primed
+        # DeltaLocation gains/loses DeltaPrimedLocation (Item.cs:1201-1210)
+        if item.delta_primed_x or item.delta_primed_y:
+            sign = 1.0 if primed else -1.0
+            item.dx += sign * item.delta_primed_x
+            item.dy += sign * item.delta_primed_y
+        if item.sprite is not None:
+            if item.show_only_when_primed:
+                item.sprite.hidden = not primed      # Item.cs:1219-1231
+            if item.hide_when_primed:
+                item.sprite.hidden = primed          # Item.cs:1232-1235
+        if primed and item.kind in TRICK_KINDS:
+            p = self.players.get(id(item.sprite)) if item.sprite else None
+            if p is None or not item.animating:
+                return
+            if item.fucked_up:
+                name = item.primed_fucked_up
+            elif item.is_tricked(self.level.items) and item.primed_tricked:
+                name = item.primed_tricked
+            else:
+                name = item.primed_normal
+            if name and p.has(name):
+                p.play_single(name)
+
+    def woody_prime(self, item):
+        """Item.WoodyPrime (Item.cs:1246-1300): transform the held inventory
+        to PrimedInventoryType, prime, consume it when asked, chain to
+        ObjectToPrimeWhenPrimed, and play the prime animation on Woody. The
+        IceBucket branch is a name-hack, not ported."""
+        used = self.inventory.used
+        if item.primed_inventory_type and item.primed_inventory_type != 'IT_NONE' \
+                and used is not None:
+            used['type'] = item.primed_inventory_type   # UsedInventory.ChangeType
+        self.set_primed(item, True)
+        if item.remove_inv_after_priming and used is not None:
+            self.inventory.remove(used['type'])
+        other = self.level.items.get(item.object_to_prime) \
+            if item.object_to_prime else None
+        if other is not None:
+            self.woody_prime(other)
+            if item.unlock_object_to_prime:
+                other.locked = False
+        seq = [a for a in item.woody_prime_anim if self.woody.anim.has(a)]
+        if seq:
+            # ReturnWoodyToStand is the sequence-end delegate; the stand hook
+            # in AnimPlayer covers it
+            self.woody.anim.play_sequence(seq)
+
     def woody_use(self, item):
         """Click on an item: walk to it, then the Woody.TryUseItem chain."""
         if self.woody is None or self.game.ending:
@@ -1333,18 +1472,90 @@ class World:
             if p is not None and anim and p.has(anim):
                 p.play_single(anim)
             return None                    # handled; no ordinary use follows
-        if required and required != 'IT_NONE':
-            if (not inv.is_using(required)) and not item.grab_directly:
-                if inv.used is not None:
-                    self._woody_cant_use()
-                    item.wrong_trick = True
-                return False
-        elif inv.used is not None:
-            self._woody_cant_use()         # holding something at a bare item
-            return False
-        if item.locked:
+        # Item.cs (CanWoodyUse head): the FirstAid + key name-hack — the only
+        # way Level108's locked kit opens. FirstAidPos is not serialized in
+        # either season's data, so the teleport half is unverifiable; skipped.
+        if item.name == 'FirstAid' and inv.used is not None \
+                and inv.used['type'] == 'IT_Key':
+            item.locked = False
+            self.woody_prime(item)
+            return True
+        held_src = self.level.items.get(inv.used.get('item')) \
+            if inv.used is not None and inv.used.get('item') else None
+        # Item.cs:1510: holding anything at a plain (non-TrickItem) item that
+        # needs no priming is a flat no
+        if inv.used is not None and item.kind not in TRICK_KINDS \
+                and not item.require_priming:
             self._woody_cant_use()
             return False
+        # Item.cs:1520-1535: a neighbour-primed item refuses Woody until the
+        # neighbour has primed it
+        if item.require_priming and not item.primed and item.rott_toggles_prime:
+            if inv.used is not None:
+                self._woody_cant_use()
+                item.wrong_trick = True
+            elif item.force_whatsup_not_primed and self.woody.anim.has('WhatsUp'):
+                self.woody.anim.play_single('WhatsUp')
+            return False
+        # Item.cs:1537-1613: the held inventory's source item wants priming —
+        # clicking its PrimingItem primes it, anything else refuses (the
+        # DoublePrimingItem name-hacks are not ported); the OnlyWhenTricked
+        # variant fires only on a tricked target
+        if held_src is not None and held_src.require_priming \
+                and not held_src.primed:
+            live = (not held_src.require_priming_only_tricked) or item.tricked
+            if live:
+                if held_src.priming_item == item.pid:
+                    self.woody_prime(held_src)
+                    p = self.players.get(id(item.sprite)) if item.sprite else None
+                    if p is not None and item.prime_other \
+                            and p.has(item.prime_other):
+                        p.play_single(item.prime_other)  # PlayAnimationDirectly
+                else:
+                    self._woody_cant_use()
+                    if not held_src.require_priming_only_tricked:
+                        item.wrong_trick = True          # Item.cs:1595
+                return False
+        # Item.cs:1615-1641: this item wants priming and Woody holds something
+        fell_through = False
+        if item.require_priming and not item.primed and inv.used is not None:
+            if item.prime_with_inventory and item.prime_with_inventory != 'IT_NONE':
+                if inv.used['type'] == item.prime_with_inventory:
+                    self.woody_prime(item)
+                    self.inventory.remove(item.prime_with_inventory)
+                else:
+                    self._woody_cant_use()
+                return False
+            if item.priming_item is None:
+                self._woody_cant_use()               # Item.cs:1638
+                return False
+            # a designated PrimingItem elsewhere: the block ends without a
+            # return, and the gate cluster below sits in its else — skipped
+            fell_through = True
+        if not fell_through:
+            # Item.cs:1654-1669: a spent UseOnce item (the Iron hack skipped)
+            if item.use_once and item.used:
+                if not (item.tricked ^ item.got_tricked):
+                    self._woody_cant_use()
+                item.wrong_trick = True
+                return False
+            # Item.cs:1671-1688; an unprimed held source never counts as the
+            # required inventory
+            if required and required != 'IT_NONE':
+                unprimed_held = held_src is not None \
+                    and held_src.require_priming and not held_src.primed
+                if ((not inv.is_using(required)) or unprimed_held) \
+                        and not item.grab_directly:
+                    if inv.used is not None:
+                        self._woody_cant_use()
+                        item.wrong_trick = True
+                    return False
+            elif inv.used is not None:
+                self._woody_cant_use()     # holding something at a bare item
+                return False
+            if item.locked:
+                self._woody_cant_use()
+                return False
         return True
 
     def _woody_cant_use(self):
@@ -1441,8 +1652,11 @@ class World:
 
     def _woody_search_done(self, item):
         """SearchItem.OnFinishAnimationCompelted -> UseItem -> InternalUse
-        (SearchItem.cs:114, 156): hand over the inventory, empty the item."""
-        self.inventory.add(item.inventory_items)
+        (SearchItem.cs:114, 156): hand over the inventory, empty the item.
+        Each Inventory keeps its source (inventory.Item = this,
+        SearchItem.cs:172) — the priming gates read it."""
+        self.inventory.add([dict(e, item=item.pid)
+                            for e in item.inventory_items])
         if not item.dont_remove_inventory:
             item.inventory_items = []
         p = self.players.get(id(item.sprite)) if item.sprite else None
@@ -1559,6 +1773,12 @@ class World:
             self._finish_animation_ended()
 
     def tick(self, dt):
+        # the MonoBehaviour.Invoke queue (GameInfo.InvokeMethodForSetPrime)
+        for entry in self._delayed[:]:
+            entry[0] -= dt
+            if entry[0] <= 0.0:
+                self._delayed.remove(entry)
+                entry[1]()
         for p in self.players.values():
             p.tick(dt)
         for p in self.pawns.values():

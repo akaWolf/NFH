@@ -39,18 +39,20 @@ Ordering is the `GUIDepth` enum, not z-sorting: higher value draws further back.
 ## Coverage
 
 All 31 levels of both seasons render with every sprite placed and no missing
-sheet — 545 sprites in total:
+sheet — 546 sprites in total:
 
 ```
 Level101  drew 16/16 sprites; missing sheets: 0
 ...
 Level214  drew 16/16 sprites; missing sheets: 0
-total sprites drawn: 545, missing sheets: 0
+total sprites drawn: 546, missing sheets: 0
 ```
 
 (535 before the alerter pass; six sleeping pets have `IdleNormal == NONE` and
 draw their `SleepSequence[0]` instead — see below. The seventh, Level109's
-parrot, always had a normal idle.)
+parrot, always had a normal idle. The 546th is Level210's dog basket, which
+starts `Primed` and draws its `PrimedNormal` pose the way `Item.Start` →
+`SetPrimed` does.)
 
 Sprite counts vary a lot by design: Level113 has 27, while Level201 has 8
 because that level paints most of its scenery into the backdrop instead.
@@ -295,8 +297,10 @@ In the viewer: click an item to use it, digits 1–9 select inventory, 0 clears.
 ## The infinite-loop release and the mutex handshake
 
 `RoutineActionUse.OnActionStarted` (RoutineActionUse.cs:152-171) can release
-"infinite" animations on named targets the moment the action starts, before
-any walking: `ItemToStopInfiniteAnimation` and
+"infinite" animations on named targets. It fires **on arrival**, not when the
+routine step begins — `ActionManager.StartAction` interposes a `MoveAction`
+first when the pawn is away (ActionManager.cs:146-171; the `SameZone` shortcut
+is only the urgent Dog/Chili run). `ItemToStopInfiniteAnimation` and
 `PawnToStopInfiniteAnimation[WhenTricked]` get `SetIgnoreInfiniteLoop(true)`,
 letting a looping `InfiniteLoop` animation reach its end, and the
 `...IgnoreInfiniteAnimationOnce` variants set the once-pair that auto-clears
@@ -322,6 +326,61 @@ span of each use; Level206's Mother has her ignore flag flip exactly at the
 neighbour's action[1]/action[3] start and stop. The pawn references are
 component pids — JSON object keys are strings while the refs are ints, which
 silently broke the first lookup.
+
+## Priming (§7)
+
+An item with `RequirePriming` has to be armed before its trick fires; 21
+levels use it. Ported method by method:
+
+**`Item.WoodyPrime`** (Item.cs:1246-1300): the held inventory changes type to
+`PrimedInventoryType` (Level108's key becomes the poison this way — the locked
+first-aid kit "contains" nothing), `SetPrimed(true)`, the inventory is consumed
+when `RemoveInventoryAfterRequirePriming`, `ObjectToPrimeWhenPrimed` chains
+recursively (with `UnlockObjectToPrime`), and `WoodyPrimeAnimation` plays on
+Woody.
+
+**`Item.SetPrimed`** (Item.cs:1169-1243) + the TrickItem override
+(TrickItem.cs:996-1010): the `DontPrimeWhileTricked` guard, `DeltaLocation`
+gaining/losing `DeltaPrimedLocation` (one nonzero case in the data, Level107's
+1.3 x-shift — and `Item.Start`'s `SetPrimed(Primed)` means every *unprimed*
+item subtracts it at load), the `ShowOnlyWhenPrimed` / `HideWhenPrimed`
+visibility, and the primed idle (`PrimedTricked` when tricked, else
+`PrimedNormal`; `PrimedFuckedUp` after a failed fix).
+
+**The `CanWoodyUse` gates**, in the source order (Item.cs:1510-1688): holding
+anything at a plain non-TrickItem that needs no priming is a flat no (1510); a
+neighbour-primed (`RottweilerUseTogglesPrime`) item refuses Woody until primed
+(1520); a held inventory whose *source item* is unprimed primes on its
+designated `PrimingItem` and refuses everywhere else (1537, with the
+`RequirePrimingOnlyWhenTricked` variant at 1599); an unprimed item Woody holds
+something at primes by `PrimeWithInventory`, refuses with no `PrimingItem`, and
+**falls through the whole `UseOnce`/required/locked cluster** when a
+`PrimingItem` is designated elsewhere (1615-1641 — the block ends without a
+return and the cluster sits in its `else`); an unprimed held source never
+counts as the `RequiredInventory` (1671). The spent-`UseOnce` gate (1654) rides
+along. Inventory entries carry their source item the way
+`SearchItem.InternalUse` sets `inventory.Item = this` (SearchItem.cs:172).
+
+**The neighbour's side** (`Item.Use`, Item.cs:1056-1095): a
+`RottweilerUseTogglesPrime` item alternates — unprimed → `SetPrimed(true)` +
+`RottweilerPrimeAnimation`, primed → `SetPrimed(false)` + the plain use;
+`RequireUnprime` makes it three-phase (prime, use, unprime). No prime animation
+means `StopCurrentAction(canPostponeStop: false)` — no angry postpone.
+Level103's cake shows the cycle: visit one primes it, visit two plays
+`BirthdayNormal`.
+
+**After-use side effects** (`RoutineActionUse.OnActionStarted`, cs:262-301):
+`GameObjectToPrimeAfterUse[Tricked]` toggles the target's `Primed` — at once on
+a zero delay, else on a `GameInfo.Invoke` timer (Level206's Fifi chain uses
+1.35 s) — and `GameObjectToTrickAfterUse` flips its `Tricked`.
+
+Not ported, by name (each a hard-coded `name.Equals` branch in the source):
+PigKeys, Pipe, IceBucket, Cow, Snake/Mouse/AngryElephant, LionStatue,
+ElectricTrapTatter, Iron, ValveMain, DogFifi's put-animation swap, WaterPuddle,
+the `DoublePrimingItem` pairs, and Beer/BBQDirty. The FirstAid + key hack *is*
+ported (it is the only way Level108's kit opens), minus the `FirstAidPos`
+teleport — those fields are not serialized in either season's data, so the
+teleport target is unverifiable.
 
 ## Detection, catching, the two endings (§6)
 
@@ -404,7 +463,8 @@ only active objects get.
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
 that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
-stop-fields live there), priming (`RequirePriming`/`WoodyPrime`), the
-fixing-item run (`RunToFixingItem`), `Mother`'s catch predicate, HUD, and the
-remaining use side-effect flags (`HideObjectDuringUse` family,
-`TeleportRottweilerOnUse`, the exit deltas, skates/toilet state).
+stop-fields live there), the fixing-item run (`RunToFixingItem`), `Mother`'s
+catch predicate, HUD, the remaining use side-effect flags
+(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
+skates/toilet state), and the name-hack branches listed at the end of the
+priming section.

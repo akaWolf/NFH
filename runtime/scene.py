@@ -128,6 +128,17 @@ class Item:
                  'can_undo_trick', 'get_tricked_at_once', 'require_priming',
                  'primed', 'second_required', 'locked', 'used', 'use_once',
                  'wrong_trick', 'fucked_up', 'was_priming',
+                 'require_priming_only_tricked', 'remove_inv_after_priming',
+                 'dont_prime_while_tricked', 'priming_item',
+                 'prime_with_inventory', 'primed_inventory_type',
+                 'object_to_prime', 'unlock_object_to_prime',
+                 'woody_prime_anim', 'prime_other',
+                 'rott_toggles_prime', 'require_unprime', 'is_using',
+                 'rott_prime_anim', 'rott_unprime_anim',
+                 'force_whatsup_not_primed',
+                 'primed_normal', 'primed_tricked', 'primed_fucked_up',
+                 'force_primed_on_start', 'show_only_when_primed',
+                 'hide_when_primed', 'delta_primed_x', 'delta_primed_y',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
@@ -199,6 +210,32 @@ class Item:
         self.get_tricked_at_once = bool(d.get('GetTrickedAtOnce'))
         self.require_priming = bool(d.get('RequirePriming'))
         self.primed = bool(d.get('Primed'))
+        # priming (Item.cs:334-352, resolved by WoodyPrime / SetPrimed and the
+        # CanWoodyUse gates; TrickItem.cs:92-96,126 add the primed idles)
+        self.require_priming_only_tricked = bool(d.get('RequirePrimingOnlyWhenTricked'))
+        self.remove_inv_after_priming = bool(d.get('RemoveInventoryAfterRequirePriming'))
+        self.dont_prime_while_tricked = bool(d.get('DontPrimeWhileTricked'))
+        self.priming_item = (d.get('PrimingItem') or {}).get('path')
+        self.prime_with_inventory = d.get('PrimeWithInventory')
+        self.primed_inventory_type = d.get('PrimedInventoryType')
+        self.object_to_prime = (d.get('ObjectToPrimeWhenPrimed') or {}).get('path')
+        self.unlock_object_to_prime = bool(d.get('UnlockObjectToPrime'))
+        self.woody_prime_anim = d.get('WoodyPrimeAnimation') or []
+        self.prime_other = _anim_name(d.get('PrimeOther'))
+        self.rott_toggles_prime = bool(d.get('RottweilerUseTogglesPrime'))
+        self.require_unprime = bool(d.get('RequireUnprime'))
+        self.is_using = False                # Item.IsUsing (RequireUnprime phase)
+        self.rott_prime_anim = d.get('RottweilerPrimeAnimation') or []
+        self.rott_unprime_anim = d.get('RottweilerUnprimeAnimation') or []
+        self.force_whatsup_not_primed = bool(d.get('ForceWhatsUpAnimWhenNotPrimed'))
+        self.primed_normal = _anim_name(d.get('PrimedNormal'))
+        self.primed_tricked = _anim_name(d.get('PrimedTricked'))
+        self.primed_fucked_up = _anim_name(d.get('PrimedFuckedUp'))
+        self.force_primed_on_start = bool(d.get('ForcePrimedAnimationOnStart'))
+        self.show_only_when_primed = bool(d.get('ShowOnlyWhenPrimed'))
+        self.hide_when_primed = bool(d.get('HideWhenPrimed'))
+        self.delta_primed_x = (d.get('DeltaPrimedLocation') or {}).get('x', 0.0)
+        self.delta_primed_y = (d.get('DeltaPrimedLocation') or {}).get('y', 0.0)
         self.second_required = d.get('SecondRequiredInventory')
         self.locked = bool(d.get('Locked'))
         self.used = False
@@ -418,6 +455,14 @@ class Level:
         self._apply_zone_bounds()
         self._apply_level_locations()
         self._find_game_info()
+        # Item.Start ends in SetPrimed(Primed) (Item.cs:697): the primed branch
+        # adds DeltaPrimedLocation to DeltaLocation, the unprimed one subtracts
+        # it (Item.cs:1201-1210; the WaterPuddle name-hack is not ported)
+        for it in self.items.values():
+            if it.delta_primed_x or it.delta_primed_y:
+                sign = 1.0 if it.primed else -1.0
+                it.dx += sign * it.delta_primed_x
+                it.dy += sign * it.delta_primed_y
 
     def _add_zone(self, o):
         go = self._go_of(o)
@@ -648,7 +693,13 @@ class Level:
                              'once_pawn': ref('PawnToIgnoreInfiniteAnimationOnce'),
                              'once_pawn_not_tricked': ref('PawnToIgnoreInfiniteAnimationOnceWhenNotTricked'),
                              'once_pawn_on_end': ref('PawnToIgnoreInfiniteAnimationOnceOnEnd'),
-                             'abort_mutex_pawn': ref('PawnToAbortMutexOnFinish')})
+                             'abort_mutex_pawn': ref('PawnToAbortMutexOnFinish'),
+                             # OnActionStarted's prime/trick-after-use tail
+                             'prime_after_use': ref('GameObjectToPrimeAfterUse'),
+                             'prime_after_use_tricked': ref('GameObjectToPrimeAfterUseTricked'),
+                             'prime_delay': a.get('PrimeDelay') or 0.0,
+                             'prime_tricked_delay': a.get('PrimeTrickedDelay') or 0.0,
+                             'trick_after_use': ref('GameObjectToTrickAfterUse')})
             # Owner names the GameObject, which Season 2 calls "Rottweiler2";
             # the component type is the stable key
             ow = d.get('Owner') or {}
@@ -748,6 +799,16 @@ class Level:
                 # ReturnToIdleAnimation plays the tricked idle when IsTricked
                 if field == 'IdleNormal' and item['data'].get('Tricked'):
                     want = item['data'].get('IdleTricked') or want
+                # Item.Start ends in SetPrimed(Primed); for a primed TrickItem
+                # that plays PlayPrimedAnimation over the idle
+                # (Item.cs:697, TrickItem.cs:996-1010, 483-491)
+                if field == 'IdleNormal' and item['data'].get('Primed'):
+                    prim = item['data'].get('PrimedTricked') \
+                        if item['data'].get('Tricked') else None
+                    prim = prim if prim and prim != 'NONE' \
+                        else item['data'].get('PrimedNormal')
+                    if prim and prim != 'NONE':
+                        want = prim
                 # Alerter.Start plays the SleepSequence instead of an idle
                 if owner_type == 'Alerter':
                     seq = item['data'].get('SleepSequence') or []
