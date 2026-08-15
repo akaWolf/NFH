@@ -9,7 +9,7 @@ Text renders through SDL_ttf with a system font — the game's own fonts are
 Unity assets that are not extracted; sizes approximate
 LevelDataGUIRenderer.CalculateFontSize by plain screen scaling.
 """
-import os, ctypes
+import os, re, ctypes
 
 import sdl2
 
@@ -25,6 +25,30 @@ FONT_CANDIDATES = (
     '/usr/share/fonts/TTF/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
 )
+
+# CalculateRating's message keys (GameInfo.cs:93-101)
+RATING_KEYS = {'EXCELLENT': 'EXCELLENTMSG', 'GOOD': 'GOODJOBMSG',
+               'PASSED': 'PASSMSG', 'FAILED': 'FAIL2MSG',
+               'TIME UP': 'TIMEUPMSG'}
+
+
+def load_strings(level_path):
+    """LocalizationManager.LoadLocalizationFile: 'KEY<>VALUE' lines from
+    Localization/Final/<language>; ';' comments. tools/extract_strings.py
+    puts the extracted files under strings/{s1,s2}/."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    season = 's2' if '/s2/' in level_path.replace('\\', '/') else 's1'
+    out = {}
+    p = os.path.join(root, 'strings', season, 'Lang.txt')
+    if not os.path.exists(p):
+        return out
+    for line in open(p, encoding='utf-8', errors='replace'):
+        line = line.rstrip('\r\n')
+        if not line or line.startswith(';') or '<>' not in line:
+            continue
+        k, v = line.split('<>', 1)
+        out.setdefault(k, v)
+    return out
 
 
 def _names(text):
@@ -132,17 +156,58 @@ class Hud:
         self._tricks_rects = None
         self._angry_count_rect = None
         self._statue_rect = None
+        self.strings = load_strings(level.path)
+        self.woody_strings = {
+            k: self.loc((level.pawns.get('Woody') or {}).get(k + '_string', ''))
+            for k in ('use', 'with', 'empty_use', 'look_at')}
         self._font = None
         self._font_small = None
+        self._fonts = {}
         if sdlttf is not None:
             sdlttf.TTF_Init()
-            for p in FONT_CANDIDATES:
-                if os.path.exists(p):
-                    self._font = sdlttf.TTF_OpenFont(
-                        p.encode(), max(10, int(17 * self.H / 600.0)))
-                    self._font_small = sdlttf.TTF_OpenFont(
-                        p.encode(), max(8, int(13 * self.H / 600.0)))
-                    break
+            # the game's own faces, extracted by tools/extract_strings.py;
+            # a face name bakes its design point size (acmesa22, bluehigh18)
+            root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            season = 's2' if '/s2/' in level.path.replace('\\', '/') else 's1'
+            self._font_dir = os.path.join(root, 'fonts', season)
+            self._font = self._style_font('TimeStyle') or \
+                self._sys_font(17)
+            self._font_small = self._style_font('TooltipStyle') or \
+                self._sys_font(13)
+
+    def _sys_font(self, design_size):
+        for p in FONT_CANDIDATES:
+            if os.path.exists(p):
+                return sdlttf.TTF_OpenFont(
+                    p.encode(), max(8, int(design_size * self.H / 600.0)))
+        return None
+
+    def _style_font(self, style_key):
+        """open the GUIStyle's serialized face at its baked size"""
+        st = self.d.get(style_key) or {}
+        name = (st.get('m_Font') or {}).get('font') if \
+            isinstance(st.get('m_Font'), dict) else None
+        if not name:
+            return None
+        if name in self._fonts:
+            return self._fonts[name]
+        m = re.search(r'(\d+)$', name)
+        size = int(m.group(1)) if m else 16
+        font = None
+        for cand in (name, name.upper(), name.lower()):
+            p = os.path.join(self._font_dir, cand + '.ttf')
+            if os.path.exists(p):
+                font = sdlttf.TTF_OpenFont(
+                    p.encode(), max(8, int(size * self.H / 600.0)))
+                break
+        self._fonts[name] = font
+        return font
+
+    def loc(self, key):
+        """LocalizationManager.GetString: empty when unknown"""
+        if not key:
+            return ''
+        return self.strings.get(key, key)
 
     # -- geometry ----------------------------------------------------------
     def rect(self, name):
@@ -327,8 +392,11 @@ class Hud:
             hov, norm, pres = self._icon_names(entry)
             if inv.used is entry:
                 self._blit(pres, r)
-                self.tooltip = 'use %s with ...' % (entry.get('name') or
-                                                    entry.get('type') or '?')
+                # SetTooltip(UseWith): UseString + name + WithString + target
+                self.tooltip = (self.woody_strings['use']
+                                + self.loc(entry.get('name') or '')
+                                + self.woody_strings['with']
+                                + self.woody_strings['empty_use'])
             elif self._hit(r, mx, my) and not self.world.game.ending:
                 self._blit(hov, r)
             else:
@@ -348,8 +416,10 @@ class Hud:
                             bubble = (r[0] - br[2] / div, r[1] - br[3],
                                       br[2], br[3])
                             self._blit(self.d.get('TextBubbleTexture'), bubble)
-                            self._text(entry.get('name') or entry.get('type')
-                                       or '', bubble, small=True)
+                            self._text(self.loc(entry.get('desc') or
+                                                entry.get('name') or ''),
+                                       bubble, small=True,
+                                       color=(40, 40, 40))
         if not hover_any:
             self.hover_index = None
             self.hover_started = None
@@ -496,15 +566,21 @@ class Hud:
         if routine is None:
             return
         it = routine.urgent_item or routine.item
-        if it is None:
-            return
-        # Alerter actions show BubbleIconMad (RoutineActionUse.BubbleIcon
-        # override); actives win over the plain icon
         name = None
-        if it.kind == 'Alerter':
-            name = it.bubble_icon_mad or it.bubble_icon
-        if name is None:
-            name = it.bubble_icon_active or it.bubble_icon
+        if it is not None:
+            # Alerter actions show BubbleIconMad (RoutineActionUse.BubbleIcon
+            # override); actives win over the plain icon
+            if it.kind == 'Alerter':
+                name = it.bubble_icon_mad or it.bubble_icon
+            if name is None:
+                name = it.bubble_icon_active or it.bubble_icon
+        else:
+            # a MoveOnly action shows MoveZone.BubbleIcon (RoutineAction.cs:53)
+            a = routine.action
+            zone_go = a.get('move_zone') if a else None
+            icons = self.level.bubble_icons.get(zone_go) if zone_go else None
+            if icons:
+                name = icons.get('active') or icons.get('icon')
         if name:
             self._blit(os.path.basename(name), self.rect(icon_rect_key))
 
@@ -525,15 +601,20 @@ class Hud:
         g = self.world.game
         mx, my = self.mouse
         self._blit(self.d.get('OriginalScoreboard'), self.rect('OriginalScoreRect'))
-        self._text(g.rating, self.rect('RatingRatioRect'))
-        self._text(g.trick_ratio, self.rect('TrickRatioRect'))
-        self._text(g.viewer_rating, self.rect('ViewerRatingRect'))
-        for rk, mk, msg in (('RestartButtonRect', 'RestartMessageRect', 'RESTART'),
-                            ('OkButtonRect', 'OkMessageRect', 'OK')):
+        # the three TextFields: Rating, "GO_TRICKS\nC / T", "GO_VIEWER_RATING\nN%"
+        self._text(self.loc(RATING_KEYS.get(g.rating, g.rating)),
+                   self.rect('RatingRatioRect'))
+        self._text(self.loc('GO_TRICKS') + '\n' + g.trick_ratio,
+                   self.rect('TrickRatioRect'))
+        self._text(self.loc('GO_VIEWER_RATING') + '\n' + g.viewer_rating,
+                   self.rect('ViewerRatingRect'))
+        for rk, mk, key in (('RestartButtonRect', 'RestartMessageRect',
+                             'RESTART_MESSAGE'),
+                            ('OkButtonRect', 'OkMessageRect', 'OK_MESSAGE')):
             r = self.rect(rk)
             hover = self._hit(r, mx, my)
             self._blit(self.d.get('ScoreButtonHover' if hover else 'ScoreButton'), r)
-            self._text(msg, self.rect(mk), small=True)
+            self._text(self.loc(key), self.rect(mk), small=True)
 
     # -- input -------------------------------------------------------------
     def check_click(self, mx, my):

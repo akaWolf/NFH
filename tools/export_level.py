@@ -196,6 +196,9 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
     hud = hud_sections(sc, index, out)
     if hud:
         out['hud'] = hud
+    bi = bubble_icons(sc, index, out)
+    if bi:
+        out['bubble_icons'] = bi
 
     if out_path:
         with open(out_path, 'w') as f:
@@ -204,10 +207,10 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
 
 
 def _resolve_asset_ref(sc, index, v):
-    """an {'external': N, 'path': P} PPtr -> {'texture': name} for a
-    Texture2D or {'text': body} for a TextAsset (HUD.LoadTextures reads
-    file-name lists out of those)"""
-    tf, o = index.deref(sc.f, v.get('external', 0), v['path'])
+    """an {'external': N, 'path': P} (or raw {'file': N, 'path': P}) PPtr ->
+    {'texture': name} for a Texture2D, {'text': body} for a TextAsset,
+    {'font': name} for a Font (GUIStyle.m_Font keeps the raw form)"""
+    tf, o = index.deref(sc.f, v.get('external', v.get('file', 0)), v['path'])
     if o is None:
         return None
     if o['class_id'] == 28:                      # Texture2D: m_Name leads
@@ -216,6 +219,8 @@ def _resolve_asset_ref(sc, index, v):
         r = Reader(tf.body(o), 0)
         r.astr()
         return {'text': r.astr()}
+    if o['class_id'] == 128:                     # Font: m_Name leads
+        return {'font': Reader(tf.body(o), 0).astr()}
     return None
 
 
@@ -229,13 +234,37 @@ def hud_sections(sc, index, out):
 
         def walk(v):
             if isinstance(v, dict):
-                if 'external' in v and 'path' in v:
+                if 'path' in v and ('external' in v or
+                                    ('file' in v and len(v) == 2)):
                     return _resolve_asset_ref(sc, index, v) or v
                 return {k: walk(x) for k, x in v.items()}
             if isinstance(v, list):
                 return [walk(x) for x in v]
             return v
         res.setdefault(e['type'], []).append(walk(e['data']))
+    return res
+
+
+def bubble_icons(sc, index, out):
+    """Zone.BubbleIcon textures — a MoveOnly action's think bubble reads
+    MoveZone.BubbleIcon (RoutineAction.cs:43-55). Items carry string paths
+    instead (Actor.BubbleIconPath), so only Zones resolve here."""
+    res = {}
+    for pid, e in out['objects'].items():
+        d = e.get('data')
+        if not isinstance(d, dict):
+            continue
+        icons = {}
+        for f, key in (('BubbleIcon', 'icon'), ('BubbleIconActive', 'active'),
+                       ('BubbleIconMad', 'mad')):
+            v = d.get(f)
+            if isinstance(v, dict) and 'path' in v and \
+                    ('external' in v or 'file' in v):
+                r = _resolve_asset_ref(sc, index, v)
+                if r and 'texture' in r:
+                    icons[key] = r['texture']
+        if icons:
+            res[pid] = icons
     return res
 
 

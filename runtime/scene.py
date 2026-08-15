@@ -266,7 +266,8 @@ class Item:
         # SearchItem.InventoryItems
         self.inventory_items = [
             {'type': v.get('Type'), 'use_count': v.get('UseCount') or 0,
-             'name': v.get('NameString') or ''}
+             'name': v.get('NameString') or '',
+             'desc': v.get('DescriptionString') or ''}
             for v in (d.get('InventoryItems') or [])]
         self.dont_remove_inventory = bool(d.get('DontRemoveInventoryItem'))
         self.activate_item_trick = (d.get('ActivateItemTrick') or {}).get('path')
@@ -395,6 +396,10 @@ class Level:
         self.quads = raw.get('quads') or []          # world-space textured planes
         # the HUD component's resolved textures/rects (tools/export_level.py)
         self.hud = ((raw.get('hud') or {}).get('HUD') or [None])[0]
+        # Zone.BubbleIcon textures for MoveOnly think bubbles, keyed by the
+        # component pid; the GO pid alias joins after the build
+        self.bubble_icons = {int(k): v
+                             for k, v in (raw.get('bubble_icons') or {}).items()}
         self.background = None      # (texture name, x, y, w, h) in world units
         self.sprites = []
         self.zones = []
@@ -472,6 +477,13 @@ class Level:
         self._apply_zone_bounds()
         self._apply_level_locations()
         self._find_game_info()
+        # a MoveOnly action stores the zone's GameObject; alias the zone
+        # components' bubble icons onto it
+        for pid in list(self.bubble_icons):
+            o = self._o(pid)
+            go = self._go_of(o) if o else None
+            if go is not None:
+                self.bubble_icons.setdefault(go, self.bubble_icons[pid])
         # Item.Start ends in SetPrimed(Primed) (Item.cs:697): the primed branch
         # adds DeltaPrimedLocation to DeltaLocation, the unprimed one subtracts
         # it (Item.cs:1201-1210; the WaterPuddle name-hack is not ported)
@@ -931,6 +943,11 @@ class Level:
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
                 'animal_tutorial': bool(pd.get('AnimalTutorial')),
                 'nfh2': bool(pd.get('NFH2Path')),
+                # Woody.Start localizes these keys (Woody.cs:197-205)
+                'use_string': pd.get('UseString') or '',
+                'with_string': pd.get('WithString') or '',
+                'empty_use_string': pd.get('EmptyUseString') or '',
+                'look_at_string': pd.get('LookAtString') or '',
                 # the fixing-tool chain, serialized inline on the Rottweiler
                 # (RoutineActionGrab / RoutineActionUseFixingItem / Return)
                 'grab_action': {

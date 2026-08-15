@@ -259,6 +259,13 @@ class Pawn:
         """Pawn.IsPawnAtZoneY"""
         return abs(self.sprite.y - self.floor_y()) < 0.1
 
+    def moving_to_adjacent_zone(self):
+        """Pawn.IsMovingToAdjacentZone = TransitionMove: the current path
+        step heads through a Transition door (Pawn.cs:1281-1283, 1712)."""
+        s = self._step
+        return (s is not None and s.get('kind') == 'door'
+                and s['door'].door_type == 'Transition')
+
     def at_use_range(self, it):
         """Item.IsAtUseRange — the walk-phase check, with the x term"""
         if self.zone is None or self.zone.pid != it.zone:
@@ -1913,11 +1920,17 @@ class World:
         return self.routines
 
     def _detect_common(self, catcher):
-        """the zone/door/hiding/blocking chain both predicates share"""
+        """the zone/door/hiding/blocking chain both predicates share. The
+        IsMovingToAdjacentZone terms are the TransitionMove flag; the
+        PassingComplexMove terms are covered by is_warping here, since this
+        port routes Transition passages through the same transit code.
+        DonePassingToOtherZone rides the unported NFH2 GoZone pathing."""
         woody = self.woody
         return (woody.zone is not None and catcher.zone is not None
                 and woody.zone.pid == catcher.zone.pid
                 and not woody.is_warping and not catcher.is_warping
+                and not woody.moving_to_adjacent_zone()
+                and not catcher.moving_to_adjacent_zone()
                 and not catcher.ignore_woody and not woody.hiding
                 and (not catcher.anim.blocking or not woody.sneaking)
                 and not woody.anim.blocking)

@@ -537,10 +537,20 @@ lists. `tools/export_level.py` resolves all of it into a `hud` section
   selection, paging, the sneak toggle (`Woody.ToggleSneak` — Season 2 only
   flips the flag, it has no sneak sprites), power (the in-game menu is not
   modelled), complete-episode (`FinishGameOnHUDClick`), the faces.
-- **Text** renders through SDL_ttf with a system font — the game's own font
-  assets and localization strings are not extracted, so labels are literal
-  and sizes approximate `LevelDataGUIRenderer`. `HUDProgressBar` depends on
-  the unported `ProgressBar` actions and is skipped.
+- **Text** renders through SDL_ttf with the game's own faces:
+  `tools/extract_strings.py` carves the Font assets' embedded TTFs (the
+  acmesa and bluehigh families, 36 per season) and pulls the localization
+  TextAssets (`Localization/Final/`, nine languages, `KEY<>VALUE` lines) into
+  `fonts/` and `strings/`. Each `GUIStyle.m_Font` resolves to its face name
+  in the hud section — the clock is acmesa22, tooltips bluehigh18 — with the
+  design size baked into the name; `LocalizationManager.GetString` backs the
+  rating messages, the Restart/Ok buttons, the `Use X with …` tooltip pieces
+  (`Woody.UseString`/`WithString` keys off the pawn), inventory names and
+  hover descriptions. A `MoveOnly` action's think bubble shows
+  `MoveZone.BubbleIcon`, resolved by the exporter (four levels use it). Sizes
+  still approximate `LevelDataGUIRenderer` by plain screen scaling.
+  `HUDProgressBar` depends on the unported `ProgressBar` actions and is
+  skipped.
 
 ## Not implemented
 
@@ -549,7 +559,8 @@ that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
 stop-fields live there), the in-game menu and `HUDProgressBar`/`ProgressBar`
 actions, the remaining use side-effect flags
 (`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
-skates/toilet state), the `IsMovingToAdjacentZone` / `DonePassingToOtherZone`
-/ `PassingComplexMove` terms of the detection predicates (states the port's
-movement model does not have), and the name-hack branches listed at the end
-of the priming section.
+skates/toilet state), the `DonePassingToOtherZone` detection term — it rides
+the unported NFH2 `GoZone` pathing; `IsMovingToAdjacentZone` is ported as
+the TransitionMove flag, and `PassingComplexMove` is covered by `is_warping`
+since Transition passages route through the same transit code here — and the
+name-hack branches listed at the end of the priming section.
