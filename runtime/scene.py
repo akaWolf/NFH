@@ -394,9 +394,15 @@ class Level:
             d.sprite = find(self._go_of(self._o(d.pid)))
 
     def _apply_zone_bounds(self):
-        """Level.Start(): PlayLeft/PlayRight come from lists on the Level
-        component, indexed by the number in the zone's name, and are deltas
-        either side of the zone's own x."""
+        """Level.Start() rebuilds every zone from lists on the Level component,
+        indexed by the number in the zone's name. The serialized zone transforms
+        are placeholders:
+
+            zone.position = (x, ZonesY[i], z) + zoneController.position
+            zone.HeightDelta = ZonesHeightDeltas[i]
+            zone.collider.size = ZonesSizes[i]
+            zone.SetPlayLeft/Right(ZonesPlayLeft/Right[i])   # around the NEW x
+        """
         lvl = None
         for o in self.objs.values():
             if o['type'] == 'Level' and 'data' in o:
@@ -404,13 +410,36 @@ class Level:
                 break
         if not lvl:
             return
+        ctrl = (0.0, 0.0)
+        for pid, o in self.objs.items():
+            if o['type'] == 'ZoneController' and 'data' in o:
+                go = self._go_of(o)
+                tr = self._transform(go)
+                if tr:
+                    p = self._pos(tr)
+                    ctrl = (p[0], p[1])
+                break
+        ys = lvl.get('ZonesY') or []
+        sizes = lvl.get('ZonesSizes') or []
         left = lvl.get('ZonesPlayLeft') or []
         right = lvl.get('ZonesPlayRight') or []
+        hd = lvl.get('ZonesHeightDeltas') or []
         for z in self.zones:
             try:
                 i = int(z.name[4:])
             except (ValueError, IndexError):
                 continue
+            if i < len(ys):
+                new_ty = ys[i] + ctrl[1]
+                z.y = z.y - z.ty + new_ty       # keep the collider centre offset
+                z.ty = new_ty
+            z.x = z.x + ctrl[0]
+            if i < len(sizes):
+                sz = sizes[i]
+                z.w = sz.get('x', z.w)
+                z.h = sz.get('y', z.h)
+            if i < len(hd):
+                z.height_delta = hd[i]
             if i < len(left):
                 z.play_left = z.x - left[i]
             if i < len(right):

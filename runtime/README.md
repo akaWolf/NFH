@@ -224,19 +224,32 @@ waiting poses.
 - Sheet lookup is case-insensitive, as `Resources.Load` is: the data asks for
   `O_workout`, the asset is `O_Workout`.
 
-## Open question — the one divergence left
+## The divergence that took three passes: zones are rebuilt at load
 
-On five S1 levels (104, 107, 108, 110, 111) and two S2 ones (209, 212) the
-neighbour's routine reaches a walk-up item that sits *below* his computed walk
-line and the climb diverges upward. All static inputs are verified against the
-data: e.g. Level107's MagnesiumBottle at y=2.866 vs
-`GetItemZoneY = zone.ty 2.909 + HeightDelta 0 + PlayerHeightDelta 0.3 = 3.209`,
-gap 0.344 against `ItemUseHeightThreshold + DeltaUseHeight = 0.2`. Without
-`PlayerHeightDelta` the gaps become 0.009–0.049, so the pawn's *actual* y
-trajectory in the original must ride near `zone.ty`, not `ty + 0.3` — the
-shipped scenes even spawn pawns 0.4 below `ty`. Which part of the
-`WalkOnPath`/`PostWalk`/warp chain keeps it there is not yet traced; nothing is
-patched around, so those routines still diverge here.
+The climb runaways (seven levels' routines flying to y=100+) were not a
+movement bug. `Level.Start` **rebuilds every zone from lists on the Level
+component**, keyed by the number in the zone's name; the serialized zone
+transforms are placeholders:
+
+```csharp
+zone.transform.position = new Vector3(x, ZonesY[i], z) + zoneController.position;
+zone.HeightDelta        = ZonesHeightDeltas[i];
+zone.collider.size      = ZonesSizes[i];
+zone.SetPlayLeft(ZonesPlayLeft[i]);   // around the repositioned x
+zone.SetPlayRight(ZonesPlayRight[i]);
+```
+
+With that, `GetDefaultZoneY = zone.y + HeightDelta + PlayerHeightDelta` lands on
+the visible floor line and matches the pawns' spawn positions to within the
+`IsPawnAtZoneY` tolerance (Level107: floor 2.411 vs spawn 2.495; Level211:
+2.240 vs 2.290) — and every walk-up item is genuinely *above* it. Before this,
+the floor computed from serialized zone data sat ~0.3–1.0 too high and the
+y-only climb check could never be satisfied.
+
+The same pass earlier established `Actor.Start`'s `LevelLocations[i]`
+repositioning (i = buildIndex − 5 for S1, + 12 for S2). Together these mean:
+**the scene's serialized transforms are not the runtime layout** — the Level
+and Actor components carry the real one.
 
 ## Not implemented
 
