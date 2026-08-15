@@ -74,6 +74,21 @@ because that level paints most of its scenery into the backdrop instead.
 
 ## Movement
 
+Speed is not a single number. `ProcessMovement` does
+`position += Velocity * dt * Speed`, and `WalkOnPath` sets
+`Velocity = direction * ForceMagnitude` for a mostly-horizontal move or
+`* DoorForceMagnitude` otherwise, with the Running variants during an urgent
+move and `SpeedSneaking` in place of `Speed` while sneaking. So Woody walks at
+`1.25 x 0.8 = 1.0` units per second and the neighbour at `1.25 x 0.7 = 0.875`.
+
+Walking limits are `Zone.PlayLeft` / `PlayRight`, set in `Level.Start()` from
+`ZonesPlayLeft` / `ZonesPlayRight` as deltas either side of the zone's x — not
+the collider box, which is only for containment. Zone03 of Level101 spans
+[1.15, 6.25] as a box but only [1.70, 5.70] as walkable. `AdjustEndMoveInZoneArea`
+clamps a free click to that range, but `BuildPathToItem` drops the clamped step
+and appends the item's own `TargetLocation`, so routine targets are never
+clamped — the binoculars at 6.30 stay reachable.
+
 `world.py` adds the parts of §3 and §8 that make Woody walk. Click anywhere:
 
 1. `zone_at(x, y)` finds the destination zone.
@@ -86,12 +101,18 @@ friends) already contain the walking character, so the game **hides the pawn and
 animates the door**. Passing one is:
 
 ```
-walk to door.x  ->  pawn.hidden = True
-                    door.play(WoodyEnterAnimation)
+walk to door.x  ->  pawn.hidden = (pawn is Woody)     # only Woody hides
+                    door.play(<role>EnterAnimation)   # on the door's controller
   on end:           pawn moves to door.LinkTo, zone = LinkTo.zone
-                    LinkTo.play(WoodyLeaveAnimation)
-  on end:           pawn.hidden = False, next step
+                    LinkTo.play(<role>LeaveAnimation)
+  on end:           pawn.hidden = False
+                    pawn.playLooping(door.ExitAnimation)
 ```
+
+`PlayDoorEnterAnimation` hides the sprite behind `if (this is Woody)` — the
+neighbour stays visible while his own door sheet plays. `ExitAnimation` is an
+`AnimationState`, so it loops on the *pawn* once through, unlike the enter and
+leave animations which are `ItemAnimationState` and belong to the door.
 
 `AnimPlayer` mirrors `AnimationControllerBase`: an animation ending pulls the
 next from the queue, and the queue draining fires the callback — which is what
@@ -115,7 +136,7 @@ Level101's routine is two actions. The neighbour walks to the sofa, plays
 through a door into the next zone, peeps through the binoculars, and comes back.
 One lap is about 35 seconds.
 
-Two details that took a debugging pass each:
+Everything below was read out of `src/`, not inferred from behaviour:
 
 - **The zone is passed explicitly, never derived from the target point.**
   `ActionManager` calls `MoveToGoal(item, item.Zone, item.TargetLocation, ...)`
@@ -127,17 +148,32 @@ Two details that took a debugging pass each:
   directly from "finished" into "start the next" recurses without bound the
   moment two such actions sit at the same spot.
 
-Each pawn type has its own use sequence (`RottweilerUseAnimation`,
-`OlgaUseAnimation`, `MotherUseAnimation`). An empty one means the item is not
-that character's to use, not that the action is instantaneous.
+- **The owner is matched by component type, not object name.** Season 2 calls
+  the neighbour's GameObject `Rottweiler2`; matching on the name skipped his
+  routine on all 14 of those levels.
+- **Each pawn type has its own use sequence** (`RottweilerUseAnimation`,
+  `OlgaUseAnimation`, `MotherUseAnimation`). `Item.PlayAnimation` picks one array
+  and plays it — there is no fallback, and an empty array means the item is not
+  that character's to use.
+- **`MutexAction` never finishes on its own.** `OnActionStarted` plays
+  `MutexLoopingAnimation` and returns; the release comes from another action's
+  `PawnToAbortMutexOnFinish`. Level205's neighbour legitimately waits at action 0
+  forever until that fires.
+- **`InfiniteLoop` and `Type == Looping` are different things.**
+  `PlayNextSequenceAnimation` calls `PlaySingleAnimation`, which forces the type
+  to Single, so inside a sequence only `InfiniteLoop` still loops. Conflating
+  them stalls a routine on any animation merely marked Looping. Of 306 use
+  sequences, exactly one of the neighbour's ends on an infinite loop; for Olga
+  and Mother it is 11, and those are the deliberate waiting poses.
 
-### Season 1 works; Season 2 does not, yet
+### Season 1 is faithful; Season 2 is not finished
 
-Season 1 routines run at a believable pace — 12 to 33 uses per three minutes
-across all 14 levels, none stuck. Season 2 still produces implausible rates on
-some levels (Level204, Level206, Level207): those routines interleave Olga,
-Mother and Kid and go down the `NFH2Path` branches, which this does not model.
-A guard freezes a routine whose every action is unplayable so it cannot spin.
+Season 1 runs 9 to 31 uses per three minutes across all 14 levels. The
+neighbour's routine also runs on 12 of Season 2's 14. What is still missing
+there is the release machinery — `PawnToAbortMutexOnFinish`,
+`SetIgnoreInfiniteLoop`, `PawnToStopInfiniteAnimation` — and the per-item
+hardcoding in `ActionManager`, which is what lets Olga and Mother out of their
+waiting poses.
 
 ## Not implemented
 

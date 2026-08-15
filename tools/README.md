@@ -83,6 +83,10 @@ Season 1 alone is 2008 `MonoBehaviour` instances across 82 script classes.
   native convention of padding after a *run* of small fields rather than after
   each one.
 - `Transform` in this build has no `m_RootOrder` and no `m_LocalEulerAnglesHint`.
+- Composing the hierarchy needs the rotation, not just position and scale. 216
+  transforms carry the quaternion that lays an object into the view plane, and
+  28 of their children sit at a non-zero local offset — one 28.7 units along
+  local z, which that rotation turns into world y.
 - `GameObject`'s trailing `m_IsActive` is not padded — `byte_size` excludes the
   inter-object padding.
 

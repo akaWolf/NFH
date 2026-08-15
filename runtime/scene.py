@@ -23,7 +23,8 @@ UNITY_PLANE_SIZE = 10.0
 
 class Anim:
     __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
-                 'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern')
+                 'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern',
+                 'infinite', 'type_looping')
 
     def __init__(self, d, base_path=''):
         self.name = d.get('Name')
@@ -41,7 +42,12 @@ class Anim:
         self.oh = d.get('OriginalHeight') or 0.0
         dl = d.get('DeltaLocation') or {}
         self.dx = dl.get('x', 0.0); self.dy = dl.get('y', 0.0)
-        self.loop = bool(d.get('InfiniteLoop')) or d.get('Type') == 'Looping'
+        # two independent things: InfiniteLoop is a runtime flag that always
+        # wins, while Type==Looping only applies when the animation is started
+        # as a looping one — PlaySingleAnimation overrides the type to Single.
+        self.infinite = bool(d.get('InfiniteLoop'))
+        self.type_looping = d.get('Type') == 'Looping'
+        self.loop = self.infinite or self.type_looping
         self.hold = bool(d.get('HoldOnLastFrame'))
         self.pattern = d.get('Pattern') or None
 
@@ -75,26 +81,31 @@ class Sprite:
 
 
 class Zone:
-    __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit')
+    __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
+                 'play_left', 'play_right')
 
     def __init__(self, name, pid, x, y, w, h, is_exit):
         self.name = name; self.pid = pid
         self.x = x; self.y = y
         self.w = w; self.h = h; self.exit = is_exit
+        # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
+        # the collider box is containment, these are the walking limits
+        self.play_left = x - w * 0.5
+        self.play_right = x + w * 0.5
 
     @property
     def left(self):
-        return self.x - self.w * 0.5
+        return self.play_left
 
     @property
     def right(self):
-        return self.x + self.w * 0.5
+        return self.play_right
 
 
 class Item:
     """Anything the neighbour's routine can act on, or Woody can trick."""
     __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy',
-                 'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked',
+                 'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral')
@@ -117,6 +128,8 @@ class Item:
         }
         self.idle = d.get('IdleNormal')
         self.idle_tricked = d.get('IdleTricked')
+        # PlayItemAnimation is a no-op unless Animating, and skips NONE outright
+        self.animating = bool(d.get('Animating'))
         self.required_inventory = d.get('RequiredInventory')
         self.trick_score = d.get('TrickScore') or 0
         self.anger = d.get('AngerAmount') or 0
@@ -134,11 +147,10 @@ class Item:
         return self.x + self.dx
 
     def sequence_for(self, role, tricked):
+        """Item.PlayAnimation picks one array and plays it. No fallback: an
+        empty array means this character has no business using the item."""
         table = self.use_tricked_anim if tricked else self.use_anim
-        seq = table.get(role) or []
-        if not seq and tricked:
-            seq = self.use_anim.get(role) or []
-        return seq
+        return table.get(role) or []
 
     def is_tricked(self):
         """TrickItem.IsTricked for the states reachable outside a live trick"""
@@ -150,13 +162,21 @@ class Door:
     the sheets contain the walking character, so the pawn hides during transit.
     """
     __slots__ = ('name', 'pid', 'x', 'y', 'zone', 'link_to', 'locked',
-                 'door_type', 'enter', 'leave', 'sprite')
+                 'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
+                 'exit_anim', 'idle', 'sprite')
 
-    def __init__(self, name, pid, x, y, zone, link_to, locked, door_type,
-                 enter, leave):
+    def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
         self.zone = zone; self.link_to = link_to; self.locked = locked
-        self.door_type = door_type; self.enter = enter; self.leave = leave
+        self.door_type = door_type
+        # enter/leave are ItemAnimationState and play on the door; ExitAnimation
+        # is an AnimationState and loops on the pawn once it is through
+        self.enter = d.get('WoodyEnterAnimation')
+        self.leave = d.get('WoodyLeaveAnimation')
+        self.rott_enter = d.get('RottweilerEnterAnimation')
+        self.rott_leave = d.get('RottweilerLeaveAnimation')
+        self.exit_anim = d.get('ExitAnimation')
+        self.idle = d.get('IdleAnimation')
         self.sprite = None
 
 
@@ -237,6 +257,7 @@ class Level:
         self._find_pawns()
         self._link_item_sprites()
         self._find_routines()
+        self._apply_zone_bounds()
 
     def _add_zone(self, o):
         go = self._go_of(o)
@@ -275,9 +296,7 @@ class Level:
         link = (d.get('LinkTo') or {}).get('path')
         self.doors.append(Door(self._o(go)['data']['name'], pid, p[0], p[1],
                                self._zone_of(go), link,
-                               bool(d.get('Locked')), d.get('DoorType'),
-                               d.get('WoodyEnterAnimation'),
-                               d.get('WoodyLeaveAnimation')))
+                               bool(d.get('Locked')), d.get('DoorType'), d))
 
     def _add_item(self, pid, o):
         d = o['data']
@@ -310,6 +329,29 @@ class Level:
                     it.sprite = by_go[kgo]
                     break
 
+    def _apply_zone_bounds(self):
+        """Level.Start(): PlayLeft/PlayRight come from lists on the Level
+        component, indexed by the number in the zone's name, and are deltas
+        either side of the zone's own x."""
+        lvl = None
+        for o in self.objs.values():
+            if o['type'] == 'Level' and 'data' in o:
+                lvl = o['data']
+                break
+        if not lvl:
+            return
+        left = lvl.get('ZonesPlayLeft') or []
+        right = lvl.get('ZonesPlayRight') or []
+        for z in self.zones:
+            try:
+                i = int(z.name[4:])
+            except (ValueError, IndexError):
+                continue
+            if i < len(left):
+                z.play_left = z.x - left[i]
+            if i < len(right):
+                z.play_right = z.x + right[i]
+
     def _find_routines(self):
         for pid, o in self.objs.items():
             if o['type'] != 'ActionManager' or 'data' not in o:
@@ -317,11 +359,22 @@ class Level:
             d = o['data']
             acts = []
             for a in (d.get('Actions') or []):
+                ml = a.get('MoveLocation') or {}
+                mz = (a.get('MoveZone') or {}).get('path')
                 acts.append({'item': (a.get('Item') or {}).get('path'),
                              'duration': a.get('Duration') or 0.0,
                              'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
-                             'hide_object': bool(a.get('HideObjectDuringUse'))})
-            self.routines.append({'owner': (d.get('Owner') or {}).get('name'),
+                             'hide_object': bool(a.get('HideObjectDuringUse')),
+                             'move_only': bool(a.get('MoveOnly')),
+                             'move_x': ml.get('x', 0.0),
+                             'move_zone': self._go_of(self._o(mz)) if mz and self._o(mz) else None,
+                             'mutex': bool(a.get('MutexAction')),
+                             'mutex_anim': a.get('MutexLoopingAnimation')})
+            # Owner names the GameObject, which Season 2 calls "Rottweiler2";
+            # the component type is the stable key
+            ow = d.get('Owner') or {}
+            self.routines.append({'owner': ow.get('type') or ow.get('name'),
+                                  'owner_name': ow.get('name'),
                                   'actions': acts,
                                   'start_index': d.get('ActionStartIndex') or 0,
                                   'loop_from_start': bool(d.get('LoopFromStartIndex')),
@@ -465,11 +518,20 @@ class Level:
             # GameObject, so hop across
             zc = (o['data'].get('Zone') or {}).get('path')
             zgo = self._go_of(self._o(zc)) if zc and self._o(zc) else None
+            pd = o['data']
             self.pawns[o['type']] = {
                 'sprite': sprite,
                 'zone': zgo,
-                'speed': o['data'].get('Speed') or 1.25,
-                'default': o['data'].get('DefaultAnimation'),
+                # ProcessMovement: position += Velocity * dt * Speed, and
+                # WalkOnPath sets Velocity = direction * ForceMagnitude, so a
+                # horizontal walk covers Speed * ForceMagnitude per second
+                'speed': pd.get('Speed') or 0.0,
+                'speed_sneaking': pd.get('SpeedSneaking') or 0.0,
+                'force': pd.get('ForceMagnitude') or 0.0,
+                'door_force': pd.get('DoorForceMagnitude') or 0.0,
+                'run_force': pd.get('RunningForceMagnitude') or 0.0,
+                'run_door_force': pd.get('RunningDoorForceMagnitude') or 0.0,
+                'default': pd.get('DefaultAnimation'),
             }
 
     def _go_of_sprite(self, sprite):

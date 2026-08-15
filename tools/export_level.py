@@ -47,17 +47,35 @@ BUILTIN_PLANE, BUILTIN_CUBE = 10209, 10202
 PLANE_SIZE = 10.0
 
 
-def _world_transforms(sc):
-    """position and scale composed down the hierarchy.
+def _qmul(a, b):
+    ax, ay, az, aw = a
+    bx, by, bz, bw = b
+    return (aw * bx + ax * bw + ay * bz - az * by,
+            aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw,
+            aw * bw - ax * bx - ay * by - az * bz)
 
-    Unity's transforms nest, so a door parented to a zone stores a local
-    position. These levels carry no meaningful rotation on the item chain, so
-    composing position and scale is enough: world = parent + parentScale * local.
+
+def _qrot(q, v):
+    """rotate a vector by a quaternion (x, y, z, w)"""
+    x, y, z, w = q
+    vx, vy, vz = v
+    tx = 2.0 * (y * vz - z * vy)
+    ty = 2.0 * (z * vx - x * vz)
+    tz = 2.0 * (x * vy - y * vx)
+    return (vx + w * tx + y * tz - z * ty,
+            vy + w * ty + z * tx - x * tz,
+            vz + w * tz + x * ty - y * tx)
+
+
+def _world_transforms(sc):
+    """Compose Unity's transform hierarchy: world = parent + parentRot * (parentScale * local).
+
+    Rotation matters. 216 transforms across these levels carry the 90-degree
+    quaternion that lays an object into the view plane, and 28 of their children
+    sit at a non-zero local offset — one of them 28.7 units along local z, which
+    the rotation turns into world y. Dropping the rotation misplaces those.
     """
-    from unityser import Reader
-    tr = {}
-    for o in sc.objs.values():
-        pass
     trs = {pid: o['data'] for pid, o in sc.objs.items()
            if o.get('class_id') == 4 and 'data' in o}
     out = {}
@@ -67,16 +85,19 @@ def _world_transforms(sc):
             return out[pid]
         t = trs.get(pid)
         if t is None or depth > 32:
-            return (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)
+            return (0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 0.0, 0.0, 1.0)
         f = t.get('father')
         if f:
-            pp, ps = resolve(f, depth + 1)
+            pp, ps, pr = resolve(f, depth + 1)
         else:
-            pp, ps = (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)
-        lp, ls = t['position'], t['scale']
-        wp = tuple(pp[i] + ps[i] * lp[i] for i in range(3))
+            pp, ps, pr = (0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (0.0, 0.0, 0.0, 1.0)
+        lp, ls, lr = t['position'], t['scale'], t['rotation']
+        scaled = tuple(ps[i] * lp[i] for i in range(3))
+        rotated = _qrot(pr, scaled)
+        wp = tuple(pp[i] + rotated[i] for i in range(3))
         ws = tuple(ps[i] * ls[i] for i in range(3))
-        out[pid] = (wp, ws)
+        wr = _qmul(pr, tuple(lr))
+        out[pid] = (wp, ws, wr)
         return out[pid]
 
     for pid in trs:
@@ -111,7 +132,8 @@ def _quads(sc, index, world):
         tex = background_texture(index, sc.f, comps)
         if not tex:
             continue
-        p, s = world.get(tr, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
+        p, s, _r = world.get(tr, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0),
+                                  (0.0, 0.0, 0.0, 1.0)))
         out.append({'name': name, 'texture': tex, 'active': active,
                     'x': p[0], 'y': p[1], 'z': p[2],
                     'w': PLANE_SIZE * s[0], 'h': PLANE_SIZE * s[2],
@@ -159,11 +181,13 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
                 {'path': c['path'],
                  'type': (sc.objs.get(c['path']) or {}).get('type')} for c in d['components']]
         elif o['class_id'] == 4:
-            wp, ws = world.get(pid, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
+            wp, ws, wr = world.get(pid, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0),
+                                         (0.0, 0.0, 0.0, 1.0)))
             e['data'] = {'name': sc.name_of(pid), 'gameObject': d['gameObject'],
                          'position': d['position'], 'scale': d['scale'],
                          'rotation': d['rotation'],
                          'world_position': list(wp), 'world_scale': list(ws),
+                         'world_rotation': list(wr),
                          'children': d['children'], 'father': d['father']}
         else:
             e['data'] = d

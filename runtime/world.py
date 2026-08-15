@@ -29,6 +29,17 @@ class AnimPlayer:
     def has(self, name):
         return name in self.by_name
 
+    def play_single(self, name):
+        """PlaySingleAnimation: the type becomes Single, so only InfiniteLoop
+        can still make it loop."""
+        i = self.by_name.get(name)
+        if i is None:
+            return False
+        self.sprite.current = i
+        self.t = 0.0
+        self.sprite.anims[i].loop = self.sprite.anims[i].infinite
+        return True
+
     def play(self, name, loop=None):
         i = self.by_name.get(name)
         if i is None:
@@ -39,18 +50,26 @@ class AnimPlayer:
             self.sprite.anims[i].loop = loop
         return True
 
+    def waiting(self):
+        """parked on an infinitely looping animation with nothing queued"""
+        return self.anim.loop and not self.queue
+
     def play_looping(self, name, abort_if_playing=True):
         if abort_if_playing and self.anim.name == name:
             return True
         return self.play(name, loop=True)
 
     def play_sequence(self, names, on_end=None):
+        """An animation flagged InfiniteLoop keeps looping even inside a
+        sequence — Refresh() checks InfiniteLoop before the Single type. That is
+        how the game parks a character in a waiting pose, and how it stalls a
+        routine until something clears the flag."""
         names = [n for n in names if self.has(n)]
         if not names:
             if on_end:
                 on_end()
             return False
-        self.play(names[0], loop=False)
+        self.play_single(names[0])
         self.queue = names[1:]
         self.on_end = on_end
         return True
@@ -67,8 +86,7 @@ class AnimPlayer:
         if not self.finished():
             return
         if self.queue:
-            nxt = self.queue.pop(0)
-            self.play(nxt, loop=False)
+            self.play_single(self.queue.pop(0))
             return
         cb, self.on_end = self.on_end, None
         if cb:
@@ -80,18 +98,25 @@ class Pawn:
 
     IDLE, WALK, DOOR_ENTER, DOOR_LEAVE = 'idle', 'walk', 'door_enter', 'door_leave'
 
-    def __init__(self, level, sprite, zone, speed=1.25, player=None):
+    def __init__(self, level, sprite, zone, spec=None, player=None, role='Woody'):
         self.level = level
         self.sprite = sprite
         self.anim = player or AnimPlayer(sprite)
         self.zone = zone
-        self.speed = speed
+        self.role = role
+        spec = spec or {}
+        self.speed = spec.get('speed') or 0.0
+        self.speed_sneaking = spec.get('speed_sneaking') or 0.0
+        self.force = spec.get('force') or 0.0
+        self.door_force = spec.get('door_force') or 0.0
+        self.sneaking = False
         self.state = self.IDLE
         self.facing = 'Left'
         self.hidden = False
         self.steps = []                  # [(door | None, target_x)]
         self.target_x = sprite.x
         self._door = None
+        self._exit_door = None
         self.on_arrive = None            # fired once the last step completes
         self.anim.play_looping('Stand_' + self.facing)
 
@@ -141,15 +166,26 @@ class Pawn:
     def _face_towards(self, dx):
         self.facing = 'Right' if dx > 0 else 'Left'
 
+    def walk_speed(self, horizontal=True):
+        """ProcessMovement multiplies the velocity by Speed (or SpeedSneaking),
+        and WalkOnPath sets that velocity to direction * ForceMagnitude for a
+        mostly-horizontal move, or * DoorForceMagnitude otherwise."""
+        base = self.speed_sneaking if self.sneaking else self.speed
+        return base * (self.force if horizontal else self.door_force)
+
     def _enter_door(self, door):
+        """Pawn.PlayDoorEnterAnimation: the door plays the sheet that contains
+        the character, and only Woody's own sprite is hidden — the neighbour
+        stays visible."""
         self.state = self.DOOR_ENTER
-        self.hidden = True
+        self.hidden = (self.role == 'Woody')
         self._door = door
+        anim = door.enter if self.role == 'Woody' else door.rott_enter
         player = door.sprite
-        if player is None or not door.enter:
+        if player is None or not anim:
             self._leave_door(door)
             return
-        player.play_sequence([door.enter], on_end=lambda: self._leave_door(door))
+        player.play_sequence([anim], on_end=lambda: self._leave_door(door))
 
     def _leave_door(self, door):
         other = self.level.door_by_pid(door.link_to)
@@ -160,14 +196,21 @@ class Pawn:
         self.sprite.x, self.sprite.y = other.x, other.y
         self.zone = self.level.zone_by_pid(other.zone) or self.zone
         self.state = self.DOOR_LEAVE
+        self._exit_door = other
+        anim = other.leave if self.role == 'Woody' else other.rott_leave
         player = other.sprite
-        if player is None or not other.leave:
+        if player is None or not anim:
             self._done_door()
             return
-        player.play_sequence([other.leave], on_end=self._done_door)
+        player.play_sequence([anim], on_end=self._done_door)
 
     def _done_door(self):
+        """Pawn.OnDoorEnterAnimationFinished: unhide, then loop the door's own
+        ExitAnimation on the pawn."""
         self.hidden = False
+        d = getattr(self, '_exit_door', None)
+        if d is not None and d.exit_anim and self.anim.has(d.exit_anim):
+            self.anim.play_looping(d.exit_anim)
         self._next_step()
 
     # -- tick ------------------------------------------------------------
@@ -175,7 +218,7 @@ class Pawn:
         self.anim.tick(dt)
         if self.state == self.WALK:
             dx = self.target_x - self.sprite.x
-            step = self.speed * dt
+            step = self.walk_speed() * dt
             if abs(dx) <= step:
                 self.sprite.x = self.target_x
                 if self._door is not None:
@@ -213,7 +256,6 @@ class Routine:
         self.on_use = None               # (item, tricked) when an action fires
         self.log = []
         self._pending = None             # 'advance' | 'start', handled in tick
-        self._skipped = 0
 
     @property
     def action(self):
@@ -243,11 +285,20 @@ class Routine:
 
     def _start_action(self):
         it = self.item
+        a = self.action
+        if a is not None and a.get('move_only'):
+            zone = self.level.zone_by_pid(a.get('move_zone'))
+            if zone is not None:
+                self.state = self.MOVING
+                if self.pawn.goto_zone(zone, a['move_x'], on_arrive=self._finish):
+                    return
+            self._pending = 'advance'
+            self.state = self.IDLE
+            return
         if it is None:
             self._pending = 'advance'
             self.state = self.IDLE
             return
-        a = self.action
         at_place = (abs(self.pawn.sprite.x - it.target_x) <= a['max_distance']
                     and self.pawn.zone is not None and self.pawn.zone.pid == it.zone)
         if at_place:
@@ -264,18 +315,27 @@ class Routine:
         it = self.item
         if it is None:
             self._pending = 'advance'; self.state = self.IDLE; return
-        tricked = it.is_tricked()
-        seq = it.sequence_for(self.role, tricked)
-        if not seq:
-            # nothing for this character to play: the item belongs to another
-            # pawn's routine. Skip rather than completing in zero time.
-            self._skipped += 1
-            if self._skipped >= len(self.actions):
-                self.frozen = True       # nothing in this routine is playable
+        a = self.action
+        if a.get('mutex'):
+            # MutexAction: park on a looping animation and wait to be released
+            self.state = self.USING
+            self.timer = 0.0
+            if a.get('mutex_anim'):
+                self.pawn.anim.play_looping(a['mutex_anim'])
+            return
+        if a.get('move_only') or it is None:
             self._pending = 'advance'
             self.state = self.IDLE
             return
-        self._skipped = 0
+        tricked = it.is_tricked()
+        seq = it.sequence_for(self.role, tricked)
+        if not seq:
+            # Item.PlayAnimation would index an empty array here, so the game
+            # never reaches this with a routine that is meant to run. Treat it
+            # as "not this character's item" and move on.
+            self._pending = 'advance'
+            self.state = self.IDLE
+            return
         self.state = self.USING
         self.timer = self.action['duration']
         self.log.append((it.name, tricked))
@@ -330,9 +390,9 @@ class World:
     def player_for(self, sprite):
         return self.players.get(id(sprite))
 
-    def spawn_woody(self, sprite, zone, speed=1.25):
-        self.woody = Pawn(self.level, sprite, zone, speed,
-                          player=self.players[id(sprite)])
+    def spawn_woody(self, sprite, zone, spec=None):
+        self.woody = Pawn(self.level, sprite, zone, spec,
+                          player=self.players[id(sprite)], role='Woody')
         return self.woody
 
     def spawn_pawn(self, role):
@@ -340,8 +400,8 @@ class World:
         if not spec or spec['zone'] is None:
             return None
         p = Pawn(self.level, spec['sprite'],
-                 self.level.zone_by_pid(spec['zone']), spec['speed'],
-                 player=self.players[id(spec['sprite'])])
+                 self.level.zone_by_pid(spec['zone']), spec,
+                 player=self.players[id(spec['sprite'])], role=role)
         self.pawns[role] = p
         return p
 
