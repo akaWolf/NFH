@@ -500,11 +500,54 @@ Level112's dog is an *inactive* GameObject (a level script enables it later) —
 no `Update`, no FSM; the port gates the FSM on the sprite's existence, which
 only active objects get.
 
+## The HUD
+
+`HUD.cs` (1491 lines) is serialized whole on every level — textures as
+external PPtrs, layout as rects, the face strips as TextAsset file-name
+lists. `tools/export_level.py` resolves all of it into a `hud` section
+(re-exported with the rest of the JSON verified byte-identical), and
+`runtime/hud.py` ports the drawing and the input:
+
+- **Coordinates** are `Helpers.AdjustRectangleRelatizeSize`: a rect's x/y are
+  screen fractions, its width/height design pixels over 800×600. The mouse
+  test is `Helpers.PointInRect` (Unity's y is bottom-up; SDL's is already
+  top-down).
+- **`DrawHUD`'s order**: base bar (the Mother levels swap in the alternate
+  art), inventory (real icons — `inventory/I_<type>_{hov,norm,pres}` for
+  Season 1, `inventory2/<type>_{hovered,std,down}` for Season 2 — with
+  selection, hover bubbles after 1 s, and paging arrows), buttons (power,
+  complete-episode once `Won`, sneak with its toggle state, info), the angry
+  meter (the full strip clipped bottom-up by `AngryMeter`, plus the whistle
+  `HUDAnimation`), the trick coins (the `InitializeTricks` ladder layout with
+  its count-dependent fudge factors, the celebration strip on a new trick,
+  the statue), the clock, the faces (idle/laugh/sleep/angry strips driven by
+  `HUDAnimation`), the think bubbles with the current action's item icon
+  (`RoutineAction.BubbleIcon` → `Actor.BubbleIconPath`, a Resources string —
+  the Alerter's mad icon included), the score screen, and the angry count.
+- **The clock** is `GameInfo`'s: timed games count down from `TimeMinutes`
+  and end the game at zero (`TimeUp` → the score screen), untimed ones count
+  up; `NFH2Path` hides it.
+- **The score screen** ports `CalculateScore` / `CalculateRating`: viewer
+  rating = trick scores + completed × `CompoundTrickScore` (capped by the
+  angry count outside tutorials, at 100 overall), the Season-2 formula
+  `completed × 90 / total (+10 at exactly one angry tick)`, the
+  EXCELLENT/GOOD/PASSED/FAILED/TIME UP bands, and working Restart / OK
+  buttons.
+- **`CheckClick`** consumes HUD clicks before the world sees them: icon
+  selection, paging, the sneak toggle (`Woody.ToggleSneak` — Season 2 only
+  flips the flag, it has no sneak sprites), power (the in-game menu is not
+  modelled), complete-episode (`FinishGameOnHUDClick`), the faces.
+- **Text** renders through SDL_ttf with a system font — the game's own font
+  assets and localization strings are not extracted, so labels are literal
+  and sizes approximate `LevelDataGUIRenderer`. `HUDProgressBar` depends on
+  the unported `ProgressBar` actions and is skipped.
+
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
 that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
-stop-fields live there), HUD, the remaining use side-effect flags
+stop-fields live there), the in-game menu and `HUDProgressBar`/`ProgressBar`
+actions, the remaining use side-effect flags
 (`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
 skates/toilet state), the `IsMovingToAdjacentZone` / `DonePassingToOtherZone`
 / `PassingComplexMove` terms of the detection predicates (states the port's

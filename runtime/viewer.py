@@ -15,6 +15,7 @@ from scene import Level, DESIGN_H
 from world import World
 from audio_out import SoundBank
 from render import Camera, TextureCache, draw_sprite, draw_quad, draw_zone_overlay
+from hud import Hud
 
 WIDTH, HEIGHT = 800, 600
 
@@ -51,6 +52,7 @@ class Viewer:
         self.cam = Camera()
         self.show_zones = False
         self.paused = False
+        self._frame_dt = 0.0
         self.follow = False
         self.woody = None
         self.t = 0.0
@@ -70,6 +72,11 @@ class Viewer:
         self.cam.y = bg[2] if bg else 0.0
         self.follow = bool(self.woody)
         self.t = 0.0
+        self.hud = Hud(self.level, self.world, self.cache, self.rnd,
+                       WIDTH, HEIGHT) if self.level.hud else None
+        if self.hud is not None:
+            # Woody.PlayTrickDone -> the HUD celebration
+            self.world.game.on_trick_done = self.hud.play_trick_done
         print('%s — %d sprites, %d zones, %d items, %d routines (%d actions)'
               % (self.level.name, len(self.level.sprites), len(self.level.zones),
                  len(self.level.items), len(self.world.routines),
@@ -113,6 +120,10 @@ class Viewer:
                 drawn += 1
         if self.show_zones:
             draw_zone_overlay(self.rnd, self.cam, self.level.zones, WIDTH, HEIGHT)
+        if self.hud is not None:
+            mx, my = ctypes.c_int(0), ctypes.c_int(0)
+            sdl2.SDL_GetMouseState(ctypes.byref(mx), ctypes.byref(my))
+            self.hud.draw(self._frame_dt, (mx.value, my.value))
         sdl2.SDL_RenderPresent(self.rnd)
         return drawn
 
@@ -176,6 +187,15 @@ class Viewer:
                         self.world.inventory.select(idx)
                         self._print_state()
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
+                    # Woody.Update: HUD.CheckClick() eats the click first
+                    if self.hud is not None:
+                        consumed = self.hud.check_click(ev.button.x, ev.button.y)
+                        if consumed == 'restart':
+                            self.load(self.i)
+                            continue
+                        if consumed:
+                            self._print_state()
+                            continue
                     wx, wy = self.cam.screen_to_world(ev.button.x, ev.button.y,
                                                       WIDTH, HEIGHT)
                     if self.world.game.ending:
@@ -194,6 +214,7 @@ class Viewer:
                         self._print_state()
             now = time.time()
             dt = now - last; last = now
+            self._frame_dt = dt
             if not self.paused:
                 self.t += dt
             if not self.paused:

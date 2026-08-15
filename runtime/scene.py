@@ -141,6 +141,7 @@ class Item:
                  'hide_when_primed', 'delta_primed_x', 'delta_primed_y',
                  'fixing_item', 'force_use_fixing_item', 'fix_depends_on',
                  'delta_fix_x', 'delta_fix_y', 'let_untrick',
+                 'bubble_icon', 'bubble_icon_active', 'bubble_icon_mad',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
@@ -245,6 +246,11 @@ class Item:
         self.delta_fix_x = (d.get('DeltaFixLocation') or {}).get('x', 0.0)
         self.delta_fix_y = (d.get('DeltaFixLocation') or {}).get('y', 0.0)
         self.let_untrick = bool(d.get('LetUntrickTrickedItem'))
+        # Actor.Start: BubbleIcon = Resources.Load(GetBaseIconPath() + path);
+        # the cache resolves by basename, so keep the raw path tail
+        self.bubble_icon = d.get('BubbleIconPath') or None
+        self.bubble_icon_active = d.get('BubbleIconActivePath') or None
+        self.bubble_icon_mad = d.get('BubbleIconMadPath') or None
         self.second_required = d.get('SecondRequiredInventory')
         self.locked = bool(d.get('Locked'))
         self.used = False
@@ -387,6 +393,8 @@ class Level:
                     if c['type'] == 'Transform':
                         self._transform_of[int(pid)] = c['path']
         self.quads = raw.get('quads') or []          # world-space textured planes
+        # the HUD component's resolved textures/rects (tools/export_level.py)
+        self.hud = ((raw.get('hud') or {}).get('HUD') or [None])[0]
         self.background = None      # (texture name, x, y, w, h) in world units
         self.sprites = []
         self.zones = []
@@ -620,6 +628,11 @@ class Level:
                 self.game_info = {
                     'total': d.get('TotalTricksCount') or 0,
                     'winning': d.get('WinningTricksCount') or 0,
+                    # the HUD clock and the score screen
+                    'time_minutes': d.get('TimeMinutes') or 0.0,
+                    'compound_trick_score': d.get('CompoundTrickScore') or 0,
+                    'is_tutorial': bool(d.get('IsTutorial')),
+                    'dont_show_angry_count': bool(d.get('DontShowAngryCount')),
                 }
                 return
 
@@ -917,6 +930,7 @@ class Level:
                 'is_sleeping': bool(pd.get('IsSleeping')),
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
                 'animal_tutorial': bool(pd.get('AnimalTutorial')),
+                'nfh2': bool(pd.get('NFH2Path')),
                 # the fixing-tool chain, serialized inline on the Rottweiler
                 # (RoutineActionGrab / RoutineActionUseFixingItem / Return)
                 'grab_action': {

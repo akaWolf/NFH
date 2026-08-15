@@ -219,6 +219,7 @@ class Pawn:
         self.run_door_force = spec.get('run_door_force') or 0.0
         self.hit_action = spec.get('hit_action') or {}
         self.animal_tutorial = bool(spec.get('animal_tutorial'))
+        self.nfh2 = bool(spec.get('nfh2'))       # Woody.NFH2Path
         self.grab_action = spec.get('grab_action') or {}
         self.use_fixing_action = spec.get('use_fixing_action') or {}
         self.fixing_item = None          # Rottweiler.FixingItem (the carried tool)
@@ -762,9 +763,50 @@ class GameState:
         self.ending = False              # GameInfo.GameEnding (FinishGame)
         self.ended = False               # GameInfo.GameEnded (FinishAnimationEnded)
         self.win_timer = None            # WinGameOnCompleteAllTricks' 2.5s wait
+        # the clock: TimedGame counts down from TimeMinutes, else up
+        # (GameInfo.Start 171-177, Update 239-254; PlayerPrefs default is on)
+        self.timed = True
+        self.time_seconds = (info.get('time_minutes') or 0.0) * 60.0
+        self.time_up = False
+        self.is_tutorial = bool(info.get('is_tutorial'))
+        self.compound_trick_score = info.get('compound_trick_score') or 0
+        self.dont_show_angry_count = bool(info.get('dont_show_angry_count'))
+        # the score screen strings (GameInfo.CalculateScore)
+        self.rating = ''
+        self.trick_ratio = ''
+        self.viewer_rating = ''
+        self.final_viewer_rating = 0
+        self.on_trick_done = None        # Woody.PlayTrickDone -> the HUD
+
+    def calculate_score(self, angry_count_ticks, nfh2=False):
+        """GameInfo.CalculateScore + CalculateRating (GameInfo.cs:392-465).
+        The label lines ride localization files that are not extracted, so
+        only the value halves render."""
+        if not nfh2:
+            compound = self.compound_trick_score
+            if not self.is_tutorial and angry_count_ticks < compound:
+                compound = angry_count_ticks
+            final = sum(self.log) + self.completed * compound
+        else:
+            final = int(self.completed * 90.0 / max(1, self.total))
+            if angry_count_ticks == 1:
+                final += 10
+        self.final_viewer_rating = min(final, 100)
+        self.trick_ratio = '%d / %d' % (self.completed, self.total)
+        self.viewer_rating = '%d%%' % self.final_viewer_rating
+        if not self.won:
+            self.rating = 'TIME UP' if self.time_up else 'FAILED'
+        elif self.final_viewer_rating >= 100:
+            self.rating = 'EXCELLENT'
+        elif self.final_viewer_rating >= 60:
+            self.rating = 'GOOD'
+        else:
+            self.rating = 'PASSED'
 
     def trick_done(self, score):
-        """GameInfo.TrickDone (GameInfo.cs:467)"""
+        """GameInfo.TrickDone (GameInfo.cs:467): Woody.PlayTrickDone leads"""
+        if self.on_trick_done is not None:
+            self.on_trick_done()
         if self.linked_trick:
             self.linked_trick = False
             self.completed += 1
@@ -1953,6 +1995,23 @@ class World:
     def _finish_animation_ended(self):
         """GameInfo.FinishAnimationEnded: everything freezes"""
         self.game.ended = True
+        self._score()
+        for r in self.routines:
+            r.frozen = True
+
+    def _score(self):
+        rott = self.pawns.get('Rottweiler')
+        self.game.calculate_score(
+            rott.angry_count_ticks if rott is not None else 0,
+            nfh2=self.woody.nfh2 if self.woody is not None else False)
+
+    def _time_up(self):
+        """GameInfo.Update's TimeUp -> FinishGameOnHUDClick: FinishGame plus
+        the immediate freeze of everyone (GameInfo.cs:245-248, 373-381)"""
+        self.game.won = False
+        self.game.ending = True
+        self.game.ended = True
+        self._score()
         for r in self.routines:
             r.frozen = True
 
@@ -1992,6 +2051,17 @@ class World:
         # GameInfo.Update, the Classic win/lose checks (GameInfo.cs:203-232)
         if self.game.ending or self.game.ended:
             return
+        # the clock (GameInfo.Update 239-254): timed games count down and end
+        # the game at zero, untimed ones count up
+        if self.game.timed:
+            if self.game.time_seconds > 0.0:
+                self.game.time_seconds -= dt
+                if int(self.game.time_seconds) <= 0:
+                    self.game.time_up = True
+                    self._time_up()
+                    return
+        else:
+            self.game.time_seconds += dt
         if self.can_rottweiler_see_woody():
             if not self.game.got_caught:
                 self._catch()
