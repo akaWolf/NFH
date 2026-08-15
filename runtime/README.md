@@ -39,14 +39,18 @@ Ordering is the `GUIDepth` enum, not z-sorting: higher value draws further back.
 ## Coverage
 
 All 31 levels of both seasons render with every sprite placed and no missing
-sheet — 535 sprites in total:
+sheet — 545 sprites in total:
 
 ```
 Level101  drew 16/16 sprites; missing sheets: 0
 ...
 Level214  drew 16/16 sprites; missing sheets: 0
-total sprites drawn: 535, missing sheets: 0
+total sprites drawn: 545, missing sheets: 0
 ```
+
+(535 before the alerter pass; six sleeping pets have `IdleNormal == NONE` and
+draw their `SleepSequence[0]` instead — see below. The seventh, Level109's
+parrot, always had a normal idle.)
 
 Sprite counts vary a lot by design: Level113 has 27, while Level201 has 8
 because that level paints most of its scenery into the backdrop instead.
@@ -59,8 +63,9 @@ because that level paints most of its scenery into the backdrop instead.
   `Item` uses `IdleNormal`. Reading the wrong field silently selects animation 0,
   which for a door is "Woody walks through it" — the whole level then shows
   Woody standing inside every doorway.
-- **`IdleNormal == 'NONE'` means "not a sprite".** Those objects are drawn as
-  quads instead; giving them a sprite draws the wrong thing.
+- **`IdleNormal == 'NONE'` means "not a sprite"** — except on an `Alerter`,
+  whose `Start` plays the `SleepSequence` instead of an idle. Every other such
+  object is drawn as a quad; giving it a sprite draws the wrong thing.
 - **Sheet names are `Resources.Load` paths**, so some contain a subdirectory or
   a duplicate-asset suffix (`Closed/closeddoorback_ms`, `trashcan_ms (2)`). The
   texture cache tries the raw name, the flattened one, the basename, and the
@@ -316,9 +321,58 @@ predicate, then the all-tricks win.
 Standing in the open while the routine passes through your zone gets you caught;
 19 of the 28 levels do exactly that to an idle Woody within three minutes.
 
+## Alerters and the alarm plumbing (§6)
+
+The sleeping pet is an `Alerter` item running a three-flag state machine
+(`Alert`, `Awake`, plus "asleep" as neither) in `Alerter.Update` and its
+coroutines; `runtime/world.py`'s `AlerterFSM` ports it method by method.
+
+**Waking up.** `Alerter.CanSeeWoody` needs Woody in the pet's zone, not hidden,
+and *not* "sneaking" — where `Woody.IsSneaking` is true both when the sneak
+toggle is on **and when he stands still**, so only a moving, walking-openly
+Woody wakes the pet. Seeing him starts `CoRoutineWoodySeeAlerter`: after
+`AlerterDelay` seconds (re-checked at the end) the pet plays
+`AlertSequenceStart` plus the directional bark (`AlertLeft`/`AlertRight` by
+which side Woody is on), and the bark chains on itself while the alert holds.
+The pet's sprite is the `SleepSequence[0]` frame at load, because
+`Alerter.Start` plays the sequence instead of an idle — its `IdleNormal` is
+`NONE`, which everywhere else means "no sprite" (six of the seven pets were
+invisible until this).
+
+**Woody flinches.** The same coroutine calls `Woody.PlayShortFearAnimation`:
+`PauseMovement`, a blocking `FearShortLeft/Right`, and `RestartMovement` when
+it ends — the path is kept, not dropped; Woody stalls mid-run and walks on.
+
+**The neighbour investigates.** `CoRoutineRottweilerHearAlerter` (same
+`AlerterDelay`) raises the alarm: `ActionManager.StartUrgentAction` aborts the
+current step and runs him to the pet's target item; a `PostponeAlarm` action
+parks the alarm until the action ends, and if he is mid-`MutexAction` the alarm
+defers (`WasAlerted`) until he next moves. Arriving plays the surprise/search
+set, then the routine resumes where it left off.
+
+**Begging and going back to sleep** — `Alerter.OnAnimationSequenceCompleted`:
+the neighbour entering the pet's zone plays `PoorSequence` (begging, no chain),
+leaving plays `WakeSequence`; when a completed sequence finds Woody no longer
+visible it drops `Alert`, and drops `Awake` into the `SleepSequence` **only if
+the neighbour is out of the pet's zone too**. That guard is why the unit test's
+pet "refused" to sleep: Level113's neighbour *starts* in the dog's zone. With
+him elsewhere the full cycle closes — bark at t=0.0, alert dropped at t=3.1,
+asleep again at t=11.2.
+
+**`NoticeWhenEnterZone`** rides the same plumbing without a pet:
+`TrickItem.Start` registers the item in `Zone.NoticeOnEnterItems`, and the
+neighbour entering the zone of the tricked item runs `RunToTrickedItem` — a
+startled look (`PauseMovement` + single animation), then the urgent run.
+Verified on Level102's TV: 20 points and `FuckedUp`, since `CanFix` is false.
+
+Level112's dog is an *inactive* GameObject (a level script enables it later) —
+no `Update`, no FSM; the port gates the FSM on the sprite's existence, which
+only active objects get.
+
 ## Not implemented
 
-From `docs/GAMEPLAY.md` §6–§7: alerters, urgent surprise actions
-(`SurpriseFar/Near`, `PawnToAbortMutexOnFinish` release, `SetIgnoreInfiniteLoop`),
-priming (`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`),
+From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
+that enable alerters mid-level, `SetIgnoreInfiniteLoop` /
+`PawnToStopInfiniteAnimation` release of infinite animations, priming
+(`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`),
 `Mother`'s catch predicate, HUD.

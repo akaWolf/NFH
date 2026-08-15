@@ -135,6 +135,10 @@ class Item:
                  'linked_item_trick', 'fix_item_trick', 'depends_on_2',
                  'use_depends_on_when_tricked', 'force_fix_original',
                  'hide_anim', 'hide_idle', 'leave_animation', 'hide_woody',
+                 'sleep_sequence', 'alert_start', 'alert_left', 'alert_right',
+                 'wake_sequence', 'poor_sequence', 'alerter_delay',
+                 'alert_on_start_timer', 'rott_surprise',
+                 'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
@@ -224,6 +228,20 @@ class Item:
         self.hide_idle = _anim_name(d.get('IdleAnim'))
         self.leave_animation = _anim_name(d.get('LeaveAnimation'))
         self.hide_woody = bool(d.get('HideWoody'))
+        # Alerter: the sleeping pet's animation sets and timings
+        self.sleep_sequence = d.get('SleepSequence') or []
+        self.alert_start = _anim_name(d.get('AlertSequenceStart'))
+        self.alert_left = _anim_name(d.get('AlertLeft'))
+        self.alert_right = _anim_name(d.get('AlertRight'))
+        self.wake_sequence = d.get('WakeSequence') or []
+        self.poor_sequence = d.get('PoorSequence') or []
+        self.alerter_delay = d.get('AlerterDelay') if d.get('AlerterDelay') is not None else 1.0
+        self.alert_on_start_timer = d.get('AlertOnStartTimer') or 0.0
+        # what the neighbour plays on arriving at a (non-tricked) surprise item
+        self.rott_surprise = d.get('RottweilerSurpriseAnimation') or []
+        self.surprise_far_left = _anim_name(d.get('SurpriseFarLeft'))
+        self.surprise_far_right = _anim_name(d.get('SurpriseFarRight'))
+        self.notice_enter = bool(d.get('NoticeWhenEnterZone'))
         self.collider = None                # (cx, cy, w, h), for click hit-tests
         self.delta_olga_x = (d.get('DeltaOlgaLocation') or {}).get('x', 0.0)
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
@@ -464,14 +482,18 @@ class Level:
             if s.kind == 'ItemAnimationController':
                 by_go.setdefault(s.go, s)
 
-        def find(go):
+        def find(go, depth=0):
+            """GetComponentInChildren is recursive"""
             if go in by_go:
                 return by_go[go]
+            if depth > 6:
+                return None
             tp = self._transform_of.get(go)
             for k in ((self._o(tp)['data'].get('children') or []) if tp else ()):
                 kgo = self._o(k)['data'].get('gameObject')
-                if kgo in by_go:
-                    return by_go[kgo]
+                hit = find(kgo, depth + 1)
+                if hit is not None:
+                    return hit
             return None
 
         for it in self.items.values():
@@ -604,6 +626,7 @@ class Level:
             for a in (d.get('Actions') or []):
                 ml = a.get('MoveLocation') or {}
                 mz = (a.get('MoveZone') or {}).get('path')
+                pa = bool(a.get('PostponeAlarm'))
                 acts.append({'item': (a.get('Item') or {}).get('path'),
                              'duration': a.get('Duration') or 0.0,
                              'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
@@ -612,6 +635,7 @@ class Level:
                              'move_x': ml.get('x', 0.0),
                              'move_zone': self._go_of(self._o(mz)) if mz and self._o(mz) else None,
                              'mutex': bool(a.get('MutexAction')),
+                             'postpone_alarm': pa,
                              'mutex_anim': a.get('MutexLoopingAnimation')})
             # Owner names the GameObject, which Season 2 calls "Rottweiler2";
             # the component type is the stable key
@@ -712,6 +736,11 @@ class Level:
                 # ReturnToIdleAnimation plays the tricked idle when IsTricked
                 if field == 'IdleNormal' and item['data'].get('Tricked'):
                     want = item['data'].get('IdleTricked') or want
+                # Alerter.Start plays the SleepSequence instead of an idle
+                if owner_type == 'Alerter':
+                    seq = item['data'].get('SleepSequence') or []
+                    if seq:
+                        want = seq[0]
                 break
         if want is None:
             for pawn_type in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
