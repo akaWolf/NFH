@@ -537,16 +537,21 @@ class Pawn:
                 return
             nx, ny = dx / mag, dy / mag
             # WalkOnPath: dominant axis picks the force and the animation, and
-            # IsInUrgentMove switches to the Running magnitudes
+            # IsInUrgentMove switches to the Running magnitudes. Woody's
+            # override plays Run_* unless Sneaking (Woody.cs:890-936); every
+            # other pawn walks (Pawn.cs:1175-1188) — Season 2's Woody sheet
+            # has no Walk_* at all
+            run = self.role == 'Woody' and not self.sneaking
+            base = 'Run_' if run else 'Walk_'
             if abs(nx) >= abs(ny):
                 f = self.run_force if self.in_urgent else self.force
                 vx, vy = nx * f, ny * f
                 self._face_towards(nx)
-                self.anim.play_looping('Walk_' + self.facing)
+                self.anim.play_looping(base + self.facing)
             else:
                 f = self.run_door_force if self.in_urgent else self.door_force
                 vx, vy = nx * f, ny * f
-                self.anim.play_looping('Walk_Up' if ny > 0 else 'Walk_Down')
+                self.anim.play_looping(base + ('Up' if ny > 0 else 'Down'))
             self.sprite.x += vx * scale
             self.sprite.y += vy * scale
         elif self.state == self.DOOR_CLIMB:
@@ -1857,6 +1862,16 @@ class World:
             r.start()
         return self.routines
 
+    def _detect_common(self, catcher):
+        """the zone/door/hiding/blocking chain both predicates share"""
+        woody = self.woody
+        return (woody.zone is not None and catcher.zone is not None
+                and woody.zone.pid == catcher.zone.pid
+                and not woody.is_warping and not catcher.is_warping
+                and not catcher.ignore_woody and not woody.hiding
+                and (not catcher.anim.blocking or not woody.sneaking)
+                and not woody.anim.blocking)
+
     def can_rottweiler_see_woody(self):
         """GameInfo.CanRottweilerSeeWoody (GameInfo.cs:181-192), the Classic
         detection predicate. Pure zone containment; the Bed special case swaps
@@ -1869,13 +1884,7 @@ class World:
         routine = next((r for r in self.routines if r.pawn is rott), None)
         if routine is None:
             return False
-        common = (woody.zone is not None and rott.zone is not None
-                  and woody.zone.pid == rott.zone.pid
-                  and not woody.is_warping and not rott.is_warping
-                  and not rott.ignore_woody and not woody.hiding
-                  and (not rott.anim.blocking or not woody.sneaking)
-                  and not woody.anim.blocking)
-        if not common:
+        if not self._detect_common(rott):
             return False
         it = routine.item if routine else None
         if it is not None and it.name == 'Bed':
@@ -1884,38 +1893,53 @@ class World:
             return moving                 # the Bed case demands Velocity > 0
         return not rott.is_sleeping
 
-    def _catch(self):
-        """GameInfo.OnNeighborCaughtWoody + FinishGame + Rottweiler.HitWoody +
+    def can_mother_see_woody(self):
+        """GameInfo.CanMotherSeeWoody (GameInfo.cs:194-199): the neighbour's
+        non-Bed chain, for the Mother; Mother.CanSeeWoody defers to level
+        behaviors, which are not ported (default true)."""
+        mother = self.pawns.get('Mother')
+        if mother is None or self.woody is None:
+            return False
+        routine = next((r for r in self.routines if r.pawn is mother), None)
+        if routine is None:
+            return False
+        return self._detect_common(mother) and not mother.is_sleeping
+
+    def _catch(self, catcher=None):
+        """GameInfo.OnNeighborCaughtWoody / OnMotherCaughtWoody + FinishGame +
+        the catcher's HitWoody urgent run (Mother.OnCaughtWoody calls
+        HitWoody too, Mother.cs:108-111) +
         RoutineActionHitWoody.OnActionStarted."""
         import random
         self.game.got_caught = True
         self.game.won = False
         self.game.ending = True           # FinishGame: input locked
-        rott = self.pawns.get('Rottweiler')
+        catcher = catcher or self.pawns.get('Rottweiler')
         woody = self.woody
-        # Woody.PlayFearAnimation(Rottweiler): face the neighbour
-        fear = woody.fear_left if rott.sprite.x < woody.sprite.x else woody.fear_right
+        # Woody.PlayFearAnimation(catcher): face whoever caught him
+        fear = woody.fear_left if catcher.sprite.x < woody.sprite.x \
+            else woody.fear_right
         if woody.anim.has(fear):
             woody.anim.play_single(fear)
         woody.steps = []
         woody.state = woody.IDLE
-        # Rottweiler.HitWoody: stop the routine, walk to Woody, then the hit
+        # HitWoody: stop the routine, walk to Woody, then the hit
         for r in self.routines:
-            if r.pawn is rott:
+            if r.pawn is catcher:
                 r.frozen = True           # ActionManager.Freeze in the action
-        rott.steps = []
-        rott.in_urgent = False            # HitWoodyAction.Urgent = false
+        catcher.steps = []
+        catcher.in_urgent = False         # HitWoodyAction.Urgent = false
 
         def hit():
-            seqs = [q for q in rott.hit_action.get('sequences', [])
-                    if all(rott.anim.has(a) for a in q)]
+            seqs = [q for q in catcher.hit_action.get('sequences', [])
+                    if all(catcher.anim.has(a) for a in q)]
             woody.sprite.hidden = True    # the hit sheets contain Woody
             if seqs:
-                rott.anim.play_sequence(random.choice(seqs),
-                                        on_end=self._finish_animation_ended)
+                catcher.anim.play_sequence(random.choice(seqs),
+                                           on_end=self._finish_animation_ended)
             else:
                 self._finish_animation_ended()
-        if not rott.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
+        if not catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
             hit()
 
     def _finish_animation_ended(self):
@@ -1963,6 +1987,10 @@ class World:
         if self.can_rottweiler_see_woody():
             if not self.game.got_caught:
                 self._catch()
+        elif self.can_mother_see_woody():
+            # GameInfo.Update's second branch (GameInfo.cs:222-224)
+            if not self.game.got_caught:
+                self._catch(self.pawns.get('Mother'))
         elif self.game.all_done():
             # WinGameOnCompleteAllTricks waits 2.5 seconds before the win pose
             if self.game.win_timer is None:

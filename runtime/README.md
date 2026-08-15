@@ -438,7 +438,16 @@ predicate, then the all-tricks win.
 - **Sneaking** is the port's toggle (`Woody.ToggleSneak`), applied at each move
   start — and `StartMoveToLocation` sets `InUrgentMove = !Sneaking`, so **a
   plain click is a running move** (`RunningForceMagnitude`, 2.0 u/s for Woody),
-  sneaking the slow one (0.52 u/s). Tab in the viewer.
+  sneaking the slow one (0.52 u/s). Tab in the viewer. Woody's walk animation
+  override plays `Run_*` unless sneaking (Woody.cs:890-936) — Season 2's
+  Woody sheet has no `Walk_*` frames at all, which is how the port's
+  hard-coded `Walk_` was caught; every other pawn walks (Pawn.cs:1175-1188).
+- **The Mother catches too** — `CanMotherSeeWoody` (GameInfo.cs:194-199) is
+  the neighbour's non-Bed chain checked as the `else if` after his
+  (GameInfo.cs:222-224), and `OnMotherCaughtWoody` mirrors the catch:
+  `Mother.OnCaughtWoody` runs the same `HitWoody` (Mother.cs:108-111), and
+  every Season-2 Mother carries all four hit sequences. Her
+  `Mother.CanSeeWoody` defers to level behaviors (not ported, default true).
 
 Standing in the open while the routine passes through your zone gets you caught;
 19 of the 28 levels do exactly that to an idle Woody within three minutes.
@@ -495,7 +504,9 @@ only active objects get.
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
 that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
-stop-fields live there), `Mother`'s catch predicate, HUD, the remaining use
-side-effect flags (`HideObjectDuringUse` family, `TeleportRottweilerOnUse`,
-the exit deltas, skates/toilet state), and the name-hack branches listed at
-the end of the priming section.
+stop-fields live there), HUD, the remaining use side-effect flags
+(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
+skates/toilet state), the `IsMovingToAdjacentZone` / `DonePassingToOtherZone`
+/ `PassingComplexMove` terms of the detection predicates (states the port's
+movement model does not have), and the name-hack branches listed at the end
+of the priming section.
