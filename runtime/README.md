@@ -287,9 +287,38 @@ The locked first-aid kit correctly refuses to open.
 
 In the viewer: click an item to use it, digits 1–9 select inventory, 0 clears.
 
+## Detection, catching, the two endings (§6)
+
+`World.tick` runs `GameInfo.Update`'s Classic checks every frame: the detection
+predicate, then the all-tricks win.
+
+- **`CanRottweilerSeeWoody`** (GameInfo.cs:181-192) verbatim: same zone, neither
+  warping through a door, neighbour not `IgnoreWoody`/`IsSleeping`, Woody not
+  `Hiding`, `(!blocking || !sneaking)` on his side, no blocking animation on
+  Woody's. The `Bed` case swaps the sleep term for "Woody is moving".
+- **The catch** (`OnNeighborCaughtWoody` → `FinishGame` → `Rottweiler.HitWoody` →
+  `RoutineActionHitWoody`): input locks, Woody plays `FearLeft/Right` facing the
+  neighbour, the neighbour drops his routine and walks over, Woody's sprite
+  hides, and one of the four serialized hit sequences plays — the beating is
+  drawn in the neighbour's sheets. Its end is `FinishAnimationEnded`.
+- **The win**: `CompletedTricksCount >= TotalTricksCount` waits the coroutine's
+  2.5 s, then `PlayWinAnimations` — everything freezes and Woody plays
+  `WinAnimation` (`WinGame`).
+- **Hiding** (`HideItem.InternalUse` → `Woody.Hide`, `Woody.Unhide` →
+  `HideItem.Leave`): using a wardrobe hides Woody at once and plays `Hide_In`;
+  any new move leaves it, restoring the wardrobe idle and playing its
+  `LeaveAnimation`.
+- **Sneaking** is the port's toggle (`Woody.ToggleSneak`), applied at each move
+  start — and `StartMoveToLocation` sets `InUrgentMove = !Sneaking`, so **a
+  plain click is a running move** (`RunningForceMagnitude`, 2.0 u/s for Woody),
+  sneaking the slow one (0.52 u/s). Tab in the viewer.
+
+Standing in the open while the routine passes through your zone gets you caught;
+19 of the 28 levels do exactly that to an idle Woody within three minutes.
+
 ## Not implemented
 
-From `docs/GAMEPLAY.md` §6–§7: detection and catching (`CanRottweilerSeeWoody`,
-win/lose in `GameInfo.Update`), alerters, sneaking and hiding, urgent actions
-(`SurpriseFar/Near`, `PawnToAbortMutexOnFinish` release), priming
-(`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`), HUD.
+From `docs/GAMEPLAY.md` §6–§7: alerters, urgent surprise actions
+(`SurpriseFar/Near`, `PawnToAbortMutexOnFinish` release, `SetIgnoreInfiniteLoop`),
+priming (`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`),
+`Mother`'s catch predicate, HUD.
