@@ -25,9 +25,13 @@ class Anim:
     __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
                  'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern')
 
-    def __init__(self, d):
+    def __init__(self, d, base_path=''):
         self.name = d.get('Name')
-        self.sheet = d.get('TextureFileName')
+        # AnimationInstance.LoadTexture does Resources.Load(BaseAnimationPath +
+        # TextureFileName), so an empty TextureFileName means the base path is
+        # itself the asset. Textures are extracted under their own name, which
+        # is the last path component either way.
+        self.sheet = os.path.basename((base_path or '') + (d.get('TextureFileName') or ''))
         self.cols = max(1, d.get('SheetColumns') or 1)
         self.rows = max(1, d.get('SheetRows') or 1)
         self.start = d.get('StartFrame') or 0
@@ -157,7 +161,9 @@ class Level:
         tr = self._transform(go)
         if not tr or not self._active(go):
             return
-        anims = [Anim(a) for a in (d.get('Animations') or []) if a.get('TextureFileName')]
+        base = d.get('BaseAnimationPath') or ''
+        anims = [Anim(a, base) for a in (d.get('Animations') or [])]
+        anims = [a for a in anims if a.sheet]
         if not anims:
             return
         depth = GUI_DEPTH.get(d.get('AnimationGUIDepth'), 32)

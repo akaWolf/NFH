@@ -37,14 +37,18 @@ Ordering is the `GUIDepth` enum, not z-sorting: higher value draws further back.
 
 ## Coverage
 
-All 28 playable levels across both seasons render with every sprite placed and
-no missing sheet:
+All 31 levels of both seasons render with every sprite placed and no missing
+sheet — 535 sprites in total:
 
 ```
-Level101  drew 15/15 sprites; missing sheets: 0
+Level101  drew 16/16 sprites; missing sheets: 0
 ...
 Level214  drew 16/16 sprites; missing sheets: 0
+total sprites drawn: 535, missing sheets: 0
 ```
+
+Sprite counts vary a lot by design: Level113 has 27, while Level201 has 8
+because that level paints most of its scenery into the backdrop instead.
 
 ## Things that bite
 
@@ -60,6 +64,12 @@ Level214  drew 16/16 sprites; missing sheets: 0
   a duplicate-asset suffix (`Closed/closeddoorback_ms`, `trashcan_ms (2)`). The
   texture cache tries the raw name, the flattened one, the basename, and the
   sanitised one.
+- **The sheet is `BaseAnimationPath + TextureFileName`, and `TextureFileName`
+  is sometimes empty** — then the base path *is* the asset, e.g.
+  `Textures/NFH2/Items/WaterPuddle/W_Water_Puddle` + `''`. Only 76 of 12374
+  animations do this (68 of them in Season 1), and treating an empty name as
+  "no sheet" drops those objects silently: Level201 rendered 4 sprites instead
+  of 8, and nothing reported an error.
 
 ## Not implemented
 
