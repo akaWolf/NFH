@@ -26,6 +26,12 @@ class Camera:
         sy = (wy - self.y) / self.size * (h * 0.5) + h * 0.5
         return sx, h - sy
 
+    def screen_to_world(self, sx, sy, w, h):
+        aspect = w / float(h)
+        wx = (sx - w * 0.5) / (w * 0.5) * (self.size * aspect) + self.x
+        wy = ((h - sy) - h * 0.5) / (h * 0.5) * self.size + self.y
+        return wx, wy
+
     def world_rect_to_screen(self, cx, cy, ww, wh, w, h):
         x0, y0 = self.world_to_screen(cx - ww * 0.5, cy + wh * 0.5, w, h)
         x1, y1 = self.world_to_screen(cx + ww * 0.5, cy - wh * 0.5, w, h)
@@ -85,6 +91,8 @@ class TextureCache:
 
 def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h):
     """One blit, following AnimationControllerBase.DrawAnimation."""
+    if getattr(sprite, 'hidden', False):
+        return False
     entry = cache.get(anim.sheet)
     if entry is None or not anim.ow or not anim.oh:
         return False

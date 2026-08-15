@@ -66,11 +66,15 @@ Done:
   quads for the backdrop, then screen-space sheet blits ordered by `GUIDepth`.
   All 28 playable levels render with every sprite placed and no missing sheet.
 
+- **Woody walks.** Click-to-move with BFS over the door graph, and door transits
+  animated the way the game does them — the pawn hides and the door plays the
+  sheet that contains him. Every zone of all 28 playable levels is reachable.
+
 Not started:
 
-- **Gameplay.** Zone pathfinding, animation sequencer, `ActionManager`, trick
-  state machine, alerter FSM, inventory, HUD — everything in
-  `docs/GAMEPLAY.md` §4–§7.
+- **Gameplay.** `ActionManager` and the neighbour's routine, trick state
+  machine, detection and catching, alerters, anger and scoring, inventory,
+  HUD — `docs/GAMEPLAY.md` §4–§7.
 
 Open questions are listed at the end of `docs/GAMEPLAY.md`.
 

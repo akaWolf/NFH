@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sdl2
 
 from scene import Level, DESIGN_H
+from world import World
 from render import Camera, TextureCache, draw_sprite, draw_quad, draw_zone_overlay
 
 WIDTH, HEIGHT = 800, 600
@@ -42,15 +43,24 @@ class Viewer:
         self.cam = Camera()
         self.show_zones = False
         self.paused = False
+        self.follow = False
+        self.woody = None
         self.t = 0.0
         self.load(self.i)
 
     def load(self, i):
         self.i = i % len(self.paths)
         self.level = Level(self.paths[self.i])
+        self.world = World(self.level)
+        self.woody = None
+        p = self.level.pawns.get('Woody')
+        if p and p['zone'] is not None:
+            self.woody = self.world.spawn_woody(
+                p['sprite'], self.level.zone_by_pid(p['zone']), p['speed'])
         bg = self.level.background
         self.cam.x = bg[1] if bg else 0.0
         self.cam.y = bg[2] if bg else 0.0
+        self.follow = bool(self.woody)
         self.t = 0.0
         print('%s — %d sprites, %d zones, background %s'
               % (self.level.name, len(self.level.sprites),
@@ -120,10 +130,22 @@ class Viewer:
                         self.paused = not self.paused
                     elif k == sdl2.SDLK_s:
                         self.screenshot('/tmp/nfh-%s.png' % self.level.name)
+                    elif k == sdl2.SDLK_f:
+                        self.follow = not self.follow
+                if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
+                    wx, wy = self.cam.screen_to_world(ev.button.x, ev.button.y,
+                                                      WIDTH, HEIGHT)
+                    if not self.woody.goto(wx, wy):
+                        print('no route to (%.2f, %.2f)' % (wx, wy))
             now = time.time()
             dt = now - last; last = now
             if not self.paused:
                 self.t += dt
+            if not self.paused:
+                self.world.tick(min(dt, 0.1))
+                if self.follow and self.woody:
+                    self.cam.x = self.woody.sprite.x
+                    self.cam.y = self.woody.sprite.y + 0.6
             drawn = self.draw()
             if shot and now - start > 0.4:
                 self.screenshot(shot)

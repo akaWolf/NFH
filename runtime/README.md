@@ -7,8 +7,9 @@ JSON and the extracted PNGs. Python + PySDL2 over the system SDL2.
 NFH_TEXTURES=/path/to/pngs python3 runtime/viewer.py levels/s1/Level101.json
 ```
 
-Keys: arrows pan · `[` `]` previous/next level · `Z` zone overlay · `Space` pause
-· `S` screenshot · `Esc` quit. Add `--shot=out.png` to render one frame headless
+Click to send Woody there. Keys: arrows pan · `F` follow camera · `[` `]`
+previous/next level · `Z` zone overlay · `Space` pause · `S` screenshot ·
+`Esc` quit. Add `--shot=out.png` to render one frame headless
 (pair it with `SDL_VIDEODRIVER=offscreen`).
 
 ## What it reproduces
@@ -71,8 +72,38 @@ because that level paints most of its scenery into the backdrop instead.
   "no sheet" drops those objects silently: Level201 rendered 4 sprites instead
   of 8, and nothing reported an error.
 
+## Movement
+
+`world.py` adds the parts of §3 and §8 that make Woody walk. Click anywhere:
+
+1. `zone_at(x, y)` finds the destination zone.
+2. `find_path` is BFS over the door graph — the game's Dijkstra uses a flat cost
+   of 1.0 per hop, so the two agree.
+3. Each hop becomes a step: walk along x to the door, transit, continue.
+
+A transit is the interesting part. The door sheets (`W_Door_Right_Enter` and
+friends) already contain the walking character, so the game **hides the pawn and
+animates the door**. Passing one is:
+
+```
+walk to door.x  ->  pawn.hidden = True
+                    door.play(WoodyEnterAnimation)
+  on end:           pawn moves to door.LinkTo, zone = LinkTo.zone
+                    LinkTo.play(WoodyLeaveAnimation)
+  on end:           pawn.hidden = False, next step
+```
+
+`AnimPlayer` mirrors `AnimationControllerBase`: an animation ending pulls the
+next from the queue, and the queue draining fires the callback — which is what
+ends the owning action. Walk direction comes from the dominant axis of the
+movement vector, and the stand pose keeps the last facing, as `Pawn` and
+`PawnAnimationController` do.
+
+Every zone of all 28 playable levels is reachable from Woody's start. The three
+intro scenes are not — they are cutscenes, and two declare no Woody zone at all.
+
 ## Not implemented
 
-Everything in `docs/GAMEPLAY.md` §4–§7: the routine engine, trick state machine,
-detection, alerters, anger and scoring. This draws a level; it does not play one.
-Input is limited to panning the camera.
+Everything in `docs/GAMEPLAY.md` §4–§7 except navigation: the routine engine,
+the trick state machine, detection and catching, alerters, anger and scoring.
+Woody walks; nothing else happens yet.
