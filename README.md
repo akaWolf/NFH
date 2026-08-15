@@ -12,6 +12,7 @@ and one spec cover both. See `docs/BUILDS.md`.
 | path | what |
 |---|---|
 | `tools/` | extraction pipeline — plain Python 3, numpy only for textures |
+| `runtime/` | reimplemented renderer — Python + PySDL2 |
 | `levels/s1/`, `levels/s2/` | all 37 scenes of both seasons as JSON (41 MB) |
 | `src/` | 33 867 lines of C# decompiled from the game assemblies |
 | `docs/GAMEPLAY.md` | behavioural spec of the game, cited to source lines |
@@ -35,6 +36,7 @@ python3 tools/summary.py levels/s1/Level101.json
 python3 tools/zonegraph.py levels/s1/Level101.json
 python3 tools/extract_textures.py textures   # 4013 PNGs, ~10 min for both seasons
 python3 tools/extract_audio.py audio         # 923 WAV + 41 raw .fsb
+NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 ```
 
 ## State
@@ -59,10 +61,16 @@ Done:
   audio clips, 923 unwrap from their FMOD FSB5 containers to WAV; the 41
   FMOD-Vorbis music tracks are kept as raw `.fsb`.
 
+- **Rendering reimplemented.** `runtime/` draws any level from the exported JSON
+  and the extracted PNGs, reproducing both passes the game used: world-space
+  quads for the backdrop, then screen-space sheet blits ordered by `GUIDepth`.
+  All 28 playable levels render with every sprite placed and no missing sheet.
+
 Not started:
 
-- **Runtime.** Sprite-sheet renderer, zone pathfinding, animation sequencer,
-  `ActionManager`, alerter FSM, inventory, HUD.
+- **Gameplay.** Zone pathfinding, animation sequencer, `ActionManager`, trick
+  state machine, alerter FSM, inventory, HUD — everything in
+  `docs/GAMEPLAY.md` §4–§7.
 
 Open questions are listed at the end of `docs/GAMEPLAY.md`.
 

@@ -1,6 +1,19 @@
 {
  "scene": "level0",
  "unity_scene": "Assets/Levels/EmptyEntry.unity",
+ "quads": [
+  {
+   "name": "Level",
+   "texture": "house01",
+   "active": true,
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 14.279999732971191,
+   "h": 7.360000014305115,
+   "is_level": true
+  }
+ ],
  "objects": {
   "1": {
    "type": "GameObject",
@@ -148,6 +161,16 @@
      -0.7071068286895752,
      -3.090862321641907e-08
     ],
+    "world_position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world_scale": [
+     1.4279999732971191,
+     1.0,
+     0.7360000014305115
+    ],
     "children": [],
     "father": 0
    }
@@ -172,6 +195,16 @@
      0.0,
      0.0,
      0.0,
+     1.0
+    ],
+    "world_position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world_scale": [
+     1.0,
+     1.0,
      1.0
     ],
     "children": [],
@@ -200,6 +233,16 @@
      0.0,
      1.0
     ],
+    "world_position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
     "children": [],
     "father": 0
    }
@@ -224,6 +267,16 @@
      0.0,
      0.0,
      0.0,
+     1.0
+    ],
+    "world_position": [
+     0.09517936408519745,
+     0.10883137583732605,
+     -0.021484375
+    ],
+    "world_scale": [
+     1.0,
+     1.0,
      1.0
     ],
     "children": [],

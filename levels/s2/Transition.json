@@ -1,6 +1,7 @@
 {
  "scene": "level2",
  "unity_scene": "Assets/Levels/Transition.unity",
+ "quads": [],
  "objects": {
   "1": {
    "type": "GameObject",
@@ -140,6 +141,16 @@
      0.0,
      1.0
     ],
+    "world_position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
     "children": [],
     "father": 0
    }
@@ -166,6 +177,16 @@
      -0.7071068286895752,
      -3.090862321641907e-08
     ],
+    "world_position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world_scale": [
+     1.4279999732971191,
+     1.0,
+     0.7360000014305115
+    ],
     "children": [],
     "father": 0
    }
@@ -190,6 +211,16 @@
      0.0,
      0.0,
      0.0,
+     1.0
+    ],
+    "world_position": [
+     0.0,
+     0.009120464324951172,
+     -5.149039268493652
+    ],
+    "world_scale": [
+     1.0,
+     1.0,
      1.0
     ],
     "children": [],

@@ -32,6 +32,7 @@ data — recover the layout from the metadata and the scene blobs become readabl
 | `audio.py` | AudioClip reader, FSB5 container walk, WAV out |
 | `extract_audio.py` | every AudioClip → WAV (or raw `.fsb`) |
 | `validate_all.py` | self-test (see below) |
+| `assets.py` | cross-file PPtr resolution: renderer → material → texture |
 | `decompile.sh` | ILSpy → `src/` (33.9k lines of C# across 241 files) |
 
 ## Usage
