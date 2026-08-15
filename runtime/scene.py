@@ -105,6 +105,7 @@ class Zone:
 class Item:
     """Anything the neighbour's routine can act on, or Woody can trick."""
     __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy',
+                 'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
@@ -130,6 +131,9 @@ class Item:
         self.idle_tricked = d.get('IdleTricked')
         # PlayItemAnimation is a no-op unless Animating, and skips NONE outright
         self.animating = bool(d.get('Animating'))
+        self.use_distance = d.get('UseDistance') or 0.01
+        self.delta_olga_x = (d.get('DeltaOlgaLocation') or {}).get('x', 0.0)
+        self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
         self.trick_score = d.get('TrickScore') or 0
         self.anger = d.get('AngerAmount') or 0
@@ -143,8 +147,17 @@ class Item:
 
     @property
     def target_x(self):
-        """where a pawn stands to use it — Item.TargetLocation"""
+        """Item.TargetLocation = position + DeltaLocation"""
         return self.x + self.dx
+
+    def move_x(self, role):
+        """Item.GetMoveLocation: Olga and Mother stand offset, everyone else
+        at TargetLocation itself."""
+        if role == 'Olga':
+            return self.target_x + self.delta_olga_x
+        if role == 'Mother':
+            return self.target_x + self.delta_mother_x
+        return self.target_x
 
     def sequence_for(self, role, tricked):
         """Item.PlayAnimation picks one array and plays it. No fallback: an
@@ -163,7 +176,7 @@ class Door:
     """
     __slots__ = ('name', 'pid', 'x', 'y', 'zone', 'link_to', 'locked',
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
-                 'exit_anim', 'idle', 'sprite')
+                 'exit_anim', 'idle', 'sprite', 'passing')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -178,6 +191,7 @@ class Door:
         self.exit_anim = d.get('ExitAnimation')
         self.idle = d.get('IdleAnimation')
         self.sprite = None
+        self.passing = None                 # Door.PassingPawn
 
 
 class Level:
@@ -313,21 +327,27 @@ class Level:
                                dl.get('x', 0.0), dl.get('y', 0.0), d)
 
     def _link_item_sprites(self):
+        """Item.Start: AnimController = GetComponentInChildren — the controller
+        is on the item's own GameObject or a child, never found by position."""
         by_go = {}
         for s in self.sprites:
             if s.kind == 'ItemAnimationController':
                 by_go.setdefault(s.go, s)
-        for it in self.items.values():
-            go = self._go_of(self._o(it.pid))
-            it.sprite = by_go.get(go)
-            if it.sprite is not None:
-                continue
+
+        def find(go):
+            if go in by_go:
+                return by_go[go]
             tp = self._transform_of.get(go)
             for k in ((self._o(tp)['data'].get('children') or []) if tp else ()):
                 kgo = self._o(k)['data'].get('gameObject')
                 if kgo in by_go:
-                    it.sprite = by_go[kgo]
-                    break
+                    return by_go[kgo]
+            return None
+
+        for it in self.items.values():
+            it.sprite = find(self._go_of(self._o(it.pid)))
+        for d in self.doors:
+            d.sprite = find(self._go_of(self._o(d.pid)))
 
     def _apply_zone_bounds(self):
         """Level.Start(): PlayLeft/PlayRight come from lists on the Level
@@ -466,6 +486,9 @@ class Level:
             item = self._component(go, owner_type)
             if item and 'data' in item:
                 want = item['data'].get(field)
+                # ReturnToIdleAnimation plays the tricked idle when IsTricked
+                if field == 'IdleNormal' and item['data'].get('Tricked'):
+                    want = item['data'].get('IdleTricked') or want
                 break
         if want is None:
             for pawn_type in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
@@ -531,6 +554,8 @@ class Level:
                 'door_force': pd.get('DoorForceMagnitude') or 0.0,
                 'run_force': pd.get('RunningForceMagnitude') or 0.0,
                 'run_door_force': pd.get('RunningDoorForceMagnitude') or 0.0,
+                'door_delta': ((pd.get('DoorDistanceDelta') or {}).get('x', 0.0),
+                               (pd.get('DoorDistanceDelta') or {}).get('y', 0.0)),
                 'default': pd.get('DefaultAnimation'),
             }
 

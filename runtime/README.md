@@ -89,6 +89,16 @@ clamps a free click to that range, but `BuildPathToItem` drops the clamped step
 and appends the item's own `TargetLocation`, so routine targets are never
 clamped — the binoculars at 6.30 stay reachable.
 
+An action is "at place" per `Item.IsAtUseRange`: same zone, and within the
+item's own `UseDistance` of `GetMoveLocation` — which offsets the stand-point by
+`DeltaOlgaLocation` / `DeltaMotherLocation` for those two and is plain
+`TargetLocation` for Woody and the neighbour. The `MaximumPawnDistanceToAction`
+field on the action is not that check.
+
+A door's animation controller is found the way `Item.Start` finds it —
+`GetComponentInChildren`, so the door's own object or a child; 116 of the 354
+doors keep it on a child, where matching by position would have guessed.
+
 `world.py` adds the parts of §3 and §8 that make Woody walk. Click anywhere:
 
 1. `zone_at(x, y)` finds the destination zone.
@@ -101,18 +111,26 @@ friends) already contain the walking character, so the game **hides the pawn and
 animates the door**. Passing one is:
 
 ```
-walk to door.x  ->  pawn.hidden = (pawn is Woody)     # only Woody hides
-                    door.play(<role>EnterAnimation)   # on the door's controller
-  on end:           pawn moves to door.LinkTo, zone = LinkTo.zone
-                    LinkTo.play(<role>LeaveAnimation)
-  on end:           pawn.hidden = False
-                    pawn.playLooping(door.ExitAnimation)
+walk to door.x  ->  SetHidden(true)                     # every pawn hides
+                    sourceDoor.play(<role>...Leave)     # both doors animate
+                    farDoor.play(<role>...Enter)        # AT THE SAME TIME
+  farDoor Enter ends:
+                    warp to farDoor.position + DoorDistanceDelta
+                    zone = farDoor.Zone, unhide
+                    pawn.playLooping(farDoor.ExitAnimation)
+  sourceDoor Leave ends:  nothing (frees the door)
 ```
 
-`PlayDoorEnterAnimation` hides the sprite behind `if (this is Woody)` — the
-neighbour stays visible while his own door sheet plays. `ExitAnimation` is an
-`AnimationState`, so it loops on the *pawn* once through, unlike the enter and
-leave animations which are `ItemAnimationState` and belong to the door.
+This is `Pawn.MoveToDoor`'s portal branch verbatim: `PlayDoorLeaveAnimation(
+TargetDoor)` and `PlayDoorEnterAnimation(TargetDoor.LinkTo)` fire together, and
+the teleport hangs off `OnDoorEnterAnimationFinished` — the far door's Enter.
+**Leave belongs to the departing side, Enter to the arriving side**, and
+`PlayDoorLeaveAnimation` calls `SetHidden(true)` unconditionally, so the
+neighbour hides during transit exactly like Woody (the `is Woody` guards touch
+the same flag again). `ExitAnimation` is an `AnimationState` and loops on the
+*pawn*; enter/leave are `ItemAnimationState` and belong to the doors. A door
+occupied by another pawn (`IsOtherPawnPassing`, either side) makes the arrival
+wait standing.
 
 `AnimPlayer` mirrors `AnimationControllerBase`: an animation ending pulls the
 next from the queue, and the queue draining fires the callback — which is what

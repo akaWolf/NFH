@@ -83,6 +83,9 @@ Season 1 alone is 2008 `MonoBehaviour` instances across 82 script classes.
   native convention of padding after a *run* of small fields rather than after
   each one.
 - `Transform` in this build has no `m_RootOrder` and no `m_LocalEulerAnglesHint`.
+- The backdrop quads reference Unity's built-in meshes: pathID 10209 is 'Plane'
+  (AABB 10x10 in XZ) and 10202 is 'Cube' (1x1x1) — verified against the
+  `unity default resources` file shipped in the APK, not assumed.
 - Composing the hierarchy needs the rotation, not just position and scale. 216
   transforms carry the quaternion that lays an object into the view plane, and
   28 of their children sit at a non-zero local offset — one 28.7 units along

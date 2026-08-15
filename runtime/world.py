@@ -109,6 +109,7 @@ class Pawn:
         self.speed_sneaking = spec.get('speed_sneaking') or 0.0
         self.force = spec.get('force') or 0.0
         self.door_force = spec.get('door_force') or 0.0
+        self.door_delta = spec.get('door_delta') or (0.0, 0.0)
         self.sneaking = False
         self.state = self.IDLE
         self.facing = 'Left'
@@ -173,43 +174,65 @@ class Pawn:
         base = self.speed_sneaking if self.sneaking else self.speed
         return base * (self.force if horizontal else self.door_force)
 
-    def _enter_door(self, door):
-        """Pawn.PlayDoorEnterAnimation: the door plays the sheet that contains
-        the character, and only Woody's own sprite is hidden — the neighbour
-        stays visible."""
-        self.state = self.DOOR_ENTER
-        self.hidden = (self.role == 'Woody')
-        self._door = door
-        anim = door.enter if self.role == 'Woody' else door.rott_enter
-        player = door.sprite
-        if player is None or not anim:
-            self._leave_door(door)
-            return
-        player.play_sequence([anim], on_end=lambda: self._leave_door(door))
+    def _door_anims(self, door):
+        """Leave belongs to the departing side, Enter to the arriving side."""
+        if self.role == 'Woody':
+            return door.leave, door.enter
+        return door.rott_leave, door.rott_enter
 
-    def _leave_door(self, door):
+    def _enter_door(self, door):
+        """Pawn.MoveToDoor, portal branch. Both doors animate at once:
+
+            PlayDoorLeaveAnimation(TargetDoor);          // source side: Leave
+            PlayDoorEnterAnimation(TargetDoor.LinkTo);   // far side: Enter
+
+        PlayDoorLeaveAnimation calls SetHidden(true), so every pawn is hidden
+        during transit, not just Woody. The teleport happens when the far
+        door's Enter animation finishes (OnDoorEnterAnimationFinished), which
+        also plays that door's ExitAnimation looping on the pawn."""
         other = self.level.door_by_pid(door.link_to)
         if other is None:
-            self.hidden = False
             self.state = self.IDLE
             return
-        self.sprite.x, self.sprite.y = other.x, other.y
-        self.zone = self.level.zone_by_pid(other.zone) or self.zone
-        self.state = self.DOOR_LEAVE
+        # Door.IsOtherPawnPassing on either side: stand and wait
+        if (door.passing is not None and door.passing is not self) or \
+                (other.passing is not None and other.passing is not self):
+            self.anim.play_looping('Stand_' + self.facing)
+            return                        # state stays WALK; retried next tick
+        self.state = self.DOOR_ENTER
+        self.hidden = True
+        self._door = door
         self._exit_door = other
-        anim = other.leave if self.role == 'Woody' else other.rott_leave
-        player = other.sprite
-        if player is None or not anim:
-            self._done_door()
-            return
-        player.play_sequence([anim], on_end=self._done_door)
+        door.passing = other.passing = self
+        leave_anim, _ = self._door_anims(door)
+        _, enter_anim = self._door_anims(other)
+        if door.sprite is not None and leave_anim:
+            door.sprite.play_sequence([leave_anim],
+                                      on_end=lambda: self._leave_played(door))
+        else:
+            door.passing = None           # Door.PlayAnimation's null branch
+        if other.sprite is not None and enter_anim:
+            other.sprite.play_sequence([enter_anim], on_end=self._enter_played)
+        else:
+            self._enter_played()          # Door.PlayAnimation's null branch
 
-    def _done_door(self):
-        """Pawn.OnDoorEnterAnimationFinished: unhide, then loop the door's own
-        ExitAnimation on the pawn."""
+    def _leave_played(self, door):
+        """OnDoorLeaveAnimationFinished does nothing for a normal door;
+        the door just frees itself (PassingPawn = null)."""
+        door.passing = None
+
+    def _enter_played(self):
+        """Pawn.OnDoorEnterAnimationFinished: warp to the far door plus
+        DoorDistanceDelta, change zone, unhide, loop its ExitAnimation."""
+        d = self._exit_door
+        if d is None:
+            return
+        d.passing = None
+        self.sprite.x = d.x + self.door_delta[0]
+        self.sprite.y = d.y + self.door_delta[1]
+        self.zone = self.level.zone_by_pid(d.zone) or self.zone
         self.hidden = False
-        d = getattr(self, '_exit_door', None)
-        if d is not None and d.exit_anim and self.anim.has(d.exit_anim):
+        if d.exit_anim and self.anim.has(d.exit_anim):
             self.anim.play_looping(d.exit_anim)
         self._next_step()
 
@@ -372,20 +395,12 @@ class World:
         self.woody = None
         self.pawns = {}
         self.routines = []
-        # exactly one player per sprite; doors point at the player of the
-        # sprite sitting on them, since a transit animates the door
+        # exactly one player per sprite; a door's controller was resolved by
+        # hierarchy in the scene (GetComponentInChildren), wrap it in a player
         self.players = {id(s): AnimPlayer(s) for s in level.sprites}
         for d in level.doors:
-            s = self._sprite_at(d.x, d.y)
-            d.sprite = self.players.get(id(s)) if s else None
-
-    def _sprite_at(self, x, y, tol=0.02):
-        best, bd = None, tol
-        for s in self.level.sprites:
-            dist = abs(s.x - x) + abs(s.y - y)
-            if dist < bd:
-                best, bd = s, dist
-        return best
+            if d.sprite is not None:
+                d.sprite = self.players.get(id(d.sprite))
 
     def player_for(self, sprite):
         return self.players.get(id(sprite))
