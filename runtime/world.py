@@ -228,6 +228,7 @@ class Pawn:
         self.state = self.IDLE
         self.facing = 'Left'
         self.hidden = False
+        self.input_locked = False        # Woody.InputLocked (the entrance)
         self.steps = []
         self.on_arrive = None
         self._step = None
@@ -452,6 +453,7 @@ class Pawn:
             # walk-up: Leave first; its end starts the far Enter
             def leave_done():
                 door.passing = None
+                self._door_idle(door)
                 if self.world:
                     self.world.zone_reaction(other.zone, 'enter')
                 self._play_enter(other, enter_anim)
@@ -467,6 +469,12 @@ class Pawn:
                 door.passing = None
             self._play_enter(other, enter_anim)
 
+    def _door_idle(self, door):
+        """Door.OnAnimationEnded ends every pass animation with
+        ReturnToIdleAnimation (Door.cs:155-197)"""
+        if door.sprite is not None and door.idle and door.sprite.has(door.idle):
+            door.sprite.play_single(door.idle)
+
     def _play_enter(self, other, enter_anim):
         if other.sprite is not None and enter_anim:
             other.sprite.play_sequence([enter_anim], on_end=self._enter_played)
@@ -475,6 +483,7 @@ class Pawn:
 
     def _leave_played(self, door):
         door.passing = None
+        self._door_idle(door)
 
     def _enter_played(self):
         """OnDoorEnterAnimationFinished: warp, unhide, loop ExitAnimation;
@@ -483,6 +492,7 @@ class Pawn:
         if d is None:
             return
         d.passing = None
+        self._door_idle(d)
         old_zone = self.zone.pid if self.zone else None
         self.sprite.x = d.x + self.door_delta[0]
         self.sprite.y = d.y + self.door_delta[1]
@@ -1560,6 +1570,7 @@ class World:
                 self.notice_items.setdefault(it.zone, []).append(it)
         self._delayed = []               # (seconds left, fn) Invoke timers
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
+        self._entrance_timer = None      # Woody's walk-in countdown
         # Item.Start ends in SetPrimed(Primed): the initial primed visibility
         # (Item.cs:697, 1219-1235)
         for it in level.items.values():
@@ -2199,6 +2210,17 @@ class World:
                  player=self.players[id(spec['sprite'])], role=role)
         p.world = self
         self.pawns[role] = p
+        if role == 'Woody' and self.level.start_location is not None:
+            # Woody.Start parks him at StartLocation in the StartZone with
+            # input locked (Woody.cs:187-192); after the intro (immediate
+            # here — the title cards are not modelled) the EntranceTimer
+            # (0.5 s, Woody.cs:114) runs and he walks in
+            p.sprite.x, p.sprite.y = self.level.start_location
+            z = self.level.zone_by_pid(self.level.start_zone)
+            if z is not None:
+                p.zone = z
+            p.input_locked = True
+            self._entrance_timer = 0.5
         return p
 
     def spawn_woody(self, sprite, zone, spec=None):
@@ -2348,6 +2370,21 @@ class World:
             if entry[0] <= 0.0:
                 self._delayed.remove(entry)
                 entry[1]()
+        # the entrance walk (Woody.cs:223-229): the timer runs down, he walks
+        # to Level.EntranceLocation, and arrival unlocks the input
+        # (OnFinishedEntrance)
+        if self._entrance_timer is not None and self.woody is not None:
+            self._entrance_timer -= dt
+            if self._entrance_timer <= 0.0:
+                self._entrance_timer = None
+                self.woody.start_move_flags()   # StartMoveToLocation(0)
+                ex, ey = self.level.entrance_location or \
+                    (self.woody.sprite.x, self.woody.sprite.y)
+                if not self.woody.goto(ex, ey):
+                    self.woody.input_locked = False
+        elif self.woody is not None and self.woody.input_locked and \
+                self.woody.state == self.woody.IDLE and not self.woody.steps:
+            self.woody.input_locked = False     # OnFinishedEntrance
         for p in self.players.values():
             p.tick(dt)
         for p in self.pawns.values():

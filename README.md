@@ -36,6 +36,8 @@ python3 tools/summary.py levels/s1/Level101.json
 python3 tools/zonegraph.py levels/s1/Level101.json
 python3 tools/extract_textures.py textures   # 4013 PNGs, ~10 min for both seasons
 python3 tools/extract_audio.py audio         # 923 WAV + 41 raw .fsb
+python3 tools/extract_gui.py textures/s1 textures/gui/ textures/bubbles/ inventory/
+python3 tools/extract_strings.py strings/s1 fonts/s1   # localization + TTFs
 NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 ```
 

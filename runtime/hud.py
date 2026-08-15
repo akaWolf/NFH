@@ -31,6 +31,16 @@ RATING_KEYS = {'EXCELLENT': 'EXCELLENTMSG', 'GOOD': 'GOODJOBMSG',
                'PASSED': 'PASSMSG', 'FAILED': 'FAIL2MSG',
                'TIME UP': 'TIMEUPMSG'}
 
+# HUD.Start's LoadTextures base paths (HUD.cs:349-352). The strips share
+# base names (all three faces ship an idle_0000), so the cache must see the
+# full Resources path — tools/extract_gui.py stores them path-flattened.
+WOODY_BASE = 'Textures/GUI/ingame2/woody_mb/'
+ROTT_BASE = 'Textures/GUI/ingame2/neighbor/'
+MOTHER_BASE = 'Textures/GUI/ingame2/mother/'
+WHISTLE_BASE = 'Textures/GUI/main/'
+# Actor.GetBaseIconPath (Actor.cs:64-71)
+BUBBLE_BASES = ('Textures/Bubbles/', 'Textures/NFH2/Bubbles/')
+
 
 def load_strings(level_path):
     """LocalizationManager.LoadLocalizationFile: 'KEY<>VALUE' lines from
@@ -470,7 +480,7 @@ class Hud:
         self.whistle_anim.update(dt)
         if self.whistle:
             i = min(self.whistle_anim.frame, len(self.whistle) - 1)
-            self._blit(self.whistle[i], self.rect('WhistleRect'))
+            self._blit(WHISTLE_BASE + self.whistle[i], self.rect('WhistleRect'))
 
     def _draw_tricks(self, dt):
         """DrawTricks: the coin ladder, the celebration strip, the statue"""
@@ -536,12 +546,12 @@ class Hud:
             self.woody_idle.restart()
         self.woody_active.update(dt)
         if self.woody_faces:
-            self._blit(self.woody_faces[
+            self._blit(WOODY_BASE + self.woody_faces[
                 min(self.woody_active.frame, len(self.woody_faces) - 1)],
                 self.rect('WoodyFaceRect'))
         self.rott_active.update(dt)
         if self.rott_faces:
-            self._blit(self.rott_faces[
+            self._blit(ROTT_BASE + self.rott_faces[
                 min(self.rott_active.frame, len(self.rott_faces) - 1)],
                 self.rect('RottweilerFaceRect'))
         routine = next((r for r in self.world.routines
@@ -552,7 +562,7 @@ class Hud:
         if self.has_mother:
             self.mother_active.update(dt)
             if self.mother_faces:
-                self._blit(self.mother_faces[
+                self._blit(MOTHER_BASE + self.mother_faces[
                     min(self.mother_active.frame, len(self.mother_faces) - 1)],
                     self.rect('MotherFaceRect'))
             mrt = next((r for r in self.world.routines
@@ -582,7 +592,12 @@ class Hud:
             if icons:
                 name = icons.get('active') or icons.get('icon')
         if name:
-            self._blit(os.path.basename(name), self.rect(icon_rect_key))
+            r = self.rect(icon_rect_key)
+            for base in BUBBLE_BASES:
+                if self._tex(base + name) is not None:
+                    self._blit(base + name, r)
+                    return
+            self._blit(os.path.basename(name), r)
 
     def _draw_angry_count(self):
         """DrawAngryCount: 'xN' beside the coins (non-NFH2, unless disabled)"""

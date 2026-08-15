@@ -90,13 +90,15 @@ def _anim_name(v):
 
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
-                 'play_left', 'play_right', 'ty', 'height_delta')
+                 'play_left', 'play_right', 'ty', 'height_delta', 'tx')
 
-    def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0):
+    def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0,
+                 tx=0.0):
         self.name = name; self.pid = pid
         self.x = x; self.y = y
         self.w = w; self.h = h; self.exit = is_exit
         self.ty = ty                        # transform y, floor reference
+        self.tx = tx                        # transform x (Entrance/StartLocation)
         self.height_delta = height_delta    # Zone.HeightDelta
         # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
         # the collider box is containment, these are the walking limits
@@ -513,6 +515,27 @@ class Level:
         self._apply_zone_bounds()
         self._apply_level_locations()
         self._find_game_info()
+        # Level.Start computes the entrance and start points from the named
+        # zones' transforms plus the serialized offsets (Level.cs:199-208);
+        # Woody.Start parks him at StartLocation and he walks to
+        # EntranceLocation once the intro lets him (Woody.cs:187-192, 223-229)
+        self.entrance_location = None
+        self.start_location = None
+        self.start_zone = None
+        lvl = next((o['data'] for o in self.objs.values()
+                    if o['type'] == 'Level' and 'data' in o), None)
+        if lvl:
+            def _point(zone_name, off_key):
+                off = lvl.get(off_key) or {}
+                for z in self.zones:
+                    if z.name == (zone_name or ''):
+                        return (z.tx + off.get('x', 0.0),
+                                z.ty + off.get('y', 0.0)), z.pid
+                return None, None
+            self.entrance_location, _ = _point(lvl.get('EntranceZoneName'),
+                                               'EntranceLocationOffset')
+            self.start_location, self.start_zone = _point(
+                lvl.get('StartZoneName'), 'StartLocationOffset')
         # a MoveOnly action stores the zone's GameObject; alias the zone
         # components' bubble icons onto it
         for pid in list(self.bubble_icons):
@@ -539,7 +562,7 @@ class Level:
         self.zones.append(Zone(self._o(go)['data']['name'], go,
                                p[0] + c[0], p[1] + c[1], s[0], s[1],
                                bool(o['data'].get('ExitZone')),
-                               ty=p[1],
+                               ty=p[1], tx=p[0],
                                height_delta=o['data'].get('HeightDelta') or 0.0))
 
     def _zone_of(self, go):
@@ -658,6 +681,7 @@ class Level:
                 z.y = z.y - z.ty + new_ty       # keep the collider centre offset
                 z.ty = new_ty
             z.x = z.x + ctrl[0]
+            z.tx = z.tx + ctrl[0]
             if i < len(sizes):
                 sz = sizes[i]
                 z.w = sz.get('x', z.w)

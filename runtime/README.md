@@ -64,7 +64,24 @@ because that level paints most of its scenery into the backdrop instead.
 - **Doors name their idle differently.** `Door` uses `IdleAnimation`, every other
   `Item` uses `IdleNormal`. Reading the wrong field silently selects animation 0,
   which for a door is "Woody walks through it" — the whole level then shows
-  Woody standing inside every doorway.
+  Woody standing inside every doorway. And every pass animation must end in
+  `ReturnToIdleAnimation` (`Door.OnAnimationEnded`, Door.cs:155-197) — without
+  it the door parks on the last stale frame of the walk-through.
+- **Flat extraction collides on base names.** All three HUD face strips ship
+  an `idle_0000`; `Resources.Load` disambiguates through the ResourceManager
+  container (class 147: path → PPtr). `tools/extract_gui.py` walks the
+  container and writes those textures with the full path flattened into the
+  name, and the HUD loads faces by `HUD.LoadTextures`' base paths
+  (HUD.cs:349-352) — before that, both portraits drew from one mixed pool and
+  flickered through each other's frames.
+- **Woody enters the level.** `Woody.Start` parks him at `Level.StartLocation`
+  (the street zone named by `StartZoneName`) with input locked
+  (Woody.cs:187-192); after the title cards (not modelled) the 0.5 s
+  `EntranceTimer` runs out and he walks to `Level.EntranceLocation`
+  (Woody.cs:223-229, Level.cs:199-208) — crossing the front door, which is
+  the entrance the player sees. Arrival unlocks the input
+  (`OnFinishedEntrance`). The `LevelLocations` teleport alone leaves him
+  standing mid-room.
 - **`IdleNormal == 'NONE'` means "not a sprite"** — except on an `Alerter`,
   whose `Start` plays the `SleepSequence` instead of an idle. Every other such
   object is drawn as a quad; giving it a sprite draws the wrong thing.

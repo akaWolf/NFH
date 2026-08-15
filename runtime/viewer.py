@@ -188,6 +188,8 @@ class Viewer:
                         self.world.inventory.select(idx)
                         self._print_state()
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
+                    if self.woody.input_locked:
+                        continue          # Woody.InputLocked (the entrance)
                     # Woody.Update: HUD.CheckClick() eats the click first
                     if self.hud is not None:
                         consumed = self.hud.check_click(ev.button.x, ev.button.y)
