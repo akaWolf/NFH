@@ -15,6 +15,12 @@ per hop), so shortest paths are plain BFS.
 """
 import json, sys, collections
 
+# ZoneController uses GetComponentsInChildren<Door>(), which also matches Door's
+# subclasses. Transition is the only one (see src/), and it is what Season 2 uses
+# for almost all of its zone links — Season 2 levels have 116 Transitions and 8
+# plain Doors.
+DOOR_TYPES = ('Door', 'Transition')
+
 
 class Level:
     def __init__(self, path):
@@ -47,8 +53,9 @@ class Level:
         return g
 
     def component(self, go, type_name):
+        wanted = DOOR_TYPES if type_name == 'Door' else (type_name,)
         for t, p in self.comps_of_go.get(go, []):
-            if t == type_name:
+            if t in wanted:
                 return p
         return None
 

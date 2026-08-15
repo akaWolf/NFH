@@ -1,8 +1,11 @@
 # NFH
 
-Reverse engineering the Android build of *Neighbours from Hell: Season 1*
-(`com.nordigames.nfh` 1.5.5, Unity 5.3.4f1, Mono) with a view to reimplementing
-the game engine.
+Reverse engineering the Android builds of *Neighbours from Hell* seasons 1 and 2
+(`com.nordigames.nfh` 1.5.5 and `com.nordigames.nfh2` 3.2.5 — both Unity 5.3.4f1,
+Mono) with a view to reimplementing the game engine.
+
+Both seasons ship the *same* `Assembly-CSharp.dll` source tree, so one decompile
+and one spec cover both. See `docs/BUILDS.md`.
 
 ## Layout
 
@@ -35,16 +38,17 @@ python3 tools/zonegraph.py levels/Level101.json
 Done:
 
 - **Data readable.** Every object in every scene deserializes with a byte-exact
-  size match — 5774 / 5774 across 20 scenes, 85 component types. The schema is
-  recovered from CIL metadata rather than guessed; see `tools/README.md` for the
-  Unity serialization rules that mattered.
+  size match — 5774 / 5774 across Season 1's 20 scenes and 4726 / 4726 across
+  Season 2's 17, with no code changes between them. The schema is recovered from
+  CIL metadata rather than guessed; see `tools/README.md` for the Unity
+  serialization rules that mattered.
 - **Code readable.** Mono assemblies decompile cleanly, no failures.
 - **Mechanics specified.** `docs/GAMEPLAY.md` covers the routine engine, trick
   state machine, detection and catching, alerters, anger and scoring, zone
   navigation, and the rendering model — with 39 line-level citations.
 - **Zone graph solved.** Not serialized, but rebuildable offline from door links
-  plus the transform hierarchy (`tools/zonegraph.py`). All 17 playable levels
-  come out connected.
+  plus the transform hierarchy (`tools/zonegraph.py`). All 31 playable levels
+  across both seasons come out connected.
 
 Not started:
 
@@ -57,8 +61,8 @@ Open questions are listed at the end of `docs/GAMEPLAY.md`.
 
 ## What makes this tractable
 
-1.5.5 ships **Mono**, so `Assembly-CSharp.dll` is ordinary CIL with full
+1.5.5 and 3.2.5 ship **Mono**, so `Assembly-CSharp.dll` is ordinary CIL with full
 metadata. That single fact gives both the game logic *and* the schema for the
 serialized level data — without it the MonoBehaviour blobs are unreadable, since
-the build has its type tree stripped. Version 1.5.14 switched to IL2CPP and loses
-this entirely.
+the builds have their type tree stripped. The successors (1.5.14, 3.2.13)
+switched to IL2CPP and lose this entirely.
