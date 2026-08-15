@@ -374,13 +374,55 @@ Level103's cake shows the cycle: visit one primes it, visit two plays
 a zero delay, else on a `GameInfo.Invoke` timer (Level206's Fifi chain uses
 1.35 s) — and `GameObjectToTrickAfterUse` flips its `Tricked`.
 
-Not ported, by name (each a hard-coded `name.Equals` branch in the source):
-PigKeys, Pipe, IceBucket, Cow, Snake/Mouse/AngryElephant, LionStatue,
-ElectricTrapTatter, Iron, ValveMain, DogFifi's put-animation swap, WaterPuddle,
-the `DoublePrimingItem` pairs, and Beer/BBQDirty. The FirstAid + key hack *is*
-ported (it is the only way Level108's kit opens), minus the `FirstAidPos`
-teleport — those fields are not serialized in either season's data, so the
-teleport target is unverifiable.
+The name-hack branches (hard-coded `name.Equals` sites in the source) are
+ported for every item on the documented list, each against its lines:
+
+- **FirstAid** + key (the only way Level108's kit opens; the `FirstAidPos`
+  teleport stays unverifiable — the fields are not serialized).
+- **ValveMain** — the Woody-click toggle owning the valve's state, the
+  completion-arm exemptions, and the early-loop unprime animation swap
+  (Item.cs:1335-1338).
+- **Iron / Rope** — single-shot once tricked (TrickItem.cs:311), the Rope
+  reset on Fix (416-420), `TakeOffIronPrimed`'s flags, the two routine jumps
+  (ActionManager.cs:213, Rottweiler.cs:461), and Iron's `WrongTrick`
+  exemption on a spent click (Item.cs:1665).
+- **PigKeys / Pig / PigMilk** — the take marks `ItemRemoved`
+  (SearchItem.cs:192-206, with `KeepFull` and `TrickAfterWoodyUse`), taken
+  keys answer WhatsUp (Item.cs:1515), the neighbour's pass restores or takes
+  them by `Primed` (1057-1063), the Pig's fix resets the keys
+  (TrickItem.cs:426-429), and the primed-keys surprise gate (837-841).
+- **Pipe** — the collider follows the neighbour's prime state
+  (Item.cs:1085, 1331), honoured by the click hit-test.
+- **Rake** — the compound lands only once tricked (TrickItem.cs:511).
+- **GroundMarbles** — `MarblesNextAction` makes the urgent resume repeat the
+  interrupted action (Item.cs:1384, ActionManager.cs:614, 642-646).
+- **DirtyCarpet** — excluded from the generic notice run (Rottweiler.cs:188);
+  its own urgent rides the unported Dog/Chili yell choreography.
+- **WaterPuddle** — `SetPrimed` negates its `DeltaLocation` outright
+  (Item.cs:1196-1200) and Fix re-primes it (2089-2092).
+- **LionStatue** — accepts its priming inventory only once tricked
+  (Item.cs:1544-1553).
+- **ElectricTrapTatter** — primes bare-handed, skipping the gate cluster
+  (Item.cs:1643-1651).
+- **IceBucket** — the prime chain re-arms it for a bucket round and writes
+  its target off as `FuckedUp` (Item.cs:1274-1281).
+- **Cow** — flowers become a priming item and the cow primes at once
+  (Item.cs:1760-1780).
+- **Snake / Mouse / AngryElephant** — the held mouse arms by target and type
+  (Item.cs:1385-1410), the snake round sets `SnakeAux208` and turns the
+  mouse into a snake (1554-1560), and the `DoublePrimingItem` elephant arm
+  primes and eats it (1573-1589). The `InventoryToAdd` rat grant rides that
+  unported machinery.
+- **DogFifi** — the first prime swaps the put animation in.
+- **Beer** — `BbqDirty` 0.3 s after a fix (TrickItem.cs:472-480).
+- **Plant / WateringCan** — the removal arms of `RemoveActionByItem`
+  (ActionManager.cs:748-790) and the can's parked second round
+  (ActionManager.cs:196-199).
+
+Outside that list the source still carries one-off Season-2 scene hacks
+(SandCastle, AztecThrone, MechanicalBull, CaptainDoor, PlantCarnivore, Hatch
+and kin) living in flows this port does not model; the Rake→Kid crying and
+the Dog/Chili yell choreography stay with the level behaviors.
 
 ## The fixing-tool run
 

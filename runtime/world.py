@@ -854,6 +854,9 @@ class Routine:
         self._urgent_handler = None      # a chain step's own arrival handler
         self._fix_tool = None            # the FixingItem being fetched
         self._fix_target = None          # the tricked item it fixes
+        self.marbles_next = False        # ActionManager.MarblesNextAction
+        self.remove_watering_can = False  # the L108 watering-can dance
+        self.remove_now = False
 
     @property
     def action(self):
@@ -883,6 +886,30 @@ class Routine:
     def _start_action(self):
         it = self.item
         a = self.action
+        # the watering-can round two (ActionManager.cs:196-199): reaching
+        # index 2 with the parked can removes it for real
+        if self.remove_watering_can and self.actions and \
+                self.index % len(self.actions) == 2 and len(self.actions) > 1:
+            self.remove_now = True
+            self.remove_actions_by_item(self.actions[1]['item'])
+            it = self.item
+            a = self.action
+        # the Iron routine jumps (ActionManager.cs:213-217, Rottweiler.cs:461):
+        # a fixed primed iron rewinds the loop to the start index late in the
+        # list, and jumps onward from the last action
+        if it is not None and it.name == 'Iron' and self.actions:
+            cur = self.index % len(self.actions)
+            if it.change_iron_routine and cur > 8:
+                it.change_iron_routine = False
+                self.index = self.start_index
+                it = self.item
+                a = self.action
+            elif it.change_iron_routine_last_path and \
+                    cur == len(self.actions) - 1:
+                it.change_iron_routine_last_path = False
+                self._advance()
+                it = self.item
+                a = self.action
         if a is not None and a.get('move_only'):
             zone = self.level.zone_by_pid(a.get('move_zone'))
             if zone is not None and self.pawn.goto_zone(zone, a['move_x'],
@@ -928,6 +955,13 @@ class Routine:
         # item alternates prime / use; RequireUnprime makes it three-phase
         # (prime, use, unprime). The PigKeys and Pipe name-hacks are skipped.
         if self.role == 'Rottweiler' and it.rott_toggles_prime and w is not None:
+            # the PigKeys dispatch precedes the toggle (Item.cs:1057-1063):
+            # taken keys reappear on the unprimed pass, primed keys are taken
+            if it.name == 'PigKeys' and not it.tricked:
+                if it.item_removed and not it.primed:
+                    it.item_removed = False
+                elif not it.item_removed and it.primed:
+                    it.item_removed = True
             leg = None
             if it.require_unprime:
                 if not it.primed:
@@ -944,6 +978,22 @@ class Routine:
                 w.set_primed(it, not it.primed)
                 if not was:
                     leg = it.rott_prime_anim
+                    # a closed main valve early in the loop plays the unprime
+                    # set instead (Item.cs:1335-1338)
+                    if it.name == 'ValveMain' and not it.main_valve_open \
+                            and self.start_index <= 3:
+                        leg = it.rott_unprime_anim
+                    # the first Fifi prime swaps the put animation in
+                    # (Item.cs RottweilerPrime's DogFifi arm)
+                    if it.name == 'DogFifi' and not it.prime_item_aux:
+                        it.prime_item_aux = True
+                        it.rott_prime_anim = ['FifiPutLeft']
+                elif it.name == 'Pipe':
+                    # an unprimed Pipe stops taking clicks (Item.cs:1085)
+                    it.clickable = False
+            if leg is not None and it.name == 'Pipe' and it.primed:
+                it.clickable = True       # RottweilerPrime re-enables it
+                                          # (Item.cs:1331-1334)
             if leg is not None:
                 seq = [x for x in leg if self.pawn.anim.has(x)]
                 self.state = self.USING
@@ -989,6 +1039,14 @@ class Routine:
         if it.tricked and self.role == 'Rottweiler':
             it.got_tricked = True
         seq = it.sequence_for(self.role, tricked)
+        # the pig-pen gate (TrickItem.cs:837-841): primed-and-tricked keys
+        # with the milk still clean play the surprise set instead
+        if it.depends_pig_keys and self.role == 'Rottweiler' and w is not None:
+            keys = self.level.items.get(it.pig_keys)
+            milk = self.level.items.get(it.pig_milk)
+            if keys is not None and keys.primed and keys.tricked and \
+                    (milk is None or not milk.tricked):
+                seq = it.rott_surprise
         self.state = self.USING
         self.timer = a['duration']
         if a.get('hide_owner'):
@@ -1048,24 +1106,41 @@ class Routine:
         return None
 
     def remove_actions_by_item(self, item_pid):
-        """ActionManager.RemoveActionByItem (ActionManager.cs:748-774), minus
-        the Plant and WateringCan name-hacks: rebuild the list and re-anchor
-        the index the way the original does inside its loop."""
+        """ActionManager.RemoveActionByItem (ActionManager.cs:748-790):
+        rebuild the list and re-anchor the index the way the original does
+        inside its loop, with the Plant and WateringCan arms."""
         if not self.actions:
             return
-        cur = self.index % len(self.actions)
-        kept = []
-        anchor = None
-        for i, a in enumerate(self.actions):
-            if a['item'] != item_pid:
-                kept.append(a)
-            if i == cur:
-                anchor = len(kept) - 1
-        if not kept:
-            return
-        self.actions = kept
-        if anchor is not None:
-            self.index = anchor           # the pending advance lands next
+        removed = self.level.items.get(item_pid)
+        if removed is not None and removed.name == 'Plant':
+            removed.tricked = True        # ActionManager.cs:752-755
+        cans = []
+        if not self.remove_watering_can or self.remove_now:
+            cur = self.index % len(self.actions)
+            kept = []
+            anchor = None
+            for i, a in enumerate(self.actions):
+                a_it = self.level.items.get(a['item']) if a['item'] else None
+                if a_it is not None and a_it.name == 'WateringCan':
+                    cans.append(a)
+                if a['item'] != item_pid:
+                    kept.append(a)
+                if i == cur:
+                    anchor = len(kept) - 1
+            if kept:
+                self.actions = kept
+                if anchor is not None:
+                    self.index = anchor   # the pending advance lands next
+            if self.remove_now:           # ActionManager.cs:775-779
+                self.index = 1
+                self.remove_now = False
+        if removed is not None and removed.name == 'WateringCan' \
+                and not self.remove_watering_can and cans and \
+                len(self.actions) >= 2:
+            # the can's first removal parks it as action 1 for one more round
+            # (ActionManager.cs:781-789)
+            self.actions = [self.actions[0], cans[0], self.actions[1]]
+            self.remove_watering_can = True
 
     def _finish(self):
         """RoutineActionUse.StopAction(canPostponeStop: true): a tricked
@@ -1242,12 +1317,16 @@ class Routine:
     def _urgent_finished(self):
         """ActionManager.StopUrgentAction (ActionManager.cs:586-649): a routine
         item that has already fired is skipped, otherwise the interrupted
-        action restarts."""
+        action restarts. MarblesNextAction suppresses the skip and clears
+        when the marbles urgent itself ends (cs:614, 642-646)."""
+        finished = self.urgent_item
         self.urgent_item = None
         self.pawn.in_urgent = False
         self.pawn.can_decrease_angry = True
+        if finished is not None and finished.name == 'GroundMarbles':
+            self.marbles_next = False
         it = self.item
-        if it is not None and it.got_tricked and \
+        if it is not None and it.got_tricked and not self.marbles_next and \
                 it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
             self._pending = 'advance'
         else:
@@ -1401,6 +1480,11 @@ class Routine:
         over the pawn — OnChangeZone's own return value."""
         w = self.pawn.world
         for it in w.notice_items.get(self.pawn.zone.pid, ()):
+            # the DirtyCarpet is excluded from the generic run
+            # (Rottweiler.cs:188) — its urgent rides the Dog/Chili yell
+            # choreography instead, which is not modelled
+            if it.name == 'DirtyCarpet':
+                continue
             if it.tricked:
                 # RunToTrickedItem: PauseMovement + a startled look, then the
                 # urgent run (consumed in OnSingleAnimationEnded)
@@ -1475,6 +1559,7 @@ class World:
             if it.notice_enter:
                 self.notice_items.setdefault(it.zone, []).append(it)
         self._delayed = []               # (seconds left, fn) Invoke timers
+        self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         # Item.Start ends in SetPrimed(Primed): the initial primed visibility
         # (Item.cs:697, 1219-1235)
         for it in level.items.values():
@@ -1582,14 +1667,49 @@ class World:
 
     def _fix(self, item):
         """Item.Fix / TrickItem.Fix, the state core: the trick is disarmed and
-        the item shows its normal idle again (Item.cs:2102, TrickItem.cs:443)."""
+        the item shows its normal idle again (Item.cs:2102, TrickItem.cs:443),
+        plus the name-hack arms of both Fix bodies."""
         item.tricked = False
         fx = self.level.items.get(item.fix_item_trick) \
             if item.fix_item_trick else None
         if fx is not None:
             fx.tricked = False
             self._return_to_idle(fx)
+        # TrickItem.Fix tail (TrickItem.cs:412-455)
+        self.call_later(0.3, lambda it=item: self._bbq_dirty(it))
+        if item.name == 'Rope' and item.got_tricked:
+            item.got_tricked = False
+            item.use_once = False
+        if item.depends_pig_keys and item.name == 'Pig':
+            keys = self.level.items.get(item.pig_keys)
+            if keys is not None:
+                keys.tricked = False
+                keys.primed = False
+        if item.fix_all:
+            item.tricked = False
+            item.primed = False
+            item.is_using = False
+        if item.take_off_iron_primed:
+            item.primed = False
+            item.change_iron_routine = True
+            item.change_iron_routine_last_path = True
+            if item.name == 'Iron':
+                item.use_once = False
+        # Item.Fix tail (Item.cs:2089-2095)
+        if item.name == 'WaterPuddle':
+            item.primed = True
+        if item.use_item_multiple_times:
+            item.use_once = False
         self._return_to_idle(item)
+
+    def _bbq_dirty(self, item):
+        """TrickItem.BbqDirty (TrickItem.cs:472-480), invoked 0.3 s after Fix"""
+        if item.tricked or item.primed or item.name != 'Beer':
+            return
+        item.idle = 'BBQDirty'
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is not None and p.has('BBQDirty'):
+            p.play_single('BBQDirty')
 
     def _return_to_idle(self, item):
         """TrickItem.ReturnToIdleAnimation, the reachable branches"""
@@ -1680,8 +1800,12 @@ class World:
         if item.dont_prime_while_tricked and item.tricked:
             return
         item.primed = primed
-        # DeltaLocation gains/loses DeltaPrimedLocation (Item.cs:1201-1210)
-        if item.delta_primed_x or item.delta_primed_y:
+        # the WaterPuddle negates its DeltaLocation outright and skips the
+        # delta arms (Item.cs:1196-1210)
+        if item.name == 'WaterPuddle':
+            item.dx = -item.dx
+            item.dy = -item.dy
+        elif item.delta_primed_x or item.delta_primed_y:
             sign = 1.0 if primed else -1.0
             item.dx += sign * item.delta_primed_x
             item.dy += sign * item.delta_primed_y
@@ -1721,6 +1845,19 @@ class World:
             self.woody_prime(other)
             if item.unlock_object_to_prime:
                 other.locked = False
+            if other.name == 'IceBucket':
+                # the IceBucket re-arms for a second round with the bucket
+                # and writes its own target off (Item.cs:1274-1281)
+                tgt = self.level.items.get(other.object_to_prime) \
+                    if other.object_to_prime else None
+                other.primed = False
+                other.require_priming = True
+                other.primed_inventory_type = 'IT2_Bucket'
+                if tgt is not None:
+                    tgt.fucked_up = True
+                other.object_to_prime = None
+                if used is not None:
+                    self.inventory.remove(used['type'])
         seq = [a for a in item.woody_prime_anim if self.woody.anim.has(a)]
         if seq:
             # ReturnWoodyToStand is the sequence-end delegate; the stand hook
@@ -1746,8 +1883,10 @@ class World:
             item.second_required, required = required, item.second_required
             item.required_inventory = required
         if item.compound and inv.used is not None and \
-                inv.used['type'] == item.compound_required:
-            # TrickItem.CanWoodyUse: the compound trick applies immediately
+                inv.used['type'] == item.compound_required and \
+                (item.name != 'Rake' or item.tricked):
+            # TrickItem.CanWoodyUse: the compound trick applies immediately;
+            # the Rake accepts its compound only once tricked (TrickItem.cs:511)
             item.compound_tricked = True
             self.woody.anim.play_single(item.animation)
             inv.remove(item.compound_required)
@@ -1756,6 +1895,47 @@ class World:
             if p is not None and anim and p.has(anim):
                 p.play_single(anim)
             return None                    # handled; no ordinary use follows
+        # the Mouse/AngryElephant/ArmsBowl/Snake primed toggles at the head
+        # (Item.cs:1385-1410) — the held mouse arms by target and type
+        if held_pre := (self.level.items.get(inv.used.get('item'))
+                        if inv.used is not None and inv.used.get('item')
+                        else None):
+            if held_pre.name == 'Mouse':
+                t = inv.used['type']
+                if item.name == 'AngryElephant':
+                    held_pre.primed = (t == 'IT2_Snake')
+                elif item.name == 'ArmsBowl' and t == 'IT2_Snake':
+                    held_pre.primed = True
+                elif item.name == 'Snake' and t == 'IT2_Rat' \
+                        and self.snake_aux_208:
+                    held_pre.primed = True
+        # CowBehavior (Item.cs:1760-1780): flowers at the cow become a
+        # priming item and the cow primes at once
+        if item.name == 'Cow' and inv.used is not None \
+                and inv.used['type'] == 'IT2_Flowers':
+            fl = self.level.items.get(item.cow_flowers) \
+                if item.cow_flowers else None
+            if fl is not None:
+                inv.used['item'] = fl.pid
+                fl.primed_inventory_type = 'IT_NONE'
+                fl.primed = False
+                fl.require_priming = True
+            item.prime_other = item.primed_tricked if item.tricked \
+                else item.primed_normal
+            self.set_primed(item, True)
+            self.inventory.remove(inv.used['type'])
+            # CowBehavior returns void — the gate flow continues bare-handed
+        # Item.cs:1384-1390 (CanWoodyUse head): clicking the marbles makes the
+        # next urgent resume advance instead of skipping (MarblesNextAction)
+        if item.name == 'GroundMarbles':
+            rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+            if rt is not None:
+                rt.marbles_next = True
+        # Item.cs:1515-1518: taken PigKeys answer with WhatsUp
+        if item.item_removed and item.name == 'PigKeys':
+            if self.woody.anim.has('WhatsUp'):
+                self.woody.anim.play_single('WhatsUp')
+            return False
         # Item.cs (CanWoodyUse head): the FirstAid + key name-hack — the only
         # way Level108's locked kit opens. FirstAidPos is not serialized in
         # either season's data, so the teleport half is unverifiable; skipped.
@@ -1789,12 +1969,41 @@ class World:
                 and not held_src.primed:
             live = (not held_src.require_priming_only_tricked) or item.tricked
             if live:
-                if held_src.priming_item == item.pid:
+                # the LionStatue accepts its priming inventory only once
+                # tricked (Item.cs:1544-1553: the untricked statue raises
+                # TrickedItem, which blocks the prime and falls to the no)
+                blocked = item.name == 'LionStatue' and not item.tricked
+                if held_src.priming_item == item.pid and not blocked:
+                    if item.name == 'LionStatue' and item.tricked:
+                        self.set_primed(item, True)      # Item.cs:1550-1552
+                    if item.name == 'Snake':
+                        # the snake round of the L208 chain (Item.cs:1554-1560);
+                        # the InventoryToAdd rat grant rides the unported
+                        # InventoryToAdd machinery
+                        self.snake_aux_208 = True
+                        self.set_primed(item, True)
+                        inv.used['type'] = 'IT2_Snake'
                     self.woody_prime(held_src)
                     p = self.players.get(id(item.sprite)) if item.sprite else None
                     if p is not None and item.prime_other \
                             and p.has(item.prime_other):
                         p.play_single(item.prime_other)  # PlayAnimationDirectly
+                elif held_src.double_priming_item:
+                    # DoublePrimingItem (Item.cs:1573-1589): the mouse's
+                    # second target is the elephant, which primes and eats it
+                    if held_src.priming_item != item.pid \
+                            and item.name != 'AngryElephant':
+                        self._woody_cant_use()
+                    elif held_src.name == 'Mouse' \
+                            and item.name == 'AngryElephant':
+                        self.woody_prime(item)
+                        if item.prime_other:
+                            seq = [x for x in item.woody_prime_anim
+                                   if self.woody.anim.has(x)]
+                            if seq:
+                                self.woody.anim.play_sequence(seq)
+                            if inv.used is not None:
+                                self.inventory.remove(inv.used['type'])
                 else:
                     self._woody_cant_use()
                     if not held_src.require_priming_only_tricked:
@@ -1816,12 +2025,20 @@ class World:
             # a designated PrimingItem elsewhere: the block ends without a
             # return, and the gate cluster below sits in its else — skipped
             fell_through = True
+        elif item.require_priming and not item.primed and inv.used is None \
+                and item.name == 'ElectricTrapTatter':
+            # Item.cs:1643-1651: the tatter primes bare-handed, and the
+            # else-cluster is skipped
+            self.woody_prime(item)
+            fell_through = True
         if not fell_through:
-            # Item.cs:1654-1669: a spent UseOnce item (the Iron hack skipped)
+            # Item.cs:1654-1669: a spent UseOnce item; Iron alone skips the
+            # WrongTrick mark (cs:1665)
             if item.use_once and item.used:
                 if not (item.tricked ^ item.got_tricked):
                     self._woody_cant_use()
-                item.wrong_trick = True
+                if item.name != 'Iron':
+                    item.wrong_trick = True
                 return False
             # Item.cs:1671-1688; an unprimed held source never counts as the
             # required inventory
@@ -1911,6 +2128,9 @@ class World:
         if item.can_undo_trick and item.tricked and item.name != 'ValveMain':
             self._get_tricked(item, False)
         else:
+            # Iron and Rope become single-shot once tricked (TrickItem.cs:311)
+            if item.name in ('Iron', 'Rope'):
+                item.use_once = True
             if item.name != 'ValveMain':
                 self._get_tricked(item, True)
             act = self.level.items.get(item.activate_item_trick) \
@@ -1957,8 +2177,15 @@ class World:
         SearchItem.cs:172) — the priming gates read it."""
         self.inventory.add([dict(e, item=item.pid)
                             for e in item.inventory_items])
-        if not item.dont_remove_inventory:
-            item.inventory_items = []
+        # SearchItem.InternalUse's emptying (SearchItem.cs:192-206): a keeper
+        # marks ItemRemoved instead, and TrickAfterWoodyUse arms the trick
+        if not item.keep_full:
+            if not item.dont_remove_inventory:
+                item.inventory_items = []
+            else:
+                item.item_removed = True
+        if item.trick_after_woody_use:
+            self._get_tricked(item, True)
         p = self.players.get(id(item.sprite)) if item.sprite else None
         if p is not None and item.empty_animation and p.has(item.empty_animation):
             p.play_single(item.empty_animation)

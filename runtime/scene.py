@@ -145,6 +145,11 @@ class Item:
                  'destroy_after_use_tricked',
                  'remove_from_routine_after_use_tricked',
                  'remove_after_first_use', 'main_valve_open',
+                 'take_off_iron_primed', 'fix_all', 'use_item_multiple_times',
+                 'keep_full', 'trick_after_woody_use', 'depends_pig_keys',
+                 'pig_keys', 'pig_milk', 'cow_flowers', 'change_iron_routine',
+                 'change_iron_routine_last_path', 'item_removed', 'clickable',
+                 'prime_item_aux', 'double_priming_item',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
@@ -261,6 +266,22 @@ class Item:
             bool(d.get('RemoveFromRoutineAfterUseTricked'))
         self.remove_after_first_use = bool(d.get('RemoveFromRoutineAfterFirstUse'))
         self.main_valve_open = False     # Item.MainValveOpen (the ValveMain hack)
+        # the name-hack support fields
+        self.take_off_iron_primed = bool(d.get('TakeOffIronPrimed'))
+        self.fix_all = bool(d.get('FixAll'))
+        self.use_item_multiple_times = bool(d.get('UseItemMultipleTimes'))
+        self.keep_full = bool(d.get('KeepFull'))
+        self.trick_after_woody_use = bool(d.get('TrickAfterWoodyUse'))
+        self.depends_pig_keys = bool(d.get('DependsPigKeys'))
+        self.pig_keys = (d.get('PigKeys') or {}).get('path')
+        self.pig_milk = (d.get('PigMilk') or {}).get('path')
+        self.cow_flowers = (d.get('CowBehaviorFlowers') or {}).get('path')
+        self.change_iron_routine = False       # set by TrickItem.Fix
+        self.change_iron_routine_last_path = False
+        self.item_removed = False              # Item.ItemRemoved (PigKeys)
+        self.clickable = True                  # Collider.enabled (the Pipe hack)
+        self.prime_item_aux = False            # Item.PrimeItemAux (DogFifi)
+        self.double_priming_item = bool(d.get('DoublePrimingItem'))
         self.second_required = d.get('SecondRequiredInventory')
         self.locked = bool(d.get('Locked'))
         self.used = False

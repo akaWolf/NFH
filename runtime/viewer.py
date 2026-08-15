@@ -83,10 +83,11 @@ class Viewer:
                  sum(len(r.actions) for r in self.world.routines)))
 
     def _item_at(self, wx, wy):
-        """click hit-test against the items' BoxColliders"""
+        """click hit-test against the items' BoxColliders; a disabled
+        collider (the Pipe hack) takes no clicks"""
         for it in self.level.items.values():
             c = it.collider
-            if c is None:
+            if c is None or not it.clickable:
                 continue
             if abs(wx - c[0]) <= c[2] * 0.5 and abs(wy - c[1]) <= c[3] * 0.5:
                 return it
