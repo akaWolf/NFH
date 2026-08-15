@@ -627,16 +627,28 @@ class Level:
                 ml = a.get('MoveLocation') or {}
                 mz = (a.get('MoveZone') or {}).get('path')
                 pa = bool(a.get('PostponeAlarm'))
-                acts.append({'item': (a.get('Item') or {}).get('path'),
+                def ref(field):
+                    return (a.get(field) or {}).get('path')
+                acts.append({'item': ref('Item'),
                              'duration': a.get('Duration') or 0.0,
                              'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
                              'hide_object': bool(a.get('HideObjectDuringUse')),
+                             'hide_owner': bool(a.get('HideOwnerDuringUse')),
                              'move_only': bool(a.get('MoveOnly')),
                              'move_x': ml.get('x', 0.0),
                              'move_zone': self._go_of(self._o(mz)) if mz and self._o(mz) else None,
                              'mutex': bool(a.get('MutexAction')),
                              'postpone_alarm': pa,
-                             'mutex_anim': a.get('MutexLoopingAnimation')})
+                             'mutex_anim': a.get('MutexLoopingAnimation'),
+                             # RoutineActionUse.OnActionStarted/Stopped release
+                             # infinite loops on these referenced targets
+                             'stop_inf_item': ref('ItemToStopInfiniteAnimation'),
+                             'stop_inf_pawn': ref('PawnToStopInfiniteAnimation'),
+                             'stop_inf_pawn_tricked': ref('PawnToStopInfiniteAnimationWhenTricked'),
+                             'once_pawn': ref('PawnToIgnoreInfiniteAnimationOnce'),
+                             'once_pawn_not_tricked': ref('PawnToIgnoreInfiniteAnimationOnceWhenNotTricked'),
+                             'once_pawn_on_end': ref('PawnToIgnoreInfiniteAnimationOnceOnEnd'),
+                             'abort_mutex_pawn': ref('PawnToAbortMutexOnFinish')})
             # Owner names the GameObject, which Season 2 calls "Rottweiler2";
             # the component type is the stable key
             ow = d.get('Owner') or {}
@@ -794,12 +806,17 @@ class Level:
             zc = (o['data'].get('Zone') or {}).get('path')
             zgo = self._go_of(self._o(zc)) if zc and self._o(zc) else None
             pd = o['data']
+            # actions reference pawns by component pid
+            # (e.g. PawnToStopInfiniteAnimation, PawnToAbortMutexOnFinish);
+            # objs keys are JSON strings, the refs are ints
+            pawn_pid = int(pid)
             ctrl = None
             for c in self._comps.get(self._go_of_sprite(sprite) if False else sprite.go, []):
                 if c['type'] == 'PawnAnimationController':
                     ctrl = self._o(c['path'])
             cd = (ctrl or {}).get('data') or {}
             self.pawns[o['type']] = {
+                'pid': pawn_pid,
                 'stand': {'Left': _anim_name(cd.get('StandLeftAnimation')) or 'Stand_Left',
                           'Right': _anim_name(cd.get('StandRightAnimation')) or 'Stand_Right',
                           'Up': _anim_name(cd.get('StandUpAnimation')) or 'Stand_Up',

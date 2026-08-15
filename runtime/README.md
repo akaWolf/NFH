@@ -292,6 +292,37 @@ The locked first-aid kit correctly refuses to open.
 
 In the viewer: click an item to use it, digits 1–9 select inventory, 0 clears.
 
+## The infinite-loop release and the mutex handshake
+
+`RoutineActionUse.OnActionStarted` (RoutineActionUse.cs:152-171) can release
+"infinite" animations on named targets the moment the action starts, before
+any walking: `ItemToStopInfiniteAnimation` and
+`PawnToStopInfiniteAnimation[WhenTricked]` get `SetIgnoreInfiniteLoop(true)`,
+letting a looping `InfiniteLoop` animation reach its end, and the
+`...IgnoreInfiniteAnimationOnce` variants set the once-pair that auto-clears
+the first time such an animation completes (AnimationControllerBase.cs:124-127,
+213-217). `OnActionStopped` (cs:326-341) resets them and fires the on-end once
+target. The tricked variants read the raw `Item.Tricked`, not the `IsTricked()`
+chain. Six Season-2 levels use these — 205, 206, 207, 210, 213 in their action
+lists, 208 via `ActionsToAddInGame`.
+
+The stop side also carries the mutex handshake (cs:342-351): a non-mutex
+action naming `PawnToAbortMutexOnFinish` unhides that pawn and calls its
+`AbortActiveMutex` (cs:127-134), which finishes the parked action *without*
+`OnActionStopped` — flags a mutex action set at its start deliberately leak.
+Level205's beach mat keeps its infinite loop released forever, in the original
+too. `HideOwnerDuringUse` hides the owner while parked (cs:174-177) or for the
+span of the use (cs:213-216), unhiding at the stop (cs:481-484). Level205 runs
+entirely on this: the neighbour parks on the mat's mutex while Olga uses it
+hidden; her stop springs him, and his next use springs her parked mutex back —
+before the handshake existed here, both routines sat parked forever.
+
+Verified: Level205's cross-cycle loops both routines with Olga hidden for the
+span of each use; Level206's Mother has her ignore flag flip exactly at the
+neighbour's action[1]/action[3] start and stop. The pawn references are
+component pids — JSON object keys are strings while the refs are ints, which
+silently broke the first lookup.
+
 ## Detection, catching, the two endings (§6)
 
 `World.tick` runs `GameInfo.Update`'s Classic checks every frame: the detection
@@ -372,7 +403,8 @@ only active objects get.
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
-that enable alerters mid-level, `SetIgnoreInfiniteLoop` /
-`PawnToStopInfiniteAnimation` release of infinite animations, priming
-(`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`),
-`Mother`'s catch predicate, HUD.
+that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
+stop-fields live there), priming (`RequirePriming`/`WoodyPrime`), the
+fixing-item run (`RunToFixingItem`), `Mother`'s catch predicate, HUD, and the
+remaining use side-effect flags (`HideObjectDuringUse` family,
+`TeleportRottweilerOnUse`, the exit deltas, skates/toilet state).

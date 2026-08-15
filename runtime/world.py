@@ -832,11 +832,17 @@ class Routine:
             self._pending = 'advance'
             self.state = self.IDLE
             return
+        # RoutineActionUse.OnActionStarted releases the named infinite loops
+        # right at action start, before any movement (RoutineActionUse.cs:152-171)
+        self._infinite_flags_on_start(a, it)
         if self.pawn.at_use_range(it):
             self._use()
         else:
             self.state = self.MOVING
             if not self.pawn.goto_item(it, on_arrive=self._use):
+                # port-side failure path (the original's pathing cannot fail
+                # on shipped data): keep the flags symmetric
+                self._action_stopped()
                 self._pending = 'advance'
                 self.state = self.IDLE
 
@@ -847,20 +853,26 @@ class Routine:
             self._pending = 'advance'; self.state = self.IDLE; return
         if a.get('mutex'):
             # MutexAction parks on its looping animation until another action's
-            # PawnToAbortMutexOnFinish releases it
+            # PawnToAbortMutexOnFinish releases it (RoutineActionUse.cs:172-179)
             self.state = self.USING
             self.timer = 0.0
+            if a.get('hide_owner'):
+                self.pawn.hidden = True   # HideOwnerDuringUse, cs:174-177
             if a.get('mutex_anim'):
                 self.pawn.anim.play_looping(a['mutex_anim'])
             return
         tricked = it.is_tricked(self.level.items)
         seq = it.sequence_for(self.role, tricked)
         if not seq:
+            # port-side: shipped use actions always carry a sequence
+            self._action_stopped()
             self._pending = 'advance'
             self.state = self.IDLE
             return
         self.state = self.USING
         self.timer = a['duration']
+        if a.get('hide_owner'):
+            self.pawn.hidden = True       # HideOwnerDuringUse, cs:213-216
         self.log.append((it.name, tricked))
         if tricked and self.role == 'Rottweiler':
             it.got_tricked = True          # Item.RottweilerUse (Item.cs:838)
@@ -893,12 +905,99 @@ class Routine:
                 self.pawn.world.play_angry(self.pawn, target,
                                            on_done=self._angry_done)
                 return
+        self._action_stopped()
         self._pending = 'advance'
 
     def _angry_done(self):
         """the second StopAction arrives with canPostponeStop=false, so the
         angry branch is skipped and the action finally finishes"""
+        self._action_stopped()
         self._pending = 'advance'
+
+    def _anim_by_pid(self, pid):
+        """resolve a serialized Item- or Pawn-component reference to the
+        AnimPlayer it animates"""
+        if pid is None or self.pawn.world is None:
+            return None
+        it = self.level.items.get(pid)
+        if it is not None:
+            return self.pawn.world.players.get(id(it.sprite)) \
+                if it.sprite is not None else None
+        for role, spec in self.level.pawns.items():
+            if spec.get('pid') == pid:
+                p = self.pawn.world.pawns.get(role)
+                return p.anim if p is not None else None
+        return None
+
+    def _infinite_flags_on_start(self, a, it):
+        """RoutineActionUse.OnActionStarted (RoutineActionUse.cs:152-171):
+        SetIgnoreInfiniteLoop(true) on the item and pawn targets — the
+        tricked variant reads the raw Item.Tricked flag — and
+        SetIgnoreInfiniteLoopOnce (both flags, AnimationControllerBase.cs:
+        213-217) on the once-targets."""
+        t = self._anim_by_pid(a.get('stop_inf_item'))
+        if t is not None:
+            t.ignore_infinite = True
+        if it.tricked:
+            t = self._anim_by_pid(a.get('stop_inf_pawn_tricked'))
+            if t is not None:
+                t.ignore_infinite = True
+        t = self._anim_by_pid(a.get('stop_inf_pawn'))
+        if t is not None:
+            t.ignore_infinite = True
+        t = self._anim_by_pid(a.get('once_pawn'))
+        if t is not None:
+            t.ignore_infinite = t.ignore_infinite_once = True
+        if not it.tricked:
+            t = self._anim_by_pid(a.get('once_pawn_not_tricked'))
+            if t is not None:
+                t.ignore_infinite = t.ignore_infinite_once = True
+
+    def _action_stopped(self):
+        """RoutineActionUse.OnActionStopped (RoutineActionUse.cs:319-353):
+        MoveOnly returns first; then the ignore flags reset, the once-on-end
+        target fires, HideOwnerDuringUse unhides (cs:481-484), and a
+        non-mutex action releases PawnToAbortMutexOnFinish's parked mutex."""
+        a = self.action
+        if a is None or a.get('move_only'):
+            return
+        it = self.item
+        t = self._anim_by_pid(a.get('stop_inf_item'))
+        if t is not None:
+            t.ignore_infinite = False
+        if it is not None and it.tricked:
+            t = self._anim_by_pid(a.get('stop_inf_pawn_tricked'))
+            if t is not None:
+                t.ignore_infinite = False
+        t = self._anim_by_pid(a.get('stop_inf_pawn'))
+        if t is not None:
+            t.ignore_infinite = False
+        t = self._anim_by_pid(a.get('once_pawn_on_end'))
+        if t is not None:
+            t.ignore_infinite = t.ignore_infinite_once = True
+        if a.get('hide_owner'):
+            self.pawn.hidden = False
+        if not a.get('mutex'):
+            self._abort_parked_mutex(a.get('abort_mutex_pawn'))
+
+    def _abort_parked_mutex(self, pid):
+        """OnActionStopped's PawnToAbortMutexOnFinish branch
+        (RoutineActionUse.cs:344-351): SetHidden(false) on the named pawn,
+        then AbortActiveMutex (cs:127-134) finishes its mutex action with
+        *no* OnActionStopped — flags set at its start deliberately stay."""
+        if pid is None or self.pawn.world is None:
+            return
+        role = next((r for r, s in self.level.pawns.items()
+                     if s.get('pid') == pid), None)
+        if role is None:
+            return
+        for rt in self.pawn.world.routines:
+            if rt.role == role:
+                rt.pawn.hidden = False
+                act = rt.action
+                if act is not None and act.get('mutex'):
+                    rt._pending = 'advance'
+                return
 
     # -- urgent interruptions (ActionManager.StartUrgentAction and the
     #    Rottweiler alarm plumbing) -----------------------------------------
