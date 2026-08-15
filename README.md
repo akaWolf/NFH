@@ -12,14 +12,16 @@ and one spec cover both. See `docs/BUILDS.md`.
 | path | what |
 |---|---|
 | `tools/` | extraction pipeline — plain Python 3, no dependencies |
-| `levels/` | all 20 scenes exported to JSON (22 MB) |
+| `levels/s1/`, `levels/s2/` | all 37 scenes of both seasons as JSON (41 MB) |
 | `src/` | 33 867 lines of C# decompiled from the game assemblies |
 | `docs/GAMEPLAY.md` | behavioural spec of the game, cited to source lines |
 | `docs/BUILDS.md` | which build is which, and why 1.5.5 is the one to use |
 | `*.apk` `*.obb` `*.xapk` | the shipped artifacts (see `docs/BUILDS.md`) |
 
-The unpacked game data (~900 MB) deliberately lives outside the repo. Point
-`NFH_DATA` at wherever `tools/extract.sh` wrote it.
+The unpacked game data (~900 MB per season) deliberately lives outside the repo.
+Point `NFH_DATA` at wherever `tools/extract.sh` wrote it; every tool reads that
+one variable, so switching seasons means pointing it at the other extraction —
+nothing else changes.
 
 ## Reproducing
 
@@ -28,9 +30,9 @@ export NFH_DATA=/tmp/nfh-data
 tools/extract.sh "$NFH_DATA"      # unpack APK + OBB, rejoin split .assets
 python3 tools/validate_all.py     # self-test the readers
 tools/decompile.sh                # ILSpy -> src/  (needs ~/.dotnet, no root)
-python3 tools/export_level.py "$NFH_DATA/obb/assets/bin/Data/level5" levels/Level101.json
-python3 tools/summary.py levels/Level101.json
-python3 tools/zonegraph.py levels/Level101.json
+python3 tools/export_level.py "$NFH_DATA/obb/assets/bin/Data/level5" levels/s1/Level101.json
+python3 tools/summary.py levels/s1/Level101.json
+python3 tools/zonegraph.py levels/s1/Level101.json
 ```
 
 ## State

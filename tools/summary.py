@@ -12,8 +12,14 @@ def main(path):
     d = json.load(open(path))
     objs = d['objects']
     print('### %s  (%s)' % (d['scene'], d.get('unity_scene')))
-    by = lambda t: [(p, o['data']) for p, o in objs.items()
-                    if o['type'] == t and 'data' in o]
+    # Transition derives from Door, and is what Season 2 uses for nearly all of
+    # its zone links; report the two together.
+    subclasses = {'Door': ('Door', 'Transition')}
+
+    def by(t):
+        want = subclasses.get(t, (t,))
+        return [(p, o['data']) for p, o in objs.items()
+                if o['type'] in want and 'data' in o]
 
     def geometry(comp):
         """Zone extents are not in the Zone component: they come from the
