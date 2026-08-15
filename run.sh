@@ -13,5 +13,13 @@ if [ ! -d "$root/textures/s1" ]; then
     (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_audio.py audio/s1)
     echo "note: season 2 assets need its apk+obb unpacked; see tools/README.md"
 fi
+# the HUD needs the path-named GUI textures, the localization and the fonts
+if ! ls "$root/textures/s1"/textures_gui_* >/dev/null 2>&1; then
+    (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_gui.py \
+        textures/s1 textures/gui/ textures/bubbles/ inventory/)
+fi
+if [ ! -f "$root/strings/s1/Lang.txt" ]; then
+    (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_strings.py strings/s1 fonts/s1)
+fi
 cd "$root"
 exec python3 runtime/viewer.py "${@:-levels/s1/Level101.json}"
