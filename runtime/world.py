@@ -983,24 +983,28 @@ class Routine:
                     self.state = self.IDLE
                 return
         tricked = it.is_tricked(self.level.items)
+        # Item.RottweilerUse opens with the raw-Tricked GotTricked mark
+        # (Item.cs:836-838) — before any animation concern; the sink/valve
+        # chains hang off it
+        if it.tricked and self.role == 'Rottweiler':
+            it.got_tricked = True
         seq = it.sequence_for(self.role, tricked)
-        if not seq:
-            # port-side: shipped use actions always carry a sequence
-            self._action_stopped()
-            self._pending = 'advance'
-            self.state = self.IDLE
-            return
         self.state = self.USING
         self.timer = a['duration']
         if a.get('hide_owner'):
             self.pawn.hidden = True       # HideOwnerDuringUse, cs:213-216
         self._after_use_side_effects(a, it)
         self.log.append((it.name, tricked))
-        if tricked and self.role == 'Rottweiler':
-            it.got_tricked = True          # Item.RottweilerUse (Item.cs:838)
         if self.on_use:
             self.on_use(it, tricked)
-        self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
+        if seq:
+            self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
+        else:
+            # an empty sequence completes at once, and the angry postpone
+            # still rides StopAction (OnUseAnimationsCompleted ->
+            # StopAction(canPostponeStop: true)) — the invisible valves
+            # of Level113 depend on this
+            self._finish()
 
     def _after_use_side_effects(self, a, it):
         """the prime/trick-after-use tail of RoutineActionUse.OnActionStarted
@@ -1187,8 +1191,9 @@ class Routine:
             return
         if self.role == 'Rottweiler' and self._fixing_dispatch(it):
             return                         # the fetch replaces the use
+        if it.tricked and self.role == 'Rottweiler':
+            it.got_tricked = True          # Item.cs:836-838, the raw flag
         if it.is_tricked(self.level.items):
-            it.got_tricked = True          # Item.RottweilerUse via PlayAngry path
             self.pawn.world.play_angry(self.pawn, it,
                                        on_done=self._urgent_finished)
         elif it.kind == 'Alerter' or it.rott_surprise:
@@ -1282,7 +1287,19 @@ class Routine:
         if tool is not None and tool.tricked and \
                 not (tool.kind in TRICK_KINDS and tool.neutral):
             tool.got_tricked = True
-            w.play_angry(self.pawn, tool, on_done=self._use_fixing_arrived)
+            # FixingItem.Use -> RottweilerUse plays the tool's tricked use
+            # first (Item.cs:894-908); the angry flow rides its end through
+            # StopAction's postpone, and RedoAction then re-enters here
+            seq = [x for x in tool.sequence_for('Rottweiler', True)
+                   if self.pawn.anim.has(x)]
+
+            def angry():
+                w.play_angry(self.pawn, tool, on_done=self._use_fixing_arrived)
+            self.state = self.USING
+            if seq:
+                self.pawn.anim.play_sequence(seq, on_end=angry)
+            else:
+                angry()
             return
         tgt.can_fix = True
         tgt.fucked_up = False
@@ -1460,10 +1477,10 @@ class World:
         pawn.can_decrease_angry = False            # Rottweiler.cs:795
 
         def done():
-            self._try_fix(item, pawn)              # FixTrickedItem on seq end
+            fetch = self._try_fix(item, pawn)      # FixTrickedItem on seq end
             pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
-            if on_done:
-                on_done()
+            if on_done and not fetch:
+                on_done()          # a started fetch owns the resume instead
 
         seq = [a for a in seq if pawn.anim.has(a)]
         if seq:
@@ -1506,7 +1523,10 @@ class World:
     def _try_fix(self, item, pawn=None):
         """TrickItem.TryFix (TrickItem.cs:1115-1134): fix, or run to the
         fixing tool when one is named and the neighbour's hands are empty,
-        or break for good; LetUntrickTrickedItem rides the tail."""
+        or break for good; LetUntrickTrickedItem rides the tail. Returns
+        True when the fetch started — the urgent chain then owns the
+        resume, and the interrupted action must not advance over it."""
+        fetch = False
         if item.can_fix:
             self._fix(item)
         elif item.fixing_item is not None and pawn is not None \
@@ -1515,6 +1535,7 @@ class World:
             routine = next((r for r in self.routines if r.pawn is pawn), None)
             if tool is not None and routine is not None:
                 routine.run_to_fixing_item(tool, self._tricked_item_to_fix(item))
+                fetch = True
             else:
                 item.fucked_up = True
         else:
@@ -1524,6 +1545,7 @@ class World:
             if tgt is not None:
                 tgt.tricked = False
                 tgt.got_tricked = True
+        return fetch
 
     def _fix(self, item):
         """Item.Fix / TrickItem.Fix, the state core: the trick is disarmed and

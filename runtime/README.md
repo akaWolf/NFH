@@ -414,6 +414,37 @@ the return leg puts the vacuum back and the routine resumes — 9.5 s
 end-to-end. `TryFix`'s earlier port approximated this branch with the wrong
 field (`FixItemTrick`); it now follows the source.
 
+A dedicated verification pass exercised the rest and fixed four deviations
+it exposed:
+
+- **The tricked tool plays its own tricked use first** (`FixingItem.Use` →
+  `RottweilerUse` → `PlayAnimation`), the angry flow riding its end — with
+  a glued vacuum the order is `VacuumLoop`, `VacuumDustExplosion`,
+  `AngryEasyUp`, `FixMid`, then the `RedoAction` re-entry cleans the carpet.
+- **`GotTricked` marks at the top of `RottweilerUse`** (Item.cs:836-838, the
+  raw flag) — not after the sequence check. Level113's invisible valves have
+  no use animation at all, and the sink/radiator `DependsOn` chains hang off
+  that mark.
+- **An empty use sequence still runs the stop flow** — the sequence
+  completes at once and `StopAction(canPostponeStop: true)`'s angry postpone
+  fires; the earlier port skipped straight to the next action.
+- **A fetch started from `TryFix` owns the resume** — the angry-completion
+  path must not advance the routine over the running Grab/UseFixingItem
+  chain; the interrupted action resumes from `StopUrgentAction` instead.
+
+Level113's full circle now closes: Woody opens the main valve, the
+neighbour's own valve turn marks it `GotTricked` (which is what starts the
+sink spraying — `IsTricked` needs `DependsOn.Tricked && GotTricked`), the
+sink use goes angry *at the sink* (`DependsOn.ForceFixOriginal`,
+RoutineActionUse.cs:564 reads the dependency's flag), `TryFix` cannot fix it
+and fetches the valve, and `FixMid` at the `GetTrickedItemToFix` target (the
+valve, `FixDependsOn`) stops the spray — 11 s from the sink use. The
+`RequireUnprime` trio cycles on all four items (Level111's machines,
+Level114's gramophone): prime, use, unprime, repeat. One open question
+stays: the raw-`Tricked` entry into the sink's `ForceUseFixingItem` fetch is
+unreachable through shipped data chains (nothing sets the sink's own flag) —
+likely level-script territory.
+
 ## Detection, catching, the two endings (§6)
 
 `World.tick` runs `GameInfo.Update`'s Classic checks every frame: the detection
