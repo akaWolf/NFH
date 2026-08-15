@@ -916,6 +916,7 @@ class Level:
                 'win_animation': _anim_name(pd.get('WinAnimation')),
                 'is_sleeping': bool(pd.get('IsSleeping')),
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
+                'animal_tutorial': bool(pd.get('AnimalTutorial')),
                 # the fixing-tool chain, serialized inline on the Rottweiler
                 # (RoutineActionGrab / RoutineActionUseFixingItem / Return)
                 'grab_action': {

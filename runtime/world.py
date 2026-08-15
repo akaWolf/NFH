@@ -218,6 +218,7 @@ class Pawn:
         self.run_force = spec.get('run_force') or 0.0
         self.run_door_force = spec.get('run_door_force') or 0.0
         self.hit_action = spec.get('hit_action') or {}
+        self.animal_tutorial = bool(spec.get('animal_tutorial'))
         self.grab_action = spec.get('grab_action') or {}
         self.use_fixing_action = spec.get('use_fixing_action') or {}
         self.fixing_item = None          # Rottweiler.FixingItem (the carried tool)
@@ -1282,9 +1283,16 @@ class Routine:
         if not self.pawn.is_warping and not self.is_alarm_postponed():
             if self.state == self.MOVING:
                 self.start_urgent(alerter_item)
-            elif self.state == self.USING and \
+                return
+            if self.state == self.USING and \
                     (self.item is None or self.item.name != 'Bed'):
                 self.was_alerted = alerter_item     # consumed when he moves
+            if self.pawn.animal_tutorial:
+                # Intro103's frozen tutorial neighbour: Unfreeze and run
+                # (Rottweiler.cs:290-295; CheckHiddenItem is a no-op here,
+                # HideObjectDuringUse being unported)
+                self.frozen = False
+                self.start_urgent(alerter_item)
         else:
             self.pending_alarm = alerter_item       # PostponeAlerterAction
 
