@@ -142,6 +142,9 @@ class Item:
                  'fixing_item', 'force_use_fixing_item', 'fix_depends_on',
                  'delta_fix_x', 'delta_fix_y', 'let_untrick',
                  'bubble_icon', 'bubble_icon_active', 'bubble_icon_mad',
+                 'destroy_after_use_tricked',
+                 'remove_from_routine_after_use_tricked',
+                 'remove_after_first_use', 'main_valve_open',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
@@ -251,6 +254,13 @@ class Item:
         self.bubble_icon = d.get('BubbleIconPath') or None
         self.bubble_icon_active = d.get('BubbleIconActivePath') or None
         self.bubble_icon_mad = d.get('BubbleIconMadPath') or None
+        # RoutineActionUse.StopAction removes routine actions once the
+        # tricked use lands (RoutineActionUse.cs:415-427)
+        self.destroy_after_use_tricked = bool(d.get('DestroyAfterUseTricked'))
+        self.remove_from_routine_after_use_tricked = \
+            bool(d.get('RemoveFromRoutineAfterUseTricked'))
+        self.remove_after_first_use = bool(d.get('RemoveFromRoutineAfterFirstUse'))
+        self.main_valve_open = False     # Item.MainValveOpen (the ValveMain hack)
         self.second_required = d.get('SecondRequiredInventory')
         self.locked = bool(d.get('Locked'))
         self.used = False
@@ -328,6 +338,11 @@ class Item:
         empty array means this character has no business using the item."""
         table = self.use_tricked_anim if tricked else self.use_anim
         return table.get(role) or []
+
+    def should_destroy(self):
+        """TrickItem.ShouldDestroy (TrickItem.cs:1090-1093)"""
+        return self.destroy_after_use_tricked or \
+            self.remove_from_routine_after_use_tricked
 
     def is_tricked(self, items=None):
         """TrickItem.IsTricked (TrickItem.cs:258), including the DependsOn

@@ -440,10 +440,32 @@ RoutineActionUse.cs:564 reads the dependency's flag), `TryFix` cannot fix it
 and fetches the valve, and `FixMid` at the `GetTrickedItemToFix` target (the
 valve, `FixDependsOn`) stops the spray — 11 s from the sink use. The
 `RequireUnprime` trio cycles on all four items (Level111's machines,
-Level114's gramophone): prime, use, unprime, repeat. One open question
-stays: the raw-`Tricked` entry into the sink's `ForceUseFixingItem` fetch is
-unreachable through shipped data chains (nothing sets the sink's own flag) —
-likely level-script territory.
+Level114's gramophone): prime, use, unprime, repeat.
+
+The raw-`Tricked` question is resolved. Nothing sets the sink's own flag —
+that entry (Item.cs:847 with `ForceUseFixingItem`) really is dead data in
+this build; the live circle runs through three pieces read out of the
+source and now ported:
+
+- **The ValveMain name-hack** (Item.cs:1714-1726, the `CanWoodyUse` tail):
+  Woody's click toggles `MainValveOpen` — opening arms `Tricked` **and**
+  `GotTricked` at once, which is what starts the sink spraying immediately.
+  Both arms of `OnUseAnimationCompleted`'s trick toggle explicitly skip
+  ValveMain (TrickItem.cs:305, 315) — the hack alone owns the valve's state.
+- **`RemoveActionByItem`** (ActionManager.cs:748-774, minus the Plant and
+  WateringCan hacks): `StopAction` removes spent actions
+  (RoutineActionUse.cs:415-427) — the item's own when `ShouldDestroy()` and
+  `IsTricked()`, every action of a `ShouldDestroy` raw-`Tricked` dependency,
+  and `RemoveFromRoutineAfterFirstUse`. The sink's use-stop drops both valve
+  actions this way (`RemoveFromRoutineAfterUseTricked` on the valve; the
+  valve is `Neutral`, so its own-arm never fires — only the dependency arm
+  does).
+- The rest is the fetch already in place.
+
+End-to-end on Level113: Woody's click sprays the sink at once; the sink use
+goes angry and the routine loses its two valve visits (10 → 8 actions); the
+fetch turns the valve back (`FixMid`) and the spray stops; a second Woody
+click closes an already-fixed valve cleanly.
 
 ## Detection, catching, the two endings (§6)
 

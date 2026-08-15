@@ -1047,11 +1047,44 @@ class Routine:
                 return dep
         return None
 
+    def remove_actions_by_item(self, item_pid):
+        """ActionManager.RemoveActionByItem (ActionManager.cs:748-774), minus
+        the Plant and WateringCan name-hacks: rebuild the list and re-anchor
+        the index the way the original does inside its loop."""
+        if not self.actions:
+            return
+        cur = self.index % len(self.actions)
+        kept = []
+        anchor = None
+        for i, a in enumerate(self.actions):
+            if a['item'] != item_pid:
+                kept.append(a)
+            if i == cur:
+                anchor = len(kept) - 1
+        if not kept:
+            return
+        self.actions = kept
+        if anchor is not None:
+            self.index = anchor           # the pending advance lands next
+
     def _finish(self):
         """RoutineActionUse.StopAction(canPostponeStop: true): a tricked
         TrickItem does not finish the action — the owner plays the angry
-        sequence first (RoutineActionUse.cs:546-553)."""
+        sequence first (RoutineActionUse.cs:546-553). The stop also removes
+        spent actions (cs:415-427): the item's own when ShouldDestroy and
+        IsTricked, every action of a ShouldDestroy raw-Tricked dependency
+        (Level113's sink drops the valve actions this way), and
+        RemoveFromRoutineAfterFirstUse unconditionally."""
         it = self.item
+        if it is not None:
+            if it.should_destroy() and it.is_tricked(self.level.items):
+                self.remove_actions_by_item(it.pid)
+            dep = self.level.items.get(it.depends_on) \
+                if it.depends_on is not None else None
+            if dep is not None and dep.should_destroy() and dep.tricked:
+                self.remove_actions_by_item(dep.pid)
+            if it.remove_after_first_use:
+                self.remove_actions_by_item(it.pid)
         if (self.role == 'Rottweiler' and it is not None
                 and it.kind == 'TrickItem' and it.is_tricked(self.level.items)
                 and self.pawn.world is not None):
@@ -1807,6 +1840,19 @@ class World:
             if item.locked:
                 self._woody_cant_use()
                 return False
+        # the ValveMain name-hack (Item.cs:1714-1726): Woody's click toggles
+        # the main valve — opening arms Tricked AND GotTricked at once, which
+        # is what starts Level113's sink spraying immediately
+        if item.name == 'ValveMain':
+            if item.main_valve_open:
+                item.main_valve_open = False
+                item.tricked = False
+                item.got_tricked = False
+            else:
+                item.tricked = True
+                item.got_tricked = True
+                item.main_valve_open = True
+                self.set_primed(item, False)
         return True
 
     def _woody_cant_use(self):
@@ -1860,10 +1906,13 @@ class World:
         if item.grab_directly:
             self.inventory.add([{'type': item.required_inventory,
                                  'use_count': 0, 'name': item.name}])
-        if item.can_undo_trick and item.tricked:
+        # both arms skip ValveMain — the CanWoodyUse hack alone drives its
+        # state (TrickItem.cs:305, 315)
+        if item.can_undo_trick and item.tricked and item.name != 'ValveMain':
             self._get_tricked(item, False)
         else:
-            self._get_tricked(item, True)
+            if item.name != 'ValveMain':
+                self._get_tricked(item, True)
             act = self.level.items.get(item.activate_item_trick) \
                 if item.activate_item_trick else None
             if act is not None:
