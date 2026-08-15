@@ -91,6 +91,60 @@ class Zone:
         return self.x + self.w * 0.5
 
 
+class Item:
+    """Anything the neighbour's routine can act on, or Woody can trick."""
+    __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy',
+                 'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked',
+                 'required_inventory', 'trick_score', 'anger', 'sprite',
+                 'tricked', 'got_tricked', 'already_tricked', 'depends_on',
+                 'use_at_other_place', 'neutral')
+
+    def __init__(self, name, pid, kind, x, y, zone, dx, dy, d):
+        self.name = name; self.pid = pid; self.kind = kind
+        self.x = x; self.y = y; self.zone = zone
+        self.dx = dx; self.dy = dy
+        # each pawn type has its own use sequence; an empty one means this
+        # item is simply not that character's to use
+        self.use_anim = {
+            'Rottweiler': d.get('RottweilerUseAnimation') or [],
+            'Olga': d.get('OlgaUseAnimation') or [],
+            'Mother': d.get('MotherUseAnimation') or [],
+        }
+        self.use_tricked_anim = {
+            'Rottweiler': d.get('RottweilerUseTrickedAnimation') or [],
+            'Olga': d.get('OlgaUseTrickedAnimation') or [],
+            'Mother': d.get('MotherUseTrickedAnimation') or [],
+        }
+        self.idle = d.get('IdleNormal')
+        self.idle_tricked = d.get('IdleTricked')
+        self.required_inventory = d.get('RequiredInventory')
+        self.trick_score = d.get('TrickScore') or 0
+        self.anger = d.get('AngerAmount') or 0
+        self.depends_on = (d.get('DependsOn') or {}).get('path')
+        self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
+        self.neutral = bool(d.get('Neutral'))
+        self.sprite = None
+        self.tricked = bool(d.get('Tricked'))
+        self.got_tricked = False
+        self.already_tricked = False
+
+    @property
+    def target_x(self):
+        """where a pawn stands to use it — Item.TargetLocation"""
+        return self.x + self.dx
+
+    def sequence_for(self, role, tricked):
+        table = self.use_tricked_anim if tricked else self.use_anim
+        seq = table.get(role) or []
+        if not seq and tricked:
+            seq = self.use_anim.get(role) or []
+        return seq
+
+    def is_tricked(self):
+        """TrickItem.IsTricked for the states reachable outside a live trick"""
+        return self.tricked and not self.use_at_other_place and not self.neutral
+
+
 class Door:
     """A zone link. Passing one plays an animation on the *door's* controller —
     the sheets contain the walking character, so the pawn hides during transit.
@@ -130,6 +184,8 @@ class Level:
         self.doors = []
         self.graph = {}             # zone pid -> [(neighbour pid, Door)]
         self.pawns = {}             # 'Woody' -> {'sprite','zone','speed'}
+        self.items = {}             # component pid -> Item
+        self.routines = []          # ActionManager models
         self._build()
 
     # -- helpers ---------------------------------------------------------
@@ -170,12 +226,17 @@ class Level:
                 self._add_zone(o)
             elif t in ('Door', 'Transition') and 'data' in o:
                 self._add_door(int(pid), o)
+            elif t in ('TrickItem', 'SearchItem', 'HideItem', 'GroundItem',
+                       'InspectItem', 'Alerter') and 'data' in o:
+                self._add_item(int(pid), o)
             elif t in ('ItemAnimationController', 'PawnAnimationController') and 'data' in o:
                 self._add_sprite(o)
         self.sprites.sort(key=lambda s: -s.depth)      # far (high) first
         self._find_background()
         self._build_graph()
         self._find_pawns()
+        self._link_item_sprites()
+        self._find_routines()
 
     def _add_zone(self, o):
         go = self._go_of(o)
@@ -217,6 +278,55 @@ class Level:
                                bool(d.get('Locked')), d.get('DoorType'),
                                d.get('WoodyEnterAnimation'),
                                d.get('WoodyLeaveAnimation')))
+
+    def _add_item(self, pid, o):
+        d = o['data']
+        go = self._go_of(o)
+        tr = self._transform(go)
+        if not tr:
+            return
+        p = self._pos(tr)
+        dl = d.get('DeltaLocation') or {}
+        zc = (d.get('Zone') or {}).get('path')
+        zgo = self._go_of(self._o(zc)) if zc and self._o(zc) else None
+        self.items[pid] = Item(self._o(go)['data']['name'], pid, o['type'],
+                               p[0], p[1], zgo,
+                               dl.get('x', 0.0), dl.get('y', 0.0), d)
+
+    def _link_item_sprites(self):
+        by_go = {}
+        for s in self.sprites:
+            if s.kind == 'ItemAnimationController':
+                by_go.setdefault(s.go, s)
+        for it in self.items.values():
+            go = self._go_of(self._o(it.pid))
+            it.sprite = by_go.get(go)
+            if it.sprite is not None:
+                continue
+            tp = self._transform_of.get(go)
+            for k in ((self._o(tp)['data'].get('children') or []) if tp else ()):
+                kgo = self._o(k)['data'].get('gameObject')
+                if kgo in by_go:
+                    it.sprite = by_go[kgo]
+                    break
+
+    def _find_routines(self):
+        for pid, o in self.objs.items():
+            if o['type'] != 'ActionManager' or 'data' not in o:
+                continue
+            d = o['data']
+            acts = []
+            for a in (d.get('Actions') or []):
+                acts.append({'item': (a.get('Item') or {}).get('path'),
+                             'duration': a.get('Duration') or 0.0,
+                             'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
+                             'hide_object': bool(a.get('HideObjectDuringUse'))})
+            self.routines.append({'owner': (d.get('Owner') or {}).get('name'),
+                                  'actions': acts,
+                                  'start_index': d.get('ActionStartIndex') or 0,
+                                  'loop_from_start': bool(d.get('LoopFromStartIndex')),
+                                  'selected_index': d.get('ActionSelectedIndex') or 0,
+                                  'frozen': bool(d.get('Frozen'))})
 
     def _build_graph(self):
         """Exactly ZoneController.Start(): a door links its own zone to the zone

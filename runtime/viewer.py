@@ -52,19 +52,20 @@ class Viewer:
         self.i = i % len(self.paths)
         self.level = Level(self.paths[self.i])
         self.world = World(self.level)
-        self.woody = None
-        p = self.level.pawns.get('Woody')
-        if p and p['zone'] is not None:
-            self.woody = self.world.spawn_woody(
-                p['sprite'], self.level.zone_by_pid(p['zone']), p['speed'])
+        for role in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
+            self.world.spawn_pawn(role)
+        self.woody = self.world.pawns.get('Woody')
+        self.world.woody = self.woody
+        self.world.start_routines()
         bg = self.level.background
         self.cam.x = bg[1] if bg else 0.0
         self.cam.y = bg[2] if bg else 0.0
         self.follow = bool(self.woody)
         self.t = 0.0
-        print('%s — %d sprites, %d zones, background %s'
-              % (self.level.name, len(self.level.sprites),
-                 len(self.level.zones), bg[0] if bg else None))
+        print('%s — %d sprites, %d zones, %d items, %d routines (%d actions)'
+              % (self.level.name, len(self.level.sprites), len(self.level.zones),
+                 len(self.level.items), len(self.world.routines),
+                 sum(len(r.actions) for r in self.world.routines)))
 
     def draw(self):
         sdl2.SDL_SetRenderDrawColor(self.rnd, 20, 22, 28, 255)

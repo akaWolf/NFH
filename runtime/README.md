@@ -102,8 +102,45 @@ movement vector, and the stand pose keeps the last facing, as `Pawn` and
 Every zone of all 28 playable levels is reachable from Woody's start. The three
 intro scenes are not — they are cutscenes, and two declare no Woody zone at all.
 
+## The neighbour's routine
+
+`Routine` in `world.py` is `ActionManager` from §4: a cyclic list of actions,
+each naming an item. Starting one walks the pawn to `item.TargetLocation`
+(`position + DeltaLocation`) and then plays the item's use sequence on the pawn.
+`Duration` is 0 almost everywhere, so **the animation sequence is the action** —
+it ends when the sequence drains.
+
+Level101's routine is two actions. The neighbour walks to the sofa, plays
+`SitDown → SitLoop → SitRemote → SitLoop → SitRemote → SitLoop → SitUp`, crosses
+through a door into the next zone, peeps through the binoculars, and comes back.
+One lap is about 35 seconds.
+
+Two details that took a debugging pass each:
+
+- **The zone is passed explicitly, never derived from the target point.**
+  `ActionManager` calls `MoveToGoal(item, item.Zone, item.TargetLocation, ...)`
+  because an item's stand-point can sit just outside its zone's collider — the
+  binoculars in Level101 are at x=6.30 while Zone03 ends at 6.25. Looking the
+  zone up by position strands the routine there.
+- **An action must never complete synchronously.** The game advances in
+  `ActionManager.Update`, so a zero-length action costs a frame. Chaining
+  directly from "finished" into "start the next" recurses without bound the
+  moment two such actions sit at the same spot.
+
+Each pawn type has its own use sequence (`RottweilerUseAnimation`,
+`OlgaUseAnimation`, `MotherUseAnimation`). An empty one means the item is not
+that character's to use, not that the action is instantaneous.
+
+### Season 1 works; Season 2 does not, yet
+
+Season 1 routines run at a believable pace — 12 to 33 uses per three minutes
+across all 14 levels, none stuck. Season 2 still produces implausible rates on
+some levels (Level204, Level206, Level207): those routines interleave Olga,
+Mother and Kid and go down the `NFH2Path` branches, which this does not model.
+A guard freezes a routine whose every action is unplayable so it cannot spin.
+
 ## Not implemented
 
-Everything in `docs/GAMEPLAY.md` §4–§7 except navigation: the routine engine,
-the trick state machine, detection and catching, alerters, anger and scoring.
-Woody walks; nothing else happens yet.
+The rest of `docs/GAMEPLAY.md` §5–§7: the trick state machine, inventory,
+detection and catching, alerters, anger and scoring. Woody walks and the
+neighbour keeps house; nothing either of them does has consequences yet.

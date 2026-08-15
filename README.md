@@ -70,11 +70,14 @@ Done:
   animated the way the game does them — the pawn hides and the door plays the
   sheet that contains him. Every zone of all 28 playable levels is reachable.
 
+- **The neighbour keeps his routine.** `ActionManager` walks his cyclic action
+  list, crossing zones and playing each item's use sequence. Season 1 runs
+  clean on all 14 levels; Season 2 needs the Olga/Mother/`NFH2Path` branches.
+
 Not started:
 
-- **Gameplay.** `ActionManager` and the neighbour's routine, trick state
-  machine, detection and catching, alerters, anger and scoring, inventory,
-  HUD — `docs/GAMEPLAY.md` §4–§7.
+- **Gameplay.** Trick state machine, inventory, detection and catching,
+  alerters, anger and scoring, HUD — `docs/GAMEPLAY.md` §5–§7.
 
 Open questions are listed at the end of `docs/GAMEPLAY.md`.
 
