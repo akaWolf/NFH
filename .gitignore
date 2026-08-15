@@ -6,5 +6,10 @@
 # unpacked game data (~900 MB); point NFH_DATA at it instead
 /data/
 
+# extracted assets — ~700 MB, regenerate with tools/extract_textures.py and
+# tools/extract_audio.py
+/textures/
+/audio/
+
 __pycache__/
 *.pyc

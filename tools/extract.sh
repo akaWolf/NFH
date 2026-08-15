@@ -12,12 +12,15 @@ mkdir -p "$dest"
 unzip -o -q "$apk" 'assets/bin/Data/*' -d "$dest/apk"
 unzip -o -q "$obb" -d "$dest/obb"
 
-# sharedassetsN.assets are stored as 1 MB splits; concatenate them back
+# Anything over ~1 MB ships as .splitN parts — sharedassets*.assets, but also
+# the .resource files holding the music. Concatenate every split set back.
 python3 - "$dest" <<'PY'
 import glob, os, re, sys, collections
 dest = sys.argv[1]
 groups = collections.defaultdict(list)
-for p in glob.glob(dest + '/*/assets/bin/Data/sharedassets*.split*'):
+for p in glob.glob(dest + '/*/assets/bin/Data/*.split*'):
+    if not re.search(r'\.split\d+$', p):
+        continue
     groups[p.split('.split')[0]].append(p)
 for base, parts in groups.items():
     parts.sort(key=lambda p: int(re.search(r'split(\d+)$', p).group(1)))

@@ -1,10 +1,10 @@
 # NFH level data extraction
 
 Reads the level data out of the Android builds of *Neighbours from Hell* seasons
-1 and 2 (1.5.5 and 3.2.5 — both Unity 5.3.4f1, Mono backend). The extraction
-pipeline is plain Python 3 with no third-party packages; decompiling to C#
-additionally needs .NET + ILSpy, both installable without root (see
-`decompile.sh`).
+1 and 2 (1.5.5 and 3.2.5 — both Unity 5.3.4f1, Mono backend). Plain Python 3, with two
+exceptions: texture decoding wants numpy (the ETC block decode is vectorised),
+and decompiling to C# needs .NET + ILSpy. Both install without root — see
+`decompile.sh`.
 
 ## Why this works
 
@@ -27,6 +27,10 @@ data — recover the layout from the metadata and the scene blobs become readabl
 | `export_level.py` | one scene → JSON, enums as names, pointers as object names |
 | `summary.py` | human-readable digest of an exported level |
 | `zonegraph.py` | rebuilds the runtime zone graph from static data |
+| `texture.py` | Texture2D reader plus ETC1/ETC2/EAC and linear decoders, PNG out |
+| `extract_textures.py` | every Texture2D → PNG |
+| `audio.py` | AudioClip reader, FSB5 container walk, WAV out |
+| `extract_audio.py` | every AudioClip → WAV (or raw `.fsb`) |
 | `validate_all.py` | self-test (see below) |
 | `decompile.sh` | ILSpy → `src/` (33.9k lines of C# across 241 files) |
 
@@ -80,6 +84,45 @@ Season 1 alone is 2008 `MonoBehaviour` instances across 82 script classes.
 - `Transform` in this build has no `m_RootOrder` and no `m_LocalEulerAnglesHint`.
 - `GameObject`'s trailing `m_IsActive` is not padded — `byte_size` excludes the
   inter-object padding.
+
+## Assets
+
+```sh
+NFH_DATA=... python3 tools/extract_textures.py textures
+NFH_DATA=... python3 tools/extract_audio.py   audio
+```
+
+Textures come out as RGBA PNG, row-flipped (Unity stores them bottom-up). Every
+one decodes; nothing in either season is streamed, so the pixel data always sits
+inline in the serialized file.
+
+| | Season 1 | Season 2 |
+|---|---|---|
+| textures | 1578 (272 Mpx) | 2435 (599 Mpx) |
+| audio | 300 WAV + 13 `.fsb` | 623 WAV + 28 `.fsb` |
+| runtime | 25.7 min | 45.9 min |
+
+Texture formats are ARGB32, RGBA32, RGB24, RGBA4444, RGB565, ETC_RGB4 and
+ETC2_RGBA8. The ETC path needed all of ETC2, not just ETC1: **9.9% of blocks use
+the T, H and Planar modes** that ETC2 adds, and decoding those as plain ETC1
+corrupts them visibly. The tell is a differential block whose 5-bit channel sum
+overflows — the first overflowing channel picks the mode.
+
+Audio is wrapped by Unity in FMOD FSB5 containers inside `.resource` files.
+Almost all of it is PCM16 mono at 44.1 kHz, which unwraps straight to WAV. The
+music tracks are FMOD Vorbis, whose setup headers FMOD strips; those are written
+out as raw `.fsb` for a real FSB5 decoder to deal with later.
+
+### A trap worth knowing
+
+Anything over ~1 MB is stored as `.splitN` parts — not only
+`sharedassets*.assets` but also the `.resource` files holding the music. Joining
+only the former silently loses 7 audio clips and 143 textures, with no error:
+the objects parse fine, their payload just isn't there. `extract.sh` joins every
+split set.
+
+Resources are also referenced across the APK/OBB boundary, so a `.resource` named
+by a file in one tree may live in the other. The extractors search both.
 
 ## What is in the data, and what is not
 
