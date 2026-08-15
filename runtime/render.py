@@ -67,18 +67,18 @@ class TextureCache:
         candidates = [name, name.replace('/', '_'), os.path.basename(name),
                       re.sub(r'[^A-Za-z0-9_.-]', '_', name)]
         path = None
+        # each candidate tries exact case then the case-insensitive table
+        # before the NEXT candidate — a full path must win over its base
+        # name, or the colliding flat faces shadow the path-extracted ones
         for cand in candidates:
             for d in self.dirs:
                 p = os.path.join(d, cand + '.png')
                 if os.path.exists(p):
                     path = p; break
+            if path is None:
+                path = self._lower.get(cand.lower())
             if path:
                 break
-        if path is None:
-            for cand in candidates:
-                path = self._lower.get(cand.lower())
-                if path:
-                    break
         if path is None:
             self._missing.add(name)
             return None
