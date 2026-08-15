@@ -139,6 +139,8 @@ class Item:
                  'primed_normal', 'primed_tricked', 'primed_fucked_up',
                  'force_primed_on_start', 'show_only_when_primed',
                  'hide_when_primed', 'delta_primed_x', 'delta_primed_y',
+                 'fixing_item', 'force_use_fixing_item', 'fix_depends_on',
+                 'delta_fix_x', 'delta_fix_y', 'let_untrick',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
@@ -236,6 +238,13 @@ class Item:
         self.hide_when_primed = bool(d.get('HideWhenPrimed'))
         self.delta_primed_x = (d.get('DeltaPrimedLocation') or {}).get('x', 0.0)
         self.delta_primed_y = (d.get('DeltaPrimedLocation') or {}).get('y', 0.0)
+        # the fixing-tool run (Item.cs:847-858, Rottweiler.RunToFixingItem)
+        self.fixing_item = (d.get('FixingItem') or {}).get('path')
+        self.force_use_fixing_item = bool(d.get('ForceUseFixingItem'))
+        self.fix_depends_on = bool(d.get('FixDependsOn'))
+        self.delta_fix_x = (d.get('DeltaFixLocation') or {}).get('x', 0.0)
+        self.delta_fix_y = (d.get('DeltaFixLocation') or {}).get('y', 0.0)
+        self.let_untrick = bool(d.get('LetUntrickTrickedItem'))
         self.second_required = d.get('SecondRequiredInventory')
         self.locked = bool(d.get('Locked'))
         self.used = False
@@ -907,6 +916,22 @@ class Level:
                 'win_animation': _anim_name(pd.get('WinAnimation')),
                 'is_sleeping': bool(pd.get('IsSleeping')),
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
+                # the fixing-tool chain, serialized inline on the Rottweiler
+                # (RoutineActionGrab / RoutineActionUseFixingItem / Return)
+                'grab_action': {
+                    'sequence': (pd.get('GrabFixingItemAction') or {}).get(
+                        'GrabSequence') or [],
+                    'postpone_alarm': bool((pd.get('GrabFixingItemAction')
+                                            or {}).get('PostponeAlarm')),
+                },
+                'use_fixing_action': {
+                    'sequence': (pd.get('UseFixingItemAction') or {}).get(
+                        'UseFixingItemSequence') or [],
+                    'should_return': bool((pd.get('UseFixingItemAction')
+                                           or {}).get('ShouldReturnFixingItem')),
+                    'return_sequence': ((pd.get('UseFixingItemAction') or {}).get(
+                        'ReturnFixingItemAction') or {}).get('ReturnSequence') or [],
+                },
                 # RoutineActionHitWoody is serialized inline on the Rottweiler
                 'hit_action': {
                     'sequences': [q for q in (

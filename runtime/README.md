@@ -382,6 +382,38 @@ ported (it is the only way Level108's kit opens), minus the `FirstAidPos`
 teleport — those fields are not serialized in either season's data, so the
 teleport target is unverifiable.
 
+## The fixing-tool run
+
+Some tricks are cleaned with a fetched tool — Level111's dirty carpet and the
+vacuum. Two triggers, both in the source:
+
+- **`Item.RottweilerUse`'s head** (Item.cs:847-852): using a raw-`Tricked`
+  item that names a `FixingItem`, with empty hands and `IsNeutral()` (the
+  `Neutral` field on a TrickItem) or `ForceUseFixingItem`, calls
+  `Rottweiler.RunToFixingItem` instead of the use. The urgent (notice/alerter)
+  path reaches this too, because the urgent action is a `RoutineActionUse`.
+  With the right tool already in hand the item is fixed outright and the tool
+  used instead (cs:854-857).
+- **`TrickItem.TryFix`** (TrickItem.cs:1115-1134): no `CanFix`, but a
+  `FixingItem` named and hands empty — same fetch; otherwise `FuckedUp`. The
+  `LetUntrickTrickedItem` tail rides along.
+
+`RunToFixingItem` (Rottweiler.cs:1077-1082) shifts the tricked item's stand
+spot by `DeltaFixLocation` and chains three urgent actions serialized on the
+Rottweiler: `RoutineActionGrab` (the `GrabSequence`, then the tool hides and
+he carries it as `Rottweiler.FixingItem`), `RoutineActionUseFixingItem` (a
+tricked non-neutral tool fires its own trick first and the action redoes —
+`RedoAction`; else `CanFix = true`, `TryFix`, and the `UseFixingItemSequence`),
+and `RoutineActionReturn` when `ShouldReturnFixingItem` (the `ReturnSequence`,
+the tool reappears). `GetTrickedItemToFix` resolves to `DependsOn` when
+`FixDependsOn`.
+
+Verified on Level111: the tricked carpet sends him to the vacuum (grab at
+t≈6, the vacuum sprite hides), `VacuumLoop` plays at the carpet and it fixes,
+the return leg puts the vacuum back and the routine resumes — 9.5 s
+end-to-end. `TryFix`'s earlier port approximated this branch with the wrong
+field (`FixItemTrick`); it now follows the source.
+
 ## Detection, catching, the two endings (§6)
 
 `World.tick` runs `GameInfo.Update`'s Classic checks every frame: the detection
@@ -463,8 +495,7 @@ only active objects get.
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
 that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
-stop-fields live there), the fixing-item run (`RunToFixingItem`), `Mother`'s
-catch predicate, HUD, the remaining use side-effect flags
-(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
-skates/toilet state), and the name-hack branches listed at the end of the
-priming section.
+stop-fields live there), `Mother`'s catch predicate, HUD, the remaining use
+side-effect flags (`HideObjectDuringUse` family, `TeleportRottweilerOnUse`,
+the exit deltas, skates/toilet state), and the name-hack branches listed at
+the end of the priming section.

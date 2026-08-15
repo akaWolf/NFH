@@ -218,6 +218,9 @@ class Pawn:
         self.run_force = spec.get('run_force') or 0.0
         self.run_door_force = spec.get('run_door_force') or 0.0
         self.hit_action = spec.get('hit_action') or {}
+        self.grab_action = spec.get('grab_action') or {}
+        self.use_fixing_action = spec.get('use_fixing_action') or {}
+        self.fixing_item = None          # Rottweiler.FixingItem (the carried tool)
         self.stand = spec.get('stand') or {}
         self.default_anim = spec.get('default')
         self.state = self.IDLE
@@ -793,6 +796,9 @@ class Routine:
         self.urgent_item = None          # ActionManager.UrgentAction's item
         self.was_alerted = None          # Rottweiler.WasAlerted + RottAlerter
         self.pending_alarm = None        # ShouldStartSurpriseActionFar
+        self._urgent_handler = None      # a chain step's own arrival handler
+        self._fix_tool = None            # the FixingItem being fetched
+        self._fix_target = None          # the tricked item it fixes
 
     @property
     def action(self):
@@ -895,6 +901,28 @@ class Routine:
                 else:
                     # no prime animation: StopCurrentAction(canPostponeStop:
                     # false) — no angry postpone (Item.cs RottweilerPrime tail)
+                    self._action_stopped()
+                    self._pending = 'advance'
+                    self.state = self.IDLE
+                return
+        # Item.RottweilerUse's FixingItem dispatch (Item.cs:836-858): a raw-
+        # Tricked item that names a fixing tool sends him fetching (neutral or
+        # ForceUseFixingItem), and with the right tool in hand the item is
+        # fixed and the tool used instead
+        if self.role == 'Rottweiler' and w is not None and it.tricked \
+                and it.fixing_item is not None:
+            if self._fixing_dispatch(it):
+                return
+            tool = self.level.items.get(it.fixing_item)
+            if tool is not None and self.pawn.fixing_item is tool:
+                w._fix(it)                     # Item.cs:854-857: Fix(); tool use
+                seq = tool.sequence_for(self.role,
+                                        tool.is_tricked(self.level.items))
+                self.state = self.USING
+                self.timer = a['duration']
+                if seq:
+                    self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
+                else:
                     self._action_stopped()
                     self._pending = 'advance'
                     self.state = self.IDLE
@@ -1078,11 +1106,13 @@ class Routine:
         """Rottweiler.MovingToAlarm"""
         return self.urgent_item is not None and self.urgent_item.kind == 'Alerter'
 
-    def start_urgent(self, item):
+    def start_urgent(self, item, arrived=None):
         """Rottweiler.StartSurpriseActionFar -> ActionManager.StartUrgentAction:
         drop the move in progress and run (SurpriseActionFar.Urgent) to the
-        item; the interrupted action stays current for the resume."""
+        item; the interrupted action stays current for the resume. A chain
+        step (the fixing-tool run) brings its own arrival handler."""
         self.urgent_item = item
+        self._urgent_handler = arrived
         self.pawn.steps = []
         self.pawn.in_urgent = True
         self.state = self.MOVING
@@ -1093,9 +1123,15 @@ class Routine:
 
     def _urgent_arrived(self):
         """RoutineActionSurpriseFar.OnActionStarted"""
+        handler, self._urgent_handler = self._urgent_handler, None
+        if handler is not None:
+            handler()
+            return
         it = self.urgent_item
         if it is None:
             return
+        if self.role == 'Rottweiler' and self._fixing_dispatch(it):
+            return                         # the fetch replaces the use
         if it.is_tricked(self.level.items):
             it.got_tricked = True          # Item.RottweilerUse via PlayAngry path
             self.pawn.world.play_angry(self.pawn, it,
@@ -1124,6 +1160,115 @@ class Routine:
         else:
             self._pending = 'start'
         self.state = self.IDLE
+
+    # -- the fixing-tool run (Rottweiler.RunToFixingItem and the Grab /
+    #    UseFixingItem / Return action chain) ------------------------------
+    def _fixing_dispatch(self, it):
+        """Item.RottweilerUse's FixingItem head (Item.cs:847-852): a raw-
+        Tricked neutral (or ForceUseFixingItem) item with empty hands starts
+        the fetch; True means the use itself must not continue. The urgent
+        path reaches it too — the urgent action is a RoutineActionUse, so its
+        OnActionStarted also calls Item.Use."""
+        w = self.pawn.world
+        if w is None or not it.tricked or it.fixing_item is None:
+            return False
+        if self.pawn.fixing_item is not None:
+            return False
+        neutral = it.kind in TRICK_KINDS and it.neutral       # Item.IsNeutral
+        if not (neutral or it.force_use_fixing_item):
+            return False
+        tool = self.level.items.get(it.fixing_item)
+        if tool is None:
+            return False
+        it.got_tricked = True                                 # Item.cs:838
+        self.run_to_fixing_item(tool, w._tricked_item_to_fix(it))
+        return True
+
+    def run_to_fixing_item(self, tool, tricked):
+        """Rottweiler.RunToFixingItem (Rottweiler.cs:1077-1082): shift the
+        tricked item's stand spot by DeltaFixLocation, wire the chain, and
+        run to the tool as an urgent action."""
+        tricked.dx += tricked.delta_fix_x
+        tricked.dy += tricked.delta_fix_y
+        self._fix_tool = tool
+        self._fix_target = tricked
+        self.start_urgent(tool, arrived=self._grab_arrived)
+
+    def _grab_arrived(self):
+        """RoutineActionGrab.OnActionStarted -> OnSequenceEnded: play the
+        GrabSequence, hide the tool, carry it, hop to the tricked item."""
+        seq = [x for x in self.pawn.grab_action.get('sequence', [])
+               if self.pawn.anim.has(x)]
+        self.state = self.USING
+
+        def grabbed():
+            tool = self._fix_tool
+            if tool is not None and tool.sprite is not None:
+                tool.sprite.hidden = True    # SetActiveObjectHidden(true)
+            self.pawn.fixing_item = tool     # Rottweiler.FixingItem = Item
+            self.start_urgent(self._fix_target,
+                              arrived=self._use_fixing_arrived)
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=grabbed)
+        else:
+            grabbed()
+
+    def _use_fixing_arrived(self):
+        """RoutineActionUseFixingItem.TryUseFixingItem: a tricked (non-neutral)
+        tool fires its own trick first and the action redoes (RedoAction);
+        else the target gets CanFix=true, FuckedUp=false, TryFix, and the
+        UseFixingItemSequence plays."""
+        w = self.pawn.world
+        tool = self.pawn.fixing_item
+        tgt = self._fix_target
+        if w is None or tgt is None:
+            self._urgent_finished()
+            return
+        if tool is not None and tool.tricked and \
+                not (tool.kind in TRICK_KINDS and tool.neutral):
+            tool.got_tricked = True
+            w.play_angry(self.pawn, tool, on_done=self._use_fixing_arrived)
+            return
+        tgt.can_fix = True
+        tgt.fucked_up = False
+        w._try_fix(tgt)
+        seq = [x for x in self.pawn.use_fixing_action.get('sequence', [])
+               if self.pawn.anim.has(x)]
+        self.state = self.USING
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=self._fixing_done)
+        else:
+            self._fixing_done()
+
+    def _fixing_done(self):
+        """RoutineActionUseFixingItem.StopAction clears Rottweiler.FixingItem;
+        OnActionStopped starts the Return urgent when ShouldReturnFixingItem
+        (its Item is pre-serialized to the tool)."""
+        self.pawn.fixing_item = None
+        if self.pawn.use_fixing_action.get('should_return') \
+                and self._fix_tool is not None:
+            self.start_urgent(self._fix_tool, arrived=self._return_arrived)
+        else:
+            self._fix_tool = self._fix_target = None
+            self._urgent_finished()
+
+    def _return_arrived(self):
+        """RoutineActionReturn: the ReturnSequence, then the tool reappears
+        (SetObjectHidden(false)) and the routine resumes."""
+        seq = [x for x in self.pawn.use_fixing_action.get('return_sequence', [])
+               if self.pawn.anim.has(x)]
+        self.state = self.USING
+
+        def returned():
+            tool = self._fix_tool
+            if tool is not None and tool.sprite is not None:
+                tool.sprite.hidden = False
+            self._fix_tool = self._fix_target = None
+            self._urgent_finished()
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=returned)
+        else:
+            returned()
 
     def hear_alerter(self, alerter_item, triggered_by_woody):
         """Rottweiler.HearAlerter (Rottweiler.cs:265)"""
@@ -1253,7 +1398,7 @@ class World:
         pawn.can_decrease_angry = False            # Rottweiler.cs:795
 
         def done():
-            self._try_fix(item)                    # FixTrickedItem on seq end
+            self._try_fix(item, pawn)              # FixTrickedItem on seq end
             pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
             if on_done:
                 on_done()
@@ -1288,13 +1433,35 @@ class World:
             item.already_tricked = True
             self.game.trick_done(item.trick_score)
 
-    def _try_fix(self, item):
-        """TrickItem.TryFix (TrickItem.cs:1115): fix, or run to the fixing
-        item (not modelled), or break for good."""
+    def _tricked_item_to_fix(self, item):
+        """TrickItem.GetTrickedItemToFix (TrickItem.cs:1136-1143)"""
+        if item.depends_on is not None and item.fix_depends_on:
+            dep = self.level.items.get(item.depends_on)
+            if dep is not None:
+                return dep
+        return item
+
+    def _try_fix(self, item, pawn=None):
+        """TrickItem.TryFix (TrickItem.cs:1115-1134): fix, or run to the
+        fixing tool when one is named and the neighbour's hands are empty,
+        or break for good; LetUntrickTrickedItem rides the tail."""
         if item.can_fix:
             self._fix(item)
-        elif item.fix_item_trick is None:
+        elif item.fixing_item is not None and pawn is not None \
+                and pawn.fixing_item is None:
+            tool = self.level.items.get(item.fixing_item)
+            routine = next((r for r in self.routines if r.pawn is pawn), None)
+            if tool is not None and routine is not None:
+                routine.run_to_fixing_item(tool, self._tricked_item_to_fix(item))
+            else:
+                item.fucked_up = True
+        else:
             item.fucked_up = True
+        if item.let_untrick and item.set_tricked_on_item is not None:
+            tgt = self.level.items.get(item.set_tricked_on_item)
+            if tgt is not None:
+                tgt.tricked = False
+                tgt.got_tricked = True
 
     def _fix(self, item):
         """Item.Fix / TrickItem.Fix, the state core: the trick is disarmed and
