@@ -11,6 +11,8 @@ def audio_dirs():
     env = os.environ.get('NFH_AUDIO')
     dirs = env.split(':') if env else []
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for s in ('s1', 's2'):
+        dirs.append(os.path.join(root, 'audio', s))
     dirs.append(os.path.join(root, 'audio'))
     return [d for d in dirs if os.path.isdir(d)]
 

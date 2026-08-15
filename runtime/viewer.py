@@ -19,10 +19,16 @@ from render import Camera, TextureCache, draw_sprite, draw_quad, draw_zone_overl
 WIDTH, HEIGHT = 800, 600
 
 
-def texture_dirs():
+def texture_dirs(level_paths=()):
     env = os.environ.get('NFH_TEXTURES')
     dirs = env.split(':') if env else []
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # season-specific dirs; the season of the opened levels wins name clashes
+    seasons = ['s1', 's2']
+    if any('/s2/' in p.replace('\\', '/') for p in level_paths):
+        seasons.reverse()
+    for s in seasons:
+        dirs.append(os.path.join(root, 'textures', s))
     dirs.append(os.path.join(root, 'textures'))
     return dirs
 
@@ -40,7 +46,7 @@ class Viewer:
                                          WIDTH, HEIGHT, flags)
         self.rnd = sdl2.SDL_CreateRenderer(
             self.win, -1, sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
-        self.cache = TextureCache(self.rnd, texture_dirs())
+        self.cache = TextureCache(self.rnd, texture_dirs(level_paths))
         self.sounds = None if headless else SoundBank.try_open()
         self.cam = Camera()
         self.show_zones = False
