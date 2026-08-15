@@ -1,0 +1,1071 @@
+{
+ "scene": "level19",
+ "unity_scene": "Assets/Levels/Transition.unity",
+ "objects": {
+  "1": {
+   "type": "GameObject",
+   "class_id": 1,
+   "data": {
+    "components": [
+     {
+      "path": 4,
+      "type": "Transform"
+     },
+     {
+      "path": 17,
+      "type": "LevelTransition"
+     }
+    ],
+    "layer": 0,
+    "name": "LevelTransition",
+    "tag": 20017,
+    "active": true
+   }
+  },
+  "2": {
+   "type": "GameObject",
+   "class_id": 1,
+   "data": {
+    "components": [
+     {
+      "path": 5,
+      "type": "Transform"
+     },
+     {
+      "path": 25,
+      "type": "Level"
+     },
+     {
+      "path": 24,
+      "type": "LocalizationManager"
+     },
+     {
+      "path": 23,
+      "type": "TaskScheduler"
+     },
+     {
+      "path": 22,
+      "type": "ExitConfirmation"
+     },
+     {
+      "path": 21,
+      "type": "LevelLoader"
+     },
+     {
+      "path": 20,
+      "type": "InputManager"
+     },
+     {
+      "path": 19,
+      "type": "DirectorAnimation"
+     },
+     {
+      "path": 12,
+      "type": "AudioSource"
+     },
+     {
+      "path": 18,
+      "type": "AudioInstantiate"
+     },
+     {
+      "path": 11,
+      "type": "AudioSource"
+     },
+     {
+      "path": 10,
+      "type": "AudioSource"
+     },
+     {
+      "path": 9,
+      "type": "AudioSource"
+     }
+    ],
+    "layer": 0,
+    "name": "Level",
+    "tag": 20000,
+    "active": true
+   }
+  },
+  "3": {
+   "type": "GameObject",
+   "class_id": 1,
+   "data": {
+    "components": [
+     {
+      "path": 6,
+      "type": "Transform"
+     },
+     {
+      "path": 7,
+      "type": "Camera"
+     },
+     {
+      "path": 13,
+      "type": "cls92"
+     },
+     {
+      "path": 15,
+      "type": "FlareLayer"
+     },
+     {
+      "path": 8,
+      "type": "AudioListener"
+     }
+    ],
+    "layer": 0,
+    "name": "Main Camera",
+    "tag": 5,
+    "active": true
+   }
+  },
+  "4": {
+   "type": "Transform",
+   "class_id": 4,
+   "data": {
+    "name": "LevelTransition",
+    "gameObject": 1,
+    "position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "children": [],
+    "father": 0
+   }
+  },
+  "5": {
+   "type": "Transform",
+   "class_id": 4,
+   "data": {
+    "name": "Level",
+    "gameObject": 2,
+    "position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "scale": [
+     1.4279999732971191,
+     1.0,
+     0.7360000014305115
+    ],
+    "rotation": [
+     -3.090862321641907e-08,
+     0.7071068286895752,
+     -0.7071068286895752,
+     -3.090862321641907e-08
+    ],
+    "children": [],
+    "father": 0
+   }
+  },
+  "6": {
+   "type": "Transform",
+   "class_id": 4,
+   "data": {
+    "name": "Main Camera",
+    "gameObject": 3,
+    "position": [
+     0.0,
+     0.009120464324951172,
+     -5.149039268493652
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "children": [],
+    "father": 0
+   }
+  },
+  "7": {
+   "type": "Camera",
+   "class_id": 20
+  },
+  "8": {
+   "type": "AudioListener",
+   "class_id": 81
+  },
+  "9": {
+   "type": "AudioSource",
+   "class_id": 82
+  },
+  "10": {
+   "type": "AudioSource",
+   "class_id": 82
+  },
+  "11": {
+   "type": "AudioSource",
+   "class_id": 82
+  },
+  "12": {
+   "type": "AudioSource",
+   "class_id": 82
+  },
+  "13": {
+   "type": "cls92",
+   "class_id": 92
+  },
+  "14": {
+   "type": "RenderSettings",
+   "class_id": 104
+  },
+  "15": {
+   "type": "FlareLayer",
+   "class_id": 124
+  },
+  "16": {
+   "type": "LightmapSettings",
+   "class_id": 157
+  },
+  "17": {
+   "type": "LevelTransition",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 1,
+     "name": "LevelTransition",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "LoadTimer": 0.10000000149011612,
+    "TransitionLevelName": "Transition",
+    "LoadingTexture": {
+     "external": 2,
+     "path": 48
+    },
+    "LoadingRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 1.0,
+     "height": 1.0
+    },
+    "ProgressBarEmpty": {
+     "external": 2,
+     "path": 46
+    },
+    "ProgressBarFull": {
+     "external": 2,
+     "path": 39
+    },
+    "ProgressRect": {
+     "x": 0.26750001311302185,
+     "y": 0.800000011920929,
+     "width": 0.4650000035762787,
+     "height": 0.08500000089406967
+    },
+    "DataRect": {
+     "x": 0.4000000059604645,
+     "y": 0.9100000262260437,
+     "width": 0.44999998807907104,
+     "height": 0.07500000298023224
+    },
+    "DataString": "LOADINGDATA",
+    "DataStyle": {
+     "m_Name": "",
+     "m_Normal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Normal.r": 0.9960784316062927,
+     "m_Normal.g": 0.9960784316062927,
+     "m_Normal.b": 0.9960784316062927,
+     "m_Normal.a": 1.0,
+     "m_Hover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Hover.r": 0.0,
+     "m_Hover.g": 0.0,
+     "m_Hover.b": 0.0,
+     "m_Hover.a": 1.0,
+     "m_Active.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Active.r": 0.0,
+     "m_Active.g": 0.0,
+     "m_Active.b": 0.0,
+     "m_Active.a": 1.0,
+     "m_Focused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Focused.r": 0.0,
+     "m_Focused.g": 0.0,
+     "m_Focused.b": 0.0,
+     "m_Focused.a": 1.0,
+     "m_OnNormal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnNormal.r": 0.0,
+     "m_OnNormal.g": 0.0,
+     "m_OnNormal.b": 0.0,
+     "m_OnNormal.a": 1.0,
+     "m_OnHover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnHover.r": 0.0,
+     "m_OnHover.g": 0.0,
+     "m_OnHover.b": 0.0,
+     "m_OnHover.a": 1.0,
+     "m_OnActive.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnActive.r": 0.0,
+     "m_OnActive.g": 0.0,
+     "m_OnActive.b": 0.0,
+     "m_OnActive.a": 1.0,
+     "m_OnFocused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnFocused.r": 0.0,
+     "m_OnFocused.g": 0.0,
+     "m_OnFocused.b": 0.0,
+     "m_OnFocused.a": 1.0,
+     "m_Border.left": 0,
+     "m_Border.right": 0,
+     "m_Border.top": 0,
+     "m_Border.bottom": 0,
+     "m_Margin.left": 0,
+     "m_Margin.right": 0,
+     "m_Margin.top": 0,
+     "m_Margin.bottom": 0,
+     "m_Padding.left": 0,
+     "m_Padding.right": 0,
+     "m_Padding.top": 0,
+     "m_Padding.bottom": 0,
+     "m_Overflow.left": 0,
+     "m_Overflow.right": 0,
+     "m_Overflow.top": 0,
+     "m_Overflow.bottom": 0,
+     "m_Font": {
+      "file": 2,
+      "path": 82
+     },
+     "m_FontSize": 0,
+     "m_FontStyle": 0,
+     "m_Alignment": 0,
+     "m_WordWrap": 0,
+     "m_RichText": 1,
+     "m_TextClipping": 0,
+     "m_ImagePosition": 0,
+     "m_ContentOffset.x": 0.0,
+     "m_ContentOffset.y": 0.0,
+     "m_FixedWidth": 0.0,
+     "m_FixedHeight": 0.0,
+     "m_StretchWidth": 1,
+     "m_StretchHeight": 0
+    }
+   }
+  },
+  "18": {
+   "type": "AudioInstantiate",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": ""
+   }
+  },
+  "19": {
+   "type": "DirectorAnimation",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "DirectorFaces": [
+     {
+      "external": 4,
+      "path": 1
+     },
+     {
+      "external": 5,
+      "path": 1
+     },
+     {
+      "external": 6,
+      "path": 1
+     },
+     {
+      "external": 7,
+      "path": 1
+     },
+     {
+      "external": 8,
+      "path": 1
+     },
+     {
+      "external": 9,
+      "path": 1
+     },
+     {
+      "external": 10,
+      "path": 1
+     },
+     {
+      "external": 11,
+      "path": 1
+     },
+     {
+      "external": 12,
+      "path": 1
+     },
+     {
+      "external": 13,
+      "path": 1
+     },
+     {
+      "external": 14,
+      "path": 1
+     }
+    ],
+    "DirectorRect": {
+     "x": 0.4749999940395355,
+     "y": 0.36000001430511475,
+     "width": 0.10000000149011612,
+     "height": 0.13333329558372498
+    },
+    "DirectorFaceInterval": 0.10000000149011612,
+    "NumberOfDirectorAnimationLoops": 2
+   }
+  },
+  "20": {
+   "type": "InputManager",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": ""
+   }
+  },
+  "21": {
+   "type": "LevelLoader",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "LoadingTexture": {
+     "external": 2,
+     "path": 48
+    },
+    "LoadingRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 1.0,
+     "height": 1.0
+    },
+    "ProgressBarEmpty": {
+     "external": 2,
+     "path": 46
+    },
+    "ProgressBarFull": {
+     "external": 2,
+     "path": 39
+    },
+    "ProgressRect": {
+     "x": 0.26750001311302185,
+     "y": 0.800000011920929,
+     "width": 0.4650000035762787,
+     "height": 0.08500000089406967
+    },
+    "EntryLevelName": "Entry",
+    "TransitionLevelName": "Transition",
+    "DataRect": {
+     "x": 0.4000000059604645,
+     "y": 0.9100000262260437,
+     "width": 0.44999998807907104,
+     "height": 0.07500000298023224
+    },
+    "DataString": "LOADINGDATA",
+    "DataStyle": {
+     "m_Name": "",
+     "m_Normal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Normal.r": 0.9960784316062927,
+     "m_Normal.g": 0.9960784316062927,
+     "m_Normal.b": 0.9960784316062927,
+     "m_Normal.a": 1.0,
+     "m_Hover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Hover.r": 0.0,
+     "m_Hover.g": 0.0,
+     "m_Hover.b": 0.0,
+     "m_Hover.a": 1.0,
+     "m_Active.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Active.r": 0.0,
+     "m_Active.g": 0.0,
+     "m_Active.b": 0.0,
+     "m_Active.a": 1.0,
+     "m_Focused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Focused.r": 0.0,
+     "m_Focused.g": 0.0,
+     "m_Focused.b": 0.0,
+     "m_Focused.a": 1.0,
+     "m_OnNormal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnNormal.r": 0.0,
+     "m_OnNormal.g": 0.0,
+     "m_OnNormal.b": 0.0,
+     "m_OnNormal.a": 1.0,
+     "m_OnHover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnHover.r": 0.0,
+     "m_OnHover.g": 0.0,
+     "m_OnHover.b": 0.0,
+     "m_OnHover.a": 1.0,
+     "m_OnActive.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnActive.r": 0.0,
+     "m_OnActive.g": 0.0,
+     "m_OnActive.b": 0.0,
+     "m_OnActive.a": 1.0,
+     "m_OnFocused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnFocused.r": 0.0,
+     "m_OnFocused.g": 0.0,
+     "m_OnFocused.b": 0.0,
+     "m_OnFocused.a": 1.0,
+     "m_Border.left": 0,
+     "m_Border.right": 0,
+     "m_Border.top": 0,
+     "m_Border.bottom": 0,
+     "m_Margin.left": 0,
+     "m_Margin.right": 0,
+     "m_Margin.top": 0,
+     "m_Margin.bottom": 0,
+     "m_Padding.left": 0,
+     "m_Padding.right": 0,
+     "m_Padding.top": 0,
+     "m_Padding.bottom": 0,
+     "m_Overflow.left": 0,
+     "m_Overflow.right": 0,
+     "m_Overflow.top": 0,
+     "m_Overflow.bottom": 0,
+     "m_Font": {
+      "file": 2,
+      "path": 82
+     },
+     "m_FontSize": 0,
+     "m_FontStyle": 0,
+     "m_Alignment": 0,
+     "m_WordWrap": 0,
+     "m_RichText": 1,
+     "m_TextClipping": 0,
+     "m_ImagePosition": 0,
+     "m_ContentOffset.x": 0.0,
+     "m_ContentOffset.y": 0.0,
+     "m_FixedWidth": 0.0,
+     "m_FixedHeight": 0.0,
+     "m_StretchWidth": 1,
+     "m_StretchHeight": 0
+    },
+    "IsLoadingLevel": false
+   }
+  },
+  "22": {
+   "type": "ExitConfirmation",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "ExitConfirmRect": {
+     "x": 0.25,
+     "y": 0.3499999940395355,
+     "width": 0.5475000143051147,
+     "height": 0.3333300054073334
+    },
+    "ExitConfirm": {
+     "external": 15,
+     "path": 1
+    },
+    "ExitConfirmOkOnly": {
+     "external": 16,
+     "path": 1
+    },
+    "ExitConfirmMessageRect": {
+     "x": 0.23000000417232513,
+     "y": 0.3700000047683716,
+     "width": 0.6000000238418579,
+     "height": 0.3333300054073334
+    },
+    "ExitStyle": {
+     "m_Name": "",
+     "m_Normal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Normal.r": 0.7568627595901489,
+     "m_Normal.g": 0.7568627595901489,
+     "m_Normal.b": 0.7568627595901489,
+     "m_Normal.a": 1.0,
+     "m_Hover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Hover.r": 0.0,
+     "m_Hover.g": 0.0,
+     "m_Hover.b": 0.0,
+     "m_Hover.a": 1.0,
+     "m_Active.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Active.r": 0.0,
+     "m_Active.g": 0.0,
+     "m_Active.b": 0.0,
+     "m_Active.a": 1.0,
+     "m_Focused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Focused.r": 0.0,
+     "m_Focused.g": 0.0,
+     "m_Focused.b": 0.0,
+     "m_Focused.a": 1.0,
+     "m_OnNormal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnNormal.r": 0.0,
+     "m_OnNormal.g": 0.0,
+     "m_OnNormal.b": 0.0,
+     "m_OnNormal.a": 1.0,
+     "m_OnHover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnHover.r": 0.0,
+     "m_OnHover.g": 0.0,
+     "m_OnHover.b": 0.0,
+     "m_OnHover.a": 1.0,
+     "m_OnActive.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnActive.r": 0.0,
+     "m_OnActive.g": 0.0,
+     "m_OnActive.b": 0.0,
+     "m_OnActive.a": 1.0,
+     "m_OnFocused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnFocused.r": 0.0,
+     "m_OnFocused.g": 0.0,
+     "m_OnFocused.b": 0.0,
+     "m_OnFocused.a": 1.0,
+     "m_Border.left": 0,
+     "m_Border.right": 0,
+     "m_Border.top": 0,
+     "m_Border.bottom": 0,
+     "m_Margin.left": 0,
+     "m_Margin.right": 0,
+     "m_Margin.top": 0,
+     "m_Margin.bottom": 0,
+     "m_Padding.left": 0,
+     "m_Padding.right": 0,
+     "m_Padding.top": 0,
+     "m_Padding.bottom": 0,
+     "m_Overflow.left": 0,
+     "m_Overflow.right": 0,
+     "m_Overflow.top": 0,
+     "m_Overflow.bottom": 0,
+     "m_Font": {
+      "file": 2,
+      "path": 68
+     },
+     "m_FontSize": 0,
+     "m_FontStyle": 0,
+     "m_Alignment": 4,
+     "m_WordWrap": 0,
+     "m_RichText": 1,
+     "m_TextClipping": 1,
+     "m_ImagePosition": 0,
+     "m_ContentOffset.x": 0.0,
+     "m_ContentOffset.y": 0.0,
+     "m_FixedWidth": 0.0,
+     "m_FixedHeight": 0.0,
+     "m_StretchWidth": 1,
+     "m_StretchHeight": 0
+    },
+    "ExitNoButtonRect": {
+     "x": 0.7200000286102295,
+     "y": 0.5799999833106995,
+     "width": 0.06499999761581421,
+     "height": 0.08500000089406967
+    },
+    "ExitNoButtonHover": {
+     "external": 17,
+     "path": 1
+    },
+    "ExitNoButton": {
+     "external": 18,
+     "path": 1
+    },
+    "ExitYesButtonRect": {
+     "x": 0.26249998807907104,
+     "y": 0.5799999833106995,
+     "width": 0.06499999761581421,
+     "height": 0.08500000089406967
+    },
+    "ExitYesHover": {
+     "external": 19,
+     "path": 1
+    },
+    "ExitYes": {
+     "external": 20,
+     "path": 1
+    },
+    "AdjustTextSize": null,
+    "AdjustTextSizeWindow": null
+   }
+  },
+  "23": {
+   "type": "TaskScheduler",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": ""
+   }
+  },
+  "24": {
+   "type": "LocalizationManager",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "LocalizationSeparator": [
+     "<>"
+    ],
+    "CommentCharacter": ";",
+    "CheckDuplicates": false,
+    "IsEmptyEntry": false
+   }
+  },
+  "25": {
+   "type": "Level",
+   "class_id": 114,
+   "data": {
+    "m_GameObject": {
+     "path": 2,
+     "name": "Level",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "ZonesHeightDeltas": [
+     0.0,
+     -0.6000000238418579,
+     -0.5,
+     -0.5,
+     -0.5,
+     -0.5,
+     -0.75,
+     -0.75,
+     -0.6000000238418579,
+     -0.699999988079071
+    ],
+    "ZonesY": [
+     0.0,
+     -1.4592540264129639,
+     1.2560440301895142,
+     1.2560440301895142,
+     -1.4592540264129639,
+     -1.4592540264129639,
+     4.260047912597656,
+     4.260047912597656,
+     4.260047912597656,
+     -4.2209858894348145
+    ],
+    "ZonesSizes": [
+     {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+     },
+     {
+      "x": 8.300000190734863,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 6.699999809265137,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 5.099999904632568,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 2.700000047683716,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 1.5,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 6.0,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 2.5,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 5.099999904632568,
+      "y": 2.5,
+      "z": 2.0
+     },
+     {
+      "x": 6.5,
+      "y": 2.5,
+      "z": 2.0
+     }
+    ],
+    "ZonesPlayLeft": [
+     0.0,
+     3.9000000953674316,
+     3.299999952316284,
+     2.0,
+     0.8999999761581421,
+     0.5,
+     2.799999952316284,
+     1.0,
+     1.5,
+     2.700000047683716
+    ],
+    "ZonesPlayRight": [
+     0.0,
+     3.700000047683716,
+     2.700000047683716,
+     2.0,
+     0.800000011920929,
+     0.5,
+     2.5999999046325684,
+     0.6000000238418579,
+     2.0,
+     2.700000047683716
+    ],
+    "ZonesNameString": [
+     "",
+     "HALL_NAME",
+     "LIVING_NAME",
+     "KITCHEN_NAME",
+     "BATHROOM_NAME",
+     "",
+     "",
+     "",
+     "",
+     ""
+    ],
+    "StartLocationOffset": {
+     "x": 0.14000000059604645,
+     "y": -0.5,
+     "z": 0.0
+    },
+    "EntranceLocationOffset": {
+     "x": 3.5,
+     "y": -0.7400000095367432,
+     "z": -9.5
+    },
+    "StartZoneName": "Zone05",
+    "EntranceZoneName": "Zone01",
+    "ReturnToMainOnEsc": false,
+    "MainMenu": null,
+    "LevelSelectionMenu": null,
+    "LevelSelectionMenu2": null,
+    "FenceDepth": "LevelFence",
+    "FenceTextures": [],
+    "IgnoreFenceSize": false,
+    "FenceRects": [],
+    "FencePositions": [],
+    "Durations": [
+     0,
+     0,
+     0,
+     5,
+     5,
+     5,
+     6,
+     6,
+     6,
+     7,
+     7,
+     7,
+     7,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10,
+     10
+    ],
+    "TricksTotal": [
+     1,
+     2,
+     1,
+     4,
+     6,
+     6,
+     7,
+     8,
+     9,
+     7,
+     6,
+     7,
+     6,
+     8,
+     10,
+     8,
+     9,
+     0,
+     4,
+     5,
+     5,
+     6,
+     5,
+     6,
+     7,
+     7,
+     7,
+     8,
+     8,
+     9,
+     9,
+     6
+    ],
+    "MinRatings": [
+     100,
+     97,
+     100,
+     50,
+     55,
+     60,
+     65,
+     70,
+     75,
+     60,
+     65,
+     70,
+     75,
+     60,
+     65,
+     70,
+     75,
+     75,
+     65,
+     50,
+     50,
+     60,
+     50,
+     60,
+     60,
+     60,
+     60,
+     65,
+     65,
+     70,
+     70,
+     60
+    ],
+    "ForceTrickCamera": false,
+    "IsTutorial": false,
+    "TrickCameraOnMove": false,
+    "SettingsDisabled": true,
+    "LevelBehaviors": [],
+    "DisableFences": false,
+    "OverallSound": null,
+    "MyAdManager": {
+     "external": 2,
+     "path": 90
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,10 @@
+# shipped artifacts — large, and not ours to redistribute
+*.apk
+*.obb
+*.xapk
+
+# unpacked game data (~900 MB); point NFH_DATA at it instead
+/data/
+
+__pycache__/
+*.pyc
