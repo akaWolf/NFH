@@ -251,8 +251,45 @@ repositioning (i = buildIndex − 5 for S1, + 12 for S2). Together these mean:
 **the scene's serialized transforms are not the runtime layout** — the Level
 and Actor components carry the real one.
 
+## The trick loop (§5)
+
+Implemented from the source, method by method:
+
+**Woody's side** — `Woody.TryUseItem` → `Item.Use` → `WoodyUse`:
+`CanWoodyUse` gates on the held inventory (`RequiredInventory`, with
+`SecondRequiredInventory` as the accepted alternative and the compound branch
+from `TrickItem.CanWoodyUse`), on `Locked`, and on holding anything at a bare
+item; failure is the `NoNo` animation and possibly `WrongTrick`. Success plays
+the item's `Animation` on Woody, and the state change rides its end:
+`TrickItem.OnUseAnimationCompleted` consumes the held inventory
+(`UseCount--`, removal unless `KeepAfterUse`), handles `GrabDirectly` and
+`CanUndoTrick`, arms the trap (`GetTricked`), propagates `ActivateItemTrick` /
+`SetTrickedOnItem`, switches the idle, and Woody laughs unless
+`DontLaughWhenTrickItem`. A `SearchItem` instead runs search → take →
+`InternalUse`, handing over `InventoryItems` (or `WhatsUp` when empty).
+
+**The neighbour's side** — `RoutineActionUse.StopAction(canPostponeStop:true)`:
+a use that ends on a tricked item does not finish the action; the owner plays
+the angry set first. `Rottweiler.PlayAngryAnimation` (Classic): meter at zero →
+`AnimationAngryEasyUp`; meter still hot → `AngryCountTicks++`,
+`AnimationAngryEasyDown + AnimationAngryHard`, a compound trick. Either way the
+meter refills and stops decaying until the use ends. The fix animation rides the
+same sequence's tail (`FixSequence` / `FixAnimation` per flags), and its end runs
+`FixTrickedItem → TryFix`: `CanFix` disarms the trap and restores the idle, no
+fix path marks it `FuckedUp`. `Item.OnTrickDone` pays `TrickScore` once
+(`AlreadyTricked` guard, linked pairs pay both) into `GameInfo.TrickDone`, which
+flips `Won` at `WinningTricksCount`.
+
+Verified end-to-end on Level101: fridge → egg → microwave armed; drawer →
+fart bag → sofa armed; the neighbour sits, the whoopee cushion fires, 25 points,
+1/4 tricks, the sofa comes back fixed, and the meter decays from 100 at 4.23/s.
+The locked first-aid kit correctly refuses to open.
+
+In the viewer: click an item to use it, digits 1–9 select inventory, 0 clears.
+
 ## Not implemented
 
-The rest of `docs/GAMEPLAY.md` §5–§7: the trick state machine, inventory,
-detection and catching, alerters, anger and scoring. Woody walks and the
-neighbour keeps house; nothing either of them does has consequences yet.
+From `docs/GAMEPLAY.md` §6–§7: detection and catching (`CanRottweilerSeeWoody`,
+win/lose in `GameInfo.Update`), alerters, sneaking and hiding, urgent actions
+(`SurpriseFar/Near`, `PawnToAbortMutexOnFinish` release), priming
+(`RequirePriming`/`WoodyPrime`), the fixing-item run (`RunToFixingItem`), HUD.

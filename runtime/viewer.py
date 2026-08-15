@@ -69,6 +69,24 @@ class Viewer:
                  len(self.level.items), len(self.world.routines),
                  sum(len(r.actions) for r in self.world.routines)))
 
+    def _item_at(self, wx, wy):
+        """click hit-test against the items' BoxColliders"""
+        for it in self.level.items.values():
+            c = it.collider
+            if c is None:
+                continue
+            if abs(wx - c[0]) <= c[2] * 0.5 and abs(wy - c[1]) <= c[3] * 0.5:
+                return it
+        return None
+
+    def _print_state(self):
+        inv = self.world.inventory
+        g = self.world.game
+        print('inventory: %s  used=%s | tricks %d/%d%s' % (
+            [i['type'] for i in inv.items],
+            inv.used['type'] if inv.used else None,
+            g.completed, g.total, '  WON' if g.won else ''))
+
     def draw(self):
         sdl2.SDL_SetRenderDrawColor(self.rnd, 20, 22, 28, 255)
         sdl2.SDL_RenderClear(self.rnd)
@@ -135,11 +153,22 @@ class Viewer:
                         self.screenshot('/tmp/nfh-%s.png' % self.level.name)
                     elif k == sdl2.SDLK_f:
                         self.follow = not self.follow
+                    elif sdl2.SDLK_0 <= k <= sdl2.SDLK_9:
+                        idx = (k - sdl2.SDLK_1) if k != sdl2.SDLK_0 else -1
+                        self.world.inventory.select(idx)
+                        self._print_state()
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
                     wx, wy = self.cam.screen_to_world(ev.button.x, ev.button.y,
                                                       WIDTH, HEIGHT)
-                    if not self.woody.goto(wx, wy):
+                    it = self._item_at(wx, wy)
+                    if it is not None:
+                        used = self.world.inventory.used
+                        print('use %s%s' % (it.name,
+                              ' with ' + used['type'] if used else ''))
+                        self.world.woody_use(it)
+                    elif not self.woody.goto(wx, wy):
                         print('no route to (%.2f, %.2f)' % (wx, wy))
+                    self._print_state()
             now = time.time()
             dt = now - last; last = now
             if not self.paused:

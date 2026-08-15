@@ -117,6 +117,23 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone',
+                 'animation', 'take_animation', 'empty_animation',
+                 'use_woody_sequence', 'animation_sequence',
+                 'use_take_sequence', 'take_sequence',
+                 'angry_easy_up', 'angry_easy_down', 'angry_hard',
+                 'fix_animation', 'fix_sequence', 'use_fix_sequence',
+                 'fix_without_animations', 'can_fix', 'dont_get_angry',
+                 'dont_laugh', 'grab_directly', 'keep_after_use',
+                 'can_undo_trick', 'get_tricked_at_once', 'require_priming',
+                 'primed', 'second_required', 'locked', 'used', 'use_once',
+                 'wrong_trick', 'fucked_up', 'was_priming',
+                 'compound', 'compound_required', 'compound_tricked',
+                 'compound_tricked_anim', 'compound_double_anim',
+                 'inventory_items', 'dont_remove_inventory',
+                 'activate_item_trick', 'set_tricked_on_item',
+                 'linked_item_trick', 'fix_item_trick', 'depends_on_2',
+                 'use_depends_on_when_tricked', 'force_fix_original',
+                 'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
@@ -149,6 +166,58 @@ class Item:
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
         self.enter_zone = _anim_name(d.get('EnterZone'))
         self.leave_zone = _anim_name(d.get('LeaveZone'))
+        # Woody's use animation (Woody.TryUseItem plays Animation, or the
+        # sequence when UseWoodyAnimationSequence)
+        self.animation = _anim_name(d.get('Animation'))
+        self.take_animation = _anim_name(d.get('TakeAnimation'))
+        self.empty_animation = _anim_name(d.get('EmptyAnimation'))
+        self.use_woody_sequence = bool(d.get('UseWoodyAnimationSequence'))
+        self.animation_sequence = d.get('AnimationSequence') or []
+        self.use_take_sequence = bool(d.get('UseTakeAnimationSequence'))
+        self.take_sequence = d.get('TakeAnimationSequence') or []
+        # the neighbour's reaction set (Rottweiler.PlayAngryAnimation)
+        self.angry_easy_up = _anim_name(d.get('AnimationAngryEasyUp'))
+        self.angry_easy_down = _anim_name(d.get('AnimationAngryEasyDown'))
+        self.angry_hard = _anim_name(d.get('AnimationAngryHard'))
+        self.fix_animation = _anim_name(d.get('FixAnimation'))
+        self.fix_sequence = d.get('FixSequence') or []
+        self.use_fix_sequence = bool(d.get('UseFixSequence'))
+        self.fix_without_animations = bool(d.get('FixWithoutAnimations'))
+        self.can_fix = bool(d.get('CanFix'))
+        self.dont_get_angry = bool(d.get('DontGetAngry'))
+        self.dont_laugh = bool(d.get('DontLaughWhenTrickItem'))
+        # trick bookkeeping (Item / TrickItem fields)
+        self.grab_directly = bool(d.get('GrabDirectly'))
+        self.keep_after_use = bool(d.get('KeepAfterUse'))
+        self.can_undo_trick = bool(d.get('CanUndoTrick'))
+        self.get_tricked_at_once = bool(d.get('GetTrickedAtOnce'))
+        self.require_priming = bool(d.get('RequirePriming'))
+        self.primed = bool(d.get('Primed'))
+        self.second_required = d.get('SecondRequiredInventory')
+        self.locked = bool(d.get('Locked'))
+        self.used = False
+        self.use_once = bool(d.get('UseOnce'))
+        self.wrong_trick = False
+        self.fucked_up = False
+        self.was_priming = False
+        self.compound = bool(d.get('Compound'))
+        self.compound_required = d.get('CompoundRequiredInventory')
+        self.compound_tricked = bool(d.get('CompoundTricked'))
+        self.compound_tricked_anim = _anim_name(d.get('CompoundTrickedAnim'))
+        self.compound_double_anim = _anim_name(d.get('CompoundDoubleTrickedAnim'))
+        # SearchItem.InventoryItems
+        self.inventory_items = [
+            {'type': v.get('Type'), 'use_count': v.get('UseCount') or 0,
+             'name': v.get('NameString') or ''}
+            for v in (d.get('InventoryItems') or [])]
+        self.dont_remove_inventory = bool(d.get('DontRemoveInventoryItem'))
+        self.activate_item_trick = (d.get('ActivateItemTrick') or {}).get('path')
+        self.set_tricked_on_item = (d.get('SetTrickedOnItem') or {}).get('path')
+        self.linked_item_trick = (d.get('LinkedItemTrick') or {}).get('path')
+        self.fix_item_trick = (d.get('FixItemTrick') or {}).get('path')
+        self.use_depends_on_when_tricked = bool(d.get('UseDependsOnWhenTricked'))
+        self.force_fix_original = bool(d.get('ForceFixOriginal'))
+        self.collider = None                # (cx, cy, w, h), for click hit-tests
         self.delta_olga_x = (d.get('DeltaOlgaLocation') or {}).get('x', 0.0)
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
@@ -182,9 +251,17 @@ class Item:
         table = self.use_tricked_anim if tricked else self.use_anim
         return table.get(role) or []
 
-    def is_tricked(self):
-        """TrickItem.IsTricked for the states reachable outside a live trick"""
-        return self.tricked and not self.use_at_other_place and not self.neutral
+    def is_tricked(self, items=None):
+        """TrickItem.IsTricked (TrickItem.cs:258), including the DependsOn
+        chain when the item table is provided."""
+        direct = self.tricked and not self.use_at_other_place and not self.neutral
+        via = False
+        if items is not None and self.depends_on is not None:
+            dep = items.get(self.depends_on)
+            if dep is not None and dep.tricked and dep.got_tricked and \
+                    (not self.use_depends_on_when_tricked or self.tricked):
+                via = True
+        return (direct or via) and not self.was_priming and not self.fucked_up
 
 
 class Door:
@@ -247,6 +324,7 @@ class Level:
         self.pawns = {}             # 'Woody' -> {'sprite','zone','speed'}
         self.items = {}             # component pid -> Item
         self.routines = []          # ActionManager models
+        self.game_info = {}         # GameInfo serialized fields
         self._build()
 
     def _level_location_index(self):
@@ -314,6 +392,7 @@ class Level:
         self._find_routines()
         self._apply_zone_bounds()
         self._apply_level_locations()
+        self._find_game_info()
 
     def _add_zone(self, o):
         go = self._go_of(o)
@@ -389,7 +468,13 @@ class Level:
             return None
 
         for it in self.items.values():
-            it.sprite = find(self._go_of(self._o(it.pid)))
+            go = self._go_of(self._o(it.pid))
+            it.sprite = find(go)
+            box = self._component(go, 'BoxCollider')
+            if box and 'data' in box:
+                b = box['data']
+                it.collider = (it.x + b['center'][0], it.y + b['center'][1],
+                               b['size'][0], b['size'][1])
         for d in self.doors:
             d.sprite = find(self._go_of(self._o(d.pid)))
 
@@ -444,6 +529,16 @@ class Level:
                 z.play_left = z.x - left[i]
             if i < len(right):
                 z.play_right = z.x + right[i]
+
+    def _find_game_info(self):
+        for o in self.objs.values():
+            if o['type'] == 'GameInfo' and 'data' in o:
+                d = o['data']
+                self.game_info = {
+                    'total': d.get('TotalTricksCount') or 0,
+                    'winning': d.get('WinningTricksCount') or 0,
+                }
+                return
 
     def _apply_level_locations(self):
         """Actor.Start: transform.position = LevelLocations[idx]. Shift each
@@ -691,6 +786,8 @@ class Level:
                 'item_use_height_threshold': pd.get('ItemUseHeightThreshold') or 0.0,
                 'portal_up': _anim_name(pd.get('PortalUpAnimation')),
                 'portal_down': _anim_name(pd.get('PortalDownAnimation')),
+                'angry_decay': pd.get('AngryMeterDecay') or 0.0,
+                'angry_max': pd.get('AngryMeterMaximum') or 100.0,
                 'default': pd.get('DefaultAnimation'),
             }
 

@@ -181,6 +181,12 @@ class Pawn:
         self.item_threshold = spec.get('item_use_height_threshold') or 0.0
         self.portal_up = spec.get('portal_up')
         self.portal_down = spec.get('portal_down')
+        # Rottweiler's anger meter (fields on the pawn, Rottweiler.cs:50-56)
+        self.angry_meter = 0.0
+        self.angry_decay = spec.get('angry_decay') or 0.0
+        self.angry_max = spec.get('angry_max') or 100.0
+        self.can_decrease_angry = True
+        self.angry_count_ticks = 0
         self.sneaking = False
         self.stand = spec.get('stand') or {}
         self.default_anim = spec.get('default')
@@ -417,6 +423,9 @@ class Pawn:
     # -- tick ---------------------------------------------------------------
     def tick(self, dt):
         self.anim.tick(dt)
+        # Rottweiler.Update: the meter decays while allowed
+        if self.can_decrease_angry and self.angry_meter > 0.0:
+            self.angry_meter = max(0.0, self.angry_meter - self.angry_decay * dt)
         scale = self.walk_speed_scale() * dt
         if self.state == self.WALK:
             tx, ty = self._step_target()
@@ -484,6 +493,66 @@ class Pawn:
                 return
             direction = -1.0 if it.should_walk_down else 1.0
             self.sprite.y += direction * self.door_force * scale
+
+
+class InventoryState:
+    """InventoryManager: a flat list, a selected UsedInventory."""
+
+    def __init__(self):
+        self.items = []                  # dicts: {'type','use_count','name'}
+        self.used = None                 # UsedInventory
+
+    def add(self, new_items):
+        """InventoryManager.AddInventory"""
+        self.items.extend(dict(i) for i in new_items)
+
+    def has(self, required):
+        """InventoryManager.HasInventory"""
+        return any(i['type'] == required for i in self.items)
+
+    def is_using(self, required):
+        """InventoryManager.IsUsingInventory"""
+        return self.used is not None and self.used['type'] == required
+
+    def remove(self, required):
+        """InventoryManager.RemoveInventory: first match only"""
+        for i, it in enumerate(self.items):
+            if it['type'] == required:
+                del self.items[i]
+                break
+        if self.used is not None and self.used['type'] == required and \
+                not self.has(required):
+            self.used = None
+
+    def select(self, idx):
+        self.used = self.items[idx] if 0 <= idx < len(self.items) else None
+
+
+class GameState:
+    """GameInfo: trick counters and the win flags."""
+
+    def __init__(self, info):
+        self.total = info.get('total', 0)
+        self.winning = info.get('winning', 0)
+        self.completed = 0
+        self.won = False
+        self.linked_trick = False
+        self.compound_tricks = 0
+        self.log = []
+
+    def trick_done(self, score):
+        """GameInfo.TrickDone (GameInfo.cs:467)"""
+        if self.linked_trick:
+            self.linked_trick = False
+            self.completed += 1
+        self.completed += 1
+        self.log.append(score)
+        if self.completed >= self.winning:
+            self.won = True
+
+    def all_done(self):
+        """the immediate-win check in GameInfo.Update"""
+        return self.total > 0 and self.completed >= self.total
 
 
 class Routine:
@@ -570,7 +639,7 @@ class Routine:
             if a.get('mutex_anim'):
                 self.pawn.anim.play_looping(a['mutex_anim'])
             return
-        tricked = it.is_tricked()
+        tricked = it.is_tricked(self.level.items)
         seq = it.sequence_for(self.role, tricked)
         if not seq:
             self._pending = 'advance'
@@ -579,11 +648,42 @@ class Routine:
         self.state = self.USING
         self.timer = a['duration']
         self.log.append((it.name, tricked))
+        if tricked and self.role == 'Rottweiler':
+            it.got_tricked = True          # Item.RottweilerUse (Item.cs:838)
         if self.on_use:
             self.on_use(it, tricked)
         self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
 
+    def _tricked_item(self, it):
+        """RoutineActionUse.GetTrickedItem"""
+        if it.tricked and not it.use_depends_on_when_tricked:
+            return it
+        if it.depends_on is not None:
+            dep = self.level.items.get(it.depends_on)
+            if dep is not None and dep.tricked:
+                if dep.force_fix_original:
+                    return it
+                return dep
+        return None
+
     def _finish(self):
+        """RoutineActionUse.StopAction(canPostponeStop: true): a tricked
+        TrickItem does not finish the action — the owner plays the angry
+        sequence first (RoutineActionUse.cs:546-553)."""
+        it = self.item
+        if (self.role == 'Rottweiler' and it is not None
+                and it.kind == 'TrickItem' and it.is_tricked(self.level.items)
+                and self.pawn.world is not None):
+            target = self._tricked_item(it)
+            if target is not None:
+                self.pawn.world.play_angry(self.pawn, target,
+                                           on_done=self._angry_done)
+                return
+        self._pending = 'advance'
+
+    def _angry_done(self):
+        """the second StopAction arrives with canPostponeStop=false, so the
+        angry branch is skipped and the action finally finishes"""
         self._pending = 'advance'
 
     def tick(self, dt):
@@ -607,6 +707,8 @@ class World:
         self.woody = None
         self.pawns = {}
         self.routines = []
+        self.game = GameState(level.game_info)
+        self.inventory = InventoryState()
         self.players = {id(s): AnimPlayer(s, sound_sink) for s in level.sprites}
         for d in level.doors:
             if d.sprite is not None:
@@ -618,10 +720,101 @@ class World:
             if it.enter_zone or it.leave_zone:
                 self._zone_items.setdefault(it.zone, []).append(it)
 
+    def play_angry(self, pawn, item, on_done=None):
+        """Rottweiler.PlayAngryAnimation, GameMode.Classic branch
+        (Rottweiler.cs:595-612, 768-787), followed on sequence end by
+        FixTrickedItem -> TryFix (Rottweiler.cs:461, TrickItem.cs:1115)."""
+        seq = []
+        if self.game is not None:
+            if pawn.angry_meter <= 0.0:
+                if item.angry_easy_up:
+                    seq = [item.angry_easy_up]
+                # HUD anger level 1, medium laugh — presentation only
+            else:
+                pawn.angry_count_ticks += 1
+                seq = [a for a in (item.angry_easy_down, item.angry_hard) if a]
+                self.game.compound_tricks += 1     # Item.OnCompoundTrickDone
+            pawn.angry_meter = pawn.angry_max
+        # the fix animation rides at the tail of the same sequence
+        if item.can_fix:
+            if item.use_fix_sequence:
+                seq.extend(item.fix_sequence)
+            elif not item.fix_without_animations and item.fix_animation:
+                seq.append(item.fix_animation)
+        if not item.dont_get_angry:
+            self._on_trick_done(item)              # Rottweiler.cs:787
+        pawn.can_decrease_angry = False            # Rottweiler.cs:795
+
+        def done():
+            self._try_fix(item)                    # FixTrickedItem on seq end
+            pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
+            if on_done:
+                on_done()
+
+        seq = [a for a in seq if pawn.anim.has(a)]
+        if seq:
+            pawn.anim.play_sequence(seq, on_end=done)
+        else:
+            done()
+
+    def _on_trick_done(self, item):
+        """Item.OnTrickDone (Item.cs:2121): score once, linked pairs pay both."""
+        if self.game is None:
+            return
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        if linked is not None and linked.tricked and item.tricked:
+            if item.already_tricked and not linked.already_tricked:
+                linked.already_tricked = True
+                self.game.linked_trick = False
+                self.game.trick_done(item.trick_score)
+            elif not item.already_tricked and linked.already_tricked:
+                item.already_tricked = True
+                self.game.linked_trick = False
+                self.game.trick_done(item.trick_score)
+            elif not item.already_tricked and not linked.already_tricked:
+                item.already_tricked = True
+                linked.already_tricked = True
+                self.game.linked_trick = True
+                self.game.trick_done(item.trick_score)
+        elif not item.already_tricked:
+            item.already_tricked = True
+            self.game.trick_done(item.trick_score)
+
+    def _try_fix(self, item):
+        """TrickItem.TryFix (TrickItem.cs:1115): fix, or run to the fixing
+        item (not modelled), or break for good."""
+        if item.can_fix:
+            self._fix(item)
+        elif item.fix_item_trick is None:
+            item.fucked_up = True
+
+    def _fix(self, item):
+        """Item.Fix / TrickItem.Fix, the state core: the trick is disarmed and
+        the item shows its normal idle again (Item.cs:2102, TrickItem.cs:443)."""
+        item.tricked = False
+        fx = self.level.items.get(item.fix_item_trick) \
+            if item.fix_item_trick else None
+        if fx is not None:
+            fx.tricked = False
+            self._return_to_idle(fx)
+        self._return_to_idle(item)
+
+    def _return_to_idle(self, item):
+        """TrickItem.ReturnToIdleAnimation, the reachable branches"""
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is None or not item.animating:
+            return
+        if item.fucked_up:
+            return
+        name = item.idle_tricked if item.is_tricked(self.level.items) else item.idle
+        if name and p.has(name):
+            p.play_single(name)
+
     def zone_reaction(self, zone_pid, which):
         """Zone.PlayItemsZoneEnter / PlayItemsZoneLeave"""
         for it in self._zone_items.get(zone_pid, ()):
-            if it.is_tricked():
+            if it.is_tricked(self.level.items):
                 continue                  # PlayZoneEnter checks IsTricked
             anim = it.enter_zone if which == 'enter' else it.leave_zone
             if not anim or it.sprite is None or not it.animating:
@@ -632,6 +825,144 @@ class World:
 
     def player_for(self, sprite):
         return self.players.get(id(sprite))
+
+    # -- Woody using items -------------------------------------------------
+    def woody_use(self, item):
+        """Click on an item: walk to it, then the Woody.TryUseItem chain."""
+        if self.woody is None:
+            return False
+        return self.woody.goto_item(item,
+                                    on_arrive=lambda: self._woody_try_use(item))
+
+    def _can_woody_use(self, item):
+        """Item.CanWoodyUse, the always-live gates (Item.cs:1671-1704), plus
+        TrickItem.CanWoodyUse's compound branch (TrickItem.cs:507-543)."""
+        inv = self.inventory
+        # SecondRequiredInventory acts as an accepted alternative (Item.cs:1736)
+        required = item.required_inventory
+        if item.second_required and item.second_required != 'IT_NONE' and \
+                inv.used is not None and inv.used['type'] == item.second_required:
+            item.second_required, required = required, item.second_required
+            item.required_inventory = required
+        if item.compound and inv.used is not None and \
+                inv.used['type'] == item.compound_required:
+            # TrickItem.CanWoodyUse: the compound trick applies immediately
+            item.compound_tricked = True
+            self.woody.anim.play_single(item.animation)
+            inv.remove(item.compound_required)
+            p = self.players.get(id(item.sprite)) if item.sprite else None
+            anim = item.compound_double_anim if item.tricked else item.compound_tricked_anim
+            if p is not None and anim and p.has(anim):
+                p.play_single(anim)
+            return None                    # handled; no ordinary use follows
+        if required and required != 'IT_NONE':
+            if (not inv.is_using(required)) and not item.grab_directly:
+                if inv.used is not None:
+                    self._woody_cant_use()
+                    item.wrong_trick = True
+                return False
+        elif inv.used is not None:
+            self._woody_cant_use()         # holding something at a bare item
+            return False
+        if item.locked:
+            self._woody_cant_use()
+            return False
+        return True
+
+    def _woody_cant_use(self):
+        """Woody.PlayCantUseAnimation"""
+        if self.woody.anim.has('NoNo'):
+            self.woody.anim.play_single('NoNo')
+
+    def _woody_try_use(self, item):
+        """Woody.TryUseItem: Item.Use -> WoodyUse gate -> play the item's
+        animation on Woody; the state change happens when it ends."""
+        item.wrong_trick = False           # Item.WoodyUse (Item.cs:1857)
+        ok = self._can_woody_use(item)
+        if ok is not True:
+            return
+        # WoodyUse: remember what was held for the later decrement
+        item_used_inventory = self.inventory.used
+        seq = list(item.animation_sequence) if item.use_woody_sequence \
+            else ([item.animation] if item.animation else [])
+        seq = [a for a in seq if self.woody.anim.has(a)]
+        searching = item.kind == 'SearchItem'
+        tricked_use = item.kind in ('TrickItem', 'GroundItem', 'HideItem',
+                                    'InspectItem') or not searching
+
+        def anim_ended():
+            if searching:
+                self._woody_search_step(item)
+            else:
+                self._woody_trick_done(item, item_used_inventory)
+        if seq:
+            self.woody.anim.play_sequence(seq, on_end=anim_ended)
+        else:
+            anim_ended()
+
+    def _woody_trick_done(self, item, used_inventory):
+        """TrickItem.OnUseAnimationCompleted (TrickItem.cs:268-380)."""
+        if item.wrong_trick:
+            return
+        item.used = True                   # Item.UseItem
+        if used_inventory is not None:
+            used_inventory['use_count'] -= 1
+            if item.required_inventory != 'IT_NONE' and not item.keep_after_use \
+                    and used_inventory['use_count'] <= 0:
+                self.inventory.remove(item.required_inventory)
+        if item.grab_directly:
+            self.inventory.add([{'type': item.required_inventory,
+                                 'use_count': 0, 'name': item.name}])
+        if item.can_undo_trick and item.tricked:
+            self._get_tricked(item, False)
+        else:
+            self._get_tricked(item, True)
+            act = self.level.items.get(item.activate_item_trick) \
+                if item.activate_item_trick else None
+            if act is not None:
+                act.tricked = True
+                self._return_to_idle(act)
+            tgt = self.level.items.get(item.set_tricked_on_item) \
+                if item.set_tricked_on_item else None
+            if tgt is not None:
+                tgt.tricked = True
+        # idle switch (the tail of OnUseAnimationCompleted)
+        self._return_to_idle(item)
+        # Woody laughs (Woody.OnSingleAnimationEnded, Woody.cs:418)
+        if not item.dont_laugh and self.woody.anim.has('TrickLaugh'):
+            self.woody.anim.play_single('TrickLaugh')
+
+    def _get_tricked(self, item, tricked):
+        """Item.GetTricked (Item.cs:1957)"""
+        item.tricked = tricked
+        if item.get_tricked_at_once:
+            item.got_tricked = tricked
+
+    def _woody_search_step(self, item):
+        """Woody.OnSingleAnimationEnded, the SearchingItem branch
+        (Woody.cs:386-411): a stocked item plays the take animation, an empty
+        one gets WhatsUp."""
+        if item.inventory_items:
+            take = list(item.take_sequence) if item.use_take_sequence \
+                else ([item.take_animation] if item.take_animation else [])
+            take = [a for a in take if self.woody.anim.has(a)]
+            if take:
+                self.woody.anim.play_sequence(
+                    take, on_end=lambda: self._woody_search_done(item))
+            else:
+                self._woody_search_done(item)
+        elif self.woody.anim.has('WhatsUp'):
+            self.woody.anim.play_single('WhatsUp')
+
+    def _woody_search_done(self, item):
+        """SearchItem.OnFinishAnimationCompelted -> UseItem -> InternalUse
+        (SearchItem.cs:114, 156): hand over the inventory, empty the item."""
+        self.inventory.add(item.inventory_items)
+        if not item.dont_remove_inventory:
+            item.inventory_items = []
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is not None and item.empty_animation and p.has(item.empty_animation):
+            p.play_single(item.empty_animation)
 
     def spawn_pawn(self, role):
         spec = self.level.pawns.get(role)
