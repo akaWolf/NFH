@@ -1,27 +1,38 @@
-"""Gameplay simulation: animation sequencing, zone navigation, door transit.
+"""Gameplay simulation, following the decompiled source method by method.
 
-Follows docs/GAMEPLAY.md §3 and §8. Movement inside a zone is one-dimensional
-along x; zones are joined only by doors, and passing one is an animation on the
-*door*, during which the pawn itself is hidden — the door sheets already contain
-the walking character.
+The references in comments are to src/Assembly-CSharp: AnimationControllerBase
+(frame stepping), AnimationInstance (frame model), Pawn (movement, doors),
+Item (use range), ActionManager / RoutineAction* (the routine), Door, Zone.
 """
 
 
 class AnimPlayer:
-    """Drives one animation controller: a current animation, an optional queued
-    sequence, and a callback when the sequence drains.
+    """AnimationControllerBase.Refresh, one animation controller.
 
-    Mirrors AnimationControllerBase: each animation ending pulls the next, and
-    the sequence finishing is what ends the owning action.
+    Time is an accumulator: each tick subtracts dt, and crossing zero advances
+    exactly one frame, then adds 1/FrameRate back (times SlowAnimationsFactor
+    when the owner is slowed). An animation only loops when its InfiniteLoop
+    flag is set or it was started as Looping; PlaySingleAnimation forces the
+    type to Single, so inside a sequence only InfiniteLoop still loops.
+    HoldOnLastFrame parks on the end frame and never finishes.
     """
 
-    def __init__(self, sprite):
+    def __init__(self, sprite, sound_sink=None):
         self.sprite = sprite
-        self.t = 0.0
+        self.by_name = {a.name: i for i, a in enumerate(sprite.anims)}
+        self.mode = 'looping'            # how the current animation was started
         self.queue = []
         self.on_end = None
-        self.by_name = {a.name: i for i, a in enumerate(sprite.anims)}
+        self.acc = 0.0
+        self.pat_idx = 0
+        self.frame = 0
+        self.slow_factor = None          # Owner.ShouldSlowAnimations hook
+        self.ignore_infinite = False     # SetIgnoreInfiniteLoop
+        self.ignore_infinite_once = False
+        self.sound_sink = sound_sink
+        self._set_start()
 
+    # -- state -------------------------------------------------------------
     @property
     def anim(self):
         return self.sprite.anims[self.sprite.current]
@@ -29,62 +40,83 @@ class AnimPlayer:
     def has(self, name):
         return name in self.by_name
 
+    def _set_start(self):
+        """AnimationInstance.SetStartFrame"""
+        a = self.anim
+        self.pat_idx = 0
+        self.frame = a.pattern[0] if a.pattern else a.start
+        self.acc = 0.0
+        self.sprite.cur_frame = self.frame
+
+    def current_index(self):
+        """AnimationInstance.CurrentIndex — the sound key"""
+        a = self.anim
+        return self.pat_idx if a.pattern else self.frame - a.start
+
+    # -- starting animations ----------------------------------------------
+    def _set(self, name, mode):
+        i = self.by_name.get(name)
+        if i is None:
+            raise RuntimeError('No animation found !!! State: %s, Owner: %s'
+                               % (name, self.sprite.name))
+        self.sprite.current = i
+        self.mode = mode
+        self._set_start()
+        return True
+
     def play_single(self, name):
-        """PlaySingleAnimation: the type becomes Single, so only InfiniteLoop
-        can still make it loop."""
-        i = self.by_name.get(name)
-        if i is None:
-            return False
-        self.sprite.current = i
-        self.t = 0.0
-        self.sprite.anims[i].loop = self.sprite.anims[i].infinite
-        return True
-
-    def play(self, name, loop=None):
-        i = self.by_name.get(name)
-        if i is None:
-            return False
-        self.sprite.current = i
-        self.t = 0.0
-        if loop is not None:
-            self.sprite.anims[i].loop = loop
-        return True
-
-    def waiting(self):
-        """parked on an infinitely looping animation with nothing queued"""
-        return self.anim.loop and not self.queue
+        """PlaySingleAnimation: type forced to Single"""
+        return self._set(name, 'single')
 
     def play_looping(self, name, abort_if_playing=True):
-        if abort_if_playing and self.anim.name == name:
+        if abort_if_playing and self.anim.name == name and self.mode == 'looping':
             return True
-        return self.play(name, loop=True)
+        self.queue = []
+        self.on_end = None
+        return self._set(name, 'looping')
 
     def play_sequence(self, names, on_end=None):
-        """An animation flagged InfiniteLoop keeps looping even inside a
-        sequence — Refresh() checks InfiniteLoop before the Single type. That is
-        how the game parks a character in a waiting pose, and how it stalls a
-        routine until something clears the flag."""
-        names = [n for n in names if self.has(n)]
+        """PlayAnimationSequence: each element via PlaySingleAnimation; the
+        sequence draining is what ends the owning action."""
+        names = list(names)
         if not names:
             if on_end:
                 on_end()
             return False
-        self.play_single(names[0])
         self.queue = names[1:]
         self.on_end = on_end
+        self.play_single(names[0])
         return True
 
-    def finished(self):
-        a = self.anim
-        if a.loop:
-            return False
-        n = len(a.pattern) if a.pattern else (a.end - a.start + 1)
-        return n > 0 and self.t * a.fps >= n
+    def waiting(self):
+        """diagnostic only: parked on something that cannot finish"""
+        return (self.anim.infinite or self.mode == 'looping') and not self.queue
 
-    def tick(self, dt):
-        self.t += dt
-        if not self.finished():
-            return
+    # -- stepping ----------------------------------------------------------
+    def _reached_end(self):
+        a = self.anim
+        if a.pattern:
+            return self.pat_idx >= len(a.pattern)
+        return self.frame > a.end
+
+    def _advance(self):
+        a = self.anim
+        if a.pattern:
+            self.pat_idx += 1
+            if self.pat_idx < len(a.pattern):
+                self.frame = a.pattern[self.pat_idx]
+        else:
+            self.frame += 1
+        self.sprite.cur_frame = min(self.frame, a.end)
+
+    def _loop_to_start(self):
+        a = self.anim
+        self.pat_idx = 0
+        self.frame = a.pattern[0] if a.pattern else a.start
+        self.sprite.cur_frame = self.frame
+
+    def _stop_single(self):
+        """StopSingleAnimation: pull the next sequence element, else finish."""
         if self.queue:
             self.play_single(self.queue.pop(0))
             return
@@ -92,11 +124,45 @@ class AnimPlayer:
         if cb:
             cb()
 
+    def tick(self, dt):
+        self.acc -= dt
+        if self.acc > 0.0:
+            return
+        a = self.anim
+        if self.sound_sink:
+            idx = self.current_index()
+            for frame, name in a.sounds:
+                if frame == idx:
+                    self.sound_sink(name)
+        self._advance()
+        if self._reached_end():
+            looping = ((a.infinite and not self.ignore_infinite)
+                       or self.mode == 'looping')
+            if looping:
+                self._loop_to_start()
+            else:
+                if a.infinite and self.ignore_infinite_once:
+                    self.ignore_infinite_once = self.ignore_infinite = False
+                if a.hold:
+                    if not a.pattern:
+                        self.frame = a.end
+                        self.sprite.cur_frame = a.end
+                    # held: never advances the sequence (Refresh does the same)
+                else:
+                    self._stop_single()
+        fps = self.anim.fps or 10.0
+        self.acc += 1.0 / fps
+        if self.slow_factor:
+            self.acc *= self.slow_factor
+
 
 class Pawn:
-    """Woody, or anyone else that walks the zone graph."""
+    """Pawn movement: 2D dominant-axis walking along the floor line, portal
+    climbs for walk-up doors and items."""
 
-    IDLE, WALK, DOOR_ENTER, DOOR_LEAVE = 'idle', 'walk', 'door_enter', 'door_leave'
+    IDLE, WALK = 'idle', 'walk'
+    DOOR_CLIMB, DOOR_ANIM, DESCEND, ITEM_CLIMB = \
+        'door_climb', 'door_anim', 'descend', 'item_climb'
 
     def __init__(self, level, sprite, zone, spec=None, player=None, role='Woody'):
         self.level = level
@@ -110,120 +176,227 @@ class Pawn:
         self.force = spec.get('force') or 0.0
         self.door_force = spec.get('door_force') or 0.0
         self.door_delta = spec.get('door_delta') or (0.0, 0.0)
+        self.height_delta = spec.get('player_height_delta') or 0.0
+        self.zone_threshold = spec.get('zone_level_threshold') or 0.0
+        self.item_threshold = spec.get('item_use_height_threshold') or 0.0
+        self.portal_up = spec.get('portal_up')
+        self.portal_down = spec.get('portal_down')
         self.sneaking = False
+        self.stand = spec.get('stand') or {}
+        self.default_anim = spec.get('default')
         self.state = self.IDLE
         self.facing = 'Left'
         self.hidden = False
-        self.steps = []                  # [(door | None, target_x)]
-        self.target_x = sprite.x
-        self._door = None
+        self.steps = []
+        self.on_arrive = None
+        self._step = None
+        self._step_sign = None
         self._exit_door = None
-        self.on_arrive = None            # fired once the last step completes
-        self.anim.play_looping('Stand_' + self.facing)
+        self.world = None                # set by World, for zone reactions
+        start = self.default_anim if self.default_anim and \
+            self.anim.has(self.default_anim) else self._stand_name()
+        if start:
+            self.anim.play_looping(start)
 
-    # -- commands --------------------------------------------------------
+    def _stand_name(self):
+        """PawnAnimationController.SwitchToStandAnimation by last facing"""
+        name = self.stand.get(self.facing, 'Stand_' + self.facing)
+        if self.anim.has(name):
+            return name
+        if self.default_anim and self.anim.has(self.default_anim):
+            return self.default_anim
+        return None
+
+    # -- geometry ----------------------------------------------------------
+    def floor_y(self, zone=None):
+        """Helpers.GetDefaultZoneY: zone y + HeightDelta + PlayerHeightDelta"""
+        z = zone or self.zone
+        return z.ty + z.height_delta + self.height_delta
+
+    def at_zone_y(self):
+        """Pawn.IsPawnAtZoneY"""
+        return abs(self.sprite.y - self.floor_y()) < 0.1
+
+    def at_use_range(self, it):
+        """Item.IsAtUseRange — the walk-phase check, with the x term"""
+        if self.zone is None or self.zone.pid != it.zone:
+            return False
+        mx = it.move_x(self.role)
+        my = it.y + it.dy
+        if it.should_walk_up:
+            return (abs(self.sprite.y - my) < self.item_threshold + it.delta_use_height
+                    and abs(self.sprite.x - mx) < it.use_distance)
+        return abs(self.sprite.x - mx) < it.use_distance
+
+    def at_use_location(self, obj):
+        """Pawn.IsAtUseLocation — the climb-phase check: y only, against the
+        object's own transform, not its move location"""
+        return abs(self.sprite.y - obj.y) < self.item_threshold + obj.delta_use_height
+
+    # -- commands ----------------------------------------------------------
     def goto(self, x, y, on_arrive=None):
-        """Walk to a world point; the zone is the one containing it."""
         dest = self.level.zone_at(x, y)
         if dest is None:
             return False
-        return self.goto_zone(dest, x, on_arrive, clamp=True)
+        return self._route(dest, {'kind': 'point',
+                                  'x': min(max(x, dest.left), dest.right)},
+                           on_arrive)
 
-    def goto_zone(self, dest, x, on_arrive=None, clamp=False):
-        """Walk to x in a named zone, routing through doors.
-
-        The zone is passed explicitly because that is what the game does —
-        ActionManager calls MoveToGoal(item, item.Zone, item.TargetLocation).
-        An item's stand-point can sit a little outside its zone's collider, so
-        deriving the zone from the point would fail.
-        """
-        self.on_arrive = on_arrive
+    def goto_zone(self, dest, x, on_arrive=None):
         if dest is None:
             return False
+        return self._route(dest, {'kind': 'point', 'x': x}, on_arrive)
+
+    def goto_item(self, it, on_arrive=None):
+        """BuildPathToItem: route to the zone; an elevated item gets a plain
+        floor step at its x first (min-dist 0.03 plus the passed-target snap),
+        so the climb starts with no horizontal error."""
+        dest = self.level.zone_by_pid(it.zone)
+        if dest is None:
+            return False
+        final = {'kind': 'item', 'item': it, 'x': it.move_x(self.role)}
+        if it.should_walk_up:
+            final = [{'kind': 'point', 'x': it.move_x(self.role)}, final]
+        return self._route(dest, final, on_arrive)
+
+    def _route(self, dest, final_step, on_arrive):
+        self.on_arrive = on_arrive
         steps = []
+        # BuildPathToTarget: when starting elevated, first walk down to the floor
+        if not self.at_zone_y():
+            steps.append({'kind': 'point', 'x': self.sprite.x,
+                          'y': self.floor_y()})
         if dest.pid != self.zone.pid:
             hops = self.level.find_path(self.zone.pid, dest.pid)
             if hops is None:
+                self.on_arrive = None
                 return False
             for _, door in hops:
-                steps.append((door, door.x))
-        steps.append((None, min(max(x, dest.left), dest.right) if clamp else x))
+                steps.append({'kind': 'door', 'door': door})
+        if isinstance(final_step, list):
+            steps.extend(final_step)
+        else:
+            steps.append(final_step)
         self.steps = steps
         self._next_step()
         return True
 
-    # -- internals -------------------------------------------------------
+    # -- step machinery ----------------------------------------------------
     def _next_step(self):
+        self._step = None
         if not self.steps:
             self.state = self.IDLE
-            self.anim.play_looping('Stand_' + self.facing)
+            st = self._stand_name()
+            if st:
+                self.anim.play_looping(st)
             cb, self.on_arrive = self.on_arrive, None
             if cb:
                 cb()
             return
-        self._door, self.target_x = self.steps.pop(0)
+        self._step = self.steps.pop(0)
+        self._step_sign = None
         self.state = self.WALK
+
+    def _step_target(self):
+        """MoveLocation for the current step. CheckMoveLocationY forces y to
+        the floor for door and item steps — climbs are separate states."""
+        s = self._step
+        if s['kind'] == 'point':
+            return s['x'], s.get('y', self.floor_y())
+        if s['kind'] == 'door':
+            d = s['door']
+            zone = self.level.zone_by_pid(d.zone)
+            return d.x + d.dx, self.floor_y(zone) if zone else self.sprite.y
+        it = s['item']
+        zone = self.level.zone_by_pid(it.zone)
+        return s['x'], self.floor_y(zone) if zone else self.sprite.y
+
+    def _min_dist(self):
+        """MinDistToNextMove per step kind"""
+        s = self._step
+        if s['kind'] == 'door':
+            d = s['door']
+            return d.item_use_height if d.should_walk_up else d.use_distance
+        if s['kind'] == 'item':
+            it = s['item']
+            return it.item_use_height if it.should_walk_up else it.use_distance
+        return 0.03
 
     def _face_towards(self, dx):
         self.facing = 'Right' if dx > 0 else 'Left'
 
-    def walk_speed(self, horizontal=True):
-        """ProcessMovement multiplies the velocity by Speed (or SpeedSneaking),
-        and WalkOnPath sets that velocity to direction * ForceMagnitude for a
-        mostly-horizontal move, or * DoorForceMagnitude otherwise."""
-        base = self.speed_sneaking if self.sneaking else self.speed
-        return base * (self.force if horizontal else self.door_force)
+    def walk_speed_scale(self):
+        return self.speed_sneaking if self.sneaking else self.speed
 
+    # -- door transit -------------------------------------------------------
     def _door_anims(self, door):
-        """Leave belongs to the departing side, Enter to the arriving side."""
         if self.role == 'Woody':
             return door.leave, door.enter
         return door.rott_leave, door.rott_enter
 
-    def _enter_door(self, door):
-        """Pawn.MoveToDoor, portal branch. Both doors animate at once:
-
-            PlayDoorLeaveAnimation(TargetDoor);          // source side: Leave
-            PlayDoorEnterAnimation(TargetDoor.LinkTo);   // far side: Enter
-
-        PlayDoorLeaveAnimation calls SetHidden(true), so every pawn is hidden
-        during transit, not just Woody. The teleport happens when the far
-        door's Enter animation finishes (OnDoorEnterAnimationFinished), which
-        also plays that door's ExitAnimation looping on the pawn."""
+    def _begin_transit(self, door):
+        """MoveToDoor's portal branch. A flat door fires both sides at once; a
+        walk-up door climbs first and then runs Leave -> Enter sequentially
+        (OnDoorLeaveAnimationFinished chains the far side)."""
         other = self.level.door_by_pid(door.link_to)
         if other is None:
             self.state = self.IDLE
             return
-        # Door.IsOtherPawnPassing on either side: stand and wait
         if (door.passing is not None and door.passing is not self) or \
                 (other.passing is not None and other.passing is not self):
-            self.anim.play_looping('Stand_' + self.facing)
-            return                        # state stays WALK; retried next tick
-        self.state = self.DOOR_ENTER
-        self.hidden = True
-        self._door = door
+            st = self._stand_name()
+            if st:
+                self.anim.play_looping(st)
+            return                        # IsOtherPawnPassing: wait standing
+        if door.should_walk_up:
+            self.state = self.DOOR_CLIMB
+            if self.portal_up and self.anim.has(self.portal_up):
+                self.anim.play_looping(self.portal_up)
+            return
+        self._transit_animations(door, other, sequential=False)
+
+    def _transit_animations(self, door, other, sequential):
+        self.state = self.DOOR_ANIM
+        self.hidden = True                # PlayDoorLeaveAnimation: SetHidden(true)
         self._exit_door = other
         door.passing = other.passing = self
+        if self.world:
+            self.world.zone_reaction(door.zone, 'leave')
+            if not sequential:
+                self.world.zone_reaction(other.zone, 'enter')
         leave_anim, _ = self._door_anims(door)
         _, enter_anim = self._door_anims(other)
-        if door.sprite is not None and leave_anim:
-            door.sprite.play_sequence([leave_anim],
-                                      on_end=lambda: self._leave_played(door))
+        if sequential:
+            # walk-up: Leave first; its end starts the far Enter
+            def leave_done():
+                door.passing = None
+                if self.world:
+                    self.world.zone_reaction(other.zone, 'enter')
+                self._play_enter(other, enter_anim)
+            if door.sprite is not None and leave_anim:
+                door.sprite.play_sequence([leave_anim], on_end=leave_done)
+            else:
+                leave_done()              # Door.PlayAnimation's null branch
         else:
-            door.passing = None           # Door.PlayAnimation's null branch
+            if door.sprite is not None and leave_anim:
+                door.sprite.play_sequence(
+                    [leave_anim], on_end=lambda: self._leave_played(door))
+            else:
+                door.passing = None
+            self._play_enter(other, enter_anim)
+
+    def _play_enter(self, other, enter_anim):
         if other.sprite is not None and enter_anim:
             other.sprite.play_sequence([enter_anim], on_end=self._enter_played)
         else:
-            self._enter_played()          # Door.PlayAnimation's null branch
+            self._enter_played()
 
     def _leave_played(self, door):
-        """OnDoorLeaveAnimationFinished does nothing for a normal door;
-        the door just frees itself (PassingPawn = null)."""
         door.passing = None
 
     def _enter_played(self):
-        """Pawn.OnDoorEnterAnimationFinished: warp to the far door plus
-        DoorDistanceDelta, change zone, unhide, loop its ExitAnimation."""
+        """OnDoorEnterAnimationFinished: warp, unhide, loop ExitAnimation;
+        a walk-up far door means climbing back down to the floor."""
         d = self._exit_door
         if d is None:
             return
@@ -234,33 +407,88 @@ class Pawn:
         self.hidden = False
         if d.exit_anim and self.anim.has(d.exit_anim):
             self.anim.play_looping(d.exit_anim)
+        if d.should_walk_up and self.steps:
+            self.state = self.DESCEND
+            if self.portal_down and self.anim.has(self.portal_down):
+                self.anim.play_looping(self.portal_down)
+            return
         self._next_step()
 
-    # -- tick ------------------------------------------------------------
+    # -- tick ---------------------------------------------------------------
     def tick(self, dt):
         self.anim.tick(dt)
+        scale = self.walk_speed_scale() * dt
         if self.state == self.WALK:
-            dx = self.target_x - self.sprite.x
-            step = self.walk_speed() * dt
-            if abs(dx) <= step:
-                self.sprite.x = self.target_x
-                if self._door is not None:
-                    self._enter_door(self._door)
+            tx, ty = self._step_target()
+            dx, dy = tx - self.sprite.x, ty - self.sprite.y
+            mag = (dx * dx + dy * dy) ** 0.5
+            # HasPassedTarget: WalkOnPath also stops when the pawn has crossed
+            # the target x — a step can be bigger than UseDistance, and without
+            # this the pawn oscillates around the goal forever
+            sign = (dx > 0) - (dx < 0)
+            passed = (self._step_sign is not None and sign != 0
+                      and sign != self._step_sign)
+            if self._step_sign is None and sign != 0:
+                self._step_sign = sign
+            if passed:
+                self.sprite.x = tx        # MoveToItem snaps onto the target
+            if mag <= self._min_dist() or passed:
+                s = self._step
+                if s['kind'] == 'door':
+                    self._begin_transit(s['door'])
+                elif s['kind'] == 'item' and s['item'].should_walk_up:
+                    it = s['item']
+                    if self.at_use_location(it):
+                        self._next_step()
+                        return
+                    self.state = self.ITEM_CLIMB
+                    up = self.portal_down if it.should_walk_down else self.portal_up
+                    if up and self.anim.has(up):
+                        self.anim.play_looping(up)
                 else:
                     self._next_step()
                 return
-            self.sprite.x += step if dx > 0 else -step
-            self._face_towards(dx)
-            self.anim.play_looping('Walk_' + self.facing)
+            nx, ny = dx / mag, dy / mag
+            # WalkOnPath: dominant axis picks the force and the animation
+            if abs(nx) >= abs(ny):
+                vx, vy = nx * self.force, ny * self.force
+                self._face_towards(nx)
+                self.anim.play_looping('Walk_' + self.facing)
+            else:
+                vx, vy = nx * self.door_force, ny * self.door_force
+                self.anim.play_looping('Walk_Up' if ny > 0 else 'Walk_Down')
+            self.sprite.x += vx * scale
+            self.sprite.y += vy * scale
+        elif self.state == self.DOOR_CLIMB:
+            # checks run before the move, as MoveToDoor runs before
+            # ProcessMovement applies the velocity
+            d = self._step['door']
+            if self.at_use_location(d):
+                other = self.level.door_by_pid(d.link_to)
+                if other is not None:
+                    self._transit_animations(d, other, sequential=True)
+                else:
+                    self.state = self.IDLE
+                return
+            self.sprite.y += self.door_force * scale
+        elif self.state == self.DESCEND:
+            # IsAtPortalTargetLocation: signed, no snapping afterwards
+            if self.sprite.y - self.floor_y() < self.zone_threshold:
+                self._next_step()
+                return
+            self.sprite.y -= self.door_force * scale
+        elif self.state == self.ITEM_CLIMB:
+            it = self._step['item']
+            if self.at_use_location(it):
+                self._next_step()         # velocity zero; on_arrive fires use
+                return
+            direction = -1.0 if it.should_walk_down else 1.0
+            self.sprite.y += direction * self.door_force * scale
 
 
 class Routine:
-    """ActionManager: the neighbour walks a cyclic list of actions.
-
-    Follows docs/GAMEPLAY.md §4. An action with Duration 0 ends when its
-    animation sequence drains, which is the usual case — the sequence *is* the
-    action.
-    """
+    """ActionManager: a cyclic action list. Zero-duration actions end when the
+    use sequence drains; advancement happens on the next Update tick."""
 
     IDLE, MOVING, USING = 'idle', 'moving', 'using'
 
@@ -276,9 +504,9 @@ class Routine:
         self.frozen = spec['frozen']
         self.state = self.IDLE
         self.timer = 0.0
-        self.on_use = None               # (item, tricked) when an action fires
+        self.on_use = None
         self.log = []
-        self._pending = None             # 'advance' | 'start', handled in tick
+        self._pending = None
 
     @property
     def action(self):
@@ -296,7 +524,6 @@ class Routine:
             self._pending = 'start'
 
     def _advance(self):
-        """AdvanceActionIndex: wrap to the configured restart point"""
         self.index += 1
         if self.index >= len(self.actions):
             if self.loop_from_start:
@@ -311,10 +538,10 @@ class Routine:
         a = self.action
         if a is not None and a.get('move_only'):
             zone = self.level.zone_by_pid(a.get('move_zone'))
-            if zone is not None:
+            if zone is not None and self.pawn.goto_zone(zone, a['move_x'],
+                                                        on_arrive=self._finish):
                 self.state = self.MOVING
-                if self.pawn.goto_zone(zone, a['move_x'], on_arrive=self._finish):
-                    return
+                return
             self._pending = 'advance'
             self.state = self.IDLE
             return
@@ -322,54 +549,41 @@ class Routine:
             self._pending = 'advance'
             self.state = self.IDLE
             return
-        at_place = (abs(self.pawn.sprite.x - it.target_x) <= a['max_distance']
-                    and self.pawn.zone is not None and self.pawn.zone.pid == it.zone)
-        if at_place:
+        if self.pawn.at_use_range(it):
             self._use()
         else:
             self.state = self.MOVING
-            zone = self.level.zone_by_pid(it.zone)
-            if not self.pawn.goto_zone(zone, it.target_x, on_arrive=self._use):
+            if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
 
     def _use(self):
-        """RoutineActionUse.OnActionStarted -> Item.Use(owner)"""
         it = self.item
+        a = self.action
         if it is None:
             self._pending = 'advance'; self.state = self.IDLE; return
-        a = self.action
         if a.get('mutex'):
-            # MutexAction: park on a looping animation and wait to be released
+            # MutexAction parks on its looping animation until another action's
+            # PawnToAbortMutexOnFinish releases it
             self.state = self.USING
             self.timer = 0.0
             if a.get('mutex_anim'):
                 self.pawn.anim.play_looping(a['mutex_anim'])
             return
-        if a.get('move_only') or it is None:
-            self._pending = 'advance'
-            self.state = self.IDLE
-            return
         tricked = it.is_tricked()
         seq = it.sequence_for(self.role, tricked)
         if not seq:
-            # Item.PlayAnimation would index an empty array here, so the game
-            # never reaches this with a routine that is meant to run. Treat it
-            # as "not this character's item" and move on.
             self._pending = 'advance'
             self.state = self.IDLE
             return
         self.state = self.USING
-        self.timer = self.action['duration']
+        self.timer = a['duration']
         self.log.append((it.name, tricked))
         if self.on_use:
             self.on_use(it, tricked)
         self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
 
     def _finish(self):
-        """An action ending never chains straight into the next one: the game
-        advances in ActionManager.Update, so a zero-length action cannot spin
-        the whole routine inside a single frame."""
         self._pending = 'advance'
 
     def tick(self, dt):
@@ -388,27 +602,36 @@ class Routine:
 
 
 class World:
-    """Everything that ticks."""
-
-    def __init__(self, level):
+    def __init__(self, level, sound_sink=None):
         self.level = level
         self.woody = None
         self.pawns = {}
         self.routines = []
-        # exactly one player per sprite; a door's controller was resolved by
-        # hierarchy in the scene (GetComponentInChildren), wrap it in a player
-        self.players = {id(s): AnimPlayer(s) for s in level.sprites}
+        self.players = {id(s): AnimPlayer(s, sound_sink) for s in level.sprites}
         for d in level.doors:
             if d.sprite is not None:
                 d.sprite = self.players.get(id(d.sprite))
+        # Zone.ZoneEnter / ZoneLeave: items whose EnterZone / LeaveZone anims
+        # react when a pawn passes a door of their zone
+        self._zone_items = {}
+        for it in level.items.values():
+            if it.enter_zone or it.leave_zone:
+                self._zone_items.setdefault(it.zone, []).append(it)
+
+    def zone_reaction(self, zone_pid, which):
+        """Zone.PlayItemsZoneEnter / PlayItemsZoneLeave"""
+        for it in self._zone_items.get(zone_pid, ()):
+            if it.is_tricked():
+                continue                  # PlayZoneEnter checks IsTricked
+            anim = it.enter_zone if which == 'enter' else it.leave_zone
+            if not anim or it.sprite is None or not it.animating:
+                continue
+            p = self.players.get(id(it.sprite))
+            if p is not None and p.has(anim):
+                p.play_single(anim)
 
     def player_for(self, sprite):
         return self.players.get(id(sprite))
-
-    def spawn_woody(self, sprite, zone, spec=None):
-        self.woody = Pawn(self.level, sprite, zone, spec,
-                          player=self.players[id(sprite)], role='Woody')
-        return self.woody
 
     def spawn_pawn(self, role):
         spec = self.level.pawns.get(role)
@@ -417,8 +640,15 @@ class World:
         p = Pawn(self.level, spec['sprite'],
                  self.level.zone_by_pid(spec['zone']), spec,
                  player=self.players[id(spec['sprite'])], role=role)
+        p.world = self
         self.pawns[role] = p
         return p
+
+    def spawn_woody(self, sprite, zone, spec=None):
+        self.woody = Pawn(self.level, sprite, zone, spec,
+                          player=self.players[id(sprite)], role='Woody')
+        self.woody.world = self
+        return self.woody
 
     def start_routines(self):
         for spec in self.level.routines:

@@ -47,6 +47,13 @@ class TextureCache:
         self.dirs = [d for d in directories if d and os.path.isdir(d)]
         self._cache = {}
         self._missing = set()
+        # Resources.Load is case-insensitive; the data says O_workout for a
+        # sheet shipped as O_Workout
+        self._lower = {}
+        for d in self.dirs:
+            for fn in os.listdir(d):
+                if fn.endswith('.png'):
+                    self._lower.setdefault(fn[:-4].lower(), os.path.join(d, fn))
 
     def get(self, name):
         if name in self._cache:
@@ -67,6 +74,11 @@ class TextureCache:
                     path = p; break
             if path:
                 break
+        if path is None:
+            for cand in candidates:
+                path = self._lower.get(cand.lower())
+                if path:
+                    break
         if path is None:
             self._missing.add(name)
             return None
@@ -107,7 +119,9 @@ def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h):
     dx = sx + (sprite.ctrl_dx + anim.dx) * scale
     dy = sy + (sprite.ctrl_dy + anim.dy) * scale
 
-    frame = anim.frame_at(t)
+    # frame is owned by the AnimPlayer (AnimationControllerBase.Refresh);
+    # frame_at(t) only serves sprites nothing is ticking
+    frame = sprite.cur_frame if sprite.cur_frame is not None else anim.frame_at(t)
     col = frame % anim.cols
     row = frame // anim.cols
     if row >= anim.rows:

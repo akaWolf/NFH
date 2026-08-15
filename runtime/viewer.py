@@ -13,6 +13,7 @@ import sdl2
 
 from scene import Level, DESIGN_H
 from world import World
+from audio_out import SoundBank
 from render import Camera, TextureCache, draw_sprite, draw_quad, draw_zone_overlay
 
 WIDTH, HEIGHT = 800, 600
@@ -40,6 +41,7 @@ class Viewer:
         self.rnd = sdl2.SDL_CreateRenderer(
             self.win, -1, sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
         self.cache = TextureCache(self.rnd, texture_dirs())
+        self.sounds = None if headless else SoundBank.try_open()
         self.cam = Camera()
         self.show_zones = False
         self.paused = False
@@ -51,7 +53,7 @@ class Viewer:
     def load(self, i):
         self.i = i % len(self.paths)
         self.level = Level(self.paths[self.i])
-        self.world = World(self.level)
+        self.world = World(self.level, sound_sink=self.sounds.play if self.sounds else None)
         for role in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
             self.world.spawn_pawn(role)
         self.woody = self.world.pawns.get('Woody')

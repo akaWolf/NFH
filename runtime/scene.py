@@ -24,7 +24,7 @@ UNITY_PLANE_SIZE = 10.0
 class Anim:
     __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
                  'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern',
-                 'infinite', 'type_looping')
+                 'infinite', 'type_looping', 'sounds')
 
     def __init__(self, d, base_path=''):
         self.name = d.get('Name')
@@ -50,6 +50,8 @@ class Anim:
         self.loop = self.infinite or self.type_looping
         self.hold = bool(d.get('HoldOnLastFrame'))
         self.pattern = d.get('Pattern') or None
+        self.sounds = [(sd.get('Frame'), sd.get('FileName'))
+                       for sd in (d.get('Sounds') or []) if sd.get('FileName')]
 
     def frame_at(self, t):
         """frame index for elapsed time t, honouring Pattern when present"""
@@ -70,24 +72,31 @@ class Anim:
 class Sprite:
     """one drawable: a world position, a depth, and an animation to play"""
     __slots__ = ('name', 'x', 'y', 'depth', 'anims', 'current', 'ctrl_dx',
-                 'ctrl_dy', 'kind', 'go', 'hidden')
+                 'ctrl_dy', 'kind', 'go', 'hidden', 'cur_frame')
 
     def __init__(self, name, x, y, depth, anims, current, ctrl_dx, ctrl_dy,
                  kind, go=None):
         self.name = name; self.x = x; self.y = y; self.depth = depth
         self.anims = anims; self.current = current
         self.ctrl_dx = ctrl_dx; self.ctrl_dy = ctrl_dy; self.kind = kind
-        self.go = go; self.hidden = False
+        self.go = go; self.hidden = False; self.cur_frame = None
+
+
+def _anim_name(v):
+    """the enum's NONE means no animation"""
+    return None if v in (None, 'NONE') else v
 
 
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
-                 'play_left', 'play_right')
+                 'play_left', 'play_right', 'ty', 'height_delta')
 
-    def __init__(self, name, pid, x, y, w, h, is_exit):
+    def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0):
         self.name = name; self.pid = pid
         self.x = x; self.y = y
         self.w = w; self.h = h; self.exit = is_exit
+        self.ty = ty                        # transform y, floor reference
+        self.height_delta = height_delta    # Zone.HeightDelta
         # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
         # the collider box is containment, these are the walking limits
         self.play_left = x - w * 0.5
@@ -106,6 +115,8 @@ class Item:
     """Anything the neighbour's routine can act on, or Woody can trick."""
     __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy',
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
+                 'should_walk_up', 'should_walk_down', 'item_use_height',
+                 'delta_use_height', 'enter_zone', 'leave_zone',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
@@ -127,11 +138,17 @@ class Item:
             'Olga': d.get('OlgaUseTrickedAnimation') or [],
             'Mother': d.get('MotherUseTrickedAnimation') or [],
         }
-        self.idle = d.get('IdleNormal')
-        self.idle_tricked = d.get('IdleTricked')
+        self.idle = _anim_name(d.get('IdleNormal'))
+        self.idle_tricked = _anim_name(d.get('IdleTricked'))
         # PlayItemAnimation is a no-op unless Animating, and skips NONE outright
         self.animating = bool(d.get('Animating'))
         self.use_distance = d.get('UseDistance') or 0.01
+        self.should_walk_up = bool(d.get('ShouldWalkUp'))
+        self.should_walk_down = bool(d.get('ShouldWalkDown'))
+        self.item_use_height = d.get('ItemUseHeight') or 0.03
+        self.delta_use_height = d.get('DeltaUseHeight') or 0.0
+        self.enter_zone = _anim_name(d.get('EnterZone'))
+        self.leave_zone = _anim_name(d.get('LeaveZone'))
         self.delta_olga_x = (d.get('DeltaOlgaLocation') or {}).get('x', 0.0)
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
@@ -176,7 +193,9 @@ class Door:
     """
     __slots__ = ('name', 'pid', 'x', 'y', 'zone', 'link_to', 'locked',
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
-                 'exit_anim', 'idle', 'sprite', 'passing')
+                 'exit_anim', 'idle', 'sprite', 'passing', 'should_walk_up',
+                 'use_distance', 'item_use_height', 'delta_use_height',
+                 'dx', 'dy')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -184,20 +203,28 @@ class Door:
         self.door_type = door_type
         # enter/leave are ItemAnimationState and play on the door; ExitAnimation
         # is an AnimationState and loops on the pawn once it is through
-        self.enter = d.get('WoodyEnterAnimation')
-        self.leave = d.get('WoodyLeaveAnimation')
-        self.rott_enter = d.get('RottweilerEnterAnimation')
-        self.rott_leave = d.get('RottweilerLeaveAnimation')
-        self.exit_anim = d.get('ExitAnimation')
-        self.idle = d.get('IdleAnimation')
+        self.enter = _anim_name(d.get('WoodyEnterAnimation'))
+        self.leave = _anim_name(d.get('WoodyLeaveAnimation'))
+        self.rott_enter = _anim_name(d.get('RottweilerEnterAnimation'))
+        self.rott_leave = _anim_name(d.get('RottweilerLeaveAnimation'))
+        self.exit_anim = _anim_name(d.get('ExitAnimation'))
+        self.idle = _anim_name(d.get('IdleAnimation'))
         self.sprite = None
         self.passing = None                 # Door.PassingPawn
+        self.should_walk_up = bool(d.get('ShouldWalkUp'))
+        self.use_distance = d.get('UseDistance') or 0.01
+        self.item_use_height = d.get('ItemUseHeight') or 0.03
+        self.delta_use_height = d.get('DeltaUseHeight') or 0.0
+        dl = d.get('DeltaLocation') or {}
+        self.dx = dl.get('x', 0.0); self.dy = dl.get('y', 0.0)
 
 
 class Level:
     def __init__(self, path):
         raw = json.load(open(path))
         self.path = path
+        self._raw_scene = raw.get('scene')
+        self._season2 = '/s2/' in path.replace('\\', '/')
         self._bg_texture = raw.get('background')
         self.scene = raw.get('unity_scene') or raw['scene']
         self.name = os.path.basename(self.scene).replace('.unity', '')
@@ -221,6 +248,20 @@ class Level:
         self.items = {}             # component pid -> Item
         self.routines = []          # ActionManager models
         self._build()
+
+    def _level_location_index(self):
+        """Actor.Start repositions every actor to LevelLocations[i] where
+        i = GetGameWithoutTutorialLevelIndex(). For NFH1 that is
+        buildIndex - 5; for NFH2, buildIndex + 12 (GetLevelIndex adds 17)."""
+        import re
+        m = re.match(r'level(\d+)$', self._raw_scene or '')
+        if not m:
+            return -1
+        build = int(m.group(1))
+        name = os.path.basename(self.scene)
+        if re.match(r'Level2\d\d', name) or self._season2:
+            return build + 12
+        return build - 5
 
     # -- helpers ---------------------------------------------------------
     def _o(self, pid):
@@ -272,6 +313,7 @@ class Level:
         self._link_item_sprites()
         self._find_routines()
         self._apply_zone_bounds()
+        self._apply_level_locations()
 
     def _add_zone(self, o):
         go = self._go_of(o)
@@ -282,7 +324,9 @@ class Level:
         p = self._pos(tr); s = box['data']['size']; c = box['data']['center']
         self.zones.append(Zone(self._o(go)['data']['name'], go,
                                p[0] + c[0], p[1] + c[1], s[0], s[1],
-                               bool(o['data'].get('ExitZone'))))
+                               bool(o['data'].get('ExitZone')),
+                               ty=p[1],
+                               height_delta=o['data'].get('HeightDelta') or 0.0))
 
     def _zone_of(self, go):
         """the Zone component on this object's parent, as ZoneController does"""
@@ -371,6 +415,54 @@ class Level:
                 z.play_left = z.x - left[i]
             if i < len(right):
                 z.play_right = z.x + right[i]
+
+    def _apply_level_locations(self):
+        """Actor.Start: transform.position = LevelLocations[idx]. Shift each
+        actor and its sprite by the same delta."""
+        idx = self._level_location_index()
+        if idx < 0:
+            return
+
+        def shift(comp_data, obj):
+            ll = comp_data.get('LevelLocations') or []
+            if idx >= len(ll):
+                return None
+            t = ll[idx]
+            return t.get('x', 0.0), t.get('y', 0.0)
+
+        for it in self.items.values():
+            o = self._o(it.pid)
+            pos = shift(o['data'], it)
+            if pos is None:
+                continue
+            dx, dy = pos[0] - it.x, pos[1] - it.y
+            it.x, it.y = pos
+            if it.sprite is not None:
+                it.sprite.x += dx
+                it.sprite.y += dy
+        for d in self.doors:
+            o = self._o(d.pid)
+            pos = shift(o['data'], d)
+            if pos is None:
+                continue
+            ddx, ddy = pos[0] - d.x, pos[1] - d.y
+            d.x, d.y = pos
+            if d.sprite is not None:
+                d.sprite.x += ddx
+                d.sprite.y += ddy
+        for role, spec in self.pawns.items():
+            for pid, o in self.objs.items():
+                if o['type'] == role and 'data' in o:
+                    pos = shift(o['data'], None)
+                    if pos is not None:
+                        s = spec['sprite']
+                        # the sprite is a child; move it with its actor root
+                        go = self._go_of(o)
+                        tr = self._transform(go)
+                        base = self._pos(tr) if tr else (s.x, s.y)
+                        s.x += pos[0] - base[0]
+                        s.y += pos[1] - base[1]
+                    break
 
     def _find_routines(self):
         for pid, o in self.objs.items():
@@ -542,7 +634,16 @@ class Level:
             zc = (o['data'].get('Zone') or {}).get('path')
             zgo = self._go_of(self._o(zc)) if zc and self._o(zc) else None
             pd = o['data']
+            ctrl = None
+            for c in self._comps.get(self._go_of_sprite(sprite) if False else sprite.go, []):
+                if c['type'] == 'PawnAnimationController':
+                    ctrl = self._o(c['path'])
+            cd = (ctrl or {}).get('data') or {}
             self.pawns[o['type']] = {
+                'stand': {'Left': _anim_name(cd.get('StandLeftAnimation')) or 'Stand_Left',
+                          'Right': _anim_name(cd.get('StandRightAnimation')) or 'Stand_Right',
+                          'Up': _anim_name(cd.get('StandUpAnimation')) or 'Stand_Up',
+                          'Down': _anim_name(cd.get('StandDownAnimation')) or 'Stand_Down'},
                 'sprite': sprite,
                 'zone': zgo,
                 # ProcessMovement: position += Velocity * dt * Speed, and
@@ -556,6 +657,11 @@ class Level:
                 'run_door_force': pd.get('RunningDoorForceMagnitude') or 0.0,
                 'door_delta': ((pd.get('DoorDistanceDelta') or {}).get('x', 0.0),
                                (pd.get('DoorDistanceDelta') or {}).get('y', 0.0)),
+                'player_height_delta': pd.get('PlayerHeightDelta') or 0.0,
+                'zone_level_threshold': pd.get('ZoneLevelThreshold') or 0.0,
+                'item_use_height_threshold': pd.get('ItemUseHeightThreshold') or 0.0,
+                'portal_up': _anim_name(pd.get('PortalUpAnimation')),
+                'portal_down': _anim_name(pd.get('PortalDownAnimation')),
                 'default': pd.get('DefaultAnimation'),
             }
 

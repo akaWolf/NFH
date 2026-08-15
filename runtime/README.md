@@ -193,6 +193,51 @@ there is the release machinery — `PawnToAbortMutexOnFinish`,
 hardcoding in `ActionManager`, which is what lets Olga and Mother out of their
 waiting poses.
 
+## Verified in this pass (each read from the source)
+
+- **Frame stepping is `Refresh` verbatim**: a time accumulator, at most one
+  frame per tick, `+= 1/FrameRate` after each advance, `SlowAnimationsFactor`
+  hook. `HoldOnLastFrame` parks on the end frame and never finishes its
+  sequence. A missing animation **throws**, as `SetAnimation` does.
+- **Frame-keyed sounds**: `AnimationSound {Frame, FileName}` fire as their index
+  comes up; `runtime/audio_out.py` plays the extracted WAVs through SDL2_mixer.
+- **Movement is 2D**: `Velocity = normalize(target - pos) * ForceMagnitude`
+  (or `DoorForceMagnitude` when y dominates), `pos += Velocity * dt * Speed`,
+  with `Walk_Up/Down` for the vertical-dominant case and `HasPassedTarget`
+  ending a move when the pawn crosses the target x (without it, any step longer
+  than `UseDistance` oscillates forever).
+- **Walk-up doors** (`ShouldWalkUp`, 114 of 354): climb on `PortalUpAnimation`
+  until `IsAtUseLocation` — a **y-only** check against the door's own transform
+  — then Leave and Enter run *sequentially*, and the far side descends on
+  `PortalDownAnimation` until `IsAtPortalTargetLocation`. Flat doors keep the
+  parallel choreography.
+- **Elevated items** (262): approach along the floor (`CheckMoveLocationY`
+  forces step y to `GetItemZoneY`), with a plain floor step at the item's x
+  first, then a vertical climb gated by the same y-only check.
+- **`Actor.Start` repositions actors from `LevelLocations[i]`**, i =
+  buildIndex − 5 (S1) / + 12 (S2). The serialized transform is not where an
+  actor stands when the array has an entry for the level.
+- **Stand poses come from the controller's `Stand*Animation` fields** and the
+  pawn's `DefaultAnimation` — `Stand_Left` is not guaranteed to exist.
+- **`PlayItemsZoneEnter/Leave`**: items with `EnterZone`/`LeaveZone` animations
+  react when a pawn passes a door of their zone.
+- Sheet lookup is case-insensitive, as `Resources.Load` is: the data asks for
+  `O_workout`, the asset is `O_Workout`.
+
+## Open question — the one divergence left
+
+On five S1 levels (104, 107, 108, 110, 111) and two S2 ones (209, 212) the
+neighbour's routine reaches a walk-up item that sits *below* his computed walk
+line and the climb diverges upward. All static inputs are verified against the
+data: e.g. Level107's MagnesiumBottle at y=2.866 vs
+`GetItemZoneY = zone.ty 2.909 + HeightDelta 0 + PlayerHeightDelta 0.3 = 3.209`,
+gap 0.344 against `ItemUseHeightThreshold + DeltaUseHeight = 0.2`. Without
+`PlayerHeightDelta` the gaps become 0.009–0.049, so the pawn's *actual* y
+trajectory in the original must ride near `zone.ty`, not `ty + 0.3` — the
+shipped scenes even spawn pawns 0.4 below `ty`. Which part of the
+`WalkOnPath`/`PostWalk`/warp chain keeps it there is not yet traced; nothing is
+patched around, so those routines still diverge here.
+
 ## Not implemented
 
 The rest of `docs/GAMEPLAY.md` §5–§7: the trick state machine, inventory,
