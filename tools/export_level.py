@@ -193,6 +193,7 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
             e['data'] = d
         out['objects'][str(pid)] = e
 
+    resolve_pattern_files(sc, index, out)
     hud = hud_sections(sc, index, out)
     if hud:
         out['hud'] = hud
@@ -222,6 +223,79 @@ def _resolve_asset_ref(sc, index, v):
     if o['class_id'] == 128:                     # Font: m_Name leads
         return {'font': Reader(tf.body(o), 0).astr()}
     return None
+
+
+def parse_pattern_file(text):
+    """AnimationInstance.SetupPattern (AnimationInstance.cs:85-128): a header
+    line, the frame count, another header, the frame indices; then blank
+    lines, a consumed header, the sound count, and 'frame, filename' lines.
+    Season 2 keeps nearly every animation's frames and sounds in these
+    TextAssets instead of the serialized Pattern/Sounds fields."""
+    lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+    i = 0
+
+    def read_line():
+        nonlocal i
+        if i >= len(lines):
+            return None
+        s = lines[i]
+        i += 1
+        return s
+    try:
+        read_line()                                   # header
+        count = int(read_line())
+        read_line()                                   # second header
+        pattern = []
+        while i < len(lines) and len(pattern) < count:
+            t = (read_line() or '').strip()
+            if not t:
+                break
+            pattern.append(int(t))
+        # skip blank lines; the loop also consumes the first non-empty line
+        while True:
+            t = read_line()
+            if t is None:
+                return pattern, []
+            if t.strip() != '':
+                break
+        sounds = []
+        n = int(read_line())
+        while i < len(lines) and len(sounds) < n:
+            t = read_line()
+            if t is None or not t.strip():
+                continue
+            frame, name = t.split(',', 1)
+            sounds.append({'Frame': int(frame.strip()),
+                           'FileName': name.strip()})
+        return pattern, sounds
+    except (ValueError, TypeError):
+        return None, None                             # the C# catch logs and
+                                                      # keeps the partial state
+
+
+def resolve_pattern_files(sc, index, out):
+    """fill each animation's Pattern and Sounds from its PatternFile
+    TextAsset, the way AnimationInstance.SetupPattern does at load"""
+    def walk(v):
+        if isinstance(v, dict):
+            pf = v.get('PatternFile')
+            if isinstance(pf, dict) and pf.get('path'):
+                if 'external' not in pf and 'file' not in pf:
+                    pf = {'external': 0, 'path': pf['path']}   # scene-local
+                r = _resolve_asset_ref(sc, index, pf)
+                if r and 'text' in r:
+                    pattern, sounds = parse_pattern_file(r['text'])
+                    if pattern is not None:
+                        v['Pattern'] = pattern
+                        v['Sounds'] = sounds
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    for e in out['objects'].values():
+        if 'data' in e and isinstance(e['data'], dict):
+            walk(e['data'])
 
 
 def hud_sections(sc, index, out):

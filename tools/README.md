@@ -24,7 +24,7 @@ data — recover the layout from the metadata and the scene blobs become readabl
 | `cli_meta.py` | ECMA-335 metadata reader: types, fields, enums, generic bases |
 | `monodeser.py` | Unity serialization rules → deserializes `MonoBehaviour` payloads |
 | `scene.py` | whole scene: `GameObject` / `Transform` / `BoxCollider` + scripts |
-| `export_level.py` | one scene → JSON, enums as names, pointers as object names |
+| `export_level.py` | one scene → JSON, enums as names, pointers as object names; `PatternFile` TextAssets parsed into each animation's `Pattern` + `Sounds` (`AnimationInstance.SetupPattern`) — Season 2 keeps 3917 animations' frames and sound keys there |
 | `summary.py` | human-readable digest of an exported level |
 | `zonegraph.py` | rebuilds the runtime zone graph from static data |
 | `texture.py` | Texture2D reader plus ETC1/ETC2/EAC and linear decoders, PNG out |
