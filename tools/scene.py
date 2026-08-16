@@ -48,10 +48,15 @@ def r_camera(r):
 
 def r_audiosource(r):
     # Unity 5.3 AudioSource: GameObject(12) enabled(1+3) mixerGroup(12)
-    # clip(12) playOnAwake(1+3) volume@44 pitch@48 loop@52
+    # clip(12: file int32 @28, path int64 @32) playOnAwake(1+3) volume@44
+    # pitch@48 loop@52
     b = r.d
+    clip_file = struct.unpack_from('<i', b, 28)[0]
+    clip_path = struct.unpack_from('<q', b, 32)[0]
     return {'volume': struct.unpack_from('<f', b, 44)[0],
-            'loop': bool(b[52])}
+            'loop': bool(b[52]),
+            'clip': ({'external': clip_file, 'path': clip_path}
+                     if clip_path else None)}
 
 
 READERS = {1: r_gameobject, 4: r_transform, 65: r_boxcollider,

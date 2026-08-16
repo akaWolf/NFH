@@ -414,8 +414,15 @@ AUDIO_FIELDS = {
 def resolve_audio_fields(sc, index, out):
     """resolve the AudioClip PPtrs the runtime's sound port consumes"""
     for e in out['objects'].values():
-        fields = AUDIO_FIELDS.get(e.get('type'))
         d = e.get('data')
+        if e.get('class_id') == 82 and isinstance(d, dict):
+            # an AudioSource's own clip (MusicPlayer.HoverSound / ClickSound
+            # are AudioSource references, MusicPlayer.cs:31-33)
+            v = d.get('clip')
+            if isinstance(v, dict) and ('external' in v or 'file' in v):
+                d['clip'] = _resolve_asset_ref(sc, index, v) or v
+            continue
+        fields = AUDIO_FIELDS.get(e.get('type'))
         if not fields or not isinstance(d, dict):
             continue
         for k in fields:
@@ -598,7 +605,27 @@ def hud_sections(sc, index, out):
     res = {}
     for pid, e in out['objects'].items():
         if e.get('type') not in ('HUD', 'HUDProgressBar', 'ProgressBar',
-                                 'DexterityComponent', 'MouseCursor') \
+                                 'DexterityComponent', 'MouseCursor',
+                                 # the menu / flow classes (Control.cs and
+                                 # kin, GameIntroAnimation, LevelLoader,
+                                 # LevelTransition, Credits, InGameMenu,
+                                 # ExitConfirmation, IntroAnimation, the
+                                 # level tiles' data renderer): the same
+                                 # pointer resolution, read by runtime/menu.py
+                                 'Control', 'ControlButton', 'ControlWindow',
+                                 'ControlSlider', 'ControlToggle',
+                                 'ControlRadioButton', 'ControlRadioButtonGroup',
+                                 'ControlRadioButtonInitializer',
+                                 'ControlLabel', 'ControlButtonRestore',
+                                 'LanguageComboBox', 'MenuLangInitializer',
+                                 'LevelDataGUIRenderer', 'LevelUnlocker',
+                                 'LevelPackUnlocker', 'GameIntroAnimation',
+                                 'SplashScreen', 'LevelLoader',
+                                 'LevelTransition', 'Credits',
+                                 'MenuMouseController', 'InGameMenu',
+                                 'ExitConfirmation', 'IntroAnimation',
+                                 'DirectorAnimation', 'LevelScript',
+                                 'MusicPlayer', 'Level') \
                 or 'data' not in e:
             continue
 
