@@ -2,17 +2,17 @@
 
 Порядок — по договорённости после коммита результата аудита.
 
-1. **Полноценная игра** — СДЕЛАНО, кроме туториального слоя
-   (`runtime/app.py`, `runtime/menu.py`, `runtime/prefs.py`,
-   `runtime/gui.py`; раздел «The menus and the flow» в
-   `runtime/README.md`; `tests/run_menu.py`): заставка
+1. **Полноценная игра** — СДЕЛАНО
+   (`runtime/app.py`, `runtime/menu.py`, `runtime/tutorial.py`,
+   `runtime/prefs.py`, `runtime/gui.py`; разделы «The menus and the
+   flow» и «The tutorial layer» в `runtime/README.md`;
+   `tests/run_menu.py` + `tests/run_tutorial.py`): заставка
    `GameIntroAnimation`, титульные карточки `IntroAnimation`, меню Entry
    (`Control*`, `LevelDataGUIRenderer`, выбор уровней обоих сезонов,
    опции, языки, титры), `LevelLoader`/`LevelTransition`-экраны,
    `InGameMenu`, `ExitConfirmation` (включая дверь выхода), прогресс и
-   настройки через PlayerPrefs-порт. Осталось из пункта: туториальный
-   слой (`LevelScript`, `TutorialScriptCamera*`, стрелки и message boxes
-   Intro-сцен) — см. «Not implemented».
+   настройки через PlayerPrefs-порт, туториальный слой (`LevelScript` +
+   четыре `TutorialScriptCamera*`) для Intro101–103 и L201/L206.
 2. **Полноэкранный режим** — СДЕЛАНО: тумблер FULLSCREEN в обоих окнах
    опций (портовое решение — у Android-декомпила нет такого SettingKey),
    pref `Fullscreen`, SDL_WINDOW_FULLSCREEN_DESKTOP поверх логического

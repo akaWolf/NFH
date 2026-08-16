@@ -287,10 +287,13 @@ def run(record, check, outdir):
                 ref = _dijkstra(L.graph, order, s, t)
                 # BuildPath -> LinkNodes finds no door between two zones
                 # while the door object is inactive (L214's DisableOnStart
-                # DoorBack pair before the CaptainDoor trick; Helpers.cs:
-                # 194-205, 243-248): FindPath returns null there
+                # DoorBack pair before the CaptainDoor trick) or Locked
+                # (the Intro scenes' TemporalLock edges before the tutorial
+                # unlocks them; Helpers.cs:194-205, 243-248): FindPath
+                # returns null there
                 if ref is not None and any(
-                        d.disabled for a, b in zip(ref, ref[1:])
+                        (d.disabled or d.locked)
+                        for a, b in zip(ref, ref[1:])
                         for nb, d in L.graph.get(a, ()) if nb == b):
                     ref = None
                 if port is None and ref is None:
@@ -302,6 +305,9 @@ def run(record, check, outdir):
                 elif len(bad) < 5:
                     bad.append((os.path.basename(p), s, t,
                                 port and len(port), ref and len(ref) - 1))
+    # 784 playable pairs + Intro103's unlocked Zone02<->Zone03; the
+    # TemporalLock edges (modelled since the tutorial layer) add only
+    # null routes — a path through a locked door is refused on both sides
     ok &= check('find_path: 786 reachable pairs, length == Dijkstra on all',
                 pairs == 786 and agree == pairs, (pairs, agree, bad))
 

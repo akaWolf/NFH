@@ -1856,12 +1856,62 @@ window graph, the tiles and prefs, the cards, the in-game menu, the
 confirmations, both score exits, season 2, the exit door, the language
 reload, the fullscreen pref) — 70 checks.
 
+## The tutorial layer (runtime/tutorial.py)
+
+`LevelScript` / `LevelScriptAction` run the three Intro scenes and the two
+Season-2 tutorial levels (`GameInfo.ShowTutorialTextAfterIntro` activates
+the inactive LevelScript object at StartGame, IntroAnimation.cs:305-307).
+Each action arms one completion signal (`LevelScriptAction.Initialize`) and
+the world raises it from the original's sites:
+
+- an Item's use — `Used = true`'s tail (Item.cs:1894-1897) — or its
+  look-at when `CompleteOnLookAt` (CheckDescriptionTooltip's arm,
+  cs:1817-1819);
+- a Door pass — Woody.OnDoorEnterAnimationFinished compares the far half
+  (Woody.cs:477-480);
+- a Zone entry (Pawn.ChangeZone, Pawn.cs:1592-1595);
+- Woody within `Threshold` of the x-location (Woody.Update, cs:288-291).
+
+`CompleteCurrentAction` (LevelScript.cs:148-166) unlocks/locks the listed
+doors and items, stops Woody on the door/location kinds, unfreezes the
+neighbour's manager (`ActionManager.Unfreeze` with the ForceAdvance pair),
+re-arms the director faces, and past the last action calls `ForceWinGame`.
+The message box, the `DescriptionMobile` strings (the alternate pair
+latched by the neighbour's trick / action — Rottweiler.cs:789-792,
+RoutineActionUse.cs:405-407), the world-anchored arrow/sign HUDAnimations
+(64 px design cells) and `DirectorAnimation.DrawFaces`' two-loop ping-pong
+all follow their files.
+
+The four `TutorialScriptCamera*` scene scripts are ported state machine by
+state machine: Intro102's film-overlay rides on the MumSmeared/Marble
+tricks; Intro103 wakes the dog-frozen manager (the port's
+`Routine.freeze_neighbour` / `stop_dog_action` mirror the ActionManager
+flags) and releases the marble walk; Level201 (NFH2) stages the neighbour
+with synthetic MoveOnly steps (`AddAction`/`RemoveAction`), the
+stair/transition locks and the water-puddle field surgery, closing 35 s
+after the last message; Level206 (NFH2206) runs the pillow lesson with the
+Mother's action-table rewrites. `GameCamera.SnapTo*Immediate` maps to the
+viewer camera.
+
+Two departures this layer surfaced, both fixed by code:
+
+- **TemporalLock is now modelled** (Door.cs; ZoneController.Start's
+  `!Locked || TemporalLock` edge): the Intro doors keep their zone edges
+  while locked and `find_path` refuses a route through a locked door
+  (Helpers.GetDoorBetweenZones wants `!Locked`) — the audit-era note that
+  the arm had no observable effect stopped holding the moment the tutorial
+  unlocks doors at runtime.
+- **A MoveOnly step's stop side-effects run** (RoutineActionUse.cs:386-412:
+  only the tricked unlocks sit behind `Item != null`) — Intro103's dog
+  walk is a MoveOnly step whose `ItemsToUnlock` opens the Drawer.
+
+`tests/run_tutorial.py` drives all five scenes (Intro101 start to the
+forced win; Intro102/103 through every signal kind and both cameras;
+the L201/L206 openings) — 39 checks.
+
 ## Not implemented
 
-From `docs/GAMEPLAY.md` §6–§7: the tutorial layer — `LevelScript` /
-`LevelScriptAction` (the arrows, message boxes and `DirectorAnimation` of the
-three intro scenes and the two NFH2 tutorial levels), the
-`TutorialScriptCamera*` scripts and the `SignalScript*` completion hooks that
-feed them; the trick-camera *behaviour* (the setting and its toggle exist;
-`Level.IsTrickCameraEnabled`'s snap-to-neighbour arm stays unwired); and
-the name-hack branches listed at the end of the priming section.
+From `docs/GAMEPLAY.md` §6–§7: the trick-camera *behaviour* (the setting
+and its toggle exist; `Level.IsTrickCameraEnabled`'s snap-to-neighbour arm
+stays unwired); and the name-hack branches listed at the end of the
+priming section.
