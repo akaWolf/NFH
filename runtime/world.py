@@ -4725,6 +4725,11 @@ class World:
         # the tutorial layer (runtime/tutorial.py): GameInfo.LevelScript;
         # the signal sites below call its hooks when the application set it
         self.level_script = None
+        # GameInfo.CalculateScore's tail is Level.SaveScore (GameInfo.cs:
+        # 409/429-435) — the application saves the progress here, right
+        # after the numbers exist (the all-tricks win raises GameEnding
+        # 2.5 s before FinishGame computes them, cs:226-236)
+        self.on_score_computed = None
         if music is not None and level.music is not None and not defer_music:
             # the viewer alone: its t=0 is IntroAnimation.StartGame; the clap
             # and the 15 s Invoke started intro_total earlier, at the scene
@@ -7761,6 +7766,8 @@ class World:
         self.game.calculate_score(
             rott.angry_count_ticks if rott is not None else 0,
             nfh2=self.woody.nfh2 if self.woody is not None else False)
+        if self.on_score_computed is not None:
+            self.on_score_computed()      # Level.SaveScore (cs:409/429)
 
     def _time_up(self):
         """GameInfo.Update's clock arm (GameInfo.cs:241-249): TimeUp = true,

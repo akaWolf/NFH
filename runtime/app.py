@@ -493,6 +493,7 @@ class App:
         w = v.world
         w.menu_toggle_hook = self.igm.toggle
         w.show_exit_confirmation = self._show_exit_confirmation
+        w.on_score_computed = self._save_score
         # the tutorial layer (LevelScript + the scene's camera script);
         # GameInfo.ShowTutorialTextAfterIntro activates it at StartGame
         # (IntroAnimation.cs:305-307)
@@ -591,7 +592,12 @@ class App:
     def _save_score(self):
         """GameInfo.CalculateScore's tail (GameInfo.cs:409/429-435):
         Level.SaveScore(GetGameOnlyLevelIndex(), ...); Perfect is
-        CalculateRating's >= 100 arm (cs:438-465)"""
+        CalculateRating's >= 100 arm (cs:438-465). Runs off
+        World.on_score_computed — after the numbers exist, not at the
+        GameEnding flag (the all-tricks win separates them by 2.5 s)."""
+        if self._score_saved:
+            return
+        self._score_saved = True
         w = self.viewer.world
         g = w.game
         idx = level_index(self.level_season, self.igm.scene.scene)
@@ -746,9 +752,6 @@ class App:
                 v.world_click(*click)
             if w.is_dexterity_on and woody:
                 v.cam.x, v.cam.y = woody.sprite.x, woody.sprite.y
-        if w.game.ending and not self._score_saved:
-            self._score_saved = True
-            self._save_score()
         v._update_camera(dt if igm.time_scale > 0.0 else 0.0)
         v._clamp_camera()
         v._frame_dt = dt
