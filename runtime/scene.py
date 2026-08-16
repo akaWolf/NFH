@@ -22,18 +22,29 @@ UNITY_PLANE_SIZE = 10.0
 
 
 class Anim:
-    __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
+    __slots__ = ('name', 'sheet', 'sheet_path', 'cols', 'rows', 'start',
+                 'end', 'fps',
                  'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern',
                  'infinite', 'type_looping', 'sounds', 'blocking',
-                 'src_index')
+                 'hide_owner_on_end', 'show_child_on_end',
+                 'src_index', 'empty_pattern')
 
     def __init__(self, d, base_path=''):
         self.name = d.get('Name')
-        # AnimationInstance.LoadTexture does Resources.Load(BaseAnimationPath +
-        # TextureFileName), so an empty TextureFileName means the base path is
-        # itself the asset. Textures are extracted under their own name, which
-        # is the last path component either way.
-        self.sheet = os.path.basename((base_path or '') + (d.get('TextureFileName') or ''))
+        # AnimationInstance.LoadTexture (AnimationInstance.cs:130-143) does
+        # SheetTexture = Resources.Load(BaseAnimationPath + TextureFileName),
+        # so an empty TextureFileName means the base path is itself the asset.
+        # The exporter resolves that Resources path through the ResourceManager
+        # container into the extraction's collision-numbered PNG name
+        # (tools/export_level.py resolve_sheet_textures) and stores it as
+        # SheetTexture; None means Load found nothing — the animation still
+        # runs, DrawAnimation just has no texture (cs:179-186). Older exports
+        # without the field fall back to the last path component.
+        self.sheet_path = (base_path or '') + (d.get('TextureFileName') or '')
+        if 'SheetTexture' in d:
+            self.sheet = d['SheetTexture']
+        else:
+            self.sheet = os.path.basename(self.sheet_path)
         self.cols = max(1, d.get('SheetColumns') or 1)
         self.rows = max(1, d.get('SheetRows') or 1)
         self.start = d.get('StartFrame') or 0
@@ -51,12 +62,34 @@ class Anim:
         self.loop = self.infinite or self.type_looping
         self.hold = bool(d.get('HoldOnLastFrame'))
         self.blocking = bool(d.get('Blocking'))     # AnimationInstance.Blocking
-        self.pattern = d.get('Pattern') or None
+        # StopSingleAnimation's end-flags (AnimationControllerBase.cs:226-233):
+        # Hide_In/BedIn/LorryEnter... hide their owner when they finish, and
+        # CarnivorPlantSprayTricked re-shows the acting item's child renderers
+        self.hide_owner_on_end = bool(d.get('HideOwnerOnAnimationEnd'))
+        self.show_child_on_end = bool(d.get('ShowChildRenderersOnEnd'))
+        # AnimationInstance.UsePattern gates the pattern (CurrentIndex,
+        # SetStartFrame, AdvanceFrame, ReachedEndFrame — AnimationInstance.cs:
+        # 66-76, 186-234): a Pattern serialized next to UsePattern=false is
+        # stale data the original never reads (262 instances differ from
+        # StartFrame..EndFrame, e.g. L113 LadderTestTransition 15-16 vs a
+        # 40-frame pattern). UsePattern with an empty Pattern (36 instances:
+        # 14 x Woody's PutEel, whose PatternFile is a GUID stub the build
+        # never shipped so SetupPattern loads nothing, and L214's
+        # OlgaStandDownInfinite) is a live rule of its own — empty_pattern:
+        # ReachedEndFrame is true at once (0 >= 0) and UpdateCurrentFrame
+        # never writes, so CurrentFrame stays the instance default 0
+        # (AnimationInstance.cs:66-76, 186-234); world.AnimPlayer honours it.
+        self.pattern = (d.get('Pattern') or None) if d.get('UsePattern') \
+            else None
+        self.empty_pattern = bool(d.get('UsePattern')) and not d.get('Pattern')
         self.sounds = [(sd.get('Frame'), sd.get('FileName'))
                        for sd in (d.get('Sounds') or []) if sd.get('FileName')]
 
     def frame_at(self, t):
-        """frame index for elapsed time t, honouring Pattern when present"""
+        """port scaffolding, not a game rule: a free-running frame index for
+        elapsed time t, honouring Pattern when present — only render.draw_sprite
+        falls back to it for a sprite nothing is ticking; a live sprite's
+        frame is owned by world.AnimPlayer (AnimationControllerBase.Refresh)"""
         if self.pattern:
             i = int(t * self.fps)
             if not self.loop and i >= len(self.pattern):
@@ -72,7 +105,11 @@ class Anim:
 
 
 class Sprite:
-    """one drawable: a world position, a depth, and an animation to play"""
+    """one drawable: a world position, a depth, and an animation to play.
+    current is the index of the controller's CurrentAnimation, None while
+    it has none (AnimationControllerBase.cs:13 — a controller before its
+    first SetAnimation draws and refreshes nothing, cs:172-189); hidden is
+    AnimationControllerBase.Hidden (cs:55, 177), a separate switch."""
     __slots__ = ('name', 'x', 'y', 'depth', 'anims', 'current', 'ctrl_dx',
                  'ctrl_dy', 'kind', 'go', 'hidden', 'cur_frame')
 
@@ -124,6 +161,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone',
+                 'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
                  'use_take_sequence', 'take_sequence',
@@ -148,17 +186,20 @@ class Item:
                  'fixing_item', 'force_use_fixing_item', 'fix_depends_on',
                  'delta_fix_x', 'delta_fix_y', 'let_untrick',
                  'bubble_icon', 'bubble_icon_active', 'bubble_icon_mad',
+                 'special_bubble_for_mother', 'bubble_mother_icon',
                  'destroy_after_use_tricked',
                  'remove_from_routine_after_use_tricked',
                  'remove_after_first_use', 'main_valve_open',
                  'take_off_iron_primed', 'fix_all', 'use_item_multiple_times',
                  'keep_full', 'trick_after_woody_use', 'depends_pig_keys',
-                 'pig_keys', 'pig_milk', 'cow_flowers', 'change_iron_routine',
+                 'pig_keys', 'pig_milk', 'cow_flowers', 'inventory_to_add',
+                 'change_iron_routine',
                  'change_iron_routine_last_path', 'item_removed', 'clickable',
                  'prime_item_aux', 'double_priming_item',
                  'compound', 'compound_required', 'compound_tricked',
                  'compound_tricked_anim', 'compound_double_anim',
                  'inventory_items', 'dont_remove_inventory',
+                 'assign_first_inventory_only',
                  'activate_item_trick', 'set_tricked_on_item',
                  'linked_item_trick', 'fix_item_trick', 'depends_on_2',
                  'use_depends_on_when_tricked', 'force_fix_original',
@@ -169,7 +210,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'anger', 'sprite',
+                 'required_inventory', 'trick_score', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -237,6 +278,7 @@ class Item:
                  'compound_trick_score_v', 'extra_coin_linked',
                  'compound_extra_coin', 'plant_carnivore_extra',
                  'extra_coin_206', 'extra_coin_210', 'dog_basket_210',
+                 'anger_amount', 'extra_coin_anger', 'extra_coin_toilet_211',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -253,9 +295,33 @@ class Item:
                  'name_tricked_string', 'name_primed_string',
                  'with_string', 'with_tricked_string', 'with_primed_string',
                  'hide_string_key', 'dont_change_tooltip_when_tricked',
+                 'description_string', 'description_tricked',
+                 'description_primed', 'description_linked',
+                 'description_fixed', 'name_fixed_string',
+                 'with_fixed_string', 'use_fixed_strings',
+                 'name_fuckedup_string', 'with_fuckedup_string',
+                 'delta_desc', 'long_description', 'not_primed_tooltip',
+                 'multiple_items_string', 'item_in_use_string',
+                 'take_multiple', 'do_nothing_while_used',
+                 'block_when_item_pick', 'open_object',
+                 'open_render_object', 'leave_toolbox_open', 'close_time',
+                 'inventory_tooltips', 'ignore_required_for_desc',
+                 'description_fuckedup', 'name_compound', 'with_compound',
+                 'description_compound', 'name_compound_tricked',
+                 'with_compound_tricked', 'description_compound_tricked',
+                 'check_depends_on_tricked', 'empty_drawing_string',
                  'item_that_changes_tooltip', 'is_floor', 'searching_item',
                  'mouse_over_icon', 'mouse_over_after_trick',
-                 'change_mouse_over_after_trick',
+                 'change_mouse_over_after_trick', 'primed_mouse_over',
+                 'primed_material', 'disable_collider_when_primed',
+                 'enable_collider_after_prime', 'disable_mesh',
+                 'play_idle_normal_seq', 'idle_normal_sequence',
+                 'play_idle_tricked_seq', 'idle_tricked_sequence',
+                 'dont_play_idle_on_start', 'ignore_depends_when_fixed',
+                 'block_valve_after_fix', 'animate_dependant',
+                 'pick_up_without_go',
+                 'tip_icon', 'tip_icon_depth', 'tip_delta', 'tip_dimensions',
+                 'always_show_tip',
                  'go_next_action', 'skip_action', 'is_mother_second_use',
                  'execute_once_mother', 'play_angry_after_toilet',
                  'restart_after_tricked', 'activate_item_after_fix',
@@ -263,7 +329,12 @@ class Item:
                  'delta_woody_x', 'delta_woody_y',
                  'rott_use_olga_seq', 'rott_use_tricked_olga_seq',
                  'drawing_current', 'drawing_done_cleaning',
-                 'progress_bar_animation', 'progress_bar_object')
+                 'progress_bar_animation', 'progress_bar_object',
+                 # SearchItem.AcquiredInventoryCount (SearchItem.cs:7) and
+                 # Item.ElephantBehaviorAux (Item.cs:564)
+                 'acquired_inventory_count', 'elephant_behavior_aux',
+                 # TrickItem.OnlyOnceWaterPuddle (TrickItem.cs:170)
+                 'only_once_water_puddle')
 
     def __init__(self, name, pid, kind, x, y, zone, dx, dy, d):
         self.name = name; self.pid = pid; self.kind = kind
@@ -285,11 +356,21 @@ class Item:
         self.idle_tricked = _anim_name(d.get('IdleTricked'))
         # PlayItemAnimation is a no-op unless Animating, and skips NONE outright
         self.animating = bool(d.get('Animating'))
-        self.use_distance = d.get('UseDistance') or 0.01
+        # the walk-arrival radii, taken as serialized (Item.cs:246 UseDistance
+        # = 0.03f, cs:220 ItemUseHeight = 0.01f); MinDistToNextMove reads
+        # ItemUseHeight as-is on a walk-up step (Pawn.cs:1112-1119) — 532
+        # items serialize 0.0 there and an `or` would have made it 0.03
+        self.use_distance = d.get('UseDistance', 0.03)
         self.should_walk_up = bool(d.get('ShouldWalkUp'))
         self.should_walk_down = bool(d.get('ShouldWalkDown'))
-        self.item_use_height = d.get('ItemUseHeight') or 0.03
+        self.item_use_height = d.get('ItemUseHeight', 0.01)
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
+        # Woody's own widening of the climb-arrival window (Pawn.cs:1702;
+        # 77 items carry it), and the ExtraDeltaHeight variant (Woody.cs:750)
+        self.woody_delta_use_height = d.get('WoodyDeltaUseHeight') or 0.0
+        self.use_woody_extra = bool(d.get('UseWoodyExtraDeltaHeight'))
+        # Pawn.CanPassTarget (Pawn.cs:1032-1035) gates the end-of-step snap
+        self.passable = d.get('Passable', True)
         self.enter_zone = _anim_name(d.get('EnterZone'))
         self.leave_zone = _anim_name(d.get('LeaveZone'))
         # Woody's use animation (Woody.TryUseItem plays Animation, or the
@@ -357,13 +438,21 @@ class Item:
         self.bubble_icon = d.get('BubbleIconPath') or None
         self.bubble_icon_active = d.get('BubbleIconActivePath') or None
         self.bubble_icon_mad = d.get('BubbleIconMadPath') or None
+        # the Mother's own bubble icon (RoutineAction.BubbleMotherIcon,
+        # RoutineAction.cs:59-70; one carrier — L210's CallRTMother shows
+        # the neighbour's face in her thoughts)
+        self.special_bubble_for_mother = bool(d.get('SpecialBubbleForMother'))
+        self.bubble_mother_icon = d.get('BubbleMotherIconPath') or None
         # RoutineActionUse.StopAction removes routine actions once the
         # tricked use lands (RoutineActionUse.cs:415-427)
         self.destroy_after_use_tricked = bool(d.get('DestroyAfterUseTricked'))
         self.remove_from_routine_after_use_tricked = \
             bool(d.get('RemoveFromRoutineAfterUseTricked'))
         self.remove_after_first_use = bool(d.get('RemoveFromRoutineAfterFirstUse'))
-        self.main_valve_open = False     # Item.MainValveOpen (the ValveMain hack)
+        # Item.MainValveOpen: L113's ValveMain serializes it TRUE — the water
+        # runs at load, the neighbour's first prime closes it (Item.cs:1352)
+        # and only then does Woody's click arm the trick (Item.cs:1714-1726)
+        self.main_valve_open = bool(d.get('MainValveOpen'))
         # the name-hack support fields
         self.take_off_iron_primed = bool(d.get('TakeOffIronPrimed'))
         self.fix_all = bool(d.get('FixAll'))
@@ -374,9 +463,23 @@ class Item:
         self.pig_keys = (d.get('PigKeys') or {}).get('path')
         self.pig_milk = (d.get('PigMilk') or {}).get('path')
         self.cow_flowers = (d.get('CowBehaviorFlowers') or {}).get('path')
+        # Item.InventoryToAdd (Item.cs:562): the SearchItem that
+        # AddInventoryToObject refills (Item.cs:1791-1810) — L208's Mouse
+        # points at itself, so the emptied Mouse gets a fresh rat at each
+        # priming round (cs:1559, 1582)
+        self.inventory_to_add = (d.get('InventoryToAdd') or {}).get('path')
         self.change_iron_routine = False       # set by TrickItem.Fix
         self.change_iron_routine_last_path = False
         self.item_removed = False              # Item.ItemRemoved (PigKeys)
+        # SearchItem.AcquiredInventoryCount: the last take's hand-over size,
+        # picking the 1 s re-close (SearchItem.cs:141-154, 191, 210)
+        self.acquired_inventory_count = 0
+        # Item.ElephantBehaviorAux, the one-shot latch of Pawn.ElephantAnimations
+        # (Pawn.cs:1539-1555; re-armed at Item.cs:1581)
+        self.elephant_behavior_aux = False
+        # TrickItem.OnlyOnceWaterPuddle: the L210 Valve's one-shot hand-over
+        # to its puddle (TrickItem.cs:1240-1251)
+        self.only_once_water_puddle = False
         self.clickable = True                  # Collider.enabled (the Pipe hack)
         self.prime_item_aux = False            # Item.PrimeItemAux (DogFifi)
         self.double_priming_item = bool(d.get('DoublePrimingItem'))
@@ -396,9 +499,17 @@ class Item:
         self.inventory_items = [
             {'type': v.get('Type'), 'use_count': v.get('UseCount') or 0,
              'name': v.get('NameString') or '',
-             'desc': v.get('DescriptionString') or ''}
+             'desc': v.get('DescriptionString') or '',
+             # PlayWontGoAnimation speaks this at Woody (Woody.cs:878-882)
+             'wrong_zone': v.get('WrongZoneTooltip') or '',
+             # the big bubble for long descriptions (HUD.cs:995-1008)
+             'long': bool(v.get('LongDescription'))}
             for v in (d.get('InventoryItems') or [])]
         self.dont_remove_inventory = bool(d.get('DontRemoveInventoryItem'))
+        # SearchItem.AssignFirstInventoryOnly (SearchItem.cs:37, 173-176): only
+        # the first hand-over entry carries its source item (L112's SportsBag,
+        # L114's DeskDrawer) — the door click reads that stamp (Pawn.cs:633)
+        self.assign_first_inventory_only = bool(d.get('AssignFirstInventoryOnly'))
         self.activate_item_trick = (d.get('ActivateItemTrick') or {}).get('path')
         self.set_tricked_on_item = (d.get('SetTrickedOnItem') or {}).get('path')
         self.linked_item_trick = (d.get('LinkedItemTrick') or {}).get('path')
@@ -429,7 +540,6 @@ class Item:
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
         self.trick_score = d.get('TrickScore') or 0
-        self.anger = d.get('AngerAmount') or 0
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))
@@ -614,6 +724,10 @@ class Item:
         self.plant_carnivore_extra = bool(d.get('PlantCarnivoreExtraAnger'))
         self.extra_coin_206 = bool(d.get('ExtraCoin206'))
         self.extra_coin_210 = bool(d.get('ExtraCoin210'))
+        # the NFH2 anger ladder (Rottweiler.cs:613-693)
+        self.anger_amount = d.get('AngerAmount', 20) or 0
+        self.extra_coin_anger = d.get('ExtraCoinAngerAmount') or 0.0
+        self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)
         self.enable_anim_index_control = bool(d.get('EnableAnimIndexControl'))
@@ -654,6 +768,53 @@ class Item:
         self.with_tricked_string = d.get('WithTrickedString') or ''
         self.with_primed_string = d.get('WithPrimedString') or ''
         self.hide_string_key = d.get('HideString') or ''
+        # the description bubble (Item.ShowItemTooltip, Item.cs:1844-1853;
+        # GetDescriptionString picks the state variant, Item.cs:2329-2344)
+        self.description_string = d.get('DescriptionString') or ''
+        self.description_tricked = d.get('DescriptionTrickedString') or ''
+        self.description_primed = d.get('DescriptionPrimedString') or ''
+        self.description_linked = d.get('DescriptionLinkedTrickString') or ''
+        self.description_fixed = d.get('DescriptionFixedString') or ''
+        self.name_fixed_string = d.get('NameFixedString') or ''
+        self.with_fixed_string = d.get('WithFixedString') or ''
+        self.use_fixed_strings = bool(d.get('UseFixedStrings'))
+        self.name_fuckedup_string = d.get('NameFuckedupString') or ''
+        self.with_fuckedup_string = d.get('WithFuckedupString') or ''
+        self.description_fuckedup = d.get('DescriptionFuckedupString') or ''
+        # the compound-state names (TrickItem.Get*String, TrickItem.cs:1164-1225)
+        self.name_compound = d.get('NameCompoundString') or ''
+        self.with_compound = d.get('WithCompoundString') or ''
+        self.description_compound = d.get('DescriptionCompoundString') or ''
+        self.name_compound_tricked = d.get('NameCompoundTrickedString') or ''
+        self.with_compound_tricked = d.get('WithCompoundTrickedString') or ''
+        self.description_compound_tricked = \
+            d.get('DescriptionCompoundTrickedString') or ''
+        self.check_depends_on_tricked = bool(d.get('CheckDependsOnTricked'))
+        self.empty_drawing_string = d.get('EmptyDrawingString') or ''
+        ddl = d.get('DeltaDescriptionLocation') or {}
+        self.delta_desc = (ddl.get('x', 0.0), ddl.get('y', 0.0))
+        self.long_description = bool(d.get('LongDescription'))
+        self.not_primed_tooltip = d.get('NotPrimedTooltip') or ''
+        self.multiple_items_string = d.get('MultipleItemsString') or ''
+        self.item_in_use_string = d.get('ItemInUseString') or ''
+        self.take_multiple = bool(d.get('TakeItemMultipleTimes'))
+        self.do_nothing_while_used = bool(d.get('DoNothingWhileBeeingUsed'))
+        # the pick animation locks the input outright (Woody.cs:534-538)
+        self.block_when_item_pick = bool(d.get('BlockWhenItemPick'))
+        # the furniture visibly opens for the search (SearchItem.PreUse,
+        # SearchItem.cs:125-152; closed again 1.5s/1s later, cs:250-268)
+        self.open_object = ref('OpenObject')
+        self.open_render_object = ref('OpenRenderObject')
+        self.leave_toolbox_open = bool(d.get('LeaveToolBoxOpen'))
+        self.close_time = 0.0
+        # InventoryTooltips: per-held-type refusal bubbles
+        # (Item.ShowWrongInventoryTooltip, Item.cs:1832-1842)
+        self.inventory_tooltips = [
+            {'type': (v.get('Type') or ''),
+             'desc': (v.get('DescriptionString') or '')}
+            for v in (d.get('InventoryTooltips') or [])]
+        self.ignore_required_for_desc = \
+            bool(d.get('IgnoreRequiredInventoryForDescription'))
         self.dont_change_tooltip_when_tricked = \
             bool(d.get('DontChangeTextTooltipWhenTricked'))
         self.item_that_changes_tooltip = ref('ItemThatChangesTooltip')
@@ -667,7 +828,48 @@ class Item:
         self.mouse_over_after_trick = d.get('MouseOverAfterTrickIconName') or ''
         self.change_mouse_over_after_trick = \
             bool(d.get('ChangeMouseOverAfterTrick'))
-        self.go_next_action = False        # Item.GoNextAction
+        # SetPrimed swaps the cursor icon in while primed (Item.cs:1215-1218);
+        # two items carry it (L108's poison shelf, L111's paint can)
+        self.primed_mouse_over = d.get('PrimedMouseOverIconName') or ''
+        # SetPrimed's material swap on the item's own quad (Item.cs:1236-1239;
+        # one carrier — L108's first-aid kit opens to 'firstaid_open')
+        pm = d.get('PrimedMaterial')
+        self.primed_material = pm.get('texture') if isinstance(pm, dict) \
+            else None
+        # the collider/mesh prime toggles (WoodyPrime Item.cs:1253-1261,
+        # RottweilerPrime cs:1326-1329): the tatter and L104's shelf pair
+        self.disable_collider_when_primed = \
+            bool(d.get('DisableColliderWhenPrimed'))
+        self.enable_collider_after_prime = \
+            bool(d.get('EnableColliderAfterPrime'))
+        self.disable_mesh = bool(d.get('DisableMesh'))
+        # the idle sequences (TrickItem.PlayIdleTrickedAnim cs:723-731,
+        # ReturnToIdleAnimation cs:698-721) and the start-idle skip (cs:214)
+        self.play_idle_normal_seq = bool(d.get('PlayIdleNormalSequence'))
+        self.idle_normal_sequence = d.get('IdleNormalSequence') or []
+        self.play_idle_tricked_seq = bool(d.get('PlayIdleTrickedSequence'))
+        self.idle_tricked_sequence = d.get('IdleTrickedSequence') or []
+        self.dont_play_idle_on_start = bool(d.get('DontPlayIdleOnStart'))
+        self.ignore_depends_when_fixed = \
+            bool(d.get('IgnoreDependsOnWhenFixed'))
+        # TrickItem.Fix's valve block (cs:421-425)
+        self.block_valve_after_fix = bool(d.get('BlockValveAfterFix'))
+        # PlayItemAnimation echoes onto the Dependant (cs:1046-1049)
+        self.animate_dependant = bool(d.get('AnimateDependant'))
+        # the Flowers knife-pick hack (Item.cs:1421-1426)
+        self.pick_up_without_go = bool(d.get('PickUpObjectWithoutGameObject'))
+        # the interaction-icon tip drawn while the HUD info button is held
+        # (Item.OnGUI, Item.cs:2740-2760; the exporter resolves the PPtr)
+        tip = d.get('ItemTipIcon')
+        self.tip_icon = tip.get('texture') if isinstance(tip, dict) else None
+        self.tip_icon_depth = GUI_DEPTH.get(d.get('ItemTipIconDepth'), 24)
+        td = d.get('ItemTipDeltaPosition') or {}
+        self.tip_delta = (td.get('x', 0.0), td.get('y', 0.0))
+        self.tip_dimensions = d.get('TipIconDimentions', 0.7)  # Item.cs:236
+        self.always_show_tip = bool(d.get('AlwaysShowTipIcon'))
+        # Item.GoNextAction: serialized true on L113's two valves — the
+        # urgent resume advances instead of redoing (ActionManager.cs:620-626)
+        self.go_next_action = bool(d.get('GoNextAction'))
         self.skip_action = False           # Item.SkipAction (Drawing.Fix)
         # the Mother's alternating DeckChair use (Item.cs:198, 1117-1137)
         self.is_mother_second_use = bool(d.get('IsMotherSecondUseAnimation'))
@@ -734,6 +936,14 @@ class Item:
                 if role == 'Rottweiler':
                     return self.use_tricked_linked
                 return self.use_tricked_anim.get(role) or []
+        # the Coal name-hack (GetRottweilerUseAnimation, Item.cs:988-1002):
+        # the walk-in element switches with the linked furnace's state
+        if role == 'Rottweiler' and self.name == 'Coal' \
+                and items is not None and self.linked_item_trick is not None:
+            linked = items.get(self.linked_item_trick)
+            seq = self.use_anim.get(role) or []
+            if linked is not None and seq:
+                seq[0] = 'CoalFuelWalk' if linked.tricked else 'CoalWalk'
         table = self.use_tricked_anim if tricked else self.use_anim
         return table.get(role) or []
 
@@ -761,11 +971,16 @@ class Door:
     """
     __slots__ = ('name', 'pid', 'x', 'y', 'zone', 'link_to', 'locked',
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
+                 'mother_enter', 'mother_leave', 'olga_enter', 'olga_leave',
                  'exit_anim', 'idle', 'sprite', 'passing', 'should_walk_up',
                  'use_distance', 'item_use_height', 'delta_use_height',
                  'dx', 'dy', 'rott_exit', 'alternate_idle', 'use_alternate_idle',
                  'complex_move', 'nfh2_stairs', 'pawn_deltas', 'passing_nfh2',
-                 'is_transition', 'collider', 'mouse_over_icon', 'locked_name')
+                 'is_transition', 'collider', 'mouse_over_icon', 'locked_name',
+                 'delta_exit', 'delta_mother_exit', 'passable', 'ignore_idle',
+                 'disabled', 'description_string', 'walk_deltas',
+                 'exit_door', 'woody_delta_use_height', 'use_woody_extra',
+                 'can_use', 'dont_use_on', 'with_string')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -777,14 +992,34 @@ class Door:
         self.leave = _anim_name(d.get('WoodyLeaveAnimation'))
         self.rott_enter = _anim_name(d.get('RottweilerEnterAnimation'))
         self.rott_leave = _anim_name(d.get('RottweilerLeaveAnimation'))
+        # the Mother's and Olga's own pairs (Door.cs:18-24; Mother.cs:63-73,
+        # Olga.cs:94-104 play them) — 98 doors carry MotherDoorBack*, Olga's
+        # ship NONE everywhere
+        self.mother_enter = _anim_name(d.get('MotherEnterAnimation'))
+        self.mother_leave = _anim_name(d.get('MotherLeaveAnimation'))
+        self.olga_enter = _anim_name(d.get('OlgaEnterAnimation'))
+        self.olga_leave = _anim_name(d.get('OlgaLeaveAnimation'))
         self.exit_anim = _anim_name(d.get('ExitAnimation'))
         self.idle = _anim_name(d.get('IdleAnimation'))
         self.sprite = None
         self.passing = None                 # Door.PassingPawn
         self.should_walk_up = bool(d.get('ShouldWalkUp'))
-        self.use_distance = d.get('UseDistance') or 0.01
-        self.item_use_height = d.get('ItemUseHeight') or 0.03
+        # Door : Item — the same arrival radii as Item, as serialized
+        # (Item.cs:246 UseDistance = 0.03f, cs:220 ItemUseHeight = 0.01f;
+        # Pawn.cs:1112-1119 reads them raw on the door step)
+        self.use_distance = d.get('UseDistance', 0.03)
+        self.item_use_height = d.get('ItemUseHeight', 0.01)
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
+        # the climb-arrival widenings IsAtUseLocation reads on a door step
+        # too (Pawn.cs:1330, 1412 -> cs:1690-1705, Woody.cs:744-755): six
+        # walk-up DoorBacks (L212-L214) serialize WoodyDeltaUseHeight 0.2-0.4
+        self.woody_delta_use_height = d.get('WoodyDeltaUseHeight') or 0.0
+        self.use_woody_extra = bool(d.get('UseWoodyExtraDeltaHeight'))
+        # Item.CanUse (Item.cs:314, = true) gates the hover cursor on a door
+        # as well (MouseCursor.cs:374); Item.DontUseOn (IsAtUseRange's y-arm
+        # skip, Item.cs:2270-2293) — every door serializes both defaults
+        self.can_use = d.get('CanUse') if d.get('CanUse') is not None else True
+        self.dont_use_on = (d.get('DontUseOn') or {}).get('path')
         dl = d.get('DeltaLocation') or {}
         self.dx = dl.get('x', 0.0); self.dy = dl.get('y', 0.0)
         # RoutineActionMove.SameZone reads the last door's exit offset
@@ -811,6 +1046,38 @@ class Door:
         n = d.get('MouseOverIconName') or ''
         self.mouse_over_icon = ('Textures/GUI/cursor/' + n) if n else None
         self.locked_name = d.get('NameString') or ''
+        # Item.GetWithString on a Door (Item.cs:2316-2327): the held-inventory
+        # hover line's tail (MouseCursor.cs:193)
+        self.with_string = d.get('WithString') or ''
+        # Door.CanWoodyUse's locked bubble reads the description
+        # (Door.cs:230-240)
+        self.description_string = d.get('DescriptionString') or ''
+        # CheckMoveLocationY adds the transition's own per-pawn delta on a
+        # ComplexMove step (Woody.cs:939-950, Mother.cs:28-39, Olga.cs:124-135)
+        self.walk_deltas = {}
+        for role, key in (('Woody', 'DeltaWoodyLocation'),
+                          ('Mother', 'DeltaMotherLocation'),
+                          ('Olga', 'DeltaOlgaLocation')):
+            v = d.get(key) or {}
+            self.walk_deltas[role] = (v.get('x', 0.0), v.get('y', 0.0))
+        # Woody / the Mother land at their own exit offsets, overriding the
+        # base DoorDistanceDelta warp (Woody.cs:476, Mother.cs:60)
+        v = d.get('DeltaExitLocation') or {}
+        self.delta_exit = (v.get('x', 0.0), v.get('y', 0.0))
+        v = d.get('DeltaMotherExitLocation') or {}
+        self.delta_mother_exit = (v.get('x', 0.0), v.get('y', 0.0))
+        # Pawn.CanPassTarget (Pawn.cs:1032): an impassable door blocks the
+        # end-of-step x-snap
+        self.passable = d.get('Passable', True)
+        # Door.Start skips the idle when asked (Door.cs:211)
+        self.ignore_idle = bool(d.get('IgnoreIdleAnimation'))
+        # a Woody pass through an ExitDoor ends the level
+        # (Pawn.OnDoorEnterAnimationFinished, Pawn.cs:1662-1665)
+        self.exit_door = bool(d.get('ExitDoor'))
+        # Door.Start deactivates the object outright (Door.cs:63-66);
+        # L214's captain-door pair only wakes through the unported
+        # CaptainDoor214 hack
+        self.disabled = bool(d.get('DisableOnStart'))
 
 
 # every ActorBehavior / RoutineBehavior / SearchBehavior subclass shipped in
@@ -873,6 +1140,14 @@ class Level:
         self.items = {}             # component pid -> Item
         self.routines = []          # ActionManager models
         self.game_info = {}         # GameInfo serialized fields
+        # InventoryManager.InventoryItems (InventoryManager.cs:5), the
+        # serialized starting inventory of Woody's InvManager (Woody.cs:8),
+        # in the port's entry shape; FirstInventoryItem (cs:7) is the flag
+        # HUD.OnGUI's first draw initializes the first entry on (HUD.cs:
+        # 972-978). Level209 ships the pen knife; every other scene an
+        # empty list.
+        self.inventory_items = []
+        self.first_inventory_item = False
         self.behaviors = []         # serialized *Behavior components
         self.progress_bars = []     # ProgressBar components
         self.dexterity = {}         # DexterityComponent pid -> spec
@@ -894,7 +1169,9 @@ class Level:
             return build + 12
         return build - 5
 
-    # -- helpers ---------------------------------------------------------
+    # -- helpers: accessors over the export format (tools/export_level.py —
+    #    objects by path id, GameObject/Transform/component tables); they
+    #    stand in for Unity's GetComponent / transform lookups, no game rule
     def _o(self, pid):
         return self.objs.get(str(pid))
 
@@ -957,6 +1234,10 @@ class Level:
                 v = e.get(k_src)
                 if isinstance(v, dict) and v.get('texture'):
                     spec[k_dst] = v['texture']
+            # the percentage label's style (ProgressBar.cs:39, 79, 269):
+            # its face resolves like the HUD styles', its size is
+            # CalculateFontSize(0)+3 at draw time
+            spec['data_style'] = e.get('DataStyle') or {}
 
     def _add_dexterity(self, pid, o):
         """DexterityComponent's serialized fields (DexterityComponent.cs);
@@ -1039,6 +1320,7 @@ class Level:
         self._find_background()
         self._build_graph()
         self._find_pawns()
+        self._find_inventory()
         self._link_item_sprites()
         self._find_routines()
         self._apply_zone_bounds()
@@ -1051,8 +1333,9 @@ class Level:
         cm = next((o['data'] for o in self.objs.values()
                    if o['type'] == 'CameraMover' and 'data' in o), None)
         if cm and cm.get('MaxX') is not None:
-            self.camera_bounds = (cm.get('MinX') or 0.0, cm.get('MaxX') or 0.0,
-                                  cm.get('MinY') or 0.0, cm.get('MaxY') or 0.0)
+            # CameraMover.cs:21-27 initializers; every scene serializes them
+            self.camera_bounds = (cm.get('MinX', -7.0), cm.get('MaxX', 7.0),
+                                  cm.get('MinY', -3.5), cm.get('MaxY', 3.5))
         # Level.Start computes the entrance and start points from the named
         # zones' transforms plus the serialized offsets (Level.cs:199-208);
         # Woody.Start parks him at StartLocation and he walks to
@@ -1070,10 +1353,86 @@ class Level:
                         return (z.tx + off.get('x', 0.0),
                                 z.ty + off.get('y', 0.0)), z.pid
                 return None, None
-            self.entrance_location, _ = _point(lvl.get('EntranceZoneName'),
-                                               'EntranceLocationOffset')
+            # Level.cs:38-40 initializers "Zone05" / "Zone01"
+            self.entrance_location, _ = _point(
+                lvl.get('EntranceZoneName', 'Zone01'), 'EntranceLocationOffset')
             self.start_location, self.start_zone = _point(
-                lvl.get('StartZoneName'), 'StartLocationOffset')
+                lvl.get('StartZoneName', 'Zone05'), 'StartLocationOffset')
+        # MusicPlayer (MusicPlayer.cs): the level track and the outcome
+        # jingles; the exporter resolves the AudioClip PPtrs into the
+        # extraction's WAV/OGG names
+        self.music = None
+        mp = next((o['data'] for o in self.objs.values()
+                   if o['type'] == 'MusicPlayer' and 'data' in o), None)
+        ia = next((o['data'] for o in self.objs.values()
+                   if o['type'] == 'IntroAnimation' and 'data' in o), None)
+        if mp:
+            def clip(v):
+                return v.get('clip') if isinstance(v, dict) else None
+            tracks = mp.get('AlternateLevelSounds') \
+                if mp.get('UseAlternateSounds') else mp.get('LevelSounds')
+            tracks = tracks or []
+            # the serialized LevelMusicSource carries the loop flag (true in
+            # every scene); the jingle sources ship loop=false
+            lm = (mp.get('LevelMusicSource') or {}).get('path')
+            lmd = (self._o(lm) or {}).get('data') or {}
+            self.music = {
+                # GetLevelMusic returns index 1, the 'normal' track
+                'level': clip(tracks[1]) if len(tracks) > 1 else None,
+                'loop': bool(lmd.get('loop', True)),
+                'clap': clip(mp.get('EntranceClap')),
+                'success': clip(mp.get('SuccessNormal')),
+                'success_perfect': clip(mp.get('SuccessPerfect')),
+                'caught': clip(mp.get('Caught')),
+                'failed': clip(mp.get('Failed')),
+                # PlayLevelMusic: the first run waits 15 s (OneTime false)
+                'delay': 0.0 if mp.get('OneTime') else 15.0,
+                # PlayEntranceMusic (MusicPlayer.cs:122-130): the EntranceSound
+                # on its own source at IntroAnimation.StartGame (cs:311)
+                'entrance': clip(mp.get('EntranceSound')),
+                # the title cards run between the scene load (the clap and
+                # the 15 s Invoke start there, MusicPlayer.Start / Level.Start
+                # -> LoadSettings, Level.cs:217-244, 295-297) and StartGame,
+                # the port's t=0: IntroAnimation.StartAnimation's seven
+                # WaitForSeconds stages (IntroAnimation.cs:86-112) — 7.79 s on
+                # Level101; the reference measures 7.08 s from StartGame to
+                # the track (0.14 s of coroutine frame latencies over the
+                # seven waits, docs/audit/verified/pass5_video.md F1)
+                'intro_total': sum(
+                    float(ia.get(k) or 0.0) for k in (
+                        'CompanyStaticTime', 'CompanyOutGameInTime',
+                        'GameTime', 'GameEpisodeInTime', 'GameEpisodeTime',
+                        'GameEpisodeOutTime', 'GameOutTime'))
+                    if ia else 0.0,
+            }
+        # the serialized game camera: orthographic, size 3 in all 31 scenes
+        # (the perspective size-100 ones are the menu scenes)
+        self.camera_size = None
+        for o in self.objs.values():
+            if o['type'] == 'Camera' and (o.get('data') or {}).get('orthographic'):
+                self.camera_size = o['data']['orthographic_size']
+                break
+        # Level.OnGUI's fences (Level.cs:322-341): screen-space textures at
+        # the world FencePositions, drawn between the pawns and the HUD
+        # (GUIDepth.LevelFence). LoadFenceSize (cs:244-252) overrides each
+        # rect's width to (H/W)*1.75/0.75 screen fractions unless
+        # IgnoreFenceSize; AdjustRectangle scales fractions into pixels.
+        self.fences = []
+        if lvl and not lvl.get('DisableFences'):
+            depth = GUI_DEPTH.get(lvl.get('FenceDepth'),
+                                  GUI_DEPTH['LevelFence'])
+            for tex, pos, rect in zip(lvl.get('FenceTextures') or [],
+                                      lvl.get('FencePositions') or [],
+                                      lvl.get('FenceRects') or []):
+                name = tex.get('texture') if isinstance(tex, dict) else None
+                if not name:
+                    continue
+                self.fences.append({
+                    'texture': name,
+                    'x': pos.get('x', 0.0), 'y': pos.get('y', 0.0),
+                    'w': rect.get('width', 0.0), 'h': rect.get('height', 0.0),
+                    'depth': depth,
+                    'ignore_size': bool(lvl.get('IgnoreFenceSize'))})
         # a MoveOnly action stores the zone's GameObject; alias the zone
         # components' bubble icons onto it
         for pid in list(self.bubble_icons):
@@ -1083,14 +1442,23 @@ class Level:
                 self.bubble_icons.setdefault(go, self.bubble_icons[pid])
         # Item.Start ends in SetPrimed(Primed) (Item.cs:697): the primed branch
         # adds DeltaPrimedLocation to DeltaLocation, the unprimed one subtracts
-        # it (Item.cs:1201-1210; the WaterPuddle name-hack is not ported)
+        # it (Item.cs:1201-1210). The WaterPuddle name-hack negates its
+        # DeltaLocation and FinalDeltaLocationNormal outright and skips both
+        # delta arms (Item.cs:1196-1210) — at load too: L201's serialized
+        # +0.6 x-delta is -0.6 from the first frame.
         for it in self.items.values():
-            if it.delta_primed_x or it.delta_primed_y:
+            if it.name == 'WaterPuddle':
+                it.dx = -it.dx
+                it.dy = -it.dy
+                it.final_normal = (-it.final_normal[0], -it.final_normal[1])
+            elif it.delta_primed_x or it.delta_primed_y:
                 sign = 1.0 if it.primed else -1.0
                 it.dx += sign * it.delta_primed_x
                 it.dy += sign * it.delta_primed_y
 
     def _add_zone(self, pid, o):
+        """loader: one serialized Zone component (Zone.cs fields, keyed by
+        their C# names) plus its GameObject's transform and BoxCollider"""
         go = self._go_of(o)
         tr = self._transform(go)
         box = self._component(go, 'BoxCollider')
@@ -1128,6 +1496,8 @@ class Level:
         return None
 
     def _add_door(self, pid, o):
+        """loader: one serialized Door/Transition component (Door.cs and
+        Transition.cs fields, keyed by their C# names)"""
         d = o['data']
         go = self._go_of(o)
         tr = self._transform(go)
@@ -1141,11 +1511,13 @@ class Level:
         door.is_transition = o['type'] == 'Transition'
         box = self._component(go, 'BoxCollider')
         if box is not None:
-            s = box['data']['size']; c = box['data']['center']
-            door.collider = (p[0] + c[0], p[1] + c[1], s[0], s[1])
+            door.collider = self._world_box(go, box['data']['center'],
+                                            box['data']['size'], p[0], p[1])
         self.doors.append(door)
 
     def _add_item(self, pid, o):
+        """loader: one serialized Item-family component (Item.cs and the
+        subclass fields, keyed by their C# names) into an Item"""
         d = o['data']
         go = self._go_of(o)
         tr = self._transform(go)
@@ -1189,10 +1561,60 @@ class Level:
             box = self._component(go, 'BoxCollider')
             if box and 'data' in box:
                 b = box['data']
-                it.collider = (it.x + b['center'][0], it.y + b['center'][1],
-                               b['size'][0], b['size'][1])
+                it.collider = self._world_box(go, b['center'], b['size'],
+                                              it.x, it.y)
+                # Collider.enabled ships off on 221 items (every SlipperyGround
+                # strip, L104's ApplePie until its round trip, L105's Football
+                # until alerted, L114's Pipe until primed, the S2 fences...) —
+                # Physics.Raycast never hits them; the enable sites are the
+                # ported ones (Item.cs:1326-1333, TrickItem.cs:599-606, 1154-1157,
+                # 2455-2476, the behaviors' collider toggles)
+                it.clickable = bool(b.get('enabled', True))
         for d in self.doors:
             d.sprite = find(self._go_of(self._o(d.pid)))
+
+    def _world_box(self, go, center, size, fx, fy):
+        """a BoxCollider's world-space XY footprint: Physics.Raycast tests
+        the collider under the full transform, so the serialized local size
+        goes through the world scale and rotation — the binoculars' box is
+        (10, 4, 14.37) local but (0.23 x 4) world (scale 0.023), and most
+        items rotate X by 90 so their screen height is the local z."""
+        tp = self._transform_of.get(go)
+        td = (self._o(tp).get('data') if tp else None) or {}
+        wp = td.get('world_position') or [fx, fy, 0.0]
+        ws = td.get('world_scale') or [1.0, 1.0, 1.0]
+        qx, qy, qz, qw = td.get('world_rotation') or [0.0, 0.0, 0.0, 1.0]
+
+        def rot(v):
+            # v + 2*cross(q.xyz, cross(q.xyz, v) + w*v)
+            cx1 = qy * v[2] - qz * v[1] + qw * v[0]
+            cy1 = qz * v[0] - qx * v[2] + qw * v[1]
+            cz1 = qx * v[1] - qy * v[0] + qw * v[2]
+            return (v[0] + 2.0 * (qy * cz1 - qz * cy1),
+                    v[1] + 2.0 * (qz * cx1 - qx * cz1),
+                    v[2] + 2.0 * (qx * cy1 - qy * cx1))
+        c = rot((center[0] * ws[0], center[1] * ws[1], center[2] * ws[2]))
+        # a box is its half-extents in every direction: a negative serialized
+        # size (L106's Pudding height, L210's ElephantCricketBat width) or a
+        # negative world scale still yields the same solid for the physics
+        # test, so the sign drops here — kept, it made the hit-test empty
+        half = [abs(size[j] * ws[j]) * 0.5 for j in range(3)]
+        w = h = dz = 0.0
+        for j, axis in enumerate(((1.0, 0.0, 0.0), (0.0, 1.0, 0.0),
+                                  (0.0, 0.0, 1.0))):
+            a = rot(axis)
+            w += abs(a[0]) * half[j]
+            h += abs(a[1]) * half[j]
+            dz += abs(a[2]) * half[j]
+        # the z centre and half-depth ride along for the raycast ordering:
+        # the click ray starts on the camera plane (ScreenToWorldPoint of the
+        # mouse, Woody.cs:708) and runs +z, so Physics.Raycast returns the
+        # collider whose NEAR face (z - dz) comes first — the X-90 rotation
+        # turns an item's local height into a depth of several units, so
+        # the centre alone orders 113 of the 667 XY-overlapping item/door
+        # collider pairs wrongly (tests/checks/assets_refs.py holds two)
+        return (wp[0] + c[0], wp[1] + c[1], 2.0 * w, 2.0 * h,
+                (wp[2] if len(wp) > 2 else 0.0) + c[2], dz)
 
     def _apply_zone_bounds(self):
         """Level.Start() rebuilds every zone from lists on the Level component,
@@ -1248,6 +1670,8 @@ class Level:
                 z.play_right = z.x + right[i]
 
     def _find_game_info(self):
+        """loader: the scene's GameInfo component (GameInfo.cs fields, keyed
+        by their C# names)"""
         for o in self.objs.values():
             if o['type'] == 'GameInfo' and 'data' in o:
                 d = o['data']
@@ -1256,7 +1680,8 @@ class Level:
                     'winning': d.get('WinningTricksCount') or 0,
                     # the HUD clock and the score screen
                     'time_minutes': d.get('TimeMinutes') or 0.0,
-                    'compound_trick_score': d.get('CompoundTrickScore') or 0,
+                    # GameInfo.cs:43 initializer 4 (2/3/4/5 serialized)
+                    'compound_trick_score': d.get('CompoundTrickScore', 4),
                     'is_tutorial': bool(d.get('IsTutorial')),
                     'dont_show_angry_count': bool(d.get('DontShowAngryCount')),
                 }
@@ -1323,7 +1748,10 @@ class Level:
                     return (a.get(field) or {}).get('path')
                 return {'item': ref('Item'),
                              'duration': a.get('Duration') or 0.0,
-                             'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
+                             # RoutineAction.cs:25 (= 0.03f), taken raw: 81
+                             # actions serialize 0.0 (RoutineActionMove.cs:39
+                             # compares against it as-is)
+                             'max_distance': a.get('MaximumPawnDistanceToAction', 0.03),
                              'hide_object': bool(a.get('HideObjectDuringUse')),
                              'hide_owner': bool(a.get('HideOwnerDuringUse')),
                              'move_only': bool(a.get('MoveOnly')),
@@ -1331,6 +1759,11 @@ class Level:
                              'move_zone': self._go_of(self._o(mz)) if mz and self._o(mz) else None,
                              'mutex': bool(a.get('MutexAction')),
                              'postpone_alarm': pa,
+                             # the second postpone flag of the Use arm of
+                             # Rottweiler.IsAlarmPostponed (Rottweiler.cs:1067;
+                             # Level105's four actions carry it)
+                             'postpone_alarm_during_use_only':
+                                 bool(a.get('PostponeAlarmDuringUseOnly')),
                              'mutex_anim': a.get('MutexLoopingAnimation'),
                              # RoutineActionUse.OnActionStarted/Stopped release
                              # infinite loops on these referenced targets
@@ -1401,12 +1834,38 @@ class Level:
                                   'actions_to_add': to_add,
                                   'start_index': d.get('ActionStartIndex') or 0,
                                   'loop_from_start': bool(d.get('LoopFromStartIndex')),
+                                  # AdvanceActionIndex's wrap (ActionManager.
+                                  # cs:566-584): start index, else the
+                                  # selected index only with this flag, else 0
+                                  'loop_from_selected':
+                                      bool(d.get('LoopFromSelectedIndex')),
                                   'selected_index': d.get('ActionSelectedIndex') or 0,
                                   'frozen': bool(d.get('Frozen'))})
 
     def _build_graph(self):
-        """Exactly ZoneController.Start(): a door links its own zone to the zone
-        of whatever it points at."""
+        """ZoneController.Start() (ZoneController.cs:16-27): a door links its
+        own zone to the zone of whatever it points at, `(!Locked ||
+        TemporalLock) && LinkTo != null`. Two departures, both documented:
+        the `|| TemporalLock` arm is not modelled — 22 doors carry it, 20 of
+        them Locked, all in s1/Intro101-103 (unported cutscenes); there the
+        original keeps the edge but LinkNodes then refuses the Locked door
+        (GetDoorBetweenZones wants !Locked, Helpers.cs:194-205, 245-248)
+        and returns a null path, while the port drops the edge — the same
+        None for every ordered zone pair of the three intros (they hold no
+        route made of unlocked doors except Intro103 Zone02<->Zone03, which
+        both graphs carry), so the missing arm has no observable effect and
+        the 28 playable levels ship no TemporalLock door at all. A
+        DisableOnStart door (Door.cs:63-66; only L214's captain DoorBack
+        pair, Zone03<->Zone05) KEEPS its edge: the pair ships active, so
+        ZoneController.Start sees it unless Door.Start deactivated it first
+        — and the level needs the edge (Item.CaptainDoorBehavior, Item.cs:
+        2606-2623, re-activates both doors and retargets the neighbour's
+        CaptainDoor action at CaptainControls in Zone05: with no edge that
+        action and the cabin's two tricks are dead). Zone.Neighbors never
+        changes afterwards; while the pair is inactive LinkNodes finds no
+        door between the zones (GetDoorBetweenZones, Helpers.cs:194-205,
+        245-248) and the path is null — find_path refuses a route through
+        a disabled door the same way."""
         by_pid = {d.pid: d for d in self.doors}
         self.graph = {z.pid: [] for z in self.zones}
         for d in self.doors:
@@ -1419,7 +1878,24 @@ class Level:
 
     def find_path(self, start_pid, end_pid):
         """Zone pids from start to end, each with the door to walk through.
-        Uniform edge cost, so BFS — Helpers.GetShortestPath adds 1.0 per hop."""
+        Uniform edge cost, so BFS — Helpers.GetShortestPath adds 1.0 per hop
+        (Helpers.cs:158-192). The LENGTH always agrees; the CHOICE among
+        equal-length routes is a documented open question: 720 of the 786
+        reachable ordered zone pairs (every Season-1 pair) have a unique
+        shortest route, the other 66 (4-6 per Season-2 level, the opposite
+        corners of the 4-cycles) have two, and there the original's pick
+        depends on ZoneController.Zones order (FindGameObjectsWithTag) and
+        Mono's unstable List.Sort at equal Cost — not recoverable from the
+        decompile. This BFS takes the first door in scene order (a faithful
+        Dijkstra under four plausible tie-breaks — stable/reversed sort x
+        scene/reversed zone order — agrees with it on 19 to 47 of those 66
+        pairs, never on all; tests/checks/assets_refs.py re-derives the
+        length equality over every pair). A route through a door whose
+        object is inactive (Door.disabled: L214's captain pair before the
+        CaptainDoor trick) is refused: GetShortestPath walks Zone.Neighbors
+        blind to door state, then BuildPath -> LinkNodes finds no active
+        door between the two zones (GetComponentsInChildren skips inactive
+        objects; Helpers.cs:194-205, 243-248) and the path is null."""
         import collections
         if start_pid == end_pid:
             return []
@@ -1439,23 +1915,34 @@ class Level:
                         out.append((n, dr))
                         n = c
                     out.reverse()
+                    if any(dr.disabled for _, dr in out):
+                        return None      # LinkNodes: no door -> null path
                     return out
                 q.append(nb)
         return None
 
     def zone_at(self, x, y):
+        """the zone under a click: the port's stand-in for the raycast's
+        GetZoneFromCollider (Pawn.MoveToLocation cs:403-404,
+        GetMoveDestination cs:698-701) — containment in the zone's box.
+        Where zone boxes overlap (10 pairs: L208/L209 Zone05 over Zone03/04
+        by 1.7-1.9 units, L210 Zone03/04 by 0.53, L213 by <0.1, the intros)
+        the first in scene order wins; every zone box spans the same z, so
+        the raycast's own tie-break there is unspecified too."""
         for z in self.zones:
             if abs(x - z.x) <= z.w * 0.5 and abs(y - z.y) <= z.h * 0.5:
                 return z
         return None
 
     def zone_by_pid(self, pid):
+        """lookup: a serialized Zone reference (path id) -> the Zone"""
         for z in self.zones:
             if z.pid == pid:
                 return z
         return None
 
     def door_by_pid(self, pid):
+        """lookup: a serialized Door reference (path id) -> the Door"""
         for d in self.doors:
             if d.pid == pid:
                 return d
@@ -1473,66 +1960,62 @@ class Level:
         # Animations[23]/[33] by position (Level206MotherBehavior.cs:26-28)
         for i, a in enumerate(anims):
             a.src_index = i
-        anims = [a for a in anims if a.sheet]
+        # an animation with an unloadable sheet stays in the controller's
+        # array (LoadTexture only logs, AnimationInstance.cs:137-140): L213's
+        # BoatPicnic use strips and S1's mother-door strips name Resources
+        # paths that do not exist; keep them, sheet None draws nothing
+        anims = [a for a in anims if a.sheet_path]
         if not anims:
             return
         depth = GUI_DEPTH.get(d.get('AnimationGUIDepth'), 32)
         dl = d.get('DeltaLocation') or {}
-        # pick the resting pose: an item's IdleNormal, a pawn's DefaultAnimation
+        # the pose at load. A controller is born with CurrentAnimation ==
+        # null (AnimationControllerBase.cs:13) and OnGUI draws / refreshes
+        # nothing until the first SetAnimation (cs:172-189, 350-371) —
+        # Sprite.current None stands for that, distinct from Sprite.hidden
+        # (= AnimationControllerBase.Hidden, cs:55). Two Starts pick a
+        # resting pose the loader can name: a pawn's PlayDefaultAnimation
+        # (Pawn.cs:224-238: PlayLoopingAnimation(DefaultAnimation)) and a
+        # door's ReturnToIdleAnimation (Door.cs:56-63, 209-223:
+        # PlayLoopingAnimation(IdleAnimation) unless IgnoreIdleAnimation
+        # skips it, cs:211 — the 8 S2 DoorBacks keep only the pass strips
+        # Door.PlayAnimation plays, cs:141-153; the sprite still exists).
+        # Every other ItemAnimationController stays at None here: the Item
+        # family's Start plays — SetPrimed's primed pose, TrickItem's
+        # ReturnToIdleAnimation, SearchItem's FullAnimation, HideItem's
+        # IdleAnim, Alerter's SleepSequence — run in World.__init__
+        # (world.py _start_item_animations) through the runtime's own
+        # PlayItemAnimation dispatch, and a controller nothing plays
+        # (IdleNormal NONE, Animating false, DontPlayIdleOnStart) keeps
+        # drawing nothing, exactly as the original's does.
         want = None
-        # Door keeps its resting pose in IdleAnimation; every other Item uses
-        # IdleNormal. 'NONE' means the object is a static quad, not a sprite.
-        for owner_type, field in (('Door', 'IdleAnimation'),
-                                  ('Transition', 'IdleAnimation'),
-                                  ('TrickItem', 'IdleNormal'),
-                                  ('SearchItem', 'IdleNormal'),
-                                  ('HideItem', 'IdleAnim'),
-                                  ('GroundItem', 'IdleNormal'),
-                                  ('Alerter', 'IdleNormal'),
-                                  ('InspectItem', 'IdleNormal')):
-            item = self._component(go, owner_type)
-            if item and 'data' in item:
-                want = item['data'].get(field)
-                # ReturnToIdleAnimation plays the tricked idle when IsTricked
-                if field == 'IdleNormal' and item['data'].get('Tricked'):
-                    want = item['data'].get('IdleTricked') or want
-                # Item.Start ends in SetPrimed(Primed); for a primed TrickItem
-                # that plays PlayPrimedAnimation over the idle
-                # (Item.cs:697, TrickItem.cs:996-1010, 483-491)
-                if field == 'IdleNormal' and item['data'].get('Primed'):
-                    prim = item['data'].get('PrimedTricked') \
-                        if item['data'].get('Tricked') else None
-                    prim = prim if prim and prim != 'NONE' \
-                        else item['data'].get('PrimedNormal')
-                    if prim and prim != 'NONE':
-                        want = prim
-                # Alerter.Start plays the SleepSequence instead of an idle
-                if owner_type == 'Alerter':
-                    seq = item['data'].get('SleepSequence') or []
-                    if seq:
-                        want = seq[0]
-                break
-        if want is None:
+        is_pawn = o['type'] == 'PawnAnimationController'
+        if is_pawn:
             for pawn_type in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
                 pawn = self._component(go, pawn_type)
                 if pawn and 'data' in pawn:
                     want = pawn['data'].get('DefaultAnimation')
                     break
+        else:
+            for owner_type in ('Door', 'Transition'):
+                door = self._component(go, owner_type)
+                if door and 'data' in door:
+                    if not door['data'].get('IgnoreIdleAnimation'):
+                        want = door['data'].get('IdleAnimation')
+                    break
         cur = None
         for i, a in enumerate(anims):
             if a.name == want:
                 cur = i; break
-        if cur is None:
-            # no resting animation: either a pawn (first entry is its idle) or a
-            # static object drawn as a quad instead
-            if want in (None, 'NONE') and o['type'] == 'ItemAnimationController':
-                return
+        if cur is None and is_pawn:
+            # a pawn whose DefaultAnimation the sheet lacks: its first entry
             cur = 0
         p = self._pos(tr)
-        self.sprites.append(Sprite(self._o(go)['data']['name'], p[0], p[1],
-                                   depth, anims, cur,
-                                   dl.get('x', 0.0), dl.get('y', 0.0),
-                                   o['type'], go))
+        sp = Sprite(self._o(go)['data']['name'], p[0], p[1],
+                    depth, anims, cur,
+                    dl.get('x', 0.0), dl.get('y', 0.0),
+                    o['type'], go)
+        self.sprites.append(sp)
 
     def _find_pawns(self):
         """A pawn's sprite lives on a child object named AnimController, so map
@@ -1583,20 +2066,28 @@ class Level:
                 'zone': zgo,
                 # ProcessMovement: position += Velocity * dt * Speed, and
                 # WalkOnPath sets Velocity = direction * ForceMagnitude, so a
-                # horizontal walk covers Speed * ForceMagnitude per second
-                'speed': pd.get('Speed') or 0.0,
-                'speed_sneaking': pd.get('SpeedSneaking') or 0.0,
-                'force': pd.get('ForceMagnitude') or 0.0,
-                'door_force': pd.get('DoorForceMagnitude') or 0.0,
-                'run_force': pd.get('RunningForceMagnitude') or 0.0,
-                'run_door_force': pd.get('RunningDoorForceMagnitude') or 0.0,
+                # horizontal walk covers Speed * ForceMagnitude per second;
+                # the fallbacks are the Pawn constructor's (Pawn.cs:203-209),
+                # every pawn serializes its own values
+                'speed': pd.get('Speed', 1.25),
+                'speed_sneaking': pd.get('SpeedSneaking', 0.65),
+                'force': pd.get('ForceMagnitude', 300.0),
+                'door_force': pd.get('DoorForceMagnitude', 80.0),
+                'run_force': pd.get('RunningForceMagnitude', 300.0),
+                'run_door_force': pd.get('RunningDoorForceMagnitude', 80.0),
                 'door_delta': ((pd.get('DoorDistanceDelta') or {}).get('x', 0.0),
-                               (pd.get('DoorDistanceDelta') or {}).get('y', 0.0)),
+                               (pd.get('DoorDistanceDelta') or {}).get('y', -0.3)),
                 'player_height_delta': pd.get('PlayerHeightDelta') or 0.0,
                 'zone_level_threshold': pd.get('ZoneLevelThreshold') or 0.0,
                 'item_use_height_threshold': pd.get('ItemUseHeightThreshold') or 0.0,
+                # Woody.IsAtUseLocation's UseWoodyExtraDeltaHeight arm
+                # (Woody.cs:750-753)
+                'extra_delta_height': pd.get('ExtraDeltaHeight') or 0.0,
                 'portal_up': _anim_name(pd.get('PortalUpAnimation')),
                 'portal_down': _anim_name(pd.get('PortalDownAnimation')),
+                # the neighbour's urgent-run climb set (Rottweiler.cs:406, 423)
+                'portal_run_up': _anim_name(pd.get('PortalRunUpAnimation')),
+                'portal_run_down': _anim_name(pd.get('PortalRunDownAnimation')),
                 'angry_decay': pd.get('AngryMeterDecay') or 0.0,
                 'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')
                     if pd.get('NoticeWhenNearTrickedDistance') is not None
@@ -1604,7 +2095,38 @@ class Level:
                 'angry_max': pd.get('AngryMeterMaximum') or 100.0,
                 'fear_left': _anim_name(pd.get('FearAnimationLeft')) or 'FearLeft',
                 'fear_right': _anim_name(pd.get('FearAnimationRight')) or 'FearRight',
+                # PlayAudienceLaugh's clip pools (Rottweiler.cs:805-818)
+                'medium_laughs': [v.get('clip') for v in
+                                  (pd.get('MediumLaughs') or [])
+                                  if isinstance(v, dict) and v.get('clip')],
+                'big_laughs': [v.get('clip') for v in
+                               (pd.get('BigLaughs') or [])
+                               if isinstance(v, dict) and v.get('clip')],
                 'win_animation': _anim_name(pd.get('WinAnimation')),
+                # PlayFinishAnimation's losing arm (Woody.cs:1120-1127)
+                'lose_animation': _anim_name(pd.get('LoseAnimation')),
+                # the end-of-entrance greeting (Pawn.cs:1064-1067)
+                'hello_animation': _anim_name(pd.get('HelloAnimation')),
+                # Pawn.HelloAnimationNFH2 (Pawn.cs:111, initializer
+                # Entrance at cs:213): IntroAnimation.StartGame plays it on
+                # the NFH2Path Woody with the input locked (IntroAnimation.
+                # cs:300-304); its single end unlocks (Woody.cs:372-375)
+                'hello_animation_nfh2': _anim_name(pd.get('HelloAnimationNFH2')),
+                # Pawn.FinishedEntrance (Pawn.cs:119) is a serialized public
+                # field: every Season-2 level (and the S1 intros) ships it
+                # TRUE — Woody.Start leaves the input unlocked (Woody.cs:191),
+                # Woody.Update never starts the entrance walk (cs:223-231),
+                # TakeNextStep never plays HelloAnimation (Pawn.cs:1064-1067;
+                # the S2 sheet has no Hello); the 14 S1 levels ship FALSE
+                'finished_entrance': bool(pd.get('FinishedEntrance')),
+                # the 30-second boredom poses (Woody.FindInput, cs:612-623)
+                'idle_animations': [a for a in (pd.get('IdleAnimations') or [])
+                                    if a and a != 'NONE'],
+                'idle_threshold': pd.get('IdleThreshold') or 30.0,
+                # the Kid's reaction sets (TrickItem.KidActions, cs:632-653)
+                'kid_use_normal_seq': pd.get('UseNormalSequence') or [],
+                'kid_use_tricked_seq': pd.get('UseTrickedSequence') or [],
+                'kid_use_linked_seq': pd.get('UseLinkedTrickSequence') or [],
                 'is_sleeping': bool(pd.get('IsSleeping')),
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
                 'animal_tutorial': bool(pd.get('AnimalTutorial')),
@@ -1627,6 +2149,16 @@ class Level:
                         'GrabSequence') or [],
                     'postpone_alarm': bool((pd.get('GrabFixingItemAction')
                                             or {}).get('PostponeAlarm')),
+                    # RoutineAction.Urgent picks the run for the interposed
+                    # move (RoutineActionMove.cs:68-75) — the fetch runs on
+                    # L110/L113 only, walks on L111
+                    'urgent': bool((pd.get('GrabFixingItemAction')
+                                    or {}).get('Urgent')),
+                    # ForceUseOriginalAction: an urgent interrupting this
+                    # step resumes the step's own original instead of the
+                    # step (ActionManager.cs:711-714; L110's UseFixingItem)
+                    'force_use_original': bool((pd.get('GrabFixingItemAction')
+                                                or {}).get('ForceUseOriginalAction')),
                 },
                 'use_fixing_action': {
                     'sequence': (pd.get('UseFixingItemAction') or {}).get(
@@ -1635,6 +2167,33 @@ class Level:
                                            or {}).get('ShouldReturnFixingItem')),
                     'return_sequence': ((pd.get('UseFixingItemAction') or {}).get(
                         'ReturnFixingItemAction') or {}).get('ReturnSequence') or [],
+                    'postpone_alarm': bool((pd.get('UseFixingItemAction')
+                                            or {}).get('PostponeAlarm')),
+                    'urgent': bool((pd.get('UseFixingItemAction')
+                                    or {}).get('Urgent')),
+                    'force_use_original': bool((pd.get('UseFixingItemAction')
+                                                or {}).get('ForceUseOriginalAction')),
+                    # the ReturnFixingItemAction never serializes Urgent
+                    'return_urgent': bool((((pd.get('UseFixingItemAction')
+                                             or {}).get('ReturnFixingItemAction')
+                                            or {}).get('Urgent'))),
+                },
+                # Rottweiler.SurpriseActionFar (cs:26) and AlarmAction (cs:62):
+                # the alerter/notice run and the phone answer, with the flags
+                # RoutineActionMove.OnActionStarted (Urgent) and Rottweiler.
+                # IsAlarmPostponed (cs:1053, 1065-1068) read off them
+                'surprise_far_action': {
+                    'urgent': bool((pd.get('SurpriseActionFar') or {}).get('Urgent')),
+                    'postpone_alarm': bool((pd.get('SurpriseActionFar')
+                                            or {}).get('PostponeAlarm')),
+                },
+                'alarm_action': {
+                    'urgent': bool((pd.get('AlarmAction') or {}).get('Urgent')),
+                    'postpone_alarm': bool((pd.get('AlarmAction')
+                                            or {}).get('PostponeAlarm')),
+                    'postpone_alarm_during_use_only': bool(
+                        (pd.get('AlarmAction') or {}).get(
+                            'PostponeAlarmDuringUseOnly')),
                 },
                 # RoutineActionHitWoody is serialized inline on the Rottweiler
                 'hit_action': {
@@ -1656,6 +2215,10 @@ class Level:
                     if (b or {}).get('path')],
                 'routine_behavior': (pd.get('RoutineBehavior') or {}).get('path'),
                 'search_behavior': (pd.get('SearchBehavior') or {}).get('path'),
+                # Woody.ItemBehavior (Woody.cs), the AngryElephant that
+                # Pawn.ElephantAnimations watches on every zone change
+                # (Pawn.cs:1536-1558; L208 only)
+                'item_behavior': (pd.get('ItemBehavior') or {}).get('path'),
                 # the Kid pawn's own animation set (Kid.cs:3-16)
                 'kid_crying': _anim_name(pd.get('Crying')),
                 'kid_use_crying_sequence': bool(pd.get('UseCryingSequence')),
@@ -1669,6 +2232,19 @@ class Level:
                              or {}).get('path'),
                     'is_toilet': bool((pd.get('ToiletAction') or {}).get(
                         'IsToiletAction')),
+                    # Urgent (true in every scene) makes the interposed move
+                    # a run; PostponeAlarm feeds IsAlarmPostponed's Use arm;
+                    # ContinueToNextAfterFinished (Level102 only) makes the
+                    # end a plain advance instead of StopUrgentAction
+                    # (ActionManager.cs:530-538)
+                    'urgent': bool((pd.get('ToiletAction') or {}).get('Urgent')),
+                    'postpone_alarm': bool((pd.get('ToiletAction')
+                                            or {}).get('PostponeAlarm')),
+                    'postpone_alarm_during_use_only': bool(
+                        (pd.get('ToiletAction') or {}).get(
+                            'PostponeAlarmDuringUseOnly')),
+                    'continue_to_next': bool((pd.get('ToiletAction') or {}).get(
+                        'ContinueToNextAfterFinished')),
                 },
                 'wait_in_fear_anim': _anim_name(
                     (pd.get('WaitInFearAction') or {}).get('FearAnimation')),
@@ -1677,10 +2253,39 @@ class Level:
                         'HitPawnSequence') or [],
                     'max_distance': (pd.get('HitPawnAction') or {}).get(
                         'MaximumPawnDistanceToAction') or 0.03,
+                    # Olga runs to the hit everywhere; the Mother walks except
+                    # on Level210 (RoutineActionMove.cs:68-75 over the pawn)
+                    'urgent': bool((pd.get('HitPawnAction') or {}).get('Urgent')),
                 },
             }
 
+    def _find_inventory(self):
+        """loader: Woody.InvManager's serialized InventoryManager component
+        (Woody.cs:8; InventoryManager.cs:5-7) — its InventoryItems list is
+        Woody's starting inventory (Unity deserializes it before Start; the
+        entries carry no source Item, that field is internal), in the same
+        entry shape SearchItem.InventoryItems is read into (Inventory.cs:
+        23-57)"""
+        wd = next((o['data'] for o in self.objs.values()
+                   if o['type'] == 'Woody' and 'data' in o), None)
+        ref = ((wd or {}).get('InvManager') or {}).get('path')
+        im = self._o(ref) if ref else None
+        if im is None or im.get('type') != 'InventoryManager':
+            im = next((o for o in self.objs.values()
+                       if o['type'] == 'InventoryManager' and 'data' in o),
+                      None)
+        d = (im or {}).get('data') or {}
+        self.inventory_items = [
+            {'type': v.get('Type'), 'use_count': v.get('UseCount') or 0,
+             'name': v.get('NameString') or '',
+             'desc': v.get('DescriptionString') or '',
+             'wrong_zone': v.get('WrongZoneTooltip') or '',
+             'long': bool(v.get('LongDescription'))}
+            for v in (d.get('InventoryItems') or [])]
+        self.first_inventory_item = bool(d.get('FirstInventoryItem'))
+
     def _go_of_sprite(self, sprite):
+        """lookup: the GameObject id a sprite was built from"""
         return getattr(sprite, 'go', None)
 
     def _find_background(self):

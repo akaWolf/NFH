@@ -39,23 +39,22 @@ Ordering is the `GUIDepth` enum, not z-sorting: higher value draws further back.
 ## Coverage
 
 All 31 levels of both seasons render with every sprite placed and no missing
-sheet — 546 sprites in total:
+sheet — 684 sprites in total over the 37 exported scenes (600 item
+controllers, 84 pawn controllers):
 
 ```
-Level101  drew 16/16 sprites; missing sheets: 0
+Level101  drew 17/17 sprites; missing sheets: 0
 ...
-Level214  drew 16/16 sprites; missing sheets: 0
-total sprites drawn: 546, missing sheets: 0
+Level214  drew 22/24 sprites; missing sheets: 0
 ```
 
-(535 before the alerter pass; six sleeping pets have `IdleNormal == NONE` and
-draw their `SleepSequence[0]` instead — see below. The seventh, Level109's
-parrot, always had a normal idle. The 546th is Level210's dog basket, which
-starts `Primed` and draws its `PrimedNormal` pose the way `Item.Start` →
-`SetPrimed` does.)
-
-Sprite counts vary a lot by design: Level113 has 27, while Level201 has 8
-because that level paints most of its scenery into the backdrop instead.
+39 of them have no CurrentAnimation after Start and 22 are hidden, so a
+load-time shot legitimately draws fewer than it holds — L202 draws 18 of 19,
+L207 27 of 29, L211 24 of 26 (see "IdleNormal == 'NONE'" below; the earlier
+"546" counted only the controllers with a resting pose, and the six sleeping
+pets that draw their `SleepSequence[0]` instead of an idle). Sprite counts
+vary a lot by design: Level213 has 36, while Level201 has 8 because that
+level paints most of its scenery into the backdrop instead.
 
 ## Things that bite
 
@@ -81,10 +80,24 @@ because that level paints most of its scenery into the backdrop instead.
   (Woody.cs:223-229, Level.cs:199-208) — crossing the front door, which is
   the entrance the player sees. Arrival unlocks the input
   (`OnFinishedEntrance`). The `LevelLocations` teleport alone leaves him
-  standing mid-room.
-- **`IdleNormal == 'NONE'` means "not a sprite"** — except on an `Alerter`,
-  whose `Start` plays the `SleepSequence` instead of an idle. Every other such
-  object is drawn as a quad; giving it a sprite draws the wrong thing.
+  standing mid-room. Season 1 only: the S2 levels serialize
+  `Pawn.FinishedEntrance` TRUE — no walk-in, `StartGame` plays the
+  `Entrance` greeting in place (see "The final audit").
+- **`IdleNormal == 'NONE'` means "no CurrentAnimation yet", not "not a
+  sprite"**. Every active `ItemAnimationController` with loadable sheets is a
+  sprite; one whose resting pose is NONE starts with no current animation
+  (`Sprite.current is None`) — the controller exists from Start and OnGUI
+  draws and refreshes nothing until the first play
+  (AnimationControllerBase.cs:172-189; `Item.Start → PlayIdleAnimation →
+  PlayItemAnimation(NONE)` is skipped, TrickItem.cs:1018-1050). 121 item
+  controllers live that way: every S2 SearchItem's Full/Empty look, the
+  ElectricTrap spark loop, the washing machine, the gramophone, L107's
+  drawing... An earlier rule ("giving it a sprite draws the wrong thing")
+  came from drawing frame 0 at load; the fix is the null current animation,
+  which is also what keeps `SetObjectHidden(false)` from drawing anything on
+  such an item. An `Alerter`'s `Start` plays the `SleepSequence` instead of
+  an idle. `Sprite.hidden` is the other flag — `AnimationControllerBase.Hidden`
+  (SetObjectHidden, HideWhenNotAnimating), which also freezes Refresh.
 - **Sheet names are `Resources.Load` paths**, so some contain a subdirectory or
   a duplicate-asset suffix (`Closed/closeddoorback_ms`, `trashcan_ms (2)`). The
   texture cache tries the raw name, the flattened one, the basename, and the
@@ -102,8 +115,12 @@ Speed is not a single number. `ProcessMovement` does
 `position += Velocity * dt * Speed`, and `WalkOnPath` sets
 `Velocity = direction * ForceMagnitude` for a mostly-horizontal move or
 `* DoorForceMagnitude` otherwise, with the Running variants during an urgent
-move and `SpeedSneaking` in place of `Speed` while sneaking. So Woody walks at
-`1.25 x 0.8 = 1.0` units per second and the neighbour at `1.25 x 0.7 = 0.875`.
+move and `SpeedSneaking` in place of `Speed` while sneaking. So the
+neighbour walks at `1.25 x 0.7 = 0.875` units per second — and Woody, whose
+plain click is an urgent move (`IsInUrgentMove = !Sneaking`, Woody.cs:858-861
+→ the Running magnitudes, Pawn.cs:961-975), runs at `2.5 x 0.8 = 2.0`; only
+the sneak toggle gives the `1.25 x 0.8 = 1.0` walk. (The reference footage
+measures 1.99–2.06 u/s, docs/audit/verified/pass5_video.md.)
 
 Walking limits are `Zone.PlayLeft` / `PlayRight`, set in `Level.Start()` from
 `ZonesPlayLeft` / `ZonesPlayRight` as deltas either side of the zone's x — not
@@ -176,7 +193,10 @@ it ends when the sequence drains.
 Level101's routine is two actions. The neighbour walks to the sofa, plays
 `SitDown → SitLoop → SitRemote → SitLoop → SitRemote → SitLoop → SitUp`, crosses
 through a door into the next zone, peeps through the binoculars, and comes back.
-One lap is about 35 seconds.
+One lap is 47.9 seconds — the sofa sequence 17.0 s, the peep 7.2 s, two
+transits and four walks (the reference footage measures 47.87 s between two
+sit-downs; an earlier build ticked every pawn controller twice per frame and
+read "about 35 s" — that number was the bug).
 
 Everything below was read out of `src/`, not inferred from behaviour:
 
@@ -329,14 +349,31 @@ lists, 208 via `ActionsToAddInGame`.
 
 The stop side also carries the mutex handshake (cs:342-351): a non-mutex
 action naming `PawnToAbortMutexOnFinish` unhides that pawn and calls its
-`AbortActiveMutex` (cs:127-134), which finishes the parked action *without*
-`OnActionStopped` — flags a mutex action set at its start deliberately leak.
-Level205's beach mat keeps its infinite loop released forever, in the original
-too. `HideOwnerDuringUse` hides the owner while parked (cs:174-177) or for the
-span of the use (cs:213-216), unhiding at the stop (cs:481-484). Level205 runs
-entirely on this: the neighbour parks on the mat's mutex while Olga uses it
-hidden; her stop springs him, and his next use springs her parked mutex back —
-before the handshake existed here, both routines sat parked forever.
+`AbortActiveMutex` (cs:127-134), which marks the parked action Finished and
+calls `AdvanceToNextAction`, whose `StartAction(next)` stops the still-Active
+mutex action first (ActionManager.cs:157-160) — its `OnActionStopped` runs
+after all: the ignore-loop resets (cs:326-341), not the non-mutex block
+(cs:342: OnUseEnded, the abort branch, the alarm checks). Level205's mat gets
+its InfiniteLoop back the moment the neighbour is sprung. `HideOwnerDuringUse`
+hides the owner while parked (cs:174-177) or for the span of the use
+(cs:213-216), unhiding at the stop (cs:481-484) — and a hidden controller
+does not animate at all: `AnimationControllerBase.OnGUI` runs `Refresh` only
+when `!Hidden` (cs:177), so a pawn behind a door pass, under
+`HideOwnerDuringUse` / `PawnToHideDuringUse` or in the wardrobe, and a hidden
+item, stand on their frame and resume when shown. That is what the Level205
+handshake is built on: Olga's mat use hides her, so her own `HitPawn` never
+ends it; `TrickItem.PlayOlgaAnimation` plays the mat's `UseNormalSequence`
+with `Olga.OnItemAnimationSequenceEnded` as the sequence delegate
+(TrickItem.cs:964-975, 988; Olga.cs:154-158 — `CurrentAction.StopAction(
+canPostponeStop: true)`), the neighbour's mat mutex releases the mat's
+InfiniteLoop step on his arrival (`ItemToStopInfiniteAnimation`) and re-arms
+it when he is sprung, so she sunbathes until he comes to watch (her use spans
+his whole lap), the mat drains 11.4 + 4.4 + 1 s after he parks, her stop
+springs him, and his tennis stop springs her; both cycle for the level
+(400 s headless: 3 / 4 laps — before the item-side delegate both parked for
+good after the first lap). Level210's mat is the second `PlayUseNormalSequence`
+carrier; the two are the only non-mutex `HideOwnerDuringUse` actions in the
+data.
 
 Verified: Level205's cross-cycle loops both routines with Olga hidden for the
 span of each use; Level206's Mother has her ignore flag flip exactly at the
@@ -879,8 +916,11 @@ two data uses both sit behind the unported tutorial flows that also
 unfreeze them. Still open here: `ChangeLayerInTricked`,
 `IgnoreTrickedExitDelta` and `frozenDuration` are serialized but carry no
 live data or code path; `KeepAnimationsInMemory` manages texture memory the
-port does not model; the L211 Olga toilet-delay arm of the hit
-(`DelayToiletBehavior211`) rides the unported Bouquet hack.
+port does not model. The L211 `DelayToiletBehavior211` arm of the hit
+(RoutineActionHitPawn.cs:23-27) is dead in the shipped build — it compares
+`GameInfo.Instance.Olga` with the hit's `Target`, and the only callers of
+`RunToHitPawn` (Rottweiler.cs:741, 752) pass the Rottweiler; the port keeps
+the writer (`StopOlgaInfiniteLoop`) and the live `else` arm.
 
 ## Testing against the original
 
@@ -928,10 +968,14 @@ think-bubble disable and the face drain overlay. A `CanSee`/urgency latch
 kills a non-`Mother210` bar for the level (ProgressBar.cs:125-142).
 
 A data observation, not a divergence: the serialized `Duration` is only the
-fill-rate denominator. The bed's 29 sleep elements play ~0.52 s each
-(2 frames at 2 fps, `animationTime` starting at 0 and `ReachedEndFrame`
-being strictly greater — AnimationControllerBase.cs:103-141), so the dog
-wakes at ~50% of the L109 bar in the original too.
+fill-rate denominator. `Refresh` runs `ResetAnimationTime` after
+`StopSingleAnimation` has switched to the next element
+(AnimationControllerBase.cs:137-141), so every element after the first lasts
+frames/FrameRate — the bed's 2-frame 2 fps `BedSleep` a full 1.0 s, and the
+bar's [2, 31) window of 29 elements ≈ 29.0 s against Duration 29.3: the bar
+fills to ~99% and the neighbour wakes on the last element. (An earlier build
+ticked every pawn controller twice per frame — 0.5 s per element and a bar
+at ~50% when he woke; that was the bug, not the design.)
 
 `Item.OnSequenceIndexChanged` (Item.cs:2693-2726) rides the same step hook:
 the six `AnimationsToControl` tables hide/show the item — or another item —
@@ -985,6 +1029,706 @@ Rottweiler: at once if he is walking, else deferred through
 TrickItem.cs:243-249). The viewer feeds mouse deltas, freezes the camera
 and mutes clicks while `IsDexterityOn`.
 
+## The parity audit (docs/PARITY_AUDIT_PROMPT.md)
+
+Four passes over the decompile, the engine contracts it leans on, the level
+data and the reference footage. Everything found was either fixed against a
+named method or written down here.
+
+### Fixed in the audit, each against its source lines
+
+Rendering and data:
+
+- **Click hitboxes ignored the transform.** BoxCollider sizes are local:
+  the binoculars' box is (10, 4, 14.37) with scale (0.023, 1, 0.037), and
+  most items rotate X by 90° so the screen height is the local z. The port
+  used the raw x/y — the binoculars' hitbox covered half the level and ate
+  the fridge's clicks. Colliders now go through the world matrix
+  (`Level._world_box`); the binoculars land at 0.23 x 0.53.
+- **Quad textures resolved by bare name.** Four L201 chests all serialize a
+  texture literally named `ms_0000`; the cache landed them on L211's deck
+  rail and drew rails instead of the deck chair and chest (S1's workbench
+  had the same silent swap). The exporter now replicates the extraction's
+  collision numbering for quads, the Level fences and the item tip icons
+  (`ms_0000~3`...).
+- **`Level.OnGUI` fences** (Level.cs:322-341, LoadFenceSize cs:244-252):
+  L201/206/211/214 draw garlands and deck rails between the pawns and the
+  HUD (GUIDepth.LevelFence); 208/209 serialize `DisableFences`.
+- **`Item.OnGUI` interaction icons** (Item.cs:2740-2760) behind the HUD
+  info button's touch-hold (`ShowInteractionIcon`, HUD.cs:835-895) — 7-29
+  items on every level carry `ItemTipIcon`, drawn at `ItemTipIconDepth`
+  in the same depth-ordered pass as the sprites.
+- **`HideOwnerOnAnimationEnd` / `ShowChildRenderersOnEnd`**
+  (StopSingleAnimation, AnimationControllerBase.cs:226-233): 88 + 14
+  animations. Woody now actually disappears into the wardrobe at the end
+  of `Hide_In` — before this every HideItem (all 32 ship `HideWoody=false`)
+  left him standing visible next to it.
+- **The catch, the score screen and the outcomes**: `LoseAnimation`
+  (Woody.cs:1120-1127), the exit-door finish (Pawn.cs:1662-1665, gated on
+  the real `FinishedEntrance`), score-style text colors from the
+  serialized styles, the statue resting grey on frame 0
+  (InitializeHUDAnims starts only the three idle strips, HUD.cs:415-436).
+
+Movement and world state:
+
+- **`Door.DeltaExitLocation`** (Woody.cs:476) and
+  `DeltaMotherExitLocation` (Mother.cs:60): 196 doors place Woody at their
+  own exit offset over the base `DoorDistanceDelta` warp.
+- **`WoodyDeltaUseHeight`** (Pawn.cs:1690-1705) + `UseWoodyExtraDeltaHeight`
+  (Woody.cs:744-755, Item.cs:2286-2288): Woody's climb-arrival window on 77
+  items.
+- **Transition walk deltas** (Woody/Mother/Olga `CheckMoveLocationY`):
+  61 transitions shift the ComplexMove step per pawn.
+- **`Passable`** gates the end-of-step snap (Pawn.cs:1032-1035, 1725-1728);
+  `DisableOnStart` kills L214's captain-door pair; `IgnoreIdleAnimation`
+  doors (8) only exist on screen during a pass (Door.cs:157-160, 210-213).
+- **`MainValveOpen` is serialized TRUE** on L113's ValveMain: the
+  neighbour's first prime closes it (Item.cs:1352-1355), his use re-opens
+  it (TrickItem.cs:570-573) — the port had hard-coded False.
+- The crab zone reactions play INVERTED strips through
+  `Pawn.CrabAnimations` (Pawn.cs:1560-1596, SearchItem.cs:275-293), with
+  the NFH2 TrickItem pass gated on `!Primed`; the plain door-pass channel
+  stays TrickItem-only.
+- The Coal walk-in swap (Item.cs:988-1002), the CabinPhone urgent alarm
+  (Rottweiler.cs:869-877), `GoNextAction` read from data (L113's valves),
+  `PrimedMouseOverIconName` (Item.cs:1215-1218),
+  `TakeItemMultipleTimes` + `DoNothingWhileBeeingUsed` gates
+  (Item.cs:1415-1437), `SearchItem.OpenObject` (61 items visibly open for
+  1.5 s/1 s, SearchItem.cs:125-152, 250-268), `UseFixedStrings`
+  (Item.cs:2113-2118), and the Mother beats from where she stops —
+  RoutineActionMotherHitWoody never calls MoveToEmptySpace.
+
+Input, HUD, and timing:
+
+- **The full click contract** (Pawn.GetMoveDestination, Pawn.cs:556-714 +
+  the Woody overrides): own-zone doors are crossed (the cut-tail
+  StopAtExitDoor path), locked Transitions swallow the click, locked doors
+  refuse with Stand_Down and their description, floor items follow
+  CheckTargetItem/ShouldGoToItem with `WrongZoneTooltip`, a missed click
+  with a held inventory clears it and keeps the old route, and blocked
+  input buffers and replays (StoreBlockedInput, Woody.cs:642-656, 336-341;
+  `BlockWhenItemPick` locks without buffering on 181 items).
+- **The description bubble** (Item.ShowItemTooltip → HUD.DrawDescription,
+  HUD.cs:673-709): every refusal speaks — descriptions, InventoryTooltips,
+  NotPrimedTooltip, locked doors — cleared by MoveToGoal and FinishGame
+  (the occupied-bed and empty-wall lines cannot show: `TrickItem.CanWoodyUse`
+  refuses the slept-in bed and `Drawing.CanWoodyUse` the hidden drawing
+  before `base.CanWoodyUse` reaches `CheckDescriptionTooltip`,
+  TrickItem.cs:537-542, Drawing.cs:81-88 — `ItemInUseString` /
+  `EmptyDrawingString` are dead strings). 218 items carry tricked variants;
+  the Fuckedup/Compound/CheckDependsOn name overrides ride
+  TrickItem.cs:1164-1225.
+- **The two-stage inventory** (Current → Used, HUD.CheckClick
+  1309-1322) with the colored latched tooltip (UpdateTooltip /
+  MakePermanentTooltip, yellow 0.86/0.86/0) and door/exit-zone hover
+  tooltips (MouseCursor.cs:302-347).
+- **The Hello greeting** ends the entrance and its blocking end unlocks
+  the input (Pawn.cs:1064-1067, Woody.cs:304-312); the 30-second boredom
+  poses (Woody.FindInput, cs:612-623); the routines' 1.5 s DelayStart;
+  the postponed alerter flinch during a use (Woody.cs:1033-1044, released
+  in Update cs:232) and the FearRepeat loop after it (Woody.cs:343-353).
+- **Season 2's anger ladder** (Rottweiler.cs:613-693): the meter
+  accumulates `AngerAmount` (10..80 in data) with the extra-coin hacks,
+  levels pick the sets, and only overflow costs a tick — with
+  RottFreakoutHead (Random.Range(0,1) is always 0), the statue strip and
+  the whistle. Classic keeps the old two arms plus the audience laughs
+  (`Medium/BigLaughs`, Rottweiler.cs:805-818) and the HUD anger faces by
+  level (PlayRottweilerAngry), idling again when the strip ends.
+- **Sound**: MusicPlayer is ported — the entrance clap at load, the level
+  track after the 15 s first-run delay (MusicPlayer.cs:88-98), the caught
+  / success (perfect at a 100 rating) / failed jingles
+  (GameInfo.cs:304-390). `tools/fsb_to_ogg.py` rebuilds the FMOD-Vorbis
+  banks (40 clips; python-fsb5). The whistle sound rides
+  PlayWhistle (HUD.cs:1473-1481) from the compound tricks and S2 statues.
+- **The camera is free**, per the desktop contract (UpdateWindowsInput,
+  CameraMover.cs:110-165 — dead code on Android, but the desktop original
+  is the reference): 5 px edge scroll and arrows at Speed*(Sensibility*3)
+  with SpeedX aspect-scaled, HUD face clicks interpolate over
+  (MoveVelocity 0.5/s), FinishGame snaps to Woody and freezes
+  (GameInfo.cs:368-369), and the dexterity snap sits exactly on Woody
+  (CameraMover.cs:468-471 — no +0.6). The viewer's follow camera is off by
+  default; `F` re-enables it as a convenience.
+- Dexterity: the margin drain boost is dead in the original (FillSpeed is
+  unconditionally reset to 1 before the drain reads it,
+  DexterityComponent.cs:237-243) and the port no longer keeps it; the
+  DexterityRunOtherAnimation win plays the literal `N2TrickItemUseNormal`
+  (cs:374-379) — both carriers serialize UseNormal as NONE.
+- The whistle frame breathes: WhistleRects[i] averages the adjusted rect
+  with each frame's own pixels (HUD.cs:353-357). DescriptionStyle's
+  serialized ContentOffset (y=-10), Padding (4/4) and WordWrap now apply,
+  long descriptions use the big bubble (HUD.cs:995-1008), the Mother
+  levels park the tooltip in TooltipMotherRect (HUD.cs:611-614), and the
+  world progress bars draw beneath the HUD strip (BackHUD=12 vs HUD=11).
+
+### Documented divergences and dead data (with numbers)
+
+- **Trick camera**: a whole sleeping subsystem (Level.IsTrickCameraEnabled,
+  SnapToRottweilerImmediate, the HUD frame, the camera-shaped cursor). The
+  PlayerPrefs setting defaults off and `ForceTrickCamera` is false in all
+  28 levels; the settings menu is not modelled, so the port leaves it
+  unimplemented.
+- **The ExitConfirmation dialog** before an exit door is a menu widget
+  (Control*); the port ends the level directly on the pass.
+- **Dead fields with data but no reader in any .cs**:
+  `AlternateStartFrame` (11644 values), `OverridesTransformation` (56; its
+  only reader Pawn.cs:893 has no caller), `SlowAnimationsFactor` (=100
+  everywhere; nothing sets ShouldSlowAnimations), `AnimationAngryCollapse`
+  / `FixAnimationExtra` (on every Item), `PrimedOffset` /
+  `ChangeScaleWhenPrimed`, `MouseOverLockedIconName` /
+  `MouseOverSystemForTutorial` (no data), `Alerter.PoorSequenceSkates`,
+  `ArrowSignDepth` (0 scenes), `AudioInstantiate` (empty class),
+  `StatueAchieved` (set, never read), and ~35 more listed in the audit
+  notes (`docs/audit/pass{1,2,3}_*.md` — the raw pass reports).
+- **GameMode is Classic in all 31 scenes** — DrawLives and the Modern
+  scoreboard are dead; `HasFingerPressed`'s double-tap click gate and the
+  touch-only skip of the finale (GameInfo.cs:257-289) are touch-input
+  paths the desktop reference never hits.
+- The exporter now reads the built-in Camera and AudioSource payloads:
+  every playable scene serializes an orthographic camera of size 3.0 (the
+  four size-100 perspective ones are menu scenes) and every
+  LevelMusicSource ships loop=true — both asserted across the data and
+  consumed instead of the old hard-codes. The last FSB bank
+  (`na2_shout3pool`, PCMFLOAT) decodes to a float WAV in
+  `tools/fsb_to_ogg.py`, so all 41 clips play.
+- The click raycast picks the collider nearest the camera: hitboxes carry
+  their world z and items compete with doors on it, as Physics.Raycast
+  orders hits. Dexterity rects use the original's integer division
+  (600*190/800 = 142, not 142.5); the clipped styles (the clock, the
+  score fields, both tooltips ship m_TextClipping=1) crop their glyphs to
+  the rect.
+- The ProgressBar-vs-HUD Start order is settled: the bar's GameObject
+  ships inactive, so its Start — which copies HUD.RottweilerFaceRect into
+  PawnHUDRect — runs at the first in-game activation, long after
+  HUD.Start's AdjustRectangles. The port's adjusted rect is correct.
+- `Item.IsAtUseRange`'s walk-up arm skips its y-check for the DontUseOn
+  pawn — kept, as the original does.
+- Woody's transit locks the input for the span of a door pass
+  (PlayDoorLeaveAnimation, Woody.cs:459-463) and the arrival unlocks and
+  replays the buffered click (Woody.cs:471-488) — without the lock a
+  mid-pass click built a second route and the pass animation played
+  twice. Clicking the door he is standing on — the one he just came
+  through — passes it at once (ShouldExitDoorNow + UseDoorAtOnce,
+  Woody.cs:777-780, Pawn.cs:769-777, 1391-1397), and the first click
+  after leaving a hiding spot re-targets the wardrobe as a plain walk
+  (the WasHiding arm, Woody.cs:798-808). The door-exit frame runs the
+  stricter catch predicate — no sneaking escape, no Bed arm
+  (Pawn.HasNeighborCaughtWoody, Pawn.cs:366-388, wired at Woody.cs:495
+  and the zone-crossing watch). The four hit sequences pick at the
+  original's 26/25/25/24 thresholds, and the win freezes only the
+  neighbour until FinishAnimationEnded (GameInfo.cs:304-313).
+- The prime family closed out: PrimedMaterial swaps the first-aid quad to
+  'firstaid_open' (Item.cs:1236-1239), DisableColliderWhenPrimed /
+  DisableMesh kill the tatter's clicks and sprite (cs:1253-1261),
+  EnableColliderAfterPrime wakes L104's shelf pair (cs:1326-1329), and
+  the Flowers-with-knife pick converts the held knife and hands a fresh
+  one back (cs:1421-1426). The idle sequences play where flagged
+  (TrickItem.cs:698-731 — the Pig, the Airer, the bull, the carnivore,
+  the parrot ledge), DontPlayIdleOnStart keeps L109's Chili invisible
+  until first played (cs:214), IgnoreDependsOnWhenFixed frees the fixed
+  Pig's idle, BlockValveAfterFix re-arms L113's valves to demand a
+  balloon (cs:421-425), AnimateDependant echoes every PlayItemAnimation
+  onto the Dependant (cs:1046-1049), TrickItem.KidActions plays the
+  kid's sand-castle reactions (cs:632-653), and the Mother's think
+  bubble honors SpecialBubbleForMother (RoutineAction.cs:59-70).
+
+### The recorder and the moment suite
+
+`runtime/record.py` now drives a virtual mouse as real input (hover art,
+tooltips, the info-button hold), glides it between targets or on a
+`mousetour` across every item and door, and adds `pause/resume`, `dex`,
+`forcewin`, `follow` and `cam`. `tests/run_moments.py` replays seven
+moments — entrance, tooltips, the refusal bubble, the catch, the sleep
+bar, the forced win, the pause — and asserts each guarded class over
+`state.jsonl` (16 checks). Reference stills from the mobile walkthrough
+footage matched the port's anchors on the entrance, the held-inventory
+tooltip line, and the whole right edge (the grey statue, the x0 counter,
+the coin ladder) — the last after the statue-frame fix above.
+
+## The final audit (docs/FINAL_AUDIT_PROMPT.md)
+
+Six passes over what happens *in time* — the flag lifecycles, an input monkey
+with invariants, the trick matrix, name twins and silent defaults, the frame
+timings against the footage, and the reverse audit of runtime/ — after the
+parity audit above had checked what was written. Counters and the per-pass
+verdicts are in `docs/audit/FINAL_AUDIT.md`; the verified per-area reports
+(every claim with its C# lines, the port lines before/after and its check)
+are `docs/audit/verified/*.md`; the drafts they were verified from are
+`docs/audit/raw/`. The regressions: `tests/run_moments.py` (the moment suite
+plus every `tests/checks/*.py` module), `tests/monkey.py --all` (the monkey,
+28 levels × seeds × 180 s), `tests/run_tricks.py --all` (28 trick plans).
+What the passes fixed, by area — each against its lines:
+
+### The animation core
+
+- **Every pawn controller refreshes once per frame** — the port ticked a
+  pawn's AnimPlayer twice (once in the players pass and again from
+  `Pawn.tick`), so every pawn animation ran at 2× its FrameRate: the sofa
+  sequence in 8.5 s instead of 17.0, the sleep in 14.7 s instead of 29, the
+  lap in 35.8 s instead of 47.9 (AnimationControllerBase.cs:172-189).
+- **`UsePattern` gates the pattern** (AnimationInstance.cs:66-76, 186-234):
+  262 instances carried a stale `Pattern` next to `UsePattern=false` (L113
+  LadderTestTransition: 15-16 vs a 40-frame pattern) that the original never
+  reads. `UsePattern` with an empty Pattern (36 instances: PutEel ×14 whose
+  PatternFile is a GUID stub the build never shipped, Olga's stand-infinite
+  poses, L101 SitSurprise) ends a single on its first step and holds sheet
+  frame 0 when looping. A pattern animation draws `Pattern[index]` unclamped —
+  4557 of 6260 pattern animations ship an EndFrame below their entries (L209
+  FireFakir's idle: 127 entries, EndFrame 0), which the port used to clamp to
+  (cs:228-234).
+- **A frame past its sheet.** `DrawAnimation` never checks `CurrentFrame`
+  against the sheet; a Single that ends with nothing set after it keeps
+  advancing, and `Graphics.DrawTexture` samples the out-of-range source rect
+  by the texture's wrap mode — Repeat wraps the row back onto the sheet, Clamp
+  smears the texture's bottom edge row over the cell (cs:153-170).
+  `draw_sprite` emulates both from `textures/<season>/wrap.json` (each PNG's
+  `m_WrapMode`, written by `tools/extract_textures.py`; `--wrap-only`
+  refreshes an old extraction): S1 1253 clamp / 325 repeat, S2 1743 / 692.
+- **StopSingleAnimation's two tails** (cs:234-246): a real
+  `PlayAnimationSequence` ends in `OnAnimationSequenceEnded` /
+  `StopCurrentAction` and never stands; a single ends in
+  `SwitchToStandAnimation` in the same Refresh unless a delegate returned
+  true — the arms that do all start something (an animation, the stored
+  click's move, the finish, the FearShort→FearRepeat loop, Woody.cs:330-353).
+  The port used to skip the stand whenever a callback was attached and drew
+  the past-the-end cell for 1/FrameRate (the Hello's Stand_Down came 0.083 s
+  late against the footage). `PrevAnimState` is never written in the original
+  (PawnAnimationController.cs:165-172 sits behind a `Type == Looping` test the
+  strict Single lookup cannot pass), so the stand after any bare single
+  (idles, NoNo, Hello, the win/lose pose) is `StandDownAnimation`; a Looping
+  current resolves by its own name (Walk/Stand/Run/RunWC families, WaitWatch,
+  WaitInFear), and the original throws "Stand with nothing before" on other
+  loops (pie/fifi/ski/bowling walks) — the port keeps the last facing's stand
+  there.
+
+### The clock, the finish and the HUD
+
+- **`GameInfo.Update`** runs in the original's order — the neighbour's catch,
+  the Mother's, the all-tricks win, then the clock — behind `!GameEnded &&
+  !GameEnding` (GameInfo.cs:212). The moment `CompletedTricksCount >=
+  TotalTricksCount` is seen, `GameEnding` is set and the 2.5 s
+  `WinGameAnimations` coroutine starts (cs:292-302): the clock stops, no catch
+  can fire, the HUD answers only the power button — but Woody's own clicks
+  stay live (`CheckMouseClick` gates on `Woody.Frozen`, Woody.cs:637), so he
+  can walk and even use an item during the wait. `PlayWinAnimations` then runs
+  `FinishGame` (cs:358-371: the neighbour drops the cake, `Woody.Freeze` +
+  `InputLocked`, the bubble closes, the camera snaps and freezes,
+  `CalculateScore`), Woody's `WinAnimation`, `Rottweiler.Freeze` — the pawn's
+  own freeze, `SwitchToStandAnimation` + `PauseMovement` (Rottweiler.cs:
+  1095-1099), not the routine's — and `PlaySuccess(perfect: true)`. `GameEnded`
+  (the score board) comes only from `FinishAnimationEnded` (cs:343-356) at the
+  end of the pose: the sleep bars are disabled (`DisableAllProgressBars`,
+  ProgressBar.cs:303-307) and Woody, the neighbour and the Mother freeze. The
+  clock running out is `TimeUp = true` + `FinishGameOnHUDClick` (cs:241-249,
+  373-390) — `Won` is untouched: a player past `WinningTricksCount` still gets
+  the success jingle and the EXCELLENT/GOOD/PASSED band; TIME UP is the `!Won`
+  band (cs:438-465). `Woody.PlayFinishAnimation` (Woody.cs:1104-1128) defers
+  mid-door-pass until the arrival (cs:490-493) and, hiding, leaves the spot
+  first and rides the leave animation's blocking end (cs:331-334); an
+  exit-door pass finishes AFTER the ExitAnimation loop (Pawn.cs:1652-1665).
+  `ForceWinGame` (`forcewin` in the recorder) is the tutorial's immediate win:
+  all tricks, `FinalTrickScore = 100`, `WinImmediate` (cs:315-321).
+- **The tooltip line**: every write is `SetTooltip` (HUD.cs:1024-1060,
+  latch-gated, GoTo renders empty), and `DrawHUD` clears an unlatched line
+  after every draw (cs:646-649). Every non-icon click runs
+  `SetUsedInventory(CurrentInventory)` unconditionally (cs:1320,
+  Woody.cs:1062-1073) — the used inventory lives for exactly one click — then
+  `UpdateTooltip` latches the current arm in yellow unless it is GoTo, dropped
+  again when nothing (Item or Door) sits under the cursor (cs:1321-1327); the
+  latch clears when the walk ends (`Woody.OnPathFinished`, cs:361-362) or the
+  item use runs its tail (`Item.UseItem`, Item.cs:1916) — a silent refusal
+  (no NoNo, only the bubble) never sets `UseCompleted`, so the item step stays
+  open and the latch survives until the next click. Only `CurrentInventory`
+  draws pressed and drives the use-inventory cursor (MouseCursor.cs:362-373);
+  its line is "Use X with <hovered item's name>" (cs:942-955); an unselected
+  icon under the cursor speaks "Use X with nothing" (cs:962-967); the 1 s
+  bubble needs a DescriptionString (cs:991). `OnInventoryAdded` pages to the
+  newest item, `OnInventoryRemoved` clamps with the pre-removal count
+  (cs:898-914, InventoryManager.cs:20, 53). The angry meter repaints at 10 Hz
+  (cs:1240-1248). The recorder's `inv N` and the viewer's digit keys stage
+  `CurrentInventory` (the icon click); the next world click promotes it.
+- **Font sizes come from the screen, not the face**: `HUD.Start` sizes each
+  style by `LevelDataGUIRenderer.CalculateFontSize` — `((W/1024)+(H/768))*10`
+  truncated, minus the style's adjust (HUD.cs:335-342, cs:177-191); at 800×600
+  the clock is 18, the tooltips and score fields 13, the rating 15, the
+  description bubble `W/1024*13` = 10, the sleep bar's percentage `+3` = 18
+  (ProgressBar.cs:79). The size baked into the face name (acmesa22,
+  bluehigh18) is the asset's, which the runtime overrides — the port drew
+  22/18 px.
+- **The music anchor**: the clap and the 15 s `Invoke("PlayMusic")` start at
+  the scene load (MusicPlayer.Start cs:43-51, Level.Start → LoadSettings,
+  Level.cs:295-297), and the `IntroAnimation` title cards run for the seven
+  serialized stage times — 7.79 s on Level101 — before `StartGame`, the
+  port's t=0 (IntroAnimation.cs:86-112, 278-315). The port resumes the clap
+  7.79 s in and arms the track at 15 − 7.79 s; the reference measures 7.08 s
+  from StartGame to the track — the seven `WaitForSeconds` add the device's
+  frame latencies (~0.14 s at 30 fps), which a fixed 60 Hz clock does not.
+  `StartGame` also plays the `EntranceSound` (levelstart, 7.78 s) on its own
+  `EntranceSoundSource` (`PlayEntranceMusic`, MusicPlayer.cs:122-135) — the
+  level track starts under it; the port gives it a second reserved channel.
+  Detection needs `ActionManager.CurrentAction` (GameInfo.cs:183-196): none
+  during the 1.5 s DelayStart. `Door.Unlock` never changes the zone graph
+  (ZoneController.cs:8-28 builds it once).
+
+### Woody's input and movement
+
+- Standing on the door he just came through (AtDoorLocation + LastExitDoor),
+  any click whose path starts back through it passes at once from the doorway
+  — ShouldExitDoorNow + UseDoorAtOnce (Woody.cs:777-780, Pawn.cs:744-780,
+  1391-1396, 1412-1416); a pawn off the floor at a door's x climbs to it
+  directly (ShouldWalkDirectlyUpToDoor, Pawn.cs:785-788). Both ride the path
+  build in `Pawn._route`; MoveToDoor's per-frame IsOtherPawnPassing wait
+  (Pawn.cs:1359-1364) covers the climb too. A door click still runs
+  `GetMoveDestination` + `MoveToLocation`: `ItemAux = null` (Pawn.cs:595) and
+  `InitializePath` replaces the path (cs:480-498) — the pending item use of
+  the previous route dies with it (the monkey caught a wardrobe click,
+  overridden by a door click, firing its hide + `SetWoodyXOnUse` teleport at
+  the end of the door pass, across half of Level105). UseDoorAtOnce is reset
+  per path here; the original only ever consumes it — an arm abandoned
+  mid-wait would ride into the next path (and double-play a flat door,
+  cs:1384-1396). Not reproduced.
+- The walk-through stairs: a pair held by another pawn parks the arriving pawn
+  standing on the first approach — TransitionEnter is assigned before the
+  claim (Pawn.cs:1004/1014, 1022-1027). Every stand switch while
+  DonePassingToOtherZone && NFH2Path drops GoZone/DoorClicked/the flag
+  (PawnAnimationController.cs:86-95), entering a path's last step restamps
+  the y-thresholds and drops it (Pawn.cs:1100-1104), and CrabAnimations drops
+  it on door passes too (Pawn.cs:1566 via PassDoor). While the flag is
+  latched, clicks are swallowed (Woody.cs:659-662): the mid-stairs re-route
+  shapes only ever run off a replayed stored click, in both games.
+- The click contract: the S2 sneak toggle only flips MbSneakToggle
+  (ToggleSneak, Woody.cs:1151-1163) and StartMoveToLocation forces Sneaking
+  off on the NFH2 path (cs:717-720) — the S2 sheets have no Walk_* strips (the
+  port crashed on a sneaking S2 walk). A click during the literal Hide_In is
+  dropped, not stored (Woody.cs:642-651); the other dive poses unhide and
+  replay. A paused game drops world clicks after the HUD (timeScale gate,
+  cs:637); LastInputTime stamps past the gates (cs:641). Season 1 re-runs
+  ProcessMoveInput when the current step's Target is a Door (cs:668-671),
+  which is how a click during a door climb gets processed there. The
+  WrongZone bubble speaks only for the floor-item refusal
+  (WrongZoneDescritionTooltip, Pawn.cs:615), the door refusal is a bare NoNo.
+  Sneaking Woody climbs with Walk_Up/Walk_Down (PortalSneak*, Woody.cs:64-66,
+  952-968). A `BoxCollider`'s size is its half-extents in magnitude — the
+  serialized negative sizes (L106's Pudding height, L210's ElephantCricketBat
+  width) still hit; and `BoxCollider.enabled` ships off on 221 items (every
+  SlipperyGround strip, L104's ApplePie until its round trip, L105's Football
+  until alerted, L114's Pipe until primed, the S2 fences and props) —
+  `Physics.Raycast` never hits them, `Item.clickable` starts from that byte.
+- The dexterity minigame: the frame after the win `Woody.Update` re-runs
+  TryUseItem on the same step (DexterityDone && !DexterityAux, Woody.cs:
+  218-222); CanWoodyUse's DexterityDone branch then unlocks, spends the
+  unlocker (unless the keep flags say otherwise), clears the three flags and
+  falls straight past the refusal cluster to the tail (Item.cs:1462-1474 →
+  1704-1730) — the take follows without a second click.
+- Door strips: each pawn class plays its own Door pair — Woody, the
+  Rottweiler, the Mother, Olga (Door.cs:85-139; Mother.cs:63-73,
+  Olga.cs:94-104); Olga's ship NONE everywhere, the base Pawn plays none. The
+  8 S2 DoorBacks serialize IdleAnimation NONE + IgnoreIdleAnimation and keep
+  their pass strips (W_Disappear/W_Appear, N_*, M_*): the controller is a
+  hidden sprite between passes — before this every S2 door pass was an
+  invisible warp for everyone.
+
+### The neighbour's routine, urgents and alarms
+
+- The two parked runs are separate slots, as in the original: the
+  alerter/notice run (`Rottweiler.ShouldStartSurpriseActionFar` +
+  `SurpriseActionFar.Item`, cs:88/271/305; `Routine.pending_surprise`) and the
+  phone alarm (`PendingAlarm`/`PendingAlarmItem`, cs:96-98/1043;
+  `Routine.pending_alarm`). `CheckSurpriseActionFar` (cs:1139-1148) releases
+  the first — from `ContinueAlarm`, from `OnChangeZone` behind
+  `CanCheckSurpriseActionFar` (`IsFixingBlockingItem`: a Grab/UseFixingItem
+  step or the walk toward one with PostponeAlarm), and from every non-mutex
+  Rottweiler use stop (RoutineActionUse.cs:358-362); `CheckPendingAlarm`
+  (cs:231-240: not postponed, not passing a door) releases the second as
+  `MoveToAlarm` — the AlarmAction's full use — from the same use stops, the
+  SurpriseFar/SurpriseNear stops, `OnChangeZone` and the AlarmNextAction gate.
+  Both stops fire from inside `StartAction(next)` (ActionManager.cs:157-160),
+  so a released run interrupts the action that was about to start and resumes
+  it afterwards. `IsAlarmPostponed` (cs:1047-1070) is the whole six-arm
+  predicate over the running template: SurpriseNear always; SurpriseFar and
+  Grab by their PostponeAlarm; the interposed move by the target action's own
+  bare PostponeAlarm; a use by `PostponeAlarm || PostponeAlarmDuringUseOnly ||
+  Item.IsTricked()` — Level105's four actions ship PostponeAlarmDuringUseOnly,
+  and every tricked use postpones. Two quirks kept as the code has them:
+  `HearAlerter`'s tricked-item exception (cs:272) dereferences the
+  MoveAction's Item, which is never set (ActionManager.cs:23), so a bark heard
+  while *walking toward* a postponed action throws out of
+  `Alerter.CoRoutineRottweilerHearAlerter` and is lost; and `!PortalMove`
+  postpones a bark heard on the walk-up climb/descend, not just the door pass.
+- Urgents nest as the original's `OriginalAction` chain (ActionManager.cs:
+  679-718): a run landing on a running one stashes it (`Routine._urgent_stack`)
+  and `StopUrgentAction`'s `StartAction(OriginalAction)` (cs:647) replays it —
+  a Grab replays its GrabSequence, a UseFixingItem its TryUseFixingItem, the
+  Return leg its ReturnSequence, an alerter run or toilet run its whole run;
+  the exceptions are the running SurpriseNear (cs:681-691), the chain
+  hand-overs (692-710), a ForceUseOriginalAction carrier (711-714 — L110's
+  UseFixingItemAction: the chain is abandoned with the tool in hand and the
+  next visit fixes with it, Item.cs:854-857), and the same template restarted
+  on itself (cs:679). Before this the port collapsed every nested urgent onto
+  the routine action, and a bark during the L110 fetch left `_fix_tool` set
+  for good. Not reproduced: the original loses a parked alerter run when the
+  resumed action needs no walk (ActionManager.cs:161-170), a bark parked
+  during a tricked toilet-rush use fires *before* the toilet run there
+  (cs:157) but after it here, and a phone alarm during the WaitInFear
+  interrupts it there and replays the fear loop for good (cs:715-718 + 647) —
+  the port parks it and resumes the routine.
+- The urgent templates run or walk by their own `Urgent` flag
+  (RoutineActionMove.cs:68-75 → `MoveToGoalUrgent`, Pawn.cs:444-448):
+  SurpriseActionFar and ToiletAction run in every scene, the AlarmAction walks
+  (the CabinPhone hack sets its Urgent for good, cs:872-875), the fetch runs on
+  L110/L113 and walks on L111, the Return leg walks everywhere, Olga runs to
+  her hit and the Mother walks to hers except on Level210. Level102's
+  ToiletAction carries `ContinueToNextAfterFinished`: its end is a plain
+  advance (ActionManager.cs:530-538). A `Duration` that runs out (L110's Beer,
+  1.0 s) is a bare `Finished` — but its `TakeGround` drains in 4/7 s first, so
+  the branch never fires in the shipped data.
+- The Dog/Chili run is watched by `RoutineActionMove.SameZone()` on every
+  `ActionManager.Update` (ActionManager.cs:442-448; RoutineActionMove.cs:105-
+  128): the first frame he stands in the pet's zone off a door latches
+  `RottPos` and `RottLastDoor` (Pawn.cs:1644-1647), and — every door of the
+  Dog/Chili levels serializing `RottweilerExitLocation` (0,0,0) — that same
+  frame switches the run: the surprise plays where he landed, `Finished &&
+  SameZone` walks him (the plain MoveToGoal) to the pet, and within 0.05 the
+  "Angry" yell of `SurpriseSequenceLeft` runs, whose end (Rottweiler.cs:
+  485-510) sends him to a raw-tricked DirtyCarpet in the zone — the fetch of
+  the vacuum (Level111's Vacuum trick was unreachable while the port only
+  took the shortcut for a neighbour already in the pet's room). A neighbour
+  who has never passed a door has no `RottLastDoor`: cs:121 throws in Update
+  each frame and the manager is dead — he walks to the pet and stands — until
+  the next StartUrgentAction retargets the MoveAction (Level113's neighbour
+  starts in the dog's zone; the port reproduces the stall). `UpdateWalking`
+  (Rottweiler.cs:833-849) runs on every walk, urgent runs included: the toilet
+  rush past a tricked NoticeWhenWalkNearby item starts the near surprise,
+  which chains the run as its OriginalAction and resumes it; the
+  ToiletAction / AlarmAction stop angers at `GetTrickedItem`
+  (RoutineActionUse.cs:548) — Level102's loo visit pays the toilet on the way
+  and the ToiletPaper on the seat.
+- `AdvanceActionIndex` (ActionManager.cs:566-584) wraps to the start index,
+  else to `ActionSelectedIndex` only with `LoopFromSelectedIndex`, else 0 —
+  Level206's Mother (LoopFromSelectedIndex false, ActionSelectedIndex 3)
+  replays her whole lap; `StopOlgaInfiniteLoop` clears the flag (Item.cs:2602).
+- Season 2's anger ladder: `Item.Fix` opens by clearing `Rottweiler.TrickedAux`
+  (Item.cs:2065), so a re-angry on a fully scored linked pair (cs:650-652) only
+  latches the meter until the next fixed trick; `CanDecreaseAngryMeter=false`
+  is Classic-only (cs:793-796, and ActionManager.cs:588-591's release) —
+  Season 2's meter keeps decaying through the angry set; the compound
+  statue/whistle of cs:702 is `!NFH2Path`-gated. `RoutineActionUse.StopAction`'s
+  angry gate is `Item as TrickItem` (cs:419) — the Drawing (L107) and the Rake
+  (L202) go angry like any TrickItem (the port's `kind == 'TrickItem'` test
+  missed the subclasses; every such test is `TRICK_KINDS` now). The animated
+  angry never rushes to the toilet: `OnAnimationSequenceEnded` runs
+  `FixTrickedItem` (cs:460, nulling `TrickedItem`) before `CheckRushToToilet`
+  (cs:478-484); only `AngryWithoutAnimations` items rush (cs:721) — every
+  `RushToToilet` carrier ships it.
+
+### The items
+
+- Two kinds of use. Only a TrickItem or SearchItem defers `UseItem` to the end
+  of Woody's animation (`ShouldUseAfterAnimationFinishes`, TrickItem.cs:
+  263-266, SearchItem.cs:121-124); every other kind runs it at once
+  (Item.cs:1865-1871) and the animation ends into nothing (Woody.cs:412-444) —
+  GroundItem and InspectItem never get that far: their `CanWoodyUse`
+  overrides stand, show the description (InspectItem's primed variant once
+  `ItemThatChangesTooltip.GotTricked`) and refuse (GroundItem.cs:3-8,
+  InspectItem.cs:5-22) — the port used to trick every SlipperyGround and the
+  carnivorous plant on a click. `Item.UseItem` (Item.cs:1879-1917) is one
+  shared body — the Dove/CowCrap/Rabbit hacks, `Used`, `InternalUse`
+  (HideAfterUse/ShowAfterUse, HideDuringWoodyAnim, the RubyThrone drop, the
+  BlockWhenItemPick unlock with its buffer clear, the post-dexterity unlock),
+  `ClearTooltip` — and the SearchItem take runs it too
+  (SearchItem.OnFinishAnimationCompelted, cs:114-119), through
+  `SearchItem.InternalUse` (cs:156-212): the KeepFull/TakeItemCount head, the
+  source stamps (`AssignFirstInventoryOnly` stamps the first entry alone —
+  L112's SportsBag, L114's DeskDrawer), the hand-over, `DisableColliderAfterUse`
+  (41 S2 items), the IceBucket re-arm, `AcquiredInventoryCount`, the emptying
+  (`!DontRemoveInventoryItem && !DexterityKeepItem`, else `ItemRemoved`),
+  `TrickAfterWoodyUse`, then the empty pose through SearchItem's own
+  `PlayItemAnimation`. The empty re-click runs the same tail after WhatsUp
+  (Woody.cs:409). `SetCloseTime` runs only on a `SearchingItem`
+  (SearchItem.cs:143): the 19 `SearchingItem=False` openers — the pin boards,
+  the toilet-paper holders, the bins, the mobile, the soil bag, L201's soap
+  chest — open and never close; a searching drawer re-closes after 1.5 s, or
+  1.0 s once a take has landed. The trick tail's idle switch is
+  TrickItem.cs:357-379, not `ReturnToIdleAnimation`: a compound item plays its
+  tricked idle until CompoundTricked, then `CompoundDoubleTrickedAnim`; else
+  the raw `Tricked` flag picks the tricked idle — a Neutral item too (L104's
+  deodorant shows its hair). `OnTrickDone` pays through the virtual
+  `GetTrickScore` (a compound-tricked compound item pays `CompoundTrickScore`,
+  L114's Shotgun 13 over 10) and a fresh linked pair with
+  `ExtraCoinLinkedTrick` pays a second time (Item.cs:2143-2146; L207's
+  SandCastle counts three). `ActivateItemTrick`'s target plays
+  `PlayIdleTrickedAnim` outright and the ElephantBucket rewrites its normal
+  idle (TrickItem.cs:326-331); `ActivateItemAfterUsingObject` retargets every
+  routine action on "CaptainControls" and activates after
+  `DelayActivateItemAfterUsingObject`, dropping the LinkedItemTrick
+  (cs:333-351, 382-389 — L214's grog: the CaptainWheel 11 s later).
+- Priming: `WasPriming` (Item.cs:398) is the flag that keeps a prime/unprime
+  visit from counting as a tricked use: `RottweilerPrime` /
+  `RottweilerUnprime` raise it (Item.cs:1330, 1361), every `RottweilerUse` head
+  clears it (cs:835), `IsTricked()` ends in `&& !WasPriming` (TrickItem.cs:260),
+  `OnUseEnded` keeps the primed pose after a prime leg (cs:691) and StopAction
+  picks `RottweilerPrimeExitDelta` over the use delta (RoutineActionUse.cs:
+  458-480) — the port never wrote it. L111's washing machine tricked while
+  unprimed: the prime visit ends calmly, the use visit (`IsUsing`) pays the
+  angry, the unprime visit resets the idle at its start (TrickItem.cs:
+  1052-1057). `DoNothingWhileBeeingUsed` reads `IsUsing` itself
+  (Item.cs:1429) — L114's gramophone refuses Woody for the whole use→unprime
+  stretch. `TrickItem.SetPrimed` and `ReturnToIdleAnimation` play through
+  `PlayItemAnimation` (UseAnimationType → PlayAnimationDirectly, so a Looping
+  strip loops; NONE hides a HideWhenNotAnimating item — L113's FuseBox drops
+  its FusePlaced strip while primed). `TrickItem.Fix`'s pose tail
+  (cs:457-471) replays the primed pose of a still-primed item and disables the
+  ElectricTrap's controller for good. `Pawn.ElephantAnimations`
+  (Pawn.cs:1536-1558) is ported: with L208's primed AngryElephant
+  (`Woody.ItemBehavior`), Woody's first zone change to another zone plays the
+  elephant's primed-then-idle pair and locks the SafetyLine again, once, until
+  the Mouse arm re-arms it (Item.cs:1581). The L210 Valve's `N2TrickItemExtra1`
+  ends into `WaterPuddleBehavior` (TrickItem.cs:1240-1251): the puddle's
+  collider comes on and it shows `N2TrickItemIdleNormal`. The WaterPuddle
+  name-hack negates `DeltaLocation` and `FinalDeltaLocationNormal` at every
+  SetPrimed — including `Item.Start`'s, so L201's serialized +0.6 is -0.6
+  from the first frame.
+- Zones and crabs: `SearchItem.PlayItemAnimation` (SearchItem.cs:68-89) is
+  the crabs' own twin — no Animating gate (that field is TrickItem-only), an
+  unconditional unhide, the Looping flag — and `Pawn.CrabAnimations` uses it
+  (L202/L207's crab strips never played before); the TrickItem lists ride
+  `PlayZoneEnter` (IsTricked gate) / `PlayZoneLeave` (raw Tricked, unhide
+  first), both through `TrickItem.PlayItemAnimation` so L110's BBQFullSmoke
+  keeps its Looping type. `TrickItem.KidActions`' SandSculpture arm animates
+  `Item.Kid` — the L205 OlgaKid TrickItem with its item-side sequences — while
+  the SandCastle arm animates the Kid pawn (the port bound both to the pawn).
+
+### Assets, data and defaults
+
+- Every texture and clip the runtime draws is named after the file the
+  extraction wrote, and the extraction numbers repeated `m_Name`s `name~2`,
+  `name~3` in serialized-file order. PPtr fields resolve through the pointer
+  in the exporter; animation sheets are `Resources.Load` strings and are
+  resolved through the ResourceManager container into `SheetTexture` (null
+  when the container has no such path — S1's Mother door strips, L213
+  BoatPicnic's boat_rent/boat_unmount: the original loads nothing there
+  either, the animation still runs and draws nothing). 23 Season-2 sheet
+  references (18 level/sheet pairs) landed on a same-named twin before —
+  L212's live bull drew the 109x72 `bull` bubble icon instead of `bull~2`,
+  L202's rocks took L211's deck rail (`ms_0000` for `ms_0000~8`); the Mother's
+  face, the sleep-bar strips and the camera icon had the same twins.
+  Details and counts: tools/README.md, docs/audit/verified/assets_refs.md.
+- Silent defaults: the exporter writes every serialized field, so a port
+  default only ever bites when an `or` replaces a serialized 0/false/''.
+  543 default-bearing reads audited; the ones that masked data are fixed —
+  `ItemUseHeight` (532 zeros; Pawn.cs:1118 reads it raw) and
+  `RoutineAction.MaximumPawnDistanceToAction` (81 zeros) are taken as
+  serialized, `Door` carries `WoodyDeltaUseHeight` / `UseWoodyExtraDeltaHeight`
+  / `CanUse` / `DontUseOn` like the Item it is (six L212-L214 DoorBacks widen
+  Woody's climb window by 0.2-0.4, Pawn.cs:1330/1412 → 1690-1705), field
+  defaults equal the C# initializers (Item.cs:220/236/246/392/432, Pawn.cs:
+  203-209, CameraMover.cs:21-27, GameInfo.cs:43, Level.cs:38-40). Open, with
+  0 carriers: `FrameRate = -1f`/`0` (AnimationControllerBase.cs:146: -1 =
+  advance every Refresh, 0 = frozen) never occurs in the data (0 of 12374).
+- Zone graph and paths: the graph is `ZoneController.Start()` minus the
+  `|| TemporalLock` arm: 22 TemporalLock doors exist, all in the three S1
+  intros (20 of them Locked), none in the 28 playable levels; there `LinkNodes`
+  refuses the Locked door anyway, so every intro zone pair yields the same null
+  path. `find_path` is a BFS: the route LENGTH equals `Helpers.GetShortestPath`
+  on all 786 reachable ordered zone pairs; 66 S2 pairs (the opposite corners
+  of the 4-cycles) have two shortest routes and the original's pick depends on
+  `FindGameObjectsWithTag` order plus Mono's unstable `List.Sort` — the port
+  takes the first door in scene order. The click raycast orders items and
+  doors by the near face of their world box (`z - dz`), which is what
+  `Physics.Raycast`'s hit distance ranks; 113 of the 667 XY-overlapping
+  collider pairs would order differently by centre.
+- Reference shorthand: comments cite the original three ways — the full
+  `File.cs:NN-MM`; the short `cs:NN` (the file is the one named by the
+  enclosing class/def docstring); or by member name
+  (`AnimationInstance.SetStartFrame`). A grep for `\.cs:\d` alone undercounts
+  by an order of magnitude.
+
+### Season 2's start and the last plan findings
+
+- **Season-2 start.** `Pawn.FinishedEntrance` is serialized (Pawn.cs:119):
+  every Season-2 level (and the S1 intros) ships Woody's TRUE, the 14 S1
+  levels FALSE. With it true there is no entrance walk — `Woody.Start` leaves
+  the input unlocked (`InputLocked = !FinishedEntrance`, Woody.cs:191),
+  `Woody.Update` never arms the EntranceTimer (cs:223-231), `TakeNextStep`
+  never plays HelloAnimation (Pawn.cs:1064-1067; the S2 sheet has no
+  `Hello`). `IntroAnimation.StartGame` (cs:300-304) locks the NFH2Path Woody
+  and plays `HelloAnimationNFH2` = `Entrance` (Pawn.cs:213; 11 frames,
+  10 fps, not Blocking) whose single end unlocks him (Woody.cs:372-375). The
+  port's Level210 "walk-in catch" was that invented walk-in (StartLocation
+  Zone02 → EntranceLocation Zone01) meeting the neighbour's DeckChair walk.
+- **AddInventoryToObject** (Item.cs:1791-1810): the L208 snake and elephant
+  rounds (cs:1559, 1582) refill the emptied Mouse (its own InventoryToAdd)
+  with a fresh IT2_Rat when its InventoryItems is null; TakeItemCount 20
+  keeps the dexterity game (cs:1466-1469); both rat tricks pay in one game.
+- **InventoryManager.InventoryItems** (InventoryManager.cs:5): the serialized
+  starting inventory — Level209 alone ships the pen knife
+  (`FirstInventoryItem`, HUD.cs:972-978 initializes it on the first draw).
+- **MotherWakeSleepBehavior.ProgressBarDelay** (cs:33/40, 46-52): 2 s after
+  MotherLookLoop the L210 Mother210 bar's `RestoreVariables` re-arms
+  `ExecutedOnce`, so her IsSleeping window opens every lap (6.5-25.9,
+  64.9-84.3, 99.6-119.0 …); the bar's own end never deactivates a Mother210
+  bar (ProgressBar.cs:164-172).
+- **MotherSleepBehaviour.ForceSleep / ForceSleepAfterTrick** (cs:73-88): the
+  Get* getters stamp CurrentAnimationSequence (MotherSecondUse /
+  MotherExtraUse, Item.cs:936-940, 977-981) — L214's DeckChairMother bar
+  window; the tricked arm reads the raw MotherUseTrickedAnimation
+  (MotherSleepLoop) with no stamp. The forced sequence's end still stops her
+  current action (AnimationControllerBase.cs:242-246: the controller's
+  ActionManager, not the call's). Her bar object is re-activated by every
+  MotherUse (Item.cs:1108-1116), so the L214 window repeats each lap
+  (61-119, 165-223, …).
+- **L214's captain cabin.** The DoorBack pair ships active with
+  DisableOnStart (Door.cs:63-66); ZoneController.Start keeps the
+  Zone03↔Zone05 edge (`Item.CaptainDoorBehavior`, Item.cs:2606-2623,
+  re-activates both and retargets his CaptainDoor action at CaptainControls
+  in Zone05); while inactive, LinkNodes finds no door and FindPath is null
+  (Helpers.cs:194-205, 243-248) — `Level.find_path` refuses a disabled door
+  the same way. The 6th L214 count (CaptainMug / Captain: no neighbour use,
+  no linked pay) is dead by data; winning=4. Level211's FishingRod is
+  unreachable by data too: its whole XY box lies inside the Zone04
+  TransitionDownwards box and the door's near face (z -4.466) beats the
+  rod's (-4.05) on the camera-plane raycast (Pawn.cs:403, Woody.cs:708);
+  7/8 (winning 6). `Level208Behaviors.CowGetUpAux1` (cs:71-80, 112-115)
+  never clears after the neighbour's first CowRide: every animation switch
+  of his forces the cow to IdleNormal (AnimationControllerBase.cs:380-385),
+  so the crap window (frame 27 of the primed pose, cs:118-131) needs the
+  prime before his first ride or a 2.8 s span without a switch.
+
+### The quads' texture window
+
+A quad's material carries `_MainTex_ST` — the Plane's 0..1 UVs sample
+`uv * scale + offset` — and 41 of the 267 quads use it: L101's Binoculars
+shows the (0.625..0.70, 0.34..0.52) window of a 256×256 sheet (the port
+drew the whole texture into 23×37 px — a speck), the Open_Chest 0.95×1,
+L103-106's MumSmeared 1×2.5 from v=-0.9, L102's Beer 1.2×1.5. The exporter
+now emits the window as the quad's `uv` (tools/export_level.py
+`_quad_texture`, tools/assets.py `read_material_maintex_st`) and
+`draw_quad` blits that source rect; the six windows that leave the texture
+all sample Clamp textures, so the outside bands repeat the edge row/column
+(3×3 bands at most). Viewer conveniences added at the same time (viewer
+decisions, no game counterpart): a single level on the command line —
+run.sh's default — still gets `[` `]` over its season's siblings, and the
+score screen's OK opens the next level of the list (the original goes to
+the level selection menu, LevelLoader, not modelled).
+
+### Documented, not reproduced
+
+- `AnimationControllerBase.Hidden` freezing `Refresh` IS reproduced (see the
+  Level205 paragraph); still open: the ShouldStopAction stale latch
+  (cs:344-348), the Invoke slot overwrite (GameInfo.cs:513-533), the frozen
+  Woody's path resuming after the finish pose (PawnAnimationController.cs:97),
+  a door-exit catch or a stored-click replay inside the 2.5 s win wait
+  (Pawn.cs:366-378 has no GameEnding gate — the original then plays two
+  endings over each other), the UseDoorAtOnce carry-over, the parked-run
+  edge cases above, and the two hidden-use timings of the routine section.
+- Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
+  `OnTrickDone` paths die in the parked ride — README above), L113's
+  ElectricTrap 8 (its collider sits inside and behind the basement door's,
+  the raycast always hits the door), L114's Gramaphone and Pipe (primable only
+  while the neighbour is in the room, no hide there), L108's ToothBrush (a
+  ~0.1 s window under perfect input), L206's Weights/DynamiteBox (Zone04
+  sealed by the awake Mother's infinite poses); the level's TotalTricksCount
+  counts them, the win comes at WinningTricksCount.
+
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the tutorial layer — `LevelScript` /
@@ -994,4 +1738,7 @@ three intro scenes and the two NFH2 tutorial levels), the
 feed them; the in-game menu's widget tree (`LevelDataGUIRenderer`, the
 save/quit buttons) — the power button runs the pause half of
 `Woody.ToggleMenu` (time freeze + the HUD fill hide) without the widgets;
-and the name-hack branches listed at the end of the priming section.
+the `IntroAnimation` title cards ("Neighbours from Hell — in — The First
+Trick") and the `GameIntroAnimation` splash; the trick-camera option and
+the ExitConfirmation dialog (see the audit section); and the name-hack
+branches listed at the end of the priming section.

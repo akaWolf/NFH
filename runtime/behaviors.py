@@ -54,14 +54,18 @@ class Behavior:
         v = self.d.get(field) or {}
         return (v.get('x', default[0]), v.get('y', default[1]))
 
-    # -- world shortcuts ---------------------------------------------------
+    # -- world shortcuts (port plumbing for the C# singletons: GameInfo.
+    #    Instance.Rottweiler, <pawn>.ActionManager, <item>.AnimController) --
     def rott(self):
+        """GameInfo.Instance.Rottweiler"""
         return self.world.pawns.get('Rottweiler')
 
     def routine(self, role='Rottweiler'):
+        """GameInfo.Instance.<role>.ActionManager"""
         return next((r for r in self.world.routines if r.role == role), None)
 
     def routine_of(self, pawn):
+        """pawn.ActionManager"""
         return next((r for r in self.world.routines if r.pawn is pawn), None)
 
     def action_item(self, role='Rottweiler'):
@@ -73,6 +77,7 @@ class Behavior:
         return rt.urgent_item if rt.urgent_item is not None else rt.item
 
     def player(self, it):
+        """item.AnimController (the port's AnimPlayer of the item's sprite)"""
         if it is None or it.sprite is None:
             return None
         return self.world.players.get(id(it.sprite))
@@ -2050,32 +2055,53 @@ class MotherSleepBehaviour(Behavior):
                 self.mother_item.tricked = False
 
     def force_sleep(self):
-        """cs:73-83"""
+        """cs:73-83: the untricked arm plays MotherItem.GetMotherSecondUse
+        Animation(), which stamps CurrentAnimationSequence = MotherSecondUse
+        (Item.cs:936-940) — the window L214's DeckChairMother bar reads
+        (ProgressBar.cs:143-148); the tricked arm reads the raw
+        MotherUseTrickedAnimation field, no stamp"""
         if self.mother is None or self.mother_item is None:
             return
         if self.target_item is not None and not self.target_item.tricked:
+            self.mother_item.current_sequence = 'MotherSecondUse'   # Item.cs:938
             seq = self.mother_item.mother_second_use
         else:
             seq = self.mother_item.use_tricked_anim.get('Mother') or []
         seq = [a for a in seq if self.mother.anim.has(a)]
         if seq:
-            self.mother.anim.play_sequence(seq)
+            self._resequence(seq)
 
     def _force_sleep_after_trick(self):
-        """cs:85-88"""
+        """cs:85-88: MotherItem.GetMotherExtraUseAnimation() stamps
+        CurrentAnimationSequence = MotherExtraUse (Item.cs:977-981)"""
         if self.mother is None or self.mother_item is None:
             return
+        self.mother_item.current_sequence = 'MotherExtraUse'       # Item.cs:979
         seq = [a for a in self.mother_item.mother_extra_use
                if self.mother.anim.has(a)]
         if seq:
-            self.mother.anim.play_sequence(seq)
+            self._resequence(seq)
+
+    def _resequence(self, seq):
+        """TargetMother.AnimController.PlayAnimationSequence(seq) over her
+        running action: the controller keeps its ActionManager, so the NEW
+        sequence's end still lands in ActionManager.StopCurrentAction
+        (AnimationControllerBase.cs:242-246 — ShouldStopAction is raised
+        when the last element is pulled, cs:289-292) and her DeckChairMother
+        action advances (to MotherWait, then the sit again -> OnMotherSit).
+        The port's stand-in for that stop is the pending on_end of her use
+        (Routine._finish), carried over here."""
+        self.mother.anim.play_sequence(seq, on_end=self.mother.anim.on_end)
 
 
 class MotherWakeSleepBehavior(Behavior):
     """MotherWakeSleepBehavior.cs: the target animation redirects the
     Mother's running sequence through SetSequenceOverride and releases her
-    loop once; an urgent Mother action resets the override to the head. The
-    ProgressBar restore rides the unported progress-bar system."""
+    loop once, and 2 s later re-arms the sleep bar (Invoke("ProgressBarDelay",
+    2f) -> ProgressBar.RestoreVariables, cs:33/40, 46-52) — the only re-arm
+    of L210's Mother210 bar, which never deactivates (ProgressBar.cs:164-172)
+    but whose ExecutedOnce SetSleeping cleared (cs:175-179); an urgent Mother
+    action resets the override to the head."""
 
     def __init__(self, world, d):
         super().__init__(world, d)
@@ -2083,6 +2109,8 @@ class MotherWakeSleepBehavior(Behavior):
         self.mother = self.pawn('TargetMother')
         self.target_item = self.item('TargetItem')
         self.target_sequence_index = self.value('TargetSequenceIndex', 0)
+        # the ProgressBar GameObject (cs:16): the bar component on it
+        self.progress_bar_go = (self.d.get('ProgressBar') or {}).get('path')
         world.subscribe('mother_urgent', self._on_mother_urgent)  # cs:17-20
 
     def play_animation(self, name):
@@ -2094,6 +2122,17 @@ class MotherWakeSleepBehavior(Behavior):
         self.mother.anim.ignore_infinite_once = True
         if it is not self.target_item:
             self.mother.anim.set_sequence_override(self.target_sequence_index)
+        # both arms end in Invoke("ProgressBarDelay", 2f) (cs:33, 40)
+        self.world.call_later(2.0, self._progress_bar_delay)
+
+    def _progress_bar_delay(self):
+        """ProgressBarDelay (cs:46-52): ProgressBar.RestoreVariables on the
+        bar component of the serialized GameObject"""
+        if self.progress_bar_go is None:
+            return
+        for pb in self.world.progress_bars:
+            if pb.spec.get('go') == self.progress_bar_go:
+                pb.restore()
 
     def _on_mother_urgent(self):
         if self.mother is not None:                   # cs:54-60

@@ -13,6 +13,10 @@ if [ ! -d "$root/textures/s1" ]; then
     (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_audio.py audio/s1)
     echo "note: season 2 assets need its apk+obb unpacked; see tools/README.md"
 fi
+# an older extraction lacks the wrap-mode sidecar the sprite blitter reads
+if [ ! -f "$root/textures/s1/wrap.json" ]; then
+    (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_textures.py textures/s1 --wrap-only)
+fi
 # the HUD needs the path-named GUI textures, the localization and the fonts
 if ! ls "$root/textures/s1"/textures_gui_* >/dev/null 2>&1; then
     (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_gui.py \
