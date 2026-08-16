@@ -20,7 +20,9 @@ root = os.path.abspath(SPECPATH)
 datas = [(os.path.join(root, 'levels'), 'levels'),
          (os.path.join(root, 'tools'), 'tools')]
 binaries = []
-hiddenimports = ['sdl2.sdlmixer', 'sdl2.sdlttf', 'PIL.Image']
+# numpy is the texture extraction's block decoder (tools/texture.py):
+# without it the first run quietly extracts zero sheets
+hiddenimports = ['sdl2.sdlmixer', 'sdl2.sdlttf', 'PIL.Image', 'numpy']
 try:
     import sdl2dll                        # pysdl2-dll: the bundled SDL libs
     datas += collect_data_files('sdl2dll')

@@ -23,6 +23,11 @@ def extract_season(data_dir, out_root, season, log=print):
     tex = os.path.join(out_root, 'textures', season)
     log('extracting %s textures (a few minutes)...' % season)
     extract_textures.main(tex)
+    pngs = sum(1 for n in os.listdir(tex) if n.endswith('.png'))
+    if pngs < 10:
+        # the per-texture excepts swallow a missing decoder wholesale
+        raise SystemExit('texture extraction produced %d PNGs — the '
+                         'decoder is broken (numpy missing?)' % pngs)
     log('extracting %s GUI sheets...' % season)
     extract_gui.main(tex, ('textures/gui/', 'textures/bubbles/',
                            'inventory/'))

@@ -797,8 +797,14 @@ class App:
 
 
 def have_assets():
-    """the extracted Season-1 assets are the minimum the Entry needs"""
-    return os.path.isdir(os.path.join(asset_root(), 'textures', 's1'))
+    """the extracted Season-1 assets are the minimum the Entry needs; a
+    texture directory with almost nothing in it counts as absent — a
+    failed first run (the numpy-less bundle regression) must re-extract"""
+    d = os.path.join(asset_root(), 'textures', 's1')
+    if not os.path.isdir(d):
+        return False
+    pngs = sum(1 for n in os.listdir(d) if n.endswith('.png'))
+    return pngs > 100
 
 
 def _message_box(title, text):
@@ -857,7 +863,13 @@ def bootstrap_assets():
 
 def main(argv):
     if '--smoke' in argv:
-        # the CI's bundle check: boot the menu headless and exit
+        # the CI's bundle check: boot the menu headless and exit; the
+        # extraction dependencies must import frozen (numpy decodes the
+        # texture blocks — missing, the first run extracts zero sheets)
+        import numpy, PIL.Image
+        print('deps OK: numpy %s, pillow %s' % (
+            numpy.__version__, PIL.Image.__version__
+            if hasattr(PIL.Image, '__version__') else 'n/a'))
         os.environ.setdefault('SDL_VIDEODRIVER', 'dummy')
         os.environ.setdefault('SDL_AUDIODRIVER', 'dummy')
         from prefs import MemoryPrefs
