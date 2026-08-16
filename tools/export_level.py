@@ -313,7 +313,8 @@ def hud_sections(sc, index, out):
     res = {}
     for pid, e in out['objects'].items():
         if e.get('type') not in ('HUD', 'HUDProgressBar', 'ProgressBar',
-                                 'DexterityComponent') or 'data' not in e:
+                                 'DexterityComponent', 'MouseCursor') \
+                or 'data' not in e:
             continue
 
         def walk(v):

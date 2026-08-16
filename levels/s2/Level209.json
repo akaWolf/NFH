@@ -77591,6 +77591,50 @@
      "height": 1.0
     }
    }
+  ],
+  "MouseCursor": [
+   {
+    "m_GameObject": {
+     "path": 4,
+     "name": "MouseCursor",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "Default": {
+     "texture": "normal"
+    },
+    "UseInventoryIcon": {
+     "texture": "use_with"
+    },
+    "DefaultHUDIcon": {
+     "texture": "normal"
+    },
+    "UseHUDIcon": {
+     "texture": "use"
+    },
+    "WalkingTexture": {
+     "texture": "goto"
+    },
+    "TrickCameraIcon": {
+     "texture": "camera"
+    },
+    "TextureDeltaLoc": {
+     "x": -0.0010000000474974513,
+     "y": -0.07000000029802322,
+     "z": -5.0
+    },
+    "ShowWindowsCursor": false,
+    "MinMouseY": 100,
+    "CancelInventoryIcon": {
+     "texture": "not_possible"
+    },
+    "cursorSize": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.031300000846385956,
+     "height": 0.04170000180602074
+    }
+   }
   ]
  }
 }
