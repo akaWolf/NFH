@@ -1635,7 +1635,8 @@ class Menu:
         self._texture_size = texture_size or (lambda n: (0, 0))
         self.scene = SceneData(path)
         self.season = self.scene.season
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        from base import asset_root
+        root = asset_root()
         self.root = root
         self.settings = Settings(prefs)
         self.progress = Progress(prefs)

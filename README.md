@@ -24,6 +24,20 @@ Point `NFH_DATA` at wherever `tools/extract.sh` wrote it; every tool reads that
 one variable, so switching seasons means pointing it at the other extraction —
 nothing else changes.
 
+## Playing
+
+```sh
+./run.sh                # the full game: splash, menus, levels (extracts
+                        # the assets from the apk/obb on first run)
+./run.sh Level108       # the full flow, straight into a level
+./run.sh levels/s2/Level208.json   # the bare level viewer
+```
+
+Standalone Linux/Windows bundles build in CI (`.github/workflows/
+bundles.yml`, PyInstaller over `nfh.spec`); a bundle extracts the assets
+from the user's own apk/obb next to the executable on first start — see
+`docs/BUNDLE.md`.
+
 ## Reproducing
 
 ```sh

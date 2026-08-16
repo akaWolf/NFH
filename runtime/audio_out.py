@@ -6,6 +6,8 @@ tools/extract_audio.py. Point NFH_AUDIO at those directories.
 """
 import os
 
+from base import asset_root
+
 
 def audio_dirs(level_paths=()):
     """the clip search path (viewer decision, mirroring viewer.texture_dirs):
@@ -15,7 +17,7 @@ def audio_dirs(level_paths=()):
     (give_take1, wod_ha1: S2 levels reference both), then audio/"""
     env = os.environ.get('NFH_AUDIO')
     dirs = env.split(':') if env else []
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root = asset_root()
     seasons = ['s1', 's2']
     if any('/s2/' in p.replace('\\', '/') for p in level_paths):
         seasons.reverse()

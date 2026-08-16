@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import sdl2
 
+from base import asset_root, data_root
 from gui import Gfx, Text, adjust_rect, font_size
 from menu import (Menu, SceneData, ControlToggle, level_index,
                   load_strings)
@@ -37,7 +38,8 @@ from tutorial import build as build_tutorial
 from audio_out import SoundBank, audio_dirs
 from viewer import Viewer, WIDTH, HEIGHT
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = asset_root()                       # textures/, audio/, strings/, fonts/
+LEVELS = data_root()                      # levels/*.json ship with the port
 
 
 def scene_path(name, season):
@@ -48,7 +50,7 @@ def scene_path(name, season):
         season = 's2'
     elif name.startswith(('Level1', 'Intro1')):
         season = 's1'
-    return os.path.join(ROOT, 'levels', season, name + '.json'), season
+    return os.path.join(LEVELS, 'levels', season, name + '.json'), season
 
 
 # ---------------------------------------------------------------------------
@@ -791,7 +793,82 @@ class App:
         self.prefs.save()                 # Unity saves the prefs on exit
 
 
+def have_assets():
+    """the extracted Season-1 assets are the minimum the Entry needs"""
+    return os.path.isdir(os.path.join(asset_root(), 'textures', 's1'))
+
+
+def _message_box(title, text):
+    """a last-resort dialog for the double-click user (works before any
+    window exists); the console gets the text either way"""
+    print(text)
+    try:
+        sdl2.SDL_ShowSimpleMessageBox(sdl2.SDL_MESSAGEBOX_INFORMATION,
+                                      title.encode(), text.encode(), None)
+    except Exception:
+        pass
+
+
+def bootstrap_assets():
+    """first run: find the game's apk/obb (or xapk) next to the bundle,
+    unpack it to a temp directory and extract the textures, audio,
+    strings and fonts into the asset root — tools/unpack.py +
+    tools/extract_assets.py, in-process (the bundle has no shell)"""
+    import shutil, tempfile
+    sys.path.insert(0, os.path.join(data_root(), 'tools'))
+    from unpack import find_sources, unpack
+    from extract_assets import extract_season
+    root = asset_root()
+    sources = {}
+    for d in dict.fromkeys([root, os.getcwd()]):
+        sources = find_sources(d)
+        if sources:
+            break
+    if not sources:
+        _message_box('Neighbours from Hell', (
+            'No game data found.\n\n'
+            'Put the game\'s .apk and .obb (or the .xapk) next to the\n'
+            'executable and start it again: the assets are extracted\n'
+            'from your own copy of the game on first run.\n\n'
+            'Season 1 is required; Season 2 is optional.\n'
+            'Looked in: %s' % root))
+        return False
+    if 's1' not in sources:
+        _message_box('Neighbours from Hell', (
+            'Only Season 2 data found — Season 1 is required (it carries '
+            'the menu). Put its apk/obb here too: %s' % root))
+        return False
+    for season in ('s1', 's2'):
+        entry = sources.get(season)
+        if entry is None:
+            continue
+        print('== extracting %s (one-time, a few minutes) ==' % season)
+        tmp = tempfile.mkdtemp(prefix='nfh-data-')
+        try:
+            unpack(entry, tmp)
+            extract_season(tmp, root, season)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+    return have_assets()
+
+
 def main(argv):
+    if '--smoke' in argv:
+        # the CI's bundle check: boot the menu headless and exit
+        os.environ.setdefault('SDL_VIDEODRIVER', 'dummy')
+        os.environ.setdefault('SDL_AUDIODRIVER', 'dummy')
+        from prefs import MemoryPrefs
+        app = App(headless=True, prefs=MemoryPrefs())
+        for _ in range(5):
+            app.tick(1.0 / 60.0, events=(False, False, False, False))
+        app.tick(1.0 / 60.0, events=(False, True, False, False))
+        app.draw_menu(1.0 / 60.0)
+        print('smoke OK: state=%s windows=%d' % (
+            app.state, sum(1 for go, e in app.menu.scene.find('ControlWindow')
+                           if app.menu.scene.active_in_hierarchy(go))))
+        return 0
+    if not have_assets() and not bootstrap_assets():
+        return 1
     start = argv[1] if len(argv) > 1 else 'Entry'
     app = App()
     if start != 'Entry':

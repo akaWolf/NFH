@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import sdl2
 
+from base import asset_root, data_root
 from scene import Level, DESIGN_H
 from world import World
 from audio_out import SoundBank
@@ -32,7 +33,7 @@ def texture_dirs(level_paths=()):
     list — a mixed s1+s2 session gives s2 priority to the s1 levels too."""
     env = os.environ.get('NFH_TEXTURES')
     dirs = env.split(':') if env else []
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root = asset_root()
     # season-specific dirs; the season of the opened levels wins name clashes
     seasons = ['s1', 's2']
     if any('/s2/' in p.replace('\\', '/') for p in level_paths):
@@ -459,8 +460,7 @@ class Viewer:
         rgba = bytearray(n)
         rgba[0::4] = buf[2::4]; rgba[1::4] = buf[1::4]
         rgba[2::4] = buf[0::4]; rgba[3::4] = buf[3::4]
-        sys.path.insert(0, os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tools'))
+        sys.path.insert(0, os.path.join(data_root(), 'tools'))
         from texture import write_png
         write_png(path, WIDTH, HEIGHT, bytes(rgba))
         print('screenshot -> %s' % path)
@@ -555,7 +555,7 @@ def main(argv):
     args = [a for a in argv[1:] if not a.startswith('--')]
     opts = [a for a in argv[1:] if a.startswith('--')]
     shot = next((a.split('=', 1)[1] for a in opts if a.startswith('--shot=')), None)
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root = data_root()
     paths = args or sorted(glob.glob(os.path.join(root, 'levels', 's1', 'Level*.json')))
     if not paths:
         print('no levels given'); return 1

@@ -17,8 +17,11 @@
    опций (портовое решение — у Android-декомпила нет такого SettingKey),
    pref `Fullscreen`, SDL_WINDOW_FULLSCREEN_DESKTOP поверх логического
    размера 800×600.
-3. **Бандлы под Linux и Windows** с сборкой в GitHub Actions: упаковка
-   рантайма (PyInstaller или аналог) с SDL2/SDL2_mixer/SDL2_ttf, извлечённые
-   ассеты как отдельный шаг (данные игры не в репозитории — бандл ожидает
-   apk/obb пользователя или готовые `textures/`, `audio/`, `strings/`,
-   `fonts/`), артефакты релиза, матрица linux/windows.
+3. **Бандлы под Linux и Windows** — СДЕЛАНО (`nfh.spec`,
+   `.github/workflows/bundles.yml`, `docs/BUNDLE.md`): PyInstaller onedir
+   с SDL2-библиотеками из pysdl2-dll; `levels/` и `tools/` внутри бандла,
+   извлекаемые ассеты — рядом с исполняемым файлом; первый запуск сам
+   распаковывает apk/obb/xapk пользователя (`tools/unpack.py` +
+   `tools/extract_assets.py`, данные игры не распространяются); headless
+   smoke в CI; артефакты на каждый прогон, релиз на теге `v*`; матрица
+   ubuntu/windows.

@@ -5,14 +5,21 @@ Override with NFH_DATA=/somewhere (the directory tools/extract.sh wrote to).
 import os, glob, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = os.environ.get('NFH_DATA', os.path.join(ROOT, 'data'))
 
-APK = os.path.join(DATA, 'apk', 'assets', 'bin', 'Data')
-OBB = os.path.join(DATA, 'obb', 'assets', 'bin', 'Data')
 
-DLL = os.path.join(APK, 'Managed', 'Assembly-CSharp.dll')
-GG_ASSETS = os.path.join(APK, 'globalgamemanagers.assets')   # holds the MonoScripts
-GG = os.path.join(APK, 'globalgamemanagers')                 # holds BuildSettings
+def set_data(data_dir):
+    """repoint every path at another unpacked-data directory (the bundle's
+    extractor switches between the two seasons in one process)"""
+    global DATA, APK, OBB, DLL, GG_ASSETS, GG
+    DATA = data_dir
+    APK = os.path.join(DATA, 'apk', 'assets', 'bin', 'Data')
+    OBB = os.path.join(DATA, 'obb', 'assets', 'bin', 'Data')
+    DLL = os.path.join(APK, 'Managed', 'Assembly-CSharp.dll')
+    GG_ASSETS = os.path.join(APK, 'globalgamemanagers.assets')  # the MonoScripts
+    GG = os.path.join(APK, 'globalgamemanagers')                # BuildSettings
+
+
+set_data(os.environ.get('NFH_DATA', os.path.join(ROOT, 'data')))
 
 
 def scene_files():

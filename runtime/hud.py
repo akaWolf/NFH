@@ -24,6 +24,10 @@ FONT_CANDIDATES = (
     '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf',
     '/usr/share/fonts/TTF/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    # the Windows bundle's fallbacks (the game's own faces, extracted on
+    # the first run, always win — hud/gui try them first)
+    'C:\\Windows\\Fonts\\arialbd.ttf',
+    'C:\\Windows\\Fonts\\arial.ttf',
 )
 
 # CalculateRating's message keys (GameInfo.cs:93-101)
@@ -49,7 +53,8 @@ def load_strings(level_path, language=0):
     the bare viewer reads English); ';' comments. tools/extract_strings.py
     puts the extracted files under strings/{s1,s2}/."""
     from menu import LANGUAGES
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    from base import asset_root
+    root = asset_root()
     season = 's2' if '/s2/' in level_path.replace('\\', '/') else 's1'
     out = {}
     name = LANGUAGES[language] if 0 <= language < len(LANGUAGES) else 'Lang'
@@ -210,9 +215,9 @@ class Hud:
             sdlttf.TTF_Init()
             # the game's own faces, extracted by tools/extract_strings.py;
             # a face name bakes its design point size (acmesa22, bluehigh18)
-            root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            from base import asset_root
             season = 's2' if '/s2/' in level.path.replace('\\', '/') else 's1'
-            self._font_dir = os.path.join(root, 'fonts', season)
+            self._font_dir = os.path.join(asset_root(), 'fonts', season)
             self._font = self._style_font('TimeStyle') or \
                 self._sys_font(self._style_size('TimeStyle'))
             self._font_small = self._style_font('TooltipStyle') or \
