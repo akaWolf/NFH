@@ -49,6 +49,7 @@ class AnimPlayer:
         self.seq_end_hook = None
         self.last_element_hook = None    # OnLastSequenceElementPlaying
         self.seq_step_hook = None        # PlayNextSequenceAnimation's name-hacks
+        self.single_end_hook = None      # the OnAnimationEnded delegate
         self._set_start()
 
     # -- state -------------------------------------------------------------
@@ -197,6 +198,10 @@ class AnimPlayer:
             # BehaviorOnAnimationSequenceEnded (Rottweiler.cs:448), before
             # the ActionManager.StopCurrentAction the callback stands for
             self.seq_end_hook()
+        if self.single_end_hook is not None:
+            # OnAnimationEnded delegates: Item.OnItemAnimationCompleted and
+            # Woody.OnSingleAnimationEnded's show-after restore ride here
+            self.single_end_hook(self.anim.name)
         if cb:
             cb()
         elif self.stand_hook is not None:
@@ -288,6 +293,13 @@ class Pawn:
         self.has_bowling = False         # Rottweiler.HasBowlingBall
         self.has_skates = False          # Rottweiler.HasSkates
         self.alarm_postponed = False     # Rottweiler.AlarmPostponed
+        self.is_using_toilet = False     # Rottweiler.IsUsingToilet
+        self.normal_pos_aux = False      # Rottweiler.NormalPosAux
+        self.item_to_ignore_next_time = None  # Rottweiler.ItemToIgnoreNextTime
+        self.show_coins = False          # Rottweiler.ShowCoins
+        self.toilet_action = spec.get('toilet_action') or {}
+        self.wait_in_fear_anim = spec.get('wait_in_fear_anim') or 'WaitInFear'
+        self.hit_pawn_action = spec.get('hit_pawn_action') or {}
         self.behaviors = []              # Actor.Behavior + SecondaryBehaviors
         self.routine_behavior = None     # Pawn.RoutineBehavior
         self.walk_hook = None            # Rottweiler.UpdateWalking's notice run
@@ -1035,6 +1047,10 @@ class Routine:
         self._same_zone = False          # ActionManager.SameZone (Dog/Chili)
         self._same_zone_yelled = False   # ActionManager.AngryAnimationStarted
         self._alarm_use = False          # the AlarmAction urgent runs a full Use
+        self._angry_target = None        # the item the current angry set is for
+        self._wait_in_fear_done = None   # the parked resume of the affect flow
+        self._hit_target = None          # RoutineActionHitPawn.Target
+        self._toilet_run = False         # the ToiletAction urgent is running
         # Rottweiler.Start wires the controller delegates (Rottweiler.cs:152)
         if role == 'Rottweiler':
             self.pawn.anim.last_element_hook = self._on_last_seq_element
@@ -1151,9 +1167,63 @@ class Routine:
         it = self.item
         a = self.action
         if start_next:
-            # the StartNextAction extras (ActionManager.cs:178-237): the kid
-            # hooks run and the AlarmNextAction gate re-arms
+            # the StartNextAction extras (ActionManager.cs:178-237): the
+            # previous action's final position, the kid hooks, the hide
+            # releases, the gramophone skip and the spent-action removal
+            w = self.pawn.world
+            prev = None
+            if self.actions:
+                prev_i = (self.index - 1) % len(self.actions)
+                prev = self.level.items.get(self.actions[prev_i]['item']) \
+                    if self.actions[prev_i]['item'] else None
+            if w is not None and self.role == 'Rottweiler' and prev is not None:
+                # CheckFinalPosition of the finished action's item
+                # (ActionManager.cs:180-191): UseFinalPositionsInBeginning,
+                # the WaterPuddle unconditionally, then the one-shot reset
+                if prev.use_final_positions_in_beginning \
+                        and not self.pawn.normal_pos_aux:
+                    w.check_final_position(self.pawn, prev)
+                if prev.name == 'WaterPuddle':
+                    w.check_final_position(self.pawn, prev)
+                if self.pawn.normal_pos_aux:
+                    self.pawn.normal_pos_aux = False
             self._kid_actions()
+            if w is not None and self.actions and len(self.actions) > 1:
+                # NextActionAfterGramaphoneTricked skips one action
+                # (ActionManager.cs:200-204)
+                p2 = self.level.items.get(
+                    self.actions[(self.index - 2) % len(self.actions)]['item']) \
+                    if self.actions[(self.index - 2) % len(self.actions)]['item'] \
+                    else None
+                if p2 is not None and p2.next_action_after_gramaphone:
+                    p2.next_action_after_gramaphone = False
+                    self.index = (self.index + 1) % len(self.actions)
+            if w is not None and prev is not None:
+                # the hide releases (ActionManager.cs:205-212)
+                if prev.hide_during_rott_animation:
+                    w.set_object_hidden(prev, False)
+                hoda = self.level.items.get(prev.hide_object_during_animation) \
+                    if prev.hide_object_during_animation else None
+                if hoda is not None:
+                    w.set_object_hidden(hoda, False)
+            if self.actions:
+                # RemoveActionAfterUse drops the spent action
+                # (ActionManager.cs:218-227)
+                last_i = (self.index - 1) % len(self.actions)
+                if self.actions[last_i].get('remove_action_after_use'):
+                    del self.actions[last_i]
+                    if last_i >= len(self.actions):
+                        last_i = 0
+                    self.index = last_i
+                # IgnoreWoodyWhenUse releases at the next start
+                # (ActionManager.cs:228-231)
+                last = self.level.items.get(
+                    self.actions[(self.index - 1) % len(self.actions)]['item']) \
+                    if self.actions[(self.index - 1) % len(self.actions)]['item'] \
+                    else None
+                if last is not None and last.ignore_woody_when_use \
+                        and self.role == 'Rottweiler':
+                    self.pawn.ignore_woody = False
             self.action_changed = True    # ActionManager.cs:234
         # the watering-can round two (ActionManager.cs:196-199): reaching
         # index 2 with the parked can removes it for real
@@ -1202,6 +1272,9 @@ class Routine:
                 # ActionManager.MoveToAction (ActionManager.cs:119-124)
                 self.routine_behavior.on_move_to_routine_action(it, a)
             self.state = self.MOVING
+            # an Urgent action is approached at a run (MoveToGoalUrgent,
+            # RoutineActionMove.cs:68-75)
+            self.pawn.in_urgent = bool(a.get('urgent'))
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
@@ -1335,10 +1408,54 @@ class Routine:
         tricked = it.is_tricked(self.level.items)
         # Item.RottweilerUse opens with the raw-Tricked GotTricked mark
         # (Item.cs:836-838) — before any animation concern; the sink/valve
-        # chains hang off it
-        if it.tricked and self.role == 'Rottweiler':
-            it.got_tricked = True
+        # chains hang off it — and IgnoreWoodyWhenUse (cs:827-830)
+        if self.role == 'Rottweiler':
+            if it.ignore_woody_when_use:
+                self.pawn.ignore_woody = True
+            if it.tricked:
+                it.got_tricked = True
+                # UpdatePawnToAffectAnimation (Item.cs:868-882): the affected
+                # Olga plays her tricked use alongside; the Mother arms hers
+                if it.pawn_to_affect is not None and w is not None:
+                    affected = w.pawn_by_pid(it.pawn_to_affect)
+                    if affected is not None and affected.role == 'Olga':
+                        it.use_olga_tricked_flag = True
+                        if it.name != 'SandCastle':
+                            oseq = [x for x in it.use_tricked_anim.get('Olga')
+                                    or [] if affected.anim.has(x)]
+                            if oseq:
+                                affected.anim.play_sequence(oseq)
+                            w.play_tricked_item_anim(it)
+                    elif affected is not None and affected.role == 'Mother':
+                        it.use_mother_tricked_flag = True
+        # ChangeHitPawnAnimation207 (TrickItem.cs:1264-1280): the sand castle
+        # and shell swap the hit-pawn opener and the wait-in-fear pose
+        if self.role == 'Rottweiler' and w is not None:
+            self._change_hit_pawn_animation_207(it)
+        # the Mother's affected variant (TrickItem.PlayAnimation cs:795-798):
+        # her angry-at-the-neighbour set plays first, and the ordinary
+        # dispatch below immediately replaces it — kept transient like the
+        # original's consecutive PlayAnimationSequence calls
+        if self.role == 'Mother' and it.pawn_to_affect is not None \
+                and it.use_mother_tricked_flag and it.mother_rott_angry:
+            mseq = [x for x in it.mother_rott_angry if self.pawn.anim.has(x)]
+            if mseq:
+                self.pawn.anim.play_sequence(mseq)
         seq = it.sequence_for(self.role, tricked, self.level.items)
+        if self.role == 'Olga' and it.is_tricked(self.level.items) \
+                and it.use_olga_tricked_flag:
+            seq = it.use_tricked_anim.get('Olga') or []
+        # the LaunchPad name-hack (TrickItem.cs:896-902): an untricked pad
+        # with a tricked harpoon plays the harpoon's tricked set instead and
+        # arms the StopAction hand-off
+        linked = self.level.items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        if self.role == 'Rottweiler' and it.name == 'LaunchPad' \
+                and not it.tricked and linked is not None and linked.tricked:
+            it.harpoon_aux = True
+            seq = linked.sequence_for(self.role, True, self.level.items)
+            if w is not None:
+                w.play_tricked_item_anim(linked)
         # the pig-pen gate (TrickItem.cs:837-841): primed-and-tricked keys
         # with the milk still clean play the surprise set instead
         if it.depends_pig_keys and self.role == 'Rottweiler' and w is not None:
@@ -1347,14 +1464,64 @@ class Routine:
             if keys is not None and keys.primed and keys.tricked and \
                     (milk is None or not milk.tricked):
                 seq = it.rott_surprise
+        # TrickItem.RottweilerUse's own side arms (TrickItem.cs:566-630)
+        if self.role == 'Rottweiler' and w is not None:
+            hoda = self.level.items.get(it.hide_object_during_animation) \
+                if it.hide_object_during_animation else None
+            if hoda is not None:              # cs:574-578
+                w.set_object_hidden(hoda, True)
+                w.set_tricked_object_hidden(hoda, True)
+            dep = self.level.items.get(it.depends_on) \
+                if it.depends_on is not None else None
+            if it.hide_during_rott_animation:  # cs:579-593
+                if it.tricked or (dep is not None and dep.tricked):
+                    if it.tricked_object_go is not None:
+                        w.set_tricked_object_hidden(it, True)
+                    else:
+                        w.set_object_hidden(it, True)
+                elif not it.tricked and it.name != 'ChairAssembly':
+                    w.set_object_hidden(it, True)
+            if it.disable_collider_after_use:  # cs:594-598
+                it.clickable = False
+                it.can_use = False
+            if it.use_at_other_place:          # cs:599-607
+                if it.should_return:
+                    it.at_home = not it.at_home
+                    w.set_active_object_hidden(it, not it.at_home)
+                    it.clickable = it.at_home
+            elif it.tricked:                   # cs:608-611
+                w.check_destroy_when_tricked(it)
+            if it.is_tricked(self.level.items):
+                if it.force_fuckedup_when_tricked:   # cs:612-619
+                    it.idle = it.idle_fucked_up
+                    it.use_normal = it.use_fucked_up
+                    it.primed_normal = it.primed_fucked_up
+                if it.give_bowling_when_tricked:     # cs:620-624
+                    self.pawn.has_bowling = True
+            if it.remove_bowling:              # cs:625-628
+                self.pawn.has_bowling = False
         self.state = self.USING
         self.timer = a['duration']
         if a.get('hide_owner'):
             self.pawn.set_hidden(True)    # HideOwnerDuringUse, cs:213-216
         self._after_use_side_effects(a, it)
+        # RoutineActionUse.OnActionStarted's teleport (cs:205-208) and
+        # Olga.TryUseItem's x-snap (Olga.cs:146-152)
+        if it.teleport_rott_on_use and self.role == 'Rottweiler':
+            self.pawn.sprite.x = it.x + it.rott_teleport_offset[0]
+            self.pawn.sprite.y = it.y + it.rott_teleport_offset[1]
+        if it.set_olga_x_on_use and self.role == 'Olga':
+            self.pawn.sprite.x = it.x
         self.log.append((it.name, tricked))
         if self.on_use:
             self.on_use(it, tricked)
+        # the item plays its own use pose alongside the pawn's sequence
+        # (TrickItem.PlayUseAnimation / PlayTrickedAnimation, cs:947-994)
+        if w is not None and it.kind in TRICK_KINDS:
+            if tricked or (self.role == 'Rottweiler' and it.tricked):
+                w.play_tricked_item_anim(it)
+            elif not it.fucked_up:
+                w.play_use_item_anim(it)
         if seq:
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
         else:
@@ -1364,14 +1531,85 @@ class Routine:
             # of Level113 depend on this
             self._finish()
 
+    def _change_hit_pawn_animation_207(self, it):
+        """TrickItem.ChangeHitPawnAnimation207 (TrickItem.cs:1264-1280)"""
+        w = self.pawn.world
+        olga = w.pawns.get('Olga')
+        rott = w.pawns.get('Rottweiler')
+        linked = self.level.items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        if it.name == 'SandCastle':
+            if olga is not None and olga.hit_pawn_action.get('sequence'):
+                olga.hit_pawn_action['sequence'][0] = 'SandCastleLiftOlga'
+            if rott is not None:
+                rott.wait_in_fear_anim = 'SandCastleFallOneFrame'
+        elif olga is not None and it.name == 'Shell':
+            if olga.hit_pawn_action.get('sequence'):
+                olga.hit_pawn_action['sequence'][0] = 'HitPawn'
+            if rott is not None:
+                rott.wait_in_fear_anim = 'WaitInFear'
+        elif it.name == 'PoolBoard' and linked is not None and linked.tricked:
+            if rott is not None:
+                rott.wait_in_fear_anim = 'WaitInFear'
+
     def _after_use_side_effects(self, a, it):
-        """the prime/trick-after-use tail of RoutineActionUse.OnActionStarted
-        (RoutineActionUse.cs:262-301): each named target toggles its Primed —
-        at once on a zero delay, else on a GameInfo.Invoke timer; the trick
-        target just flips its Tricked field."""
+        """RoutineActionUse.OnActionStarted's side-effect run
+        (RoutineActionUse.cs:201-307), in source order: the toilet flag, the
+        tricked hide-after, the during-use hides and activations, the layer
+        swap, then the prime/trick-after-use tail and the Bed mark."""
         w = self.pawn.world
         if w is None:
             return
+        items = self.level.items
+        if a.get('is_toilet') and self.role == 'Rottweiler':
+            self.pawn.is_using_toilet = True           # cs:201-204
+        if it.is_tricked(items) and a.get('go_hide_after_use_tricked'):
+            tgt = items.get(a['go_hide_after_use_tricked'])
+            if tgt is not None:                        # cs:209-212
+                w.set_active_object_hidden(tgt, True)
+        if a.get('hide_object'):                       # cs:217-220
+            w.set_active_object_hidden(it, True)
+        if a.get('hide_object_tricked') and it.tricked:  # cs:221-224
+            w.set_active_object_hidden(it, True)
+        if a.get('hide_object_tricked_delayed'):       # cs:225-228
+            tgt = items.get(a['hide_object_tricked_delayed'])
+            if tgt is not None:
+                w.call_later(a.get('hide_object_tricked_delay') or 0.0,
+                             lambda t=tgt: w.set_active_object_hidden(t, True))
+        if a.get('hide_child'):                        # cs:229-232
+            w.set_child_renderers_hidden(it, True)
+        if a.get('object_to_hide'):                    # cs:233-236
+            tgt = items.get(a['object_to_hide'])
+            if tgt is not None:
+                w.set_active_object_hidden(tgt, True)
+        if a.get('object_to_hide_tricked') and it.is_tricked(items):
+            tgt = items.get(a['object_to_hide_tricked'])
+            if tgt is not None:                        # cs:237-240
+                w.set_active_object_hidden(tgt, True)
+        if a.get('object_to_activate'):                # cs:241-244
+            tgt = items.get(a['object_to_activate'])
+            if tgt is not None:
+                w.set_active(tgt, True)
+        if a.get('pawn_to_hide'):                      # cs:245-248
+            p = w.pawn_by_pid(a['pawn_to_hide'])
+            if p is not None:
+                p.set_hidden(True)
+        linked = items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        if a.get('change_layer_linked') and it.tricked \
+                and linked is not None and linked.tricked:
+            from scene import GUI_DEPTH                # cs:249-261
+            depth = GUI_DEPTH.get(a.get('layer_to_change'))
+            tgt = items.get(a.get('item_to_change_layer')) \
+                if a.get('item_to_change_layer') else None
+            if tgt is not None and tgt.sprite is not None and depth:
+                a['_layer_aux'] = tgt.sprite.depth
+                tgt.sprite.depth = depth
+            p = w.pawn_by_pid(a.get('pawn_to_change_layer')) \
+                if a.get('pawn_to_change_layer') else None
+            if p is not None and depth:
+                a['_layer_aux'] = p.sprite.depth
+                p.sprite.depth = depth
         tgt = self.level.items.get(a.get('prime_after_use_tricked')) \
             if a.get('prime_after_use_tricked') else None
         if tgt is not None and it.tricked:
@@ -1392,6 +1630,8 @@ class Routine:
             if a.get('trick_after_use') else None
         if tgt is not None:
             tgt.tricked = not tgt.tricked  # RoutineActionUse.cs:298-301
+        if it.kind in TRICK_KINDS and it.is_bed:
+            it.is_rottweiler_sleeping = True   # cs:302-306
 
     def _tricked_item(self, it):
         """RoutineActionUse.GetTrickedItem"""
@@ -1451,16 +1691,110 @@ class Routine:
             self.actions = [self.actions[0], cans[0], self.actions[1]]
             self.remove_watering_can = True
 
+    def _stop_side_effects(self, a, it):
+        """RoutineActionUse.StopAction's side-effect run (cs:386-535): the
+        unlocks, the exit deltas with their one-shot aux flags, the unhides,
+        the Bed clear, the after-use hide/show and the layer restore. The
+        original runs this on BOTH stop calls of a tricked use."""
+        w = self.pawn.world
+        if w is None or a is None or a.get('move_only'):
+            return
+        items = self.level.items
+        for pid in a.get('doors_to_unlock') or ():     # cs:390-393
+            d = self.level.door_by_pid(pid)
+            if d is not None:
+                w.unlock_door(d)
+        for pid in a.get('items_to_unlock') or ():     # cs:394-397
+            tgt = items.get(pid)
+            if tgt is not None:
+                tgt.locked = False
+        if it.tricked:                                 # cs:398-404
+            for pid in a.get('items_to_unlock_tricked') or ():
+                tgt = items.get(pid)
+                if tgt is not None:
+                    tgt.locked = False
+        dont_on_owner = it.dont_use_on is not None and \
+            w.pawn_by_pid(it.dont_use_on) is self.pawn
+        dx, dy = it.rott_use_item_exit_delta
+        if (dx > 0 or dy > 0) and not it.exit_delta_aux and it.tricked:
+            if not dont_on_owner:                      # cs:428-440
+                self.pawn.sprite.x += dx
+                self.pawn.sprite.y += dy
+                it.exit_delta_aux = True
+        else:
+            it.exit_delta_aux = False                  # cs:441-444
+        dx, dy = it.rott_use_not_tricked_exit_delta
+        if (dx > 0 or dy > 0) and not it.exit_delta_not_tricked_aux \
+                and not it.tricked and \
+                (not it.already_tricked or it.still_use_not_tricked_delta):
+            if not dont_on_owner:                      # cs:445-453
+                self.pawn.sprite.x += dx
+                self.pawn.sprite.y += dy
+                it.exit_delta_not_tricked_aux = True
+        else:
+            it.exit_delta_not_tricked_aux = False      # cs:454-457
+        # the plain exit delta, prime-vs-use by WasPriming (cs:458-480);
+        # DontUseOn skips the owner it names
+        delta = it.rott_prime_exit_delta if it.was_priming \
+            else it.rott_use_exit_delta
+        if not dont_on_owner:
+            self.pawn.sprite.x += delta[0]
+            self.pawn.sprite.y += delta[1]
+        if a.get('hide_object'):                       # cs:485-488
+            w.set_active_object_hidden(it, False)
+        if a.get('hide_object_tricked') and it.tricked:  # cs:489-492
+            w.set_active_object_hidden(it, False)
+        if a.get('hide_child'):                        # cs:493-496
+            w.set_child_renderers_hidden(it, False)
+        if a.get('object_to_hide'):                    # cs:497-500
+            tgt = items.get(a['object_to_hide'])
+            if tgt is not None:
+                w.set_active_object_hidden(tgt, False)
+        if a.get('object_to_hide_tricked'):            # cs:501-504
+            tgt = items.get(a['object_to_hide_tricked'])
+            if tgt is not None:
+                w.set_active_object_hidden(tgt, False)
+        if a.get('object_to_activate'):                # cs:505-508
+            tgt = items.get(a['object_to_activate'])
+            if tgt is not None:
+                w.set_active(tgt, False)
+        if a.get('pawn_to_hide'):                      # cs:509-512
+            p = w.pawn_by_pid(a['pawn_to_hide'])
+            if p is not None:
+                p.set_hidden(False)
+        if it.kind in TRICK_KINDS and it.is_bed:       # cs:513-516
+            it.is_rottweiler_sleeping = False
+        if a.get('go_hide_after_use'):                 # cs:517-520
+            tgt = items.get(a['go_hide_after_use'])
+            if tgt is not None:
+                w.set_active_object_hidden(tgt, True)
+        linked = items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        if a.get('change_layer_linked') and it.tricked \
+                and linked is not None and linked.tricked \
+                and a.get('_layer_aux') is not None:   # cs:521-531
+            tgt = items.get(a.get('item_to_change_layer')) \
+                if a.get('item_to_change_layer') else None
+            if tgt is not None and tgt.sprite is not None:
+                tgt.sprite.depth = a['_layer_aux']
+            p = w.pawn_by_pid(a.get('pawn_to_change_layer')) \
+                if a.get('pawn_to_change_layer') else None
+            if p is not None:
+                p.sprite.depth = a['_layer_aux']
+        if a.get('go_show_after_use'):                 # cs:532-535
+            tgt = items.get(a['go_show_after_use'])
+            if tgt is not None:
+                w.set_active_object_hidden(tgt, False)
+
     def _finish(self):
-        """RoutineActionUse.StopAction(canPostponeStop: true): a tricked
-        TrickItem does not finish the action — the owner plays the angry
-        sequence first (RoutineActionUse.cs:546-553). The stop also removes
-        spent actions (cs:415-427): the item's own when ShouldDestroy and
-        IsTricked, every action of a ShouldDestroy raw-Tricked dependency
-        (Level113's sink drops the valve actions this way), and
-        RemoveFromRoutineAfterFirstUse unconditionally."""
+        """RoutineActionUse.StopAction(canPostponeStop: true): the side
+        effects run, then a tricked TrickItem does not finish the action —
+        the owner plays the angry sequence first (RoutineActionUse.cs:
+        541-553). The stop also removes spent actions (cs:415-427)."""
         it = self.item
+        a = self.action
         if it is not None:
+            self._stop_side_effects(a, it)
             if it.should_destroy() and it.is_tricked(self.level.items):
                 self.remove_actions_by_item(it.pid)
             dep = self.level.items.get(it.depends_on) \
@@ -1469,22 +1803,42 @@ class Routine:
                 self.remove_actions_by_item(dep.pid)
             if it.remove_after_first_use:
                 self.remove_actions_by_item(it.pid)
-        if (self.role == 'Rottweiler' and it is not None
-                and it.kind == 'TrickItem' and it.is_tricked(self.level.items)
-                and self.pawn.world is not None):
-            target = self._tricked_item(it)
-            if target is not None:
-                self.pawn.world.play_angry(self.pawn, target,
-                                           on_done=self._angry_done)
+        w = self.pawn.world
+        if self.role == 'Rottweiler' and it is not None and w is not None:
+            # the Harpoon hand-off (cs:541-545): the pad's stop plays the
+            # tricked harpoon's angry instead
+            linked = self.level.items.get(it.linked_item_trick) \
+                if it.linked_item_trick else None
+            if linked is not None and linked.tricked \
+                    and linked.name == 'Harpoon' and it.harpoon_aux:
+                it.harpoon_aux = False
+                self._angry_target = linked
+                w.play_angry(self.pawn, linked, on_done=self._angry_done)
                 return
+            if it.kind == 'TrickItem' and it.is_tricked(self.level.items):
+                target = self._tricked_item(it)
+                if target is not None:
+                    self._angry_target = target
+                    w.play_angry(self.pawn, target, on_done=self._angry_done)
+                    return
         self._action_stopped()
         self._pending = 'advance'
 
     def _angry_done(self):
-        """the second StopAction arrives with canPostponeStop=false, so the
-        angry branch is skipped and the action finally finishes"""
+        """the second StopAction arrives with canPostponeStop=false: the
+        side effects run again — the aux flags gate the delta doubling — and
+        the action finishes, or restarts for a ReuseAfterFix item
+        (Rottweiler.cs:707-714, ActionManager.RestartCurrentAction)"""
+        it = self.item
+        if it is not None:
+            self._stop_side_effects(self.action, it)
+        target = getattr(self, '_angry_target', None)
+        self._angry_target = None
         self._action_stopped()
-        self._pending = 'advance'
+        if target is not None and target.reuse_after_fix:
+            self._pending = 'start'
+        else:
+            self._pending = 'advance'
 
     def _anim_by_pid(self, pid):
         """resolve a serialized Item- or Pawn-component reference to the
@@ -1549,6 +1903,20 @@ class Routine:
             t.ignore_infinite = t.ignore_infinite_once = True
         if a.get('hide_owner'):
             self.pawn.set_hidden(False)   # cs:481-484
+        w = self.pawn.world
+        if it is not None and w is not None:
+            # Item.OnUseEnded resets the affect flags (Item.cs:2216-2223) and
+            # the TrickItem override returns the pose to idle (cs:688-695)
+            if self.role == 'Rottweiler' and it.pawn_to_affect is not None:
+                it.use_olga_tricked_flag = False
+                it.use_mother_tricked_flag = False
+            if it.kind in TRICK_KINDS and not it.was_priming \
+                    and not it.animate_after_use:
+                w._return_to_idle(it)
+            if a.get('is_toilet') and self.role == 'Rottweiler':
+                self.pawn.is_using_toilet = False      # cs:354-357
+        # Rottweiler.OnUseEnded lets the meter decay again (cs:879-892)
+        self.pawn.can_decrease_angry = True
         if not a.get('mutex'):
             self._abort_parked_mutex(a.get('abort_mutex_pawn'))
 
@@ -1595,6 +1963,14 @@ class Routine:
             w.fire_event('mother_urgent')
         if self.frozen:
             return                        # ActionManager.cs:657-660
+        # a queued advance means the next action already started in the
+        # original's synchronous flow — materialize it so the resume lands
+        # on the right action (StartUrgentAction interrupts the new one)
+        if self._pending in ('advance', 'skip'):
+            self._advance()
+            self._pending = None
+        elif self._pending in ('first', 'start'):
+            self._pending = None
         self.urgent_item = item
         self._urgent_handler = arrived
         self._alarm_use = alarm_use
@@ -1759,6 +2135,12 @@ class Routine:
         self.urgent_item = None
         self.pawn.in_urgent = False
         self.pawn.can_decrease_angry = True
+        if getattr(self, '_toilet_run', False):
+            # Rottweiler.OnUseEnded ends the sickness (cs:879-892) and
+            # OnActionStopped drops IsUsingToilet (cs:354-357)
+            self._toilet_run = False
+            self.pawn.feel_sick = False
+            self.pawn.is_using_toilet = False
         self._same_zone = False
         self._same_zone_yelled = False
         self._alarm_use = False
@@ -1984,6 +2366,78 @@ class Routine:
         self.continue_alarm()
         self._urgent_finished()
 
+    def run_to_hit_pawn(self, target_pawn):
+        """Pawn.RunToHitPawn (Pawn.cs:1837-1841) -> StartUrgentAction(
+        HitPawnAction): walk into the target's zone within
+        MaximumPawnDistanceToAction, then the hit choreography
+        (RoutineActionHitPawn.cs:13-45)."""
+        if self.frozen:
+            return
+        if self._pending in ('advance', 'skip'):
+            self._advance()
+        self._pending = None
+        self._hit_target = target_pawn
+        self.urgent_item = None
+        self.pawn.steps = []
+        self.pawn.in_urgent = True
+        self.state = self.MOVING
+        maxd = self.pawn.hit_pawn_action.get('max_distance') or 0.03
+        if self.pawn.zone is target_pawn.zone and \
+                abs(self.pawn.sprite.x - target_pawn.sprite.x) < maxd:
+            self._hit_pawn_arrived()
+        elif target_pawn.zone is None or not self.pawn.goto_zone(
+                target_pawn.zone, target_pawn.sprite.x,
+                on_arrive=self._hit_pawn_arrived):
+            self._hit_pawn_arrived()
+
+    def _hit_pawn_arrived(self):
+        """RoutineActionHitPawn.OnActionStarted (cs:20-38): the target —
+        the neighbour being hit — hides (the hit sheets contain him), the
+        owner's current item can reveal itself, and the HitPawnSequence
+        plays. The Olga toilet-delay arm rides the unported Bouquet hack."""
+        target = getattr(self, '_hit_target', None)
+        w = self.pawn.world
+        if target is None or w is None:
+            self._urgent_finished()
+            return
+        target.sprite.hidden = True       # Target.AnimController.Hidden
+        oit = self.item
+        if oit is not None and oit.show_item_when_affected:
+            w.set_object_hidden(oit, False)    # cs:32-36
+        seq = [x for x in self.pawn.hit_pawn_action.get('sequence', ())
+               if self.pawn.anim.has(x)]
+        self.state = self.USING
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=self._hit_pawn_done)
+        else:
+            self._hit_pawn_done()
+
+    def _hit_pawn_done(self):
+        """RoutineActionHitPawn.OnActionStopped (cs:40-45): the target
+        reappears and its parked angry resumes"""
+        target, self._hit_target = getattr(self, '_hit_target', None), None
+        w = self.pawn.world
+        if target is not None:
+            target.sprite.hidden = False
+            if w is not None:
+                w.continue_angry_animation(target)   # Target.ContinueAngryAnimation
+        self._urgent_finished()
+
+    def move_to_toilet(self, feel_sick):
+        """Rottweiler.MoveToToilet (Rottweiler.cs:863-867) +
+        ActionManager.StartToiletAction: the sick run to the serialized
+        ToiletAction item; the use end clears the flags
+        (Rottweiler.OnUseEnded cs:879-892, OnActionStopped cs:354-357)."""
+        pid = self.pawn.toilet_action.get('item')
+        it = self.level.items.get(pid) if pid else None
+        if it is None:
+            return
+        self.pawn.feel_sick = feel_sick   # Pawn.MoveToToilet
+        if self.pawn.toilet_action.get('is_toilet'):
+            self.pawn.is_using_toilet = True
+        self._toilet_run = True
+        self.start_urgent(it, alarm_use=True)
+
     def postpone_alarm(self):
         """Rottweiler.PostponeAlarm (Rottweiler.cs:1126-1130)"""
         self.pawn.alarm_postponed = True
@@ -2076,6 +2530,14 @@ class Routine:
                 return
         if self._pending:
             what, self._pending = self._pending, None
+            if what == 'advance':
+                # FreezeAfterCompletion parks the manager instead of
+                # advancing (ActionManager.cs:539-543)
+                cur = self.action
+                if cur is not None and cur.get('freeze_after_completion'):
+                    self.frozen = True
+                    self.state = self.IDLE
+                    return
             if what in ('advance', 'skip'):
                 self._advance()
             # 'first' and 'advance' are StartNextAction; 'skip' and 'start'
@@ -2127,6 +2589,10 @@ class World:
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         self._entrance_timer = None      # Woody's walk-in countdown
         self.time = 0.0                  # Time.time for the alarm intervals
+        self._woody_show_after = []      # Woody.ItemToShowAfterAnim queue
+        self._woody_layer_restore = []   # (pawn, depth) from the hide layers
+        self._woody_use_anim_item = None  # Woody.itemAux (HideDuringWoodyUseAnim)
+        self._woody_use_anim_hidden = False
         self.behavior_objs = []          # live level-behavior instances
         self.search_behavior = None      # Woody.SearchBehavior
         self.events = {}                 # the behaviors' static C# events
@@ -2138,13 +2604,66 @@ class World:
                     it.sprite.hidden = not it.primed
                 if it.hide_when_primed and it.primed:
                     it.sprite.hidden = True
+        # TrickItem.OnItemAnimationCompleted (TrickItem.cs:1059-1079): the
+        # zone poses and an AnimateAfterUse use pose return to idle
+        for it in level.items.values():
+            if it.kind in TRICK_KINDS and it.sprite is not None:
+                p = self.players.get(id(it.sprite))
+                if p is not None:
+                    p.single_end_hook = \
+                        (lambda name, i=it: self._item_anim_completed(i, name))
+
+    def _on_compound_trick_done(self, item):
+        """Item.OnCompoundTrickDone (Item.cs:2161-2169): counts once while
+        the item has not paid its plain trick yet"""
+        if not item.already_tricked:
+            self.game.compound_tricks += 1
 
     def play_angry(self, pawn, item, on_done=None):
-        """Rottweiler.PlayAngryAnimation, GameMode.Classic branch
-        (Rottweiler.cs:595-612, 768-787), followed on sequence end by
-        FixTrickedItem -> TryFix (Rottweiler.cs:461, TrickItem.cs:1115)."""
+        """Rottweiler.PlayAngryAnimation (Rottweiler.cs:552-797), the
+        GameMode.Classic branch, with the name-hack heads, the extra-angry
+        insert, the affected-pawn hand-off and the after-run of
+        OnAnimationSequenceEnded (FixTrickedItem, the toilet rush)."""
+        items = self.level.items
+        routine = next((r for r in self.routines if r.pawn is pawn), None)
+        if item.dont_get_angry:
+            item.use_once = False                  # cs:564-568
+            item.got_tricked = False
+        self.check_final_position(pawn, item)      # cs:569
+        if item.name == 'Chef' and item.activate_item_trick is not None:
+            fx = items.get(item.fix_item_trick) \
+                if item.fix_item_trick else None
+            if fx is not None:                     # cs:570-573
+                self.set_object_hidden(fx, True)
+        hoda = items.get(item.hide_object_during_animation) \
+            if item.hide_object_during_animation else None
+        if hoda is not None:                       # cs:574-577
+            self.set_object_hidden(hoda, False)
+        if item.name == 'ChairAssemblyBook':       # cs:578-585
+            chair = next((i for i in items.values()
+                          if i.name == 'ChairAssembly'), None)
+            if chair is not None:
+                self.set_object_hidden(chair, False)
+        if item.name == 'LiveBull':                # cs:586-592
+            fx = items.get(item.fix_item_trick) \
+                if item.fix_item_trick else None
+            linked = items.get(item.linked_item_trick) \
+                if item.linked_item_trick else None
+            if fx is not None:
+                fx.idle = 'N2TrickItemUseTricked'
+                self.play_item_anim(fx, fx.idle)
+                if fx.sprite is not None:
+                    from scene import GUI_DEPTH
+                    fx.sprite.depth = GUI_DEPTH['ItemsFront']
+            if linked is not None:
+                self.set_active(linked, True)
+        self._show_objects(item)                   # Item.ShowObjects
+        if item.change_item_anim_when_angry and item.item_anim_when_angry:
+            p = self.players.get(id(item.sprite)) if item.sprite else None
+            if p is not None and p.has(item.item_anim_when_angry):
+                p.play_directly(item.item_anim_when_angry)   # Item.cs:2654-2660
         seq = []
-        if self.game is not None:
+        if self.game is not None:                  # cs:595-612
             if pawn.angry_meter <= 0.0:
                 if item.angry_easy_up:
                     seq = [item.angry_easy_up]
@@ -2152,29 +2671,151 @@ class World:
             else:
                 pawn.angry_count_ticks += 1
                 seq = [a for a in (item.angry_easy_down, item.angry_hard) if a]
-                self.game.compound_tricks += 1     # Item.OnCompoundTrickDone
+                self._on_compound_trick_done(item)   # cs:608
             pawn.angry_meter = pawn.angry_max
-        # the fix animation rides at the tail of the same sequence
+        if item.object_to_show_before_angry_go is not None:
+            self.set_go_renderer(item.object_to_show_before_angry_go, True)
+        if item.kind in TRICK_KINDS:               # cs:698-706
+            self.play_item_anim(item, item.before_angry)   # PlayBeforeAngry
+            if item.compound and item.compound_tricked:
+                self._on_compound_trick_done(item)
+        restart = item.reuse_after_fix             # cs:707-714
+        if item.name == 'MumStatueFootStool' and item.tricked:
+            item.tricked = False                   # cs:715-718
+
+        def after_run(played_angry=True):
+            """the OnAnimationSequenceEnded tail (Rottweiler.cs:454-484):
+            FixTrickedItem -> TryFix, then the toilet rush; a started fetch
+            or toilet run owns the resume"""
+            fetch = self._try_fix(item, pawn)
+            pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
+            rushed = False
+            if not fetch and item.kind in TRICK_KINDS \
+                    and item.cause_rush_to_toilet(items) \
+                    and routine is not None:       # cs:478-484, 542-550
+                if on_done:
+                    on_done()
+                routine.move_to_toilet(item.cause_sickness)
+                rushed = True
+            if on_done and not fetch and not rushed:
+                on_done()
+
+        if item.angry_without_animations:          # cs:719-736
+            if item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
+                    and routine is not None:
+                if not item.dont_get_angry:
+                    self._on_trick_done(item)
+                pawn.can_decrease_angry = False
+                self._try_fix(item, pawn)
+                if on_done:
+                    on_done()
+                routine.move_to_toilet(item.cause_sickness)
+                return
+            self._try_fix(item, pawn)
+            if not item.dont_get_angry:
+                self._on_trick_done(item)
+            if on_done:
+                on_done()
+            return
+        affected = self.pawn_by_pid(item.pawn_to_affect) \
+            if item.pawn_to_affect is not None else None
+        linked = items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        affect_live = affected is not None \
+            and item is not pawn.item_to_ignore_next_time \
+            and (not item.pawn_to_affect_only_linked
+                 or (linked is not None and linked.tricked))
+        if affect_live:                            # cs:737-753
+            pawn.item_to_ignore_next_time = item
+            self._start_wait_in_fear(pawn, on_done)
+            afr = next((r for r in self.routines if r.pawn is affected), None)
+            if afr is not None:
+                afr.run_to_hit_pawn(pawn)          # Pawn.RunToHitPawn
+                oit = afr.item
+                if oit is not None and oit.change_item_anim_when_affected \
+                        and oit.item_anim_when_affected:
+                    p = self.players.get(id(oit.sprite)) if oit.sprite else None
+                    if p is not None and p.has(oit.item_anim_when_affected):
+                        p.play_directly(oit.item_anim_when_affected)
+            if item.fix_directly:                  # cs:781-784
+                self._fix(item)
+            if not item.dont_get_angry:
+                self._on_trick_done(item)          # cs:785-787
+            pawn.can_decrease_angry = False
+            return
+        # the extra-angry insert, gated for the sand castle (cs:754-766)
+        if item.sand_castle_flag:
+            if linked is not None and item.tricked and linked.tricked:
+                seq = list(item.rott_extra_angry) + seq
+        else:
+            seq = list(item.rott_extra_angry) + seq
+        # the fix animation rides at the tail of the same sequence (cs:767-777)
         if item.can_fix:
             if item.use_fix_sequence:
                 seq.extend(item.fix_sequence)
             elif not item.fix_without_animations and item.fix_animation:
                 seq.append(item.fix_animation)
+        if item.fix_directly:                      # cs:781-784
+            self._fix(item)
         if not item.dont_get_angry:
-            self._on_trick_done(item)              # Rottweiler.cs:787
-        pawn.can_decrease_angry = False            # Rottweiler.cs:795
-
-        def done():
-            fetch = self._try_fix(item, pawn)      # FixTrickedItem on seq end
-            pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
-            if on_done and not fetch:
-                on_done()          # a started fetch owns the resume instead
-
+            self._on_trick_done(item)              # cs:785-787
+        pawn.can_decrease_angry = False            # cs:793-796
         seq = [a for a in seq if pawn.anim.has(a)]
         if seq:
-            pawn.anim.play_sequence(seq, on_end=done)
+            pawn.anim.play_sequence(seq, on_end=after_run)
         else:
-            done()
+            after_run(False)
+
+    def _show_objects(self, item):
+        """Item.ShowObjects (Item.cs:2662-2674): the MechanicalBull's coins
+        and the fuckedup Hatch reveal their linked halves"""
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        rott = self.pawns.get('Rottweiler')
+        if item.name == 'MechanicalBull' and linked is not None \
+                and rott is not None and not rott.show_coins:
+            rott.show_coins = True
+            self.set_active(linked, True)
+        if item.name == 'Hatch' and linked is not None:
+            # the Dexterity arm rides the unported dexterity flow; the
+            # LinkedItemTrick activation is the live half
+            item.item_anim_when_angry = 'N2TrickItemIdleFuckedup'
+            self.set_active(linked, True)
+
+    def _start_wait_in_fear(self, pawn, resume):
+        """Rottweiler.StartWaitInFearAction (cs:827-831) ->
+        RoutineActionWaitInFear.OnActionStarted (cs:13-19): pause, postpone
+        the alarm and loop the fear pose until the hit lands; the resume is
+        parked for ContinueAngryAnimation."""
+        routine = next((r for r in self.routines if r.pawn is pawn), None)
+        pawn.movement_paused = True
+        if routine is not None:
+            routine.postpone_alarm()
+            routine._wait_in_fear_done = resume
+            routine.state = routine.USING
+        if pawn.wait_in_fear_anim and pawn.anim.has(pawn.wait_in_fear_anim):
+            pawn.anim.play_looping(pawn.wait_in_fear_anim)
+
+    def continue_angry_animation(self, pawn):
+        """Pawn.ContinueAngryAnimation -> Rottweiler's override
+        (Rottweiler.cs:820-825): the parked angry now plays, against the
+        ItemToIgnoreNextTime that blocks a second affect run"""
+        item, pawn.item_to_ignore_next_time = pawn.item_to_ignore_next_time, None
+        routine = next((r for r in self.routines if r.pawn is pawn), None)
+        resume = None
+        if routine is not None:
+            resume, routine._wait_in_fear_done = \
+                routine._wait_in_fear_done, None
+            # RoutineActionWaitInFear.OnActionStopped (cs:21-27)
+            pawn.movement_paused = False
+            routine.continue_alarm()
+        if item is None:
+            if resume:
+                resume()
+            return
+        pawn.item_to_ignore_next_time = item       # the gate the re-entry sees
+        self.play_angry(pawn, item, on_done=resume)
+        pawn.item_to_ignore_next_time = None       # Rottweiler.cs:824
 
     def _on_trick_done(self, item):
         """Item.OnTrickDone (Item.cs:2121): score once, linked pairs pay both."""
@@ -2238,7 +2879,8 @@ class World:
     def _fix(self, item):
         """Item.Fix / TrickItem.Fix, the state core: the trick is disarmed and
         the item shows its normal idle again (Item.cs:2102, TrickItem.cs:443),
-        plus the name-hack arms of both Fix bodies."""
+        plus the name-hack arms of both Fix bodies. The UseAtOtherPlace guard
+        and the tricked-overlay swap come from TrickItem.Fix (cs:438-446)."""
         item.tricked = False
         fx = self.level.items.get(item.fix_item_trick) \
             if item.fix_item_trick else None
@@ -2259,6 +2901,15 @@ class World:
             item.tricked = False
             item.primed = False
             item.is_using = False
+            item.next_action_after_gramaphone = True   # TrickItem.cs:436
+        # a fetched-away item skips the visual tail (TrickItem.cs:438-441)
+        if item.use_at_other_place and not item.at_home:
+            return
+        self.set_tricked_object_hidden(item, True)     # cs:442
+        rott = self.pawns.get('Rottweiler')
+        if (rott is None or rott.fixing_item is not item) \
+                and not item.dont_show_on_fix and item.name != 'Pipe':
+            self.set_object_hidden(item, False)        # cs:443-446
         if item.take_off_iron_primed:
             item.primed = False
             item.change_iron_routine = True
@@ -2281,6 +2932,19 @@ class World:
         if p is not None and p.has('BBQDirty'):
             p.play_single('BBQDirty')
 
+    def _item_anim_completed(self, item, name):
+        """TrickItem.OnItemAnimationCompleted (TrickItem.cs:1059-1079): the
+        EnterZone / LeaveZone poses always return to idle, the use poses only
+        with AnimateAfterUse. The WaterPuddle Valve arm rides the unported
+        hover machinery."""
+        if name is None:
+            return
+        if name in (item.enter_zone, item.leave_zone):
+            self._return_to_idle(item)
+        elif item.animate_after_use and \
+                name in (item.use_normal, item.use_tricked_single):
+            self._return_to_idle(item)
+
     def _return_to_idle(self, item):
         """TrickItem.ReturnToIdleAnimation, the reachable branches"""
         p = self.players.get(id(item.sprite)) if item.sprite else None
@@ -2294,6 +2958,59 @@ class World:
         name = item.idle_tricked if tricked else item.idle
         if name and p.has(name):
             p.play_single(name)
+
+    def pawn_by_pid(self, pid):
+        """resolve a serialized Pawn-component reference to the live pawn"""
+        for role, spec in self.level.pawns.items():
+            if spec.get('pid') == pid:
+                return self.pawns.get(role)
+        return None
+
+    def play_use_item_anim(self, item):
+        """TrickItem.PlayUseAnimation (TrickItem.cs:982-994): the item's own
+        normal-use pose — the single UseNormal, or the UseNormalSequence.
+        The AnimateDependant echo is unused by the shipped use flows."""
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is None:
+            return
+        if not item.play_use_normal_seq:
+            self.play_item_anim(item, item.use_normal)
+            return
+        seq = [x for x in item.use_normal_sequence if p.has(x)]
+        if seq:
+            p.play_sequence(seq)
+
+    def play_tricked_item_anim(self, item, pawn=None):
+        """TrickItem.PlayTrickedAnimation (TrickItem.cs:947-962): the single
+        UseTricked — gated by DontUseOn — or the UseTrickedSequence."""
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is None:
+            return
+        if not item.play_use_tricked_seq:
+            if item.dont_use_on is None or \
+                    (pawn is not None
+                     and self.pawn_by_pid(item.dont_use_on) is not pawn):
+                self.play_item_anim(item, item.use_tricked_single)
+            return
+        seq = [x for x in item.use_tricked_sequence if p.has(x)]
+        if seq:
+            p.play_sequence(seq)
+
+    def check_destroy_when_tricked(self, item):
+        """TrickItem.CheckDestroyWhenTricked (TrickItem.cs:656-665): a
+        DestroyAfterUseTricked item vanishes and leaves the notice lists"""
+        if not item.destroy_after_use_tricked:
+            return
+        self.set_object_hidden(item, True)
+        self.set_tricked_object_hidden(item, True)
+        if item.notice_enter:
+            lst = self.notice_items.get(item.zone)
+            if lst and item in lst:
+                lst.remove(item)
+        if item.notice_near:
+            lst = self.near_items.get(item.zone)
+            if lst and item in lst:
+                lst.remove(item)
 
     def play_item_anim(self, item, name):
         """TrickItem.PlayItemAnimation (TrickItem.cs:1018-1050): a no-op
@@ -2362,7 +3079,106 @@ class World:
         renderer and the click collider follow the flag."""
         if item.sprite is not None:
             item.sprite.hidden = not active
+        q = self.level.quads_by_go.get(item.go) if item.go is not None else None
+        if q is not None:
+            q['active'] = active
         item.clickable = active
+
+    def set_go_renderer(self, go, enabled):
+        """Renderer.enabled on a bare object: its backdrop quad or sprite"""
+        q = self.level.quads_by_go.get(go)
+        if q is not None:
+            q['renderer_enabled'] = enabled
+            return
+        for s in self.level.sprites:
+            if s.go == go:
+                s.hidden = not enabled
+                return
+
+    def set_object_hidden(self, item, hidden):
+        """Item.SetObjectHidden (Item.cs:1984-1995): the object's own
+        renderer — a backdrop quad on the static items — and its controller"""
+        if item.sprite is not None:
+            item.sprite.hidden = hidden
+        if item.go is not None:
+            q = self.level.quads_by_go.get(item.go)
+            if q is not None:
+                q['renderer_enabled'] = not hidden
+
+    def set_tricked_object_hidden(self, item, hidden):
+        """TrickItem.SetTrickedObjectHidden (TrickItem.cs:400-410): the
+        overlay's renderer, and the ground tricks' collider rides along —
+        approximated by the item's own clickability, the port's only
+        click surface."""
+        if item.tricked_object_go is None:
+            return
+        self.set_go_renderer(item.tricked_object_go, not hidden)
+
+    def set_active_object_hidden(self, item, hidden):
+        """Item.SetActiveObjectHidden + the TrickItem override that prefers
+        the tricked overlay while tricked (Item.cs:1964-1967,
+        TrickItem.cs:495-505)"""
+        if item.kind in TRICK_KINDS and item.tricked \
+                and item.tricked_object_go is not None:
+            self.set_tricked_object_hidden(item, hidden)
+        else:
+            self.set_object_hidden(item, hidden)
+
+    def set_child_renderers_hidden(self, item, hidden):
+        """Item.SetChildRendererHidden (Item.cs:1969-1978): the first child
+        renderer, plus the second once tricked"""
+        goes = item.child_renderers[:2 if item.tricked else 1]
+        for go in goes:
+            if go is not None:
+                self.set_go_renderer(go, not hidden)
+
+    def unlock_door(self, door):
+        """Door.Unlock (Door.cs:198-207): the alternate idle takes over and
+        the zone graph gains the link"""
+        if not door.locked:
+            return
+        door.locked = False
+        door.use_alternate_idle = True
+        p = self.players.get(id(door.sprite)) if door.sprite else None
+        if p is not None and door.alternate_idle and p.has(door.alternate_idle):
+            p.play_looping(door.alternate_idle)
+        self.level._build_graph()
+
+    def check_final_position(self, pawn, item):
+        """Rottweiler.CheckFinalPosition (Rottweiler.cs:1241-1291): the
+        normal / tricked / linked-tricked stand shifts, exact or relative,
+        with the NormalPosAux one-shot."""
+        if item is None:
+            return
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        fx, fy = item.final_normal
+        if (fx or fy) and not item.tricked and not pawn.normal_pos_aux:
+            if item.exact_normal:
+                pawn.sprite.x, pawn.sprite.y = fx, fy
+            else:
+                pawn.sprite.x += fx
+                pawn.sprite.y += fy
+            return
+        fx, fy = item.final_linked
+        if (fx or fy) and linked is not None and linked.tricked \
+                and item.tricked:
+            pawn.normal_pos_aux = True
+            if item.exact_linked:
+                pawn.sprite.x, pawn.sprite.y = fx, fy
+            else:
+                pawn.sprite.x += fx
+                pawn.sprite.y += fy
+            return
+        fx, fy = item.final_tricked
+        if (fx or fy) and item.tricked and \
+                (linked is None or not linked.tricked):
+            pawn.normal_pos_aux = True
+            if item.exact_tricked:
+                pawn.sprite.x, pawn.sprite.y = fx, fy
+            else:
+                pawn.sprite.x += fx
+                pawn.sprite.y += fy
 
     def icon_pressed(self, entry):
         """HUD.CheckClick consults the held item's OnIconPressed before
@@ -2651,6 +3467,12 @@ class World:
             return True
         held_src = self.level.items.get(inv.used.get('item')) \
             if inv.used is not None and inv.used.get('item') else None
+        # a slept-in bed refuses Woody outright (TrickItem.CanWoodyUse,
+        # TrickItem.cs:537-541)
+        if item.kind in TRICK_KINDS and item.is_bed \
+                and item.is_rottweiler_sleeping:
+            self._woody_cant_use()
+            return False
         # Item.cs:1510: holding anything at a plain (non-TrickItem) item that
         # needs no priming is a flat no
         if inv.used is not None and item.kind not in TRICK_KINDS \
@@ -2777,18 +3599,47 @@ class World:
                 self.set_primed(item, False)
         return True
 
+    def _woody_single_ended(self, name):
+        """Woody.OnSingleAnimationEnded's ItemToShowAfterAnim restore
+        (Woody.cs:381-385) plus the layer restore of
+        OnBlockingAnimationEnded (Woody.cs:304-307)"""
+        for it in self._woody_show_after:
+            self.set_active_object_hidden(it, False)
+        self._woody_show_after = []
+        for pawn, depth in self._woody_layer_restore:
+            pawn.sprite.depth = depth
+        self._woody_layer_restore = []
+
     def _woody_cant_use(self):
         """Woody.PlayCantUseAnimation"""
         if self.woody.anim.has('NoNo'):
             self.woody.anim.play_single('NoNo')
 
     def _woody_try_use(self, item):
-        """Woody.TryUseItem: Item.Use -> WoodyUse gate -> play the item's
-        animation on Woody; the state change happens when it ends."""
+        """Woody.TryUseItem (Woody.cs:499-550): Item.Use -> WoodyUse gate ->
+        the use teleports -> the item's animation on Woody; the state change
+        happens when it ends."""
         item.wrong_trick = False           # Item.WoodyUse (Item.cs:1857)
         ok = self._can_woody_use(item)
         if ok is not True:
             return
+        if item.hide_during_woody_use_anim:
+            self._woody_use_anim_item = item   # Woody.itemAux (Woody.cs:216)
+        # the use teleports (Woody.cs:520-533)
+        if item.teleport_woody_on_use:
+            self.woody.sprite.x, self.woody.sprite.y = item.x, item.y
+        if item.set_woody_x_on_use:
+            self.woody.sprite.x = item.x
+        if item.woody_target_y:
+            self.woody.sprite.y = item.woody_target_y
+        # Item.PreUse for the end-of-animation users (Item.cs:2225-2235)
+        if item.kind in TRICK_KINDS or item.kind == 'SearchItem':
+            if item.hide_before_use:
+                self.set_object_hidden(item, True)
+            other = self.level.items.get(item.hide_other_object_woody) \
+                if item.hide_other_object_woody else None
+            if other is not None:
+                self.set_active_object_hidden(other, True)
         # WoodyUse: remember what was held for the later decrement
         item_used_inventory = self.inventory.used
         if item.kind == 'HideItem':
@@ -2830,6 +3681,15 @@ class World:
         if item.grab_directly:
             self.inventory.add([{'type': item.required_inventory,
                                  'use_count': 0, 'name': item.name}])
+        # the tricked overlay swap (TrickItem.OnUseAnimationCompleted,
+        # cs:295-299) and the hide-other restore (cs:300-304)
+        if item.tricked_object_go is not None:
+            self.set_object_hidden(item, True)
+            self.set_tricked_object_hidden(item, False)
+        other = self.level.items.get(item.hide_other_object_woody) \
+            if item.hide_other_object_woody else None
+        if other is not None:
+            self.set_active_object_hidden(other, False)
         # both arms skip ValveMain — the CanWoodyUse hack alone drives its
         # state (TrickItem.cs:305, 315)
         if item.can_undo_trick and item.tricked and item.name != 'ValveMain':
@@ -2849,6 +3709,22 @@ class World:
                 if item.set_tricked_on_item else None
             if tgt is not None:
                 tgt.tricked = True
+        # Item.InternalUse's own hide/show flags (Item.cs:1919-1938)
+        if item.hide_after_use:
+            self.set_object_hidden(item, True)
+        elif item.show_after_use:
+            self.set_object_hidden(item, False)
+        if item.hide_during_woody_anim:
+            from scene import GUI_DEPTH
+            p = self.pawn_by_pid(item.pawn_to_change_layer_during_hide) \
+                if item.pawn_to_change_layer_during_hide else None
+            if p is not None and item.layer_depth in GUI_DEPTH:
+                self._woody_layer_restore.append((p, p.sprite.depth))
+                p.sprite.depth = GUI_DEPTH[item.layer_depth]
+            # Woody.ShowAfterFinishAnimation: reappears when his next single
+            # ends (Woody.cs:381-385, 304-307)
+            self._woody_show_after.append(item)
+            self.set_active_object_hidden(item, True)
         # idle switch (the tail of OnUseAnimationCompleted)
         self._return_to_idle(item)
         # Woody laughs (Woody.OnSingleAnimationEnded, Woody.cs:418)
@@ -2950,6 +3826,11 @@ class World:
                  player=self.players[id(spec['sprite'])], role=role)
         p.world = self
         self.pawns[role] = p
+        if role == 'Woody':
+            # Woody.OnSingleAnimationEnded restores the hidden-during-anim
+            # items, and OnBlockingAnimationEnded the swapped layers
+            # (Woody.cs:381-385, 304-307)
+            p.anim.single_end_hook = self._woody_single_ended
         if role == 'Woody' and self.level.start_location is not None:
             # Woody.Start parks him at StartLocation in the StartZone with
             # input locked (Woody.cs:187-192); after the intro (immediate
@@ -3212,6 +4093,18 @@ class World:
         elif self.woody is not None and self.woody.input_locked and \
                 self.woody.state == self.woody.IDLE and not self.woody.steps:
             self.woody.input_locked = False     # OnFinishedEntrance
+        # HideDuringWoodyUseAnim rides Woody.Update's itemAux watch
+        # (Woody.cs:237-250): hidden while his current animation is the
+        # item's use animation, shown again after
+        ua = self._woody_use_anim_item
+        if ua is not None and self.woody is not None:
+            cur = self.woody.anim.anim.name
+            if cur == ua.animation and not self._woody_use_anim_hidden:
+                self.set_object_hidden(ua, True)
+                self._woody_use_anim_hidden = True
+            elif cur != ua.animation and self._woody_use_anim_hidden:
+                self._woody_use_anim_hidden = False
+                self.set_object_hidden(ua, False)
         for p in self.players.values():
             p.tick(dt)
         for p in self.pawns.values():

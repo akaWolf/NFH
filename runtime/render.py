@@ -138,8 +138,10 @@ def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h):
 
 def draw_quad(rnd, cache, cam, q, w, h):
     """A world-space textured Plane — the backdrop and the static item overlays.
-    These go through Unity's normal renderer, so they draw beneath every sprite."""
-    if not q.get('active'):
+    These go through Unity's normal renderer, so they draw beneath every
+    sprite. Renderer.m_Enabled gates the draw: the tricked overlays ship with
+    it off and SetTrickedObjectHidden flips it at runtime."""
+    if not q.get('active') or not q.get('renderer_enabled', True):
         return False
     entry = cache.get(q['texture'])
     if entry is None:

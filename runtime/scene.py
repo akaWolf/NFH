@@ -183,7 +183,43 @@ class Item:
                  'use_tricked_sequence', 'rott_use_exit_delta',
                  'rott_use_item_exit_delta', 'notice_near', 'cause_slip',
                  'surprise_delta', 'surprise_left', 'surprise_right',
-                 'change_actions_208')
+                 'change_actions_208',
+                 # the use side-effect block (RoutineActionUse / RottweilerUse
+                 # / PlayAngryAnimation / InternalUse)
+                 'go', 'teleport_woody_on_use', 'set_woody_x_on_use',
+                 'woody_target_y', 'set_olga_x_on_use',
+                 'teleport_rott_on_use', 'rott_teleport_offset',
+                 'is_bed', 'is_rottweiler_sleeping',
+                 'rush_to_toilet', 'cause_sickness',
+                 'pawn_to_affect', 'pawn_to_affect_only_linked',
+                 'show_item_when_affected', 'change_item_anim_when_affected',
+                 'item_anim_when_affected', 'change_item_anim_when_angry',
+                 'item_anim_when_angry', 'use_olga_tricked_flag',
+                 'use_mother_tricked_flag',
+                 'reuse_after_fix', 'angry_without_animations', 'fix_directly',
+                 'rott_extra_angry', 'before_angry', 'sand_castle_flag',
+                 'hide_during_rott_animation', 'hide_object_during_animation',
+                 'disable_collider_after_use', 'give_bowling_when_tricked',
+                 'remove_bowling', 'force_fuckedup_when_tricked',
+                 'idle_fucked_up', 'use_fucked_up', 'use_normal',
+                 'use_tricked_single', 'use_normal_sequence',
+                 'play_use_normal_seq', 'play_use_tricked_seq',
+                 'final_normal', 'final_tricked', 'final_linked',
+                 'exact_normal', 'exact_tricked', 'exact_linked',
+                 'use_final_positions_in_beginning',
+                 'should_return', 'at_home',
+                 'dont_use_on', 'still_use_not_tricked_delta',
+                 'rott_prime_exit_delta', 'rott_use_not_tricked_exit_delta',
+                 'exit_delta_aux', 'exit_delta_not_tricked_aux',
+                 'hide_during_woody_anim', 'hide_during_woody_use_anim',
+                 'hide_other_object_woody', 'hide_before_use',
+                 'hide_after_use', 'show_after_use',
+                 'pawn_to_change_layer_during_hide', 'layer_depth',
+                 'tricked_object_go', 'is_ground_trick', 'dont_show_on_fix',
+                 'next_action_after_gramaphone', 'ignore_woody_when_use',
+                 'harpoon_aux', 'child_renderers',
+                 'object_to_show_before_angry_go', 'animate_after_use',
+                 'mother_rott_angry')
 
     def __init__(self, name, pid, kind, x, y, zone, dx, dy, d):
         self.name = name; self.pid = pid; self.kind = kind
@@ -406,6 +442,105 @@ class Item:
         # TrickItem.MotherUse injects ActionsToAddInGame on a tricked use
         # (TrickItem.cs:1253-1262)
         self.change_actions_208 = bool(d.get('ChangeActionsWhenTricked208'))
+        # -- the use side-effect block ----------------------------------
+        def ref(field):
+            return (d.get(field) or {}).get('path')
+        def vec2(field):
+            v = d.get(field) or {}
+            return (v.get('x', 0.0), v.get('y', 0.0))
+        self.go = None                    # filled by Level._add_item
+        # Woody.TryUseItem's teleports (Woody.cs:520-533) and Olga's
+        # (Olga.cs:146-152)
+        self.teleport_woody_on_use = bool(d.get('TeleportWoodyOnUse'))
+        self.set_woody_x_on_use = bool(d.get('SetWoodyXOnUse'))
+        self.woody_target_y = d.get('WoodyTargetY') or 0.0
+        self.set_olga_x_on_use = bool(d.get('SetOlgaXOnUse'))
+        # RoutineActionUse.OnActionStarted's teleport (cs:205-208)
+        self.teleport_rott_on_use = bool(d.get('TeleportRottweilerOnUse'))
+        self.rott_teleport_offset = vec2('RottweilerTeleportOffset')
+        # the Bed state (TrickItem.cs:124, 136; RoutineActionUse.cs:302-306,
+        # 513-516) — CanWoodyUse refuses a slept-in bed
+        self.is_bed = bool(d.get('IsBed'))
+        self.is_rottweiler_sleeping = False
+        # the toilet rush (TrickItem.CauseRushToToilet, cs:683-686)
+        self.rush_to_toilet = bool(d.get('RushToToilet'))
+        self.cause_sickness = bool(d.get('CauseSicknessWhenTricked'))
+        # the hit-pawn choreography (Rottweiler.cs:737-753)
+        self.pawn_to_affect = ref('PawnToAffectWhenTricked')
+        self.pawn_to_affect_only_linked = bool(d.get('PawnToAffectOnlyWhenLinked'))
+        self.show_item_when_affected = bool(d.get('ShowItemWhenAffected'))
+        self.change_item_anim_when_affected = bool(d.get('ChangeItemAnimationWhenAffected'))
+        self.item_anim_when_affected = _anim_name(d.get('ItemAnimationWhenAffected'))
+        self.change_item_anim_when_angry = bool(d.get('ChangeItemAnimationWhenAngry'))
+        self.item_anim_when_angry = _anim_name(d.get('ItemAnimationWhenAngry'))
+        self.use_olga_tricked_flag = False   # Item.UseOlgaTrickedAnimation
+        self.use_mother_tricked_flag = False  # Item.UseMotherTrickedAnimation
+        # the angry flow (Rottweiler.PlayAngryAnimation)
+        self.reuse_after_fix = bool(d.get('ReuseAfterFix'))
+        self.angry_without_animations = bool(d.get('AngryWithoutAnimations'))
+        self.fix_directly = bool(d.get('FixDirectly'))
+        self.rott_extra_angry = d.get('RottweilerExtraAngryAnimation') or []
+        self.before_angry = _anim_name(d.get('BeforeAngry'))
+        self.sand_castle_flag = bool(d.get('SandCastleBehavior'))
+        # TrickItem.RottweilerUse's hide arms (TrickItem.cs:574-593)
+        self.hide_during_rott_animation = bool(d.get('HideDuringRottAnimation'))
+        self.hide_object_during_animation = ref('HideObjectDuringAnimation')
+        self.disable_collider_after_use = bool(d.get('DisableColliderAfterUse'))
+        self.give_bowling_when_tricked = bool(d.get('GiveBowlingBallWhenTricked'))
+        self.remove_bowling = bool(d.get('RemoveBowlingBall'))
+        self.force_fuckedup_when_tricked = bool(d.get('ForceFuckedUpAnimWhenTricked'))
+        self.idle_fucked_up = _anim_name(d.get('IdleFuckedUp'))
+        self.use_fucked_up = _anim_name(d.get('UseFuckedUp'))
+        # the item-side use animations (TrickItem.cs:947-994)
+        self.use_normal = _anim_name(d.get('UseNormal'))
+        self.use_tricked_single = _anim_name(d.get('UseTricked'))
+        self.use_normal_sequence = d.get('UseNormalSequence') or []
+        self.play_use_normal_seq = bool(d.get('PlayUseNormalSequence'))
+        self.play_use_tricked_seq = bool(d.get('PlayUseTrickedSequence'))
+        # the final stand-point shifts (Rottweiler.CheckFinalPosition,
+        # cs:1241-1291; ActionManager.cs:180-191)
+        self.final_normal = vec2('FinalDeltaLocationNormal')
+        self.final_tricked = vec2('FinalDeltaLocationAfterTrick')
+        self.final_linked = vec2('FinalDeltaLocationAfterLinkedTrick')
+        self.exact_normal = bool(d.get('ExactPositionNormal'))
+        self.exact_tricked = bool(d.get('ExactPositionNormalTricked'))
+        self.exact_linked = bool(d.get('ExactPositionLinkedTricked'))
+        self.use_final_positions_in_beginning = bool(d.get('UseFinalPositionsInBeginning'))
+        # UseAtOtherPlace / ShouldReturn (TrickItem.cs:32-38, 599-607)
+        self.should_return = bool(d.get('ShouldReturn'))
+        self.at_home = True                   # TrickItem.AtHome
+        # the exit deltas (RoutineActionUse.StopAction, cs:428-480)
+        self.dont_use_on = ref('DontUseOn')
+        self.still_use_not_tricked_delta = bool(d.get('StillUseItemNotTrickedExitDeltaAfterTrick'))
+        self.rott_prime_exit_delta = vec2('RottweilerPrimeExitDelta')
+        self.rott_use_not_tricked_exit_delta = vec2('RottweilerUseItemNotTrickedExitDelta')
+        self.exit_delta_aux = False           # RottweilerUseItemExitDeltaAux
+        self.exit_delta_not_tricked_aux = False
+        # Woody-side hide flows (Item.InternalUse / PreUse, cs:1919-1953,
+        # 2225-2235; Woody.cs:237-250, 381-385)
+        self.hide_during_woody_anim = bool(d.get('HideDuringWoodyAnim'))
+        self.hide_during_woody_use_anim = bool(d.get('HideDuringWoodyUseAnim'))
+        self.hide_other_object_woody = ref('HideOtherObjectDuringWoodyAnim')
+        self.hide_before_use = bool(d.get('HideBeforeUse'))
+        self.hide_after_use = bool(d.get('HideAfterUse'))
+        self.show_after_use = bool(d.get('ShowAfterUse'))
+        self.pawn_to_change_layer_during_hide = ref('PawnToChangeLayerDuringHide')
+        self.layer_depth = d.get('LayerDepth')
+        # the tricked overlay object (TrickItem.cs:20, 295-299, 400-410)
+        self.tricked_object_go = ref('TrickedObject')
+        self.is_ground_trick = bool(d.get('IsGroundTrick'))
+        self.dont_show_on_fix = bool(d.get('DontShowOnFix'))
+        self.next_action_after_gramaphone = False   # set by FixAll
+        self.ignore_woody_when_use = bool(d.get('IgnoreWoodyWhenUse'))
+        self.harpoon_aux = False              # Item.harpoonAux
+        self.child_renderers = [(c or {}).get('path')
+                                for c in (d.get('ChildRenderers') or [])]
+        self.object_to_show_before_angry_go = ref('ObjectToShowBeforeAngryAnimation')
+        # TrickItem.OnItemAnimationCompleted returns the use pose to idle
+        # when AnimateAfterUse (TrickItem.cs:116, 1074-1077)
+        self.animate_after_use = bool(d.get('AnimateAfterUse'))
+        # the Mother's angry-at-the-neighbour set (Item.cs:1037-1041)
+        self.mother_rott_angry = d.get('MotherRottweilerAngryAnimation') or []
         self.cause_slip = bool(d.get('CauseSlip'))
         sd = d.get('SurpriseDeltaLocation') or {}
         self.surprise_delta = (sd.get('x', 0.0), sd.get('y', 0.0))
@@ -413,6 +548,15 @@ class Item:
         # SameZone yell both read them)
         self.surprise_left = d.get('SurpriseSequenceLeft') or []
         self.surprise_right = d.get('SurpriseSequenceRight') or []
+
+    def cause_rush_to_toilet(self, items):
+        """TrickItem.CauseRushToToilet (TrickItem.cs:683-686)"""
+        if self.rush_to_toilet:
+            return True
+        if not self.tricked and self.depends_on is not None:
+            dep = items.get(self.depends_on)
+            return dep is not None and dep.tricked and dep.rush_to_toilet
+        return False
 
     @property
     def target_x(self):
@@ -470,7 +614,7 @@ class Door:
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
                  'exit_anim', 'idle', 'sprite', 'passing', 'should_walk_up',
                  'use_distance', 'item_use_height', 'delta_use_height',
-                 'dx', 'dy', 'rott_exit')
+                 'dx', 'dy', 'rott_exit', 'alternate_idle', 'use_alternate_idle')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -496,6 +640,9 @@ class Door:
         # (RoutineActionMove.cs:121)
         rel = d.get('RottweilerExitLocation') or {}
         self.rott_exit = (rel.get('x', 0.0), rel.get('y', 0.0))
+        # Door.Unlock switches to the alternate idle (Door.cs:198-223)
+        self.alternate_idle = _anim_name(d.get('AlternateIdleAnimation'))
+        self.use_alternate_idle = False
 
 
 # every ActorBehavior / RoutineBehavior / SearchBehavior subclass shipped in
@@ -541,6 +688,7 @@ class Level:
                     if c['type'] == 'Transform':
                         self._transform_of[int(pid)] = c['path']
         self.quads = raw.get('quads') or []          # world-space textured planes
+        self.quads_by_go = {q['go']: q for q in self.quads if 'go' in q}
         # the HUD component's resolved textures/rects (tools/export_level.py)
         self.hud = ((raw.get('hud') or {}).get('HUD') or [None])[0]
         # Zone.BubbleIcon textures for MoveOnly think bubbles, keyed by the
@@ -734,9 +882,11 @@ class Level:
         dl = d.get('DeltaLocation') or {}
         zc = (d.get('Zone') or {}).get('path')
         zgo = self._go_of(self._o(zc)) if zc and self._o(zc) else None
-        self.items[pid] = Item(self._o(go)['data']['name'], pid, o['type'],
-                               p[0], p[1], zgo,
-                               dl.get('x', 0.0), dl.get('y', 0.0), d)
+        it = Item(self._o(go)['data']['name'], pid, o['type'],
+                  p[0], p[1], zgo,
+                  dl.get('x', 0.0), dl.get('y', 0.0), d)
+        it.go = go
+        self.items[pid] = it
 
     def _link_item_sprites(self):
         """Item.Start: AnimController = GetComponentInChildren — the controller
@@ -931,7 +1081,39 @@ class Level:
                              'remove_fifi': bool(a.get('RemoveFifi')),
                              'give_skates': bool(a.get('GiveSkates')),
                              'remove_skates': bool(a.get('RemoveSkates')),
-                             'alert_next': bool(a.get('AlertNext'))}
+                             'alert_next': bool(a.get('AlertNext')),
+                             # the use side-effect set
+                             # (RoutineActionUse.cs:7-101, 201-307, 386-535)
+                             'is_toilet': bool(a.get('IsToiletAction')),
+                             # an Urgent routine action is approached at a
+                             # run (RoutineActionMove.OnActionStarted,
+                             # cs:68-75); ContinueToNextAfterFinished then
+                             # advances normally (ActionManager.cs:530-538)
+                             'urgent': bool(a.get('Urgent')),
+                             'freeze_after_completion':
+                                 bool(a.get('FreezeAfterCompletion')),
+                             'hide_object_tricked': bool(a.get('HideObjectDuringUseTricked')),
+                             'hide_object_tricked_delayed': ref('HideObjectDuringUseTrickedWithDelay'),
+                             'hide_object_tricked_delay': a.get('HideObjectDuringUseTrickedDelay') or 0.0,
+                             'hide_child': bool(a.get('HideChildRendererDuringUse')),
+                             'object_to_hide': ref('ObjectToHideDuringUse'),
+                             'object_to_hide_tricked': ref('ObjectToHideDuringUseTricked'),
+                             'object_to_activate': ref('ObjectToActivateDuringUse'),
+                             'pawn_to_hide': ref('PawnToHideDuringUse'),
+                             'go_hide_after_use': ref('GameObjectToHideAfterUse'),
+                             'go_hide_after_use_tricked': ref('GameObjectToHideAfterUseTricked'),
+                             'go_show_after_use': ref('GameObjectToShowAfterUse'),
+                             'remove_action_after_use': bool(a.get('RemoveActionAfterUse')),
+                             'change_layer_linked': bool(a.get('ChangeLayerInLinkedTricked')),
+                             'layer_to_change': a.get('LayerToChange'),
+                             'pawn_to_change_layer': ref('PawnToChangeLayer'),
+                             'item_to_change_layer': ref('ItemToChangeLayer'),
+                             'doors_to_unlock': [(x or {}).get('path')
+                                                 for x in (a.get('DoorsToUnlock') or [])],
+                             'items_to_unlock': [(x or {}).get('path')
+                                                 for x in (a.get('ItemsToUnlock') or [])],
+                             'items_to_unlock_tricked': [(x or {}).get('path')
+                                                         for x in (a.get('ItemsToUnlockWhenTricked') or [])]}
             acts = [parse_action(a) for a in (d.get('Actions') or [])]
             # ActionManager.ActionsToAddInGame, injected by the tricked
             # Fifi's Mother use (ActionManager.cs:814-842)
@@ -1201,6 +1383,22 @@ class Level:
                 'kid_crying_sequence': pd.get('CryingSequence') or [],
                 'kid_remote_sequence': _anim_name(pd.get('RemoteSequence')),
                 'kid_olga': (pd.get('olga') or {}).get('path'),
+                # the toilet run (Rottweiler.ToiletAction, cs:32; MoveToToilet
+                # cs:863-867) and the hit-pawn pair (Pawn.cs:123-125)
+                'toilet_action': {
+                    'item': ((pd.get('ToiletAction') or {}).get('Item')
+                             or {}).get('path'),
+                    'is_toilet': bool((pd.get('ToiletAction') or {}).get(
+                        'IsToiletAction')),
+                },
+                'wait_in_fear_anim': _anim_name(
+                    (pd.get('WaitInFearAction') or {}).get('FearAnimation')),
+                'hit_pawn_action': {
+                    'sequence': (pd.get('HitPawnAction') or {}).get(
+                        'HitPawnSequence') or [],
+                    'max_distance': (pd.get('HitPawnAction') or {}).get(
+                        'MaximumPawnDistanceToAction') or 0.03,
+                },
             }
 
     def _go_of_sprite(self, sprite):

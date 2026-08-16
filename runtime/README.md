@@ -792,6 +792,93 @@ was dead before this.
   linked-pair head of `TrickItem.PlayAnimation` (TrickItem.cs:804-816) — since
   Level207/210's behaviors rewrite it at runtime.
 
+## The use side-effects
+
+The block `RoutineActionUse` and `Rottweiler.PlayAngryAnimation` hang their
+flags on, ported end to end:
+
+- **The started run** (RoutineActionUse.cs:201-307, in source order): the
+  toilet flag, `TeleportRottweilerOnUse`, the tricked hide-after, the whole
+  `HideObjectDuringUse` family (`...Tricked`, `...TrickedWithDelay` through
+  the Invoke queue, `HideChildRendererDuringUse`, `ObjectToHideDuringUse[Tricked]`,
+  `ObjectToActivateDuringUse`, `PawnToHideDuringUse`), the linked-tricked
+  layer swap, the prime/trick-after-use tail, and the Bed mark
+  (`IsRottweilerSleeping`, which also refuses Woody the bed —
+  TrickItem.cs:537-541).
+- **The stop run** (cs:386-535) fires on *both* stop calls of a tricked use,
+  exactly as the original calls StopAction twice around the angry set: the
+  door and item unlocks (`Door.Unlock` switches to the alternate idle and
+  reopens the zone graph), the four exit deltas with their one-shot aux
+  flags and the `DontUseOn` and `WasPriming` gates — the positive-component
+  check on the item deltas is the original's quirk and is kept — the
+  unhides, the after-use hide/show, the layer restore, and the Harpoon
+  hand-off (cs:541-545) paired with the LaunchPad head
+  (TrickItem.cs:896-902).
+- **`PlayAngryAnimation` is now the whole method** (Rottweiler.cs:552-797):
+  the `DontGetAngry` resets, `CheckFinalPosition` (with the
+  `FinalDeltaLocation*` triple, the exact variants and the `NormalPosAux`
+  one-shot — also run from `StartNextAction` for
+  `UseFinalPositionsInBeginning` and the WaterPuddle), the Chef /
+  ChairAssemblyBook / LiveBull / MumStatueFootStool name-hacks,
+  `HideObjectDuringAnimation`, `ShowObjects`, `ChangeItemAnimationWhenAngry`,
+  `ObjectToShowBeforeAngryAnimation`, `PlayBeforeAngry`, the compound
+  double-count guard, the extra-angry insert with its sand-castle gate,
+  `FixDirectly`, `AngryWithoutAnimations`, and `ReuseAfterFix` restarting
+  the action instead of advancing.
+- **The affected-pawn choreography** (Rottweiler.cs:737-753, 820-831;
+  RoutineActionHitPawn / RoutineActionWaitInFear): a tricked
+  `PawnToAffectWhenTricked` item parks the neighbour in his fear loop
+  (`WaitInFearAction`, whose pose `ChangeHitPawnAnimation207` rewrites for
+  the sand castle and shell), sends Olga or the Mother over — the hit
+  sheets contain the neighbour, so the target hides — and
+  `ContinueAngryAnimation` plays the parked angry afterwards, against the
+  `ItemToIgnoreNextTime` re-entry gate. Olga's simultaneous tricked-use
+  (`UpdatePawnToAffectAnimation`, Item.cs:868-882) and
+  `ChangeItemAnimationWhenAffected` ride along.
+- **The toilet run**: `CauseRushToToilet` → `MoveToToilet` → the serialized
+  `ToiletAction` as an urgent full use, with `FeelSick` switching the walk
+  and portal sets to `RunWC*` and the flags clearing on the use end
+  (Rottweiler.cs:542-550, 863-892; TrickItem.cs:683-686). The `Toilet`
+  subclass with its no-paper branch instantiates nowhere in either season's
+  data.
+- **Woody's side**: the use teleports (`TeleportWoodyOnUse`,
+  `SetWoodyXOnUse`, `WoodyTargetY`, Olga's `SetOlgaXOnUse`), `PreUse`'s
+  `HideBeforeUse` / `HideOtherObjectDuringWoodyAnim`, `InternalUse`'s
+  `HideAfterUse` / `ShowAfterUse` / `HideDuringWoodyAnim` with the layer
+  swap and the show-at-next-single restore, and `HideDuringWoodyUseAnim`'s
+  per-frame watch (Woody.cs:237-250, 381-385, 520-533; Item.cs:1919-1953,
+  2225-2235).
+- **The items act their use**: `PlayUseAnimation` / `PlayTrickedAnimation`
+  play the item's own `UseNormal` / `UseTricked` pose or sequence during
+  the neighbour's use, `OnUseEnded` returns it to idle (or
+  `AnimateAfterUse` does, via the controller's animation-ended delegate,
+  which also serves the zone poses' return — TrickItem.cs:688-695,
+  947-994, 1059-1079).
+
+### The tricked overlays were drawing all along
+
+93 items carry a `TrickedObject` — a separate quad whose `Renderer.enabled`
+ships **off** and flips with the trick (`SetTrickedObjectHidden`,
+TrickItem.cs:295-299, 400-410, 442). The exporter never read the renderer's
+enabled byte, so all 125 disabled overlay quads (the dirty microwave, the
+glued binoculars, the slippery floors...) drew from level start, under the
+sprites. The exporter now emits `renderer_enabled` plus the GameObject id
+per quad, the renderer honours it, and `SetObjectHidden` /
+`SetActiveObjectHidden` toggle the quads too — the overlay appears on the
+trick and vanishes with the fix, and `CheckDestroyWhenTricked` also drops
+the notice registrations (TrickItem.cs:656-665).
+
+An `Urgent` routine action is approached at a run
+(RoutineActionMove.cs:68-75; the 206/208/210 Mother calls), its
+`ContinueToNextAfterFinished` then matching the port's normal advance, and
+`FreezeAfterCompletion` parks the manager (ActionManager.cs:539-543) — its
+two data uses both sit behind the unported tutorial flows that also
+unfreeze them. Still open here: `ChangeLayerInTricked`,
+`IgnoreTrickedExitDelta` and `frozenDuration` are serialized but carry no
+live data or code path; `KeepAnimationsInMemory` manages texture memory the
+port does not model; the L211 Olga toilet-delay arm of the hit
+(`DelayToiletBehavior211`) rides the unported Bouquet hack.
+
 ## Testing against the original
 
 `runtime/record.py` drives the real `Viewer` deterministically — a fixed
