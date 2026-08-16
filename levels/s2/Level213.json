@@ -6,6 +6,8 @@
    "name": "Level",
    "texture": "house213",
    "active": true,
+   "renderer_enabled": true,
+   "go": 6,
    "x": 0.0,
    "y": 0.0,
    "z": 0.0,

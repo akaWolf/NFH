@@ -118,7 +118,8 @@ def _quads(sc, index, world):
         n = r.i32()
         comps = [(r.i32(), r.i32(), r.i64()) for _ in range(n)]
         layer = r.i32(); name = r.astr(); r.u16(); active = bool(r.u8())
-        if not any(cid == 23 for cid, _, _ in comps):
+        mr = next((pid for cid, _, pid in comps if cid == 23), None)
+        if mr is None:
             continue
         mf = next((pid for cid, _, pid in comps if cid == 33), None)
         tr = next((pid for cid, _, pid in comps if cid == 4), None)
@@ -132,9 +133,17 @@ def _quads(sc, index, world):
         tex = background_texture(index, sc.f, comps)
         if not tex:
             continue
+        # Renderer.m_Enabled is the first byte after the GameObject pointer
+        # (the layout read_renderer_materials documents); the tricked-overlay
+        # objects ship with it off and SetTrickedObjectHidden flips it
+        ro = next((x for x in sc.f.objects if x['path_id'] == mr), None)
+        er = Reader(sc.f.body(ro), 0); er.i32(); er.i64()
+        renderer_enabled = bool(er.u8())
         p, s, _r = world.get(tr, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0),
                                   (0.0, 0.0, 0.0, 1.0)))
         out.append({'name': name, 'texture': tex, 'active': active,
+                    'renderer_enabled': renderer_enabled,
+                    'go': o['path_id'],
                     'x': p[0], 'y': p[1], 'z': p[2],
                     'w': PLANE_SIZE * s[0], 'h': PLANE_SIZE * s[2],
                     'is_level': any(sc.objs.get(pid, {}).get('type') == 'Level'
