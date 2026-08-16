@@ -84560,6 +84560,68 @@
     "HideObjectDuringDexterity": false,
     "GameCamera": null
    }
+  ],
+  "TutorialScriptCameraNFH2": [
+   {
+    "m_GameObject": {
+     "path": 67,
+     "name": "TutorialScriptCamera",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "WaterPuddle": {
+     "path": 232,
+     "name": "WaterPuddle",
+     "type": "TrickItem"
+    },
+    "Buffet": {
+     "path": 219,
+     "name": "Buffet",
+     "type": "TrickItem"
+    },
+    "DeckRail": {
+     "path": 251,
+     "name": "DeckRail",
+     "type": "TrickItem"
+    },
+    "woody": {
+     "path": 218,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "CameraOverlay": null,
+    "CameraOverlayRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "LevelScript": {
+     "path": 230,
+     "name": "LevelScript",
+     "type": "LevelScript"
+    },
+    "LeftSideStair": {
+     "path": 223,
+     "name": "TransitionDownwards",
+     "type": "Transition"
+    },
+    "RightSideStair": {
+     "path": 215,
+     "name": "TransitionDownwards",
+     "type": "Transition"
+    },
+    "UpTransition": {
+     "path": 253,
+     "name": "TransitionLeftComplex",
+     "type": "Transition"
+    },
+    "DownTransition": {
+     "path": 234,
+     "name": "TransitionLeftComplex",
+     "type": "Transition"
+    }
+   }
   ]
  },
  "bubble_icons": {

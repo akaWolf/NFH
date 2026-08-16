@@ -51939,6 +51939,35 @@
     }
    }
   ],
+  "TutorialScriptCamera": [
+   {
+    "m_GameObject": {
+     "path": 43,
+     "name": "TutorialScriptCamera",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "MumSmeared": {
+     "path": 218,
+     "name": "MumPicture",
+     "type": "TrickItem"
+    },
+    "Marble": {
+     "path": 205,
+     "name": "Ground",
+     "type": "TrickItem"
+    },
+    "CameraOverlay": {
+     "texture": "camera~2"
+    },
+    "CameraOverlayRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 1.0,
+     "height": 1.0
+    }
+   }
+  ],
   "ControlSlider": [
    {
     "m_GameObject": {

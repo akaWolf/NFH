@@ -99096,6 +99096,63 @@
     "Mother210": false
    }
   ],
+  "TutorialScriptCameraNFH2206": [
+   {
+    "m_GameObject": {
+     "path": 72,
+     "name": "TutorialScriptCamera",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "woody": {
+     "path": 231,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "CameraOverlay": null,
+    "CameraOverlayRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "LevelScript": {
+     "path": 295,
+     "name": "LevelScript",
+     "type": "LevelScript"
+    },
+    "DeckChair": {
+     "path": 312,
+     "name": "DeckChair",
+     "type": "TrickItem"
+    },
+    "DeckChairThrow": {
+     "path": 283,
+     "name": "DeckChairThrow",
+     "type": "TrickItem"
+    },
+    "LeftSideStair": {
+     "path": 246,
+     "name": "TransitionDownwards",
+     "type": "Transition"
+    },
+    "RightSideStair": {
+     "path": 228,
+     "name": "TransitionDownwards",
+     "type": "Transition"
+    },
+    "UpTransition": {
+     "path": 288,
+     "name": "TransitionLeftComplex",
+     "type": "Transition"
+    },
+    "DownTransition": {
+     "path": 254,
+     "name": "TransitionLeftComplex",
+     "type": "Transition"
+    }
+   }
+  ],
   "DexterityComponent": [
    {
     "m_GameObject": {

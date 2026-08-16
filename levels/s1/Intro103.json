@@ -57751,6 +57751,45 @@
      "height": 1.0
     }
    }
+  ],
+  "TutorialScriptCameraIntro3": [
+   {
+    "m_GameObject": {
+     "path": 52,
+     "name": "TutorialScriptCamera03",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "Marble": {
+     "path": 206,
+     "name": "Ground",
+     "type": "TrickItem"
+    },
+    "RottActionManager": {
+     "path": 209,
+     "name": "RottweilerActionManager",
+     "type": "ActionManager"
+    },
+    "LevelScript": {
+     "path": 189,
+     "name": "LevelScript",
+     "type": "LevelScript"
+    },
+    "Woody": {
+     "path": 164,
+     "name": "Player",
+     "type": "Woody"
+    },
+    "CameraOverlay": {
+     "texture": "camera~2"
+    },
+    "CameraOverlayRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 1.0,
+     "height": 1.0
+    }
+   }
   ]
  },
  "bubble_icons": {

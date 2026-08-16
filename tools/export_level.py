@@ -625,6 +625,10 @@ def hud_sections(sc, index, out):
                                  'MenuMouseController', 'InGameMenu',
                                  'ExitConfirmation', 'IntroAnimation',
                                  'DirectorAnimation', 'LevelScript',
+                                 'TutorialScriptCamera',
+                                 'TutorialScriptCameraIntro3',
+                                 'TutorialScriptCameraNFH2',
+                                 'TutorialScriptCameraNFH2206',
                                  'MusicPlayer', 'Level') \
                 or 'data' not in e:
             continue
