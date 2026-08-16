@@ -17,6 +17,10 @@ Season 2 "On Vacation") rebuilt against the game's own decompiled code.
 3. Play. Season 1 is required (it carries the menu); without Season 2 its
    episodes stay unplayable.
 
+Got Season 2 later? Drop its `.xapk` (or apk+obb) next to the executable
+and start the game — a season that is not extracted yet is picked up on
+any start, not only the first one.
+
 ## Controls
 
 - **Left click** — walk, use items, all menu buttons

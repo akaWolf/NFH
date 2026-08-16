@@ -797,18 +797,24 @@ class App:
         self.prefs.save()                 # Unity saves the prefs on exit
 
 
-def have_assets():
-    """the extracted Season-1 assets are the minimum the Entry needs; a
-    texture directory with almost nothing in it counts as absent — a
-    failed first run (the numpy-less bundle regression) must re-extract"""
-    d = os.path.join(asset_root(), 'textures', 's1')
+def _season_installed(season):
+    """one season's extracted assets: a texture directory with real
+    content (almost-empty counts as absent — a failed first run, the
+    numpy-less bundle regression, must re-extract) plus the exported
+    levels"""
+    d = os.path.join(asset_root(), 'textures', season)
     if not os.path.isdir(d):
         return False
     pngs = sum(1 for n in os.listdir(d) if n.endswith('.png'))
     if pngs <= 100:
         return False
-    return os.path.exists(os.path.join(levels_root(), 'levels', 's1',
+    return os.path.exists(os.path.join(levels_root(), 'levels', season,
                                        'Entry.json'))
+
+
+def have_assets():
+    """the Season-1 assets are the minimum the Entry needs"""
+    return _season_installed('s1')
 
 
 def _message_box(title, text):
@@ -822,11 +828,13 @@ def _message_box(title, text):
         pass
 
 
-def bootstrap_assets():
-    """first run: find the game's apk/obb (or xapk) next to the bundle,
-    unpack it to a temp directory and extract the textures, audio,
-    strings and fonts into the asset root — tools/unpack.py +
-    tools/extract_assets.py, in-process (the bundle has no shell)"""
+def ensure_assets():
+    """the first run AND a later season purchase: every apk/obb (or
+    xapk) next to the bundle whose season is not extracted yet gets
+    extracted on the way in — tools/unpack.py + tools/extract_assets.py,
+    in-process (the bundle has no shell). Season 1 is the gate: the
+    Entry lives there; Season 2 dropped in after the first run is
+    picked up here too."""
     import shutil, tempfile
     sys.path.insert(0, os.path.join(data_root(), 'tools'))
     from unpack import find_sources, unpack
@@ -837,28 +845,27 @@ def bootstrap_assets():
         sources = find_sources(d)
         if sources:
             break
-    if not sources:
-        _message_box('Neighbours from Hell', (
-            'No game data found.\n\n'
-            'Put the game\'s .apk and .obb (or the .xapk) next to the\n'
-            'executable and start it again: the assets are extracted\n'
-            'from your own copy of the game on first run.\n\n'
-            'Season 1 is required; Season 2 is optional.\n'
-            'Looked in: %s' % root))
-        return False
-    if 's1' not in sources:
-        _message_box('Neighbours from Hell', (
-            'Only Season 2 data found — Season 1 is required (it carries '
-            'the menu). Put its apk/obb here too: %s' % root))
+    if not have_assets() and 's1' not in sources:
+        if sources:
+            _message_box('Neighbours from Hell', (
+                'Only Season 2 data found — Season 1 is required (it '
+                'carries the menu). Put its apk/obb here too: %s' % root))
+        else:
+            _message_box('Neighbours from Hell', (
+                'No game data found.\n\n'
+                'Put the game\'s .apk and .obb (or the .xapk) next to the\n'
+                'executable and start it again: the assets are extracted\n'
+                'from your own copy of the game on first run.\n\n'
+                'Season 1 is required; Season 2 is optional.\n'
+                'Looked in: %s' % root))
         return False
     for season in ('s1', 's2'):
-        entry = sources.get(season)
-        if entry is None:
+        if season not in sources or _season_installed(season):
             continue
         print('== extracting %s (one-time, a few minutes) ==' % season)
         tmp = tempfile.mkdtemp(prefix='nfh-data-')
         try:
-            unpack(entry, tmp)
+            unpack(sources[season], tmp)
             extract_season(tmp, root, season)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -886,7 +893,7 @@ def main(argv):
             app.state, sum(1 for go, e in app.menu.scene.find('ControlWindow')
                            if app.menu.scene.active_in_hierarchy(go))))
         return 0
-    if not have_assets() and not bootstrap_assets():
+    if not ensure_assets():
         return 1
     start = argv[1] if len(argv) > 1 else 'Entry'
     app = App()
