@@ -1729,16 +1729,139 @@ the level selection menu, LevelLoader, not modelled).
   sealed by the awake Mother's infinite poses); the level's TotalTricksCount
   counts them, the win comes at WinningTricksCount.
 
+## The menus and the flow (runtime/app.py, runtime/menu.py)
+
+`runtime/app.py` is the whole game: the scene machine the original wraps
+around the levels. `CoreFrameworkController` loads "Entry"
+(CoreFrameworkController.cs:24-27); the port's `App` builds the Entry
+scene's `Menu` (runtime/menu.py) over `levels/s1/Entry.json`, and a level
+start swaps in the `Viewer` sharing the same SDL window, renderer, texture
+cache and mixer. `./run.sh` starts it; `./run.sh <name>.json` still opens
+the bare level viewer.
+
+What runs, each class against its file:
+
+- **The splash** — `GameIntroAnimation`: Company (2 s) → Company2 (2 s) →
+  Game (1.5 s) → "tap to start"; any click/Esc enters the menu
+  (`EnterGame`, cs:97-103); the static `Finished` keeps it one-shot per
+  process, so returning from a level skips it.
+- **The widgets** — `Control` / `ControlButton` / `ControlWindow` /
+  `ControlToggle` / `ControlSlider` / `ControlRadioButton(+Group,
+  Initializer)` over the exported GameObject tree with its active flags;
+  `Control.SetObjectActive` toggles the object and its direct children
+  (Control.cs:305-322). A click is the mouse-up over the control
+  (Control.LateUpdate, cs:243-250); the pointer-over state shows the hover
+  texture (the PC look; the mobile CheckTextureIndex only knows pressed).
+  A widget whose window a click just activated does not see that same
+  click — Unity schedules a freshly activated behaviour's LateUpdate for
+  the next frame, and `OnHouseButtonStart` shares `MenuButtonStart`'s
+  exact rect, so without this the season selection would fall through.
+- **The level pages** — `LevelDataGUIRenderer` under the 1024×768
+  `GUI.matrix`: the `L{i}T/H/D/B` strings, the Duration / MinRating /
+  Record / TricksPlayed format strings, the trick coins stepping ×1.5
+  width from `StartTrickRect`, the NFH2 variant (the world map with the
+  season-2 totals via `CalculateTricks`, the shipped `i + 18` slots).
+- **The tiles** — `ControlRadioButton`: textures rebuilt per progress
+  (`_normal`/`_passed`/`_perfect` + hover/pressed), the rating percentage
+  label, `LastLoadedLevel(2)` written on select, the 0.25 s double-click
+  start, the group initializer re-selecting the last level on window open
+  (`ControlRadioButtonInitializer.OnEnable`; out-of-range → 0).
+- **The settings** — `Level.LoadSettings` defaults (Level.cs:278-307):
+  Music/AudioEnabled 1, Music/AudioLevel 10, TimedGame 1, TrickCamera 0,
+  Language 0, Sensibility 0.5; the sliders write `value = |mouse.x -
+  rect.x| / rect.width`, the toggles flip ints, ApplySettings re-reads and
+  re-applies the audio. PlayerPrefs is `runtime/prefs.py` — one JSON at
+  `$XDG_DATA_HOME/nfh/prefs.json` (`NFH_PREFS` overrides).
+- **The languages** — the flag buttons stage `Control.SelectedLang`; the
+  options' OK (`SetLanguage`) writes the pref and reloads Entry
+  (`LocalizationManager.SetCurrentLanguage`, cs:189-206); Back
+  (`UnsetLanguage`) reverts. The strings come from
+  `strings/<season>/<Lang|NEW_LANG_*>.txt`; the level HUD reads the same
+  language (hud.load_strings).
+- **The credits** — `Credits`: the names/entries XML TextAssets, the
+  styles by name, the −40 px/s scroll after the 1.5 s pause, the window
+  force-closing 1.5 s after the last entry crosses the top. The original
+  mutates the entry rects inside OnGUI; the port moves them in `tick` so
+  a headless frame advances identically.
+- **The loading screens** — `LevelLoader.OnGUI` out of Entry,
+  `LevelTransition` (the Transition scene) out of a level. The original
+  loads async and fills the bar with `LoadingOperation.progress`; the
+  port's load is blocking, so the screen draws once with the Transition's
+  fixed 0.8 fill and holds `LoadTimer` (0.1 s).
+- **The title cards** — `IntroAnimation`: the seven-state coroutine with
+  the serialized stage times and the px/s slides (`IncrementWithCap`),
+  "IN" + `L{n}T`, sizes `CalculateFontSize+5/+6`; a click/Esc skips
+  (`StopIntroAnimation`). The camera parks on the neighbour for the span
+  (`SnapToRottweilerImmediate`, cs:259-262) and `StartGame` glides it back
+  (`SnapToWoody`). During the cards the port ticks only the ambient
+  AnimPlayers (`World.tick_ambient`) — the actors wait for `CanStart`,
+  the clock for `IntroAnimation.Finished` — and the world clock starts at
+  StartGame, the port's t=0 (the audit's convention); the music picks up
+  the elapsed card time (`World.start_music(elapsed)`), so the clap
+  resumes mid-jingle exactly as the always-running original sources do.
+- **The in-game menu** — `InGameMenu` over the level's own widget scene:
+  Esc / the power button toggle it (`Woody.FindInput`, cs:583-586;
+  `InGameMenu.Toggle` gated on the exit dialog), Enable freezes time and
+  shows the `IsInGameMenu` renderer page, Continue/`DisableInGameMenu`
+  resumes, Restart is `samesame`, Quit "Entry", SelectEpisode "Entry" +
+  `ReturnToLevelSelection`. The score screen's Restart reloads and OK
+  raises `Level.OpenLevelSelection` (HUD.cs:1287-1299); the Entry scene's
+  `Level.Update` arm then opens the selection window `MenuLoader` picked —
+  stamped 1/2 by Woody's path at HUD build (HUD.cs:358-368).
+- **The confirmations** — `ExitConfirmation` (+`DirectorAnimation`'s
+  face strip at `DirectorFaceInterval`): the destructive buttons'
+  `RequireConfirmation`, the first window's Esc-to-quit
+  (`ShowQuitGameConfirmation` + `EscapeAux`), and the exit door:
+  a finished-entrance pass through an `ExitDoor` parks the pawn
+  (`Pawn.cs:1378-1383`, `ShowExitConfirmation` → `PauseMovement`) and asks;
+  Yes runs `ContinueExit`, No `AbortExit` (Woody.cs:558-568,
+  Pawn.cs:1500-1515). The bare viewer has no dialog and passes straight
+  through, as before.
+- **The score save** — `GameInfo.CalculateScore`'s tail
+  (`Level.SaveScore(GetGameOnlyLevelIndex(), ...)`, GameInfo.cs:429-435):
+  tricks/rating only rise, completion sticks, Perfect is the ≥100 arm.
+
+Port decisions, each documented in place:
+
+- **One process, one Entry.** The original shipped two apps that launch
+  each other (`ControlButton.CanLaunchApplication` /
+  `BuildSettings.AppToLaunch`, ControlButton.cs:153-160); the port hosts
+  both seasons and always returns to Season 1's Entry, whose
+  GameSelection already carries both level selections. `levels/s2/
+  Entry.json` stays unused.
+- **The packs are unlocked.** `LevelUnlocker`/`LevelPackUnlocker` lock
+  tiles by the store's purchase state (LevelUnlocker.cs:82-93); there is
+  no store here, so every tile is open (the `TestMode` arm's outcome).
+- **The Level112/113 index swap is kept.** The build order ships
+  Level113 as `level16` and Level112 as `level17` (the exports'
+  `unity_scene` fields), so `GetGameOnlyLevelIndex` = loadedLevel−2
+  computes 15 for Level112 and 14 for Level113 — while their menu tiles
+  serialize LevelIndex 14/15 and the Entry tables (`TricksTotal[14]`=10 =
+  Level112's count) follow the tile order. The original therefore shows
+  the *other* level's title card and writes its progress into the other's
+  slot for this pair; the port reproduces it rather than fix it.
+- **Fullscreen is the port's own toggle** (the PC build had one; the
+  Android decompile has no SettingKey for it): a synthesized
+  `ControlToggle` in both options windows, the `Fullscreen` pref,
+  SDL fullscreen-desktop over the 800×600 logical size.
+- **The sliders' first run looks shipped.** `ControlSlider.LoadValue`
+  reads the raw default 10 into a [0,1]-ranged control
+  (ControlSlider.cs:47-70: `CalculatedScreenRect.width *= FloatValue`,
+  `ScreenUVRect.width = FloatValue`), so until first dragged the fill
+  rect is 10× the slider and the clamp-wrapped texture smears across the
+  screen — the original data does this; the port draws the same bands.
+
+`tests/run_menu.py` drives the whole flow headless (the splash, the
+window graph, the tiles and prefs, the cards, the in-game menu, the
+confirmations, both score exits, season 2, the exit door, the language
+reload, the fullscreen pref) — 70 checks.
+
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the tutorial layer — `LevelScript` /
 `LevelScriptAction` (the arrows, message boxes and `DirectorAnimation` of the
 three intro scenes and the two NFH2 tutorial levels), the
 `TutorialScriptCamera*` scripts and the `SignalScript*` completion hooks that
-feed them; the in-game menu's widget tree (`LevelDataGUIRenderer`, the
-save/quit buttons) — the power button runs the pause half of
-`Woody.ToggleMenu` (time freeze + the HUD fill hide) without the widgets;
-the `IntroAnimation` title cards ("Neighbours from Hell — in — The First
-Trick") and the `GameIntroAnimation` splash; the trick-camera option and
-the ExitConfirmation dialog (see the audit section); and the name-hack
-branches listed at the end of the priming section.
+feed them; the trick-camera *behaviour* (the setting and its toggle exist;
+`Level.IsTrickCameraEnabled`'s snap-to-neighbour arm stays unwired); and
+the name-hack branches listed at the end of the priming section.
