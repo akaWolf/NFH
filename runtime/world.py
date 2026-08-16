@@ -1307,13 +1307,27 @@ class Routine:
         it = self.urgent_item
         if it is None:
             return
-        if self.role == 'Rottweiler' and self._fixing_dispatch(it):
-            return                         # the fetch replaces the use
-        if it.tricked and self.role == 'Rottweiler':
-            it.got_tricked = True          # Item.cs:836-838, the raw flag
+        # RoutineActionSurpriseFar.OnActionStarted
+        # (RoutineActionSurpriseFar.cs:40-63): a tricked item goes straight
+        # to the angry flow, a Neutral TrickItem gets a full Use, anything
+        # else plays its surprise animation
         if it.is_tricked(self.level.items):
             self.pawn.world.play_angry(self.pawn, it,
                                        on_done=self._urgent_finished)
+        elif it.kind in TRICK_KINDS and it.neutral and self.role == 'Rottweiler':
+            if self._fixing_dispatch(it):
+                return                     # the fetch replaces the use
+            # Item.Use -> RottweilerUse: the raw-Tricked mark and the
+            # tricked-or-normal use sequence (Item.cs:836-838, 894-908)
+            if it.tricked:
+                it.got_tricked = True
+            seq = [a for a in it.sequence_for(self.role, it.tricked)
+                   if self.pawn.anim.has(a)]
+            self.state = self.USING
+            if seq:
+                self.pawn.anim.play_sequence(seq, on_end=self._urgent_finished)
+            else:
+                self._urgent_finished()
         elif it.kind == 'Alerter' or it.rott_surprise:
             seq = [a for a in it.rott_surprise if self.pawn.anim.has(a)]
             self.state = self.USING
