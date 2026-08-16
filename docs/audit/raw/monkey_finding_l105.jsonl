@@ -1,0 +1,1 @@
+{"level": "Level105", "seed": 2, "t": 19.05, "invariant": "y-off-floor", "subject": "Woody", "detail": "y=-1.67 vs floor 0.76 in Zone02", "state": {"role": "Woody", "x": -0.168, "y": -1.67, "state": "idle", "anim": "Hide_In", "zone": "Zone02", "locked": false, "warping": false, "hidden": false}}

@@ -1,0 +1,956 @@
+== Level101
+    D DoorRight01          196 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           204 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           205 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          210 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           213 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedBack01     215 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Microwave            218 score=16 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Television           225 score=20 CompoundRequir=IT_Antispot CanFix NoticeWhenEnterZone UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           235 score=0 CanFix DexUnlock=IT_Antispot
+  * T Binoculars           239 score=30 RequiredInvent=IT_Superglue CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Fridge                 240 inv=[IT_Egg x0] 
+  S FirstAid               241 inv=[IT_Superglue x0] 
+  * T Sofa                 243 score=25 RequiredInvent=IT_Fartbag CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Drawer                 258 inv=[IT_Fartbag x0] 
+    H Wardrobe             266 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           268 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           271 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedBack01     276 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorBack02           277 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          278 score=0 CanFix DexUnlock=IT_Antispot
+== Level102
+  S ToiletPaper            216 inv=[IT_Wcpaper x0] TrickAfterWoodyUse
+  * T Microwave            222 score=10 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           236 score=0 CanFix DexUnlock=IT_Antispot
+  * T Toilet               238 score=10 RequiredInvent=IT_Wcpaper CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DependsOn->ToiletPaper DexUnlock=IT_Antispot
+    D DoorClosedBack01     240 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorRight01          249 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           250 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           258 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               264 inv=[IT_Laxative x0] 
+    D DoorBack01           266 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          274 score=0 CanFix DexUnlock=IT_Antispot
+    H Wardrobe             276 score=0 CanFix DexUnlock=IT_Antispot
+  S Drawer                 277 inv=[IT_Saw x0] 
+  * T Sofa                 279 score=25 RequiredInvent=IT_Saw CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->Beer DexUnlock=IT_Antispot
+    D DoorClosedBack01     287 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorBack01           290 score=0 CanFix DexUnlock=IT_Antispot
+  * T Television           293 score=15 CompoundRequir=IT_Antispot CanFix NoticeWhenEnterZone UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           295 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           298 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          299 score=0 CanFix DexUnlock=IT_Antispot
+  * T Beer                 300 score=18 RequiredInvent=IT_Laxative CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+  S Fridge                 301 inv=[IT_Egg x0] 
+== Level103
+  S ToiletPaper            239 inv=[IT_Wcpaper x0] TrickAfterWoodyUse
+    D DoorRight01          250 score=0 CanFix DexUnlock=IT_Antispot
+  * T BirthdayCake         251 score=25 RequiredInvent=IT_Magnesium CompoundRequir=IT_Antispot RottweilerUseTogglesPrime UseOnce DependsOn->Candle DexUnlock=IT_Antispot
+  S FirstAid               253 inv=[] 
+  * T MumPicture           257 score=10 RequiredInvent=IT_Marker CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    H Wardrobe             263 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           264 score=0 CanFix DexUnlock=IT_Antispot
+  * T Toilet               265 score=10 RequiredInvent=IT_Wcpaper CompoundRequir=IT_Antispot Neutral CanFix NoticeWhenWalkNearby UseOnce DependsOn->ToiletPaper DexUnlock=IT_Antispot
+    D DoorClosedBack01     267 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorRight01          278 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           279 score=0 CanFix DexUnlock=IT_Antispot
+  * T Candle               284 score=25 RequiredInvent=IT_Boom CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           286 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       288 score=0 CanFix DexUnlock=IT_Antispot
+  * T LetterBox            291 score=20 RequiredInvent=IT_Mousetrap CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           296 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               305 score=10 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       307 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       308 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedBack01     316 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Ground               318 score=10 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           319 score=0 CanFix DexUnlock=IT_Antispot
+  S Fridge                 321 inv=[IT_Egg x0] 
+  S SoapDish               323 inv=[IT_Soap x0] 
+    D DoorBack01           324 score=0 CanFix DexUnlock=IT_Antispot
+  * T Microwave            326 score=10 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Drawer                 327 inv=[IT_Boom x0, IT_Marker x0, IT_Mousetrap x0] 
+    D DoorBack02           328 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          329 score=0 CanFix DexUnlock=IT_Antispot
+== Level104
+  S ToiletPaper            251 inv=[IT_Wcpaper x0] TrickAfterWoodyUse
+  S FirstAid               254 inv=[IT_Shavingfoam x0, IT_Hairrestorer x0] 
+    D DoorLeft01           259 score=0 CanFix DexUnlock=IT_Antispot
+  * T Toilet               262 score=8 RequiredInvent=IT_Wcpaper CompoundRequir=IT_Antispot Neutral CanFix NoticeWhenWalkNearby UseOnce DependsOn->AfterShave DexUnlock=IT_Antispot
+    D DoorClosedBack01     264 score=0 Locked CanFix DexUnlock=IT_Antispot
+  S Fridge                 265 inv=[IT_Egg x0] 
+  * T Microwave            268 score=8 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          273 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           274 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       275 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       276 score=0 CanFix DexUnlock=IT_Antispot
+    T ApplePie             278 score=0 RequiredInvent=IT_Magnesium CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix UseOnce DependsOn->WhippedCream DexUnlock=IT_Antispot
+  * T Ground               280 score=8 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T SinkAftershave       284 score=20 RequiredInvent=IT_Magnesium CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->AfterShave DexUnlock=IT_Antispot
+  * T MumPicture           285 score=8 RequiredInvent=IT_Marker CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          290 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           293 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               295 score=8 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Drawer                 312 inv=[IT_Marker x0, IT_Superglue x0] 
+    G SlipperyGround       314 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       315 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           318 score=0 CanFix DexUnlock=IT_Antispot
+  * T Deodrant             323 score=15 RequiredInvent=IT_Hairrestorer CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce Primed DexUnlock=IT_Antispot
+    D DoorBack01           325 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedBack01     332 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorBack01           334 score=0 CanFix DexUnlock=IT_Antispot
+    H Wardrobe             338 score=0 CanFix DexUnlock=IT_Antispot
+  S SoapDish               339 inv=[IT_Soap x0] 
+    D DoorBack02           340 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          342 score=0 CanFix DexUnlock=IT_Antispot
+  * T SinkDeodrant         343 score=15 RequiredInvent=IT_Magnesium CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->Deodrant DexUnlock=IT_Antispot
+  * T AfterShave           345 score=20 RequiredInvent=IT_Superglue CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce Primed DexUnlock=IT_Antispot
+  * T WhippedCream         346 score=15 RequiredInvent=IT_Shavingfoam CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level105
+  S ToiletPaper            254 inv=[IT_Wcpaper x0] TrickAfterWoodyUse
+    D DoorLeft01           262 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          265 score=0 CanFix DexUnlock=IT_Antispot
+  * T Toilet               266 score=7 RequiredInvent=IT_Wcpaper CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     278 score=0 Locked CanFix DexUnlock=IT_Antispot
+  S Fridge                 279 inv=[IT_Egg x0, IT_Cheese x0] 
+    H Wardrobe             288 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          289 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           292 score=0 CanFix DexUnlock=IT_Antispot
+  S Mobile                 293 inv=[IT_Handy x0] 
+    G SlipperyGround       300 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       303 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               305 score=7 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           310 score=0 CanFix DexUnlock=IT_Antispot
+    T Window               311 score=0 RequiredInvent=IT_Bowling CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+  * T Football             313 score=15 RequiredInvent=IT_Bowling CompoundRequir=IT_Antispot DexUnlock=IT_Antispot
+  * T MumPicture           315 score=7 RequiredInvent=IT_Marker CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby DexUnlock=IT_Antispot
+  * T PlantStink           316 score=13 RequiredInvent=IT_Cheese CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Ground               319 score=7 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Phone                320 score=10 CompoundRequir=IT_Antispot Tricked DexUnlock=IT_Antispot
+  * T Piano                322 score=13 RequiredInvent=IT_Marker CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+  S Drawer                 324 inv=[IT_Marker x9999] 
+  * T Microwave            326 score=7 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S BowlingBag             333 inv=[IT_Bowling x0] 
+    D DoorBack01           335 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           340 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedBack01     342 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorBack01           344 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               347 inv=[] 
+  S SoapDish               348 inv=[IT_Soap x0] 
+    D DoorBack02           350 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          352 score=0 CanFix DexUnlock=IT_Antispot
+== Level106
+  S ToiletPaper            277 inv=[IT_Wcpaper x0] TrickAfterWoodyUse
+  S SoapDish               278 inv=[IT_Soap x0] 
+  * T Ground               282 score=7 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     288 score=0 Locked CanFix DexUnlock=IT_Antispot
+    H Wardrobe             290 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           292 score=0 CanFix DexUnlock=IT_Antispot
+  * T Towel                293 score=12 RequiredInvent=IT_Shoepolish CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     297 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Ground               300 score=7 RequiredInvent=IT_Soap CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          302 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          303 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           306 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           307 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       308 score=0 CanFix DexUnlock=IT_Antispot
+  S Fridge                 315 inv=[IT_Egg x0] 
+  S Drawer                 324 inv=[IT_Glue x0, IT_Marker x0, IT_Shoepolish x0] 
+  * T Toilet               326 score=7 RequiredInvent=IT_Wcpaper CompoundRequir=IT_Antispot Neutral CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Pudding              327 score=8 RequiredInvent=IT_Fullbottle CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Ground               328 score=7 RequiredInvent=IT_Knotbook CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           329 score=0 CanFix DexUnlock=IT_Antispot
+  * T Candy                330 score=8 RequiredInvent=IT_Foamballs CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T MumPicture           331 score=7 RequiredInvent=IT_Marker CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       334 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               335 inv=[IT_Foamballs x0, IT_Hairrestorer x0] 
+    D DoorBack01           341 score=0 CanFix DexUnlock=IT_Antispot
+  * T Microwave            355 score=7 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           357 score=0 CanFix DexUnlock=IT_Antispot
+  * T BathTub              358 score=12 RequiredInvent=IT_Hairrestorer CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S RubbishBinBottle       360 inv=[IT_Emptybottle x0] RequirePriming
+    G SlipperyGround       362 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           368 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          369 score=0 CanFix DexUnlock=IT_Antispot
+  * T PhotoAlbum           371 score=8 RequiredInvent=IT_Glue CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level107
+    D DoorBack02           253 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               255 inv=[IT_Scissors x0, IT_Antispot x0] 
+    D DoorBack01           256 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           260 score=0 CanFix DexUnlock=IT_Antispot
+  * T DieselChair          276 score=10 RequiredInvent=IT_Pins CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          277 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           279 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       280 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       281 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               282 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          286 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinBanana       294 inv=[IT_Banana x0] 
+    D DoorLeft01           298 score=0 CanFix DexUnlock=IT_Antispot
+    H Bed                  300 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           302 score=0 CanFix DexUnlock=IT_Antispot
+  S PinsBoard              305 inv=[IT_Pins x0] 
+  * T MumStatueFootStool   306 score=15 CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     308 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Camera               311 score=12 RequiredInvent=IT_Magnesium CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix Primed DexUnlock=IT_Antispot
+  * T Ground               313 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Drawer                 315 inv=[IT_Wrench x0] 
+    D DoorBack01           328 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          329 score=0 CanFix DexUnlock=IT_Antispot
+    H Wardrobe             331 score=0 CanFix DexUnlock=IT_Antispot
+  * T DieselGenerator      333 score=15 RequiredInvent=IT_Wrench CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T MumStatueDummy       338 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          340 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           341 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           342 score=0 CanFix DexUnlock=IT_Antispot
+  * D Drawing              344 score=12 RequiredInvent=IT_Antispot CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Dove                 351 score=10 RequiredInvent=IT_Scissors CompoundRequir=IT_Antispot NoticeWhenEnterZone UseOnce DexUnlock=IT_Antispot
+    D DoorBack02           353 score=0 CanFix DexUnlock=IT_Antispot
+  S MagnesiumBottle        354 inv=[IT_Magnesium x0] 
+    D DoorClosedLeft       356 score=0 Locked CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       357 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       358 score=0 CanFix DexUnlock=IT_Antispot
+== Level108
+  S FirstAid               318 inv=[] Locked RequirePriming
+    T SunShade             319 score=0 CompoundRequir=IT_Antispot Neutral UseOnce DependsOn->SunLotion DexUnlock=IT_Antispot
+    G SlipperyGround       321 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       322 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           327 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           328 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       329 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       330 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           332 score=0 CanFix DexUnlock=IT_Antispot
+  S PinsBoard              334 inv=[IT_Pins x0] 
+  * T Shezlong             335 score=10 RequiredInvent=IT_Pins CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->SunLotion DexUnlock=IT_Antispot
+    D DoorRight01          345 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           346 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       347 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       348 score=0 CanFix DexUnlock=IT_Antispot
+  * T ToothBrush           362 score=15 RequiredInvent=IT_Brush CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Ground               363 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T CoffeeMaker          364 score=15 RequiredInvent=IT_Soil_only CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          365 score=0 CanFix DexUnlock=IT_Antispot
+    T BeeHive              377 score=0 RequiredInvent=IT_Balloon CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    H Bed                  378 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           386 score=0 CanFix DexUnlock=IT_Antispot
+  * T SunLotion            388 score=20 RequiredInvent=IT_Honey CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Ground               389 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     391 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorRight01          392 score=0 CanFix DexUnlock=IT_Antispot
+    T WateringCan          393 score=0 RequiredInvent=IT_Poison CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+  S RubbishBinBanana2      394 inv=[IT_Banana x0] 
+  * T Plant                395 score=20 RequiredInvent=IT_Balloon CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->WateringCan DexUnlock=IT_Antispot
+  S Drawer                 396 inv=[IT_Brush x0] 
+    G SlipperyGround       399 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       400 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               403 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Ground               406 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           407 score=0 CanFix DexUnlock=IT_Antispot
+  S SoilBag                409 inv=[IT_Soil_only x0] 
+    D DoorBack01           412 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               413 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S BedDrawer              414 inv=[IT_Key x0] 
+    G SlipperyGround       417 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       418 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               419 score=8 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Fridge                 421 inv=[IT_Honey x0] 
+    D DoorRight01          422 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           423 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           430 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       433 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       434 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorClosedLeft       437 score=0 Locked CanFix DexUnlock=IT_Antispot
+    H Wardrobe             440 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           441 score=0 CanFix DexUnlock=IT_Antispot
+== Level109
+  S ChemicalSet            292 inv=[IT_Nitro x0] 
+  * T Ground               294 score=7 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     297 score=0 Locked CanFix DexUnlock=IT_Antispot
+    H Wardrobe             299 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           302 score=0 CanFix DexUnlock=IT_Antispot
+  * T AlarmClock           303 score=13 RequiredInvent=IT_Cactus CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           305 score=0 CanFix DexUnlock=IT_Antispot
+    T CornChips            306 score=0 RequiredInvent=IT_Chips CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           308 score=0 CanFix DexUnlock=IT_Antispot
+  * T PigMilk              312 score=20 RequiredInvent=IT_Nitro CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Bed                  313 score=8 RequiredInvent=IT_Pins CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          323 score=0 CanFix DexUnlock=IT_Antispot
+  S SpicyChips             325 inv=[IT_Chips x0] 
+    D DoorLeft01           326 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       327 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       328 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       329 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       330 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       332 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       333 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          334 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinBanana2      336 inv=[IT_Banana x0] 
+    D DoorClosedLeft       338 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Chili                345 score=15 CompoundRequir=IT_Antispot CanFix DependsOn->CornChips DexUnlock=IT_Antispot
+  * T Ground               350 score=7 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           352 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               355 score=7 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           356 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       357 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       358 score=0 CanFix DexUnlock=IT_Antispot
+  * T Teeth                359 score=15 RequiredInvent=IT_Tabasco CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S Drawer                 373 inv=[] 
+  S Fridge                 378 inv=[IT_Tabasco x0] 
+  S PinsBoard              381 inv=[IT_Pins x0] 
+  S Cactus                 382 inv=[IT_Cactus x0] 
+    D DoorBack01           383 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          385 score=0 CanFix DexUnlock=IT_Antispot
+  * T Pig                  390 score=20 RequiredInvent=IT_Pigkey CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby DependsOn->PigMilk DexUnlock=IT_Antispot
+    D DoorRight01          392 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           393 score=0 CanFix DexUnlock=IT_Antispot
+  S PigKeys                398 inv=[IT_Pigkey x0] RequirePriming TrickAfterWoodyUse
+    D DoorBack01           400 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               407 inv=[] 
+    D DoorBack02           409 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               410 score=7 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+== Level110
+    H Wardrobe             317 score=0 CanFix DexUnlock=IT_Antispot
+  * T CarnivorPlantSpray   319 score=15 RequiredInvent=IT_Growthliquid CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       320 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       321 score=0 CanFix DexUnlock=IT_Antispot
+  S PinsBoard              323 inv=[IT_Pins x0] 
+    D DoorBack02           326 score=0 CanFix DexUnlock=IT_Antispot
+    T SteakMeat            327 score=0 RequiredInvent=IT_Handy CompoundRequir=IT_Antispot Neutral UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           328 score=0 CanFix DexUnlock=IT_Antispot
+  * T SteakChair           329 score=10 RequiredInvent=IT_Pins CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorClosedBack01     331 score=0 Locked CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           332 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ground               336 score=10 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T SteakWineGlass       341 score=0 CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+  * T FireExtinguisher     342 score=15 CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          344 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           346 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       347 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       348 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           349 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       350 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       351 score=0 CanFix DexUnlock=IT_Antispot
+  S Drawer                 353 inv=[] 
+    D DoorRight01          354 score=0 CanFix DexUnlock=IT_Antispot
+    T SteakTable           356 score=0 CompoundRequir=IT_Antispot Neutral UseOnce DexUnlock=IT_Antispot
+    D DoorClosedLeft       368 score=0 Locked CanFix DexUnlock=IT_Antispot
+  * T Ground               373 score=10 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T PigPen               374 score=0 RequiredInvent=IT_Handy CompoundRequir=IT_Antispot Neutral UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           380 score=0 CanFix DexUnlock=IT_Antispot
+  * T BBQ                  382 score=20 RequiredInvent=IT_Cork CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime UseOnce Primed DependsOn->Beer FixingItem->FireExtinguisher DexUnlock=IT_Antispot
+    G SlipperyGround       386 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       387 score=0 CanFix DexUnlock=IT_Antispot
+  * T Beer                 388 score=20 RequiredInvent=IT_Fuel CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Ground               390 score=10 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S FirstAid               391 inv=[IT_Fuel x0, IT_Growthliquid x0] 
+  * T Ground               402 score=10 RequiredInvent=IT_Banana CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    I CarnivorPlant        403 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           404 score=0 CanFix DexUnlock=IT_Antispot
+  S Fridge                 405 inv=[IT_Vinegar x0] 
+    D DoorRight01          410 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          411 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           412 score=0 CanFix DexUnlock=IT_Antispot
+    H Bed                  413 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           418 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinBanana2      426 inv=[IT_Banana x0] 
+    D DoorBack02           428 score=0 CanFix DexUnlock=IT_Antispot
+  * T SteakWine            430 score=15 RequiredInvent=IT_Vinegar CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level111
+    G SlipperyGround       356 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       357 score=0 CanFix DexUnlock=IT_Antispot
+  S BasementDrawer         359 inv=[IT_Tongs x0] 
+  * T GroundMarbles        360 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Drier                362 score=10 RequiredInvent=IT_Tongs CompoundRequir=IT_Antispot RequireUnprime RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        365 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack02           368 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           369 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       370 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       371 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           372 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        377 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T FishTank             380 score=10 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Airer                382 score=13 RequiredInvent=IT_Birdfood CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix NoticeWhenWalkNearby UseOnce FixingItem->Airer DexUnlock=IT_Antispot
+  * T GroundMarbles        384 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          385 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           387 score=0 CanFix DexUnlock=IT_Antispot
+  S Detergent              388 inv=[IT_Detergent x0] 
+    T Dove                 394 score=0 RequiredInvent=IT_Scissors CompoundRequir=IT_Antispot Neutral CanFix UseOnce DexUnlock=IT_Antispot
+  S FirstAid               395 inv=[] 
+  S TableShovel            396 inv=[IT_Shovel x0] RequirePriming
+    D DoorRight01          409 score=0 CanFix DexUnlock=IT_Antispot
+    H Wardrobe             413 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          415 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        416 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       422 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       423 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           425 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          427 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinCable        429 inv=[IT_Cable x0] 
+  * T ElectricTrap         431 score=11 RequiredInvent=IT_Cable CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       432 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       433 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       435 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       436 score=0 CanFix DexUnlock=IT_Antispot
+  S Drawer                 438 inv=[IT_Marbles x0] 
+  * T GroundMarbles        442 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           444 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       447 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       448 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       449 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       450 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        451 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T WashingMachine       454 score=10 RequiredInvent=IT_Winebottle CompoundRequir=IT_Antispot RequireUnprime RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S WineCellar             455 inv=[IT_Winebottle x0] 
+  * T Iron                 460 score=10 CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T DirtyCarpet          461 score=15 RequiredInvent=IT_Soil CompoundRequir=IT_Antispot Neutral CanFix NoticeWhenEnterZone UseOnce FixingItem->Vacuum DexUnlock=IT_Antispot
+    H Bed                  464 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       467 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       468 score=0 CanFix DexUnlock=IT_Antispot
+    T PlantSoil            471 score=0 RequiredInvent=IT_Shovel CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           475 score=0 CanFix DexUnlock=IT_Antispot
+    T Aquarium             477 score=0 CompoundRequir=IT_Antispot Neutral CanFix DexUnlock=IT_Antispot
+    D DoorBack01           481 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          482 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           483 score=0 CanFix DexUnlock=IT_Antispot
+  S DeskDrawer             487 inv=[IT_Paperknife x0] 
+    D DoorBack01           489 score=0 CanFix DexUnlock=IT_Antispot
+  S Fridge                 490 inv=[] 
+  * T Vacuum               494 score=15 RequiredInvent=IT_Paperknife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorLeft01           496 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        497 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack02           498 score=0 CanFix DexUnlock=IT_Antispot
+  S Perch                  499 inv=[IT_Birdfood x0] 
+    D DoorBack03           500 score=0 CanFix DexUnlock=IT_Antispot
+== Level112
+  S BasementSpring         355 inv=[IT_Spring x0] 
+  * T Weights              357 score=8 RequiredInvent=IT_Metalsaw CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       361 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundSkates         364 score=14 RequiredInvent=IT_Skate CompoundRequir=IT_Antispot NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S FirstAid               365 inv=[IT_Steroids x0] 
+    D DoorBack02           366 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           367 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           371 score=0 CanFix DexUnlock=IT_Antispot
+  S DeskDrawer             375 inv=[] 
+  * T FishTank             377 score=8 RequiredInvent=IT_Steroids CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S BasementDrawer         381 inv=[IT_Tongs x0] 
+  S Fridge                 382 inv=[] 
+    H Wardrobe             385 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          386 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           387 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       389 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       390 score=0 CanFix DexUnlock=IT_Antispot
+    T YogaExercise         392 score=0 RequiredInvent=IT_Balloon CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+  * T Yoga                 393 score=7 RequiredInvent=IT_Football CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->YogaBook DexUnlock=IT_Antispot
+  S SportsBag              395 inv=[IT_Skate x0, IT_Rubberrope x0] 
+    D DoorRight01          398 score=0 CanFix DexUnlock=IT_Antispot
+  S Drawer                 399 inv=[IT_Marbles x0] 
+    D DoorRight01          400 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       407 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       408 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          409 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       412 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       413 score=0 CanFix DexUnlock=IT_Antispot
+  * T Trampoline           416 score=8 RequiredInvent=IT_Spring CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T Rope                 418 score=7 CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H Bed                  419 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           424 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           426 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        427 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T Mixer                429 score=0 CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  * T Bicycle              434 score=8 RequiredInvent=IT_Tongs CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S TableSaw               439 inv=[IT_Metalsaw x0] 
+  S RubbishBinCable        441 inv=[IT_Cable x0] 
+  * T ElectricTrap         444 score=7 RequiredInvent=IT_Cable CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        445 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T Aquarium             451 score=0 CompoundRequir=IT_Antispot Neutral CanFix DexUnlock=IT_Antispot
+  * T YogaBook             452 score=7 RequiredInvent=IT_Knotbook CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        453 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        455 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           457 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        472 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           474 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          475 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           476 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       477 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       478 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       480 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       481 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           482 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           488 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           489 score=0 CanFix DexUnlock=IT_Antispot
+  * T ChestExpander        491 score=8 RequiredInvent=IT_Rubberrope CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack03           492 score=0 CanFix DexUnlock=IT_Antispot
+  S BedDrawer              493 inv=[IT_Knotbook x0] 
+== Level113
+  S Drawer                 359 inv=[IT_Fuse x0, IT_Marbles x0] 
+    H Bed                  362 score=0 CanFix DexUnlock=IT_Antispot
+  * T ValveHot             364 score=15 CompoundRequir=IT_Antispot Neutral CanFix GetTrickedAtOnce CanUndoTrick DexUnlock=IT_Antispot
+  * T GroundMarbles        365 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack02           373 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           374 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           375 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        380 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T ElectricTrap         383 score=8 RequiredInvent=IT_Cable CompoundRequir=IT_Antispot RequirePriming CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       385 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       386 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          388 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           389 score=0 CanFix DexUnlock=IT_Antispot
+  * T LadderDrill          391 score=10 RequiredInvent=IT_Glue CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->FuseBox DexUnlock=IT_Antispot
+    D DoorRight01          392 score=0 CanFix DexUnlock=IT_Antispot
+  * T ChairAssembly        394 score=10 RequiredInvent=IT_Honey CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->ChairAssemblyBook DexUnlock=IT_Antispot
+    G SlipperyGround       396 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       397 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       399 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       400 score=0 CanFix DexUnlock=IT_Antispot
+  S BasementDrawer         401 inv=[IT_Tongs x0] 
+    H Wardrobe             403 score=0 CanFix DexUnlock=IT_Antispot
+  * T ChairAssemblyBook    405 score=10 RequiredInvent=IT_Painbook CompoundRequir=IT_Antispot CanFix GetTrickedAtOnce UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          407 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               410 inv=[] 
+    T ElectricTrapTatter   414 score=0 CompoundRequir=IT_Antispot RequirePriming UseOnce ObjectToPrim->ElectricTrap DexUnlock=IT_Antispot
+  * T GroundMarbles        416 score=8 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          418 score=0 CanFix DexUnlock=IT_Antispot
+  S BedDrawer              421 inv=[IT_Painbook x0] 
+  * T Sink                 422 score=12 RequiredInvent=IT_Spring CompoundRequir=IT_Antispot UseOnce DependsOn->ValveMain FixingItem->ValveMain DexUnlock=IT_Antispot
+  * T FuseBox              425 score=10 RequiredInvent=IT_Fuse CompoundRequir=IT_Antispot RequirePriming Neutral RottweilerUseTogglesPrime CanFix GetTrickedAtOnce UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           430 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        431 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Radiator             432 score=15 RequiredInvent=IT_Honey CompoundRequir=IT_Antispot UseOnce DependsOn->ValveHot FixingItem->ValveHot DexUnlock=IT_Antispot
+    G SlipperyGround       434 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       435 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           437 score=0 CanFix DexUnlock=IT_Antispot
+  * T Ladder               439 score=15 RequiredInvent=IT_Tongs CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        442 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Fridge                 445 inv=[] 
+    G SlipperyGround       447 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       448 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       449 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       450 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        463 score=8 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        466 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T AngleGrinder         467 score=10 CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        468 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T Aquarium             473 score=0 CompoundRequir=IT_Antispot Neutral CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       477 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       478 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           482 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       485 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       486 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           488 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          489 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           491 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        492 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           493 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinCable        494 inv=[IT_Cable x0] 
+    G SlipperyGround       498 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       499 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           502 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           503 score=0 CanFix DexUnlock=IT_Antispot
+  S DeskDrawer             505 inv=[] 
+  * T ValveMain            506 score=12 CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix CanUndoTrick DexUnlock=IT_Antispot
+    D DoorBack03           507 score=0 CanFix DexUnlock=IT_Antispot
+== Level114
+    G SlipperyGround       355 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       356 score=0 CanFix DexUnlock=IT_Antispot
+  S MouseHole              358 inv=[IT_Rat x0] 
+  S ShotgunShells          360 inv=[IT_Munition x0] 
+    G SlipperyGround       362 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       363 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        364 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    D DoorBack02           368 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack01           370 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           372 score=0 CanFix DexUnlock=IT_Antispot
+  S RubbishBinCable        373 inv=[IT_Cable x0, IT_Cork x0] 
+  * T MedalBox             376 score=8 RequiredInvent=IT_Rat CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       379 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       380 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        381 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Gramaphone           382 score=10 RequiredInvent=IT_Nail CompoundRequir=IT_Antispot RequirePriming RequireUnprime RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  * T ElectricTrap         386 score=7 RequiredInvent=IT_Cable CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T Polish               387 score=8 RequiredInvent=IT_Shoepolish CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          391 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           392 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       393 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       394 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        395 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        397 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       398 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       399 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorRight01          403 score=0 CanFix DexUnlock=IT_Antispot
+  S Drawer                 405 inv=[IT_Marbles x0, IT_Shoepolish x0] 
+    D DoorRight01          412 score=0 CanFix DexUnlock=IT_Antispot
+  * T Hat                  420 score=8 RequiredInvent=IT_Superglue CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           421 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        423 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T Aquarium             429 score=0 CompoundRequir=IT_Antispot Neutral CanFix DexUnlock=IT_Antispot
+    T CDs                  446 score=0 RequiredInvent=IT_Munition CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  * T GroundMarbles        448 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    G SlipperyGround       450 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       451 score=0 CanFix DexUnlock=IT_Antispot
+    H Wardrobe             455 score=0 CanFix DexUnlock=IT_Antispot
+  * T GoldCup              457 score=8 RequiredInvent=IT_Munition CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->Polish DexUnlock=IT_Antispot
+    D DoorBack01           458 score=0 CanFix DexUnlock=IT_Antispot
+    H Bed                  460 score=0 CanFix DexUnlock=IT_Antispot
+  * T GroundMarbles        462 score=7 RequiredInvent=IT_Marbles CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S BedDrawer              463 inv=[IT_Balloon x0] 
+    D DoorBack01           466 score=0 CanFix DexUnlock=IT_Antispot
+  * T Horn                 467 score=8 RequiredInvent=IT_Balloon CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorRight01          468 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           469 score=0 CanFix DexUnlock=IT_Antispot
+  S FirstAid               471 inv=[IT_Superglue x0] 
+    D DoorLeft01           473 score=0 CanFix DexUnlock=IT_Antispot
+  S BasementDrawer         474 inv=[IT_Nail x0] 
+    D DoorRight01          477 score=0 CanFix DexUnlock=IT_Antispot
+  * T Pipe                 478 score=10 RequiredInvent=IT_Gunpowder CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack01           479 score=0 CanFix DexUnlock=IT_Antispot
+  * T Shotgun              480 score=10 RequiredInvent=IT_Munition CompoundRequir=IT_Cork Compound CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       482 score=0 CanFix DexUnlock=IT_Antispot
+    G SlipperyGround       483 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorLeft01           490 score=0 CanFix DexUnlock=IT_Antispot
+    D DoorBack02           492 score=0 CanFix DexUnlock=IT_Antispot
+  S Fridge                 495 inv=[] 
+    D DoorBack03           496 score=0 CanFix DexUnlock=IT_Antispot
+  S DeskDrawer             498 inv=[IT_Dogwhistle x0, IT_Gunpowder x0] 
+== Level201
+  S VanityBag              199 inv=[IT2_Hairpin x0] Locked
+    T Buffet               219 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DontUseOn DexUnlock=IT_Antispot
+    T WaterPuddle          232 score=0 RequiredInvent=IT2_Soap CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix UseOnce Primed LinkedItemTr->DeckRail DexUnlock=IT_Antispot
+  S SpaghettiCar           248 inv=[IT2_Spaghetti x0] 
+    T DeckRail             251 score=0 RequiredInvent=IT2_Pipetongs CompoundRequir=IT_Antispot Locked CanFix UseOnce DependsOn->WaterPuddle DexUnlock=IT_Antispot
+  S SoapChest              254 inv=[IT2_Soap x0] KeepFull
+    T CaptainHatHook       259 score=0 RequiredInvent=IT_Fartbag CompoundRequir=IT_Antispot Neutral CanFix UseOnce DexUnlock=IT_Antispot
+  S ToolBox                263 inv=[IT2_Knife x0, IT2_Pipetongs x0] Locked Dexterity
+    T CaptainHat           265 score=0 RequiredInvent=IT2_Spaghetti CompoundRequir=IT_Antispot Locked CanFix UseOnce DexUnlock=IT_Antispot
+== Level202
+    T Swimming             206 score=0 CanFix UseOnce DependsOn->Submarine DexUnlock=IT_Antispot
+    T Fence1               227 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S RubbishBin             231 inv=[IT2_Fin x0] 
+    T EelBox               239 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+  S Reed                   241 inv=[IT2_Reed x0] 
+    T Rocks                248 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Pond                 252 score=0 RequiredInvent=IT2_Sandbucketeel CompoundRequir=IT2_Sandbucketeel CanFix UseOnce DexUnlock=IT_Antispot
+  S CrayFish               255 inv=[IT2_Crayfish x0] Dexterity
+    T BridgeRail           260 score=0 RequiredInvent=IT2_Sawfish CompoundRequir=IT2_Sandbucketeel Compound CanFix LinkedItemTr->Pond DexUnlock=IT_Antispot
+    T BeerMat              264 score=0 RequiredInvent=IT2_Crayfish RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S Sandbucket             265 inv=[IT2_Sandbucket x0] RequirePriming
+    T OlgaMat              282 score=0 RequiredInvent=IT2_Crayfish RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    T Submarine            287 score=0 RequiredInvent=IT2_Fin CanFix UseOnce DexUnlock=IT_Antispot
+  S SawFish                289 inv=[IT2_Sawfish x0] 
+    T Fence2               296 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Weed                   297 inv=[IT2_Weed x0] 
+    T BridgeRailFront      300 score=0 RequiredInvent=IT2_Sawfish CompoundRequir=IT2_Sandbucketeel Compound Neutral CanFix UseOnce DexUnlock=IT_Antispot
+    R Rake                 302 score=0 CompoundRequir=IT2_Weed Compound CanFix UseOnce DexUnlock=IT_Antispot
+== Level203
+    T Watermelon           194 score=0 RequiredInvent=IT2_Cannonball CanFix UseOnce DependsOn->Bicycle DexUnlock=IT_Antispot
+    T ToiletRocket         200 score=0 CanFix UseOnce DexUnlock=IT_Antispot
+  S ToolPelt               208 inv=[IT2_Wrench x0] 
+  S CannonBall             215 inv=[IT2_Cannonball x0] 
+  S OlgaBag                233 inv=[IT2_Tights x0] Dexterity
+    T DieselGenerator      239 score=0 RequiredInvent=IT2_Tights CanFix UseOnce DexUnlock=IT_Antispot
+    T Toilet               241 score=0 RequiredInvent=IT2_Sawfish CanFix UseOnce DexUnlock=IT_Antispot
+    T Microphone           245 score=0 RequiredInvent=IT2_Crayfish CanFix UseOnce DexUnlock=IT_Antispot
+    T DictatorPhoto        254 score=0 CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+    T Bicycle              257 score=0 RequiredInvent=IT2_Wrench CanFix UseOnce DexUnlock=IT_Antispot
+    T MicrophoneStage      260 score=0 RequiredInvent=IT2_Crayfish CanFix UseOnce DexUnlock=IT_Antispot
+    T ToiletPaper          263 score=0 RequiredInvent=IT2_Piripiri CanFix UseOnce DexUnlock=IT_Antispot
+  S ChiliSoup              267 inv=[IT2_Piripiri x0] 
+  S OilCan                 271 inv=[IT2_Oilcan x0] 
+    T ToiletFlush          282 score=0 RequiredInvent=IT2_Oilcan CanFix UseOnce DexUnlock=IT_Antispot
+== Level204
+    T Vase                 192 score=0 RequiredInvent=IT2_Rice_full CanFix DexUnlock=IT_Antispot
+  S RiceBowl               199 inv=[IT2_Rice_empty x2] RequirePriming
+  S Bricks                 207 inv=[IT2_Brick x0] 
+  S ToyDispenser           216 inv=[IT2_Teddy x0] Dexterity RequirePriming
+    T GongMan              222 score=0 RequiredInvent=IT2_Crayfish CanFix UseOnce DexUnlock=IT_Antispot
+    T Karate               224 score=0 RequiredInvent=IT2_Brick CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaKid              227 score=0 RequiredInvent=IT_Detergent CanFix UseOnce DexUnlock=IT_Antispot
+    T GongGrease           237 score=0 RequiredInvent=IT_Emptybottle CanFix UseOnce DexUnlock=IT_Antispot
+    T PullKart             239 score=0 RequiredInvent=IT2_Rice_full CanFix DexUnlock=IT_Antispot
+    T JadeNecklace         242 score=0 RequiredInvent=IT2_Scissors CanFix LinkedItemTr->Vase DexUnlock=IT_Antispot
+  S UmbrellaStand          246 inv=[IT2_Sunshade x0] 
+  S BonsaiScissors         251 inv=[IT2_Scissors x2] 
+    T GongDrumstick        258 score=0 RequiredInvent=IT2_Sunshade CanFix UseOnce DexUnlock=IT_Antispot
+    T HotDog               272 score=0 RequiredInvent=IT2_Confetti CanFix UseOnce DexUnlock=IT_Antispot
+== Level205
+    T WaterSkiisAux        207 score=0 RequiredInvent=IT2_Tools CanFix UseOnce DexUnlock=IT_Antispot
+    T LionStatue           222 score=0 RequiredInvent=IT2_Bangers CanFix DexUnlock=IT_Antispot
+  S HammerNails            230 inv=[IT2_Tools x0] 
+    T Fence1               233 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Chef                 238 score=0 RequiredInvent=IT_Fuel CanFix UseOnce DexUnlock=IT_Antispot
+    T SandSculpture        240 score=0 RequiredInvent=IT2_Lionhead CanFix UseOnce DexUnlock=IT_Antispot
+  S DuckCage               243 inv=[IT2_Egg x0] Dexterity
+    T TabbleTennis         248 score=0 RequiredInvent=IT2_Egg CanFix UseOnce DexUnlock=IT_Antispot
+    T BridgeRailFront      252 score=0 RequiredInvent=IT2_Sawfish CompoundRequir=IT2_Sandbucketeel Compound Neutral CanFix UseOnce DexUnlock=IT_Antispot
+    T Eals                 257 score=0 RequiredInvent=IT2_Tube CanFix UseOnce DexUnlock=IT_Antispot
+  S Anchor                 258 inv=[IT2_Rope x0] 
+    T RocketsBackground    262 score=0 RequiredInvent=IT2_Rope CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence2               269 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Rockets              272 score=0 RequiredInvent=IT2_Rope CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaKid              285 score=0 RequiredInvent=IT2_Crayfish PrimedInventor=IT2_Confetti CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaMatBeach         287 score=0 RequiredInvent=IT2_Crayfish RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S BicycleTubeBox         290 inv=[IT2_Tube x0] 
+  S Banger                 293 inv=[IT2_Bangers x0] 
+    T WaterSkiis           295 score=0 RequiredInvent=IT2_Tools RottweilerUseTogglesPrime CanFix UseOnce Primed DexUnlock=IT_Antispot
+  S Glasses                298 inv=[IT2_Glasses x0] RequirePriming
+== Level206
+    T Weights              215 score=0 RequiredInvent=IT2_Fleablanket CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S FleaBlanket            218 inv=[IT2_Fleablanket x0, IT2_Rabbit x0] TrickAfterWoodyUse
+    T DeckChairOrder       219 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S FifiHarpoon            224 inv=[IT2_Fleablanket x0, IT2_Rabbit x0] TrickAfterWoodyUse
+    T Pillows              233 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Harpoon              242 score=0 RequiredInvent=IT2_Rubber CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S SportsBag              245 inv=[IT2_Rubber x0] 
+    T LaunchPad            249 score=0 RequiredInvent=IT2_Rabbit CompoundRequir=IT_Antispot RequireUnprime RottweilerUseTogglesPrime CanFix UseOnce LinkedItemTr->Harpoon DependsOn->Harpoon DexUnlock=IT_Antispot
+  S FifiWeights            267 inv=[IT2_Fleablanket x0, IT2_Rabbit x0] TrickAfterWoodyUse
+  S FifiWeightsDrop        275 inv=[IT2_Fleablanket x0, IT2_Rabbit x0] TrickAfterWoodyUse
+    H Pipe                 278 score=0 CanFix DexUnlock=IT_Antispot
+  S ToyBox                 281 inv=[IT2_Fartbag x0] 
+    T DeckChairThrow       283 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S Rabbit                 285 inv=[IT2_Rabbit x0] KeepFull
+    T DeckChairCall        289 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    T DynamiteBox          292 score=0 RequiredInvent=IT2_Kukident CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S FifiWeightsGrab        306 inv=[IT2_Fleablanket x0, IT2_Rabbit x0] TrickAfterWoodyUse
+  S DentureAdhesive        307 inv=[IT2_Kukident x0] Dexterity
+    T DeckChair            312 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix UseOnce DependsOn->Pillows DexUnlock=IT_Antispot
+    T DogFifi              319 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot RottweilerUseTogglesPrime UseOnce DexUnlock=IT_Antispot
+== Level207
+    T PoolBoard            244 score=0 RequiredInvent=IT2_Spring CompoundRequir=IT_Antispot CanFix LinkedItemTr->PoolAwning DexUnlock=IT_Antispot
+    T BeachTowel           246 score=0 RequiredInvent=IT2_Hedgehog CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Moped                  251 inv=[IT2_Spring x0] 
+    T Shell                257 score=0 RequiredInvent=IT2_Crayfish CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S MopedPool              265 inv=[IT2_Spring x0] 
+  S IceBucket              272 inv=[IT2_Bucket_empty x0] Locked
+    T Fence2               276 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S BBQ                    290 inv=[IT2_Bbqtongs x0] 
+    H BeachChair           292 score=0 CanFix DexUnlock=IT_Antispot
+    T PoolAwning           298 score=0 RequiredInvent=IT2_Pedal CompoundRequir=IT_Antispot Locked CanFix UseOnce DexUnlock=IT_Antispot
+  S SeaUrchin              299 inv=[IT2_Hedgehog x1] 
+  S Moped2                 303 inv=[IT2_Pedal x0] KeepFull
+  S Whisky                 307 inv=[IT2_Whiskey x0] RequirePriming
+    T Pole                 313 score=0 RequiredInvent=IT2_Pedal CompoundRequir=IT_Antispot Locked CanFix UseOnce DexUnlock=IT_Antispot
+  S CrayFish               316 inv=[IT2_Crayfish x0] Dexterity KeepFull
+    T Fence1               319 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T PoolLadder           321 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T SandCastle           325 score=0 RequiredInvent=IT2_Crayfish CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->BeachTowel DexUnlock=IT_Antispot
+    T ShellLaydown         327 score=0 RequiredInvent=IT2_Hedgehog CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Elephant             339 score=0 RequiredInvent=IT2_Bucket CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T DeckChair            341 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    T Bartender            344 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T ElephantBucket       346 score=0 RequiredInvent=IT2_Bucket CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Tap                  348 score=0 RequiredInvent=IT_Chips CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T BeachLogo            354 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level208
+    T Snake                234 score=0 RequiredInvent=IT_Detergent CanFix UseOnce DexUnlock=IT_Antispot
+    T ArmsBowl             237 score=0 RequiredInvent=IT2_Snake CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T PutFifi              238 score=0 RequiredInvent=IT_Fartbag CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H Basket               241 score=0 CanFix DexUnlock=IT_Antispot
+    T SafetyLine           242 score=0 RequiredInvent=IT2_Chalk_sponge CompoundRequir=IT_Antispot Locked CanFix UseOnce DexUnlock=IT_Antispot
+    T MotherRott           243 score=0 RequiredInvent=IT_Chips CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T SeeSaw               245 score=0 RequiredInvent=IT2_Shovel CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T DressingRoom         248 score=0 RequiredInvent=IT_Football CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    T IndianMagician       260 score=0 RequiredInvent=IT2_Balloon CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fifi                 263 score=0 CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T TakeFifi             265 score=0 RequiredInvent=IT_Fuse CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence2               270 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Spade                  273 inv=[IT2_Shovel x0] 
+  S BoardNail              275 inv=[IT2_Blades x0] 
+    T ShoeMachine          294 score=0 RequiredInvent=IT2_Blades CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T IndianPlatform       299 score=0 RequiredInvent=IT_Chips CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->SeeSaw DexUnlock=IT_Antispot
+  S Balloons               315 inv=[IT2_Balloon x0] 
+    T Fence1               319 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Cable                  322 inv=[IT2_Cable x0] 
+    T AngryElephant        329 score=0 RequiredInvent=IT_Cable CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->SafetyLine ObjectToPrim->SafetyLine DexUnlock=IT_Antispot
+    T Fence3               332 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T ElectricTap          335 score=0 RequiredInvent=IT2_Cable CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+    T MotherFifi           337 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Rake                 340 score=0 CompoundRequir=IT_Antispot CanFix NoticeWhenWalkNearby UseOnce DexUnlock=IT_Antispot
+  S Mouse                  341 inv=[IT2_Rat x0] Dexterity RequirePriming
+  S Chalk                  349 inv=[IT2_Chalk_sponge x0] 
+== Level209
+    T FireChannel          232 score=0 RequiredInvent=IT2_Fuel CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T IceCream             236 score=0 RequiredInvent=IT2_Crap CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Coal                 241 score=0 RequiredInvent=IT2_Tongs CompoundRequir=IT_Antispot Dexterity CanFix UseOnce LinkedItemTr->Trough DexUnlock=IT2_Air_pump
+    T Fence2               245 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T FireFakir            247 score=0 RequiredInvent=IT_Cheese CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->FireChannel DexUnlock=IT_Antispot
+    T Fence1               255 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence3               260 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S AsbestosNappies        269 inv=[IT2_Pants x0] RequirePriming
+  S ConstructionSet        275 inv=[IT2_Fuel x0, IT2_Match x0] 
+    T DressingRoom         284 score=0 RequiredInvent=IT2_Blades CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    H Basket               286 score=0 CanFix DexUnlock=IT_Antispot
+    T MotherStart          289 score=0 RequiredInvent=IT2_Blades CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Drain                293 score=0 RequiredInvent=IT2_Match CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T TadjMahal            296 score=0 RequiredInvent=IT_Bowling CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S CowCrap                298 inv=[IT2_Crap x0] 
+    T HotShoe              301 score=0 RequiredInvent=IT2_Pants_coal CompoundRequir=IT_Antispot RequirePriming RottweilerUseTogglesPrime CanFix UseOnce LinkedItemTr->Drain DexUnlock=IT_Antispot
+  S PairOfBellows          302 inv=[IT2_Air_pump x0] 
+  S Flowers                306 inv=[IT2_Flowers x0] RequirePriming
+    T Flowers              307 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot PrimedInventor=IT2_Flowers CanFix PrimingItem->Cow DexUnlock=IT_Antispot
+    T Trough               310 score=0 RequiredInvent=IT2_Fuel CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Cow                  317 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level210
+    T Pylon                250 score=0 RequiredInvent=IT2_Bra_sling CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence2               253 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T DivingBoard          256 score=0 RequiredInvent=IT2_Sunoil CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T DogBasket            258 score=0 RequiredInvent=IT2_Bone CompoundRequir=IT_Antispot RottweilerUseTogglesPrime CanFix UseOnce Primed LinkedItemTr->DivingBoard DexUnlock=IT_Antispot
+    T Pool                 264 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce ObjectToPrim->Valve DexUnlock=IT_Antispot
+    T Elephant             268 score=0 RequiredInvent=IT2_Bat CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T ElephantCricketBat   274 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T WaterMelons          276 score=0 RequiredInvent=IT2_Bat CompoundRequir=IT_Antispot PrimedInventor=IT2_Bra_sling Neutral CanFix UseOnce PrimingItem->OlgaBra DexUnlock=IT_Antispot
+    T PoolLadder           278 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T DogBasketPut         282 score=0 RequiredInvent=IT2_Bone CompoundRequir=IT_Antispot RequirePriming CanFix UseOnce Primed DexUnlock=IT_Antispot
+    T Shower               284 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T FifiTurban           288 score=0 RequiredInvent=IT2_Bone CompoundRequir=IT_Antispot UseOnce DexUnlock=IT_Antispot
+    T DeckChairMother      292 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S ValveWaterPuddle       298 inv=[IT2_Oktopus x0] 
+    T Valve                304 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce ObjectToPrim->ValveWaterPuddle DexUnlock=IT_Antispot
+  S FishNet                309 inv=[IT2_Brailer x0] 
+    T CallRTMother         311 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral CanFix UseOnce DexUnlock=IT_Antispot
+  S AlmsBowl               312 inv=[IT2_Bone x0] 
+    T FifiElephant         317 score=0 RequiredInvent=IT2_Sunoil CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaShower           320 score=0 RequiredInvent=IT2_Crayfish CanFix UseOnce DexUnlock=IT_Antispot
+  S SeaUrchin              322 inv=[IT2_Hedgehog x0] KeepFull
+  S SuntanOil              324 inv=[IT2_Sunoil x0] 
+    H Bin                  333 score=0 CanFix DexUnlock=IT_Antispot
+  S OlgaBra                348 inv=[IT2_Bra x0] RequirePriming
+    T TurbanShop           351 score=0 RequiredInvent=IT2_Hedgehog SecondRequired=IT2_Oktopus CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaMatBeach         357 score=0 RequiredInvent=IT2_Crayfish CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence1               359 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S CricketBat             367 inv=[IT2_Bat x0] 
+    T DeckChair            372 score=0 RequiredInvent=IT2_Hedgehog CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->Pylon DexUnlock=IT_Antispot
+  S ToolBelt               373 inv=[IT2_Tongs x0] Dexterity RequirePriming
+== Level211
+    T Sweets               231 score=0 RequiredInvent=IT2_Pissballs CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack             236 score=0 CanFix DexUnlock=IT_Antispot
+    T DivingGear           243 score=0 RequiredInvent=IT2_Extinguisher CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H DeckChair            255 score=0 CanFix DexUnlock=IT_Antispot
+    T Dog                  266 score=0 RequiredInvent=IT_Egg CompoundRequir=IT_Antispot PrimeWithInven=IT2_Sausage CanFix UseOnce DexUnlock=IT_Antispot
+    T ToiletSign           269 score=0 RequiredInvent=IT2_Rasp CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaSeaView          273 score=0 RequiredInvent=IT2_Bentnail CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaStandStill       278 score=0 RequiredInvent=IT2_Bentnail CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T LifeJacket           281 score=0 RequiredInvent=IT2_Pressuretank CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack             282 score=0 CanFix DexUnlock=IT_Antispot
+  S ChestDrawer            283 inv=[IT2_Coin x0] KeepFull
+    T CabinPhone           285 score=0 RequiredInvent=IT_Foamballs CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->OlgaChild DexUnlock=IT_Antispot
+    T ToiletWomen          289 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->ToiletSign DexUnlock=IT_Antispot
+  S Plate                  292 inv=[IT2_Sausage x0] RequirePriming
+    T FishingRod           296 score=0 RequiredInvent=IT2_Bentnail CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S MumPicture             298 inv=[IT2_Bentnail x0] 
+    T PayPhone             314 score=0 RequiredInvent=IT2_Coin CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+  S Urinal                 318 inv=[IT2_Pissballs x0] 
+    T OlgaChild            322 score=0 RequiredInvent=IT2_Pressuretank CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S FireExtinguisher       324 inv=[IT2_Extinguisher x0] 
+  S CompressedAir          326 inv=[IT2_Pressuretank x0] KeepFull
+  S Handbag                328 inv=[IT2_Rasp x0] Locked RequirePriming
+    T LifeBoat             334 score=0 RequiredInvent=IT_Cork CompoundRequir=IT_Antispot Dexterity CanFix UseOnce DexUnlock=IT2_Rasp
+    T DeckChairMother      338 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+    T ToiletMen            340 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DependsOn->ToiletSign DexUnlock=IT_Antispot
+== Level212
+    T AztecThroneHands     268 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S MechanicalBullCoins    273 inv=[IT2_Coin x0] KeepFull
+    T BoatCoinSlot         275 score=0 RequiredInvent=IT2_Coin CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T MechanicalBull       284 score=0 RequiredInvent=IT2_Resin CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->MechanicalBullCoins DexUnlock=IT_Antispot
+    T BoatRent             287 score=0 RequiredInvent=IT_Cork CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence3               291 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T AztecThrone          294 score=0 RequiredInvent=IT2_Ruby CanFix UseOnce LinkedItemTr->AztecThrone2 DexUnlock=IT_Antispot
+    D DoorBack             295 score=0 CanFix DexUnlock=IT_Antispot
+    T Fence2               300 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence1               304 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H Lorry                312 score=0 CanFix DexUnlock=IT_Antispot
+  S PaintPot               315 inv=[IT2_Paint x0] 
+    H StatueHidden         322 score=0 CanFix DexUnlock=IT_Antispot
+    T CigarBox             324 score=0 RequiredInvent=IT2_Tnt CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T PreAztecThrone       325 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Crowbar                327 inv=[IT2_Crowbar x0] RequirePriming
+  S WhipStonePlate         331 inv=[IT2_Ruby x0, IT2_Coin x0] Dexterity
+    T Rock1                333 score=0 RequiredInvent=IT_Bowling CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T AztecThrone2         336 score=0 RequiredInvent=IT2_Ruby CanFix UseOnce LinkedItemTr->AztecThrone DexUnlock=IT_Antispot
+  S ClosedMine             338 inv=[IT2_Tnt x0] KeepFull
+  S RubyThrone             341 inv=[IT2_Ruby x0] KeepFull
+    T Fence1               345 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack             356 score=0 CanFix DexUnlock=IT_Antispot
+    T RotatingStoneDisc    359 score=0 RequiredInvent=IT_Cork CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Corn                   362 inv=[IT2_Corn x0] 
+    T ClosedMine1          367 score=0 RequiredInvent=IT_Cactus CompoundRequir=IT_Antispot CanFix LinkedItemTr->ClosedMine DexUnlock=IT_Antispot
+  S Skeleton               371 inv=[IT2_Dagger_rusty x0] RequirePriming
+    T PreParrotLedge       374 score=0 RequiredInvent=IT_Birdfood CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Whip                 377 score=0 RequiredInvent=IT2_Dagger CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->WhipStonePlate DexUnlock=IT_Antispot
+    T ParrotLedge          380 score=0 RequiredInvent=IT2_Corn CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->BoatCoinSlot DexUnlock=IT_Antispot
+    T SleepBench           384 score=0 RequiredInvent=IT2_Paint CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T MumWaitZone4         385 score=0 RequiredInvent=IT_Detergent CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T MumWaitZone3         386 score=0 RequiredInvent=IT_Chips CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T LiveBull             388 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T BoatBase             392 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S ParrotNest             394 inv=[IT2_Ruby x0] 
+  S Resin                  396 inv=[IT2_Resin x0] KeepFull
+    T ParrotCrap           399 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level213
+    T LiveBull             275 score=0 RequiredInvent=IT2_Flowers CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->Wasp DexUnlock=IT_Antispot
+    T Fence2               277 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T AztecThroneHands     280 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T BoatCoinSlot         283 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T AztecThrone          288 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Tortilla             290 score=0 RequiredInvent=IT2_Chili CompoundRequir=IT2_Tequila Compound CanFix UseOnce DexUnlock=IT_Antispot
+    T MechanicalBullWait   291 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->MechanicalBullControls DexUnlock=IT_Antispot
+  S Skeleton               295 inv=[IT2_Tequila x0] 
+    T MotherWaitZone2      297 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence1               305 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T BoatBase             308 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T PlantCarnivore       314 score=0 RequiredInvent=IT2_Chickenwing Compound CanFix UseOnce DexUnlock=IT_Antispot
+    H StatueHidden         317 score=0 CanFix DexUnlock=IT_Antispot
+  S Flowers                320 inv=[IT2_Flowers x0] 
+    T MechanicalBullControlsWait 322 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T LiveBullHorseShoe    326 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T MechanicalBullControls 328 score=0 RequiredInvent=IT2_Hand CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack             332 score=0 CanFix DexUnlock=IT_Antispot
+  S Wasp                   336 inv=[IT2_Beehive x0] 
+    T BoatPicnic           339 score=0 RequiredInvent=IT2_Termites CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S ChickenWings           341 inv=[IT2_Chickenwing x0] KeepFull
+    T Rock1                344 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S CementBag              346 inv=[IT2_Cement x0] 
+    T OlgaTowelWipe        349 score=0 RequiredInvent=IT2_Cement CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Fence1               353 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Piranha                354 inv=[IT2_Piranha x0] 
+    T RotatingStoneDisc    357 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T CementBath           359 score=0 RequiredInvent=IT2_Cement CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H Lorry                372 score=0 CanFix DexUnlock=IT_Antispot
+    T MotherWaitZone5      375 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T LiveBullFeed         379 score=0 RequiredInvent=IT2_Flowers CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Termite              385 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot PrimedInventor=IT2_Termites CanFix UseOnce PrimingItem->Jar DexUnlock=IT_Antispot
+    T LiveBullWall         389 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Chili                  394 inv=[IT2_Chili x0] KeepFull
+    T MechanicalBull       396 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Pinata               398 score=0 RequiredInvent=IT_Cactus CompoundRequir=IT_Antispot Dexterity CanFix UseOnce DexUnlock=IT2_Beehive
+    T Fence3               401 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Jar                    405 inv=[IT2_Jar_empty x0] RequirePriming
+  S StatueHand             410 inv=[IT2_Hand x0] 
+    D DoorBack             412 score=0 CanFix DexUnlock=IT_Antispot
+    T MotherIntermediateZone2 415 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T OlgaBackTowel        417 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+== Level214
+  S Carpet                 243 inv=[IT2_Carpet x0] 
+    T CaptainDoor          249 score=0 RequiredInvent=IT2_Key CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Washbucket           252 score=0 RequiredInvent=IT2_Fish CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Glass                255 score=0 RequiredInvent=IT2_Swiffer CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Shower               257 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    H DeckChair            264 score=0 CanFix DexUnlock=IT_Antispot
+    T Bird                 265 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    D DoorBack             276 score=0 CanFix DexUnlock=IT_Antispot
+  S Shards                 280 inv=[IT2_Shards x0] 
+    T CaptainMug           283 score=0 RequiredInvent=IT2_Pills CompoundRequir=IT_Antispot CanFix UseOnce LinkedItemTr->Captain DexUnlock=IT_Antispot
+  S Mat                    285 inv=[IT2_Code x0] 
+    D DoorBack             287 score=0 CanFix DexUnlock=IT_Antispot
+    T MotherWait           288 score=0 CompoundRequir=IT_Antispot CanFix DexUnlock=IT_Antispot
+    T Pistol               294 score=0 RequiredInvent=IT2_Ammo CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T CaptainControls      302 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Bouquet              319 score=0 RequiredInvent=IT2_Fish CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Hatch                323 score=0 RequiredInvent=IT2_Carpet CompoundRequir=IT_Antispot Compound CanFix UseOnce LinkedItemTr->HatchFish DexUnlock=IT2_Shards
+  S Ammo                   325 inv=[IT2_Ammo x0] 
+    T DeckChairMother      329 score=0 RequiredInvent=IT2_Fartbag CompoundRequir=IT_Antispot Neutral RottweilerUseTogglesPrime CanFix UseOnce DexUnlock=IT_Antispot
+  S HatchFish              331 inv=[IT2_Fish x0, IT2_Fish x0] 
+    T BirdPerch            336 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+  S Handbag                343 inv=[IT2_Pills x0] 
+  S Cloth                  348 inv=[IT2_Swiffer x0] 
+  S BirdDead               356 inv=[IT2_Key x0] 
+    T CaptainWheel         358 score=0 RequiredInvent=IT2_Code CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot
+    T Captain              361 score=0 RequiredInvent=IT2_Knife CompoundRequir=IT_Antispot CanFix UseOnce DexUnlock=IT_Antispot

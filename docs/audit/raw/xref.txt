@@ -1,0 +1,1868 @@
+gameplay-relevant twins (>=2 modeled owners): 131
+
+== Acceleration | owners: ParrotLedgeFallBehavior(ParrotLedgeFallBehavior.cs:11 field Vector3), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:35 field Vector3)
+   (no port reads)
+
+== ActionManager | owners: AnimationControllerBase(AnimationControllerBase.cs:37 field ActionManager), Mother(Mother.cs:6 field ActionManager), Olga(Olga.cs:6 field ActionManager), Rottweiler(Rottweiler.cs:22 field ActionManager), RoutineAction(RoutineAction.cs:5 field ActionManager)
+   runtime/scene.py:1587:            if o['type'] != 'ActionManager' or 'data' not in o:
+
+== Actions | owners: ActionManager(ActionManager.cs:21 field RoutineActionUse[]), LevelScript(LevelScript.cs:19 field LevelScriptAction[])
+   runtime/world.py:403:        self.world = None                # set by World, for zone reactions
+   runtime/world.py:1102:        1526-1534): the zone swap, the crab/search zone reactions and the
+   runtime/world.py:1486:    """ActionManager: a cyclic action list. Zero-duration actions end when the
+   runtime/world.py:1495:        self.actions = spec['actions']
+   runtime/world.py:1496:        self.actions_to_add = spec.get('actions_to_add') or []
+   runtime/world.py:1548:        if not self.actions:
+   runtime/world.py:1550:        return self.actions[self.index % len(self.actions)]
+   runtime/world.py:1558:        if self.actions and not self.frozen:
+   runtime/world.py:1579:            if i >= len(self.actions):    # AdvanceActionIndex's wrap
+   runtime/world.py:1582:            nxt = self.level.items.get(self.actions[i]['item']) \
+   runtime/world.py:1583:                if self.actions[i]['item'] else None
+   runtime/world.py:1643:        if self.index >= len(self.actions):
+   runtime/world.py:1651:    def _trick_kid_actions(self, it):
+   runtime/world.py:1672:    def _kid_actions(self):
+   runtime/world.py:1687:            if self.actions:
+   runtime/world.py:1689:                    self.actions[(self.index + 1) % len(self.actions)]['item'])
+   runtime/world.py:1708:        if self.role == 'Rottweiler' and self.actions and it is not None \
+   runtime/world.py:1710:            last = self.level.items.get(self.actions[-1]['item']) \
+   runtime/world.py:1711:                if self.actions[-1]['item'] else None
+   runtime/world.py:1734:        if olga is None or not self.actions:
+   runtime/world.py:1739:        prev = items.get(self.actions[(self.index - 1) % len(self.actions)]
+   runtime/world.py:1741:            if self.actions[(self.index - 1) % len(self.actions)]['item'] \
+   runtime/world.py:1784:        if ort is not None and ort.actions:
+   runtime/world.py:1785:            olga_cur = items.get(ort.actions[ort.index % len(ort.actions)]
+   runtime/world.py:1787:                if ort.actions[ort.index % len(ort.actions)]['item'] else None
+   runtime/world.py:1825:            if self.actions:
+   runtime/world.py:1826:                prev_i = (self.index - 1) % len(self.actions)
+   runtime/world.py:1827:                prev = self.level.items.get(self.actions[prev_i]['item']) \
+   runtime/world.py:1828:                    if self.actions[prev_i]['item'] else None
+   runtime/world.py:1840:            self._kid_actions()
+   runtime/world.py:1842:            if w is not None and self.actions and len(self.actions) > 1:
+   runtime/world.py:1846:                    self.actions[(self.index - 2) % len(self.actions)]['item']) \
+   runtime/world.py:1847:                    if self.actions[(self.index - 2) % len(self.actions)]['item'] \
+   runtime/world.py:1851:                    self.index = (self.index + 1) % len(self.actions)
+   runtime/world.py:1860:            if self.actions:
+   runtime/world.py:1863:                last_i = (self.index - 1) % len(self.actions)
+   runtime/world.py:1864:                if self.actions[last_i].get('remove_action_after_use'):
+   runtime/world.py:1865:                    del self.actions[last_i]
+   runtime/world.py:1866:                    if last_i >= len(self.actions):
+   runtime/world.py:1872:                    self.actions[(self.index - 1) % len(self.actions)]['item']) \
+   ... 67 more
+
+== Alerter | owners: GameInfo(GameInfo.cs:57 field Alerter), Woody(Woody.cs:148 field Alerter), Zone(Zone.cs:10 field Alerter)
+   runtime/world.py:371:        self.postponed_alerter = None        # Woody.PostponeAlert + Alerter
+   runtime/world.py:1313:                    self.world.woody_see_alerter(self.item)
+   runtime/world.py:1318:                self.world.rott_hear_alerter(self, self.triggered_by_woody)
+   runtime/world.py:1322:        self._see_delay = self.item.alerter_delay
+   runtime/world.py:1325:        self._hear_delay = self.item.alerter_delay
+   runtime/world.py:2864:        return self.urgent_item is not None and self.urgent_item.kind == 'Alerter'
+   runtime/world.py:2972:        elif it.kind == 'Alerter' or it.rott_surprise:
+   runtime/world.py:3234:    def hear_alerter(self, alerter_item, triggered_by_woody):
+   runtime/world.py:3244:                self.pending_alarm = alerter_item
+   runtime/world.py:3247:                self.start_urgent(alerter_item)
+   runtime/world.py:3251:                self.was_alerted = alerter_item     # consumed when he moves
+   runtime/world.py:3257:                self.start_urgent(alerter_item)
+   runtime/world.py:3259:            self.pending_alarm = alerter_item       # PostponeAlerterAction
+   runtime/world.py:3392:        postpone and fire the parked alerter run; a frozen manager keeps it
+   runtime/world.py:3403:        and calming the alerter he was called by. Returns True when it took
+   runtime/world.py:3434:            fsm = w.alerters.get(self.urgent_item.pid)
+   runtime/world.py:3516:    """SurpriseActionFar.Item = alerter; CheckHiddenItem;
+   runtime/world.py:3877:        self.alerters = {it.pid: AlerterFSM(self, it)
+   runtime/world.py:3879:                         if it.kind == 'Alerter' and it.sprite is not None}
+   runtime/world.py:4879:            if src.wake_alerter_flag:
+   runtime/world.py:4882:                for fsm in self.alerters.values():
+   runtime/world.py:4917:        elif item.wake_alerter_flag:
+   runtime/world.py:4918:            for fsm in self.alerters.values():
+   runtime/world.py:5010:    def rott_hear_alerter(self, fsm, triggered_by_woody):
+   runtime/world.py:5015:            routine.hear_alerter(fsm.item, triggered_by_woody)
+   runtime/world.py:5017:    def woody_see_alerter(self, item):
+   runtime/world.py:5029:            w.postponed_alerter = item
+   runtime/world.py:5059:        """zone-crossing hooks: the alerter left behind calms down
+   runtime/world.py:5067:        for fsm in self.alerters.values():
+   runtime/world.py:6432:        if self.woody is not None and self.woody.postponed_alerter is not None \
+   runtime/world.py:6434:            it0, self.woody.postponed_alerter = self.woody.postponed_alerter, None
+   runtime/world.py:6435:            self.woody_see_alerter(it0)
+   runtime/world.py:6506:        for fsm in self.alerters.values():
+   runtime/scene.py:175:                 'wake_sequence', 'poor_sequence', 'alerter_delay',
+   runtime/scene.py:190:                 'cause_alarm', 'cause_alarm_when_trick', 'wake_alerter_flag',
+   runtime/scene.py:471:        self.alerter_delay = d.get('AlerterDelay') if d.get('AlerterDelay') is not None else 1.0
+   runtime/scene.py:514:        self.wake_alerter_flag = bool(d.get('WakeAlerter'))
+   runtime/scene.py:1152:                'item': (d.get('alerter') or {}).get('path'),
+   runtime/scene.py:1205:                       'InspectItem', 'Alerter', 'Drawing', 'Rake',
+   runtime/scene.py:1764:                                  ('Alerter', 'IdleNormal'),
+   ... 2 more
+
+== AlerterDelay | owners: Alerter(Alerter.cs:24 field float), DexterityComponent(DexterityComponent.cs:80 field float)
+   runtime/world.py:1322:        self._see_delay = self.item.alerter_delay
+   runtime/world.py:1325:        self._hear_delay = self.item.alerter_delay
+   runtime/scene.py:175:                 'wake_sequence', 'poor_sequence', 'alerter_delay',
+   runtime/scene.py:471:        self.alerter_delay = d.get('AlerterDelay') if d.get('AlerterDelay') is not None else 1.0
+
+== AnimController | owners: Item(Item.cs:388 field ItemAnimationController), Pawn(Pawn.cs:79 field PawnAnimationController), ScriptMarker(ScriptMarker.cs:5 field ItemAnimationController)
+   (no port reads)
+
+== AnimationSequence | owners: AnimationControllerBase(AnimationControllerBase.cs:9 field T[]), AnimationSequenceControl(AnimationSequenceControl.cs:8 field AnimationSequenceState), AnimationSequenceProperties(AnimationSequenceProperties.cs:8 field AnimationSequenceState), Item(Item.cs:78 field AnimationState[])
+   runtime/world.py:1619:            if c.get('AnimationSequence') != it.current_sequence:
+   runtime/world.py:3828:            if s['AnimationSequence'] == state:
+   runtime/world.py:5809:        seq = list(item.animation_sequence) if item.use_woody_sequence \
+   runtime/world.py:6118:                    [b.on_animation_sequence_ended() for b in bl]
+   runtime/scene.py:135:                 'use_woody_sequence', 'animation_sequence',
+   runtime/scene.py:340:        self.animation_sequence = d.get('AnimationSequence') or []
+   runtime/behaviors.py:147:    def on_animation_sequence_ended(self):
+   runtime/behaviors.py:493:    def on_animation_sequence_ended(self):
+   runtime/behaviors.py:648:    def on_animation_sequence_ended(self):
+   runtime/behaviors.py:2175:    def on_animation_sequence_ended(self):
+
+== AnimationStartIndex | owners: AnimationSequenceControl(AnimationSequenceControl.cs:23 field int), AnimationSequenceProperties(AnimationSequenceProperties.cs:11 field int)
+   runtime/world.py:1621:            if c.get('AnimationStartIndex') == idx:
+   runtime/world.py:3778:        if s['AnimationStartIndex'] <= self.item.current_seq_index \
+
+== Animations | owners: ItemAnimationController(ItemAnimationController.cs:6 field ItemAnimationInstance[]), PawnAnimationController(PawnAnimationController.cs:7 field PawnAnimationInstance[])
+   runtime/world.py:81:    # -- starting animations ----------------------------------------------
+   runtime/world.py:368:        self.idle_animations = spec.get('idle_animations') or []
+   runtime/world.py:370:        self.animations_in_progress = False  # Pawn.AnimationsInProgress
+   runtime/world.py:866:        self._transit_animations(door, other, sequential=False)
+   runtime/world.py:868:    def _transit_animations(self, door, other, sequential):
+   runtime/world.py:1212:                    self._transit_animations(d, other, sequential=True)
+   runtime/world.py:1726:    def _olga_extra_animations(self):
+   runtime/world.py:1841:            self._olga_extra_animations()
+   runtime/world.py:2118:        # the Rake subclass skips its animations outside the compound trick
+   runtime/world.py:3067:                it2.angry_without_animations = False
+   runtime/world.py:4153:        if item.angry_without_animations:          # cs:719-736
+   runtime/world.py:4206:            elif not item.fix_without_animations and item.fix_animation:
+   runtime/world.py:4441:        if not (item.fix_without_animations and item.name == 'LiveBull'):
+   runtime/world.py:4454:        if not (item.fix_without_animations and item.name == 'BoatPicnic'):
+   runtime/world.py:5028:        if w.animations_in_progress:
+   runtime/world.py:5063:        self.crab_animations(pawn, pawn.zone.pid if pawn.zone else None,
+   runtime/world.py:5110:    def crab_animations(self, pawn, new_zone_pid, old_zone_pid):
+   runtime/world.py:5113:        animations — entering their zone hides them (the LeaveZone strip),
+   runtime/world.py:5334:                    woody._transit_animations(door, other,
+   runtime/world.py:5718:            self.woody.animations_in_progress = False
+   runtime/world.py:5776:        self.woody.animations_in_progress = True   # Item.cs:1858
+   runtime/world.py:6433:                and not self.woody.animations_in_progress:
+   runtime/world.py:6445:                if not w0.nfh2 and w0.idle_animations:
+   runtime/world.py:6447:                    name = random.choice(w0.idle_animations)
+   runtime/scene.py:139:                 'fix_without_animations', 'can_fix', 'dont_get_angry',
+   runtime/scene.py:210:                 'reuse_after_fix', 'angry_without_animations', 'fix_directly',
+   runtime/scene.py:350:        self.fix_without_animations = bool(d.get('FixWithoutAnimations'))
+   runtime/scene.py:459:        # HideItem: the wardrobe's own animations and whether Woody vanishes
+   runtime/scene.py:575:        self.angry_without_animations = bool(d.get('AngryWithoutAnimations'))
+   runtime/scene.py:589:        # the item-side use animations (TrickItem.cs:947-994)
+   runtime/scene.py:1743:        anims = [Anim(a, base) for a in (d.get('Animations') or [])]
+   runtime/scene.py:1913:                'idle_animations': [a for a in (pd.get('IdleAnimations') or [])
+
+== Aux | owners: Helpers(Helpers.cs:19 field int), Level206RoutineBehavior(Level206RoutineBehavior.cs:9 field bool), Level207MotherBehavior(Level207MotherBehavior.cs:5 field bool)
+   runtime/world.py:300:        self.tricked_aux = False         # Rottweiler.TrickedAux (never reset)
+   runtime/world.py:316:        self.item_aux = None             # Pawn.ItemAux
+   runtime/world.py:317:        self.flag_aux = False            # Pawn.FlagAux
+   runtime/world.py:333:        self.normal_pos_aux = False      # Rottweiler.NormalPosAux
+   runtime/world.py:338:        self.olga_aux_anim = None        # animationAuxOlga
+   runtime/world.py:587:        self.item_aux = None                        # ItemAux = targetItem
+   runtime/world.py:606:        self.item_aux = it                          # Pawn.cs:595
+   runtime/world.py:668:        if not self.at_zone_y() and (self.role != 'Woody' or self.flag_aux):
+   runtime/world.py:720:                aux = H['step_index'] - H['first_step_index']
+   runtime/world.py:721:                if aux in (2, 3, 4):
+   runtime/world.py:726:                if aux == 1:
+   runtime/world.py:785:        if self._move_index == 1 and self.flag_aux:
+   runtime/world.py:786:            self.flag_aux = False
+   runtime/world.py:1031:        ia = self.item_aux
+   runtime/world.py:1034:            self.flag_aux = True
+   runtime/world.py:1039:                and not self.done_passing and not self.flag_aux:
+   runtime/world.py:1520:        self.cont_aux = -1               # ActionManager.ContAux (KidActions)
+   runtime/world.py:1530:        self.anim_aux = None             # animationAux
+   runtime/world.py:1683:        self.cont_aux += 1
+   runtime/world.py:1685:                and self.cont_aux > 0 and kid is not None:
+   runtime/world.py:1721:        if self.anim_aux is not None:
+   runtime/world.py:1722:            self.anim_aux.infinite = True
+   runtime/world.py:1723:        self.anim_aux = olga.anim.anim
+   runtime/world.py:1781:            olga.olga_aux_anim = self.anim_aux
+   runtime/world.py:1811:            olga.olga_aux_anim = self.anim_aux
+   runtime/world.py:1813:                and olga.olga_aux_anim is not None:   # cs:378-381
+   runtime/world.py:1814:            olga.olga_aux_anim.infinite = True
+   runtime/world.py:1834:                        and not self.pawn.normal_pos_aux:
+   runtime/world.py:1838:                if self.pawn.normal_pos_aux:
+   runtime/world.py:1839:                    self.pawn.normal_pos_aux = False
+   runtime/world.py:2018:                    if it.name == 'DogFifi' and not it.prime_item_aux:
+   runtime/world.py:2019:                        it.prime_item_aux = True
+   runtime/world.py:2345:            it.harpoon_aux = True
+   runtime/world.py:2519:                a['_layer_aux'] = tgt.sprite.depth
+   runtime/world.py:2524:                a['_layer_aux'] = p.sprite.depth
+   runtime/world.py:2609:        unlocks, the exit deltas with their one-shot aux flags, the unhides,
+   runtime/world.py:2632:        if (dx > 0 or dy > 0) and not it.exit_delta_aux and it.tricked:
+   runtime/world.py:2636:                it.exit_delta_aux = True
+   runtime/world.py:2638:            it.exit_delta_aux = False                  # cs:441-444
+   runtime/world.py:2640:        if (dx > 0 or dy > 0) and not it.exit_delta_not_tricked_aux \
+   ... 258 more
+
+== Boat | owners: Level211Behavior(Level211Behavior.cs:15 field TrickItem), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:15 field Item)
+   runtime/world.py:4357:        self._fix_boat_behavior(item)
+   runtime/world.py:4451:    def _fix_boat_behavior(self, item):
+   runtime/world.py:4452:        """Item.FixBoatBehavior (Item.cs:2519-2531): the picnic boat sinks
+   runtime/behaviors.py:1095:    """Level211Behavior.cs: the sea-side toilets, the fall-boat pose swap and
+   runtime/behaviors.py:1103:        self.boat = self.item('Boat')
+   runtime/behaviors.py:1106:        self.boat_aux = False
+   runtime/behaviors.py:1107:        self.show_boat = False
+   runtime/behaviors.py:1108:        self.boat_aux2 = False
+   runtime/behaviors.py:1116:        if self.boat_aux and self.boat is not None:   # cs:40-49
+   runtime/behaviors.py:1117:            self.play_directly(self.boat, self.boat.idle)
+   runtime/behaviors.py:1118:            self.collider(self.boat, False)
+   runtime/behaviors.py:1119:            self.boat_aux = False
+   runtime/behaviors.py:1120:        if self.boat_aux2:                            # cs:50-54
+   runtime/behaviors.py:1121:            self.boat_aux2 = False
+   runtime/behaviors.py:1122:            self.hide_obj(self.boat, False)
+   runtime/behaviors.py:1123:        if self.show_boat:                            # cs:55-60
+   runtime/behaviors.py:1124:            self.show_boat = False
+   runtime/behaviors.py:1125:            self.hide_obj(self.boat, True)
+   runtime/behaviors.py:1126:            self.boat_aux2 = True
+   runtime/behaviors.py:1139:        if name == 'FallBoat' and self.boat is not None:     # cs:79-83
+   runtime/behaviors.py:1140:            self.boat_aux = True
+   runtime/behaviors.py:1141:            self.boat.idle = 'N2TrickItemIdleFuckedup'
+   runtime/behaviors.py:1143:            self.show_boat = True
+   runtime/behaviors.py:1144:            self.hide_obj(self.boat, False)
+   runtime/behaviors.py:1154:    """Level211LifeBoatBehavior.cs: getting caught during the life-boat
+   runtime/behaviors.py:1155:    action brings the boat back into view, for good."""
+   runtime/behaviors.py:1159:        self.life_boat = self.item('LifeBoat')
+   runtime/behaviors.py:1164:        if it is not None and it is self.life_boat:   # cs:14-23
+   runtime/behaviors.py:1165:            self.play_item(self.life_boat, 'N2TrickItemIdleNormal')
+   runtime/behaviors.py:1166:            self.hide_obj(self.life_boat, False)
+   runtime/behaviors.py:1171:            self.hide_obj(self.life_boat, False)
+   runtime/behaviors.py:1180:    """Level213Behavior.cs: depth choreography for the picnic boat and the
+   runtime/behaviors.py:1709:    box's exit-delta swaps, the bench/boat crashes, and the Mother's depth
+   runtime/behaviors.py:1718:        self.boat = self.item('Boat')
+   runtime/behaviors.py:1725:        self.boat_tricked = False
+   runtime/behaviors.py:1761:        if self.boat_tricked:                         # cs:78-81
+   runtime/behaviors.py:1762:            self.boat_tricked = False
+   runtime/behaviors.py:1767:            self.set_active(self.boat, False)
+   runtime/behaviors.py:1768:        if self.boat is not None and self.boat.tricked \
+   runtime/behaviors.py:1771:            self.boat_tricked = True                  # cs:91-94
+
+== BubbleIcon | owners: Actor(Actor.cs:34 field Texture), RoutineActionMove(RoutineActionMove.cs:13 field Texture), Zone(Zone.cs:46 field Texture)
+   runtime/scene.py:157:                 'bubble_icon', 'bubble_icon_active', 'bubble_icon_mad',
+   runtime/scene.py:396:        self.bubble_icon = d.get('BubbleIconPath') or None
+   runtime/scene.py:397:        self.bubble_icon_active = d.get('BubbleIconActivePath') or None
+   runtime/scene.py:398:        self.bubble_icon_mad = d.get('BubbleIconMadPath') or None
+   runtime/scene.py:1048:        self.bubble_icons = {int(k): v
+   runtime/scene.py:1049:                             for k, v in (raw.get('bubble_icons') or {}).items()}
+   runtime/scene.py:1318:        for pid in list(self.bubble_icons):
+   runtime/scene.py:1322:                self.bubble_icons.setdefault(go, self.bubble_icons[pid])
+   runtime/hud.py:1103:                name = it.bubble_icon_mad or it.bubble_icon
+   runtime/hud.py:1110:                name = it.bubble_icon_active or it.bubble_icon
+   runtime/hud.py:1115:            icons = self.level.bubble_icons.get(zone_go) if zone_go else None
+   tools/export_level.py:250:    bi = bubble_icons(sc, index, out)
+   tools/export_level.py:252:        out['bubble_icons'] = bi
+   tools/export_level.py:536:def bubble_icons(sc, index, out):
+   tools/export_level.py:546:        for f, key in (('BubbleIcon', 'icon'), ('BubbleIconActive', 'active'),
+
+== BubbleMotherIcon | owners: Actor(Actor.cs:40 field Texture), RoutineActionMove(RoutineActionMove.cs:15 field Texture)
+   runtime/scene.py:158:                 'special_bubble_for_mother', 'bubble_mother_icon',
+   runtime/scene.py:403:        self.bubble_mother_icon = d.get('BubbleMotherIconPath') or None
+   runtime/hud.py:1108:                name = it.bubble_mother_icon
+
+== Bucket | owners: RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:19 field Item), WashbucketBehavior(WashbucketBehavior.cs:11 field Item)
+   runtime/world.py:5232:                # the IceBucket re-arms for a second round with the bucket
+   runtime/scene.py:1018:    'RottweilerMotherBehaviour', 'WashbucketBehavior',
+   runtime/behaviors.py:2106:    pistol's use sets, and the hatch / bucket / fish poses ride along."""
+   runtime/behaviors.py:2115:        self.bucket = self.item('Bucket')
+   runtime/behaviors.py:2117:        self.bucket_aux = False
+   runtime/behaviors.py:2145:            self.hide_obj(self.bucket, True)
+   runtime/behaviors.py:2146:        if self.bucket_aux:                           # cs:70-74
+   runtime/behaviors.py:2147:            self.bucket_aux = False
+   runtime/behaviors.py:2148:            self.depth(self.bucket, 'Rottweiler')
+   runtime/behaviors.py:2149:        if name == 'WaitInFear' and not self.bucket_aux \
+   runtime/behaviors.py:2150:                and self.bucket is not None and self.bucket.tricked:
+   runtime/behaviors.py:2151:            self.hide_obj(self.bucket, False)         # cs:75-80
+   runtime/behaviors.py:2152:            self.depth(self.bucket, 'Items')
+   runtime/behaviors.py:2153:            self.bucket_aux = True
+   runtime/behaviors.py:2219:class WashbucketBehavior(Behavior):
+   runtime/behaviors.py:2220:    """WashbucketBehavior.cs: Olga's shower run — the bucket pose brings the
+   runtime/behaviors.py:2221:    wash bucket out and turns the shower's prime into its use set; the cloth
+   runtime/behaviors.py:2227:        self.bucket_animation = self.anim_name('BucketAnimation')
+   runtime/behaviors.py:2233:        if name == self.bucket_animation:             # cs:24-33
+   runtime/behaviors.py:2236:                self.go_set_active('Washbucket', True)
+   runtime/behaviors.py:2294:    'WashbucketBehavior': WashbucketBehavior,
+
+== BucketAux | owners: RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:25 field bool), WashbucketBehavior(WashbucketBehavior.cs:19 field bool)
+   runtime/behaviors.py:2117:        self.bucket_aux = False
+   runtime/behaviors.py:2146:        if self.bucket_aux:                           # cs:70-74
+   runtime/behaviors.py:2147:            self.bucket_aux = False
+   runtime/behaviors.py:2149:        if name == 'WaitInFear' and not self.bucket_aux \
+   runtime/behaviors.py:2153:            self.bucket_aux = True
+
+== Bull | owners: Level213Behavior(Level213Behavior.cs:7 field Item), Level213OlgaBehavior(Level213OlgaBehavior.cs:3 field Item), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:11 field Item)
+   runtime/world.py:3100:            # the bull-wait double skip (ActionManager.cs:627-639)
+   runtime/world.py:4356:        self._fix_bull_behavior(item)
+   runtime/world.py:4439:    def _fix_bull_behavior(self, item):
+   runtime/world.py:4564:        bull, the carnivore, the parrot ledge)"""
+   runtime/behaviors.py:1181:    mechanical-bull activation."""
+   runtime/behaviors.py:1185:        self.bull = self.item('Bull')
+   runtime/behaviors.py:1186:        self.bull_controls = self.item('BullControls')
+   runtime/behaviors.py:1193:        self.bull_visible = False
+   runtime/behaviors.py:1215:        if self.bull_visible:                         # cs:59-62
+   runtime/behaviors.py:1216:            self.bull_visible = False
+   runtime/behaviors.py:1219:            self.hide_obj(self.bull_controls, False)
+   runtime/behaviors.py:1227:        if name == 'BullActivateManip' and not self.bull_visible:  # cs:79-85
+   runtime/behaviors.py:1228:            self.hide_obj(self.bull_controls, True)
+   runtime/behaviors.py:1229:            self.hide_obj(self.bull, True)
+   runtime/behaviors.py:1230:            self.bull_visible = True
+   runtime/behaviors.py:1235:    """Level213OlgaBehavior.cs: Olga's bull crash and workout depths."""
+   runtime/behaviors.py:1239:        self.bull = self.item('Bull')
+   runtime/behaviors.py:1240:        self.bull_controls = self.item('BullControls')
+   runtime/behaviors.py:1241:        self.bull_aux = False
+   runtime/behaviors.py:1246:        if self.bull_aux:                             # cs:20-24
+   runtime/behaviors.py:1247:            self.bull_aux = False
+   runtime/behaviors.py:1248:            self.hide_obj(self.bull, False)
+   runtime/behaviors.py:1251:            self.depth(self.bull_controls, 'FrontDoors')
+   runtime/behaviors.py:1253:            self.bull_aux = True
+   runtime/behaviors.py:1256:        if name == 'HitPawn' and self.bull is not None and self.bull.tricked:
+   runtime/behaviors.py:1258:            self.depth(self.bull_controls, 'Items')
+   runtime/behaviors.py:1716:        self.bull = self.item('Bull')
+   runtime/behaviors.py:1724:        self.bull_aux = False
+   runtime/behaviors.py:1743:        if self.bull_aux:                             # cs:55-59
+   runtime/behaviors.py:1744:            self.bull_aux = False
+   runtime/behaviors.py:1745:            self.hide_obj(self.bull, False)
+   runtime/behaviors.py:1764:            self.hide_obj(self.bull, True)
+   runtime/behaviors.py:1765:            self.bull_aux = True
+
+== BullAux | owners: Level213OlgaBehavior(Level213OlgaBehavior.cs:13 field bool), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:25 field bool)
+   runtime/behaviors.py:1241:        self.bull_aux = False
+   runtime/behaviors.py:1246:        if self.bull_aux:                             # cs:20-24
+   runtime/behaviors.py:1247:            self.bull_aux = False
+   runtime/behaviors.py:1253:            self.bull_aux = True
+   runtime/behaviors.py:1724:        self.bull_aux = False
+   runtime/behaviors.py:1743:        if self.bull_aux:                             # cs:55-59
+   runtime/behaviors.py:1744:            self.bull_aux = False
+   runtime/behaviors.py:1765:            self.bull_aux = True
+
+== BullControls | owners: Level213Behavior(Level213Behavior.cs:9 field Item), Level213OlgaBehavior(Level213OlgaBehavior.cs:5 field Item)
+   runtime/behaviors.py:1186:        self.bull_controls = self.item('BullControls')
+   runtime/behaviors.py:1219:            self.hide_obj(self.bull_controls, False)
+   runtime/behaviors.py:1228:            self.hide_obj(self.bull_controls, True)
+   runtime/behaviors.py:1240:        self.bull_controls = self.item('BullControls')
+   runtime/behaviors.py:1251:            self.depth(self.bull_controls, 'FrontDoors')
+   runtime/behaviors.py:1258:            self.depth(self.bull_controls, 'Items')
+
+== CalculatedtHeight | owners: Control(Control.cs:92 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:154 field float), LevelLoader(LevelLoader.cs:38 field float), LevelScript(LevelScript.cs:43 field float), LevelTransition(LevelTransition.cs:35 field float), ProgressBar(ProgressBar.cs:51 field float), ProgressBarTrick(ProgressBarTrick.cs:29 field float)
+   (no port reads)
+
+== CalculatedtWidth | owners: Control(Control.cs:94 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:156 field float), LevelLoader(LevelLoader.cs:40 field float), LevelScript(LevelScript.cs:45 field float), LevelTransition(LevelTransition.cs:37 field float), ProgressBar(ProgressBar.cs:53 field float), ProgressBarTrick(ProgressBarTrick.cs:31 field float)
+   (no port reads)
+
+== CanStart | owners: Alerter(Alerter.cs:28 field bool), Pawn(Pawn.cs:121 field bool)
+   runtime/world.py:1245:        self.can_start = True            # IntroAnimation.cs:293 sets it post-intro
+   runtime/world.py:1303:        if self.can_start and self.start_timer > 0.0:
+
+== ComplexMove | owners: Item(Item.cs:218 field bool), Step(Step.cs:25 field bool)
+   runtime/world.py:501:                and not s['door'].complex_move)
+   runtime/world.py:692:        if not (door.is_transition and door.complex_move):
+   runtime/world.py:710:        def transfer(loc, complex_move):
+   runtime/world.py:711:            s = {'kind': 'cpoint' if complex_move else 'point',
+   runtime/world.py:713:            if complex_move:
+   runtime/scene.py:918:                 'complex_move', 'nfh2_stairs', 'pawn_deltas', 'passing_nfh2',
+   runtime/scene.py:952:        self.complex_move = bool(d.get('ComplexMove'))
+
+== CompoundTrickScore | owners: GameInfo(GameInfo.cs:43 field int), Item(Item.cs:68 field int)
+   runtime/world.py:1431:        self.compound_trick_score = info.get('compound_trick_score') or 0
+   runtime/world.py:1448:            compound = self.compound_trick_score
+   runtime/scene.py:245:                 'compound_trick_score_v', 'extra_coin_linked',
+   runtime/scene.py:660:        self.compound_trick_score_v = d.get('CompoundTrickScore') or 0
+   runtime/scene.py:1531:                    'compound_trick_score': d.get('CompoundTrickScore') or 0,
+
+== CurrentAction | owners: ActionManager(ActionManager.cs:85 field RoutineAction), LevelScript(LevelScript.cs:57 field LevelScriptAction)
+   (no port reads)
+
+== CurrentAnim | owners: IndianPlatformBehavior(IndianPlatformBehavior.cs:15 field string), Level101Behavior(Level101Behavior.cs:7 field string), Level105Behavior(Level105Behavior.cs:5 field string), Level108Behavior(Level108Behavior.cs:5 field string), Level109Behavior(Level109Behavior.cs:11 field string), Level113Behavior(Level113Behavior.cs:3 field string), Level114Behavior(Level114Behavior.cs:13 field string), Level206Behavior(Level206Behavior.cs:9 field string), Level208Behaviors(Level208Behaviors.cs:21 field string), Level210Behavior(Level210Behavior.cs:19 field string), Level211Behavior(Level211Behavior.cs:17 field string), Level212Behavior(Level212Behavior.cs:3 field string), Level213Behavior(Level213Behavior.cs:15 field string), Level213OlgaBehavior(Level213OlgaBehavior.cs:9 field string), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:31 field string), PoolJumpBehavior(PoolJumpBehavior.cs:19 field string), RollerSkaterBehavior(RollerSkaterBehavior.cs:45 field string), SandCastleBehavior(SandCastleBehavior.cs:19 field string)
+   runtime/behaviors.py:27:        self.current_animation = None    # ActorBehavior.CurrentAnimation
+   runtime/behaviors.py:142:        self.current_animation = name    # ActorBehavior.PlayAnimation base
+   runtime/behaviors.py:277:        if self.current_animation == 'SunBathLotion' and idx == 8 \
+   runtime/behaviors.py:309:                and self.current_animation == 'TakeInventory'
+   runtime/behaviors.py:427:        if self.current_animation == 'VacuumDustExplosion':   # cs:29-31
+   runtime/behaviors.py:430:            if self.current_animation.startswith('Angry'):    # cs:35-37
+   runtime/behaviors.py:432:            elif self.current_animation == 'VacuumLoop':      # cs:39-41
+   runtime/behaviors.py:434:            elif self.current_animation == 'Walk_Right':      # cs:43-48
+   runtime/behaviors.py:472:        if self.current_animation == 'SlideSkate':    # cs:55-57
+   runtime/behaviors.py:474:        elif self.current_animation.startswith('Stand_') \
+   runtime/behaviors.py:488:        if idx == 1 and self.current_animation == 'FeedFish' \
+   runtime/behaviors.py:1147:        if idx == 3 and self.current_animation == 'WaitInFear2':   # cs:94-101
+   runtime/behaviors.py:1396:        if idx == 8 and self.current_animation == 'SplashCrayfish':  # cs:99-102
+   runtime/behaviors.py:1786:        if self.current_animation == 'CliffCrash' and idx == 5:  # cs:121-124
+   runtime/behaviors.py:1811:        if idx == 3 and self.current_animation == 'PoolAwningFall':
+   runtime/behaviors.py:1813:        elif idx == 6 and self.current_animation == 'PoolAwningFall':
+   runtime/behaviors.py:1817:        self.current_animation = name
+   runtime/behaviors.py:1897:        if idx == 3 and self.current_animation == 'TakeSnake':   # cs:57-60
+   runtime/behaviors.py:1917:        if self.current_animation == self.put_animation:     # cs:14-19
+   runtime/behaviors.py:1922:        elif self.current_animation == self.take_animation:  # cs:20-24
+   runtime/behaviors.py:1979:        cur = self.current_animation
+   runtime/behaviors.py:2000:        cur = self.current_animation
+   runtime/behaviors.py:2211:        if self.current_animation == self.first_anim_tricked and idx == 65:
+
+== CurrentAnimation | owners: ActorBehavior(ActorBehavior.cs:5 field string), AnimationControllerBase(AnimationControllerBase.cs:13 field AnimationInstance<T>)
+   runtime/behaviors.py:27:        self.current_animation = None    # ActorBehavior.CurrentAnimation
+   runtime/behaviors.py:142:        self.current_animation = name    # ActorBehavior.PlayAnimation base
+   runtime/behaviors.py:277:        if self.current_animation == 'SunBathLotion' and idx == 8 \
+   runtime/behaviors.py:309:                and self.current_animation == 'TakeInventory'
+   runtime/behaviors.py:427:        if self.current_animation == 'VacuumDustExplosion':   # cs:29-31
+   runtime/behaviors.py:430:            if self.current_animation.startswith('Angry'):    # cs:35-37
+   runtime/behaviors.py:432:            elif self.current_animation == 'VacuumLoop':      # cs:39-41
+   runtime/behaviors.py:434:            elif self.current_animation == 'Walk_Right':      # cs:43-48
+   runtime/behaviors.py:472:        if self.current_animation == 'SlideSkate':    # cs:55-57
+   runtime/behaviors.py:474:        elif self.current_animation.startswith('Stand_') \
+   runtime/behaviors.py:488:        if idx == 1 and self.current_animation == 'FeedFish' \
+   runtime/behaviors.py:1147:        if idx == 3 and self.current_animation == 'WaitInFear2':   # cs:94-101
+   runtime/behaviors.py:1396:        if idx == 8 and self.current_animation == 'SplashCrayfish':  # cs:99-102
+   runtime/behaviors.py:1786:        if self.current_animation == 'CliffCrash' and idx == 5:  # cs:121-124
+   runtime/behaviors.py:1811:        if idx == 3 and self.current_animation == 'PoolAwningFall':
+   runtime/behaviors.py:1813:        elif idx == 6 and self.current_animation == 'PoolAwningFall':
+   runtime/behaviors.py:1817:        self.current_animation = name
+   runtime/behaviors.py:1897:        if idx == 3 and self.current_animation == 'TakeSnake':   # cs:57-60
+   runtime/behaviors.py:1917:        if self.current_animation == self.put_animation:     # cs:14-19
+   runtime/behaviors.py:1922:        elif self.current_animation == self.take_animation:  # cs:20-24
+   runtime/behaviors.py:1979:        cur = self.current_animation
+   runtime/behaviors.py:2000:        cur = self.current_animation
+   runtime/behaviors.py:2211:        if self.current_animation == self.first_anim_tricked and idx == 65:
+
+== CurrentFrameIndex | owners: AnimationInstance(AnimationInstance.cs:58 field int), HUDAnimation(HUDAnimation.cs:20 field int)
+   (no port reads)
+
+== DataStyle | owners: LevelLoader(LevelLoader.cs:24 field GUIStyle), LevelTransition(LevelTransition.cs:23 field GUIStyle), ProgressBar(ProgressBar.cs:39 field GUIStyle), ProgressBarTrick(ProgressBarTrick.cs:15 field GUIStyle)
+   (no port reads)
+
+== DefaultHeight | owners: Control(Control.cs:88 field float), Credits(Credits.cs:81 field float), GameIntroAnimation(GameIntroAnimation.cs:62 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:150 field float), LevelLoader(LevelLoader.cs:34 field float), LevelScript(LevelScript.cs:39 field float), LevelTransition(LevelTransition.cs:31 field float), ProgressBar(ProgressBar.cs:47 field float), ProgressBarTrick(ProgressBarTrick.cs:25 field float)
+   (no port reads)
+
+== DefaultWidth | owners: Control(Control.cs:90 field float), Credits(Credits.cs:83 field float), GameIntroAnimation(GameIntroAnimation.cs:64 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:152 field float), LevelLoader(LevelLoader.cs:36 field float), LevelScript(LevelScript.cs:41 field float), LevelTransition(LevelTransition.cs:33 field float), ProgressBar(ProgressBar.cs:49 field float), ProgressBarTrick(ProgressBarTrick.cs:27 field float)
+   (no port reads)
+
+== DelayStart | owners: Mother(Mother.cs:18 field float), Olga(Olga.cs:8 field float), Rottweiler(Rottweiler.cs:24 field float)
+   runtime/world.py:1504:        self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
+   runtime/world.py:3457:        if self.delay_start > 0.0:
+   runtime/world.py:3458:            self.delay_start -= dt
+   runtime/world.py:3459:            if self.delay_start > 0.0:
+
+== DeltaDescriptionLocation | owners: Item(Item.cs:70 field Vector3), Woody(Woody.cs:144 field Vector3)
+   runtime/scene.py:735:        ddl = d.get('DeltaDescriptionLocation') or {}
+
+== DeltaLocation | owners: AnimationControllerBase(AnimationControllerBase.cs:45 field Vector2), AnimationInstance(AnimationInstance.cs:36 field Vector2), Item(Item.cs:86 field Vector3)
+   runtime/scene.py:45:        dl = d.get('DeltaLocation') or {}
+   runtime/scene.py:942:        dl = d.get('DeltaLocation') or {}
+   runtime/scene.py:1394:        dl = d.get('DeltaLocation') or {}
+   runtime/scene.py:1752:        dl = d.get('DeltaLocation') or {}
+
+== DeltaProgressRect | owners: ProgressBar(ProgressBar.cs:15 field Rect), ProgressBarTrick(ProgressBarTrick.cs:9 field Rect)
+   runtime/scene.py:1125:            'delta': d.get('DeltaProgressRect') or {},
+
+== DescriptionString | owners: HUD(HUD.cs:277 field string), Inventory(Inventory.cs:39 field string), Item(Item.cs:38 field string)
+   runtime/world.py:4392:            item.description_string = item.description_fixed
+   runtime/world.py:5356:                    if door.description_string:
+   runtime/world.py:5357:                        self.hud.show_item_tooltip(door.description_string,
+   runtime/world.py:5738:            key = self.hud.get_description_string(item)
+   runtime/scene.py:265:                 'description_string', 'description_tricked',
+   runtime/scene.py:446:             'desc': v.get('DescriptionString') or '',
+   runtime/scene.py:714:        self.description_string = d.get('DescriptionString') or ''
+   runtime/scene.py:755:             'desc': (v.get('DescriptionString') or '')}
+   runtime/scene.py:921:                 'disabled', 'description_string', 'walk_deltas',
+   runtime/scene.py:970:        self.description_string = d.get('DescriptionString') or ''
+   runtime/hud.py:477:    def get_description_string(self, it):
+   runtime/hud.py:494:        return it.description_string
+
+== DexterityAlert | owners: SearchItem(SearchItem.cs:29 field DexterityComponent), TrickItem(TrickItem.cs:166 field DexterityComponent)
+   runtime/world.py:5695:            ds = self.dex_states.get(item.dexterity_alert) \
+   runtime/world.py:5696:                if item.dexterity_alert else None
+   runtime/world.py:6482:                if it.dexterity_alert is None:
+   runtime/world.py:6484:                ds = self.dex_states.get(it.dexterity_alert)
+   runtime/scene.py:257:                 'dexterity_hide_object', 'dexterity_alert',
+   runtime/scene.py:693:        self.dexterity_alert = ref('DexterityAlert')
+
+== DisableColliderAfterUse | owners: SearchItem(SearchItem.cs:41 field bool), TrickItem(TrickItem.cs:134 field bool)
+   runtime/world.py:2166:            if it.disable_collider_after_use:  # cs:594-598
+   runtime/scene.py:213:                 'disable_collider_after_use', 'give_bowling_when_tricked',
+   runtime/scene.py:583:        self.disable_collider_after_use = bool(d.get('DisableColliderAfterUse'))
+
+== DoorsToUnlock | owners: LevelScriptAction(LevelScriptAction.cs:37 field Door[]), RoutineActionUse(RoutineActionUse.cs:63 field Door[])
+   runtime/world.py:2616:        for pid in a.get('doors_to_unlock') or ():     # cs:390-393
+   runtime/scene.py:1656:                             'doors_to_unlock': [(x or {}).get('path')
+   runtime/scene.py:1657:                                                 for x in (a.get('DoorsToUnlock') or [])],
+
+== Duration | owners: AnimationSequenceProperties(AnimationSequenceProperties.cs:17 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:116 field string), ProgressBarTrick(ProgressBarTrick.cs:11 field float), RoutineAction(RoutineAction.cs:9 field float)
+   runtime/world.py:1486:    """ActionManager: a cyclic action list. Zero-duration actions end when the
+   runtime/world.py:2032:                self.timer = a['duration']
+   runtime/world.py:2060:                self.timer = a['duration']
+   runtime/world.py:2123:            self.timer = a['duration']
+   runtime/world.py:2186:        self.timer = a['duration']
+   runtime/world.py:3724:    the owning pawn to sleep for the duration."""
+   runtime/world.py:3783:            if self.seconds <= s['Duration']:
+   runtime/world.py:3784:                self.progress = self.seconds / s['Duration']
+   runtime/world.py:4876:                    self.call_later(src.action_duration,
+   runtime/world.py:4915:                self.call_later(item.action_duration,
+   runtime/scene.py:191:                 'direct_use', 'alarm_item', 'action_duration',
+   runtime/scene.py:517:        self.action_duration = d.get('ActionDuration') or 0.0
+   runtime/scene.py:1597:                             'duration': a.get('Duration') or 0.0,
+
+== EndPosition | owners: BirdMovementBehavior(BirdMovementBehavior.cs:17 field Vector3), FifiBehavior(FifiBehavior.cs:15 field Vector3)
+   runtime/behaviors.py:1271:        self.end_position = (-1.0, -3.049)            # ctor, cs:31
+   runtime/behaviors.py:1280:        dx = self.end_position[0] - tf.x
+   runtime/behaviors.py:1281:        dy = self.end_position[1] - tf.y
+   runtime/behaviors.py:1284:            nx, ny = self.end_position
+   runtime/behaviors.py:1303:            if (tf.x, tf.y) == self.end_position:     # StartMovement, cs:86-105
+   runtime/behaviors.py:1490:        self.end_position = (-7.8, 2.5)               # ctor, cs:54
+   runtime/behaviors.py:1491:        self.end_position_tricked = (-5.5, 1.763572)  # ctor, cs:55
+   runtime/behaviors.py:1567:        if (b.x, b.y) == self.end_position:
+   runtime/behaviors.py:1572:            self._step(self.end_position)
+   runtime/behaviors.py:1577:        if (b.x, b.y) != self.end_position_tricked \
+   runtime/behaviors.py:1579:            self._step(self.end_position_tricked)
+
+== EndString | owners: Woody(Woody.cs:42 field string), Zone(Zone.cs:8 field string)
+   runtime/scene.py:101:                 'name_string', 'end_string')
+   runtime/scene.py:112:        self.end_string = ''                # Zone.EndString
+   runtime/scene.py:1345:        z.end_string = o['data'].get('EndString') or ''
+   runtime/scene.py:1934:                'end_string': pd.get('EndString') or '',
+   runtime/hud.py:562:                self.tooltip = ws['end'] + loc(z.end_string if z else '')
+   runtime/hud.py:569:                self.tooltip = ws['end'] + loc(zone.end_string)
+
+== EnterZone | owners: SearchItem(SearchItem.cs:43 field ItemAnimationState), TrickItem(TrickItem.cs:106 field ItemAnimationState)
+   runtime/world.py:3870:            if it.enter_zone or it.leave_zone:
+   runtime/world.py:4554:        if name in (item.enter_zone, item.leave_zone):
+   runtime/world.py:5119:            if it.kind == 'SearchItem' and it.enter_zone \
+   runtime/world.py:5126:                self.play_item_anim(it, it.enter_zone)
+   runtime/world.py:5134:                if it.kind in TRICK_KINDS and it.enter_zone \
+   runtime/world.py:5137:                    self.play_item_anim(it, it.enter_zone)
+   runtime/world.py:5147:            anim = it.enter_zone if which == 'enter' else it.leave_zone
+   runtime/scene.py:132:                 'delta_use_height', 'enter_zone', 'leave_zone',
+   runtime/scene.py:332:        self.enter_zone = _anim_name(d.get('EnterZone'))
+
+== EntranceClap | owners: MusicPlayer(MusicPlayer.cs:31 field AudioClip), Woody(Woody.cs:48 field AudioClip)
+   runtime/scene.py:1280:                'clap': clip(mp.get('EntranceClap')),
+   tools/export_level.py:396:                    'Caught', 'Failed', 'Joke', 'EntranceClap'),
+
+== EntranceLocation | owners: Level(Level.cs:82 field Vector3), RollerSkaterBehavior(RollerSkaterBehavior.cs:23 field Vector3)
+   runtime/world.py:6401:                ex, ey = self.level.entrance_location or \
+   runtime/scene.py:1243:        self.entrance_location = None
+   runtime/scene.py:1256:            self.entrance_location, _ = _point(lvl.get('EntranceZoneName'),
+   runtime/behaviors.py:455:        self.entrance_location = self.vec('EntranceLocation')
+   runtime/behaviors.py:555:        rott.sprite.x, rott.sprite.y = self.entrance_location
+
+== EntranceZone | owners: Level(Level.cs:84 field Zone), RollerSkaterBehavior(RollerSkaterBehavior.cs:21 field Zone)
+   runtime/behaviors.py:454:        self.entrance_zone = self.zone('EntranceZone')
+   runtime/behaviors.py:556:        if self.entrance_zone is not None:
+   runtime/behaviors.py:557:            rott.zone = self.entrance_zone
+
+== Fifi | owners: FifiBehavior(FifiBehavior.cs:5 field TrickItem), Level206RoutineBehavior(Level206RoutineBehavior.cs:5 field Item)
+   runtime/world.py:328:        self.has_fifi = False            # Rottweiler.HasFifi
+   runtime/world.py:444:            if self.has_fifi:
+   runtime/world.py:462:            if self.has_fifi:
+   runtime/world.py:473:            if self.has_fifi:
+   runtime/world.py:1961:        if a.get('give_fifi'):
+   runtime/world.py:1962:            self.pawn.has_fifi = True
+   runtime/world.py:1965:        if a.get('remove_fifi'):
+   runtime/world.py:1966:            self.pawn.has_fifi = False
+   runtime/world.py:4999:    def _fifi_bone_behavior(self, item):
+   runtime/world.py:5933:        self._fifi_bone_behavior(item)
+   runtime/scene.py:1625:                             'give_fifi': bool(a.get('GiveFifi')),
+   runtime/scene.py:1626:                             'remove_fifi': bool(a.get('RemoveFifi')),
+   runtime/behaviors.py:744:        self.fifi_harpoon = self.item('FifiHarpoon')
+   runtime/behaviors.py:746:        self.fifi_tricked = False
+   runtime/behaviors.py:747:        self.fifi_tricked1 = False
+   runtime/behaviors.py:755:            if self.fifi_harpoon is not None:
+   runtime/behaviors.py:756:                self.fifi_harpoon.primed_animation = 'N2TrickItemExtra1'
+   runtime/behaviors.py:757:                self.depth(self.fifi_harpoon, 'LevelFence')
+   runtime/behaviors.py:758:            self.fifi_tricked = True
+   runtime/behaviors.py:762:        f = self.fifi_harpoon
+   runtime/behaviors.py:766:        if self.fifi_tricked1 and name == 'WaitInFear' and f is not None:
+   runtime/behaviors.py:767:            self.fifi_tricked1 = False                # cs:43-50
+   runtime/behaviors.py:775:        if self.fifi_tricked and name in ('FifiFire', 'FifiFireManip') \
+   runtime/behaviors.py:778:            self.fifi_tricked = False
+   runtime/behaviors.py:780:            self.fifi_tricked1 = True
+   runtime/behaviors.py:974:        self.fifi_elephant = self.item('FifiElephant')
+   runtime/behaviors.py:977:        self.fifi_turban = self.item('FifiTurban')
+   runtime/behaviors.py:978:        self.fifi_prime_aux = False
+   runtime/behaviors.py:987:        self.show_fifi = False
+   runtime/behaviors.py:989:        self.fifi_elephant_aux = False
+   runtime/behaviors.py:997:                self.fifi_prime_aux = True
+   runtime/behaviors.py:999:                self.hide_obj(self.fifi_turban, True)
+   runtime/behaviors.py:1021:        if self.show_fifi and db is not None:         # cs:94-99
+   runtime/behaviors.py:1022:            self.show_fifi = False
+   runtime/behaviors.py:1027:            self.hide_obj(self.fifi_elephant, True)
+   runtime/behaviors.py:1057:                self.show_fifi = True
+   runtime/behaviors.py:1063:                rott.has_fifi = False                 # SetHasFifi(false)
+   runtime/behaviors.py:1068:                and self.cricket_bat.tricked and not self.fifi_elephant_aux:
+   runtime/behaviors.py:1069:            self.set_active(self.fifi_elephant, True)   # cs:154-159
+   runtime/behaviors.py:1070:            self.play_directly(self.fifi_elephant, 'N2TrickItemIdleNormal')
+   ... 17 more
+
+== FifiTricked | owners: FifiBehavior(FifiBehavior.cs:11 field bool), Level206Behavior(Level206Behavior.cs:13 field bool)
+   runtime/behaviors.py:746:        self.fifi_tricked = False
+   runtime/behaviors.py:747:        self.fifi_tricked1 = False
+   runtime/behaviors.py:758:            self.fifi_tricked = True
+   runtime/behaviors.py:766:        if self.fifi_tricked1 and name == 'WaitInFear' and f is not None:
+   runtime/behaviors.py:767:            self.fifi_tricked1 = False                # cs:43-50
+   runtime/behaviors.py:775:        if self.fifi_tricked and name in ('FifiFire', 'FifiFireManip') \
+   runtime/behaviors.py:778:            self.fifi_tricked = False
+   runtime/behaviors.py:780:            self.fifi_tricked1 = True
+   runtime/behaviors.py:1272:        self.fifi_tricked = False
+   runtime/behaviors.py:1297:        if f.tricked and not self.fifi_tricked:       # cs:42-52
+   runtime/behaviors.py:1304:                self.fifi_tricked = True
+   runtime/behaviors.py:1311:            self.fifi_tricked = False
+
+== FireChannel | owners: Level208Behaviors(Level208Behaviors.cs:5 field Item), Level212Behavior(Level212Behavior.cs:5 field Item)
+   runtime/behaviors.py:882:        self.fire_channel = self.item('FireChannel')
+   runtime/behaviors.py:890:        self.fire_channel_hide = False
+   runtime/behaviors.py:902:        if self.fire_channel_hide:                    # cs:45-49
+   runtime/behaviors.py:903:            self.hide_obj(self.fire_channel, False)
+   runtime/behaviors.py:904:            self.fire_channel_hide = False
+   runtime/behaviors.py:925:            self.fire_channel_hide = True
+
+== Fish | owners: RollerSkaterBehavior(RollerSkaterBehavior.cs:43 field Item), RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:21 field Item)
+   runtime/world.py:2307:            self._fish_plant(it)                      # cs:851
+   runtime/world.py:2434:    def _fish_plant(self, it):
+   runtime/behaviors.py:465:        self.fish = self.item('Fish')
+   runtime/behaviors.py:466:        self.fish_aux = False
+   runtime/behaviors.py:478:        if self.fish_aux:                             # cs:63-67
+   runtime/behaviors.py:479:            self.fish_aux = False
+   runtime/behaviors.py:480:            self.set_active(self.fish, True)
+   runtime/behaviors.py:489:                and not self.fish_aux:                # cs:84-88
+   runtime/behaviors.py:490:            self.fish_aux = True
+   runtime/behaviors.py:491:            self.set_active(self.fish, False)
+   runtime/behaviors.py:1396:        if idx == 8 and self.current_animation == 'SplashCrayfish':  # cs:99-102
+   runtime/behaviors.py:2106:    pistol's use sets, and the hatch / bucket / fish poses ride along."""
+   runtime/behaviors.py:2116:        self.fish = self.item('Fish')
+   runtime/behaviors.py:2173:            self.hide_obj(self.fish, False)
+
+== FixingItem | owners: Item(Item.cs:292 field Item), Rottweiler(Rottweiler.cs:82 field Item)
+   runtime/world.py:390:        self.fixing_item = None          # Rottweiler.FixingItem (the carried tool)
+   runtime/world.py:2050:                and it.fixing_item is not None:
+   runtime/world.py:2053:            tool = self.level.items.get(it.fixing_item)
+   runtime/world.py:2054:            if tool is not None and self.pawn.fixing_item is tool:
+   runtime/world.py:3121:        if w is None or not it.tricked or it.fixing_item is None:
+   runtime/world.py:3123:        if self.pawn.fixing_item is not None:
+   runtime/world.py:3126:        if not (neutral or it.force_use_fixing_item):
+   runtime/world.py:3128:        tool = self.level.items.get(it.fixing_item)
+   runtime/world.py:3132:        self.run_to_fixing_item(tool, w._tricked_item_to_fix(it))
+   runtime/world.py:3135:    def run_to_fixing_item(self, tool, tricked):
+   runtime/world.py:3156:            self.pawn.fixing_item = tool     # Rottweiler.FixingItem = Item
+   runtime/world.py:3170:        tool = self.pawn.fixing_item
+   runtime/world.py:3208:        self.pawn.fixing_item = None
+   runtime/world.py:4311:        elif item.fixing_item is not None and pawn is not None \
+   runtime/world.py:4312:                and pawn.fixing_item is None:
+   runtime/world.py:4313:            tool = self.level.items.get(item.fixing_item)
+   runtime/world.py:4316:                routine.run_to_fixing_item(tool, self._tricked_item_to_fix(item))
+   runtime/world.py:4416:        if (rott is None or rott.fixing_item is not item) \
+   runtime/scene.py:155:                 'fixing_item', 'force_use_fixing_item', 'fix_depends_on',
+   runtime/scene.py:388:        self.fixing_item = (d.get('FixingItem') or {}).get('path')
+   runtime/scene.py:389:        self.force_use_fixing_item = bool(d.get('ForceUseFixingItem'))
+
+== FontSize | owners: Control(Control.cs:86 field float), Credits(Credits.cs:79 field float), LevelDataGUIRenderer(LevelDataGUIRenderer.cs:148 field float), LevelLoader(LevelLoader.cs:32 field float), LevelScript(LevelScript.cs:37 field float), LevelTransition(LevelTransition.cs:29 field float), ProgressBar(ProgressBar.cs:45 field float), ProgressBarTrick(ProgressBarTrick.cs:23 field float)
+   (no port reads)
+
+== Frozen | owners: ActionManager(ActionManager.cs:33 field bool), CameraMover(CameraMover.cs:57 field bool), Woody(Woody.cs:70 field bool)
+   runtime/world.py:361:        self.frozen = False              # Woody.Frozen
+   runtime/world.py:1501:        self.frozen = spec['frozen']
+   runtime/world.py:1558:        if self.actions and not self.frozen:
+   runtime/world.py:2877:        if self.frozen:
+   runtime/world.py:3075:        if self.frozen:
+   runtime/world.py:3076:            # a frozen manager swallows the resume (ActionManager.cs:604-606);
+   runtime/world.py:3253:                # Intro103's frozen tutorial neighbour: Unfreeze and run
+   runtime/world.py:3256:                self.frozen = False
+   runtime/world.py:3319:        if self.frozen:
+   runtime/world.py:3392:        postpone and fire the parked alerter run; a frozen manager keeps it
+   runtime/world.py:3395:        if self.pending_alarm is not None and not self.frozen:
+   runtime/world.py:3452:        if self.frozen:
+   runtime/world.py:3500:                    self.frozen = True
+   runtime/world.py:3578:            w.woody.frozen = True                  # Woody.Freeze
+   runtime/world.py:3701:            w.woody.frozen = False                 # Woody.UnFreeze
+   runtime/world.py:3850:        self.camera_frozen = False       # GameCamera.Freeze (FinishGame)
+   runtime/world.py:6208:        self.camera_frozen = True         # (GameInfo.cs:368-369)
+   runtime/world.py:6226:                r.frozen = True           # ActionManager.Freeze in the action
+   runtime/world.py:6289:            r.frozen = True
+   runtime/world.py:6306:            r.frozen = True
+   runtime/world.py:6321:        self.camera_frozen = True
+   runtime/world.py:6324:            r.frozen = True
+   runtime/world.py:6356:        self.camera_frozen = True
+   runtime/world.py:6359:                r.frozen = True
+   runtime/scene.py:1677:                                  'frozen': bool(d.get('Frozen'))})
+   runtime/behaviors.py:546:            rt.frozen = True                          # ActionManager.Freeze
+   runtime/behaviors.py:584:            rt.frozen = False
+   runtime/behaviors.py:696:    """Level204OlgaBehavior.cs: the HitPawn parks Olga frozen at the kart
+   runtime/behaviors.py:714:                rt.frozen = True                      # ActionManager.Frozen
+   runtime/behaviors.py:724:                rt.frozen = False
+   runtime/viewer.py:126:        if w.camera_frozen or self.headless:
+
+== GameCamera | owners: CameraMover(CameraMover.cs:19 field Camera), DexterityComponent(DexterityComponent.cs:96 field CameraMover), GameInfo(GameInfo.cs:85 field CameraMover)
+   (no port reads)
+
+== HUDGUIDepth | owners: ProgressBar(ProgressBar.cs:43 field GUIDepth), ProgressBarTrick(ProgressBarTrick.cs:19 field GUIDepth)
+   (no port reads)
+
+== HideString | owners: Item(Item.cs:36 field string), Woody(Woody.cs:38 field string)
+   runtime/scene.py:264:                 'hide_string_key', 'dont_change_tooltip_when_tricked',
+   runtime/scene.py:711:        self.hide_string_key = d.get('HideString') or ''
+   runtime/scene.py:1933:                'hide_string': pd.get('HideString') or '',
+   runtime/hud.py:595:            self.tooltip = ws['hide'] + loc(item.hide_string_key)
+
+== HideWhenNotAnimating | owners: SearchItem(SearchItem.cs:25 field bool), TrickItem(TrickItem.cs:58 field bool)
+   runtime/world.py:4654:                if item.hide_when_not_animating and item.sprite is not None:
+   runtime/world.py:4663:            elif item.hide_when_not_animating and item.sprite is not None:
+   runtime/world.py:4682:        elif it.hide_when_not_animating and it.sprite is not None:
+   runtime/scene.py:186:                 'looping_flag', 'hide_when_not_animating', 'use_anim_type',
+   runtime/scene.py:504:        self.hide_when_not_animating = bool(d.get('HideWhenNotAnimating'))
+
+== HitWoodyAction | owners: Mother(Mother.cs:8 field RoutineActionMotherHitWoody), Rottweiler(Rottweiler.cs:90 field RoutineActionHitWoody)
+   runtime/scene.py:1954:                        (pd.get('HitWoodyAction') or {}).get('Sequence1') or [],
+   runtime/scene.py:1955:                        (pd.get('HitWoodyAction') or {}).get('Sequence2') or [],
+   runtime/scene.py:1956:                        (pd.get('HitWoodyAction') or {}).get('Sequence3') or [],
+   runtime/scene.py:1957:                        (pd.get('HitWoodyAction') or {}).get('Sequence4') or []) if q],
+   runtime/scene.py:1958:                    'max_distance': (pd.get('HitWoodyAction') or {}).get(
+
+== IgnoreWoody | owners: Mother(Mother.cs:16 field bool), Rottweiler(Rottweiler.cs:66 field bool)
+   runtime/world.py:362:        self.ignore_woody = spec.get('ignore_woody') or False
+   runtime/world.py:1875:                if last is not None and last.ignore_woody_when_use \
+   runtime/world.py:1877:                    self.pawn.ignore_woody = False
+   runtime/world.py:2080:            if it.ignore_woody_when_use:
+   runtime/world.py:2081:                self.pawn.ignore_woody = True
+   runtime/world.py:5089:                and not rott.ignore_woody and not woody.hiding \
+   runtime/world.py:5100:                and not mother.ignore_woody and not woody.hiding \
+   runtime/world.py:6148:                and not catcher.ignore_woody and not woody.hiding
+   runtime/scene.py:230:                 'next_action_after_gramaphone', 'ignore_woody_when_use',
+   runtime/scene.py:629:        self.ignore_woody_when_use = bool(d.get('IgnoreWoodyWhenUse'))
+   runtime/scene.py:1921:                'ignore_woody': bool(pd.get('IgnoreWoody')),
+
+== InventoryItems | owners: InventoryManager(InventoryManager.cs:5 field List<Inventory>), SearchItem(SearchItem.cs:5 field Inventory[])
+   runtime/world.py:5477:        if item.take_multiple and inv.used is None and item.inventory_items \
+   runtime/world.py:5478:                and inv.has(item.inventory_items[0].get('type')):
+   runtime/world.py:5671:            and item.kind == 'SearchItem' and item.inventory_items
+   runtime/world.py:5672:            and (not inv.has(item.inventory_items[0].get('type'))
+   runtime/world.py:5947:        if item.inventory_items:
+   runtime/world.py:5970:                            for e in item.inventory_items])
+   runtime/world.py:5975:                item.inventory_items = []
+   runtime/scene.py:169:                 'inventory_items', 'dont_remove_inventory',
+   runtime/scene.py:443:        self.inventory_items = [
+   runtime/scene.py:451:            for v in (d.get('InventoryItems') or [])]
+
+== IsPlayingWoodyHit | owners: Mother(Mother.cs:10 field bool), Rottweiler(Rottweiler.cs:92 field bool)
+   (no port reads)
+
+== IsTutorial | owners: GameInfo(GameInfo.cs:119 field bool), Level(Level.cs:68 field bool)
+   runtime/world.py:1430:        self.is_tutorial = bool(info.get('is_tutorial'))
+   runtime/world.py:1449:            if not self.is_tutorial and angry_count_ticks < compound:
+   runtime/scene.py:1532:                    'is_tutorial': bool(d.get('IsTutorial')),
+   runtime/hud.py:740:        if not g.is_tutorial:
+
+== Item | owners: Inventory(Inventory.cs:25 field Item), LevelScriptAction(LevelScriptAction.cs:13 field Item), RoutineAction(RoutineAction.cs:23 field Item), TrickProgressBarBehavior(TrickProgressBarBehavior.cs:7 field TrickItem)
+   runtime/world.py:47:                                         # a stand pose; item controllers don't
+   runtime/world.py:197:        SwitchToStandAnimation (a no-op on item controllers, the
+   runtime/world.py:205:        # item's child renderers
+   runtime/world.py:268:    climbs for walk-up doors and items."""
+   runtime/world.py:272:        'door_climb', 'door_anim', 'descend', 'item_climb'
+   runtime/world.py:288:        self.item_threshold = spec.get('item_use_height_threshold') or 0.0
+   runtime/world.py:307:        self.hiding_item = None
+   runtime/world.py:316:        self.item_aux = None             # Pawn.ItemAux
+   runtime/world.py:334:        self.item_to_ignore_next_time = None  # Rottweiler.ItemToIgnoreNextTime
+   runtime/world.py:378:        self.last_hiding_item = None         # Woody.LastHidingItem
+   runtime/world.py:390:        self.fixing_item = None          # Rottweiler.FixingItem (the carried tool)
+   runtime/world.py:506:        widens by Woody.ExtraDeltaHeight when the item asks (cs:2286-2288)"""
+   runtime/world.py:515:            thr = self.item_threshold + it.delta_use_height
+   runtime/world.py:525:        the item's WoodyDeltaUseHeight, or by his own ExtraDeltaHeight when
+   runtime/world.py:527:        thr = self.item_threshold + getattr(obj, 'delta_use_height', 0.0)
+   runtime/world.py:530:                thr = self.item_threshold + obj.delta_use_height \
+   runtime/world.py:545:    def hide(self, item):
+   runtime/world.py:548:        self.hiding_item = item
+   runtime/world.py:549:        self.last_hiding_item = item     # LastHidingItem = HidingItem
+   runtime/world.py:550:        if item.hide_woody:
+   runtime/world.py:552:        p = self.world.players.get(id(item.sprite)) \
+   runtime/world.py:553:            if self.world and item.sprite else None
+   runtime/world.py:554:        if p is not None and item.hide_anim and p.has(item.hide_anim):
+   runtime/world.py:555:            p.play_single(item.hide_anim)
+   runtime/world.py:562:        item, self.hiding_item = self.hiding_item, None
+   runtime/world.py:563:        self.last_hiding_item = item     # LastHidingItem = HidingItem
+   runtime/world.py:564:        if item is None or self.world is None:
+   runtime/world.py:566:        p = self.world.players.get(id(item.sprite)) if item.sprite else None
+   runtime/world.py:567:        if p is not None and item.hide_idle and p.has(item.hide_idle):
+   runtime/world.py:568:            p.play_single(item.hide_idle)
+   runtime/world.py:569:        if item.leave_animation and self.anim.has(item.leave_animation):
+   runtime/world.py:570:            self.anim.play_single(item.leave_animation)
+   runtime/world.py:574:        the item, door and zone branches (Pawn.cs:604-612, 645-653, 700-708)"""
+   runtime/world.py:587:        self.item_aux = None                        # ItemAux = targetItem
+   runtime/world.py:599:    def goto_item(self, it, on_arrive=None):
+   runtime/world.py:600:        """BuildPathToItem: route to the zone; an elevated item gets a plain
+   runtime/world.py:606:        self.item_aux = it                          # Pawn.cs:595
+   runtime/world.py:608:        final = {'kind': 'item', 'item': it, 'x': it.move_x(self.role)}
+   runtime/world.py:799:        the floor for door and item steps — climbs are separate states."""
+   runtime/world.py:819:        it = s['item']
+   ... 1594 more
+
+== ItemsToUnlock | owners: LevelScriptAction(LevelScriptAction.cs:41 field Item[]), RoutineActionUse(RoutineActionUse.cs:65 field Item[])
+   runtime/world.py:2620:        for pid in a.get('items_to_unlock') or ():     # cs:394-397
+   runtime/world.py:2625:            for pid in a.get('items_to_unlock_tricked') or ():
+   runtime/scene.py:1658:                             'items_to_unlock': [(x or {}).get('path')
+   runtime/scene.py:1659:                                                 for x in (a.get('ItemsToUnlock') or [])],
+   runtime/scene.py:1660:                             'items_to_unlock_tricked': [(x or {}).get('path')
+
+== Kid | owners: IndianPlatformBehavior(IndianPlatformBehavior.cs:5 field Item), Item(Item.cs:522 field TrickItem), Level211Behavior(Level211Behavior.cs:11 field Item), SandCastleBehavior(SandCastleBehavior.cs:7 field Kid)
+   runtime/world.py:351:        self.kid_start_crying = False
+   runtime/world.py:352:        self.kid_using_remote = False
+   runtime/world.py:353:        self.kid_remote = False
+   runtime/world.py:1651:    def _trick_kid_actions(self, it):
+   runtime/world.py:1655:        kid = w.pawns.get('Kid') if w is not None else None
+   runtime/world.py:1656:        if kid is None or it.kind not in TRICK_KINDS \
+   runtime/world.py:1659:        spec = self.level.pawns.get('Kid') or {}
+   runtime/world.py:1663:            seq = spec.get('kid_use_normal_seq')
+   runtime/world.py:1665:            seq = spec.get('kid_use_linked_seq')
+   runtime/world.py:1667:            seq = spec.get('kid_use_tricked_seq')
+   runtime/world.py:1668:        seq = [a for a in (seq or []) if kid.anim.has(a)]
+   runtime/world.py:1670:            kid.anim.play_sequence(seq)
+   runtime/world.py:1672:    def _kid_actions(self):
+   runtime/world.py:1674:        StartNextAction: the Rake starts the kid crying, Olga's mat hands him
+   runtime/world.py:1676:        the submarine back, and the beach mat resets the kid's idle."""
+   runtime/world.py:1679:        kid = w.pawns.get('Kid') if w is not None else None
+   runtime/world.py:1680:        if it is not None and it.name == 'Rake' and kid is not None \
+   runtime/world.py:1682:            kid.kid_start_crying = True
+   runtime/world.py:1685:                and self.cont_aux > 0 and kid is not None:
+   runtime/world.py:1686:            kid.kid_using_remote = True
+   runtime/world.py:1706:            if kid is not None:
+   runtime/world.py:1707:                kid.kid_remote = True
+   runtime/world.py:1712:            kid_it = self.level.items.get(last.kid_item) \
+   runtime/world.py:1713:                if last is not None and last.kid_item else None
+   runtime/world.py:1714:            if kid_it is not None and kid_it.sprite is not None:
+   runtime/world.py:1715:                p = w.players.get(id(kid_it.sprite))
+   runtime/world.py:1716:                if p is not None and kid_it.idle and p.has(kid_it.idle):
+   runtime/world.py:1717:                    p.play_looping(kid_it.idle)
+   runtime/world.py:1821:            # previous action's final position, the kid hooks, the hide
+   runtime/world.py:1840:            self._kid_actions()
+   runtime/world.py:2087:            # sculpture/castle uses play the kid's reaction sets
+   runtime/world.py:2088:            self._trick_kid_actions(it)
+   runtime/world.py:5984:    def _kid_update(self, kid):
+   runtime/world.py:5988:        spec = self.level.pawns.get('Kid') or {}
+   runtime/world.py:5989:        if kid.kid_start_crying:
+   runtime/world.py:5990:            kid.kid_start_crying = False
+   runtime/world.py:5994:            if spec.get('kid_use_crying_sequence'):
+   runtime/world.py:5995:                seq = [a for a in spec.get('kid_crying_sequence') or ()
+   runtime/world.py:5996:                       if kid.anim.has(a)]
+   runtime/world.py:5998:                    kid.anim.play_sequence(seq)
+   ... 57 more
+
+== LastAnimation | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:9 field AnimationState), PoolJumpBehavior(PoolJumpBehavior.cs:21 field bool)
+   runtime/behaviors.py:1806:        self.last_animation = False
+   runtime/behaviors.py:1807:        self.last_animation_linked = False
+   runtime/behaviors.py:1818:        if self.last_animation:                       # cs:57-60
+   runtime/behaviors.py:1819:            self.last_animation = False
+   runtime/behaviors.py:1820:        if self.last_animation_linked:                # cs:61-66
+   runtime/behaviors.py:1826:            self.last_animation_linked = False
+   runtime/behaviors.py:1830:            self.last_animation = True
+   runtime/behaviors.py:1836:            self.last_animation_linked = True
+   runtime/behaviors.py:2024:        self.last_animation = self.anim_name('LastAnimation')
+   runtime/behaviors.py:2045:            elif name == self.last_animation:
+
+== LaunchPad | owners: Level206Behavior(Level206Behavior.cs:5 field Item), Level206RoutineBehavior(Level206RoutineBehavior.cs:7 field Item)
+   runtime/world.py:2343:        if it.name == 'LaunchPad' and not it.tricked \
+   runtime/world.py:2369:        if w is not None and it.name == 'LaunchPad' and it.tricked \
+   runtime/world.py:4474:        if item.name == 'LaunchPad' and item.tricked and rabbit is not None:
+   runtime/behaviors.py:743:        self.launch_pad = self.item('LaunchPad')
+   runtime/behaviors.py:748:        self.fix_launch_pad = False
+   runtime/behaviors.py:749:        self.fix_launch_pad1 = False
+   runtime/behaviors.py:752:        if self.launch_pad is not None and self.launch_pad.tricked \
+   runtime/behaviors.py:763:        if self.fix_launch_pad1:                      # cs:38-41
+   runtime/behaviors.py:764:            self.fix_launch_pad1 = False
+   runtime/behaviors.py:771:            self.fix_launch_pad = True
+   runtime/behaviors.py:772:        if self.fix_launch_pad and name == 'FixMid':  # cs:51-55
+   runtime/behaviors.py:773:            self.fix_launch_pad = False
+   runtime/behaviors.py:774:            self.fix_launch_pad1 = True
+   runtime/behaviors.py:817:        self.launch_pad = self.item('LaunchPad')
+   runtime/behaviors.py:822:        lp = self.launch_pad
+
+== LeaveZone | owners: SearchItem(SearchItem.cs:45 field ItemAnimationState), TrickItem(TrickItem.cs:108 field ItemAnimationState)
+   runtime/world.py:3870:            if it.enter_zone or it.leave_zone:
+   runtime/world.py:4554:        if name in (item.enter_zone, item.leave_zone):
+   runtime/world.py:5121:                self.play_item_anim(it, it.leave_zone)
+   runtime/world.py:5123:            if it.kind == 'SearchItem' and it.leave_zone and not it.tricked:
+   runtime/world.py:5129:                if it.kind in TRICK_KINDS and it.leave_zone \
+   runtime/world.py:5132:                    self.play_item_anim(it, it.leave_zone)
+   runtime/world.py:5147:            anim = it.enter_zone if which == 'enter' else it.leave_zone
+   runtime/scene.py:132:                 'delta_use_height', 'enter_zone', 'leave_zone',
+   runtime/scene.py:333:        self.leave_zone = _anim_name(d.get('LeaveZone'))
+
+== LevelScript | owners: GameInfo(GameInfo.cs:55 field LevelScript), LevelScriptAction(LevelScriptAction.cs:61 field LevelScript), TutorialScriptCameraIntro3(TutorialScriptCameraIntro3.cs:18 field LevelScript), TutorialScriptCameraNFH2(TutorialScriptCameraNFH2.cs:36 field LevelScript), TutorialScriptCameraNFH2206(TutorialScriptCameraNFH2206.cs:29 field LevelScript)
+   (no port reads)
+
+== LongDescription | owners: Inventory(Inventory.cs:55 field bool), Item(Item.cs:62 field bool)
+   runtime/world.py:5743:                                   item.long_description)
+   runtime/scene.py:270:                 'delta_desc', 'long_description', 'not_primed_tooltip',
+   runtime/scene.py:450:             'long': bool(v.get('LongDescription'))}
+   runtime/scene.py:737:        self.long_description = bool(d.get('LongDescription'))
+
+== Looping | owners: HUDAnimation(HUDAnimation.cs:14 field bool), SearchItem(SearchItem.cs:23 field bool), TrickItem(TrickItem.cs:56 field bool)
+   runtime/world.py:30:        self.mode = 'looping'            # how the current animation was started
+   runtime/world.py:112:        return self._set(name, 'looping' if a.type_looping else 'single')
+   runtime/world.py:114:    def play_looping(self, name, abort_if_playing=True):
+   runtime/world.py:115:        if abort_if_playing and self.anim.name == name and self.mode == 'looping':
+   runtime/world.py:120:        return self._set(name, 'looping')
+   runtime/world.py:169:        return (self.anim.infinite or self.mode == 'looping') and not self.seq
+   runtime/world.py:226:                self.play_looping(name)
+   runtime/world.py:246:            looping = ((a.infinite and not self.ignore_infinite)
+   runtime/world.py:247:                       or self.mode == 'looping')
+   runtime/world.py:248:            if looping:
+   runtime/world.py:408:            self.anim.play_looping(start)
+   runtime/world.py:772:                self.anim.play_looping(st)
+   runtime/world.py:858:                self.anim.play_looping(st)
+   runtime/world.py:864:                self.anim.play_looping(up)
+   runtime/world.py:930:            door.sprite.play_looping(name)
+   runtime/world.py:996:            self.anim.play_looping(d.exit_anim)
+   runtime/world.py:1001:                self.anim.play_looping(down)
+   runtime/world.py:1090:                    self.anim.play_looping(st)
+   runtime/world.py:1180:                        self.anim.play_looping(up)
+   runtime/world.py:1197:                self.anim.play_looping(self._walk_anim(self.facing))
+   runtime/world.py:1201:                self.anim.play_looping(
+   runtime/world.py:1717:                    p.play_looping(kid_it.idle)
+   runtime/world.py:1748:                olga.anim.play_looping(olga.default_anim)
+   runtime/world.py:1947:            # MutexAction parks on its looping animation until another action's
+   runtime/world.py:1955:                self.pawn.anim.play_looping(a['mutex_anim'])
+   runtime/world.py:4247:            pawn.anim.play_looping(pawn.wait_in_fear_anim)
+   runtime/world.py:4659:                    elif item.looping_flag:
+   runtime/world.py:4660:                        p.play_looping(name)
+   runtime/world.py:4678:                if it.looping_flag:
+   runtime/world.py:4679:                    p.play_looping(name)
+   runtime/world.py:4818:            p.play_looping(door.alternate_idle)
+   runtime/world.py:5046:                w.anim.play_looping(rep)
+   runtime/world.py:5050:                    w.anim.play_looping(st)
+   runtime/world.py:5354:                    woody.anim.play_looping('Stand_Down')
+   runtime/world.py:5619:                        self.woody.anim.play_looping(name)
+   runtime/world.py:5689:                    woody.anim.play_looping(item.dexterity_animation)
+   runtime/world.py:5897:                    p.play_looping(name)
+   runtime/world.py:6000:                kid.anim.play_looping(spec['kid_crying'])
+   runtime/world.py:6005:                kid.anim.play_looping(rs)
+   runtime/world.py:6009:                kid.anim.play_looping(kid.default_anim)
+   ... 26 more
+
+== Mother | owners: GameInfo(GameInfo.cs:33 field Mother), HUD(HUD.cs:269 field Mother), PoolJumpBehavior(PoolJumpBehavior.cs:15 field Pawn), TutorialScriptCameraNFH2206(TutorialScriptCameraNFH2206.cs:55 field Mother)
+   runtime/world.py:451:        if self.role in ('Mother', 'Olga') and self.in_urgent:
+   runtime/world.py:972:        elif self.role == 'Mother':
+   runtime/world.py:973:            self.sprite.x = d.x + d.delta_mother_exit[0]
+   runtime/world.py:974:            self.sprite.y = d.y + d.delta_mother_exit[1]
+   runtime/world.py:1594:        if it is not None and self.role in ('Rottweiler', 'Mother'):
+   runtime/world.py:1975:            if self.role == 'Mother':
+   runtime/world.py:1976:                w.activate_progress_bar(it, 'Mother')
+   runtime/world.py:1979:                w.activate_progress_bar(it, 'Mother')
+   runtime/world.py:2070:        if self.role == 'Mother' and it.change_actions_208 and it.tricked \
+   runtime/world.py:2073:                if r.role in ('Mother', 'Rottweiler'):
+   runtime/world.py:2103:                    elif affected is not None and affected.role == 'Mother':
+   runtime/world.py:2104:                        it.use_mother_tricked_flag = True
+   runtime/world.py:2113:        if self.role == 'Mother' and it.pawn_to_affect is not None \
+   runtime/world.py:2114:                and it.use_mother_tricked_flag and it.mother_rott_angry:
+   runtime/world.py:2115:            mseq = [x for x in it.mother_rott_angry if self.pawn.anim.has(x)]
+   runtime/world.py:2235:        if self.role == 'Mother':
+   runtime/world.py:2239:                if it.is_mother_second_use and it.execute_once_mother \
+   runtime/world.py:2242:                    return list(it.mother_second_use), None
+   runtime/world.py:2243:                it.execute_once_mother = True
+   runtime/world.py:2245:                return list(it.use_anim.get('Mother') or []), None
+   runtime/world.py:2246:            it.execute_once_mother = False
+   runtime/world.py:2248:            return list(it.use_tricked_anim.get('Mother') or []), None
+   runtime/world.py:2825:                it.use_mother_tricked_flag = False
+   runtime/world.py:2873:        if self.role == 'Mother' and w is not None:
+   runtime/world.py:2876:            w.fire_event('mother_urgent')
+   runtime/world.py:3072:        if self.role == 'Mother' and self.pawn.world is not None:
+   runtime/world.py:3074:            self.pawn.world.fire_event('mother_urgent_stop')
+   runtime/world.py:3591:        if self.update_aux and (w.can_mother_see_woody()
+   runtime/world.py:3731:        self.mother_210 = spec['mother_210']
+   runtime/world.py:3742:        self.is_pawn_hud = spec['actor'] in ('Rottweiler', 'Mother')
+   runtime/world.py:3744:            else spec['mother_hud']
+   runtime/world.py:3746:        world.subscribe('mother_urgent', self.stop_for_urgency)
+   runtime/world.py:3747:        world.subscribe('mother_urgent_stop', self.resume_after_urgency)
+   runtime/world.py:3762:        if self.execute_once_3 and self.spec['actor'] == 'Mother' and \
+   runtime/world.py:3763:                (w.can_mother_see_woody() or self.stop_progress):
+   runtime/world.py:3766:            if not self.mother_210:
+   runtime/world.py:3772:            if not self.mother_210:
+   runtime/world.py:3790:            if not self.mother_210:
+   runtime/world.py:3799:        if self.spec['actor'] in ('Rottweiler', 'Mother'):
+   runtime/world.py:5095:        mother = self.pawns.get('Mother')
+   ... 140 more
+
+== MouseCursor | owners: DexterityComponent(DexterityComponent.cs:28 field MouseCursor), Woody(Woody.cs:116 field MouseCursor)
+   runtime/scene.py:1062:        self.mouse_cursor = None    # MouseCursor component spec
+   runtime/scene.py:1173:    def _add_mouse_cursor(self, pid, o):
+   runtime/scene.py:1183:        for e in (self._hud_raw.get('MouseCursor') or []):
+   runtime/scene.py:1194:        self.mouse_cursor = spec
+   runtime/scene.py:1219:            elif t == 'MouseCursor' and 'data' in o:
+   runtime/scene.py:1220:                self._add_mouse_cursor(int(pid), o)
+   runtime/hud.py:631:        mc = self.level.mouse_cursor
+   runtime/hud.py:670:        mc = self.level.mouse_cursor
+   runtime/viewer.py:110:        if not self.headless and self.level.mouse_cursor is not None:
+   runtime/viewer.py:235:        mc = self.level.mouse_cursor
+   tools/export_level.py:519:                                 'DexterityComponent', 'MouseCursor') \
+
+== MouseOverBasePath | owners: Item(Item.cs:394 field string), MouseCursor(MouseCursor.cs:33 field string)
+   (no port reads)
+
+== MoveLocation | owners: Pawn(Pawn.cs:59 field Vector3), RoutineAction(RoutineAction.cs:37 field Vector3)
+   runtime/scene.py:1591:                ml = a.get('MoveLocation') or {}
+
+== MovingToHitWoody | owners: Mother(Mother.cs:12 field bool), Rottweiler(Rottweiler.cs:94 field bool)
+   (no port reads)
+
+== NameString | owners: Inventory(Inventory.cs:35 field string), Item(Item.cs:8 field string), Zone(Zone.cs:6 field string)
+   runtime/world.py:4390:            item.name_string = item.name_fixed_string
+   runtime/scene.py:101:                 'name_string', 'end_string')
+   runtime/scene.py:111:        self.name_string = ''               # Zone.NameString
+   runtime/scene.py:261:                 'change_tooltip_when_tricked', 'name_string',
+   runtime/scene.py:445:             'name': v.get('NameString') or '',
+   runtime/scene.py:703:        self.name_string = d.get('NameString') or ''
+   runtime/scene.py:967:        self.locked_name = d.get('NameString') or ''
+   runtime/scene.py:1344:        z.name_string = o['data'].get('NameString') or ''
+   runtime/hud.py:446:    def _get_name_string(self, it):
+   runtime/hud.py:455:            return it.name_string if it.main_valve_open \
+   runtime/hud.py:461:        return it.name_string
+   runtime/hud.py:581:                self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+   runtime/hud.py:586:                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+   runtime/hud.py:588:                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+   runtime/hud.py:590:                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+   runtime/hud.py:592:                self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+   runtime/hud.py:599:                    self.tooltip = ws['look_at'] + loc(item.name_string)
+   runtime/hud.py:603:                    self.tooltip = ws['look_at'] + loc(item.name_string)
+   runtime/hud.py:605:                    self.tooltip = ws['examine'] + loc(item.name_string)
+   runtime/hud.py:607:                self.tooltip = ws['examine'] + loc(item.name_string)
+   runtime/hud.py:609:            self.tooltip = ws['look_at'] + loc(item.name_string)
+   runtime/hud.py:614:                self.tooltip = ws['look_at'] + loc(item.name_string)
+
+== OldZone | owners: Helpers(Helpers.cs:21 field Zone), Pawn(Pawn.cs:135 field Zone)
+   runtime/world.py:953:        old_zone = self.zone.pid if self.zone else None
+   runtime/world.py:992:        if self.world is not None and old_zone != (self.zone.pid if self.zone else None):
+   runtime/world.py:993:            if self.world.on_pawn_zone_changed(self, old_zone):
+   runtime/world.py:5058:    def on_pawn_zone_changed(self, pawn, old_zone_pid):
+   runtime/world.py:5064:                             old_zone_pid)
+   runtime/world.py:5068:            if fsm.item.zone == old_zone_pid:
+   runtime/world.py:5110:    def crab_animations(self, pawn, new_zone_pid, old_zone_pid):
+   runtime/world.py:5122:        for it in self._zone_items.get(old_zone_pid, ()):
+   runtime/world.py:5128:            for it in self._zone_items.get(old_zone_pid, ()):
+
+== Olga | owners: BirdPerchBehavior(BirdPerchBehavior.cs:7 field Olga), GameInfo(GameInfo.cs:31 field Olga), Level201Behavior(Level201Behavior.cs:7 field Pawn), Level204Behavior(Level204Behavior.cs:7 field Pawn), Level204OlgaBehavior(Level204OlgaBehavior.cs:7 field Pawn), Level211Behavior(Level211Behavior.cs:13 field Pawn), Level213Behavior(Level213Behavior.cs:11 field Pawn)
+   runtime/world.py:338:        self.olga_aux_anim = None        # animationAuxOlga
+   runtime/world.py:339:        self.olga_workout_anim = None    # animationWorkoutOlga
+   runtime/world.py:340:        self.olga_wait_picnic_anim = None  # animationWaitPicnicOlga
+   runtime/world.py:341:        self.olga_workout2_anim = None   # animationWorkoutOlga2
+   runtime/world.py:451:        if self.role in ('Mother', 'Olga') and self.in_urgent:
+   runtime/world.py:1537:        self.one_time_olga = False       # ActionManager.OneTime
+   runtime/world.py:1538:        self.second_one_time_olga = False  # ActionManager.SecondOneTime
+   runtime/world.py:1603:        if self.role == 'Olga' and idx < len(player.seq) \
+   runtime/world.py:1684:        if self.role == 'Olga' and it is not None and it.name == 'OlgaMat' \
+   runtime/world.py:1719:    def _olga_infinite_behavior(self, olga):
+   runtime/world.py:1723:        self.anim_aux = olga.anim.anim
+   runtime/world.py:1724:        olga.anim.anim.infinite = False
+   runtime/world.py:1726:    def _olga_extra_animations(self):
+   runtime/world.py:1733:        olga = w.pawns.get('Olga') if w is not None else None
+   runtime/world.py:1734:        if olga is None or not self.actions:
+   runtime/world.py:1745:                (prev.rott_use_olga_seq or prev.rott_use_tricked_olga_seq):
+   runtime/world.py:1747:            if olga.default_anim and olga.anim.has(olga.default_anim):
+   runtime/world.py:1748:                olga.anim.play_looping(olga.default_anim)
+   runtime/world.py:1751:                self.anim_standing_left = olga.anim.anim
+   runtime/world.py:1764:                self.anim_standing_up = olga.anim.anim
+   runtime/world.py:1773:                self.anim_wc = olga.anim.anim
+   runtime/world.py:1780:            self._olga_infinite_behavior(olga)
+   runtime/world.py:1781:            olga.olga_aux_anim = self.anim_aux
+   runtime/world.py:1782:        ort = next((r for r in w.routines if r.role == 'Olga'), None)
+   runtime/world.py:1783:        olga_cur = None
+   runtime/world.py:1785:            olga_cur = items.get(ort.actions[ort.index % len(ort.actions)]
+   runtime/world.py:1789:                and olga_cur is not None and olga_cur.name == 'BoatPicnic' \
+   runtime/world.py:1790:                and not self.second_one_time_olga:    # cs:337-345
+   runtime/world.py:1791:            olga.anim.anim.infinite = False
+   runtime/world.py:1792:            olga.olga_wait_picnic_anim = olga.anim.anim
+   runtime/world.py:1793:        if self.role == 'Olga' and olga_cur is not None \
+   runtime/world.py:1794:                and olga_cur.name in ('BoatPicnic', 'MechanicalBullWait') \
+   runtime/world.py:1795:                and not self.one_time_olga:           # cs:346-350
+   runtime/world.py:1796:            self.one_time_olga = True
+   runtime/world.py:1797:            olga.olga_workout2_anim = olga.anim.anim
+   runtime/world.py:1798:        if self.role == 'Olga' and olga_cur is not None \
+   runtime/world.py:1799:                and olga_cur.name == 'MechanicalBullWait':   # cs:351-365
+   runtime/world.py:1800:            if olga.olga_wait_picnic_anim is not None:
+   runtime/world.py:1801:                olga.olga_wait_picnic_anim.infinite = True
+   runtime/world.py:1802:                self.second_one_time_olga = False
+   ... 153 more
+
+== OneTime | owners: ActionManager(ActionManager.cs:79 field bool), Inventory(Inventory.cs:59 field bool), Level206Behavior(Level206Behavior.cs:11 field bool), Level213Behavior(Level213Behavior.cs:17 field bool), Level213OlgaBehavior(Level213OlgaBehavior.cs:11 field bool), MusicPlayer(MusicPlayer.cs:39 field bool), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:21 field bool), TutorialScriptCameraNFH2206(TutorialScriptCameraNFH2206.cs:39 field bool)
+   runtime/world.py:1537:        self.one_time_olga = False       # ActionManager.OneTime
+   runtime/world.py:1538:        self.second_one_time_olga = False  # ActionManager.SecondOneTime
+   runtime/world.py:1790:                and not self.second_one_time_olga:    # cs:337-345
+   runtime/world.py:1795:                and not self.one_time_olga:           # cs:346-350
+   runtime/world.py:1796:            self.one_time_olga = True
+   runtime/world.py:1802:                self.second_one_time_olga = False
+   runtime/scene.py:1286:                'delay': 0.0 if mp.get('OneTime') else 15.0,
+   runtime/behaviors.py:217:        self.one_time = False
+   runtime/behaviors.py:225:        if not self.one_time and self.football is not None \
+   runtime/behaviors.py:228:            self.one_time = True
+   runtime/behaviors.py:745:        self.one_time = False
+   runtime/behaviors.py:753:                and not self.one_time:                # cs:25-31
+   runtime/behaviors.py:754:            self.one_time = True
+   runtime/behaviors.py:765:            self.one_time = False
+   runtime/behaviors.py:1189:        self.one_time = False
+   runtime/behaviors.py:1200:        if cur == 'PicnicEnter' and not self.one_time:       # cs:33-37
+   runtime/behaviors.py:1201:            self.one_time = True
+   runtime/behaviors.py:1213:            self.one_time = False
+   runtime/behaviors.py:1492:        self.one_time_leave_aux = False
+   runtime/behaviors.py:1493:        self.one_time_leave_tricked_aux = False
+   runtime/behaviors.py:1494:        self.one_time_come_back_aux = False
+   runtime/behaviors.py:1542:                if not self.one_time_leave_aux and not self.can_go_back:
+   runtime/behaviors.py:1544:                    self.one_time_come_back_aux = False
+   runtime/behaviors.py:1545:                    self.one_time_leave_aux = True
+   runtime/behaviors.py:1547:            elif not self.one_time_come_back_aux and self.can_go_back:
+   runtime/behaviors.py:1549:                self.one_time_leave_aux = False
+   runtime/behaviors.py:1550:                self.one_time_come_back_aux = True
+   runtime/behaviors.py:1558:            if not self.one_time_leave_tricked_aux:   # cs:96-107
+   runtime/behaviors.py:1559:                self.one_time_leave_tricked_aux = True
+   runtime/behaviors.py:1722:        self.one_time = False
+   runtime/behaviors.py:1747:        if cb is not None and cb.tricked and not self.one_time:  # cs:60-68
+   runtime/behaviors.py:1748:            self.one_time = True
+   runtime/behaviors.py:1756:            self.one_time = False
+
+== OriginalAction | owners: ActionManager(ActionManager.cs:13 field RoutineAction), RoutineAction(RoutineAction.cs:17 field RoutineAction)
+   (no port reads)
+
+== Owner | owners: ActionManager(ActionManager.cs:17 field Pawn), AnimationControllerBase(AnimationControllerBase.cs:57 field Actor)
+   runtime/world.py:17:    when the owner is slowed). An animation only loops when its InfiniteLoop
+   runtime/world.py:204:        # hide their owner, CarnivorPlantSprayTricked re-shows the acting
+   runtime/world.py:206:        if self.anim.hide_owner_on_end:
+   runtime/world.py:1590:        Item.CurrentSequenceIndex stamp for the Rottweiler and Mother owners
+   runtime/world.py:1951:            if a.get('hide_owner'):
+   runtime/world.py:2033:                if a.get('hide_owner'):
+   runtime/world.py:2187:        if a.get('hide_owner'):
+   runtime/world.py:2629:        dont_on_owner = it.dont_use_on is not None and \
+   runtime/world.py:2633:            if not dont_on_owner:                      # cs:428-440
+   runtime/world.py:2643:            if not dont_on_owner:                      # cs:445-453
+   runtime/world.py:2650:        # DontUseOn skips the owner it names
+   runtime/world.py:2653:        if not dont_on_owner:
+   runtime/world.py:2705:        the owner plays the angry sequence first (RoutineActionUse.cs:
+   runtime/world.py:2817:        if a.get('hide_owner'):
+   runtime/world.py:3341:        owner's current item can reveal itself, and the HitPawnSequence
+   runtime/world.py:6056:            pawn = self.pawns.get(spec['owner'])
+   runtime/world.py:6059:            r = Routine(self.level, pawn, spec, role=spec['owner'])
+   runtime/world.py:6075:        """wire the serialized behavior components to their owners the way
+   runtime/scene.py:28:                 'hide_owner_on_end', 'show_child_on_end',
+   runtime/scene.py:56:        # Hide_In/BedIn/LorryEnter... hide their owner when they finish, and
+   runtime/scene.py:58:        self.hide_owner_on_end = bool(d.get('HideOwnerOnAnimationEnd'))
+   runtime/scene.py:1600:                             'hide_owner': bool(a.get('HideOwnerDuringUse')),
+   runtime/scene.py:1669:            ow = d.get('Owner') or {}
+   runtime/scene.py:1670:            self.routines.append({'owner': ow.get('type') or ow.get('name'),
+   runtime/scene.py:1671:                                  'owner_name': ow.get('name'),
+   runtime/scene.py:1758:        for owner_type, field in (('Door', 'IdleAnimation'),
+   runtime/scene.py:1766:            item = self._component(go, owner_type)
+   runtime/scene.py:1795:                if owner_type == 'Alerter':
+
+== ParrotCrap | owners: ParrotLedgeBehavior(ParrotLedgeBehavior.cs:7 field Item), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:13 field Item)
+   runtime/behaviors.py:1641:        self.parrot_crap = self.item('ParrotCrap')
+   runtime/behaviors.py:1668:                    self.set_active(self.parrot_crap, True)
+   runtime/behaviors.py:1717:        self.parrot_crap = self.item('ParrotCrap')
+   runtime/behaviors.py:1787:            self.set_active(self.parrot_crap, False)
+
+== ParrotLedge | owners: ParrotLedgeBehavior(ParrotLedgeBehavior.cs:5 field Item), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:19 field Item)
+   runtime/behaviors.py:1640:        self.parrot_ledge = self.item('ParrotLedge')
+   runtime/behaviors.py:1651:        self.is_jumping = item is self.parrot_ledge   # cs:25-29
+   runtime/behaviors.py:1659:        if item is self.parrot_ledge:                 # cs:36-49
+   runtime/behaviors.py:1665:            if self.parrot_ledge is not None:
+   runtime/behaviors.py:1666:                self.world.set_primed(self.parrot_ledge, True)
+   runtime/behaviors.py:1667:                if self.parrot_ledge.tricked:
+   runtime/behaviors.py:1674:            if self.parrot_ledge is not None:
+   runtime/behaviors.py:1675:                self.world.set_primed(self.parrot_ledge, False)
+   runtime/behaviors.py:1719:        self.parrot_ledge = self.item('ParrotLedge')
+   runtime/behaviors.py:1769:                and self.parrot_ledge is not None \
+   runtime/behaviors.py:1770:                and self.parrot_ledge.tricked and name == 'CliffBoatCrash':
+
+== Piano | owners: Level105Behavior(Level105Behavior.cs:13 field Item), Level105RoutineBehavior(Level105RoutineBehavior.cs:5 field Item)
+   runtime/behaviors.py:208:    """Level105Behavior.cs: the tricked football rewrites the piano's use to
+   runtime/behaviors.py:214:        self.piano = self.item('Piano')
+   runtime/behaviors.py:226:                and self.football.got_tricked and self.piano is not None:
+   runtime/behaviors.py:227:            self.piano.use_anim['Rottweiler'] = ['PlayPianoLong']   # cs:35-40
+   runtime/behaviors.py:240:    """Level105RoutineBehavior.cs: the piano visit closes the alarm gate,
+   runtime/behaviors.py:245:        self.piano = self.item('Piano')
+   runtime/behaviors.py:249:        if item is not None and item is self.piano:   # cs:9-16
+
+== PostponeAlarm | owners: RoutineActionGrab(RoutineActionGrab.cs:10 field bool), RoutineActionSurpriseFar(RoutineActionSurpriseFar.cs:7 field bool), RoutineActionUse(RoutineActionUse.cs:53 field bool)
+   runtime/world.py:2860:        return bool(a and a.get('postpone_alarm')) and self.state == self.USING
+   runtime/world.py:3285:        self.postpone_alarm()                 # Owner.PostponeAlarm
+   runtime/world.py:3386:    def postpone_alarm(self):
+   runtime/world.py:3444:                (self.pawn.grab_action.get('postpone_alarm')
+   runtime/world.py:3445:                 or self.pawn.use_fixing_action.get('postpone_alarm')):
+   runtime/world.py:4243:            routine.postpone_alarm()
+   runtime/scene.py:1593:                pa = bool(a.get('PostponeAlarm'))
+   runtime/scene.py:1605:                             'postpone_alarm': pa,
+   runtime/scene.py:1940:                    'postpone_alarm': bool((pd.get('GrabFixingItemAction')
+   runtime/scene.py:1941:                                            or {}).get('PostponeAlarm')),
+   runtime/behaviors.py:537:            rt.postpone_alarm()                       # Rottweiler.PostponeAlarm
+
+== Progress | owners: ProgressBar(ProgressBar.cs:37 field float), ProgressBarTrick(ProgressBarTrick.cs:13 field float)
+   runtime/world.py:370:        self.animations_in_progress = False  # Pawn.AnimationsInProgress
+   runtime/world.py:1976:                w.activate_progress_bar(it, 'Mother')
+   runtime/world.py:1978:                w.activate_progress_bar(it, 'Rottweiler')
+   runtime/world.py:1979:                w.activate_progress_bar(it, 'Mother')
+   runtime/world.py:2868:        drop the move in progress and run (SurpriseActionFar.Urgent) to the
+   runtime/world.py:3735:        self.progress = 0.0
+   runtime/world.py:3741:        self.stop_progress = False       # StopProgressBar
+   runtime/world.py:3763:                (w.can_mother_see_woody() or self.stop_progress):
+   runtime/world.py:3769:                (w.can_rottweiler_see_woody() or self.stop_progress):
+   runtime/world.py:3784:                self.progress = self.seconds / s['Duration']
+   runtime/world.py:3786:                self.progress = 1.0
+   runtime/world.py:3806:        self.stop_progress = True
+   runtime/world.py:3817:        self.progress = 0.0
+   runtime/world.py:3823:        self.stop_progress = False
+   runtime/world.py:3902:        self.progress_bars = [ProgressBarState(self, s)
+   runtime/world.py:3903:                              for s in level.progress_bars]
+   runtime/world.py:3966:    def activate_progress_bar(self, item, actor):
+   runtime/world.py:3970:        if not item.progress_bar_animation or item.progress_bar_object is None:
+   runtime/world.py:3972:        for pb in self.progress_bars:
+   runtime/world.py:3973:            if pb.spec['go'] == item.progress_bar_object \
+   runtime/world.py:5028:        if w.animations_in_progress:
+   runtime/world.py:5718:            self.woody.animations_in_progress = False
+   runtime/world.py:5776:        self.woody.animations_in_progress = True   # Item.cs:1858
+   runtime/world.py:6433:                and not self.woody.animations_in_progress:
+   runtime/world.py:6473:        for pb in self.progress_bars:
+   runtime/scene.py:299:                 'progress_bar_animation', 'progress_bar_object')
+   runtime/scene.py:831:        self.progress_bar_animation = bool(d.get('ProgressBarAnimation'))
+   runtime/scene.py:832:        self.progress_bar_object = (d.get('ProgressBarObject') or {}).get('path')
+   runtime/scene.py:1060:        self.progress_bars = []     # ProgressBar components
+   runtime/scene.py:1110:    def _add_progress_bar(self, pid, o):
+   runtime/scene.py:1117:        self.progress_bars.append({
+   runtime/scene.py:1132:        spec = self.progress_bars[-1]
+   runtime/scene.py:1216:                self._add_progress_bar(int(pid), o)
+   runtime/behaviors.py:592:    ProgressBarTrick rendering is the unported progress-bar HUD; the state
+   runtime/behaviors.py:2078:    ProgressBar restore rides the unported progress-bar system."""
+   runtime/hud.py:722:        self._draw_progress_bars()
+   runtime/hud.py:1013:        drains top-down — the group's height is (1 - progress) of the face
+   runtime/hud.py:1018:        for pb in self.world.progress_bars:
+   runtime/hud.py:1023:            p = min(1.0, max(0.0, pb.progress))
+   runtime/hud.py:1063:    def _draw_progress_bars(self):
+   ... 6 more
+
+== ProgressBarEmpty | owners: LevelLoader(LevelLoader.cs:10 field Texture), LevelTransition(LevelTransition.cs:13 field Texture), MainMenu(MainMenu.cs:25 field Texture), ProgressBar(ProgressBar.cs:9 field Texture), ProgressBarTrick(ProgressBarTrick.cs:5 field Texture)
+   runtime/scene.py:1126:            'empty': d.get('ProgressBarEmpty'),
+   runtime/scene.py:1136:            for k_src, k_dst in (('ProgressBarEmpty', 'empty'),
+
+== ProgressBarFull | owners: LevelLoader(LevelLoader.cs:12 field Texture), LevelTransition(LevelTransition.cs:15 field Texture), MainMenu(MainMenu.cs:27 field Texture), ProgressBar(ProgressBar.cs:11 field Texture), ProgressBarTrick(ProgressBarTrick.cs:7 field Texture)
+   runtime/scene.py:1127:            'full': d.get('ProgressBarFull'),
+   runtime/scene.py:1137:                                 ('ProgressBarFull', 'full'),
+
+== RottPos | owners: Level204Behavior(Level204Behavior.cs:15 field Vector3), PoolJumpBehavior(PoolJumpBehavior.cs:25 field Vector3), RoutineActionMove(RoutineActionMove.cs:11 field Vector3)
+   runtime/behaviors.py:668:        self.rott_pos = (-1.0, 0.0)                   # ctor, cs:30
+   runtime/behaviors.py:669:        self.rott_pos_aux = False
+   runtime/behaviors.py:674:        if self.rott_pos_aux:                         # cs:44-49
+   runtime/behaviors.py:675:            self.rott_pos_aux = False
+   runtime/behaviors.py:677:                self.rottweiler.sprite.x += self.rott_pos[0]
+   runtime/behaviors.py:678:                self.rottweiler.sprite.y += self.rott_pos[1]
+   runtime/behaviors.py:684:            self.rott_pos_aux = True
+   runtime/behaviors.py:1417:        self.rott_pos_aux = (-5.745195, -1.984)       # ctor, cs:55
+   runtime/behaviors.py:1434:                rott.sprite.x, rott.sprite.y = self.rott_pos_aux
+   runtime/behaviors.py:1805:        self.rott_pos = (-3.2, 1.2)                   # ctor, cs:33
+   runtime/behaviors.py:1825:                    self.rott_pos
+
+== RottPosAux | owners: Level204Behavior(Level204Behavior.cs:17 field bool), SkiBehavior(SkiBehavior.cs:31 field Vector3)
+   runtime/behaviors.py:669:        self.rott_pos_aux = False
+   runtime/behaviors.py:674:        if self.rott_pos_aux:                         # cs:44-49
+   runtime/behaviors.py:675:            self.rott_pos_aux = False
+   runtime/behaviors.py:684:            self.rott_pos_aux = True
+   runtime/behaviors.py:1417:        self.rott_pos_aux = (-5.745195, -1.984)       # ctor, cs:55
+   runtime/behaviors.py:1434:                rott.sprite.x, rott.sprite.y = self.rott_pos_aux
+
+== Rottweiler | owners: DexterityComponent(DexterityComponent.cs:74 field Rottweiler), GameInfo(GameInfo.cs:27 field Rottweiler), HUD(HUD.cs:267 field Rottweiler), Item(Item.cs:270 field Rottweiler), Level204Behavior(Level204Behavior.cs:9 field Pawn), Level204OlgaBehavior(Level204OlgaBehavior.cs:9 field Pawn), Level213Behavior(Level213Behavior.cs:13 field Pawn), Level213OlgaBehavior(Level213OlgaBehavior.cs:7 field Pawn), ParrotLedgeBehavior(ParrotLedgeBehavior.cs:15 field Rottweiler), ParrotLedgeFallBehavior(ParrotLedgeFallBehavior.cs:7 field Rottweiler), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:7 field Rottweiler), PoolJumpBehavior(PoolJumpBehavior.cs:17 field Pawn), RollerSkaterBehavior(RollerSkaterBehavior.cs:15 field Rottweiler), SandCastleBehavior(SandCastleBehavior.cs:9 field Pawn), SkiBehavior(SkiBehavior.cs:29 field Rottweiler), TutorialScriptCamera(TutorialScriptCamera.cs:26 field Rottweiler), TutorialScriptCameraIntro3(TutorialScriptCameraIntro3.cs:30 field Rottweiler), TutorialScriptCameraNFH2(TutorialScriptCameraNFH2.cs:54 field Rottweiler), TutorialScriptCameraNFH2206(TutorialScriptCameraNFH2206.cs:53 field Rottweiler)
+   runtime/world.py:435:        if self.role == 'Rottweiler':
+   runtime/world.py:457:        if self.role == 'Rottweiler':
+   runtime/world.py:468:        if self.role == 'Rottweiler':
+   runtime/world.py:978:        if self.role == 'Rottweiler' and not d.should_walk_up:
+   runtime/world.py:1094:            if w.can_rottweiler_see_woody() and not w.game.got_caught:
+   runtime/world.py:1109:        if self.role in ('Woody', 'Rottweiler'):
+   runtime/world.py:1334:    def on_rottweiler_enter(self):
+   runtime/world.py:1338:    def on_rottweiler_leave(self):
+   runtime/world.py:1346:        rott = self.world.pawns.get('Rottweiler')
+   runtime/world.py:1491:    def __init__(self, level, pawn, spec, role='Rottweiler'):
+   runtime/world.py:1540:        if role == 'Rottweiler':
+   runtime/world.py:1594:        if it is not None and self.role in ('Rottweiler', 'Mother'):
+   runtime/world.py:1681:                and self.role == 'Rottweiler':
+   runtime/world.py:1694:        if self.role == 'Rottweiler' and it is not None \
+   runtime/world.py:1708:        if self.role == 'Rottweiler' and self.actions and it is not None \
+   runtime/world.py:1744:        if self.role == 'Rottweiler' and prev is not None and \
+   runtime/world.py:1749:        if self.role == 'Rottweiler' and name == 'Sweets':   # cs:274-297
+   runtime/world.py:1761:        elif self.role == 'Rottweiler' and name == 'LifeBoat':   # cs:298-314
+   runtime/world.py:1770:        elif self.role == 'Rottweiler' and name == 'FishingRod':  # cs:315-331
+   runtime/world.py:1779:        if self.role == 'Rottweiler' and name == 'Tortilla':  # cs:332-336
+   runtime/world.py:1788:        if self.role == 'Rottweiler' and name == 'Pinata' \
+   runtime/world.py:1805:        if self.role == 'Rottweiler' and name == 'CaptainDoor':  # cs:366-377
+   runtime/world.py:1829:            if w is not None and self.role == 'Rottweiler' and prev is not None:
+   runtime/world.py:1876:                        and self.role == 'Rottweiler':
+   runtime/world.py:1978:                w.activate_progress_bar(it, 'Rottweiler')
+   runtime/world.py:1983:        if self.role == 'Rottweiler' and it.rott_toggles_prime and w is not None:
+   runtime/world.py:2049:        if self.role == 'Rottweiler' and w is not None and it.tricked \
+   runtime/world.py:2073:                if r.role in ('Mother', 'Rottweiler'):
+   runtime/world.py:2079:        if self.role == 'Rottweiler':
+   runtime/world.py:2107:        if self.role == 'Rottweiler' and w is not None:
+   runtime/world.py:2120:        if it.kind == 'Rake' and self.role == 'Rottweiler' \
+   runtime/world.py:2131:        if it.kind == 'Drawing' and self.role == 'Rottweiler' and w is not None:
+   runtime/world.py:2135:                ru = it.use_anim.get('Rottweiler') or []
+   runtime/world.py:2137:                    it.use_anim['Rottweiler'] = [ru[1]]
+   runtime/world.py:2144:                ru = it.use_anim.get('Rottweiler') or []
+   runtime/world.py:2145:                it.use_anim['Rottweiler'] = \
+   runtime/world.py:2150:        if self.role == 'Rottweiler' and w is not None:
+   runtime/world.py:2192:        if it.teleport_rott_on_use and self.role == 'Rottweiler':
+   runtime/world.py:2205:        if self.role == 'Rottweiler' and w is not None \
+   runtime/world.py:2268:            return list(table.get('Rottweiler') or []), None
+   ... 135 more
+
+== SameZone | owners: ActionManager(ActionManager.cs:51 field bool), SandCastleBehavior(SandCastleBehavior.cs:15 field Zone)
+   runtime/world.py:1521:        self._same_zone = False          # ActionManager.SameZone (Dog/Chili)
+   runtime/world.py:1522:        self._same_zone_yelled = False   # ActionManager.AngryAnimationStarted
+   runtime/world.py:2904:            self._same_zone = True
+   runtime/world.py:2905:            self._same_zone_yelled = False
+   runtime/world.py:2933:        done = self._same_zone_walk if self._same_zone else self._urgent_finished
+   runtime/world.py:2995:    def _same_zone_walk(self):
+   runtime/world.py:3005:        if not self.pawn.goto_item(it, on_arrive=self._same_zone_yell):
+   runtime/world.py:3006:            self._same_zone_yell()
+   runtime/world.py:3008:    def _same_zone_yell(self):
+   runtime/world.py:3011:        if self._same_zone_yelled:
+   runtime/world.py:3013:        self._same_zone_yelled = True
+   runtime/world.py:3031:        self._same_zone = False
+   runtime/world.py:3032:        self._same_zone_yelled = False
+   runtime/world.py:3069:        self._same_zone = False
+   runtime/world.py:3070:        self._same_zone_yelled = False
+   runtime/world.py:3487:        if self._same_zone and self.state == self.MOVING \
+   runtime/world.py:3488:                and self.urgent_item is not None and not self._same_zone_yelled:
+   runtime/world.py:3491:                self._same_zone_yell()
+   runtime/behaviors.py:1341:        self.same_zone = self.zone('SameZone')
+   runtime/behaviors.py:1353:        if self.same_zone is not None and rott.zone is self.same_zone \
+   runtime/hud.py:653:        same_zone_door = door is None or door.zone == woody_zone
+   runtime/hud.py:654:        if cand is not None and cand_icon and cand_use and same_zone_door:
+
+== SearchAnimation | owners: Pawn(Pawn.cs:71 field bool), PawnAnimationController(PawnAnimationController.cs:13 field AnimationState)
+   (no port reads)
+
+== SearchingItem | owners: Item(Item.cs:268 field bool), Pawn(Pawn.cs:67 field bool)
+   runtime/scene.py:280:                 'item_that_changes_tooltip', 'is_floor', 'searching_item',
+   runtime/scene.py:763:        self.searching_item = bool(d.get('SearchingItem'))
+   runtime/hud.py:597:            if item.searching_item:
+
+== SecondTime | owners: BirdMovementBehavior(BirdMovementBehavior.cs:37 field bool), Level206MotherBehavior(Level206MotherBehavior.cs:5 field int), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:23 field bool), RoutineActionUseFixingItem(RoutineActionUseFixingItem.cs:17 field bool)
+   runtime/behaviors.py:789:        self.second_time = 0
+   runtime/behaviors.py:793:            self.second_time += 1
+   runtime/behaviors.py:794:            if self.second_time >= 2:
+   runtime/behaviors.py:1498:        self.second_time = False
+   runtime/behaviors.py:1548:                self.second_time = True
+   runtime/behaviors.py:1554:            elif self.can_go_back and self.second_time and not self.can_leave:
+   runtime/behaviors.py:1596:            self.second_time = False
+   runtime/behaviors.py:1723:        self.second_time = False
+   runtime/behaviors.py:1749:            self.second_time = False
+   runtime/behaviors.py:1754:        if cb is not None and not cb.tricked and not self.second_time:
+   runtime/behaviors.py:1755:            self.second_time = True                   # cs:69-77
+
+== SecondsCount | owners: ProgressBar(ProgressBar.cs:59 field float), ProgressBarTrick(ProgressBarTrick.cs:21 field float)
+   (no port reads)
+
+== Sequence1 | owners: RoutineActionHitWoody(RoutineActionHitWoody.cs:7 field AnimationState[]), RoutineActionMotherHitWoody(RoutineActionMotherHitWoody.cs:7 field AnimationState[])
+   runtime/scene.py:1954:                        (pd.get('HitWoodyAction') or {}).get('Sequence1') or [],
+
+== Sequence2 | owners: RoutineActionHitWoody(RoutineActionHitWoody.cs:9 field AnimationState[]), RoutineActionMotherHitWoody(RoutineActionMotherHitWoody.cs:9 field AnimationState[])
+   runtime/scene.py:1955:                        (pd.get('HitWoodyAction') or {}).get('Sequence2') or [],
+
+== Sequence3 | owners: RoutineActionHitWoody(RoutineActionHitWoody.cs:11 field AnimationState[]), RoutineActionMotherHitWoody(RoutineActionMotherHitWoody.cs:11 field AnimationState[])
+   runtime/scene.py:1956:                        (pd.get('HitWoodyAction') or {}).get('Sequence3') or [],
+
+== Sequence4 | owners: RoutineActionHitWoody(RoutineActionHitWoody.cs:13 field AnimationState[]), RoutineActionMotherHitWoody(RoutineActionMotherHitWoody.cs:13 field AnimationState[])
+   runtime/scene.py:1957:                        (pd.get('HitWoodyAction') or {}).get('Sequence4') or []) if q],
+
+== ShouldStopAction | owners: AnimationControllerBase(AnimationControllerBase.cs:49 field bool), Rottweiler(Rottweiler.cs:78 field bool)
+   (no port reads)
+
+== Speed | owners: BirdMovementBehavior(BirdMovementBehavior.cs:21 field float), Pawn(Pawn.cs:17 field float)
+   runtime/world.py:281:        self.speed = spec.get('speed') or 0.0
+   runtime/world.py:282:        self.speed_sneaking = spec.get('speed_sneaking') or 0.0
+   runtime/world.py:837:    def walk_speed_scale(self):
+   runtime/world.py:838:        return self.speed_sneaking if self.sneaking else self.speed
+   runtime/world.py:1126:        scale = self.walk_speed_scale() * dt
+   runtime/world.py:3538:        self.fill_speed = 1.0
+   runtime/world.py:3605:            self.fill_speed = 1.0         # cs:243: unconditional, so the
+   runtime/world.py:3616:        self.percent += sway * self.fill_speed * dt
+   runtime/scene.py:1055:        self.pawns = {}             # 'Woody' -> {'sprite','zone','speed'}
+   runtime/scene.py:1874:                'speed': pd.get('Speed') or 0.0,
+   runtime/scene.py:1875:                'speed_sneaking': pd.get('SpeedSneaking') or 0.0,
+   runtime/behaviors.py:1269:        self.speed = self.value('FifiSpeed', 1.0)
+   runtime/behaviors.py:1279:        step = self.speed * dt
+   runtime/behaviors.py:1487:        self.speed = self.value('Speed', 1.8)
+   runtime/behaviors.py:1519:        step = self.speed * (1.0 / 60.0)              # one MoveTowards step
+   runtime/viewer.py:153:        speed_x = 7.0 * aspect * (0.5 * 3.0)   # SpeedX*aspect, Sensibility .5
+   runtime/viewer.py:154:        speed_y = 7.0 * (0.5 * 3.0)
+   runtime/viewer.py:156:            self.cam.x += dt * speed_x
+   runtime/viewer.py:158:            self.cam.x -= dt * speed_x
+   runtime/viewer.py:160:            self.cam.y += dt * speed_y
+   runtime/viewer.py:162:            self.cam.y -= dt * speed_y
+
+== StartFallIndex | owners: ParrotLedgeFallBehavior(ParrotLedgeFallBehavior.cs:9 field int), ParrotLedgeJumpBehavior(ParrotLedgeJumpBehavior.cs:33 field int)
+   runtime/behaviors.py:1686:        self.start_fall_index = self.value('StartFallIndex', 40)
+   runtime/behaviors.py:1695:        if self.in_fall and idx >= self.start_fall_index and rott is not None:
+   runtime/behaviors.py:1721:        self.start_fall_index = self.value('StartFallIndex', 13)
+   runtime/behaviors.py:1776:        if self.in_jump and idx >= self.start_fall_index and rott is not None:
+
+== StartPosition | owners: BirdMovementBehavior(BirdMovementBehavior.cs:15 field Vector3), FifiBehavior(FifiBehavior.cs:13 field Vector3)
+   runtime/behaviors.py:1270:        self.start_position = (5.09, -3.049)          # ctor, cs:30
+   runtime/behaviors.py:1313:                tf.sprite.x += self.start_position[0] - tf.x
+   runtime/behaviors.py:1314:                tf.sprite.y += self.start_position[1] - tf.y
+   runtime/behaviors.py:1315:            tf.x, tf.y = self.start_position
+   runtime/behaviors.py:1489:        self.start_position = (-2.318666, 1.763572)   # ctor, cs:53
+   runtime/behaviors.py:1593:        if (b.x, b.y) == self.start_position:
+   runtime/behaviors.py:1602:            self._step(self.start_position)
+
+== State | owners: GameIntroAnimation(GameIntroAnimation.cs:58 field GameIntroAnimationState), IntroAnimation(IntroAnimation.cs:76 field IntroAnimationState), RollerSkaterBehavior(RollerSkaterBehavior.cs:49 field SkateState), TutorialScriptCamera(TutorialScriptCamera.cs:24 field RottweilerState), TutorialScriptCameraIntro3(TutorialScriptCameraIntro3.cs:28 field RottweilerState), TutorialScriptCameraNFH2(TutorialScriptCameraNFH2.cs:50 field RottweilerState), TutorialScriptCameraNFH2206(TutorialScriptCameraNFH2206.cs:51 field RottweilerState), Woody(Woody.cs:12 field WoodyState)
+   runtime/world.py:31:        self.seq = []                    # AnimationSequence (state names)
+   runtime/world.py:60:    # -- state -------------------------------------------------------------
+   runtime/world.py:105:        """PlayAnimationDirectly -> SetAnimation(state): the animation keeps
+   runtime/world.py:309:        # the NFH2 walk-through pathing state (Pawn.cs:150-183)
+   runtime/world.py:393:        self.state = self.IDLE
+   runtime/world.py:429:        """the walking animation per prop state: Rottweiler.
+   runtime/world.py:769:            self.state = self.IDLE
+   runtime/world.py:795:        self.state = self.WALK
+   runtime/world.py:799:        the floor for door and item steps — climbs are separate states."""
+   runtime/world.py:852:            self.state = self.IDLE
+   runtime/world.py:861:            self.state = self.DOOR_CLIMB
+   runtime/world.py:869:        self.state = self.DOOR_ANIM
+   runtime/world.py:998:            self.state = self.DESCEND
+   runtime/world.py:1008:        new zone drops the complex-move state, releases the transition claim
+   runtime/world.py:1127:        if self.state == self.WALK:
+   runtime/world.py:1176:                    self.state = self.ITEM_CLIMB
+   runtime/world.py:1191:                if self.state != self.WALK:
+   runtime/world.py:1205:        elif self.state == self.DOOR_CLIMB:
+   runtime/world.py:1214:                    self.state = self.IDLE
+   runtime/world.py:1217:        elif self.state == self.DESCEND:
+   runtime/world.py:1223:        elif self.state == self.ITEM_CLIMB:
+   runtime/world.py:1268:        return w is not None and w.state in (w.WALK, w.DOOR_CLIMB,
+   runtime/world.py:1502:        self.state = self.IDLE
+   runtime/world.py:1575:        if (self.state == self.USING and self.urgent_item is None
+   runtime/world.py:1910:                self.state = self.MOVING
+   runtime/world.py:1913:            self.state = self.IDLE
+   runtime/world.py:1917:            self.state = self.IDLE
+   runtime/world.py:1925:            self.state = self.MOVING
+   runtime/world.py:1931:                self.state = self.IDLE
+   runtime/world.py:1937:            self._pending = 'advance'; self.state = self.IDLE; return
+   runtime/world.py:1949:            self.state = self.USING
+   runtime/world.py:2031:                self.state = self.USING
+   runtime/world.py:2043:                    self.state = self.IDLE
+   runtime/world.py:2059:                self.state = self.USING
+   runtime/world.py:2066:                    self.state = self.IDLE
+   runtime/world.py:2122:            self.state = self.USING
+   runtime/world.py:2185:        self.state = self.USING
+   runtime/world.py:2860:        return bool(a and a.get('postpone_alarm')) and self.state == self.USING
+   runtime/world.py:2895:        self.state = self.MOVING
+   runtime/world.py:2944:            self.state = self.USING
+   ... 112 more
+
+== TakeAnimation | owners: Item(Item.cs:84 field AnimationState), OlgaBraBehavior(OlgaBraBehavior.cs:7 field AnimationState)
+   runtime/world.py:5949:                else ([item.take_animation] if item.take_animation else [])
+   runtime/scene.py:134:                 'animation', 'take_animation', 'empty_animation',
+   runtime/scene.py:337:        self.take_animation = _anim_name(d.get('TakeAnimation'))
+   runtime/behaviors.py:1908:        self.take_animation = self.anim_name('TakeAnimation',
+   runtime/behaviors.py:1922:        elif self.current_animation == self.take_animation:  # cs:20-24
+
+== Target | owners: RoutineAction(RoutineAction.cs:21 field Pawn), Step(Step.cs:13 field Item)
+   runtime/world.py:489:    def door_target(self, door):
+   runtime/world.py:587:        self.item_aux = None                        # ItemAux = targetItem
+   runtime/world.py:601:        floor step at its x first (min-dist 0.03 plus the passed-target snap),
+   runtime/world.py:701:        gtl_near = self.door_target(door)
+   runtime/world.py:702:        gtl_far = self.door_target(other)
+   runtime/world.py:797:    def _step_target(self):
+   runtime/world.py:1128:            tx, ty = self._step_target()
+   runtime/world.py:1132:            # the target x — a step can be bigger than UseDistance, and without
+   runtime/world.py:1148:            # runs only on steps with a Passable target — an impassable door
+   runtime/world.py:1152:            target = s0.get('door') if s0['kind'] == 'door' else \
+   runtime/world.py:1154:            can_pass = target is not None and getattr(target, 'passable', True)
+   runtime/world.py:1156:                self.sprite.x = tx        # MoveToItem snaps onto the target
+   runtime/world.py:1513:        self._fix_target = None          # the tricked item it fixes
+   runtime/world.py:1524:        self._angry_target = None        # the item the current angry set is for
+   runtime/world.py:1526:        self._hit_target = None          # RoutineActionHitPawn.Target
+   runtime/world.py:1633:                # the original shows the HIDE target here (Item.cs:2722-2725),
+   runtime/world.py:2416:        with the tricked linked toilet retarget the toilet run, arm the
+   runtime/world.py:2424:        if it.linked_trick_rush_toilet_target:
+   runtime/world.py:2425:            self.pawn.toilet_action['item'] = it.linked_trick_rush_toilet_target
+   runtime/world.py:2728:                self._angry_target = linked
+   runtime/world.py:2732:                target = self._tricked_item(it)
+   runtime/world.py:2733:                if target is not None:
+   runtime/world.py:2734:                    self._angry_target = target
+   runtime/world.py:2735:                    w.play_angry(self.pawn, target, on_done=self._angry_done)
+   runtime/world.py:2748:        target = getattr(self, '_angry_target', None)
+   runtime/world.py:2749:        self._angry_target = None
+   runtime/world.py:2751:        if target is not None and target.reuse_after_fix:
+   runtime/world.py:2773:        SetIgnoreInfiniteLoop(true) on the item and pawn targets — the
+   runtime/world.py:2776:        213-217) on the once-targets."""
+   runtime/world.py:2798:        target fires, HideOwnerDuringUse unhides (cs:481-484), and a
+   runtime/world.py:2996:        """ActiveAction.Finished with SameZone set: walk to the target
+   runtime/world.py:3142:        self._fix_target = tricked
+   runtime/world.py:3157:            self.start_urgent(self._fix_target,
+   runtime/world.py:3167:        else the target gets CanFix=true, FuckedUp=false, TryFix, and the
+   runtime/world.py:3171:        tgt = self._fix_target
+   runtime/world.py:3213:            self._fix_tool = self._fix_target = None
+   runtime/world.py:3227:            self._fix_tool = self._fix_target = None
+   runtime/world.py:3271:                    abs(self.pawn.sprite.x - it.target_x) \
+   runtime/world.py:3314:    def run_to_hit_pawn(self, target_pawn):
+   runtime/world.py:3316:        HitPawnAction): walk into the target's zone within
+   ... 94 more
+
+== TargetAnimation | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:11 field AnimationState), MotherWakeSleepBehavior(MotherWakeSleepBehavior.cs:5 field AnimationState), PoolJumpBehavior(PoolJumpBehavior.cs:5 field AnimationState)
+   runtime/behaviors.py:2025:        self.target_animation = self.anim_name('TargetAnimation')
+   runtime/behaviors.py:2036:                and name != self.target_animation:    # cs:36-55
+   runtime/behaviors.py:2082:        self.target_animation = self.anim_name('TargetAnimation')
+   runtime/behaviors.py:2090:        if name != self.target_animation or self.mother is None:
+
+== TargetItem | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:19 field TrickItem), MotherWakeSleepBehavior(MotherWakeSleepBehavior.cs:11 field TrickItem), OlgaBraBehavior(OlgaBraBehavior.cs:9 field SearchItem), RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:13 field TrickItem)
+   runtime/behaviors.py:1910:        self.target = self.item('TargetItem')
+   runtime/behaviors.py:2028:        self.target_item = self.item('TargetItem')
+   runtime/behaviors.py:2039:                if self.repeat_sleep and self.target_item is not None \
+   runtime/behaviors.py:2040:                        and self.target_item.already_tricked:
+   runtime/behaviors.py:2056:        if self.target_item is not None and not self.target_item.tricked:
+   runtime/behaviors.py:2084:        self.target_item = self.item('TargetItem')
+   runtime/behaviors.py:2095:        if it is not self.target_item:
+   runtime/behaviors.py:2112:        self.target_item = self.item('TargetItem')
+   runtime/behaviors.py:2113:        self.target_item_mother = self.item('TargetItemMother')
+   runtime/behaviors.py:2129:        if it is not None and it is self.target_item \
+   runtime/behaviors.py:2130:                and self.target_item is not None and self.target_item.tricked \
+   runtime/behaviors.py:2132:            self.hide_obj(self.target_item, True)
+   runtime/behaviors.py:2134:            if self.target_item_mother is not None:
+   runtime/behaviors.py:2135:                self.target_item_mother.tricked = True
+   runtime/behaviors.py:2139:            self.hide_obj(self.target_item, True)
+   runtime/behaviors.py:2177:        if it is not None and it is self.target_item:  # cs:116-119
+   runtime/behaviors.py:2181:            self.hide_obj(self.target_item, False)
+   runtime/behaviors.py:2191:        t = self.target_item
+   runtime/behaviors.py:2201:        t = self.target_item
+
+== TargetMother | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:13 field Mother), MotherWakeSleepBehavior(MotherWakeSleepBehavior.cs:7 field Mother), RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:11 field Mother)
+   runtime/behaviors.py:2026:        self.mother = self.pawn('TargetMother')
+   runtime/behaviors.py:2083:        self.mother = self.pawn('TargetMother')
+   runtime/behaviors.py:2111:        self.mother = self.pawn('TargetMother')
+
+== TargetRottweiler | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:17 field Rottweiler), MotherWakeSleepBehavior(MotherWakeSleepBehavior.cs:9 field Rottweiler), RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:9 field Rottweiler)
+   (no port reads)
+
+== TargetSequenceIndex | owners: MotherSleepBehaviour(MotherSleepBehaviour.cs:21 field int), MotherWakeSleepBehavior(MotherWakeSleepBehavior.cs:13 field int)
+   runtime/behaviors.py:2085:        self.target_sequence_index = self.value('TargetSequenceIndex', 0)
+   runtime/behaviors.py:2096:            self.mother.anim.set_sequence_override(self.target_sequence_index)
+
+== TexturesGUIDepth | owners: DexterityComponent(DexterityComponent.cs:12 field GUIDepth), ProgressBar(ProgressBar.cs:41 field GUIDepth), ProgressBarTrick(ProgressBarTrick.cs:17 field GUIDepth)
+   (no port reads)
+
+== Toilet | owners: Pawn(Pawn.cs:105 field Item), ToiletBehavior(ToiletBehavior.cs:7 field Item)
+   runtime/world.py:9:TRICK_KINDS = ('TrickItem', 'Drawing', 'Rake', 'Toilet', 'Television')
+   runtime/world.py:332:        self.is_using_toilet = False     # Rottweiler.IsUsingToilet
+   runtime/world.py:337:        # L211 toilet delay (Olga.cs:10)
+   runtime/world.py:342:        self.delay_toilet_211 = 0.0      # DelayToiletBehavior211
+   runtime/world.py:343:        self.toilet_action = spec.get('toilet_action') or {}
+   runtime/world.py:1527:        self._toilet_run = False         # the ToiletAction urgent is running
+   runtime/world.py:2306:            self._toilet_211(it)                      # cs:850
+   runtime/world.py:2414:    def _toilet_211(self, it):
+   runtime/world.py:2416:        with the tricked linked toilet retarget the toilet run, arm the
+   runtime/world.py:2417:        after-toilet angry and pay the extra coin"""
+   runtime/world.py:2419:        rush = self.level.items.get(it.linked_trick_rush_toilet) \
+   runtime/world.py:2420:            if it.linked_trick_rush_toilet else None
+   runtime/world.py:2424:        if it.linked_trick_rush_toilet_target:
+   runtime/world.py:2425:            self.pawn.toilet_action['item'] = it.linked_trick_rush_toilet_target
+   runtime/world.py:2430:        it.play_angry_after_toilet = True
+   runtime/world.py:2431:        it.extra_coin_toilet_211 = True    # feeds the NFH2 anger ladder
+   runtime/world.py:2470:        (RoutineActionUse.cs:201-307), in source order: the toilet flag, the
+   runtime/world.py:2477:        if a.get('is_toilet') and self.role == 'Rottweiler':
+   runtime/world.py:2478:            self.pawn.is_using_toilet = True           # cs:201-204
+   runtime/world.py:2829:            if a.get('is_toilet') and self.role == 'Rottweiler':
+   runtime/world.py:2830:                self.pawn.is_using_toilet = False      # cs:354-357
+   runtime/world.py:3054:        if getattr(self, '_toilet_run', False):
+   runtime/world.py:3057:            self._toilet_run = False
+   runtime/world.py:3059:            self.pawn.is_using_toilet = False
+   runtime/world.py:3061:            if it2 is not None and it2.play_angry_after_toilet \
+   runtime/world.py:3063:                # StopUrgentAction's after-toilet angry (ActionManager.cs:
+   runtime/world.py:3065:                it2.play_angry_after_toilet = False
+   runtime/world.py:3066:                it2.fix_item_trick = it2.linked_trick_rush_toilet
+   runtime/world.py:3342:        plays. The Olga toilet-delay arm rides the unported Bouquet hack."""
+   runtime/world.py:3371:    def move_to_toilet(self, feel_sick):
+   runtime/world.py:3376:        pid = self.pawn.toilet_action.get('item')
+   runtime/world.py:3381:        if self.pawn.toilet_action.get('is_toilet'):
+   runtime/world.py:3382:            self.pawn.is_using_toilet = True
+   runtime/world.py:3383:        self._toilet_run = True
+   runtime/world.py:4005:        OnAnimationSequenceEnded (FixTrickedItem, the toilet rush)."""
+   runtime/world.py:4067:            if item.extra_coin_toilet_211:         # cs:615-619
+   runtime/world.py:4068:                item.extra_coin_toilet_211 = False
+   runtime/world.py:4138:            FixTrickedItem -> TryFix, then the toilet rush; a started fetch
+   runtime/world.py:4139:            or toilet run owns the resume"""
+   runtime/world.py:4144:                    and item.cause_rush_to_toilet(items) \
+   ... 34 more
+
+== TrickCamera | owners: Item(Item.cs:632 field bool), Level(Level.cs:98 field bool)
+   (no port reads)
+
+== TrickItem | owners: Pawn(Pawn.cs:69 field bool), RoutineActionUse(RoutineActionUse.cs:101 field Item)
+   runtime/world.py:9:TRICK_KINDS = ('TrickItem', 'Drawing', 'Rake', 'Toilet', 'Television')
+   runtime/world.py:2731:            if it.kind == 'TrickItem' and it.is_tricked(self.level.items):
+   runtime/world.py:3682:        if it.dexterity_trick_item or it.take_item_count > 0:
+   runtime/world.py:4502:            item.dexterity_trick_item = True
+   runtime/world.py:5489:                and item.kind != 'TrickItem':
+   runtime/world.py:5670:            and not item.dexterity_trick_item
+   runtime/world.py:5677:            and item.dexterity_trick_item and not item.tricked)
+   runtime/world.py:5813:        tricked_use = item.kind in ('TrickItem', 'GroundItem', 'HideItem',
+   runtime/scene.py:251:                 'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
+   runtime/scene.py:680:        self.dexterity_trick_item = bool(d.get('DexterityTrickItem'))
+   runtime/scene.py:1204:            elif t in ('TrickItem', 'SearchItem', 'HideItem', 'GroundItem',
+   runtime/scene.py:1760:                                  ('TrickItem', 'IdleNormal'),
+   runtime/hud.py:434:        if it.kind not in ('TrickItem', 'Drawing', 'Rake', 'Toilet',
+   runtime/hud.py:574:        if item.kind in ('TrickItem', 'Drawing', 'Rake', 'Toilet',
+
+== TrickedItem | owners: Item(Item.cs:524 field bool), Rottweiler(Rottweiler.cs:48 field TrickItem), RoutineActionUseFixingItem(RoutineActionUseFixingItem.cs:13 field TrickItem)
+   runtime/world.py:2102:                            w.play_tricked_item_anim(it)
+   runtime/world.py:2258:                    item_play = lambda: w.play_tricked_item_anim(it, self.pawn)
+   runtime/world.py:2284:                (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2287:                (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2291:                (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2301:                    (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2311:                (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2322:                (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2326:                (lambda: w.play_tricked_item_anim(it, self.pawn))   # cs:863-868
+   runtime/world.py:2331:                    (lambda: w.play_tricked_item_anim(it, self.pawn))  # cs:869-874
+   runtime/world.py:2335:                    (lambda: w.play_tricked_item_anim(it, self.pawn))
+   runtime/world.py:2347:                (lambda: w.play_tricked_item_anim(linked, self.pawn))
+   runtime/world.py:2549:    def _tricked_item(self, it):
+   runtime/world.py:2732:                target = self._tricked_item(it)
+   runtime/world.py:3132:        self.run_to_fixing_item(tool, w._tricked_item_to_fix(it))
+   runtime/world.py:4294:    def _tricked_item_to_fix(self, item):
+   runtime/world.py:4316:                routine.run_to_fixing_item(tool, self._tricked_item_to_fix(item))
+   runtime/world.py:4612:    def play_tricked_item_anim(self, item, pawn=None):
+
+== TricksTotal | owners: HUD(HUD.cs:293 field int), Level(Level.cs:62 field int[]), LevelDataSaver(LevelDataSaver.cs:7 field int[])
+   (no port reads)
+
+== Type | owners: AnimationInstance(AnimationInstance.cs:10 field AnimationType), Entry(Credits.cs:16 field EntryType), Inventory(Inventory.cs:23 field InventoryType)
+   runtime/world.py:19:    type to Single, so inside a sequence only InfiniteLoop still loops.
+   runtime/world.py:99:        """PlaySingleAnimation: type forced to Single. The pending sequence is
+   runtime/world.py:106:        its own serialized type instead of being forced Single."""
+   runtime/world.py:112:        return self._set(name, 'looping' if a.type_looping else 'single')
+   runtime/world.py:1244:        self.animation_type = 0
+   runtime/world.py:1292:            self.animation_type = 1
+   runtime/world.py:1298:            self.animation_type = 0
+   runtime/world.py:1328:        if self.animation_type == 1:
+   runtime/world.py:1370:        self.items = []                  # dicts: {'type','use_count','name'}
+   runtime/world.py:1380:        return any(i['type'] == required for i in self.items)
+   runtime/world.py:1384:        return self.used is not None and self.used['type'] == required
+   runtime/world.py:1389:            if it['type'] == required:
+   runtime/world.py:1392:        if self.used is not None and self.used['type'] == required and \
+   runtime/world.py:1395:        if self.current is not None and self.current['type'] == required \
+   runtime/world.py:4646:        unless Animating; NONE hides a HideWhenNotAnimating item; the type
+   runtime/world.py:4657:                    if item.use_anim_type:
+   runtime/world.py:5005:                and used.get('type') == 'IT2_Bone' and not item.primed:
+   runtime/world.py:5211:        if item.primed_inventory_type and item.primed_inventory_type != 'IT_NONE' \
+   runtime/world.py:5213:            used['type'] = item.primed_inventory_type   # UsedInventory.ChangeType
+   runtime/world.py:5224:            self.inventory.remove(used['type'])
+   runtime/world.py:5238:                other.primed_inventory_type = 'IT2_Bucket'
+   runtime/world.py:5243:                    self.inventory.remove(used['type'])
+   runtime/world.py:5303:                    and inv.used['type'] != item.required_inventory:
+   runtime/world.py:5315:                                         or inv.used['type'] == 'IT2_Knife'):
+   runtime/world.py:5393:        # type, the tricked use set, the tricked idle and the paid flag
+   runtime/world.py:5396:                inv.used is not None and inv.used['type'] == item.second_required:
+   runtime/world.py:5407:                inv.used['type'] == item.compound_required and \
+   runtime/world.py:5420:        # (Item.cs:1385-1410) — the held mouse arms by target and type
+   runtime/world.py:5425:                t = inv.used['type']
+   runtime/world.py:5436:                and inv.used['type'] == 'IT2_Flowers':
+   runtime/world.py:5441:                fl.primed_inventory_type = 'IT_NONE'
+   runtime/world.py:5447:            self.inventory.remove(inv.used['type'])
+   runtime/world.py:5467:                and inv.used['type'] == 'IT_Key':
+   runtime/world.py:5478:                and inv.has(item.inventory_items[0].get('type')):
+   runtime/world.py:5488:                and inv.used['type'] == item.required_inventory \
+   runtime/world.py:5490:            item.primed_inventory_type = 'IT2_Flowers'
+   runtime/world.py:5492:            inv.add([{'type': 'IT2_Knife', 'use_count': 0,
+   runtime/world.py:5501:            if inv.used is not None and inv.used['type'] == 'IT_Nail':
+   runtime/world.py:5559:                        inv.used['type'] = 'IT2_Snake'
+   runtime/world.py:5580:                                self.inventory.remove(inv.used['type'])
+   ... 96 more
+
+== UseFixingItemAction | owners: Rottweiler(Rottweiler.cs:36 field RoutineActionUseFixingItem), RoutineActionGrab(RoutineActionGrab.cs:6 field RoutineActionUseFixingItem)
+   runtime/scene.py:1944:                    'sequence': (pd.get('UseFixingItemAction') or {}).get(
+   runtime/scene.py:1946:                    'should_return': bool((pd.get('UseFixingItemAction')
+   runtime/scene.py:1948:                    'return_sequence': ((pd.get('UseFixingItemAction') or {}).get(
+
+== UseNormalSequence | owners: Kid(Kid.cs:11 field AnimationState[]), TrickItem(TrickItem.cs:80 field ItemAnimationState[])
+   runtime/world.py:2406:            seq = [x for x in dep.use_normal_sequence if p.has(x)]
+   runtime/world.py:4608:        seq = [x for x in item.use_normal_sequence if p.has(x)]
+   runtime/scene.py:216:                 'use_tricked_single', 'use_normal_sequence',
+   runtime/scene.py:592:        self.use_normal_sequence = d.get('UseNormalSequence') or []
+   runtime/scene.py:1917:                'kid_use_normal_seq': pd.get('UseNormalSequence') or [],
+
+== UseTrickedSequence | owners: Kid(Kid.cs:13 field AnimationState[]), TrickItem(TrickItem.cs:86 field ItemAnimationState[])
+   runtime/world.py:2404:            seq = [x for x in dep.use_tricked_sequence if p.has(x)]
+   runtime/world.py:2408:            seq = [x for x in dep.use_tricked_sequence if p.has(x)]
+   runtime/world.py:4624:        seq = [x for x in item.use_tricked_sequence if p.has(x)]
+   runtime/scene.py:194:                 'use_tricked_sequence', 'rott_use_exit_delta',
+   runtime/scene.py:527:        self.use_tricked_sequence = d.get('UseTrickedSequence') or []
+   runtime/scene.py:1918:                'kid_use_tricked_seq': pd.get('UseTrickedSequence') or [],
+   runtime/behaviors.py:1886:                seq = [a for a in self.magician.use_tricked_sequence
+
+== UsedInventory | owners: InventoryManager(InventoryManager.cs:11 field Inventory), Item(Item.cs:440 field Inventory)
+   runtime/world.py:5801:        item_used_inventory = self.inventory.used
+   runtime/world.py:5830:                self._woody_trick_done(item, item_used_inventory)
+   runtime/world.py:5838:    def _woody_trick_done(self, item, used_inventory):
+   runtime/world.py:5843:        if used_inventory is not None:
+   runtime/world.py:5844:            used_inventory['use_count'] -= 1
+   runtime/world.py:5846:                    and used_inventory['use_count'] <= 0:
+
+== Velocity | owners: Pawn(Pawn.cs:99 field Vector3), RollerSkaterBehavior(RollerSkaterBehavior.cs:31 field Vector3), SkiBehavior(SkiBehavior.cs:25 field Vector3)
+   runtime/world.py:1135:            # on the y axis (arrival window 2*MinDist < one velocity step), so
+   runtime/world.py:1207:            # ProcessMovement applies the velocity
+   runtime/world.py:1226:                self._next_step()         # velocity zero; on_arrive fires use
+   runtime/world.py:5018:        """Woody.SeeAlerter -> PlayShortFearAnimation: velocity zeroed, stand,
+   runtime/behaviors.py:459:        self.velocity = self.vec('Velocity')
+   runtime/behaviors.py:505:                rott.sprite.x += self.velocity[0] * dt
+   runtime/behaviors.py:506:                rott.sprite.y += self.velocity[1] * dt
+   runtime/behaviors.py:1415:        self.right_velocity = self.vec('RightVelocity', (2.4, 0.0))
+   runtime/behaviors.py:1416:        self.left_velocity = self.vec('LeftVelocity', (-2.4, 0.0))
+   runtime/behaviors.py:1418:        self.velocity = (0.0, 0.0)
+   runtime/behaviors.py:1455:        self.velocity = self.right_velocity
+   runtime/behaviors.py:1468:        rott.sprite.x += self.velocity[0] * dt        # cs:122-143
+   runtime/behaviors.py:1469:        rott.sprite.y += self.velocity[1] * dt
+   runtime/behaviors.py:1471:            self.velocity = self.left_velocity
+
+== Visible | owners: HUDProgressBar(HUDProgressBar.cs:8 field bool), ProgressBar(ProgressBar.cs:55 field bool)
+   runtime/world.py:26:        # door) becomes visible the moment something plays on it — the
+   runtime/world.py:2219:            # StopAction(canPostponeStop: true)) — the invisible valves
+   runtime/world.py:3734:        self.visible = False
+   runtime/world.py:3787:        elif self.execute_once_2 and self.visible:             # cs:164-172
+   runtime/world.py:3797:        self.visible = value
+   runtime/world.py:3816:        self.visible = False
+   runtime/behaviors.py:1193:        self.bull_visible = False
+   runtime/behaviors.py:1215:        if self.bull_visible:                         # cs:59-62
+   runtime/behaviors.py:1216:            self.bull_visible = False
+   runtime/behaviors.py:1227:        if name == 'BullActivateManip' and not self.bull_visible:  # cs:79-85
+   runtime/behaviors.py:1230:            self.bull_visible = True
+   runtime/hud.py:1019:            if not (pb.visible and pb.is_pawn_hud
+   runtime/hud.py:1070:            if not pb.visible:
+   runtime/record.py:240:                     if pb.visible],
+
+== WithString | owners: Item(Item.cs:22 field string), Woody(Woody.cs:28 field string)
+   runtime/world.py:4391:            item.with_string = item.with_fixed_string
+   runtime/scene.py:263:                 'with_string', 'with_tricked_string', 'with_primed_string',
+   runtime/scene.py:708:        self.with_string = d.get('WithString') or ''
+   runtime/scene.py:1928:                'with_string': pd.get('WithString') or '',
+   runtime/hud.py:463:    def _get_with_string(self, it):
+   runtime/hud.py:475:        return it.with_string
+   runtime/hud.py:542:            tail = loc(self._get_with_string(item)) if item is not None \
+
+== Woody | owners: CameraMover(CameraMover.cs:55 field Woody), DexterityComponent(DexterityComponent.cs:54 field Woody), GameInfo(GameInfo.cs:29 field Woody), HUD(HUD.cs:271 field Woody), Item(Item.cs:272 field Woody), Level105Behavior(Level105Behavior.cs:11 field Pawn), Mother(Mother.cs:14 field Woody), MouseCursor(MouseCursor.cs:17 field Woody), Rottweiler(Rottweiler.cs:40 field Woody), TutorialScriptCameraIntro3(TutorialScriptCameraIntro3.cs:20 field Woody)
+   runtime/world.py:274:    def __init__(self, level, sprite, zone, spec=None, player=None, role='Woody'):
+   runtime/world.py:362:        self.ignore_woody = spec.get('ignore_woody') or False
+   runtime/world.py:376:        self.finished_entrance = (role != 'Woody')
+   runtime/world.py:423:        if self.role == 'Woody':
+   runtime/world.py:449:        if self.role == 'Woody':
+   runtime/world.py:516:            if it.use_woody_extra and self.role == 'Woody':
+   runtime/world.py:528:        if self.role == 'Woody':
+   runtime/world.py:529:            if getattr(obj, 'use_woody_extra', False):
+   runtime/world.py:533:                thr += getattr(obj, 'woody_delta_use_height', 0.0)
+   runtime/world.py:550:        if item.hide_woody:
+   runtime/world.py:638:        woody = self.world.woody if self.world else None
+   runtime/world.py:641:        if woody is not None and woody.zone is not None \
+   runtime/world.py:642:                and self._door_between(woody.zone.pid, dest.pid) is not None:
+   runtime/world.py:646:        if self.role == 'Woody' and self.world is not None \
+   runtime/world.py:668:        if not self.at_zone_y() and (self.role != 'Woody' or self.flag_aux):
+   runtime/world.py:787:        if not self.steps and self.role == 'Woody':   # entering the last step
+   runtime/world.py:842:        if self.role == 'Woody':
+   runtime/world.py:876:        if self.role == 'Woody':
+   runtime/world.py:958:        if self.role == 'Woody':
+   runtime/world.py:1011:            if self.role == 'Woody' and self.passing_complex:
+   runtime/world.py:1032:        if ia is not None and ia.should_walk_up and self.role == 'Woody' \
+   runtime/world.py:1038:                and self.nfh2 and self.role == 'Woody' \
+   runtime/world.py:1093:        if self.role == 'Woody' and w is not None:
+   runtime/world.py:1094:            if w.can_rottweiler_see_woody() and not w.game.got_caught:
+   runtime/world.py:1109:        if self.role in ('Woody', 'Rottweiler'):
+   runtime/world.py:1243:        self.triggered_by_woody = False
+   runtime/world.py:1263:    def _woody(self):
+   runtime/world.py:1264:        return self.world.woody
+   runtime/world.py:1266:    def _woody_moving(self):
+   runtime/world.py:1267:        w = self._woody()
+   runtime/world.py:1271:    def can_see_woody(self):
+   runtime/world.py:1274:        w = self._woody()
+   runtime/world.py:1277:        sneaking = w.sneaking or not self._woody_moving()
+   runtime/world.py:1281:        w = self._woody()
+   runtime/world.py:1288:        w = self._woody()
+   runtime/world.py:1291:        if self.can_see_woody() and self._woody_moving() and not self.alert:
+   runtime/world.py:1293:            self.triggered_by_woody = True
+   runtime/world.py:1294:            self.on_notice_woody()
+   runtime/world.py:1297:                and not self._woody_moving() and not w.hiding):
+   runtime/world.py:1299:            self.triggered_by_woody = True
+   ... 404 more
+
+== WrongZoneItem | owners: TrickItem(TrickItem.cs:160 field Item), Woody(Woody.cs:142 field Item)
+   (no port reads)
+
+== Zone | owners: Actor(Actor.cs:16 field Zone), LevelScriptAction(LevelScriptAction.cs:19 field Zone)
+   runtime/world.py:274:    def __init__(self, level, sprite, zone, spec=None, player=None, role='Woody'):
+   runtime/world.py:278:        self.zone = zone
+   runtime/world.py:287:        self.zone_threshold = spec.get('zone_level_threshold') or 0.0
+   runtime/world.py:311:        self.adjacent_zones = spec.get('adjacent_zones') or False
+   runtime/world.py:314:        self.go_zone = None              # Pawn.GoZone
+   runtime/world.py:322:        self._last_zone2 = zone          # Pawn.lastZone2
+   runtime/world.py:403:        self.world = None                # set by World, for zone reactions
+   runtime/world.py:480:    def floor_y(self, zone=None):
+   runtime/world.py:481:        """Helpers.GetDefaultZoneY: zone y + HeightDelta + PlayerHeightDelta"""
+   runtime/world.py:482:        z = zone or self.zone
+   runtime/world.py:485:    def at_zone_y(self):
+   runtime/world.py:495:    def moving_to_adjacent_zone(self):
+   runtime/world.py:507:        if self.zone is None or self.zone.pid != it.zone:
+   runtime/world.py:574:        the item, door and zone branches (Pawn.cs:604-612, 645-653, 700-708)"""
+   runtime/world.py:575:        if dest is not None and (self.go_zone is None
+   runtime/world.py:576:                                 or self.go_zone.pid != dest.pid) \
+   runtime/world.py:578:            self.go_zone = dest
+   runtime/world.py:584:        dest = self.level.zone_at(x, y)
+   runtime/world.py:593:    def goto_zone(self, dest, x, on_arrive=None):
+   runtime/world.py:600:        """BuildPathToItem: route to the zone; an elevated item gets a plain
+   runtime/world.py:603:        dest = self.level.zone_by_pid(it.zone)
+   runtime/world.py:619:                    'first_step_index': 0, 'original_start_zone': None}
+   runtime/world.py:622:                         'first_step_index': 0, 'original_start_zone': None}
+   runtime/world.py:629:            if d.locked or d.zone != z1_pid or d.link_to is None:
+   runtime/world.py:632:            if other is not None and other.zone == z2_pid:
+   runtime/world.py:640:        # when a door links Woody's zone to the destination
+   runtime/world.py:641:        if woody is not None and woody.zone is not None \
+   runtime/world.py:642:                and self._door_between(woody.zone.pid, dest.pid) is not None:
+   runtime/world.py:644:        H['original_start_zone'] = self.zone.pid if self.zone else None
+   runtime/world.py:654:        if dest.pid == self.zone.pid and self.done_passing \
+   runtime/world.py:655:                and self.go_zone is not None \
+   runtime/world.py:656:                and self.go_zone.pid != dest.pid:
+   runtime/world.py:657:            hops = self.level.find_path(self.go_zone.pid, dest.pid)
+   runtime/world.py:658:        if hops is None and dest.pid != self.zone.pid:
+   runtime/world.py:659:            hops = self.level.find_path(self.zone.pid, dest.pid)
+   runtime/world.py:663:        for zone_pid, door in (hops or ()):
+   runtime/world.py:668:        if not self.at_zone_y() and (self.role != 'Woody' or self.flag_aux):
+   runtime/world.py:697:        far_pid = other.zone
+   runtime/world.py:698:        # zone1 is the hop's destination, zone2 its origin (BuildPath walks
+   runtime/world.py:700:        zone1_pid = far_pid
+   ... 263 more
+
+== cont | owners: Level211Behavior(Level211Behavior.cs:29 field int), Pawn(Pawn.cs:159 field int)
+   runtime/world.py:13:    """AnimationControllerBase.Refresh, one animation controller.
+   runtime/world.py:27:        # controller had no CurrentAnimation to draw until then
+   runtime/world.py:47:                                         # a stand pose; item controllers don't
+   runtime/world.py:197:        SwitchToStandAnimation (a no-op on item controllers, the
+   runtime/world.py:630:                continue
+   runtime/world.py:870:        # PlayDoorLeaveAnimation: SetHidden(true) hides the controller for
+   runtime/world.py:872:        # (Pawn.cs:1615-1635) — the door sheets contain the walking figure
+   runtime/world.py:922:        its controller disabled — the sprite disappears between passes."""
+   runtime/world.py:1520:        self.cont_aux = -1               # ActionManager.ContAux (KidActions)
+   runtime/world.py:1539:        # Rottweiler.Start wires the controller delegates (Rottweiler.cs:152)
+   runtime/world.py:1596:            if it.enable_anim_index_control:
+   runtime/world.py:1597:                self._anim_index_control(it, idx)
+   runtime/world.py:1608:    def _anim_index_control(self, it, idx):
+   runtime/world.py:1609:        """Item.OnSequenceIndexChanged (Item.cs:2693-2726): the controls
+   runtime/world.py:1616:        for c in it.anims_to_control:
+   runtime/world.py:1618:                continue
+   runtime/world.py:1620:                continue
+   runtime/world.py:1683:        self.cont_aux += 1
+   runtime/world.py:1685:                and self.cont_aux > 0 and kid is not None:
+   runtime/world.py:3117:        the fetch; True means the use itself must not continue. The urgent
+   runtime/world.py:3311:        self.continue_alarm()
+   runtime/world.py:3340:        the neighbour being hit — hides (the hit sheets contain him), the
+   runtime/world.py:3368:                w.continue_angry_animation(target)   # Target.ContinueAngryAnimation
+   runtime/world.py:3390:    def continue_alarm(self):
+   runtime/world.py:3411:                continue
+   runtime/world.py:4249:    def continue_angry_animation(self, pawn):
+   runtime/world.py:4261:            routine.continue_alarm()
+   runtime/world.py:4763:                continue
+   runtime/world.py:4773:        renderer — a backdrop quad on the static items — and its controller"""
+   runtime/world.py:5144:                continue
+   runtime/world.py:5146:                continue                  # PlayZoneEnter checks IsTricked
+   runtime/world.py:5149:                continue
+   runtime/world.py:5372:        # SetUsedInventory(null), ClearTooltip, and the old route continues
+   runtime/world.py:5448:            # CowBehavior returns void — the gate flow continues bare-handed
+   runtime/world.py:6058:                continue
+   runtime/world.py:6086:                continue
+   runtime/world.py:6089:                continue
+   runtime/world.py:6103:                continue
+   runtime/world.py:6128:        # controller (the Vacuum, GroundSkates, PoolBoard, Bird, Mug)
+   runtime/world.py:6132:                continue
+   ... 81 more
+
+== currentAnimationState | owners: Level204Behavior(Level204Behavior.cs:5 field string), Level204OlgaBehavior(Level204OlgaBehavior.cs:5 field string), MugBehavior(MugBehavior.cs:9 field string), RottweilerMotherBehaviour(RottweilerMotherBehaviour.cs:33 field string), ToiletBehavior(ToiletBehavior.cs:9 field string)
+   (no port reads)
+

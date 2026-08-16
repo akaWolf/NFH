@@ -1,0 +1,190 @@
+distinct (name, season) references: 1487
+
+== MISSING (no file resolves): 0
+
+== PLAIN-NAME REFS WITH NUMBERED SIBLINGS ON DISK: 46
+  F_Fifi                               s2 -> F_Fifi.png | sibs: ['F_Fifi', 'F_Fifi~2']
+        s2/Level206.json:anim(N2TrickItemIdleTricked)@ItemAnimationController
+  F_Jump                               s2 -> F_Jump.png | sibs: ['F_Jump', 'F_Jump~2']
+        s2/Level206.json:anim(N2TrickItemExtra1)@ItemAnimationController
+  Mutter_dis_001                       s1 -> Mutter_dis_001.png | sibs: ['Mutter_dis_001', 'Mutter_dis_001~2']
+        s1/Level109.json:hud
+  Mutter_dis_001                       s2 -> Mutter_dis_001.png | sibs: ['Mutter_dis_001', 'Mutter_dis_001~2']
+        s2/Level202.json:hud
+        s2/Level206.json:hud
+        s2/Level207.json:hud
+        s2/Level208.json:hud
+  abrechnungsscreen                    s1 -> abrechnungsscreen.png | sibs: ['abrechnungsscreen', 'abrechnungsscreen~2']
+        s1/Intro101.json:hud
+        s1/Intro102.json:hud
+        s1/Intro103.json:hud
+        s1/Level101.json:hud
+  abrechnungsscreen                    s2 -> abrechnungsscreen.png | sibs: ['abrechnungsscreen', 'abrechnungsscreen~2']
+        s2/Level201.json:hud
+        s2/Level202.json:hud
+        s2/Level203.json:hud
+        s2/Level204.json:hud
+  bar                                  s2 -> bar.png | sibs: ['bar', 'bar~2']
+        s2/Level207.json:BubbleIconPath@TrickItem
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  bar_left_HNonly                      s1 -> bar_left_HNonly.png | sibs: ['bar_left_HNonly', 'bar_left_HNonly~2']
+        s1/Intro101.json:hud
+        s1/Intro102.json:hud
+        s1/Intro103.json:hud
+        s1/Level101.json:hud
+  bar_left_HNonly                      s2 -> bar_left_HNonly.png | sibs: ['bar_left_HNonly', 'bar_left_HNonly~2']
+        s2/Level201.json:hud
+        s2/Level202.json:hud
+        s2/Level203.json:hud
+        s2/Level204.json:hud
+  bar_mid                              s2 -> bar_mid.png | sibs: ['bar_mid', 'bar_mid~2']
+        s2/Level201.json:hud
+        s2/Level202.json:hud
+        s2/Level203.json:hud
+        s2/Level204.json:hud
+  bar_mid_HNonly                       s1 -> bar_mid_HNonly.png | sibs: ['bar_mid_HNonly', 'bar_mid_HNonly~2']
+        s1/Intro101.json:hud
+        s1/Intro102.json:hud
+        s1/Intro103.json:hud
+        s1/Level101.json:hud
+  bar_mid_HNonly                       s2 -> bar_mid_HNonly.png | sibs: ['bar_mid_HNonly', 'bar_mid_HNonly~2']
+        s2/Level201.json:hud
+        s2/Level202.json:hud
+        s2/Level203.json:hud
+        s2/Level204.json:hud
+  bike                                 s2 -> bike.png | sibs: ['bike', 'bike~2']
+        s2/Level203.json:BubbleIconPath@TrickItem
+        s2/Level203.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  boat                                 s2 -> boat.png | sibs: ['boat', 'boat~2']
+        s2/Level211.json:BubbleIconPath@TrickItem
+        s2/Level211.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  book_ms                              s1 -> book_ms.png | sibs: ['book_ms', 'book_ms~2']
+        s1/Level112.json:quad(YogaBook)
+  bucket                               s2 -> bucket.png | sibs: ['bucket', 'bucket~2']
+        s2/Level207.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level214.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  bull                                 s2 -> bull.png | sibs: ['bull', 'bull~2', 'bull~3']
+        s2/Level212.json:BubbleIconPath@TrickItem
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level213.json:BubbleIconPath@TrickItem
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  camera                               s1 -> camera.png | sibs: ['camera', 'camera~2']
+        s1/Intro101.json:hud
+        s1/Intro102.json:hud
+        s1/Intro103.json:hud
+        s1/Level101.json:hud
+  camera                               s2 -> camera.png | sibs: ['camera', 'camera~2']
+        s2/Level201.json:hud
+        s2/Level202.json:hud
+        s2/Level203.json:hud
+        s2/Level204.json:hud
+  controls                             s2 -> controls.png | sibs: ['controls', 'controls~2']
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level214.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  hotdog                               s2 -> hotdog.png | sibs: ['hotdog', 'hotdog~2']
+        s2/Level204.json:BubbleIconPath@TrickItem
+        s2/Level204.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  jade                                 s2 -> jade.png | sibs: ['jade', 'jade~2']
+        s2/Level204.json:BubbleIconPath@TrickItem
+        s2/Level204.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  manip                                s2 -> manip.png | sibs: ['manip', 'manip~2']
+        s2/Level208.json:anim(N2TrickItemIdleTricked)@ItemAnimationController
+  mat                                  s2 -> mat.png | sibs: ['mat', 'mat~2']
+        s2/Level207.json:BubbleIconPath@TrickItem
+        s2/Level214.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  ms_0000                              s2 -> ms_0000.png | sibs: ['ms_0000', 'ms_0000~10', 'ms_0000~11', 'ms_0000~2', 'ms_0000~3', 'ms_0000~4']
+        s2/Level201.json:fence
+        s2/Level202.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level206.json:fence
+  open_0000                            s2 -> open_0000.png | sibs: ['open_0000', 'open_0000~2']
+        s2/Level201.json:quad(Opened)
+  phone                                s2 -> phone.png | sibs: ['phone', 'phone~2']
+        s2/Level211.json:BubbleIconPath@TrickItem
+        s2/Level211.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  picnic                               s2 -> picnic.png | sibs: ['picnic', 'picnic~2']
+        s2/Level213.json:BubbleIconPath@TrickItem
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  pinata                               s2 -> pinata.png | sibs: ['pinata', 'pinata~2']
+        s2/Level213.json:BubbleIconPath@TrickItem
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  pistol                               s2 -> pistol.png | sibs: ['pistol', 'pistol~2']
+        s2/Level214.json:BubbleIconPath@TrickItem
+        s2/Level214.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  progress_back                        s1 -> progress_back.png | sibs: ['progress_back', 'progress_back~2']
+        s1/Level109.json:hud
+  progress_back                        s2 -> progress_back.png | sibs: ['progress_back', 'progress_back~2']
+        s2/Level202.json:hud
+        s2/Level206.json:hud
+        s2/Level207.json:hud
+        s2/Level208.json:hud
+  progress_front                       s1 -> progress_front.png | sibs: ['progress_front', 'progress_front~2']
+        s1/Level109.json:hud
+  progress_front                       s2 -> progress_front.png | sibs: ['progress_front', 'progress_front~2']
+        s2/Level202.json:hud
+        s2/Level206.json:hud
+        s2/Level207.json:hud
+        s2/Level208.json:hud
+  rock                                 s2 -> rock.png | sibs: ['rock', 'rock~2']
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  rockets                              s2 -> rockets.png | sibs: ['rockets', 'rockets~2']
+        s2/Level205.json:BubbleIconPath@TrickItem
+        s2/Level205.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  shell                                s2 -> shell.png | sibs: ['shell', 'shell~2']
+        s2/Level207.json:BubbleIconPath@TrickItem
+        s2/Level207.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  statue                               s2 -> statue.png | sibs: ['statue', 'statue~2']
+        s2/Level208.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  sub_takeshark                        s2 -> sub_takeshark.png | sibs: ['sub_takeshark', 'sub_takeshark~2']
+        s2/Level202.json:anim(N2TrickItemUseTricked)@ItemAnimationController
+        s2/Level202.json:anim(OlgaPutSubTricked)@PawnAnimationController
+  sub_takesub                          s2 -> sub_takesub.png | sibs: ['sub_takesub', 'sub_takesub~2']
+        s2/Level202.json:anim(N2TrickItemUseNormal)@ItemAnimationController
+        s2/Level202.json:anim(OlgaPutSub)@PawnAnimationController
+  throne                               s2 -> throne.png | sibs: ['throne', 'throne~2']
+        s2/Level212.json:BubbleIconPath@TrickItem
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level213.json:BubbleIconPath@TrickItem
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  toilet                               s2 -> toilet.png | sibs: ['toilet', 'toilet~2']
+        s2/Level203.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+        s2/Level211.json:BubbleIconPath@TrickItem
+  tortilla                             s2 -> tortilla.png | sibs: ['tortilla', 'tortilla~2']
+        s2/Level213.json:BubbleIconPath@TrickItem
+        s2/Level213.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  trashcan_me                          s1 -> trashcan_me.png | sibs: ['trashcan_me', 'trashcan_me~2']
+        s1/Level111.json:quad(RubishBinCableEmpty)
+        s1/Level112.json:quad(RubishBinCableEmpty)
+        s1/Level113.json:quad(RubishBinCableEmpty)
+        s1/Level114.json:quad(RubishBinCableEmpty)
+  turban                               s2 -> turban.png | sibs: ['turban', 'turban~2']
+        s2/Level210.json:BubbleIconPath@TrickItem
+        s2/Level210.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+  whip                                 s2 -> whip.png | sibs: ['whip', 'whip~2']
+        s2/Level212.json:BubbleIconPath@TrickItem
+        s2/Level212.json:anim(N2TrickItemIdleNormal)@ItemAnimationController
+
+== CROSS-SEASON CONTENT TWINS (same stem, different pixels, both dirs): 23
+  C_Idle                                   [s1] ['s1/Level107.json:anim(ChiliIdle)@ItemAnimationController']
+  C_idle                                   [s2] ['s2/Level205.json:anim(N2TrickItemIdleNormal)@ItemAnimationController']
+  M_appear                                 [s1] ['s1/Level101.json:anim(MotherDoorBackEnter)@ItemAnimationController']
+  M_disappear                              [s1] ['s1/Level101.json:anim(MotherDoorBackLeave)@ItemAnimationController']
+  N_Cry                                    [s1] ['s1/Intro102.json:anim(Cry)@PawnAnimationController']
+  N_Ladder                                 [s1] ['s1/Intro102.json:anim(LadderClimb)@PawnAnimationController']
+  N_Search                                 [s1] ['s1/Intro102.json:anim(SearchLeftRight)@PawnAnimationController']
+  N_Weights                                [s1] ['s1/Intro102.json:anim(LiftSawedWeights)@PawnAnimationController']
+  N_weights                                [s2] ['s2/Level201.json:anim(Weights)@PawnAnimationController']
+  W_Appear                                 [s2] ['s2/Level201.json:anim(Appear)@PawnAnimationController']
+  W_Disappear                              [s2] ['s2/Level201.json:anim(Disappear)@PawnAnimationController']
+  W_Fear                                   [s1] ['s1/Intro101.json:anim(FearLeft)@PawnAnimationController']
+  W_NoNo                                   [s1] ['s1/Intro101.json:anim(NoNo)@PawnAnimationController']
+  W_Whats_Up                               [s1] ['s1/Intro101.json:anim(LoseGame)@PawnAnimationController']
+  beer                                     [s1] ['s1/Level102.json:quad(Beer)']
+  ms_0000                                  [s2] ['s2/Level201.json:fence']
+
+== CASE TWINS INSIDE ONE DIR:
+
+== ~N REFERENCES:
+  total ~N references: 11 (all resolved exactly unless BAD lines above)

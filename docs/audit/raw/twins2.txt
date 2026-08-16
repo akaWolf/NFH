@@ -1,0 +1,1148 @@
+total distinct member names: 2297
+twin names (>=2 owner classes): 231
+
+== Acceleration  (2 owners)
+   ParrotLedgeFallBehavior            ParrotLedgeFallBehavior.cs:11  [field] Vector3  | public Vector3 Acceleration;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:35  [field] Vector3  | public Vector3 Acceleration;
+
+== ActionManager  (5 owners)
+   AnimationControllerBase            AnimationControllerBase.cs:37  [field] ActionManager  | internal ActionManager ActionManager;
+   Mother                             Mother.cs:6  [field] ActionManager  | public ActionManager ActionManager;
+   Olga                               Olga.cs:6  [field] ActionManager  | public ActionManager ActionManager;
+   Rottweiler                         Rottweiler.cs:22  [field] ActionManager  | public ActionManager ActionManager;
+   RoutineAction                      RoutineAction.cs:5  [field] ActionManager  | protected ActionManager ActionManager;
+
+== Actions  (2 owners)
+   ActionManager                      ActionManager.cs:21  [field] RoutineActionUse[]  | public RoutineActionUse[] Actions;
+   LevelScript                        LevelScript.cs:19  [field] LevelScriptAction[]  | public LevelScriptAction[] Actions;
+
+== AdjustTextSize  (3 owners)
+   ExitConfirmation                   ExitConfirmation.cs:48  [field] LevelDataGUIRenderer  | public LevelDataGUIRenderer AdjustTextSize;
+   HUD                                HUD.cs:283  [field] LevelDataGUIRenderer  | public LevelDataGUIRenderer AdjustTextSize;
+   IntroAnimation                     IntroAnimation.cs:84  [field] LevelDataGUIRenderer  | public LevelDataGUIRenderer AdjustTextSize;
+
+== Alerter  (3 owners)
+   GameInfo                           GameInfo.cs:57  [field] Alerter  | internal Alerter Alerter;
+   Woody                              Woody.cs:148  [field] Alerter  | internal Alerter Alerter;
+   Zone                               Zone.cs:10  [field] Alerter  | public Alerter Alerter;
+
+== AlerterDelay  (2 owners)
+   Alerter                            Alerter.cs:24  [field] float  | public float AlerterDelay = 1f;
+   DexterityComponent                 DexterityComponent.cs:80  [field] float  | private float AlerterDelay = 1f;
+
+== AnimController  (3 owners)
+   Item                               Item.cs:388  [field] ItemAnimationController  | internal ItemAnimationController AnimController;
+   Pawn                               Pawn.cs:79  [field] PawnAnimationController  | public PawnAnimationController AnimController;
+   ScriptMarker                       ScriptMarker.cs:5  [field] ItemAnimationController  | internal ItemAnimationController AnimController;
+
+== AnimationSequence  (4 owners)
+   AnimationControllerBase            AnimationControllerBase.cs:9  [field] T[]  | protected T[] AnimationSequence;
+   AnimationSequenceControl           AnimationSequenceControl.cs:8  [field] AnimationSequenceState  | private AnimationSequenceState AnimationSequence;
+   AnimationSequenceProperties        AnimationSequenceProperties.cs:8  [field] AnimationSequenceState  | private AnimationSequenceState AnimationSequence;
+   Item                               Item.cs:78  [field] AnimationState[]  | public AnimationState[] AnimationSequence;
+
+== AnimationStartIndex  (2 owners)
+   AnimationSequenceControl           AnimationSequenceControl.cs:23  [field] int  | private int AnimationStartIndex;
+   AnimationSequenceProperties        AnimationSequenceProperties.cs:11  [field] int  | private int AnimationStartIndex;
+
+== Animations  (2 owners)
+   ItemAnimationController            ItemAnimationController.cs:6  [field] ItemAnimationInstance[]  | public ItemAnimationInstance[] Animations;
+   PawnAnimationController            PawnAnimationController.cs:7  [field] PawnAnimationInstance[]  | public PawnAnimationInstance[] Animations;
+
+== ArrowHeight  (2 owners)
+   ArrowSignDepth                     ArrowSignDepth.cs:7  [field] float  | private float ArrowHeight;
+   LevelScript                        LevelScript.cs:49  [field] float  | private float ArrowHeight;
+
+== ArrowWidth  (2 owners)
+   ArrowSignDepth                     ArrowSignDepth.cs:5  [field] float  | private float ArrowWidth;
+   LevelScript                        LevelScript.cs:47  [field] float  | private float ArrowWidth;
+
+== Aux  (3 owners)
+   Helpers                            Helpers.cs:19  [field] int  | internal static int Aux;
+   Level206RoutineBehavior            Level206RoutineBehavior.cs:9  [field] bool  | private bool Aux;
+   Level207MotherBehavior             Level207MotherBehavior.cs:5  [field] bool  | private bool Aux;
+
+== Background  (3 owners)
+   ControlSlider                      ControlSlider.cs:9  [field] Texture2D  | public Texture2D Background;
+   GameIntroAnimation                 GameIntroAnimation.cs:18  [field] Texture  | public Texture Background;
+   IntroAnimation                     IntroAnimation.cs:18  [field] Texture  | public Texture Background;
+
+== BackgroundRect  (3 owners)
+   DexterityComponent                 DexterityComponent.cs:20  [field] Rect  | public Rect BackgroundRect;
+   GameIntroAnimation                 GameIntroAnimation.cs:16  [field] Rect  | public Rect BackgroundRect;
+   IntroAnimation                     IntroAnimation.cs:20  [field] Rect  | public Rect BackgroundRect;
+
+== Boat  (2 owners)
+   Level211Behavior                   Level211Behavior.cs:15  [field] TrickItem  | public TrickItem Boat;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:15  [field] Item  | public Item Boat;
+
+== BubbleIcon  (3 owners)
+   Actor                              Actor.cs:34  [field] Texture  | internal Texture BubbleIcon;
+   RoutineActionMove                  RoutineActionMove.cs:13  [field] Texture  | internal override Texture BubbleIcon => NextAction.BubbleIcon;
+   Zone                               Zone.cs:46  [field] Texture  | public Texture BubbleIcon;
+
+== BubbleMotherIcon  (2 owners)
+   Actor                              Actor.cs:40  [field] Texture  | internal Texture BubbleMotherIcon;
+   RoutineActionMove                  RoutineActionMove.cs:15  [field] Texture  | internal override Texture BubbleMotherIcon => NextAction.BubbleMotherIcon;
+
+== Bucket  (2 owners)
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:19  [field] Item  | public Item Bucket;
+   WashbucketBehavior                 WashbucketBehavior.cs:11  [field] Item  | public Item Bucket;
+
+== BucketAux  (2 owners)
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:25  [field] bool  | internal bool BucketAux;
+   WashbucketBehavior                 WashbucketBehavior.cs:19  [field] bool  | public bool BucketAux;
+
+== Bull  (3 owners)
+   Level213Behavior                   Level213Behavior.cs:7  [field] Item  | public Item Bull;
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:3  [field] Item  | public Item Bull;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:11  [field] Item  | public Item Bull;
+
+== BullAux  (2 owners)
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:13  [field] bool  | private bool BullAux;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:25  [field] bool  | public bool BullAux;
+
+== BullControls  (2 owners)
+   Level213Behavior                   Level213Behavior.cs:9  [field] Item  | public Item BullControls;
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:5  [field] Item  | public Item BullControls;
+
+== CalculatedtHeight  (7 owners)
+   Control                            Control.cs:92  [field] float  | private float CalculatedtHeight;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:154  [field] float  | private float CalculatedtHeight;
+   LevelLoader                        LevelLoader.cs:38  [field] float  | private float CalculatedtHeight;
+   LevelScript                        LevelScript.cs:43  [field] float  | private float CalculatedtHeight;
+   LevelTransition                    LevelTransition.cs:35  [field] float  | private float CalculatedtHeight;
+   ProgressBar                        ProgressBar.cs:51  [field] float  | private float CalculatedtHeight;
+   ProgressBarTrick                   ProgressBarTrick.cs:29  [field] float  | private float CalculatedtHeight;
+
+== CalculatedtWidth  (7 owners)
+   Control                            Control.cs:94  [field] float  | private float CalculatedtWidth;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:156  [field] float  | private float CalculatedtWidth;
+   LevelLoader                        LevelLoader.cs:40  [field] float  | private float CalculatedtWidth;
+   LevelScript                        LevelScript.cs:45  [field] float  | private float CalculatedtWidth;
+   LevelTransition                    LevelTransition.cs:37  [field] float  | private float CalculatedtWidth;
+   ProgressBar                        ProgressBar.cs:53  [field] float  | private float CalculatedtWidth;
+   ProgressBarTrick                   ProgressBarTrick.cs:31  [field] float  | private float CalculatedtWidth;
+
+== CameraOverlay  (4 owners)
+   TutorialScriptCamera               TutorialScriptCamera.cs:18  [field] Texture  | public Texture CameraOverlay;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:22  [field] Texture  | public Texture CameraOverlay;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:32  [field] Texture  | public Texture CameraOverlay;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:25  [field] Texture  | public Texture CameraOverlay;
+
+== CameraOverlayRect  (4 owners)
+   TutorialScriptCamera               TutorialScriptCamera.cs:20  [field] Rect  | public Rect CameraOverlayRect;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:24  [field] Rect  | public Rect CameraOverlayRect;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:34  [field] Rect  | public Rect CameraOverlayRect;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:27  [field] Rect  | public Rect CameraOverlayRect;
+
+== CanStart  (2 owners)
+   Alerter                            Alerter.cs:28  [field] bool  | internal bool CanStart;
+   Pawn                               Pawn.cs:121  [field] bool  | internal bool CanStart;
+
+== CloseTime  (2 owners)
+   ExitConfirmation                   ExitConfirmation.cs:30  [field] float  | internal float CloseTime;
+   SearchItem                         SearchItem.cs:35  [field] float  | private float CloseTime;
+
+== CompanyLogo  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:24  [field] Texture  | public Texture CompanyLogo;
+   IntroAnimation                     IntroAnimation.cs:22  [field] Texture  | public Texture CompanyLogo;
+
+== CompanyRect  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:22  [field] Rect  | public Rect CompanyRect;
+   IntroAnimation                     IntroAnimation.cs:24  [field] Rect  | public Rect CompanyRect;
+
+== ComplexMove  (2 owners)
+   Item                               Item.cs:218  [field] bool  | public bool ComplexMove;
+   Step                               Step.cs:25  [field] bool  | internal bool ComplexMove;
+
+== CompoundTrickScore  (2 owners)
+   GameInfo                           GameInfo.cs:43  [field] int  | public int CompoundTrickScore = 4;
+   Item                               Item.cs:68  [field] int  | public int CompoundTrickScore;
+
+== ConfirmString  (2 owners)
+   ControlButton                      ControlButton.cs:29  [field] string  | public string ConfirmString;
+   ControlWindow                      ControlWindow.cs:11  [field] string  | public string ConfirmString;
+
+== CurrentAction  (2 owners)
+   ActionManager                      ActionManager.cs:85  [field] RoutineAction  | internal RoutineAction CurrentAction => ActiveAction;
+   LevelScript                        LevelScript.cs:57  [field] LevelScriptAction  | internal LevelScriptAction CurrentAction => (ActionIndex >= Actions.Length) ? null : Actions[ActionIndex];
+
+== CurrentAnim  (18 owners)
+   IndianPlatformBehavior             IndianPlatformBehavior.cs:15  [field] string  | private string CurrentAnim;
+   Level101Behavior                   Level101Behavior.cs:7  [field] string  | private string CurrentAnim;
+   Level105Behavior                   Level105Behavior.cs:5  [field] string  | private string CurrentAnim;
+   Level108Behavior                   Level108Behavior.cs:5  [field] string  | private string CurrentAnim;
+   Level109Behavior                   Level109Behavior.cs:11  [field] string  | private string CurrentAnim;
+   Level113Behavior                   Level113Behavior.cs:3  [field] string  | private string CurrentAnim;
+   Level114Behavior                   Level114Behavior.cs:13  [field] string  | private string CurrentAnim;
+   Level206Behavior                   Level206Behavior.cs:9  [field] string  | private string CurrentAnim;
+   Level208Behaviors                  Level208Behaviors.cs:21  [field] string  | private string CurrentAnim;
+   Level210Behavior                   Level210Behavior.cs:19  [field] string  | private string CurrentAnim;
+   Level211Behavior                   Level211Behavior.cs:17  [field] string  | private string CurrentAnim;
+   Level212Behavior                   Level212Behavior.cs:3  [field] string  | private string CurrentAnim;
+   Level213Behavior                   Level213Behavior.cs:15  [field] string  | private string CurrentAnim;
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:9  [field] string  | private string CurrentAnim;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:31  [field] string  | public string CurrentAnim;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:19  [field] string  | private string CurrentAnim;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:45  [field] string  | private string CurrentAnim;
+   SandCastleBehavior                 SandCastleBehavior.cs:19  [field] string  | private string CurrentAnim;
+
+== CurrentAnimation  (2 owners)
+   ActorBehavior                      ActorBehavior.cs:5  [field] string  | protected string CurrentAnimation;
+   AnimationControllerBase            AnimationControllerBase.cs:13  [field] AnimationInstance<T>  | internal AnimationInstance<T> CurrentAnimation;
+
+== CurrentFrameIndex  (2 owners)
+   AnimationInstance                  AnimationInstance.cs:58  [field] int  | protected int CurrentFrameIndex;
+   HUDAnimation                       HUDAnimation.cs:20  [field] int  | protected int CurrentFrameIndex;
+
+== DataRect  (2 owners)
+   LevelLoader                        LevelLoader.cs:20  [field] Rect  | public Rect DataRect;
+   LevelTransition                    LevelTransition.cs:19  [field] Rect  | public Rect DataRect;
+
+== DataString  (2 owners)
+   LevelLoader                        LevelLoader.cs:22  [field] string  | public string DataString;
+   LevelTransition                    LevelTransition.cs:21  [field] string  | public string DataString;
+
+== DataStyle  (4 owners)
+   LevelLoader                        LevelLoader.cs:24  [field] GUIStyle  | public GUIStyle DataStyle;
+   LevelTransition                    LevelTransition.cs:23  [field] GUIStyle  | public GUIStyle DataStyle;
+   ProgressBar                        ProgressBar.cs:39  [field] GUIStyle  | public GUIStyle DataStyle;
+   ProgressBarTrick                   ProgressBarTrick.cs:15  [field] GUIStyle  | public GUIStyle DataStyle;
+
+== DefaultHeight  (9 owners)
+   Control                            Control.cs:88  [field] float  | private float DefaultHeight = 768f;
+   Credits                            Credits.cs:81  [field] float  | private float DefaultHeight = 768f;
+   GameIntroAnimation                 GameIntroAnimation.cs:62  [field] float  | private float DefaultHeight = 768f;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:150  [field] float  | private float DefaultHeight = 768f;
+   LevelLoader                        LevelLoader.cs:34  [field] float  | private float DefaultHeight = 768f;
+   LevelScript                        LevelScript.cs:39  [field] float  | private float DefaultHeight = 768f;
+   LevelTransition                    LevelTransition.cs:31  [field] float  | private float DefaultHeight = 768f;
+   ProgressBar                        ProgressBar.cs:47  [field] float  | private float DefaultHeight = 768f;
+   ProgressBarTrick                   ProgressBarTrick.cs:25  [field] float  | private float DefaultHeight = 768f;
+
+== DefaultWidth  (9 owners)
+   Control                            Control.cs:90  [field] float  | private float DefaultWidth = 1024f;
+   Credits                            Credits.cs:83  [field] float  | private float DefaultWidth = 1024f;
+   GameIntroAnimation                 GameIntroAnimation.cs:64  [field] float  | private float DefaultWidth = 1024f;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:152  [field] float  | private float DefaultWidth = 1024f;
+   LevelLoader                        LevelLoader.cs:36  [field] float  | private float DefaultWidth = 1024f;
+   LevelScript                        LevelScript.cs:41  [field] float  | private float DefaultWidth = 1024f;
+   LevelTransition                    LevelTransition.cs:33  [field] float  | private float DefaultWidth = 1024f;
+   ProgressBar                        ProgressBar.cs:49  [field] float  | private float DefaultWidth = 1024f;
+   ProgressBarTrick                   ProgressBarTrick.cs:27  [field] float  | private float DefaultWidth = 1024f;
+
+== DelayStart  (3 owners)
+   Mother                             Mother.cs:18  [field] float  | private float DelayStart = 1.5f;
+   Olga                               Olga.cs:8  [field] float  | private float DelayStart = 1.5f;
+   Rottweiler                         Rottweiler.cs:24  [field] float  | private float DelayStart;
+
+== DeltaDescriptionLocation  (2 owners)
+   Item                               Item.cs:70  [field] Vector3  | public Vector3 DeltaDescriptionLocation;
+   Woody                              Woody.cs:144  [field] Vector3  | public Vector3 DeltaDescriptionLocation;
+
+== DeltaLocation  (3 owners)
+   AnimationControllerBase            AnimationControllerBase.cs:45  [field] Vector2  | public Vector2 DeltaLocation;
+   AnimationInstance                  AnimationInstance.cs:36  [field] Vector2  | public Vector2 DeltaLocation;
+   Item                               Item.cs:86  [field] Vector3  | public Vector3 DeltaLocation;
+
+== DeltaProgressRect  (2 owners)
+   ProgressBar                        ProgressBar.cs:15  [field] Rect  | public Rect DeltaProgressRect;
+   ProgressBarTrick                   ProgressBarTrick.cs:9  [field] Rect  | public Rect DeltaProgressRect;
+
+== Description  (2 owners)
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:130  [field] string  | protected string Description;
+   LevelScriptAction                  LevelScriptAction.cs:21  [field] string  | public string Description;
+
+== DescriptionRect  (2 owners)
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:30  [field] Rect  | public Rect DescriptionRect;
+   LevelScript                        LevelScript.cs:27  [field] Rect  | public Rect DescriptionRect;
+
+== DescriptionString  (3 owners)
+   HUD                                HUD.cs:277  [field] string  | protected string DescriptionString;
+   Inventory                          Inventory.cs:39  [field] string  | public string DescriptionString;
+   Item                               Item.cs:38  [field] string  | public string DescriptionString;
+
+== DescriptionStyle  (2 owners)
+   HUD                                HUD.cs:253  [field] GUIStyle  | public GUIStyle DescriptionStyle;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:32  [field] GUIStyle  | public GUIStyle DescriptionStyle;
+
+== DexterityAlert  (2 owners)
+   SearchItem                         SearchItem.cs:29  [field] DexterityComponent  | public DexterityComponent DexterityAlert;
+   TrickItem                          TrickItem.cs:166  [field] DexterityComponent  | public DexterityComponent DexterityAlert;
+
+== DirectorAnimation  (2 owners)
+   ExitConfirmation                   ExitConfirmation.cs:28  [field] DirectorAnimation  | protected DirectorAnimation DirectorAnimation;
+   LevelScript                        LevelScript.cs:33  [field] DirectorAnimation  | protected DirectorAnimation DirectorAnimation;
+
+== DisableColliderAfterUse  (2 owners)
+   SearchItem                         SearchItem.cs:41  [field] bool  | public bool DisableColliderAfterUse;
+   TrickItem                          TrickItem.cs:134  [field] bool  | public bool DisableColliderAfterUse;
+
+== DocFile  (2 owners)
+   TemplateLangCreator                TemplateLangCreator.cs:31  [field] XDocument  | private XDocument DocFile;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:51  [field] XDocument  | private XDocument DocFile;
+
+== DoorsToUnlock  (2 owners)
+   LevelScriptAction                  LevelScriptAction.cs:37  [field] Door[]  | public Door[] DoorsToUnlock;
+   RoutineActionUse                   RoutineActionUse.cs:63  [field] Door[]  | public Door[] DoorsToUnlock;
+
+== DownTransition  (2 owners)
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:48  [field] Door  | public Door DownTransition;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:47  [field] Door  | public Door DownTransition;
+
+== Duration  (4 owners)
+   AnimationSequenceProperties        AnimationSequenceProperties.cs:17  [field] float  | private float Duration;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:116  [field] string  | public string Duration;
+   ProgressBarTrick                   ProgressBarTrick.cs:11  [field] float  | public float Duration;
+   RoutineAction                      RoutineAction.cs:9  [field] float  | public float Duration;
+
+== Durations  (2 owners)
+   Level                              Level.cs:60  [field] int[]  | public int[] Durations;
+   LevelDataSaver                     LevelDataSaver.cs:5  [field] int[]  | public int[] Durations;
+
+== EndPosition  (2 owners)
+   BirdMovementBehavior               BirdMovementBehavior.cs:17  [field] Vector3  | private Vector3 EndPosition;
+   FifiBehavior                       FifiBehavior.cs:15  [field] Vector3  | private Vector3 EndPosition;
+
+== EndString  (2 owners)
+   Woody                              Woody.cs:42  [field] string  | public string EndString;
+   Zone                               Zone.cs:8  [field] string  | public string EndString;
+
+== EnterZone  (2 owners)
+   SearchItem                         SearchItem.cs:43  [field] ItemAnimationState  | public ItemAnimationState EnterZone;
+   TrickItem                          TrickItem.cs:106  [field] ItemAnimationState  | public ItemAnimationState EnterZone;
+
+== EntranceClap  (2 owners)
+   MusicPlayer                        MusicPlayer.cs:31  [field] AudioClip  | public AudioClip EntranceClap;
+   Woody                              Woody.cs:48  [field] AudioClip  | public AudioClip EntranceClap;
+
+== EntranceLocation  (2 owners)
+   Level                              Level.cs:82  [field] Vector3  | internal static Vector3 EntranceLocation;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:23  [field] Vector3  | public Vector3 EntranceLocation;
+
+== EntranceZone  (2 owners)
+   Level                              Level.cs:84  [field] Zone  | internal static Zone EntranceZone;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:21  [field] Zone  | public Zone EntranceZone;
+
+== EscapeAux  (2 owners)
+   ControlWindow                      ControlWindow.cs:15  [field] bool  | public bool EscapeAux;
+   Level                              Level.cs:142  [field] bool  | internal static bool EscapeAux;
+
+== ExitConfirmMessage  (2 owners)
+   ExitConfirmation                   ExitConfirmation.cs:32  [field] string  | protected string ExitConfirmMessage;
+   Woody                              Woody.cs:46  [field] string  | public string ExitConfirmMessage;
+
+== Fifi  (2 owners)
+   FifiBehavior                       FifiBehavior.cs:5  [field] TrickItem  | public TrickItem Fifi;
+   Level206RoutineBehavior            Level206RoutineBehavior.cs:5  [field] Item  | public Item Fifi;
+
+== FifiTricked  (2 owners)
+   FifiBehavior                       FifiBehavior.cs:11  [field] bool  | private bool FifiTricked;
+   Level206Behavior                   Level206Behavior.cs:13  [field] bool  | private bool FifiTricked;
+
+== FileName  (9 owners)
+   AnimationSound                     AnimationSound.cs:9  [field] string  | public string FileName;
+   LangCreator                        LangCreator.cs:66  [field] string  | public string FileName;
+   LocalizationManager                LocalizationManager.cs:10  [field] string  | private static string FileName;
+   TemplateLangCreator                TemplateLangCreator.cs:41  [field] string  | public string FileName;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:61  [field] string  | public string FileName;
+   UpdateLangWithKeys                 UpdateLangWithKeys.cs:38  [field] string  | public string FileName;
+   XMLDiff                            XMLDiff.cs:66  [field] string  | public string FileName;
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:44  [field] string  | public string FileName;
+   XMLMerge                           XMLMerge.cs:36  [field] string  | public string FileName;
+
+== Finished  (3 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:60  [field] bool  | private static bool Finished;
+   HUDAnimation                       HUDAnimation.cs:24  [field] bool  | internal bool Finished;
+   IntroAnimation                     IntroAnimation.cs:82  [field] bool  | internal static bool Finished;
+
+== FireChannel  (2 owners)
+   Level208Behaviors                  Level208Behaviors.cs:5  [field] Item  | public Item FireChannel;
+   Level212Behavior                   Level212Behavior.cs:5  [field] Item  | public Item FireChannel;
+
+== Fish  (2 owners)
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:43  [field] Item  | public Item Fish;
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:21  [field] Item  | public Item Fish;
+
+== FixingItem  (2 owners)
+   Item                               Item.cs:292  [field] Item  | public Item FixingItem;
+   Rottweiler                         Rottweiler.cs:82  [field] Item  | internal Item FixingItem;
+
+== FontSize  (8 owners)
+   Control                            Control.cs:86  [field] float  | private float FontSize = 16f;
+   Credits                            Credits.cs:79  [field] float  | private float FontSize = 16f;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:148  [field] float  | private float FontSize = 16f;
+   LevelLoader                        LevelLoader.cs:32  [field] float  | private float FontSize = 16f;
+   LevelScript                        LevelScript.cs:37  [field] float  | private float FontSize = 16f;
+   LevelTransition                    LevelTransition.cs:29  [field] float  | private float FontSize = 16f;
+   ProgressBar                        ProgressBar.cs:45  [field] float  | private float FontSize = 16f;
+   ProgressBarTrick                   ProgressBarTrick.cs:23  [field] float  | private float FontSize = 16f;
+
+== Frozen  (3 owners)
+   ActionManager                      ActionManager.cs:33  [field] bool  | public bool Frozen;
+   CameraMover                        CameraMover.cs:57  [field] bool  | private bool Frozen;
+   Woody                              Woody.cs:70  [field] bool  | private bool Frozen;
+
+== GameCamera  (3 owners)
+   CameraMover                        CameraMover.cs:19  [field] Camera  | private Camera GameCamera;
+   DexterityComponent                 DexterityComponent.cs:96  [field] CameraMover  | public CameraMover GameCamera;
+   GameInfo                           GameInfo.cs:85  [field] CameraMover  | internal CameraMover GameCamera;
+
+== GameLogo  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:36  [field] Texture  | public Texture GameLogo;
+   IntroAnimation                     IntroAnimation.cs:26  [field] Texture  | public Texture GameLogo;
+
+== GameRect  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:34  [field] Rect  | public Rect GameRect;
+   IntroAnimation                     IntroAnimation.cs:28  [field] Rect  | public Rect GameRect;
+
+== GameTime  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:56  [field] float  | public float GameTime = 1f;
+   IntroAnimation                     IntroAnimation.cs:46  [field] float  | public float GameTime;
+
+== HUDGUIDepth  (2 owners)
+   ProgressBar                        ProgressBar.cs:43  [field] GUIDepth  | public GUIDepth HUDGUIDepth;
+   ProgressBarTrick                   ProgressBarTrick.cs:19  [field] GUIDepth  | public GUIDepth HUDGUIDepth;
+
+== HideString  (2 owners)
+   Item                               Item.cs:36  [field] string  | public string HideString;
+   Woody                              Woody.cs:38  [field] string  | public string HideString;
+
+== HideWhenNotAnimating  (2 owners)
+   SearchItem                         SearchItem.cs:25  [field] bool  | public bool HideWhenNotAnimating;
+   TrickItem                          TrickItem.cs:58  [field] bool  | public bool HideWhenNotAnimating;
+
+== HitWoodyAction  (2 owners)
+   Mother                             Mother.cs:8  [field] RoutineActionMotherHitWoody  | public RoutineActionMotherHitWoody HitWoodyAction;
+   Rottweiler                         Rottweiler.cs:90  [field] RoutineActionHitWoody  | public RoutineActionHitWoody HitWoodyAction;
+
+== IdTag  (4 owners)
+   LangCreator                        LangCreator.cs:38  [field] string  | private const string IdTag = "id";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:39  [field] string  | private const string IdTag = "id";
+   XMLDiff                            XMLDiff.cs:38  [field] string  | private const string IdTag = "id";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:30  [field] string  | private const string IdTag = "id";
+
+== IgnoreRender  (2 owners)
+   MenuMouseController                MenuMouseController.cs:11  [field] bool  | private bool IgnoreRender;
+   MouseCursor                        MouseCursor.cs:29  [field] bool  | private bool IgnoreRender;
+
+== IgnoreWoody  (2 owners)
+   Mother                             Mother.cs:16  [field] bool  | public bool IgnoreWoody;
+   Rottweiler                         Rottweiler.cs:66  [field] bool  | public bool IgnoreWoody;
+
+== Instance  (5 owners)
+   AdManager                          AdManager.cs:25  [field] AdManager  | public static AdManager Instance => ThisInstance;
+   BuildSettings                      BuildSettings.cs:19  [field] BuildSettings  | public static BuildSettings Instance => instance;
+   GameInfo                           GameInfo.cs:35  [field] GameInfo  | public static GameInfo Instance;
+   LevelPackUnlocker                  LevelPackUnlocker.cs:7  [field] LevelPackUnlocker  | private static LevelPackUnlocker Instance;
+   AppLauncher                        NFH.AppLauncher/AppLauncher.cs:20  [field] AppLauncher  | public static AppLauncher Instance => instance;
+
+== InventoryItems  (2 owners)
+   InventoryManager                   InventoryManager.cs:5  [field] List<Inventory>  | public List<Inventory> InventoryItems;
+   SearchItem                         SearchItem.cs:5  [field] Inventory[]  | public Inventory[] InventoryItems;
+
+== IsPlayingWoodyHit  (2 owners)
+   Mother                             Mother.cs:10  [field] bool  | internal bool IsPlayingWoodyHit;
+   Rottweiler                         Rottweiler.cs:92  [field] bool  | internal bool IsPlayingWoodyHit;
+
+== IsTutorial  (2 owners)
+   GameInfo                           GameInfo.cs:119  [field] bool  | public bool IsTutorial;
+   Level                              Level.cs:68  [field] bool  | public bool IsTutorial;
+
+== Item  (4 owners)
+   Inventory                          Inventory.cs:25  [field] Item  | internal Item Item;
+   LevelScriptAction                  LevelScriptAction.cs:13  [field] Item  | public Item Item;
+   RoutineAction                      RoutineAction.cs:23  [field] Item  | public Item Item;
+   TrickProgressBarBehavior           TrickProgressBarBehavior.cs:7  [field] TrickItem  | public TrickItem Item;
+
+== ItemsToUnlock  (2 owners)
+   LevelScriptAction                  LevelScriptAction.cs:41  [field] Item[]  | public Item[] ItemsToUnlock;
+   RoutineActionUse                   RoutineActionUse.cs:65  [field] Item[]  | public Item[] ItemsToUnlock;
+
+== Kid  (4 owners)
+   IndianPlatformBehavior             IndianPlatformBehavior.cs:5  [field] Item  | public Item Kid;
+   Item                               Item.cs:522  [field] TrickItem  | public TrickItem Kid;
+   Level211Behavior                   Level211Behavior.cs:11  [field] Item  | public Item Kid;
+   SandCastleBehavior                 SandCastleBehavior.cs:7  [field] Kid  | public Kid Kid;
+
+== LangDocFile  (2 owners)
+   LangCreator                        LangCreator.cs:52  [field] XDocument  | private XDocument LangDocFile;
+   XMLDiff                            XMLDiff.cs:52  [field] XDocument  | private XDocument LangDocFile;
+
+== LangText  (3 owners)
+   LangCreator                        LangCreator.cs:60  [field] Dictionary<string, string>  | private Dictionary<string, string> LangText;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:55  [field] Dictionary<string, string>  | private Dictionary<string, string> LangText;
+   XMLDiff                            XMLDiff.cs:60  [field] Dictionary<string, string>  | private Dictionary<string, string> LangText;
+
+== LangXmlFile  (2 owners)
+   LangCreator                        LangCreator.cs:50  [field] TextAsset  | public TextAsset LangXmlFile;
+   XMLDiff                            XMLDiff.cs:50  [field] TextAsset  | public TextAsset LangXmlFile;
+
+== LastAnimation  (2 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:9  [field] AnimationState  | public AnimationState LastAnimation;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:21  [field] bool  | private bool LastAnimation;
+
+== LaunchPad  (2 owners)
+   Level206Behavior                   Level206Behavior.cs:5  [field] Item  | public Item LaunchPad;
+   Level206RoutineBehavior            Level206RoutineBehavior.cs:7  [field] Item  | public Item LaunchPad;
+
+== LeaveZone  (2 owners)
+   SearchItem                         SearchItem.cs:45  [field] ItemAnimationState  | public ItemAnimationState LeaveZone;
+   TrickItem                          TrickItem.cs:108  [field] ItemAnimationState  | public ItemAnimationState LeaveZone;
+
+== LeftSideStair  (2 owners)
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:42  [field] Door  | public Door LeftSideStair;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:41  [field] Door  | public Door LeftSideStair;
+
+== Level  (5 owners)
+   LangCreator                        LangCreator.cs:58  [field] GameObject  | public GameObject Level;
+   TemplateLangCreator                TemplateLangCreator.cs:33  [field] GameObject  | public GameObject Level;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:53  [field] GameObject  | public GameObject Level;
+   XMLDiff                            XMLDiff.cs:58  [field] GameObject  | public GameObject Level;
+   XMLExample                         XMLExample.cs:25  [field] GameObject  | public GameObject Level;
+
+== LevelDataRenderer  (2 owners)
+   ControlRadioButton                 ControlRadioButton.cs:32  [field] LevelDataGUIRenderer  | public LevelDataGUIRenderer LevelDataRenderer;
+   InGameMenu                         InGameMenu.cs:9  [field] LevelDataGUIRenderer  | protected static LevelDataGUIRenderer LevelDataRenderer;
+
+== LevelScript  (5 owners)
+   GameInfo                           GameInfo.cs:55  [field] LevelScript  | public LevelScript LevelScript;
+   LevelScriptAction                  LevelScriptAction.cs:61  [field] LevelScript  | private LevelScript LevelScript;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:18  [field] LevelScript  | public LevelScript LevelScript;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:36  [field] LevelScript  | public LevelScript LevelScript;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:29  [field] LevelScript  | public LevelScript LevelScript;
+
+== LevelToStart  (2 owners)
+   ControlButton                      ControlButton.cs:53  [field] string  | public string LevelToStart;
+   ControlRadioButton                 ControlRadioButton.cs:28  [field] string  | public string LevelToStart;
+
+== LevelsCount  (2 owners)
+   Level                              Level.cs:108  [field] int  | internal static int LevelsCount = 32;
+   MainMenu                           MainMenu.cs:9  [field] int  | public int LevelsCount;
+
+== LineTag  (6 owners)
+   LangCreator                        LangCreator.cs:36  [field] string  | private const string LineTag = "line";
+   TemplateLangCreator                TemplateLangCreator.cs:21  [field] string  | private const string LineTag = "line";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:37  [field] string  | private const string LineTag = "line";
+   XMLDiff                            XMLDiff.cs:36  [field] string  | private const string LineTag = "line";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:28  [field] string  | private const string LineTag = "line";
+   XMLMerge                           XMLMerge.cs:28  [field] string  | private const string LineTag = "line";
+
+== LoadingOperation  (2 owners)
+   DexterityComponent                 DexterityComponent.cs:68  [field] AsyncOperation  | private AsyncOperation LoadingOperation;
+   LevelLoader                        LevelLoader.cs:26  [field] AsyncOperation  | private AsyncOperation LoadingOperation;
+
+== LoadingRect  (4 owners)
+   LevelLoader                        LevelLoader.cs:8  [field] Rect  | public Rect LoadingRect;
+   LevelTransition                    LevelTransition.cs:11  [field] Rect  | public Rect LoadingRect;
+   MainMenu                           MainMenu.cs:23  [field] Rect  | public Rect LoadingRect;
+   SplashScreen                       SplashScreen.cs:7  [field] Rect  | public Rect LoadingRect;
+
+== LoadingTexture  (4 owners)
+   LevelLoader                        LevelLoader.cs:6  [field] Texture  | public Texture LoadingTexture;
+   LevelTransition                    LevelTransition.cs:9  [field] Texture  | public Texture LoadingTexture;
+   MainMenu                           MainMenu.cs:19  [field] Texture  | public Texture LoadingTexture;
+   SplashScreen                       SplashScreen.cs:5  [field] Texture  | public Texture LoadingTexture;
+
+== Locked  (2 owners)
+   Control                            Control.cs:58  [field] bool  | public bool Locked;
+   Item                               Item.cs:254  [field] bool  | public bool Locked;
+
+== LongDescription  (2 owners)
+   Inventory                          Inventory.cs:55  [field] bool  | public bool LongDescription;
+   Item                               Item.cs:62  [field] bool  | public bool LongDescription;
+
+== Looping  (3 owners)
+   HUDAnimation                       HUDAnimation.cs:14  [field] bool  | public bool Looping;
+   SearchItem                         SearchItem.cs:23  [field] bool  | public bool Looping;
+   TrickItem                          TrickItem.cs:56  [field] bool  | public bool Looping;
+
+== MainMenu  (2 owners)
+   ControlWindow                      ControlWindow.cs:5  [field] GameObject  | public GameObject MainMenu;
+   Level                              Level.cs:44  [field] GameObject  | public GameObject MainMenu;
+
+== Marble  (2 owners)
+   TutorialScriptCamera               TutorialScriptCamera.cs:16  [field] TrickItem  | public TrickItem Marble;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:14  [field] TrickItem  | public TrickItem Marble;
+
+== MessageStyle  (2 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:20  [field] GUIStyle  | public GUIStyle MessageStyle;
+   LevelScript                        LevelScript.cs:31  [field] GUIStyle  | public GUIStyle MessageStyle;
+
+== MinRatings  (2 owners)
+   Level                              Level.cs:64  [field] int[]  | public int[] MinRatings;
+   LevelDataSaver                     LevelDataSaver.cs:9  [field] int[]  | public int[] MinRatings;
+
+== MissValue  (2 owners)
+   LangCreator                        LangCreator.cs:48  [field] int  | private const int MissValue = 999999999;
+   XMLDiff                            XMLDiff.cs:48  [field] int  | private const int MissValue = 999999999;
+
+== MissingStr  (4 owners)
+   LangCreator                        LangCreator.cs:42  [field] string  | private const string MissingStr = "@@@@@@@@@@@@---MISSING---@@@@@@@@@@@@";
+   TemplateLangCreator                TemplateLangCreator.cs:23  [field] string  | private const string MissingStr = "@@@@@@@@@@@@---MISSING---@@@@@@@@@@@@";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:43  [field] string  | private const string MissingStr = "@@@@@@@@@@@@---MISSING---@@@@@@@@@@@@";
+   XMLDiff                            XMLDiff.cs:42  [field] string  | private const string MissingStr = "@@@@@@@@@@@@---MISSING---@@@@@@@@@@@@";
+
+== Mother  (4 owners)
+   GameInfo                           GameInfo.cs:33  [field] Mother  | public Mother Mother;
+   HUD                                HUD.cs:269  [field] Mother  | protected Mother Mother;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:15  [field] Pawn  | public Pawn Mother;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:55  [field] Mother  | private Mother Mother => GameInfo.Instance.Mother;
+
+== MouseCursor  (2 owners)
+   DexterityComponent                 DexterityComponent.cs:28  [field] MouseCursor  | public MouseCursor MouseCursor;
+   Woody                              Woody.cs:116  [field] MouseCursor  | internal MouseCursor MouseCursor;
+
+== MouseOverBasePath  (2 owners)
+   Item                               Item.cs:394  [field] string  | private static readonly string MouseOverBasePath = "Textures/GUI/cursor/";
+   MouseCursor                        MouseCursor.cs:33  [field] string  | private static readonly string MouseOverBasePath = "Textures/GUI/cursor/";
+
+== MousePosition  (2 owners)
+   ExitConfirmation                   ExitConfirmation.cs:38  [field] Vector3  | private Vector3 MousePosition;
+   HUD                                HUD.cs:189  [field] Vector3  | internal Vector3 MousePosition;
+
+== MoveLocation  (2 owners)
+   Pawn                               Pawn.cs:59  [field] Vector3  | protected Vector3 MoveLocation;
+   RoutineAction                      RoutineAction.cs:37  [field] Vector3  | public Vector3 MoveLocation;
+
+== MovingToHitWoody  (2 owners)
+   Mother                             Mother.cs:12  [field] bool  | internal bool MovingToHitWoody;
+   Rottweiler                         Rottweiler.cs:94  [field] bool  | internal bool MovingToHitWoody;
+
+== Name  (2 owners)
+   AnimationInstance                  AnimationInstance.cs:8  [field] T  | public T Name;
+   PluginDescriptor                   hgutil/PluginDescriptor.cs:5  [prop] string  | public string Name { get; private set; }
+
+== NameString  (3 owners)
+   Inventory                          Inventory.cs:35  [field] string  | public string NameString;
+   Item                               Item.cs:8  [field] string  | public string NameString;
+   Zone                               Zone.cs:6  [field] string  | public string NameString;
+
+== NameTag  (7 owners)
+   LangCreator                        LangCreator.cs:30  [field] string  | private const string NameTag = "name";
+   TemplateLangCreator                TemplateLangCreator.cs:15  [field] string  | private const string NameTag = "name";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:31  [field] string  | private const string NameTag = "name";
+   XMLDiff                            XMLDiff.cs:30  [field] string  | private const string NameTag = "name";
+   XMLExample                         XMLExample.cs:11  [field] string  | private const string NameTag = "name";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:22  [field] string  | private const string NameTag = "name";
+   XMLMerge                           XMLMerge.cs:22  [field] string  | private const string NameTag = "name";
+
+== NewKey  (4 owners)
+   LangCreator                        LangCreator.cs:44  [field] string  | private const string NewKey = "@@@@@@@@@@@@---NEW KEY---@@@@@@@@@@@@";
+   TemplateLangCreator                TemplateLangCreator.cs:25  [field] string  | private const string NewKey = "@@@@@@@@@@@@---NEW KEY---@@@@@@@@@@@@";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:45  [field] string  | private const string NewKey = "@@@@@@@@@@@@---NEW KEY---@@@@@@@@@@@@";
+   XMLDiff                            XMLDiff.cs:44  [field] string  | private const string NewKey = "@@@@@@@@@@@@---NEW KEY---@@@@@@@@@@@@";
+
+== NewKeys  (4 owners)
+   LangCreator                        LangCreator.cs:62  [field] List<string>  | private List<string> NewKeys;
+   TemplateLangCreator                TemplateLangCreator.cs:37  [field] List<string>  | private List<string> NewKeys;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:57  [field] List<string>  | private List<string> NewKeys;
+   XMLDiff                            XMLDiff.cs:62  [field] List<string>  | private List<string> NewKeys;
+
+== NumberTag  (4 owners)
+   LangCreator                        LangCreator.cs:40  [field] string  | private const string NumberTag = "number";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:41  [field] string  | private const string NumberTag = "number";
+   XMLDiff                            XMLDiff.cs:40  [field] string  | private const string NumberTag = "number";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:32  [field] string  | private const string NumberTag = "number";
+
+== OldZone  (2 owners)
+   Helpers                            Helpers.cs:21  [field] Zone  | internal static Zone OldZone;
+   Pawn                               Pawn.cs:135  [field] Zone  | protected Zone OldZone;
+
+== Olga  (7 owners)
+   BirdPerchBehavior                  BirdPerchBehavior.cs:7  [field] Olga  | public Olga Olga;
+   GameInfo                           GameInfo.cs:31  [field] Olga  | public Olga Olga;
+   Level201Behavior                   Level201Behavior.cs:7  [field] Pawn  | public Pawn Olga;
+   Level204Behavior                   Level204Behavior.cs:7  [field] Pawn  | public Pawn Olga;
+   Level204OlgaBehavior               Level204OlgaBehavior.cs:7  [field] Pawn  | public Pawn Olga;
+   Level211Behavior                   Level211Behavior.cs:13  [field] Pawn  | public Pawn Olga;
+   Level213Behavior                   Level213Behavior.cs:11  [field] Pawn  | public Pawn Olga;
+
+== OnVacationSeason  (2 owners)
+   ControlRadioButton                 ControlRadioButton.cs:42  [field] bool  | public bool OnVacationSeason;
+   ControlRadioButtonInitializer      ControlRadioButtonInitializer.cs:7  [field] bool  | public bool OnVacationSeason;
+
+== OneTime  (8 owners)
+   ActionManager                      ActionManager.cs:79  [field] bool  | internal bool OneTime;
+   Inventory                          Inventory.cs:59  [field] bool  | private bool OneTime;
+   Level206Behavior                   Level206Behavior.cs:11  [field] bool  | private bool OneTime;
+   Level213Behavior                   Level213Behavior.cs:17  [field] bool  | private bool OneTime;
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:11  [field] bool  | private bool OneTime;
+   MusicPlayer                        MusicPlayer.cs:39  [field] bool  | public bool OneTime;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:21  [field] bool  | public bool OneTime;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:39  [field] bool  | private bool OneTime;
+
+== OriginalAction  (2 owners)
+   ActionManager                      ActionManager.cs:13  [field] RoutineAction  | protected RoutineAction OriginalAction;
+   RoutineAction                      RoutineAction.cs:17  [field] RoutineAction  | internal RoutineAction OriginalAction;
+
+== Owner  (2 owners)
+   ActionManager                      ActionManager.cs:17  [field] Pawn  | public Pawn Owner;
+   AnimationControllerBase            AnimationControllerBase.cs:57  [field] Actor  | internal Actor Owner;
+
+== ParrotCrap  (2 owners)
+   ParrotLedgeBehavior                ParrotLedgeBehavior.cs:7  [field] Item  | public Item ParrotCrap;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:13  [field] Item  | public Item ParrotCrap;
+
+== ParrotLedge  (2 owners)
+   ParrotLedgeBehavior                ParrotLedgeBehavior.cs:5  [field] Item  | public Item ParrotLedge;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:19  [field] Item  | public Item ParrotLedge;
+
+== Path  (7 owners)
+   LangCreator                        LangCreator.cs:64  [field] string  | public string Path;
+   TemplateLangCreator                TemplateLangCreator.cs:39  [field] string  | public string Path;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:59  [field] string  | public string Path;
+   UpdateLangWithKeys                 UpdateLangWithKeys.cs:36  [field] string  | public string Path;
+   XMLDiff                            XMLDiff.cs:64  [field] string  | public string Path;
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:42  [field] string  | public string Path;
+   XMLMerge                           XMLMerge.cs:34  [field] string  | public string Path;
+
+== Piano  (2 owners)
+   Level105Behavior                   Level105Behavior.cs:13  [field] Item  | public Item Piano;
+   Level105RoutineBehavior            Level105RoutineBehavior.cs:5  [field] Item  | public Item Piano;
+
+== PostponeAlarm  (3 owners)
+   RoutineActionGrab                  RoutineActionGrab.cs:10  [field] bool  | public bool PostponeAlarm;
+   RoutineActionSurpriseFar           RoutineActionSurpriseFar.cs:7  [field] bool  | public bool PostponeAlarm;
+   RoutineActionUse                   RoutineActionUse.cs:53  [field] bool  | public bool PostponeAlarm;
+
+== Progress  (2 owners)
+   ProgressBar                        ProgressBar.cs:37  [field] float  | private float Progress;
+   ProgressBarTrick                   ProgressBarTrick.cs:13  [field] float  | private float Progress;
+
+== ProgressBarEmpty  (5 owners)
+   LevelLoader                        LevelLoader.cs:10  [field] Texture  | public Texture ProgressBarEmpty;
+   LevelTransition                    LevelTransition.cs:13  [field] Texture  | public Texture ProgressBarEmpty;
+   MainMenu                           MainMenu.cs:25  [field] Texture  | public Texture ProgressBarEmpty;
+   ProgressBar                        ProgressBar.cs:9  [field] Texture  | public Texture ProgressBarEmpty;
+   ProgressBarTrick                   ProgressBarTrick.cs:5  [field] Texture  | public Texture ProgressBarEmpty;
+
+== ProgressBarFull  (5 owners)
+   LevelLoader                        LevelLoader.cs:12  [field] Texture  | public Texture ProgressBarFull;
+   LevelTransition                    LevelTransition.cs:15  [field] Texture  | public Texture ProgressBarFull;
+   MainMenu                           MainMenu.cs:27  [field] Texture  | public Texture ProgressBarFull;
+   ProgressBar                        ProgressBar.cs:11  [field] Texture  | public Texture ProgressBarFull;
+   ProgressBarTrick                   ProgressBarTrick.cs:7  [field] Texture  | public Texture ProgressBarFull;
+
+== ProgressRect  (3 owners)
+   LevelLoader                        LevelLoader.cs:14  [field] Rect  | public Rect ProgressRect;
+   LevelTransition                    LevelTransition.cs:17  [field] Rect  | public Rect ProgressRect;
+   ProgressBar                        ProgressBar.cs:13  [field] Rect  | public Rect ProgressRect;
+
+== Rating  (2 owners)
+   GameInfo                           GameInfo.cs:83  [field] string  | internal string Rating;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:88  [field] string  | public string Rating;
+
+== RatingStyle  (2 owners)
+   HUD                                HUD.cs:233  [field] GUIStyle  | public GUIStyle RatingStyle;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:92  [field] GUIStyle  | public GUIStyle RatingStyle;
+
+== RightSideStair  (2 owners)
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:44  [field] Door  | public Door RightSideStair;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:43  [field] Door  | public Door RightSideStair;
+
+== RottPos  (3 owners)
+   Level204Behavior                   Level204Behavior.cs:15  [field] Vector3  | internal Vector3 RottPos;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:25  [field] Vector3  | private Vector3 RottPos;
+   RoutineActionMove                  RoutineActionMove.cs:11  [field] Vector3  | private Vector3 RottPos;
+
+== RottPosAux  (2 owners)
+   Level204Behavior                   Level204Behavior.cs:17  [field] bool  | internal bool RottPosAux;
+   SkiBehavior                        SkiBehavior.cs:31  [field] Vector3  | private Vector3 RottPosAux;
+
+== Rottweiler  (19 owners)
+   DexterityComponent                 DexterityComponent.cs:74  [field] Rottweiler  | public Rottweiler Rottweiler;
+   GameInfo                           GameInfo.cs:27  [field] Rottweiler  | public Rottweiler Rottweiler;
+   HUD                                HUD.cs:267  [field] Rottweiler  | protected Rottweiler Rottweiler;
+   Item                               Item.cs:270  [field] Rottweiler  | protected Rottweiler Rottweiler;
+   Level204Behavior                   Level204Behavior.cs:9  [field] Pawn  | public Pawn Rottweiler;
+   Level204OlgaBehavior               Level204OlgaBehavior.cs:9  [field] Pawn  | public Pawn Rottweiler;
+   Level213Behavior                   Level213Behavior.cs:13  [field] Pawn  | public Pawn Rottweiler;
+   Level213OlgaBehavior               Level213OlgaBehavior.cs:7  [field] Pawn  | public Pawn Rottweiler;
+   ParrotLedgeBehavior                ParrotLedgeBehavior.cs:15  [field] Rottweiler  | public Rottweiler Rottweiler;
+   ParrotLedgeFallBehavior            ParrotLedgeFallBehavior.cs:7  [field] Rottweiler  | public Rottweiler Rottweiler;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:7  [field] Rottweiler  | public Rottweiler Rottweiler;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:17  [field] Pawn  | public Pawn Rottweiler;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:15  [field] Rottweiler  | public Rottweiler Rottweiler;
+   SandCastleBehavior                 SandCastleBehavior.cs:9  [field] Pawn  | public Pawn Rottweiler;
+   SkiBehavior                        SkiBehavior.cs:29  [field] Rottweiler  | private Rottweiler Rottweiler;
+   TutorialScriptCamera               TutorialScriptCamera.cs:26  [field] Rottweiler  | private Rottweiler Rottweiler => GameInfo.Instance.Rottweiler;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:30  [field] Rottweiler  | private Rottweiler Rottweiler => GameInfo.Instance.Rottweiler;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:54  [field] Rottweiler  | private Rottweiler Rottweiler => GameInfo.Instance.Rottweiler;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:53  [field] Rottweiler  | private Rottweiler Rottweiler => GameInfo.Instance.Rottweiler;
+
+== SameZone  (2 owners)
+   ActionManager                      ActionManager.cs:51  [field] bool  | internal bool SameZone;
+   SandCastleBehavior                 SandCastleBehavior.cs:15  [field] Zone  | public Zone SameZone;
+
+== SearchAnimation  (2 owners)
+   Pawn                               Pawn.cs:71  [field] bool  | protected bool SearchAnimation;
+   PawnAnimationController            PawnAnimationController.cs:13  [field] AnimationState  | public AnimationState SearchAnimation;
+
+== SearchingItem  (2 owners)
+   Item                               Item.cs:268  [field] bool  | public bool SearchingItem;
+   Pawn                               Pawn.cs:67  [field] bool  | protected bool SearchingItem;
+
+== SecondTime  (4 owners)
+   BirdMovementBehavior               BirdMovementBehavior.cs:37  [field] bool  | internal bool SecondTime;
+   Level206MotherBehavior             Level206MotherBehavior.cs:5  [field] int  | private int SecondTime;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:23  [field] bool  | public bool SecondTime;
+   RoutineActionUseFixingItem         RoutineActionUseFixingItem.cs:17  [field] bool  | private bool SecondTime;
+
+== SecondsCount  (2 owners)
+   ProgressBar                        ProgressBar.cs:59  [field] float  | internal float SecondsCount;
+   ProgressBarTrick                   ProgressBarTrick.cs:21  [field] float  | private float SecondsCount;
+
+== Sequence1  (2 owners)
+   RoutineActionHitWoody              RoutineActionHitWoody.cs:7  [field] AnimationState[]  | public AnimationState[] Sequence1;
+   RoutineActionMotherHitWoody        RoutineActionMotherHitWoody.cs:7  [field] AnimationState[]  | public AnimationState[] Sequence1;
+
+== Sequence2  (2 owners)
+   RoutineActionHitWoody              RoutineActionHitWoody.cs:9  [field] AnimationState[]  | public AnimationState[] Sequence2;
+   RoutineActionMotherHitWoody        RoutineActionMotherHitWoody.cs:9  [field] AnimationState[]  | public AnimationState[] Sequence2;
+
+== Sequence3  (2 owners)
+   RoutineActionHitWoody              RoutineActionHitWoody.cs:11  [field] AnimationState[]  | public AnimationState[] Sequence3;
+   RoutineActionMotherHitWoody        RoutineActionMotherHitWoody.cs:11  [field] AnimationState[]  | public AnimationState[] Sequence3;
+
+== Sequence4  (2 owners)
+   RoutineActionHitWoody              RoutineActionHitWoody.cs:13  [field] AnimationState[]  | public AnimationState[] Sequence4;
+   RoutineActionMotherHitWoody        RoutineActionMotherHitWoody.cs:13  [field] AnimationState[]  | public AnimationState[] Sequence4;
+
+== ShouldStopAction  (2 owners)
+   AnimationControllerBase            AnimationControllerBase.cs:49  [field] bool  | protected bool ShouldStopAction;
+   Rottweiler                         Rottweiler.cs:78  [field] bool  | private bool ShouldStopAction;
+
+== ShowLevelData  (2 owners)
+   ControlButton                      ControlButton.cs:69  [field] bool  | public bool ShowLevelData;
+   ControlWindow                      ControlWindow.cs:13  [field] bool  | public bool ShowLevelData;
+
+== ShowWindowsCursor  (2 owners)
+   MenuMouseController                MenuMouseController.cs:7  [field] bool  | public bool ShowWindowsCursor;
+   MouseCursor                        MouseCursor.cs:21  [field] bool  | public bool ShowWindowsCursor;
+
+== SignHeight  (2 owners)
+   ArrowSignDepth                     ArrowSignDepth.cs:9  [field] float  | private float SignHeight;
+   LevelScript                        LevelScript.cs:51  [field] float  | private float SignHeight;
+
+== Speed  (2 owners)
+   BirdMovementBehavior               BirdMovementBehavior.cs:21  [field] float  | public float Speed;
+   Pawn                               Pawn.cs:17  [field] float  | public float Speed;
+
+== StartFallIndex  (2 owners)
+   ParrotLedgeFallBehavior            ParrotLedgeFallBehavior.cs:9  [field] int  | public int StartFallIndex = 40;
+   ParrotLedgeJumpBehavior            ParrotLedgeJumpBehavior.cs:33  [field] int  | public int StartFallIndex = 13;
+
+== StartPosition  (2 owners)
+   BirdMovementBehavior               BirdMovementBehavior.cs:15  [field] Vector3  | private Vector3 StartPosition;
+   FifiBehavior                       FifiBehavior.cs:13  [field] Vector3  | private Vector3 StartPosition;
+
+== State  (8 owners)
+   GameIntroAnimation                 GameIntroAnimation.cs:58  [field] GameIntroAnimationState  | private GameIntroAnimationState State;
+   IntroAnimation                     IntroAnimation.cs:76  [field] IntroAnimationState  | private IntroAnimationState State;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:49  [field] SkateState  | private SkateState State;
+   TutorialScriptCamera               TutorialScriptCamera.cs:24  [field] RottweilerState  | protected RottweilerState State;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:28  [field] RottweilerState  | protected RottweilerState State;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:50  [field] RottweilerState  | protected RottweilerState State;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:51  [field] RottweilerState  | protected RottweilerState State;
+   Woody                              Woody.cs:12  [field] WoodyState  | internal WoodyState State;
+
+== StringTag  (7 owners)
+   LangCreator                        LangCreator.cs:28  [field] string  | private const string StringTag = "string";
+   TemplateLangCreator                TemplateLangCreator.cs:13  [field] string  | private const string StringTag = "string";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:29  [field] string  | private const string StringTag = "string";
+   XMLDiff                            XMLDiff.cs:28  [field] string  | private const string StringTag = "string";
+   XMLExample                         XMLExample.cs:9  [field] string  | private const string StringTag = "string";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:20  [field] string  | private const string StringTag = "string";
+   XMLMerge                           XMLMerge.cs:20  [field] string  | private const string StringTag = "string";
+
+== StringsTag  (6 owners)
+   LangCreator                        LangCreator.cs:26  [field] string  | private const string StringsTag = "strings";
+   TemplateLangCreator                TemplateLangCreator.cs:11  [field] string  | private const string StringsTag = "strings";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:27  [field] string  | private const string StringsTag = "strings";
+   XMLDiff                            XMLDiff.cs:26  [field] string  | private const string StringsTag = "strings";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:18  [field] string  | private const string StringsTag = "strings";
+   XMLMerge                           XMLMerge.cs:18  [field] string  | private const string StringsTag = "strings";
+
+== TakeAnimation  (2 owners)
+   Item                               Item.cs:84  [field] AnimationState  | public AnimationState TakeAnimation = AnimationState.TakeInventory;
+   OlgaBraBehavior                    OlgaBraBehavior.cs:7  [field] AnimationState  | public AnimationState TakeAnimation = AnimationState.OlgaShowerTakeBra;
+
+== Target  (2 owners)
+   RoutineAction                      RoutineAction.cs:21  [field] Pawn  | internal Pawn Target;
+   Step                               Step.cs:13  [field] Item  | internal Item Target;
+
+== TargetAnimation  (3 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:11  [field] AnimationState  | public AnimationState TargetAnimation;
+   MotherWakeSleepBehavior            MotherWakeSleepBehavior.cs:5  [field] AnimationState  | public AnimationState TargetAnimation;
+   PoolJumpBehavior                   PoolJumpBehavior.cs:5  [field] AnimationState  | public AnimationState TargetAnimation;
+
+== TargetItem  (4 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:19  [field] TrickItem  | public TrickItem TargetItem;
+   MotherWakeSleepBehavior            MotherWakeSleepBehavior.cs:11  [field] TrickItem  | public TrickItem TargetItem;
+   OlgaBraBehavior                    OlgaBraBehavior.cs:9  [field] SearchItem  | public SearchItem TargetItem;
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:13  [field] TrickItem  | public TrickItem TargetItem;
+
+== TargetMother  (3 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:13  [field] Mother  | public Mother TargetMother;
+   MotherWakeSleepBehavior            MotherWakeSleepBehavior.cs:7  [field] Mother  | public Mother TargetMother;
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:11  [field] Mother  | public Mother TargetMother;
+
+== TargetRottweiler  (3 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:17  [field] Rottweiler  | public Rottweiler TargetRottweiler;
+   MotherWakeSleepBehavior            MotherWakeSleepBehavior.cs:9  [field] Rottweiler  | public Rottweiler TargetRottweiler;
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:9  [field] Rottweiler  | public Rottweiler TargetRottweiler;
+
+== TargetSequenceIndex  (2 owners)
+   MotherSleepBehaviour               MotherSleepBehaviour.cs:21  [field] int  | public int TargetSequenceIndex;
+   MotherWakeSleepBehavior            MotherWakeSleepBehavior.cs:13  [field] int  | public int TargetSequenceIndex;
+
+== TemplateDocFile  (2 owners)
+   LangCreator                        LangCreator.cs:56  [field] XDocument  | private XDocument TemplateDocFile;
+   XMLDiff                            XMLDiff.cs:56  [field] XDocument  | private XDocument TemplateDocFile;
+
+== TemplateFile  (2 owners)
+   LangCreator                        LangCreator.cs:54  [field] TextAsset  | public TextAsset TemplateFile;
+   XMLDiff                            XMLDiff.cs:54  [field] TextAsset  | public TextAsset TemplateFile;
+
+== TestMode  (2 owners)
+   AdManager                          AdManager.cs:15  [field] bool  | private static bool TestMode;
+   Purchaser                          NFH.IAP/Purchaser.cs:14  [field] bool  | public static bool TestMode;
+
+== TextMobileRect  (2 owners)
+   Control                            Control.cs:30  [field] Rect  | public Rect TextMobileRect;
+   MultiLangAdjust                    MultiLangAdjust.cs:11  [field] Rect  | public Rect TextMobileRect;
+
+== TextRect  (2 owners)
+   Control                            Control.cs:28  [field] Rect  | public Rect TextRect;
+   MultiLangAdjust                    MultiLangAdjust.cs:9  [field] Rect  | public Rect TextRect;
+
+== TextTag  (7 owners)
+   LangCreator                        LangCreator.cs:32  [field] string  | private const string TextTag = "text";
+   TemplateLangCreator                TemplateLangCreator.cs:17  [field] string  | private const string TextTag = "text";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:33  [field] string  | private const string TextTag = "text";
+   XMLDiff                            XMLDiff.cs:32  [field] string  | private const string TextTag = "text";
+   XMLExample                         XMLExample.cs:13  [field] string  | private const string TextTag = "text";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:24  [field] string  | private const string TextTag = "text";
+   XMLMerge                           XMLMerge.cs:24  [field] string  | private const string TextTag = "text";
+
+== Texture  (2 owners)
+   Entry                              Credits.cs:22  [field] Texture2D  | public Texture2D Texture;
+   LevelScriptAction                  LevelScriptAction.cs:33  [field] Texture  | public Texture Texture;
+
+== TextureDeltaLoc  (2 owners)
+   MenuMouseController                MenuMouseController.cs:9  [field] Vector3  | public Vector3 TextureDeltaLoc;
+   MouseCursor                        MouseCursor.cs:19  [field] Vector3  | public Vector3 TextureDeltaLoc;
+
+== TexturesGUIDepth  (3 owners)
+   DexterityComponent                 DexterityComponent.cs:12  [field] GUIDepth  | public GUIDepth TexturesGUIDepth = GUIDepth.BackHUD;
+   ProgressBar                        ProgressBar.cs:41  [field] GUIDepth  | public GUIDepth TexturesGUIDepth;
+   ProgressBarTrick                   ProgressBarTrick.cs:17  [field] GUIDepth  | public GUIDepth TexturesGUIDepth;
+
+== Title  (2 owners)
+   IntroAnimation                     IntroAnimation.cs:30  [field] string  | private string Title = "IN";
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:126  [field] string  | protected string Title;
+
+== TitleRect  (2 owners)
+   IntroAnimation                     IntroAnimation.cs:32  [field] Rect  | public Rect TitleRect;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:20  [field] Rect  | public Rect TitleRect;
+
+== TitleStyle  (2 owners)
+   IntroAnimation                     IntroAnimation.cs:34  [field] GUIStyle  | public GUIStyle TitleStyle;
+   LevelDataGUIRenderer               LevelDataGUIRenderer.cs:22  [field] GUIStyle  | public GUIStyle TitleStyle;
+
+== Toilet  (2 owners)
+   Pawn                               Pawn.cs:105  [field] Item  | public Item Toilet;
+   ToiletBehavior                     ToiletBehavior.cs:7  [field] Item  | public Item Toilet;
+
+== Tooltip  (2 owners)
+   Control                            Control.cs:38  [field] string  | public string Tooltip;
+   HUD                                HUD.cs:257  [field] string  | internal string Tooltip;
+
+== TooltipRect  (2 owners)
+   Control                            Control.cs:44  [field] Rect  | public Rect TooltipRect;
+   HUD                                HUD.cs:245  [field] Rect  | public Rect TooltipRect;
+
+== TooltipStyle  (2 owners)
+   Control                            Control.cs:48  [field] GUIStyle  | public GUIStyle TooltipStyle;
+   HUD                                HUD.cs:249  [field] GUIStyle  | public GUIStyle TooltipStyle;
+
+== TransitionLevelName  (2 owners)
+   LevelLoader                        LevelLoader.cs:18  [field] string  | public string TransitionLevelName;
+   LevelTransition                    LevelTransition.cs:7  [field] string  | public string TransitionLevelName;
+
+== TrickCamera  (2 owners)
+   Item                               Item.cs:632  [field] bool  | internal bool TrickCamera;
+   Level                              Level.cs:98  [field] bool  | protected static bool TrickCamera;
+
+== TrickItem  (2 owners)
+   Pawn                               Pawn.cs:69  [field] bool  | protected bool TrickItem;
+   RoutineActionUse                   RoutineActionUse.cs:101  [field] Item  | internal Item TrickItem;
+
+== TrickedItem  (3 owners)
+   Item                               Item.cs:524  [field] bool  | internal bool TrickedItem;
+   Rottweiler                         Rottweiler.cs:48  [field] TrickItem  | private TrickItem TrickedItem;
+   RoutineActionUseFixingItem         RoutineActionUseFixingItem.cs:13  [field] TrickItem  | private TrickItem TrickedItem;
+
+== TricksTotal  (3 owners)
+   HUD                                HUD.cs:293  [field] int  | protected int TricksTotal;
+   Level                              Level.cs:62  [field] int[]  | public int[] TricksTotal;
+   LevelDataSaver                     LevelDataSaver.cs:7  [field] int[]  | public int[] TricksTotal;
+
+== TutorialStr  (4 owners)
+   LangCreator                        LangCreator.cs:46  [field] string  | private const string TutorialStr = "@@@@@@@@@@@@---TUTORIAL---@@@@@@@@@@@@";
+   TemplateLangCreator                TemplateLangCreator.cs:27  [field] string  | private const string TutorialStr = "@@@@@@@@@@@@---TUTORIAL---@@@@@@@@@@@@";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:47  [field] string  | private const string TutorialStr = "@@@@@@@@@@@@---TUTORIAL---@@@@@@@@@@@@";
+   XMLDiff                            XMLDiff.cs:46  [field] string  | private const string TutorialStr = "@@@@@@@@@@@@---TUTORIAL---@@@@@@@@@@@@";
+
+== Type  (3 owners)
+   AnimationInstance                  AnimationInstance.cs:10  [field] AnimationType  | public AnimationType Type;
+   Entry                              Credits.cs:16  [field] EntryType  | public EntryType Type;
+   Inventory                          Inventory.cs:23  [field] InventoryType  | public InventoryType Type;
+
+== Unlockables  (2 owners)
+   LevelPackData                      LevelPackData.cs:8  [field] ControlRadioButton[]  | public ControlRadioButton[] Unlockables;
+   LevelPackDetails                   LevelPackDetails.cs:13  [field] List<ControlRadioButton>  | private List<ControlRadioButton> Unlockables = unlockables;
+
+== UpTransition  (2 owners)
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:46  [field] Door  | public Door UpTransition;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:45  [field] Door  | public Door UpTransition;
+
+== UseFixingItemAction  (2 owners)
+   Rottweiler                         Rottweiler.cs:36  [field] RoutineActionUseFixingItem  | public RoutineActionUseFixingItem UseFixingItemAction;
+   RoutineActionGrab                  RoutineActionGrab.cs:6  [field] RoutineActionUseFixingItem  | public RoutineActionUseFixingItem UseFixingItemAction;
+
+== UseNormalSequence  (2 owners)
+   Kid                                Kid.cs:11  [field] AnimationState[]  | public AnimationState[] UseNormalSequence;
+   TrickItem                          TrickItem.cs:80  [field] ItemAnimationState[]  | public ItemAnimationState[] UseNormalSequence;
+
+== UseTrickedSequence  (2 owners)
+   Kid                                Kid.cs:13  [field] AnimationState[]  | public AnimationState[] UseTrickedSequence;
+   TrickItem                          TrickItem.cs:86  [field] ItemAnimationState[]  | public ItemAnimationState[] UseTrickedSequence;
+
+== UsedInventory  (2 owners)
+   InventoryManager                   InventoryManager.cs:11  [field] Inventory  | internal Inventory UsedInventory;
+   Item                               Item.cs:440  [field] Inventory  | protected Inventory UsedInventory;
+
+== Velocity  (3 owners)
+   Pawn                               Pawn.cs:99  [field] Vector3  | internal Vector3 Velocity;
+   RollerSkaterBehavior               RollerSkaterBehavior.cs:31  [field] Vector3  | public Vector3 Velocity;
+   SkiBehavior                        SkiBehavior.cs:25  [field] Vector3  | private Vector3 Velocity;
+
+== Visible  (2 owners)
+   HUDProgressBar                     HUDProgressBar.cs:8  [field] bool  | private bool Visible = true;
+   ProgressBar                        ProgressBar.cs:55  [field] bool  | internal bool Visible;
+
+== WithString  (2 owners)
+   Item                               Item.cs:22  [field] string  | public string WithString;
+   Woody                              Woody.cs:28  [field] string  | public string WithString;
+
+== Woody  (10 owners)
+   CameraMover                        CameraMover.cs:55  [field] Woody  | public Woody Woody;
+   DexterityComponent                 DexterityComponent.cs:54  [field] Woody  | public Woody Woody;
+   GameInfo                           GameInfo.cs:29  [field] Woody  | public Woody Woody;
+   HUD                                HUD.cs:271  [field] Woody  | protected Woody Woody;
+   Item                               Item.cs:272  [field] Woody  | protected Woody Woody;
+   Level105Behavior                   Level105Behavior.cs:11  [field] Pawn  | public Pawn Woody;
+   Mother                             Mother.cs:14  [field] Woody  | private Woody Woody;
+   MouseCursor                        MouseCursor.cs:17  [field] Woody  | internal Woody Woody;
+   Rottweiler                         Rottweiler.cs:40  [field] Woody  | public Woody Woody;
+   TutorialScriptCameraIntro3         TutorialScriptCameraIntro3.cs:20  [field] Woody  | public Woody Woody;
+
+== WrongZoneItem  (2 owners)
+   TrickItem                          TrickItem.cs:160  [field] Item  | internal Item WrongZoneItem;
+   Woody                              Woody.cs:142  [field] Item  | private Item WrongZoneItem;
+
+== XmlFile  (2 owners)
+   TemplateLangCreator                TemplateLangCreator.cs:29  [field] TextAsset  | public TextAsset XmlFile;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:49  [field] TextAsset  | public TextAsset XmlFile;
+
+== XmlTag  (6 owners)
+   LangCreator                        LangCreator.cs:34  [field] string  | private const string XmlTag = "xml";
+   TemplateLangCreator                TemplateLangCreator.cs:19  [field] string  | private const string XmlTag = "xml";
+   TemplateXMLCreator                 TemplateXMLCreator.cs:35  [field] string  | private const string XmlTag = "xml";
+   XMLDiff                            XMLDiff.cs:34  [field] string  | private const string XmlTag = "xml";
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:26  [field] string  | private const string XmlTag = "xml";
+   XMLMerge                           XMLMerge.cs:26  [field] string  | private const string XmlTag = "xml";
+
+== Zone  (2 owners)
+   Actor                              Actor.cs:16  [field] Zone  | public Zone Zone;
+   LevelScriptAction                  LevelScriptAction.cs:19  [field] Zone  | public Zone Zone;
+
+== attribute  (5 owners)
+   LangCreator                        LangCreator.cs:70  [field] XmlAttribute  | private XmlAttribute attribute;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:65  [field] XmlAttribute  | private XmlAttribute attribute;
+   XMLDiff                            XMLDiff.cs:70  [field] XmlAttribute  | private XmlAttribute attribute;
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:48  [field] XmlAttribute  | private XmlAttribute attribute;
+   XMLMerge                           XMLMerge.cs:42  [field] XmlAttribute  | private XmlAttribute attribute;
+
+== aux  (3 owners)
+   Credits                            Credits.cs:93  [field] float  | private float aux;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:38  [field] Item  | internal Item aux;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:35  [field] Item  | internal Item aux;
+
+== cont  (2 owners)
+   Level211Behavior                   Level211Behavior.cs:29  [field] int  | private int cont;
+   Pawn                               Pawn.cs:159  [field] int  | internal int cont;
+
+== count  (2 owners)
+   Level114Behavior                   Level114Behavior.cs:19  [field] int  | private int count = -1;
+   TemplateLangCreator                TemplateLangCreator.cs:43  [field] int  | private int count;
+
+== currentAnimationState  (5 owners)
+   Level204Behavior                   Level204Behavior.cs:5  [field] string  | private string currentAnimationState;
+   Level204OlgaBehavior               Level204OlgaBehavior.cs:5  [field] string  | private string currentAnimationState;
+   MugBehavior                        MugBehavior.cs:9  [field] string  | private string currentAnimationState;
+   RottweilerMotherBehaviour          RottweilerMotherBehaviour.cs:33  [field] string  | private string currentAnimationState;
+   ToiletBehavior                     ToiletBehavior.cs:9  [field] string  | private string currentAnimationState;
+
+== cursorSize  (2 owners)
+   MenuMouseController                MenuMouseController.cs:13  [field] Rect  | public Rect cursorSize;
+   MouseCursor                        MouseCursor.cs:31  [field] Rect  | public Rect cursorSize;
+
+== depth  (2 owners)
+   ArrowSignDepth                     ArrowSignDepth.cs:11  [field] GUIDepth  | public GUIDepth depth = GUIDepth.BackItems;
+   LevelScript                        LevelScript.cs:53  [field] GUIDepth  | public GUIDepth depth = GUIDepth.BackHUD;
+
+== instance  (2 owners)
+   BuildSettings                      BuildSettings.cs:7  [field] BuildSettings  | private static readonly BuildSettings instance = new BuildSettings();
+   AppLauncher                        NFH.AppLauncher/AppLauncher.cs:8  [field] AppLauncher  | private static readonly AppLauncher instance = new AppLauncher();
+
+== mInstance  (2 owners)
+   AbstractManager                    hginternal/AbstractManager.cs:10  [field] ManagerType  | private static ManagerType mInstance;
+   LambdaReceiver                     hginternal/LambdaReceiver.cs:21  [field] LambdaReceiver  | private static LambdaReceiver mInstance;
+
+== mReceiverIdentifier  (2 owners)
+   AbstractManager                    hginternal/AbstractManager.cs:22  [field] int  | private int mReceiverIdentifier;
+   LambdaReceiver                     hginternal/LambdaReceiver.cs:15  [field] int  | private int mReceiverIdentifier;
+
+== sConnectorCount  (3 owners)
+   BillingConnectorJava               hginternal/BillingConnectorJava.cs:10  [field] int  | private static int sConnectorCount;
+   ExpansionFileConnectorJava         hginternal/ExpansionFileConnectorJava.cs:10  [field] int  | private static int sConnectorCount;
+   MoreGamesConnectorJava             hginternal/MoreGamesConnectorJava.cs:10  [field] int  | private static int sConnectorCount;
+
+== sManagerClass  (3 owners)
+   BillingConnectorJava               hginternal/BillingConnectorJava.cs:8  [field] AndroidJavaClass  | private static AndroidJavaClass sManagerClass;
+   ExpansionFileConnectorJava         hginternal/ExpansionFileConnectorJava.cs:8  [field] AndroidJavaClass  | private static AndroidJavaClass sManagerClass;
+   MoreGamesConnectorJava             hginternal/MoreGamesConnectorJava.cs:8  [field] AndroidJavaClass  | private static AndroidJavaClass sManagerClass;
+
+== touch  (2 owners)
+   Control                            Control.cs:118  [field] Touch  | private Touch touch;
+   HUD                                HUD.cs:325  [field] Touch  | private Touch touch;
+
+== trickDone  (3 owners)
+   TutorialScriptCamera               TutorialScriptCamera.cs:22  [field] bool  | private bool trickDone;
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:40  [field] bool  | private bool trickDone;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:37  [field] bool  | private bool trickDone;
+
+== userNode  (5 owners)
+   LangCreator                        LangCreator.cs:68  [field] XmlNode  | private XmlNode userNode;
+   TemplateXMLCreator                 TemplateXMLCreator.cs:63  [field] XmlNode  | private XmlNode userNode;
+   XMLDiff                            XMLDiff.cs:68  [field] XmlNode  | private XmlNode userNode;
+   XMLGetNoDoubles                    XMLGetNoDoubles.cs:46  [field] XmlNode  | private XmlNode userNode;
+   XMLMerge                           XMLMerge.cs:40  [field] XmlNode  | private XmlNode userNode;
+
+== woody  (2 owners)
+   TutorialScriptCameraNFH2           TutorialScriptCameraNFH2.cs:30  [field] Woody  | public Woody woody;
+   TutorialScriptCameraNFH2206        TutorialScriptCameraNFH2206.cs:23  [field] Woody  | public Woody woody;
