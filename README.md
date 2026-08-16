@@ -14,7 +14,7 @@ and one spec cover both. See `docs/BUILDS.md`.
 | `tools/` | extraction pipeline — plain Python 3, numpy only for textures |
 | `runtime/` | reimplemented renderer — Python + PySDL2 |
 | `levels/s1/`, `levels/s2/` | all 37 scenes of both seasons as JSON (41 MB) |
-| `src/` | 33 867 lines of C# decompiled from the game assemblies |
+| `src/` | the decompiled game assemblies — generated, not stored (see `src/README.md`) |
 | `docs/GAMEPLAY.md` | behavioural spec of the game, cited to source lines |
 | `docs/BUILDS.md` | which build is which, and why 1.5.5 is the one to use |
 | `*.apk` `*.obb` `*.xapk` | the shipped artifacts (see `docs/BUILDS.md`) |

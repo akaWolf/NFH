@@ -15,3 +15,11 @@ __pycache__/
 *.pyc
 /strings/
 /fonts/
+
+# the decompiled game code — not ours to redistribute; regenerate with
+# tools/extract.sh + tools/decompile.sh (see src/README.md)
+/src/*
+!/src/README.md
+
+# levels/*.json stay in the repo (the tests and CI need them without the
+# game's data); the bundle generates them on first run instead
