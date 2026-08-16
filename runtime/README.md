@@ -910,19 +910,79 @@ This loop caught two real bugs the flag-level tests had passed over:
   layout, clock, HUD and the door pass; the original's wider slice is the
   phone's 16:9 against the design 800×600.
 
+## The sleep bars
+
+`ProgressBar`/`HUDProgressBar` are ported whole (ProgressBar.cs,
+HUDProgressBar.cs). The bar's GameObject ships inactive; `Item.Use` turns on
+the Rottweiler-actor bar at its head and the Mother-actor bar at its tail,
+`MotherUse` and `RottweilerPrime` their own (Item.cs:831-834, 861-864,
+1110-1113, 1322-1325). The fill runs while the item's
+`CurrentAnimationSequence` matches an entry and `CurrentSequenceIndex` sits
+in `[start, end)` — both stamped from the use dispatch and the sequence step
+hook (AnimationControllerBase.cs:277-284) — and `SetSleeping` drives
+`Pawn.IsSleeping` (a detection gate), the HUD sleep/blind faces, the
+think-bubble disable and the face drain overlay. A `CanSee`/urgency latch
+kills a non-`Mother210` bar for the level (ProgressBar.cs:125-142).
+
+A data observation, not a divergence: the serialized `Duration` is only the
+fill-rate denominator. The bed's 29 sleep elements play ~0.52 s each
+(2 frames at 2 fps, `animationTime` starting at 0 and `ReachedEndFrame`
+being strictly greater — AnimationControllerBase.cs:103-141), so the dog
+wakes at ~50% of the L109 bar in the original too.
+
+`Item.OnSequenceIndexChanged` (Item.cs:2693-2726) rides the same step hook:
+the six `AnimationsToControl` tables hide/show the item — or another item —
+at their start/end element indices, including the shipped quirk of showing
+the *hide* target on the last item index (cs:2722-2725).
+
+## The walk-through stairs
+
+All 116 Season-2 transitions are `ComplexMove`, and the original never warps
+them: `Helpers.LinkNodes` (Helpers.cs:225-357) expands each hop into walk
+steps — `NFH2Stairs` pairs walk the pawn diagonally to the far side's
+per-pawn `GetTargetLocation` (Item.cs:2010-2050), flat pairs walk through at
+`TargetLocation`, and a `TransferToZone` step runs `ChangeZone` with the
+zone search reactions. Woody's mid-stairs re-click shapes consume the
+`Helpers.StepIndex`/`FirstStepIndex`/`DonePassingHelper`/`OriginalStartZone`
+statics verbatim, and `FindPath` starts from `GoZone` when he is already
+crossing (Helpers.cs:86-106). Pawns claim both sides of a transition while
+passing (`PassingPawnTransitionNFH2`, Pawn.cs:996-1030) and stand when the
+pair is held; `PassingComplexMove` and the `DonePassingToOtherZone`
+y-tracker (Pawn.cs:319-342) now sit in both catch predicates as themselves
+(GameInfo.cs:189, 198). `AdjacentZonesEnabled` is per-pawn data — Season-2
+Olga ships without it and walks the stairs unclaimed, as shipped.
+
+One deliberate divergence, documented in the walking loop: the original's
+variable `Time.deltaTime` breaks up the y-axis approach, but a fixed 1/60
+step can oscillate forever around a target narrower than one velocity step
+(the arrival window `2*MinDist = 0.02` against a `0.0267` step). The port
+extends the existing x crossing guard to y — cross, snap, arrive.
+
+## The dexterity minigame
+
+`DexterityComponent` is ported whole (DexterityComponent.cs): the GUI rects
+anchor at the component's screen position after `SnapToWoodyImmediate`, the
+pick drifts on a once-a-second random vector (`Dificulty` 2) against the
+player's touch/mouse delta, the margin clamp swaps in the alarm field and
+boosts the drain to 1.2, and the fill follows the center-distance sway
+(cap 25, win 85, lose 10 with the `DexterityCannotLose` floor at 12).
+`CanWoodyUse`'s chain (Item.cs:1438-1507) arms the search and trick-item
+branches — Woody loops his `DexterityAnimation`, the component enables, the
+use is refused — and the `DexterityDone` pass unlocks, spends the unlocker
+(unless the keep flags say otherwise) and falls through to the normal take.
+Losing plays `DexterityFailed`, restarts the game and alerts the
+Rottweiler: at once if he is walking, else deferred through
+`RottInAnimation` to the item Update watchers (SearchItem.cs:245-251,
+TrickItem.cs:243-249). The viewer feeds mouse deltas, freezes the camera
+and mutes clicks while `IsDexterityOn`.
+
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the tutorial layer — `LevelScript` /
 `LevelScriptAction` (the arrows, message boxes and `DirectorAnimation` of the
 three intro scenes and the two NFH2 tutorial levels), the
 `TutorialScriptCamera*` scripts and the `SignalScript*` completion hooks that
-feed them; the in-game menu and `HUDProgressBar`/`ProgressBar` actions (the
-`ProgressBar` sleep bars also gate `IsSleeping`, so a couple of Season-2
-levels sleep less than the original); the remaining use side-effect flags
-(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas —
-`ParrotLedgeJumpBehavior`'s delta writes land in fields nothing applies yet —
-skates/toilet state); the `DonePassingToOtherZone` detection term — it rides
-the unported NFH2 `GoZone` pathing; `IsMovingToAdjacentZone` is ported as
-the TransitionMove flag, and `PassingComplexMove` is covered by `is_warping`
-since Transition passages route through the same transit code here — and the
-name-hack branches listed at the end of the priming section.
+feed them; the in-game menu's widget tree (`LevelDataGUIRenderer`, the
+save/quit buttons) — the power button runs the pause half of
+`Woody.ToggleMenu` (time freeze + the HUD fill hide) without the widgets;
+and the name-hack branches listed at the end of the priming section.
