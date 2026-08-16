@@ -91,7 +91,8 @@ def _anim_name(v):
 
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
-                 'play_left', 'play_right', 'ty', 'height_delta', 'tx')
+                 'play_left', 'play_right', 'ty', 'height_delta', 'tx',
+                 'name_string', 'end_string')
 
     def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0,
                  tx=0.0):
@@ -101,6 +102,8 @@ class Zone:
         self.ty = ty                        # transform y, floor reference
         self.tx = tx                        # transform x (Entrance/StartLocation)
         self.height_delta = height_delta    # Zone.HeightDelta
+        self.name_string = ''               # Zone.NameString
+        self.end_string = ''                # Zone.EndString
         # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
         # the collider box is containment, these are the walking limits
         self.play_left = x - w * 0.5
@@ -247,6 +250,10 @@ class Item:
                  'activate_item_after_using', 'delay_activate_after_using',
                  'captain_door_1', 'captain_door_2', 'extra_item',
                  'change_tooltip_when_tricked', 'name_string',
+                 'name_tricked_string', 'name_primed_string',
+                 'with_string', 'with_tricked_string', 'with_primed_string',
+                 'hide_string_key', 'dont_change_tooltip_when_tricked',
+                 'item_that_changes_tooltip', 'is_floor', 'searching_item',
                  'go_next_action', 'skip_action', 'is_mother_second_use',
                  'execute_once_mother', 'play_angry_after_toilet',
                  'restart_after_tricked', 'activate_item_after_fix',
@@ -637,6 +644,19 @@ class Item:
         self.extra_item = ref('ExtraItem')
         self.change_tooltip_when_tricked = bool(d.get('ChangeToolTipWhenTricked'))
         self.name_string = d.get('NameString') or ''
+        # the hover tooltip strings (MouseCursor.UpdateMouseOver,
+        # Item.GetNameString / GetWithString)
+        self.name_tricked_string = d.get('NameTrickedString') or ''
+        self.name_primed_string = d.get('NamePrimedString') or ''
+        self.with_string = d.get('WithString') or ''
+        self.with_tricked_string = d.get('WithTrickedString') or ''
+        self.with_primed_string = d.get('WithPrimedString') or ''
+        self.hide_string_key = d.get('HideString') or ''
+        self.dont_change_tooltip_when_tricked = \
+            bool(d.get('DontChangeTextTooltipWhenTricked'))
+        self.item_that_changes_tooltip = ref('ItemThatChangesTooltip')
+        self.is_floor = bool(d.get('IsFloor'))
+        self.searching_item = bool(d.get('SearchingItem'))
         self.go_next_action = False        # Item.GoNextAction
         self.skip_action = False           # Item.SkipAction (Drawing.Fix)
         # the Mother's alternating DeckChair use (Item.cs:198, 1117-1137)
@@ -1042,6 +1062,8 @@ class Level:
                  bool(o['data'].get('ExitZone')),
                  ty=p[1], tx=p[0],
                  height_delta=o['data'].get('HeightDelta') or 0.0)
+        z.name_string = o['data'].get('NameString') or ''
+        z.end_string = o['data'].get('EndString') or ''
         self.zones.append(z)
         self._zone_comp[pid] = z          # behaviors reference the component
 
@@ -1549,6 +1571,10 @@ class Level:
                 'with_string': pd.get('WithString') or '',
                 'empty_use_string': pd.get('EmptyUseString') or '',
                 'look_at_string': pd.get('LookAtString') or '',
+                'open_string': pd.get('OpenString') or '',
+                'examine_string': pd.get('ExamineString') or '',
+                'hide_string': pd.get('HideString') or '',
+                'end_string': pd.get('EndString') or '',
                 # the fixing-tool chain, serialized inline on the Rottweiler
                 # (RoutineActionGrab / RoutineActionUseFixingItem / Return)
                 'grab_action': {

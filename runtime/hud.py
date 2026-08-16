@@ -173,7 +173,8 @@ class Hud:
         self.strings = load_strings(level.path)
         self.woody_strings = {
             k: self.loc((level.pawns.get('Woody') or {}).get(k + '_string', ''))
-            for k in ('use', 'with', 'empty_use', 'look_at')}
+            for k in ('use', 'with', 'empty_use', 'look_at',
+                      'open', 'examine', 'hide', 'end')}
         self._font = None
         self._font_small = None
         self._fonts = {}
@@ -333,6 +334,87 @@ class Hud:
             y += h
 
     # -- state hooks (HUD.Play*) ------------------------------------------
+    def _get_name_string(self, it):
+        """Item.GetNameString (Item.cs:2295-2314)"""
+        if it.name == 'ValveMain':
+            return it.name_string if it.main_valve_open \
+                else it.name_tricked_string
+        if it.tricked:
+            return it.name_tricked_string
+        if it.primed:
+            return it.name_primed_string
+        return it.name_string
+
+    def _get_with_string(self, it):
+        """Item.GetWithString (Item.cs:2316-2327)"""
+        if it.tricked:
+            return it.with_tricked_string
+        if it.primed:
+            return it.with_primed_string
+        return it.with_string
+
+    def update_hover(self, item, zone):
+        """MouseCursor.UpdateMouseOver (MouseCursor.cs): the permanent
+        tooltip under the cursor. SetTooltip's GoTo state renders empty
+        (HUD.cs:1049-1051), so the go-to arms clear it."""
+        w = self.world
+        ws = self.woody_strings
+        inv = w.inventory
+        loc = self.loc
+        if inv.used is not None:
+            tail = loc(self._get_with_string(item)) if item is not None \
+                else ws['empty_use']
+            self.tooltip = ws['use'] + (inv.used.get('name') or '') \
+                + ws['with'] + tail
+            return
+        if item is None:
+            self.tooltip = None
+            return
+        woody_zone = w.woody.zone.pid if w.woody and w.woody.zone else None
+        if item.kind in ('TrickItem', 'Drawing', 'Rake', 'Toilet',
+                         'Television'):
+            if item.is_floor:
+                self.tooltip = None                     # GoTo renders empty
+            elif item.required_inventory in (None, '', 'IT_NONE') \
+                    and item.tricked \
+                    and not item.dont_change_tooltip_when_tricked:
+                self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+            elif item.required_inventory in (None, '', 'IT_NONE') \
+                    and not item.tricked \
+                    and item.dont_change_tooltip_when_tricked:
+                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+            elif item.dont_change_tooltip_when_tricked and item.tricked:
+                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+            elif item.change_tooltip_when_tricked:
+                self.tooltip = ws['use'] + loc(self._get_name_string(item))
+            else:
+                self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+        elif item.kind == 'HideItem':
+            self.tooltip = ws['hide'] + loc(item.hide_string_key)
+        elif item.kind == 'SearchItem':
+            if item.searching_item:
+                if item.locked:
+                    self.tooltip = ws['look_at'] + loc(item.name_string)
+                elif item.primed:
+                    self.tooltip = ws['open'] + loc(item.name_primed_string)
+                elif item.require_priming:
+                    self.tooltip = ws['look_at'] + loc(item.name_string)
+                else:
+                    self.tooltip = ws['examine'] + loc(item.name_string)
+            else:
+                self.tooltip = ws['examine'] + loc(item.name_string)
+        elif item.kind == 'GroundItem':
+            self.tooltip = ws['look_at'] + loc(item.name_string)
+        elif item.kind == 'InspectItem':
+            changer = self.level.items.get(item.item_that_changes_tooltip) \
+                if item.item_that_changes_tooltip else None
+            if changer is None or not changer.got_tricked:
+                self.tooltip = ws['look_at'] + loc(item.name_string)
+            else:
+                self.tooltip = ws['look_at'] + loc(item.name_primed_string)
+        else:
+            self.tooltip = None
+
     def play_trick_done(self):
         """HUD.PlayTrickDone + Woody.PlayTrickDone's laugh"""
         self.trick_anim.restart()
@@ -602,7 +684,10 @@ class Hud:
     def _face_fill(self, actor, rect_key):
         """HUDProgressBar.OnGUI (HUDProgressBar.cs:10-21): the face overlay
         drains top-down — the group's height is (1 - progress) of the face
-        rect, cropping the overlay texture's bottom off"""
+        rect, cropping the overlay texture's bottom off. The menu hides it
+        (OnGameMenuEnter -> Hide, HUDProgressBar.cs:23-43)."""
+        if self.world.menu_open:
+            return
         for pb in self.world.progress_bars:
             if not (pb.visible and pb.is_pawn_hud
                     and pb.spec['actor'] == actor):
@@ -777,7 +862,10 @@ class Hud:
                 w.woody.sneaking = w.woody.sneak_toggle
             return True
         if self._hit(self.rect('PowerRect'), mx, my):
-            return True                # InGameMenu is not modelled
+            # Woody.ToggleMenu (HUD.cs:1350-1353); the widgets stay unported,
+            # the pause itself runs
+            w.toggle_menu()
+            return True
         if self._hit(self.rect('CompleteRect'), mx, my) \
                 and g.completed >= g.winning:
             # GameInfo.FinishGameOnHUDClick with Won kept true

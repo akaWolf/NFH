@@ -158,6 +158,16 @@ class Viewer:
         if self.hud is not None:
             mx, my = ctypes.c_int(0), ctypes.c_int(0)
             sdl2.SDL_GetMouseState(ctypes.byref(mx), ctypes.byref(my))
+            # MouseCursor.UpdateHover: the item under the cursor drives the
+            # permanent tooltip and the TrickItem hover pose
+            if not self.world.game.ending and not self.world.menu_open:
+                wx, wy = self.cam.screen_to_world(mx.value, my.value,
+                                                  WIDTH, HEIGHT)
+                hit = self._item_at(wx, wy)
+                zone = self.level.zone_at(wx, wy)
+                if hit is not None:
+                    self.world.on_mouse_hover(hit)
+                self.hud.update_hover(hit, zone)
             self.hud.draw(self._frame_dt, (mx.value, my.value))
         sdl2.SDL_RenderPresent(self.rnd)
         return drawn
@@ -264,7 +274,7 @@ class Viewer:
             self._frame_dt = dt
             if not self.paused:
                 self.t += dt
-            if not self.paused:
+            if not self.paused and not self.world.menu_open:
                 self.world.tick(min(dt, 0.1))
                 if self.world.is_dexterity_on and self.woody:
                     # GameCamera.Freeze + SnapToWoodyImmediate (cs:149, 171)

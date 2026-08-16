@@ -3672,6 +3672,7 @@ class World:
                               for s in level.progress_bars]
         # the DexterityComponent minigames (DexterityComponent.cs)
         self.is_dexterity_on = False     # GameInfo.IsDexterityOn
+        self.menu_open = False           # InGameMenu enabled (timeScale=0)
         self.screen_size = (800, 600)    # the viewer overrides these two
         self.screen_point = self._default_screen_point
         self.snap_camera = None          # CameraMover.SnapToWoodyImmediate
@@ -3700,6 +3701,25 @@ class World:
                 if p is not None:
                     p.single_end_hook = \
                         (lambda name, i=it: self._item_anim_completed(i, name))
+
+    def on_mouse_hover(self, item):
+        """TrickItem.OnMouseHover (TrickItem.cs:557-565): the hover pose
+        plays while the item is untricked and not already playing it"""
+        if item.kind not in TRICK_KINDS:
+            return
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if p is None or not item.animating or not item.hover_anim:
+            return
+        if item.is_tricked(self.level.items):
+            return
+        if p.has(item.hover_anim) and p.anim.name != item.hover_anim:
+            self.play_item_anim(item, item.hover_anim)
+
+    def toggle_menu(self):
+        """Woody.ToggleMenu -> InGameMenu.Toggle (InGameMenu.cs:28-61):
+        Enable freezes time, Disable resumes it. The menu's widget tree is
+        not modelled; the pause and the HUD fill hide are."""
+        self.menu_open = not self.menu_open
 
     def _default_screen_point(self, x, y):
         """WorldToScreenPoint with the y flip, camera on Woody — the viewer
