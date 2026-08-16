@@ -84,9 +84,11 @@ class Behavior:
 
     # -- the C# helpers the behaviors lean on ------------------------------
     def hide_obj(self, it, hidden):
-        """Item.SetObjectHidden"""
-        if it is not None and it.sprite is not None:
-            it.sprite.hidden = hidden
+        """Item.SetObjectHidden (Item.cs:1984-1995): the object's OWN
+        renderer — the backdrop quad on a static item (L101's Binoculars)
+        — and its controller; world.set_object_hidden carries both"""
+        if it is not None:
+            self.world.set_object_hidden(it, hidden)
 
     def set_active(self, it, active):
         """GameObject.SetActive on an item's object"""
