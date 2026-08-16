@@ -1,0 +1,26 @@
+# Level204 — TotalTricksCount 6 (winning 4); every S2 TrickScore is 0.
+# Routine (Rottweiler2): PullKart, Karate (Zone01) -> GongDrumstick (Zone04)
+# -> HotDog (Zone03) -> JadeNecklace (Zone02); Olga: PullKart.
+# Dead data: GongMan (IT2_Crayfish, no source, collider off), OlgaKid as a
+# trick (IT_Detergent) — it is the ToyDispenser's PrimingItem, GongGrease
+# as a trick (IT_Emptybottle) — it is the RiceBowl's PrimingItem.
+take Bricks IT2_Brick
+usewith Karate IT2_Brick          # action [1]
+await Karate 0
+take UmbrellaStand IT2_Sunshade
+usewith GongDrumstick IT2_Sunshade   # action [2]
+await GongDrumstick 0
+take RiceBowl IT2_Rice_empty      # RequirePriming, x2 uses, PrimingItem GongGrease -> IT2_Rice_full
+prime GongGrease IT2_Rice_empty   # Item.cs:1537-1573: the held source primes on its PrimingItem
+usewith Vase IT2_Rice_full        # not in the routine: pays through JadeNecklace's LinkedItemTrick
+usewith PullKart IT2_Rice_full    # action [0], PawnToAffectWhenTricked Olga (Level204OlgaBehavior)
+await PullKart 0
+take BonsaiScissors IT2_Scissors
+usewith JadeNecklace IT2_Scissors # action [4]; linked pair with the Vase: both pay (Item.OnTrickDone)
+await JadeNecklace 0
+await Vase 0
+unlock ToyDispenser               # Dexterity, DexterityUnlocker IT_NONE; RequirePriming, PrimingItem OlgaKid
+take ToyDispenser IT2_Teddy
+prime OlgaKid IT2_Teddy           # the teddy primes on the kid -> IT2_Confetti
+usewith HotDog IT2_Confetti       # action [3]
+await HotDog 0

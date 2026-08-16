@@ -1,0 +1,25 @@
+# Level202 — TotalTricksCount 5 (winning 3), every S2 TrickScore is 0
+# (GameInfo.CalculateScore's NFH2 formula counts completed tricks): the
+# Submarine fin (pays through Swimming, SetTrickedOnItem), the crayfish
+# under the beer mat (RottweilerUseTogglesPrime: visit 1 primes, visit 2
+# pays), the sawn bridge rail + the eels in the pond (LinkedItemTrick, both
+# pay on the rail visit), the rake (bare-hand trick, weed compound; KNOWN:
+# Rake tricks never go angry in the port).
+take RubbishBin IT2_Fin
+usewith Submarine IT2_Fin         # TrickItem.OnUseAnimationCompleted: ActivateItemTrick/SetTrickedOnItem -> Swimming
+await Swimming 0                  # Rottweiler action [3] Swimming (DependsOn Submarine)
+take Reed IT2_Reed
+unlock CrayFish IT2_Reed          # SearchItem Dexterity, DexterityUnlocker IT2_Reed
+take CrayFish IT2_Crayfish
+usewith BeerMat IT2_Crayfish      # RottweilerUseTogglesPrime, no RequirePriming: usable any time
+await BeerMat 0                   # actions [0]/[1] BeerMat: prime visit (WasPriming, no angry), then the use
+take Sandbucket IT2_Sandbucket    # RequirePriming, PrimingItem EelBox, PrimedInventoryType IT2_Sandbucketeel
+prime EelBox IT2_Sandbucket       # Item.cs:1537-1573: the held source primes on its PrimingItem -> IT2_Sandbucketeel
+usewith Pond IT2_Sandbucketeel    # the eels go in (RequiredInventory)
+take SawFish IT2_Sawfish
+usewith BridgeRail IT2_Sawfish    # linked pair with Pond: the rail visit [4] pays both
+await BridgeRail 0
+take Weed IT2_Weed
+use Rake                          # bare-hand (RequiredInventory IT_NONE)
+usewith Rake IT2_Weed             # the compound lands only once tricked (TrickItem.cs:511)
+await Rake 0                      # KNOWN: Drawing/Rake tricks never go angry

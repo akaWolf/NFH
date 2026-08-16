@@ -1,0 +1,55 @@
+# Level114 — 9 tricks (GameInfo.TotalTricksCount 9): MedalBox 8, Ground-
+# Marbles 7, Gramaphone 10, ElectricTrap 7, Polish/GoldCup 8 (the GoldCup's
+# own score is dead: the Polish is UseAtOtherPlace, he carries the swapped
+# tin to the cup and the cup's DependsOn branch goes angry on the Polish —
+# TrickItem.cs:857, RoutineActionUse.cs:556-570, no ForceFixOriginal), Hat 8,
+# Horn 8, Pipe 10, Shotgun 10 / CompoundTrickScore 13 (shells + cork,
+# TrickItem.GetTrickScore cs:391-398).
+#
+# Routine (~155 s a lap): Polish(Z03) -> GoldCup(Z08) -> Polish(Z03) ->
+# Pipe, Gramaphone, CDs, Gramaphone, Pipe, Gramaphone (all Z02, ~35 s) ->
+# Shotgun(Z09) -> Hat, MedalBox, Hat(Z06) -> Horn(Z07) -> loop.  The dog
+# sleeps in the bedroom (Z06, auto-sneak).
+#
+# Gramaphone (RequirePriming + RequireUnprime + RottweilerUseTogglesPrime,
+# Item.cs:1520 refuses Woody until his prime) is primed only between his
+# [4] and [8], and Pipe (RequirePriming + RottweilerUseTogglesPrime,
+# ShowOnlyWhenPrimed) only between [3] and [7] — a stretch he spends
+# entirely in Zone02, which has no HideItem; GameInfo.CanRottweilerSeeWoody
+# is zone-level (cs:181-192; his only Blocking animations are BedSleep /
+# FireExtinguisher / the hits, so the sneak clause never applies).  The
+# dog alarm (Z06) pulls him out of Z02 for a few seconds, but Woody has to
+# be in Z06 to raise it and Z06 -> Z02 is the door he comes through.  Both
+# tricks are recorded as manual (unreachable in this build's data).
+
+take Drawer IT_Marbles                # Z01: IT_Marbles + IT_Shoepolish
+usewith GroundMarbles@Zone01 IT_Marbles   # x=-0.60, on his Z02-door(-1.92) -> Z09-door(2.18) walk
+usewith Polish IT_Shoepolish          # Z03, after his [0]: he carries the black tin to the cup
+take RubbishBinCable IT_Cable         # Z03: IT_Cable + IT_Cork
+take MouseHole IT_Rat                 # Z09
+usewith ElectricTrap IT_Cable         # Z09 x=2.06, on his door(2.21) -> Shotgun(0.66) walk, 7
+take FirstAid IT_Superglue            # Z04
+park Zone04                           # he crosses the hall to the basement (~95)
+# -- he is in the basement: the bedroom -----------------------------------
+take ShotgunShells IT_Munition        # Z06
+usewith MedalBox IT_Rat               # Z06, 8 at his [11]
+take BedDrawer IT_Balloon             # Z06
+usewith Hat IT_Superglue              # Z06: RottweilerUseTogglesPrime without RequirePriming —
+                                      # any time; [10] primes (TryHatOn), [12] uses (TryHatGlue), 8
+hide Bed                              # he comes up for the Hat/MedalBox/Hat, then the Horn
+# -- he has left the balcony for the kitchen: the horn, back to bed --------
+usewith Horn IT_Balloon               # Z07, 8 at his next [13]
+hide Bed                              # he passes the bedroom twice for the cup
+# -- he is on the balcony again: the shotgun -------------------------------
+usewith Shotgun IT_Munition           # Z09: Tricked
+usewith Shotgun IT_Cork               # the compound: CompoundTricked (TrickItem.cs:509-529)
+park Zone04
+await MedalBox 8
+await Hat 8
+await Polish 8
+await ElectricTrap 7
+await GroundMarbles@Zone01 7
+await Horn 8
+await Shotgun 13                      # CompoundTrickScore 13 (KNOWN: the port pays 10)
+manual Gramaphone 10: primed only during his [4]..[8] Zone02 stretch, no window (see header)
+manual Pipe 10: primed only during his [3]..[7] Zone02 stretch, no window (see header)

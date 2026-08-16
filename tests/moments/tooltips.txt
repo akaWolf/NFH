@@ -1,0 +1,17 @@
+# hover tooltips: bare hand, held inventory, the info button
+wait 4.0
+mouseitem Fridge          # hover the fridge: "Examine fridge"
+wait 2.0
+clickitem Fridge          # search it -> the egg
+wait 4.0
+inv 1                     # hold the egg
+mouseitem Microwave       # "Use egg with microwave"
+wait 2.0
+clickworld 2.0 1.2        # miss: the inventory clears (ShouldAbortMove)
+wait 1.0
+mouse 768 475             # glide onto the info button (InfoRect 751..786, 458..493)
+wait 0.5
+mousedown                 # hold it: every ItemTipIcon shows
+wait 2.0
+mouseup
+wait 1.0

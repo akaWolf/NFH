@@ -1,0 +1,4 @@
+# the win: every trick done -> the 2.5s wait -> WinAnimation + score
+wait 4.0
+forcewin
+wait 10.0

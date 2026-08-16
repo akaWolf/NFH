@@ -1,0 +1,38 @@
+# Level214 — GameInfo total=6 / winning=4 (S2: TrickScore 0 everywhere).
+# Catchers: Rottweiler + Mother (Olga is not one). Rottweiler lap ~80 s:
+# Shower (Zone01, 4-9) -> Bouquet (Zone04, 10-25) -> CaptainDoor, Pistol
+# (Zone03, 32-60) -> Hatch (Zone02, 71-79). The zones ring: Zone02 (start,
+# hatch) - Zone03 (Mother) - Zone04 (bouquet) - Zone01 (shower) - Zone02;
+# Zone05 (the cabin) opens behind the CaptainDoor (its DoorBack pair ships
+# DisableOnStart, Item.CaptainDoorBehavior activates it, Item.cs:2606-2623).
+# The Mother sits in Zone03 (DeckChairMother: MotherLookLoop 5-60 awake); the
+# neighbour's pistol play ends in RottweilerMotherBehaviour.OnMotherSleep ->
+# MotherSleepBehaviour.ForceSleep -> MotherItem.GetMotherSecondUseAnimation()
+# (stamps CurrentAnimationSequence = MotherSecondUse, Item.cs:936-940) and her
+# bar (ProgressBar go 19: MotherSecondUse [0,10), 57.7 s) sets IsSleeping for
+# ~61-119 s; the bar's window end deactivates its object (not Mother210,
+# ProgressBar.cs:164-172) but her next DeckChairMother use re-activates it
+# (Item.MotherUse -> ProgressBarObject.SetActive(true), Item.cs:1108-1116;
+# OnEnable -> RestoreVariables), so the window repeats every lap (~165-223,
+# ...). The Zone03 raid and the cabin fit into the first one; then Woody hides
+# in Zone03's DeckChair (HideItem) while the neighbour walks through to the
+# swapped CaptainControls (Zone05) and back to the Pistol.
+take HatchFish IT2_Fish                # Zone02 (two fish)
+take Carpet IT2_Carpet                 # Zone01
+take Ammo IT2_Ammo                     # Zone01
+usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash; FixItemTrick Washbucket)
+usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his 71 s Hatch visit
+take BirdDead IT2_Key                  # Zone04 while he plays the pistol in Zone03 (32-60)
+usewith Bouquet IT2_Fish               # Zone04 (BouquetFish; FishPlantBehavior strips Olga's next two actions, Item.cs:2388-2396)
+take Handbag IT2_Pills                 # Zone03 — the Mother's first IsSleeping window (~61-119 s), the neighbour gone at 60
+take Mat IT2_Code                      # Zone03
+usewith Pistol IT2_Ammo                # Zone03 (PistolFire; PawnToAffectWhenTricked Mother; FixItemTrick DeckChairMother)
+usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBacks (DisableOnStart) and swaps his CaptainDoor action for CaptainControls
+usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel after 11 s (TrickItem.cs:333-351: the CaptainControls action becomes the wheel). The mug itself never pays: no neighbour use animation and no linked pay reaches it — the level's 6th count is dead by data (winning=4)
+usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the mug
+hide DeckChair                         # Zone03: out of both predicates (Woody.Hiding) while he crosses to the cabin and back to the pistol
+await Shower 0
+await Hatch 0
+await Bouquet 0
+await CaptainWheel 0
+await Pistol 0

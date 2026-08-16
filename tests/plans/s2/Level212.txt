@@ -1,0 +1,34 @@
+# Level212 — GameInfo total=9 / winning=7 (S2: TrickScore 0 everywhere).
+# Catchers: Rottweiler + Mother. Rottweiler lap ~133 s: PreAztecThrone,
+# AztecThrone (Zone05, 4-20) -> Whip (Zone03, 24-41) -> CigarBox, SleepBench
+# (Zone04, 43-71, asleep 55-70) -> MechanicalBull (Zone01, 79-89) ->
+# PreParrotLedge, ParrotLedge (Zone02, 96-119) -> back via Zone03 (121-135).
+# The Mother alternates MumWaitZone4 / MumWaitZone3 (~20 s each: Zone03 at
+# 27-47, 77-94, 124-...). Zone05 (the thrones) is a dead end behind Zone03's
+# DoorBack: Zone03 is clear 48-76 and 95-120. Woody starts in Zone01.
+take Skeleton IT2_Dagger_rusty         # Zone01 (RequirePrimingOnlyWhenTricked: primes at the tricked RotatingStoneDisc)
+take MechanicalBullCoins IT2_Coin      # Zone01 (KeepFull)
+take ParrotNest IT2_Ruby               # Zone03: one ruby (the RubyThrone gives the other and deactivates after its take, Item.cs:1939-1942)
+take Resin IT2_Resin                   # Zone03 (KeepFull)
+usewith AztecThrone IT2_Ruby           # Zone05: PutRuby; ActivateItemTrick -> RotatingStoneDisc.Tricked; ThroneBehavior212 swaps the colliders to AztecThrone2 (Item.cs:2450-2469)
+prime RotatingStoneDisc IT2_Dagger_rusty  # Zone05, same visit: the rusty dagger sharpens on the TRICKED disc (RequirePrimingOnlyWhenTricked, Item.cs:1599-1613) -> IT2_Dagger
+take RubyThrone IT2_Ruby               # Zone05: the second ruby (TakeItemMultipleTimes refuses while a ruby is held — hence after the first throne)
+usewith AztecThrone2 IT2_Ruby          # Zone05: the linked pair, armed together before his sit (his angry+Fix swaps the colliders back and pays the first alone)
+take Crowbar IT2_Crowbar               # Zone05 (RequirePriming: primes at ClosedMine1 -> IT2_Tnt)
+take Corn IT2_Corn                     # Zone05
+usewith Whip IT2_Dagger                # Zone03 (KeepAfterUse; LinkedItemTrick WhipStonePlate)
+prime ClosedMine1 IT2_Crowbar          # Zone01: Item.cs:1561-1566 — the crowbar becomes IT2_Tnt (PrimedInventoryType), a fresh crowbar lands back, ClosedMine1 deactivates and the ClosedMine search item activates
+usewith MechanicalBull IT2_Resin       # Zone01 (LinkedItemTrick MechanicalBullCoins)
+usewith CigarBox IT2_Tnt               # Zone04
+take PaintPot IT2_Paint                # Zone04
+usewith SleepBench IT2_Paint           # Zone04
+usewith BoatCoinSlot IT2_Coin          # Zone02: ActivateItemTrick -> BoatRent; LinkedItemTrick of the ParrotLedge
+usewith ParrotLedge IT2_Corn           # Zone02
+await AztecThrone 0
+await AztecThrone2 0
+await Whip 0
+await CigarBox 0
+await SleepBench 0
+await MechanicalBull 0
+await ParrotLedge 0
+await BoatCoinSlot 0

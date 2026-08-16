@@ -1,0 +1,35 @@
+# Level201 — the NFH2 tutorial: TotalTricksCount 4 (winning 3), every S2
+# TrickScore is 0. The whole trick loop hangs off the unported tutorial
+# layer (LevelScript + TutorialScriptCameraNFH2, README "Not implemented"):
+# the neighbour's ActionManager ships Frozen and only LevelScriptAction
+# 1/4/9/14 (UnfreezeNeighbor) start it, VanityBag/DeckRail/CaptainHat ship
+# Locked and only actions 5/12/14 unlock them, and the routine's action [5]
+# is the script's FreezeAfterCompletion park (ActionManager.cs:539-543)
+# that the script juggles (AddAction/RemoveAction) and drops at its end.
+# `tutorial n` applies the serialized action's effects (a manual step in
+# the results); `tutorial end` drops the park action the way
+# TutorialScriptCameraNFH2.End1 leaves the routine, so it loops.
+# Routine: CaptainHat, Buffet (Zone04) -> WaterPuddle, DeckRail, WaterPuddle
+# (Zone03) -> [5] park at Zone03 x=1; Olga: Buffet. Dead data:
+# CaptainHatHook (IT_Fartbag, no source, no collider). The second soap on
+# the puddle (the script's linked demo) is refused here: WaterPuddle is
+# UseOnce and Fix leaves Used (the script's UseOnce=false toggle,
+# TutorialScriptCameraNFH2 TableTrick2, is unported) — DeckRail pays alone.
+take SoapChest IT2_Soap           # KeepFull
+usewith WaterPuddle IT2_Soap      # Primed at load, RottweilerUseTogglesPrime, no RequirePriming
+tutorial 1                        # UnfreezeNeighbor: lap 1 (CaptainHat, Buffet, WaterPuddle ...)
+await WaterPuddle 0               # action [2]: the use unprimes and slips; Fix re-primes (Item.cs:2089)
+tutorial 5                        # ItemsToUnlock VanityBag
+take VanityBag IT2_Hairpin
+unlock ToolBox IT2_Hairpin        # Dexterity, DexterityUnlocker IT2_Hairpin
+take ToolBox IT2_Knife            # the box hands both the knife and the pipe tongs
+tutorial 12                       # ItemsToUnlock DeckRail
+tutorial 14                       # ItemsToUnlock CaptainHat (+ UnfreezeNeighbor/ForceAdvance off the park)
+tutorial end                      # the park action [5] removed: the routine loops from here
+take SpaghettiCar IT2_Spaghetti
+usewith Buffet IT2_Knife          # action [1]; PawnToAffectWhenTricked Olga; DontUseOn
+usewith DeckRail IT2_Pipetongs    # action [3]: Tricked && !Neutral pays alone (DependsOn WaterPuddle only widens)
+usewith CaptainHat IT2_Spaghetti  # action [0]
+await Buffet 0
+await DeckRail 0
+await CaptainHat 0

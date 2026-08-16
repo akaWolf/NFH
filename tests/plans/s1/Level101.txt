@@ -1,0 +1,13 @@
+# Level101 — 4 tricks, 91 points total (the data: TrickScore per item)
+take Fridge IT_Egg
+usewith Microwave IT_Egg          # NoticeWhenWalkNearby, score 16
+reclick Microwave                 # armed: a second click is WrongTrick/NoNo
+await Microwave 16
+use Television                    # bare-hand, NoticeWhenEnterZone, score 20
+await Television 20
+take Drawer IT_Fartbag
+usewith Sofa IT_Fartbag           # score 25
+await Sofa 25
+take FirstAid IT_Superglue
+usewith Binoculars IT_Superglue   # score 30
+await Binoculars 30

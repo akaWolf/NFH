@@ -1,0 +1,35 @@
+# Level205 — TotalTricksCount 5 (winning 3); every S2 TrickScore is 0.
+# Routine (Rottweiler2): OlgaMatBeach (mutex, Zone02) -> TabbleTennis
+# (Zone02) -> WaterSkiis x2 (Zone01) -> Chef (Zone04) -> Rockets ->
+# SandSculpture (Zone01); Olga: OlgaMatBeach / TabbleTennis (the mutex
+# handshake, README). PORT (plans_s2a.md): after lap 1 the neighbour parks on
+# the mat mutex and Olga on the tennis mutex for good — the port ends
+# Olga's use only when HER sequence drains and never plays the item's
+# UseNormalSequence with olga.OnItemAnimationSequenceEnded
+# (TrickItem.cs:964-975 -> Olga.cs:154-158), the second release of the
+# handshake — so only lap 1 (~70 s) is playable: the plan is ordered by
+# that lap (Chef at ~47 s, Rockets at ~59 s, SandSculpture at ~64 s).
+# Dead data: Fence1/Fence2, BridgeRailFront, WaterSkiisAux,
+# RocketsBackground, OlgaKid, OlgaMatBeach as a trick (colliders off; no
+# crayfish source), Chef's own click (IT_Fuel — it pays through Eals'
+# SetTrickedOnItem), LionStatue alone (not in the routine — it is the
+# Glasses' PrimingItem, accepted only once tricked, Item.cs:1544).
+take BicycleTubeBox IT2_Tube
+usewith Eals IT2_Tube             # SetTrickedOnItem -> Chef
+take Anchor IT2_Rope
+usewith Rockets IT2_Rope          # action [5]
+await Chef 0                      # action [4]
+await Rockets 0
+take HammerNails IT2_Tools
+usewith WaterSkiis IT2_Tools      # Primed at load, RottweilerUseTogglesPrime, no RequirePriming
+await WaterSkiis 0                # actions [2]/[3]: the use visit pays (lap 2 — never comes)
+take Banger IT2_Bangers
+usewith LionStatue IT2_Bangers    # the statue must be tricked before it accepts the glasses
+take Glasses IT2_Glasses          # RequirePriming, PrimingItem LionStatue -> IT2_Lionhead
+prime LionStatue IT2_Glasses
+usewith SandSculpture IT2_Lionhead   # action [6], KidActions on the OlgaKid pawn
+await SandSculpture 0
+unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
+take DuckCage IT2_Egg
+usewith TabbleTennis IT2_Egg      # action [1], PawnToAffectWhenTricked Olga
+await TabbleTennis 0

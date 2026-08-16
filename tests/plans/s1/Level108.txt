@@ -1,0 +1,35 @@
+# Level108 — TotalTricksCount 6 (the six Ground twins share the bin's one
+# banana): ToothBrush 15, CoffeeMaker 15, Shezlong 10, SunLotion 20,
+# Plant 20, Ground 8 = 88 points.
+# Routine: ToothBrush(Z04, RemoveFromRoutineAfterFirstUse) CoffeeMaker(Z03)
+# Shezlong(Z07) WateringCan(Z07) Plant(Z01) WateringCan(Z07); he starts in
+# Zone06. Zone02 holds the Chili dog (Alerter). Zone07 is a dead end
+# behind Zone06 (the Bed hides Woody while he passes).
+manual ToothBrush 15: his FIRST use removes the action (RoutineActionUse.cs:424-427, ActionManager.RemoveActionByItem) and it is his first action; with the brush from the Drawer next to the start Woody reaches the bathroom door 0.1 s after the neighbour claims it (Pawn.cs:1359 door-pair wait) — see the report
+take PinsBoard IT_Pins               # Zone01
+take BedDrawer IT_Key +12            # Zone06 (he never returns here after the start);
+                                     # +12: the balcony raid and the way back to the bed
+take SoilBag IT_Soil_only            # Zone07
+use SunShade                         # Zone07, bare hand: Neutral, folds the shade —
+                                     # the lotion plays only while SunShade.Tricked
+                                     # (TrickItem.cs:869-881)
+usewith Shezlong IT_Pins             # Zone07, 10
+hide Bed                             # Zone06: he comes through to the balcony
+await Shezlong 10                    # PinsJump, angry, ReuseAfterFix restart
+take RubbishBinBanana2 IT_Banana     # Zone03
+take Fridge IT_Honey                 # Zone03
+usewith Ground@Zone03 IT_Banana      # Zone03, 8: he slips on his way to the coffee
+prime FirstAid IT_Key                # Zone04: the FirstAid+key hack turns the key
+                                     # into IT_Poison (Item.cs:1407-1411, WoodyPrime)
+usewith CoffeeMaker IT_Soil_only     # Zone03, 15
+reclick CoffeeMaker                  # UseOnce+Used: CantUse/WrongTrick, no change (Item.cs:1654-1668)
+usewith SunLotion IT_Honey +10       # Zone07, 20: fires at his Shezlong use, paid
+                                     # through GetTrickedItem -> DependsOn
+usewith WateringCan IT_Poison        # Zone07: Plant 20 at his next watering
+                                     # (StopAction's RemoveActionByItem sets
+                                     # Plant.Tricked, ActionManager.cs:748-753)
+hide Bed
+await Ground@Zone03 8
+await CoffeeMaker 15
+await SunLotion 20
+await Plant 20

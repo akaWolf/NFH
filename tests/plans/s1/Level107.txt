@@ -1,0 +1,28 @@
+# Level107 — TotalTricksCount 7 (the two Ground twins share the bin's one
+# banana: RubbishBinBanana hands IT_Banana x0 once, InternalUse nulls
+# InventoryItems, SearchItem.cs:154-201), 82 points in one run.
+# Routine: Drawing(Z07) Camera Magnesium Camera(Z06) DieselChair
+# DieselGenerator(Z03) MumStatueFootStool(Z02); he starts in Zone06.
+# Zone02 holds the Chili dog (Alerter): the driver sneaks through it.
+take PinsBoard IT_Pins               # Zone01
+take Drawer IT_Wrench                # Zone01
+take RubbishBinBanana IT_Banana      # Zone03
+usewith DieselChair IT_Pins          # Zone03, 10
+reclick DieselChair                  # UseOnce+Used: CantUse/WrongTrick, no change (Item.cs:1654-1668)
+usewith DieselGenerator IT_Wrench    # Zone03, 15
+usewith Ground@Zone03 IT_Banana      # Zone03, 8, NoticeWhenWalkNearby
+take FirstAid IT_Scissors            # Zone04: scissors + antispot together
+await Ground@Zone03 8                # the slip on his way to the chair
+await DieselChair 10
+use MumStatueFootStool               # Zone02, bare hand, 15 (he is at the generator)
+take MagnesiumBottle IT_Magnesium    # Zone06
+usewith Camera IT_Magnesium          # Zone06, 12 (RottweilerUseTogglesPrime, starts Primed)
+hide Bed                             # Zone06: he crosses this room to the balcony next
+await DieselGenerator 15
+await MumStatueFootStool 15
+await Camera 12                      # paid on his next Camera visit after the balcony
+usewith Dove IT_Scissors             # Zone07, 10, NoticeWhenEnterZone (he is in Zone03/02)
+usewith Drawing IT_Antispot          # Zone07, 12: the wall shows only after his first drawing
+hide Bed                             # the balcony is a dead end: let him pass
+await Dove 10
+await Drawing 12                     # KNOWN: Drawing tricks never go angry

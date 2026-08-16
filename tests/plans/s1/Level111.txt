@@ -1,0 +1,72 @@
+# Level111 — 8 tricks (GameInfo.TotalTricksCount 8): the DirtyCarpet's own
+# TrickScore (15) is dead data — the carpet is Neutral (TrickItem.IsTricked
+# is false, TrickItem.cs:260) and its raw-Tricked urgent only fetches the
+# vacuum (Item.cs:847-852); the points come from the glued Vacuum, which
+# fires its own tricked use as the fixing tool (RoutineActionUseFixingItem
+# .TryUseFixingItem -> StopAction's angry, 15).  The carpet urgent itself
+# starts only from the Dog yell (Rottweiler.cs:485-510, the SameZone
+# alarm run) — OnChangeZone skips the DirtyCarpet (Rottweiler.cs:188).
+#
+# Routine (~110 s a lap): Detergent(Z03) -> WM x3, Drier x3 (Z09; ~8 s) ->
+# Iron(Z06) -> Airer(Z07) -> FishTank(Z08) -> Airer -> Iron -> loop.  The
+# upstairs dead ends (Z07 balcony, Z08 study) are safe only while he is in
+# the kitchen/basement; the basement only while he is upstairs.  The clock
+# is 10 minutes (TimeMinutes), so the order matters.
+
+# -- lap 1: he walks Z06 -> Z02 -> Z03 (Detergent, t~15) -> Z01 -> Z09 ------
+take TableShovel IT_Shovel            # Z07 at once, behind him (Z01->Z02->Z06->Z07)
+take Detergent IT_Detergent           # Z03 after his [0] use
+take RubbishBinCable IT_Cable         # Z03
+# he comes up Z01(38) -> Z02(46) -> Z06(50) -> Iron(64) ...
+take Perch IT_Birdfood                # Z02 (auto-sneak: the dog)
+prime PlantSoil IT_Shovel             # the shovel's source primes on its PrimingItem
+                                      # (Item.cs:1537-1572); the held type becomes IT_Soil
+usewith DirtyCarpet IT_Soil           # the trigger (no score of its own)
+take Drawer IT_Marbles                # Z01
+park Zone04                           # the dead end he never visits
+
+# -- lap 2, he is in the kitchen: the study, then the vacuum ---------------
+take DeskDrawer IT_Paperknife         # Z08 (via Z02/Z06 while he is in Z03/Z01)
+usewith Vacuum IT_Paperknife          # Z02, the tool that pays 15
+# -- lap 2, he is upstairs: the basement ---------------------------------
+take BasementDrawer IT_Tongs
+usewith Drier IT_Tongs                # RequireUnprime trio: pays at his use visit
+take WineCellar IT_Winebottle
+usewith WashingMachine IT_Winebottle
+usewith ElectricTrap IT_Cable         # NoticeWhenWalkNearby, 11
+usewith GroundMarbles@Zone09 IT_Marbles   # NoticeWhenWalkNearby, 7
+park Zone04
+
+# -- lap 3, he is in the kitchen/basement: the fish tank, then the bed -----
+usewith FishTank IT_Detergent         # Z08, 10 at his [9] — the long tricked use
+                                      # is what widens the Airer window below
+hide Bed                              # Z06: he comes up to iron
+# -- lap 3 upstairs: the primed Iron (his [7]) and Airer (his [8]) --------
+use Iron                              # RequirePriming+RottweilerUseTogglesPrime: waits for
+                                      # his prime, goes while he is on the balcony
+hide Bed
+usewith Airer IT_Birdfood             # primed at [8]; only while he is at the fish tank
+hide Bed
+await Iron 10
+await Airer 13
+
+# -- the dog alarm -> the yell -> the carpet urgent -> the vacuum ----------
+# PORT finding (docs/audit/verified/plans_s1c.md): the source checks
+# RoutineActionMove.SameZone() every Update of the alarm run (ActionManager
+# .cs:442-448) — with RottweilerExitLocation (0,0,0) on every door it is true
+# the moment he lands in the dog's zone, so the arrival from ANY zone starts
+# the surprise, the walk to the dog, the "Angry" yell and then the carpet
+# urgent (Rottweiler.cs:485-510).  The port applies the shortcut only when
+# he is already in the dog's zone at StartUrgentAction (world.py
+# Routine.start_urgent); arriving from elsewhere he plays the surprise at
+# the dog and resumes — no yell, no carpet run, the vacuum never pays.
+sneak off
+park Zone02                           # walking openly wakes the dog (Alerter.CanSeeWoody)
+park Zone03                           # out of his way (Z09 -> Z01 -> Z02 and back)
+sneak auto
+await Vacuum 15                       # fails in the port (see above)
+await FishTank 10
+await WashingMachine 10
+await Drier 10
+await ElectricTrap 11
+await GroundMarbles@Zone09 7

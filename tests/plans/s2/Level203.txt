@@ -1,0 +1,23 @@
+# Level203 — TotalTricksCount 5 (winning 3); every S2 TrickScore is 0.
+# Routine (Rottweiler2): Microphone (Zone03) -> ToiletPaper -> ToiletFlush
+# (Zone04) -> Watermelon -> Bicycle (Zone01); Olga's manager ships Frozen.
+# Dead data (no source / disabled collider): Toilet (IT2_Sawfish),
+# MicrophoneStage (IT2_Crayfish), Microphone's own click (IT2_Crayfish,
+# collider off — it pays through the DieselGenerator's ActivateItemTrick),
+# ToiletRocket / DictatorPhoto (colliders off).
+unlock OlgaBag                    # SearchItem Dexterity, DexterityUnlocker IT_NONE (bare)
+take OlgaBag IT2_Tights
+usewith DieselGenerator IT2_Tights   # ActivateItemTrick -> Microphone (TrickItem.cs:322-330)
+await Microphone 0                # action [0] Microphone plays tricked, angry, pays
+take ChiliSoup IT2_Piripiri
+usewith ToiletPaper IT2_Piripiri  # action [1]
+take OilCan IT2_Oilcan
+usewith ToiletFlush IT2_Oilcan    # action [2]
+await ToiletPaper 0
+await ToiletFlush 0
+take ToolPelt IT2_Wrench
+usewith Bicycle IT2_Wrench        # action [4]
+take CannonBall IT2_Cannonball
+usewith Watermelon IT2_Cannonball # action [3]; DependsOn Bicycle only widens IsTricked
+await Watermelon 0
+await Bicycle 0

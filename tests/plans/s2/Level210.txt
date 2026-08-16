@@ -1,0 +1,35 @@
+# Level210 — GameInfo total=8 / winning=6 (S2: TrickScore 0 everywhere, the
+# rating is completed*90/total). Catchers: Rottweiler + Mother; Olga is not
+# one (GameInfo.Update checks only CanRottweilerSeeWoody / CanMotherSeeWoody).
+# The Mother lives in Zone04 (DeckChairMother sleep bar 7-26, 63-85, 100-118
+# ... + CallRTMother); the neighbour's lap is ~98 s: DeckChair (Zone01, asleep
+# 5-16, sitting awake to ~53) -> CallRTMother, DogBasket (Zone04, 57-65) ->
+# TurbanShop (Zone02, 84-92, through Zone01 73-82) -> Elephant (Zone03,
+# 101-110) -> DogBasketPut (Zone04, 117) -> DeckChair (129).
+# (no walk-in: every Season-2 Woody serializes FinishedEntrance=true — Woody.Start
+# leaves the input unlocked and Woody.Update never starts the entrance walk,
+# Woody.cs:191, 223-231; StartGame plays the Entrance greeting with the input
+# locked for its 1.1 s, IntroAnimation.cs:300-304, Woody.cs:372-375)
+take SeaUrchin IT2_Hedgehog            # Zone02 (KeepFull: repeatable)
+usewith TurbanShop IT2_Hedgehog        # Zone02 (SecondRequiredInventory IT2_Oktopus is the alternative)
+take SeaUrchin IT2_Hedgehog            # a second urchin
+take AlmsBowl IT2_Bone                 # Zone03
+usewith DogBasket IT2_Bone             # Zone04 in the Mother's first sleep (RottweilerUseTogglesPrime, ships Primed; LinkedItemTrick -> DivingBoard; ExtraCoin210 with the empty pool)
+take CricketBat IT2_Bat                # Zone01 once the neighbour has left the deck chair (~55 s)
+take SuntanOil IT2_Sunoil              # Zone01
+take OlgaBra IT2_Bra                   # Zone01: OlgaBraBehavior puts it within reach during Olga's shower (OlgaShowerPutBra .. TakeBra: 5-22, 42-58, 79-96 ...)
+prime WaterMelons IT2_Bra              # Zone03: the bra's PrimingItem (Item.cs:1548-1572) — the held bra becomes IT2_Bra_sling (PrimedInventoryType)
+usewith Elephant IT2_Bat               # Zone03: ActivateItemTrick -> ElephantCricketBat
+usewith Pylon IT2_Bra_sling            # Zone01: LinkedItemTrick of the DeckChair — BEFORE the chair: the chair is UseOnce (no UseItemMultipleTimes, so its Fix keeps UseOnce), the pair must be armed together for one sit (Item.cs:2137-2142)
+usewith DeckChair IT2_Hedgehog         # Zone01 (LinkedItemTrick -> Pylon)
+usewith DivingBoard IT2_Sunoil         # Zone04 — in a later Mother sleep: MotherWakeSleepBehavior's MotherLookLoop -> Invoke ProgressBarDelay 2 s -> ProgressBar.RestoreVariables re-arms the Mother210 bar each lap (MotherWakeSleepBehavior.cs:26-52; sleeps 7-26, 65-84, 100-119 ...)
+await TurbanShop 0
+await DogBasket 0
+await DivingBoard 0
+await DeckChair 0
+await Elephant 0
+await Pylon 0
+take FishNet IT2_Brailer               # Zone04 (a later Mother sleep)
+unlock ToolBelt IT2_Brailer            # Zone01 dexterity search (unlocker IT2_Brailer) -> IT2_Tongs (RequirePriming, PrimingItem Valve); the tongs land only when the take animation ends, ~1.4 s after the done-pass (SearchItem.OnFinishAnimationCompelted)
+prime Valve IT2_Tongs                  # Zone01: the tongs prime at the valve (RemoveInventoryAfterRequirePriming); ObjectToPrimeWhenPrimed: Valve -> ValveWaterPuddle, ToolBelt -> Pool (the empty pool)
+take ValveWaterPuddle IT2_Oktopus      # Zone01: the puddle's octopus (the shop's second required)

@@ -1,0 +1,33 @@
+# Level206 — TotalTricksCount 6 (winning 4); every S2 TrickScore is 0.
+# Routine (Rottweiler2, LoopFromSelectedIndex, ActionSelectedIndex 4):
+# DogFifi, DeckChair (Zone04) -> Pillows (Zone03) -> DeckChair | DogFifi
+# (Zone04) -> LaunchPad, Harpoon, LaunchPad, Harpoon, LaunchPad (Zone01) ->
+# FifiWeightsDrop, Weights, FifiWeightsGrab (Zone02) -> DogFifi (Zone04) ->
+# DynamiteBox (Zone03), then round from [4] — actions [0..3] run ONCE, so
+# the Pillows (whose ActivateItemTrick arms the DeckChair) are a race
+# against his one Pillows visit at ~18 s: `usewith!` skips the gate the way
+# a human takes that chance. The Mother (a catcher, GameInfo.cs:222) lives
+# on the Zone04 deck chairs (a 58 s sleep bar on the second DeckChair use);
+# Olga's manager ships Frozen. Dead data (colliders off): DogFifi and
+# DeckChair as clicks, the DeckChairThrow/Call/Order Mother stops, the
+# FifiHarpoon / FifiWeights* poses of the flea blanket. Six coins = Pillows/
+# DeckChair, Weights, DynamiteBox, Harpoon + LaunchPad linked (Item.OnTrickDone
+# pays both, and the ExtraCoin206Calculation name-hack a third,
+# Item.cs:2409-2416 from TrickItem.PlayAnimation cs:813).
+take ToyBox IT2_Fartbag
+usewith! Pillows IT2_Fartbag      # action [2] at ~18 s (urgent run): ActivateItemTrick -> DeckChair (action [3])
+take SportsBag IT2_Rubber
+usewith Harpoon IT2_Rubber        # Neutral, RottweilerUseTogglesPrime: pays through the LaunchPad's harpoonAux hand-off
+take Rabbit IT2_Rabbit            # KeepFull, TakeItemMultipleTimes
+usewith LaunchPad IT2_Rabbit      # RequireUnprime toggles (prime [5], use [7], unprime [9]); DependsOn/LinkedItemTrick Harpoon
+await Pillows 0
+await Harpoon 0
+await LaunchPad 0
+unlock DentureAdhesive            # Dexterity, DexterityUnlocker IT_NONE (Zone04, the Mother's zone)
+take DentureAdhesive IT2_Kukident
+usewith DynamiteBox IT2_Kukident  # action [14]
+take FleaBlanket IT2_Fleablanket  # TrickAfterWoodyUse; hands the rabbit too
+usewith Weights IT2_Fleablanket   # action [11]
+await Weights 0
+await DynamiteBox 0
+await DeckChair 0

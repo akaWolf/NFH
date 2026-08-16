@@ -1,0 +1,36 @@
+# Level211 — GameInfo total=8 / winning=6 (S2: TrickScore 0 everywhere).
+# Catchers: Rottweiler + Mother (Olga is not one). Rottweiler lap ~81 s:
+# Sweets, FishingRod (Zone04, 4-22) -> LifeBoat (Zone01, 26-41) -> LifeJacket,
+# DivingGear (Zone02, 48-71) -> back through Zone03 (73-84). Mother: the
+# DeckChairMother sleep in Zone03 (4-24, 39-59, 75-94, 110-130 ...) and
+# OlgaChild in Zone04 (26-33, 61-68, 97-104 ...). Zone05 (the cabin) is on no
+# routine.
+# The FishingRod (IT2_Bentnail, ActivateItemTrick -> OlgaStandStill) is dead by
+# data: its collider (-4.84,2.08, 0.85x0.34, near face z=-4.05) lies entirely
+# inside the Zone04->Zone01 TransitionDownwards box (-4.96,2.30, 1.80x1.26, near
+# face -4.47), and Pawn.MoveToLocation's Physics.Raycast from the camera plane
+# (Pawn.cs:403, Woody.cs:708) returns the nearest hit — the door (both are
+# trigger colliders, hit by default); every click on the rod is a door click,
+# so the level caps at 7/8 (winning=6). The MumPicture's nail is only for it.
+take FireExtinguisher IT2_Extinguisher # Zone03 in the Mother's first sleep, from the start zone next door
+take Urinal IT2_Pissballs              # Zone02
+take ChestDrawer IT2_Coin              # Zone05 (KeepFull)
+take Plate IT2_Sausage                 # Zone05 (RequirePriming: primes at the Dog, PrimingItem; UnlockObjectToPrime -> Handbag)
+take CompressedAir IT2_Pressuretank    # Zone01 (KeepFull)
+usewith LifeJacket IT2_Pressuretank    # Zone02
+usewith DivingGear IT2_Extinguisher    # Zone02
+prime Dog IT2_Sausage                  # Zone03 (a Mother sleep): the held sausage's source primes on its PrimingItem (Item.cs:1548-1572, RemoveInventoryAfterRequirePriming) and unlocks + primes the Handbag (Item.WoodyPrime's ObjectToPrimeWhenPrimed / UnlockObjectToPrime)
+take Handbag IT2_Rasp                  # Zone03
+usewith ToiletSign IT2_Rasp            # Zone04 (KeepAfterUse: the rasp stays; DependsOn of ToiletMen/ToiletWomen)
+usewith Sweets IT2_Pissballs           # Zone04: RushToToilet; with the sign tricked Toilet211Behavior (Item.cs:2373-2384) sends him to the women's toilet, sets Olga on him and pays an extra TrickDone
+take CompressedAir IT2_Pressuretank    # Zone01 again (KeepFull)
+usewith OlgaChild IT2_Pressuretank     # Zone04 (the Mother's action; LinkedItemTrick of the CabinPhone)
+usewith PayPhone IT2_Coin              # Zone04: ActivateItemTrick -> CabinPhone (Zone05) + AlarmItem/CauseAlarm: the phone rings and he runs to answer it (AnswerPhoneNFH2)
+unlock LifeBoat IT2_Rasp               # Zone01: the dexterity trick item (DexterityTrickItem, unlocker IT2_Rasp, DexterityKeepItem) — the done-pass falls out of CanWoodyUse's chain and the boat is tricked (Item.cs:1475-1507; RemoveFromRoutineAfterUseTricked)
+await LifeJacket 0
+await DivingGear 0
+await Sweets 0
+await CabinPhone 0
+await OlgaChild 0
+await LifeBoat 0
+await 7                                # the toilet extra coin: GameInfo.TrickDone from Toilet211Behavior (no item flips AlreadyTricked for it) — 7 = TotalTricksCount minus the dead FishingRod

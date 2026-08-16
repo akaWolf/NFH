@@ -1,0 +1,32 @@
+# Level213 — GameInfo total=9 / winning=7 (S2: TrickScore 0 everywhere).
+# Catchers: Rottweiler + Mother (Olga is not one). Rottweiler lap ~112 s:
+# LiveBull (Zone04, 5-9) -> PlantCarnivore, Tortilla (Zone03, 26-33) ->
+# BoatPicnic (Zone02, 42-56) -> Pinata, MechanicalBullControls (Zone01,
+# 71-97) -> CementBath (Zone04, 106-112). Mother: MotherWaitZone5 (Zone05,
+# 3-24, 65-84 ...) <-> MotherWaitZone2 (Zone02, 40-51, 97-112 ...) through
+# Zone03. Woody starts in Zone03.
+take CementBag IT2_Cement              # Zone03
+take ChickenWings IT2_Chickenwing      # Zone01 (KeepFull)
+take Skeleton IT2_Tequila              # Zone01
+take Jar IT2_Jar_empty                 # Zone04 (RequirePriming: primes at the Termite -> IT2_Termites)
+prime Termite IT2_Jar_empty            # Zone01: the jar's PrimingItem (Item.cs:1548-1572)
+take Chili IT2_Chili                   # Zone02 (KeepFull)
+usewith CementBath IT2_Cement          # Zone04
+take StatueHand IT2_Hand               # Zone05 (behind Zone03's DoorBack; the Mother's MotherWaitZone5 spot)
+take Flowers IT2_Flowers               # Zone05
+usewith LiveBull IT2_Flowers           # Zone04 (LinkedItemTrick Wasp; his angry activates the Wasp search item, Rottweiler.cs:583-590)
+usewith PlantCarnivore IT2_Chickenwing # Zone03 (Compound; PlantCarnivoreExtraAnger)
+usewith Tortilla IT2_Chili             # Zone03
+usewith Tortilla IT2_Tequila           # Zone03: the compound (CompoundRequiredInventory IT2_Tequila, TrickItem.CanWoodyUse cs:509-529) — CompoundExtraCoin pays a second trick (Item.ExtraCoinCompound cs:2398-2409)
+usewith BoatPicnic IT2_Termites        # Zone02
+usewith MechanicalBullControls IT2_Hand # Zone01: ActivateItemTrick -> MechanicalBull (Olga's ride)
+await CementBath 0
+await LiveBull 0
+await PlantCarnivore 0
+await Tortilla 0
+await BoatPicnic 0
+await MechanicalBullControls 0
+take Wasp IT2_Beehive                  # Zone04: the wasp nest activated by the bull's angry (LinkedItemTrick of LiveBull)
+unlock Pinata IT2_Beehive              # Zone01: the dexterity trick item (unlocker IT2_Beehive)
+await Pinata 0
+await 9                                # the compound extra coin (Tortilla) and the plant's: TotalTricksCount

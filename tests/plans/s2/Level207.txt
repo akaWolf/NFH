@@ -1,0 +1,38 @@
+# Level207 — TotalTricksCount 7 (winning 5); every S2 TrickScore is 0.
+# Routine (Rottweiler2): PoolBoard (Zone04) -> Bartender, Elephant (Zone03)
+# -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); the Mother (a
+# catcher) on Zone04's DeckChair / PoolLadder (Level207MotherBehavior swaps
+# the pool board's sets while she is on the ladder); Olga on Zone02's shells.
+# Dead data (colliders off / no source): Fence1/2, PoolLadder, BeachLogo
+# (IT2_Knife), DeckChair (IT2_Fartbag), ShellLaydown, Pole, Tap and
+# Bartender as clicks (they are the IceBucket's / Whisky's PrimingItems),
+# ElephantBucket (Elephant's ActivateItemTrick). Seven coins = PoolBoard,
+# PoolAwning (linked, unlocked by the tricked board's use:
+# ItemsToUnlockWhenTricked + PoolJumpBehavior's collider enable), Elephant,
+# BeachTowel, Shell, SandCastle (+ its ExtraCoinLinkedTrick — KNOWN).
+take Moped IT2_Spring
+usewith PoolBoard IT2_Spring      # action [0]; PawnToAffectWhenTricked Mother
+await PoolBoard 0                 # the tricked use unlocks the awning (RoutineActionUse.cs:398-404)
+take Moped2 IT2_Pedal             # KeepFull
+usewith PoolAwning IT2_Pedal      # Locked until the board pays; collider enabled at PoolAwningFall frame 6
+take MopedPool IT2_Spring         # the second spring: the board has no UseOnce
+usewith PoolBoard IT2_Spring      # both tricked: the linked CrashMother set, the awning pays
+await PoolAwning 0
+take SeaUrchin IT2_Hedgehog
+usewith BeachTowel IT2_Hedgehog   # action [5]
+await BeachTowel 0
+take Whisky IT2_Whiskey           # RequirePriming, PrimingItem Bartender, ObjectToPrimeWhenPrimed IceBucket
+prime Bartender IT2_Whiskey       # Item.cs:1537-1573 + the IceBucket name-hack (cs:1274-1281): the bucket unlocks and re-arms
+take IceBucket IT2_Bucket_empty   # RequirePriming (re-armed), PrimingItem Tap -> IT2_Bucket
+prime Tap IT2_Bucket_empty
+usewith Elephant IT2_Bucket       # action [2]; ActivateItemTrick ElephantBucket
+await Elephant 0
+take BBQ IT2_Bbqtongs
+unlock CrayFish IT2_Bbqtongs      # Dexterity, DexterityUnlocker IT2_Bbqtongs, KeepFull
+take CrayFish IT2_Crayfish        # KNOWN: the dexterity win does not take the item (RequiredInventory IT_Foamballs junk)
+usewith Shell IT2_Crayfish        # action [3]; PawnToAffectWhenTricked Olga
+await Shell 0
+unlock CrayFish IT2_Bbqtongs      # TakeItemCount 2: the first win kept Dexterity (Item.cs:1466: it drops only at TakeItemCount == 1), the tongs are DexterityKeepItem — a second round
+take CrayFish IT2_Crayfish        # KeepFull: the second crayfish (SearchItem.cs:158-160)
+usewith SandCastle IT2_Crayfish   # action [4]; LinkedItemTrick BeachTowel (already paid: +1), ExtraCoinLinkedTrick pays a second time (Item.cs:2143-2146)
+await SandCastle 0

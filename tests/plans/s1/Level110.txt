@@ -1,0 +1,33 @@
+# Level110 — TotalTricksCount 6 (the four Ground twins share the bin's one
+# banana; the Beer's 20 is a fuse, see below): CarnivorPlantSpray 15,
+# SteakChair 10, Ground 10, FireExtinguisher 15, BBQ 20, SteakWine 15 = 85.
+# Routine: SteakMeat(Z03) Beer(Z07) BBQ(Z07) CarnivorPlantSpray(Z07) BBQ(Z07)
+# SteakChair(Z02) SteakWine(Z02); he starts in Zone06. Zone02 holds the
+# Chili dog (Alerter). Zone07 is the dead-end balcony behind Zone06 (Bed).
+# The BBQ needs IT_Cork, which no SearchItem holds: its trick is the Beer's
+# fuel (Beer.SetTrickedOnItem = BBQ, TrickItem.cs:341-343) — the fire at his
+# BBQ use pays the BBQ (GetTrickedItem -> BBQ.Tricked), and the Beer itself
+# never pays (UseAtOtherPlace keeps its IsTricked false, TrickItem.cs:260).
+# The BBQ has no CanFix: TryFix fetches the FireExtinguisher (FixingItem,
+# TrickItem.cs:1115-1124, README "The fixing-tool run"); a tricked tool
+# fires its own trick first (RoutineActionUseFixingItem's RedoAction) — the
+# extinguisher's 15 comes only through the BBQ fire.
+take PinsBoard IT_Pins               # Zone01
+take FirstAid IT_Fuel                # Zone04: fuel + growth liquid together
+take RubbishBinBanana2 IT_Banana     # Zone03
+take Fridge IT_Vinegar               # Zone03
+usewith Ground@Zone03 IT_Banana      # Zone03, 10: his walk to the steak
+usewith SteakChair IT_Pins           # Zone02, 10
+usewith SteakWine IT_Vinegar         # Zone02, 15
+use FireExtinguisher                 # Zone06, bare hand: the BBQ's fixing tool
+hide Bed                             # Zone06: he crosses to the balcony
+await SteakChair 10
+await SteakWine 15
+usewith Beer IT_Fuel +8              # Zone07: BBQ.Tricked via SetTrickedOnItem;
+                                     # +8: the spray, the way back and the bed
+usewith CarnivorPlantSpray IT_Growthliquid   # Zone07, 15 (RemoveFromRoutineAfterUseTricked)
+hide Bed
+await Ground@Zone03 10
+await BBQ 20                         # the fire; then the extinguisher fetch
+await FireExtinguisher 15            # the fetched tool's own trick (RedoAction)
+await CarnivorPlantSpray 15

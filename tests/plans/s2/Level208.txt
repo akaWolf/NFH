@@ -1,0 +1,31 @@
+# Level208 — GameInfo total=7 / winning=5. S2 scoring: TrickScore is 0 on every
+# item, the rating is completed*90/total (GameInfo.CalculateScore cs:413), so
+# every await asserts 0. Catchers: Rottweiler + Mother (the Mother never leaves
+# Zone02; her DressingRoom sleep bar, ~16 s of a ~26 s cycle, is the window —
+# IsSleeping gates CanMotherSeeWoody, GameInfo.cs:198). The Rottweiler's lap
+# is ~61 s: IndianPlatform (Zone03) -> ShoeMachine, AngryElephant (Zone01) ->
+# ArmsBowl (Zone04), crossing the hub Zone05 twice.
+take Balloons IT2_Balloon              # Zone05
+take Spade IT2_Shovel                  # Zone05
+usewith IndianMagician IT2_Balloon     # Zone03: ActivateItemTrick -> IndianPlatform.Tricked (TrickItem.cs:323-327)
+usewith SeeSaw IT2_Shovel              # Zone03: LinkedItemTrick of IndianPlatform
+await IndianPlatform 0                 # the linked pair pays both (Item.cs:2137-2142, GameInfo.TrickDone's LinkedTrick double count)
+await SeeSaw 0
+take BoardNail IT2_Blades              # Zone02 (the Mother's zone; her sleep window)
+usewith ShoeMachine IT2_Blades         # Zone01
+await ShoeMachine 0
+take Cable IT2_Cable                   # Zone02
+usewith ElectricTap IT2_Cable          # Zone04, NoticeWhenWalkNearby: the ArmsBowl walk passes it, an empty use sequence still runs the stop flow
+await ElectricTap 0
+use Rake                               # Zone02, bare hand, NoticeWhenWalkNearby — the Rottweiler only enters Zone02 for the Fifi chain below
+use Fifi                               # Zone02, bare hand: not a scored trick by itself (no Rottweiler use of Fifi; TrickDone fires only from Rottweiler.PlayAngryAnimation, Rottweiler.cs:787) — ChangeActionsWhenTricked208 makes the Mother's next Fifi use inject MotherRott/TakeFifi/PutFifi into the Rottweiler's routine (TrickItem.cs:1256-1260, ActionManager.AddInGameActions cs:814) and he walks past the Rake
+await Rake 0                           # RakeBazarCrash on the MotherRott walk
+take Chalk IT2_Chalk_sponge            # Zone02 — BEFORE the elephant: Pawn.ElephantAnimations (Pawn.cs:1536-1558) re-locks the SafetyLine the moment Woody leaves the primed elephant's zone
+take Mouse IT2_Rat                     # Zone04, dexterity search (unlocker IT_NONE, TakeItemCount 20): the minigame, then the take
+prime AngryElephant IT2_Rat            # Zone01: the DoublePrimingItem arm (Item.cs:1573-1589) primes the elephant, eats the rat, unlocks+primes SafetyLine (ObjectToPrimeWhenPrimed+UnlockObjectToPrime, Item.WoodyPrime)
+usewith SafetyLine IT2_Chalk_sponge    # Zone01, same visit: ActivateItemTrick -> AngryElephant.Tricked (TrickItem.cs:323-327)
+await AngryElephant 0
+take Mouse IT2_Rat                     # a second rat: AddInventoryToObject(InventoryToAdd=Mouse) refilled it after the elephant round (Item.cs:1582)
+prime Snake IT2_Rat                    # Zone02: the snake round (Item.cs:1554-1560): SnakeAux208, Snake primed, the held rat becomes IT2_Snake
+usewith ArmsBowl IT2_Snake             # Zone04
+await ArmsBowl 0                       # the 7th trick: the level ends here (CompletedTricksCount >= TotalTricksCount, GameInfo.cs:226)

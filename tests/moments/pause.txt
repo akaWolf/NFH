@@ -1,0 +1,8 @@
+# the power button pauses (Woody.ToggleMenu's time freeze)
+wait 4.0
+mouseitem Fridge
+wait 1.0
+click 685 575             # the power button (PowerRect 668..703, 558..593)
+wait 3.0
+click 745 552             # unpause
+wait 3.0

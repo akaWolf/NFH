@@ -1,0 +1,63 @@
+# Level112 — 10 tricks (GameInfo.TotalTricksCount 10): eleven scoring items,
+# but Yoga's own TrickScore is dead — its trick is the YogaBook's: the book
+# is UseAtOtherPlace (TrickItem.IsTricked false at the book, TrickItem.cs:260),
+# he carries the swapped book to the mat, and the mat's DependsOn branch
+# (TrickItem.PlayAnimation cs:857, RoutineActionUse.GetTrickedItem cs:556-570)
+# goes angry on the YogaBook — 7 points, once.
+#
+# Routine (~120 s a lap): YogaBook, FishTank (Z08) -> Yoga (Z02) -> YogaBook
+# (Z08) -> Trampoline (Z06) -> Bicycle (Z02) -> Mixer x2 (Z03) ->
+# ChestExpander, Weights (Z09) -> Rope (Z01) -> loop.  The skate ride (the
+# GroundSkates slip, RollerSkaterBehavior) parks the routine for good
+# (README "The Level112 skate ride parks, by the source's own arithmetic"),
+# so it goes last, after everything else has paid.  The 14 never pays:
+# the FallAction is a RoutineActionSurpriseNear whose SlideSkate x4
+# sequence would pay at its end (StopAction(true) -> Item.Tricked ->
+# PlayAngryAnimation, RoutineActionSurpriseNear.cs:49-58), but the fall
+# frame hides the controller (ScriptFreeze; a Hidden controller does not
+# Refresh, AnimationControllerBase.cs:172-181) and the comeback run's
+# UpdateWalkingAnimation -> PlayLoopingAnimation nulls AnimationSequence
+# (Pawn.cs:1175, AnimationControllerBase.cs:344-347) — the sequence never
+# ends; and the Shout (RollerSkaterBehavior.Shout, the other OnTrickDone
+# path) sits behind the Breath the door-exit stand starts and the walk-up
+# kills (README).  A dead trick in the shipped data — the port that still
+# ticked hidden controllers (KNOWN, since fixed) paid it 4 s after the
+# slip; the current one parks him unpaid, as the source does.
+
+# -- the hall while he is in the study/bedroom ----------------------------
+take Drawer IT_Marbles                # Z01
+take SportsBag IT_Skate               # Z01: IT_Skate + IT_Rubberrope
+use Rope                              # Z01, bare hand: the knotted rope, 7 at his [10]
+usewith GroundMarbles@Zone01 IT_Marbles   # x=3.30, on his Z03 -> Z09 walk (door 4.26 -> 2.18)
+# -- the basement (visited only at [8]/[9]) and the kitchen ---------------
+take BasementSpring IT_Spring         # Z09
+take BasementDrawer IT_Tongs          # Z09
+usewith ChestExpander IT_Rubberrope   # Z09, 8 at his [8]
+take RubbishBinCable IT_Cable         # Z03
+usewith ElectricTrap IT_Cable         # Z09 x=2.06, crossed on the [8] -> [9] walk, 7
+take FirstAid IT_Steroids             # Z04
+# -- upstairs while he is in the kitchen/basement/hall --------------------
+take BedDrawer IT_Knotbook            # Z06
+usewith Trampoline IT_Spring          # Z06, 8 at his [4]
+take TableSaw IT_Metalsaw             # Z07
+usewith FishTank IT_Steroids          # Z08, 8 at his [1]
+usewith YogaBook IT_Knotbook          # Z08: pays as the YogaBook at his Yoga [2]
+usewith Bicycle IT_Tongs              # Z02, 8 at his [5]
+usewith Weights IT_Metalsaw           # Z09, 8 at his [9]
+park Zone04
+
+await Rope 7
+await GroundMarbles@Zone01 7
+await ChestExpander 8
+await ElectricTrap 7
+await Weights 8
+await Trampoline 8
+await FishTank 8
+await YogaBook 7
+await Bicycle 8
+
+# -- last: the skate ride --------------------------------------------------
+usewith GroundSkates IT_Skate         # Z03 x=4.12, on his Z02 -> Mixer walk (14 at the Shout,
+                                      # RollerSkaterBehavior.Shout -> PlayAngryAnimation)
+await GroundSkates 14                 # never pays (see header) — a finding, kept as the assertion
+manual GroundSkates 14: no manual step exists — the SlideSkate sequence is dropped by the comeback walk and the Breath never reaches BreathEndFrame (see header)

@@ -1,0 +1,57 @@
+# Level113 — 8 tricks (GameInfo.TotalTricksCount 8) out of twelve scoring
+# items: the four DependsOn victims pay as their dependency chain, once —
+#   Radiator (needs IT_Honey, none in the level) fires on ValveHot's raw
+#     Tricked+GotTricked (GetTrickedAtOnce) and goes angry as itself
+#     (ValveHot.ForceFixOriginal, RoutineActionUse.cs:556-570) — 15;
+#   Sink (IT_Spring, none) the same on ValveMain (ForceFixOriginal) — 12;
+#   LadderDrill (IT_Glue, none) on the FuseBox, angry on the FuseBox — 10;
+#   ChairAssembly (IT_Honey) on the ChairAssemblyBook — 10.
+# ValveMain: MainValveOpen ships TRUE, so Woody's first click only closes it
+# (Item.cs:1714-1719); the second arms Tricked+GotTricked (1720-1726) — the
+# `use` leg's poke re-clicks after 8 s.  FuseBox: RequirePriming +
+# RottweilerUseTogglesPrime — only after his [6] prime (Item.cs:1520).
+#
+# Routine (~150 s a lap): ChairAssembly(Z02) -> AngleGrinder(Z07) ->
+# ValveMain(Z09) -> Radiator(Z03) -> Sink(Z04) -> ValveMain(Z09) ->
+# FuseBox(Z01) -> Ladder, LadderDrill(Z08) -> FuseBox(Z01) -> loop.  He
+# crosses the hall (Z01) between almost every pair; the wardrobe there and
+# the bed (Z06) are the hides.
+
+# -- he is on the balcony (AngleGrinder, t~15-30): the hall, kitchen, basement
+take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles
+take RubbishBinCable IT_Cable         # Z03
+usewith GroundMarbles@Zone03 IT_Marbles   # x=4.63 (score 8), on his door(4.09) -> Radiator(6.51) walk
+take BasementDrawer IT_Tongs          # Z09
+hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
+# -- he is in the basement / kitchen / bathroom: upstairs -----------------
+take BedDrawer IT_Painbook            # Z06
+usewith Ladder IT_Tongs               # Z08, 15 at his [7]
+use AngleGrinder                      # Z07, bare, 10 at his [1]
+usewith ChairAssemblyBook IT_Painbook # Z02: GetTrickedAtOnce -> ChairAssembly [0], 10
+park Zone03                           # off his Z01 -> Z02 -> Z06 -> Z08 walk
+# -- he is in the study: the fuse box, then the valves ---------------------
+usewith FuseBox IT_Fuse               # Z01: after his [6] prime -> LadderDrill [8], 10
+use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
+use ValveHot                          # Z09, bare: GetTrickedAtOnce -> the Radiator at [3], 15
+park Zone04
+
+await GroundMarbles@Zone03 8
+await Ladder 15
+await FuseBox 10
+await ChairAssemblyBook 10
+await AngleGrinder 10
+await Radiator 15
+await Sink 12
+
+# -- last: the trap, unreachable by the level's own geometry ---------------
+# The L113 ElectricTrap's collider (transform z -0.001; box x 1.97..2.16,
+# y -4.54..-4.12, near face -4.001) lies entirely inside the basement back
+# door's box (x 1.81..2.61, y -4.78..-3.34, near face -4.068): the click
+# raycast (Pawn.cs:403 — origin on the camera plane z=-10, Woody.cs:708
+# ScreenToWorldPoint(Input.mousePosition)) always hits the door first, so
+# no click ever reaches the trap.  In L111/L114 the same trap sits at
+# z -0.219 (near -4.219) and wins the ray.  The tatter's prime works (its
+# box peeks out to x 1.58).
+prime ElectricTrapTatter              # bare click primes the trap (Item.cs:1643-1651)
+usewith ElectricTrap IT_Cable         # never lands: the door takes the click
+await ElectricTrap 8

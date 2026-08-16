@@ -1,0 +1,34 @@
+# Level105 — 8 scoring tricks reachable, 79 points (+7 for the mutually
+# exclusive second Ground: one IT_Soap).  Routine: Piano (Zone02, AlertNext ->
+# the football rolls in on the last piano element), Football + Window (Zone03,
+# PostponeAlarm), PlantStink (Zone01); the toilet (Zone04) on the cheese rush.
+# The kitchen is only reachable from the living room (Zone02): the hall stairs
+# route crosses the plant visit — so Woody parks upstairs during the kitchen
+# stretch and slips through the side door when the neighbour comes to the piano.
+# The Phone (Zone01) is Tricked from the start: Woody's mobile icon in the HUD
+# strip raises the alarm (Item.OnIconPressed -> RaiseAlarm), the neighbour
+# answers TalkPhone once the postpone lifts.  The Window's IT_Bowling branch
+# scores 0 (the ball goes to the football).
+take Drawer IT_Marker             # Zone01, x9999
+take BowlingBag IT_Bowling        # Zone01
+usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 7
+take ToiletPaper IT_Wcpaper       # Zone04
+usewith Toilet IT_Wcpaper         # pays on the cheese rush (Puke x3, angry) or the walk-by, score 7
+take SoapDish IT_Soap
+park Zone02                       # up the hall stairs while he is in the kitchen
+take Mobile IT_Handy              # Zone02
+take Fridge IT_Egg                # Zone03 by the side door, once he heads for the piano: Egg + Cheese
+usewith Microwave IT_Egg          # Zone03 walk-by, score 7
+usewith Ground@Zone03 IT_Soap     # slip on the football/window walk, score 7 (Ground@Zone04 is the alternative)
+usewith Football IT_Bowling       # usable only once the piano's AlertNext rolls it in (fire on enable), score 15
+usewith PlantStink IT_Cheese      # Zone01, pays at SniffBad, score 13 -> RushToToilet
+usewith Piano IT_Marker           # Zone02, pays at PlayPianoSmeared, score 13
+icon IT_Handy                     # MobileCall -> the phone rings; he answers after the postponed use
+await Football 15
+await MumPicture 7
+await Microwave 7
+await Ground@Zone03 7
+await PlantStink 13
+await Toilet 7
+await Piano 13
+await Phone 10

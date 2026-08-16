@@ -1,0 +1,28 @@
+# Level104 — 7 scoring tricks reachable, 82 points (+8 for the mutually
+# exclusive second Ground: one IT_Soap).  Routine: ApplePie(take), Microwave,
+# WhippedCream, ApplePie(eat) in the kitchen (Zone03), then Deodrant,
+# AfterShave, SinkAftershave, SinkDeodrant, AfterShave, Deodrant in the
+# bathroom (Zone04); the hall (Zone01) is crossed between them.
+# The IT_Magnesium branches (ApplePie, SinkAftershave, SinkDeodrant) are dead
+# data (no source): the sinks pay through DependsOn -> Deodrant / AfterShave
+# (Neutral shelf items, RottweilerUseTogglesPrime, start Primed = on the shelf),
+# the pie through DependsOn -> WhippedCream (GetTrickedItem, RoutineActionUse.cs).
+take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by (0.1), score 8
+take SoapDish IT_Soap             # the one soap
+usewith Deodrant IT_Hairrestorer  # on the shelf (Primed); pays at SinkDeodrant [7], score 15
+take Drawer IT_Superglue          # Zone01: Superglue + Marker
+usewith AfterShave IT_Superglue   # on the shelf (Primed); pays at SinkAftershave [6], score 20
+usewith MumPicture IT_Marker      # Zone01, crossed on every hall transit, score 8
+take Fridge IT_Egg                # Zone03 during the bathroom stretch
+usewith Microwave IT_Egg          # routine use [1] (ReuseAfterFix), score 8
+usewith WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at [2], pays at the pie's eat [3], score 15
+usewith Ground@Zone03 IT_Soap     # CauseSlip between microwave and pie, score 8 (Ground@Zone04 is the alternative)
+await AfterShave 20
+await Deodrant 15
+await Toilet 8
+await MumPicture 8
+await Microwave 8
+await WhippedCream 15
+await Ground@Zone03 8

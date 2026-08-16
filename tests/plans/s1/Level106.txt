@@ -1,0 +1,35 @@
+# Level106 — 9 scoring tricks reachable, 76 points (+7 for the mutually
+# exclusive second Ground: one IT_Soap; Ground@Zone01 needs IT_Knotbook, which
+# no SearchItem of the level holds — unreachable by data).
+# Routine: PhotoAlbum, Candy (Zone02), Pudding (Zone03), BathTub prime (Zone04),
+# PhotoAlbum, Candy, Pudding, BathTub bath, Towel (Zone04); the hall is crossed
+# on the kitchen<->bathroom legs, the toilet (Zone04) on the candy rush.
+# The tub is primed (full) by the neighbour's own [3] visit: only then does the
+# empty bottle fill on it (RubbishBinBottle.RequirePriming, PrimingItem = BathTub,
+# PrimedInventoryType IT_Fullbottle, Item.cs:1537-1572) and only then does the
+# hair restorer go in (Item.cs:1520).
+take Drawer IT_Glue               # Zone01: Glue + Marker + Shoepolish
+usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 7
+take FirstAid IT_Foamballs        # Zone04: Foamballs + Hairrestorer
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by, score 7
+take SoapDish IT_Soap             # the one soap
+usewith Towel IT_Shoepolish       # pays at [8] BathTowelPolish, score 12
+take Fridge IT_Egg                # Zone03
+usewith Microwave IT_Egg          # Zone03 walk-by, score 7
+usewith Ground@Zone03 IT_Soap     # slip on the pudding walk, score 7 (Ground@Zone04 is the alternative)
+take RubbishBinBottle IT_Emptybottle   # Zone03
+usewith PhotoAlbum IT_Glue        # Zone02, pays at [0]/[4] PhotoAlbumSticky, score 8
+usewith Candy IT_Foamballs        # Zone02, pays at [1]/[5] SpitRight, score 8 -> RushToToilet
+prime BathTub IT_Emptybottle      # the full tub fills the bottle: IT_Emptybottle -> IT_Fullbottle
+usewith BathTub IT_Hairrestorer   # in the full tub, pays at [7] BathHair, score 12
+usewith Pudding IT_Fullbottle     # Zone03, pays at [2]/[6] PourMilk, score 8 — PORT: unclickable in the port (BoxCollider size z = -14.05 -> a negative collider height, docs/audit/verified/plans_s1a.md #2)
+await PhotoAlbum 8
+await Candy 8
+await Toilet 7
+await Pudding 8
+await BathTub 12
+await Towel 12
+await Microwave 7
+await Ground@Zone03 7
+await MumPicture 7

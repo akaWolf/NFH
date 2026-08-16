@@ -1,0 +1,22 @@
+# Level102 — 5 scoring tricks, 78 points (the data: TrickScore per item)
+# routine: Sofa (Zone02, ~7 s sit) <-> Beer (Zone03, TakeInventory); the toilet
+# (Zone04) only on the laxative rush.  The saw is SawSofa x3 = 14.3 s at 13 fps
+# (+ TrickLaugh) and lands at the sequence end, so the sofa needs the long
+# absence of the toilet trip (~30 s), not the 12.7 s beer run: arm the beer and
+# the microwave first, wait it out in the kitchen, saw while he is on the loo.
+take Drawer IT_Saw
+take FirstAid IT_Laxative
+take ToiletPaper IT_Wcpaper       # TrickAfterWoodyUse + GetTrickedAtOnce: the holder is tricked
+usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
+take Fridge IT_Egg
+usewith Beer IT_Laxative          # UseAtOtherPlace: drunk at the sofa (Sofa.DependsOn -> Beer), score 18
+usewith Microwave IT_Egg          # NoticeWhenWalkNearby (the beer run passes it), score 10
+reclick Microwave                 # UseOnce: a second click is WrongTrick/NoNo
+await Microwave 10                # the beer run: surprise near, angry, fix
+await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa
+park Zone03                       # the kitchen is free while he rages and runs to the loo
+usewith Sofa IT_Saw               # score 25 — sawn during the toilet trip
+await Toilet 10                   # the ToiletAction visit (ShitNormal, ShitNoPaper) — paid meanwhile
+await Sofa 25                     # the next sit: SitDown, SitFall, SofaBlur
+use Television                    # bare-hand, NoticeWhenEnterZone, score 15
+await Television 15

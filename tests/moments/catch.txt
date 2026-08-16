@@ -1,0 +1,4 @@
+# stand in the open until the neighbour's lap catches Woody
+wait 4.0
+clickworld 4.0 1.2        # into the living room, in the routine's path
+wait 56.0

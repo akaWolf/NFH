@@ -1,0 +1,24 @@
+# Level103 — 6 scoring tricks reachable, 85 points (+10 for the mutually
+# exclusive second Ground: one IT_Soap in the level, SoapDish x1, no KeepFull)
+# routine: Candle, BirthdayCake, BirthdayCake (all Zone03), LetterBox (Zone01);
+# the "ToiletAction" is the FirstAid in Zone04 (LetterBox.RushToToilet: the
+# mousetrapped finger runs to the first-aid kit).  Zone02 is never visited.
+# BirthdayCake's own IT_Magnesium branch is dead data (no source in the level):
+# the cake pays through DependsOn -> Candle (fireworks, GetTrickedItem returns
+# the dependency, RoutineActionUse.cs:556-571), i.e. Candle's 25.
+take Drawer IT_Boom               # Boom + Marker + Mousetrap in one take
+usewith MumPicture IT_Marker      # Zone01, NoticeWhenWalkNearby (0.1), score 10
+take ToiletPaper IT_Wcpaper       # Zone04
+usewith Toilet IT_Wcpaper         # Neutral: pays only raw-Tricked, on the first-aid rush walk-by, score 10
+take SoapDish IT_Soap             # the one soap
+usewith LetterBox IT_Mousetrap    # Zone01, score 20 -> RushToToilet (the FirstAid)
+usewith Candle IT_Boom            # Zone03, UseAtOtherPlace: taken at [0], explodes at the cake's use visit, score 25
+usewith Ground@Zone03 IT_Soap     # Zone03, CauseSlip, score 10 (Ground@Zone04 is the alternative)
+take Fridge IT_Egg
+usewith Microwave IT_Egg          # Zone03, NoticeWhenWalkNearby, score 10
+await LetterBox 20
+await MumPicture 10               # crossed on the rush to the first-aid kit
+await Toilet 10                   # crossed on the rush to the first-aid kit
+await Candle 25
+await Ground@Zone03 10
+await Microwave 10

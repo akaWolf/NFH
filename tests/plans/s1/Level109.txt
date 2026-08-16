@@ -1,0 +1,38 @@
+# Level109 — TotalTricksCount 7 (the three Ground twins share the bin's one
+# banana): Ground 7, AlarmClock 13, PigMilk 20, Bed 8, Chili 15 (paid as
+# CornChips 0 — see below), Teeth 15, Pig 20 = 83 points by the C#.
+# Routine: Teeth(Z06, prime) Bed(Z06, ~30 s sleep) AlarmClock(Z06) Teeth(Z06)
+# PigKeys(Z06) PigMilk(Z03) Pig(Z01) PigMilk(Z03) CornChips(Z03) Chili(Z02)
+# PigKeys(Z06); he starts in Zone06. Zone02 holds the Chili dog (Alerter).
+# Zone07 (the Cactus) is never visited: a safe balcony behind Zone06.
+# While he sleeps in the Bed IsSleeping gates the catch (GameInfo.cs:189):
+# Woody works the bedroom during the sleep (the driver's ETA reads a
+# sleeper as harmless until his bar's window ends).
+take PinsBoard IT_Pins               # Zone01
+take PigKeys IT_Pigkey               # Zone06, during the sleep: the hook holds
+                                     # them only while Primed (Item.cs:1057-1063,
+                                     # 1515), TrickAfterWoodyUse arms them
+take Cactus IT_Cactus                # Zone07
+usewith AlarmClock IT_Cactus         # Zone06, 13 (BedAlarmCactus, AngryWithoutAnimations)
+take ChemicalSet IT_Nitro            # Zone02
+take SpicyChips IT_Chips             # Zone02, next to the dog
+usewith Pig IT_Pigkey                # Zone01, 20: the pig gets out (NoticeWhenWalkNearby)
+await AlarmClock 13
+take RubbishBinBanana2 IT_Banana     # Zone03
+take Fridge IT_Tabasco               # Zone03
+usewith Ground@Zone03 IT_Banana      # Zone03, 7: on his way to the milk
+usewith PigMilk IT_Nitro             # Zone03: explodes at the pig, paid through
+                                     # GetTrickedItem -> DependsOn = PigMilk (20)
+usewith CornChips IT_Chips           # Zone03: fed to the dog at Chili; the C# pays
+                                     # GetTrickedItem -> DependsOn = CornChips
+                                     # (TrickScore 0) — the Chili's 15 is dead data
+await Pig 20
+usewith Teeth IT_Tabasco             # Zone06 while primed (his sleep), 15 at the
+                                     # RottweilerUseTogglesPrime use (SpitFire)
+usewith Bed IT_Pins                  # Zone06 with the bed empty (IsRottweilerSleeping
+                                     # refuses Woody, TrickItem.cs:538-542), 8
+await Ground@Zone03 7
+await PigMilk 20
+await CornChips 0
+await Teeth 15
+await Bed 8
