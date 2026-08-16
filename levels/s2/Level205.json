@@ -76197,6 +76197,90 @@
   }
  },
  "hud": {
+  "DexterityComponent": [
+   {
+    "m_GameObject": {
+     "path": 56,
+     "name": "DuckCage",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "TexturesGUIDepth": "HUD",
+    "ForegroundTexture": {
+     "texture": "egg_cursor"
+    },
+    "ForegroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "BackgroundTexture": {
+     "texture": "field"
+    },
+    "BackgroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 190.0,
+     "height": 190.0
+    },
+    "BackgroundTextureWrong": {
+     "texture": "field_alarm"
+    },
+    "BackgroundTextureItem": {
+     "texture": "egg_white"
+    },
+    "BackgroundTextureItemRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "MouseCursor": {
+     "path": 289,
+     "name": "MouseCursor",
+     "type": "MouseCursor"
+    },
+    "Woody": {
+     "path": 215,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "FieldAlarmFull": {
+     "texture": "field_full"
+    },
+    "Rottweiler": {
+     "path": 204,
+     "name": "Rottweiler2",
+     "type": "Rottweiler"
+    },
+    "alerter": {
+     "path": 243,
+     "name": "DuckCage",
+     "type": "SearchItem"
+    },
+    "ForegroundRectAux": {
+     "x": 30.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundRectAux": {
+     "x": 30.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundTextureItemRectAux": {
+     "x": 30.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "HideObjectDuringDexterity": false,
+    "GameCamera": null
+   }
+  ],
   "HUD": [
    {
     "m_GameObject": {

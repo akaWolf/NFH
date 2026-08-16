@@ -85202,6 +85202,90 @@
     }
    }
   ],
+  "DexterityComponent": [
+   {
+    "m_GameObject": {
+     "path": 77,
+     "name": "Hatch",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "TexturesGUIDepth": "HUD",
+    "ForegroundTexture": {
+     "texture": "shards_cursor"
+    },
+    "ForegroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "BackgroundTexture": {
+     "texture": "field"
+    },
+    "BackgroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 190.0,
+     "height": 190.0
+    },
+    "BackgroundTextureWrong": {
+     "texture": "field_alarm"
+    },
+    "BackgroundTextureItem": {
+     "texture": "shards_white"
+    },
+    "BackgroundTextureItemRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "MouseCursor": {
+     "path": 345,
+     "name": "MouseCursor",
+     "type": "MouseCursor"
+    },
+    "Woody": {
+     "path": 262,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "FieldAlarmFull": {
+     "texture": "field_full"
+    },
+    "Rottweiler": {
+     "path": 244,
+     "name": "Rottweiler2",
+     "type": "Rottweiler"
+    },
+    "alerter": {
+     "path": 323,
+     "name": "Hatch",
+     "type": "TrickItem"
+    },
+    "ForegroundRectAux": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundRectAux": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundTextureItemRectAux": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "HideObjectDuringDexterity": false,
+    "GameCamera": null
+   }
+  ],
   "HUDProgressBar": [
    {
     "m_GameObject": {
@@ -85215,6 +85299,168 @@
      "name": "ProgressBar",
      "type": "ProgressBar"
     }
+   }
+  ],
+  "ProgressBar": [
+   {
+    "m_GameObject": {
+     "path": 19,
+     "name": "ProgressBar",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "HUDProgress": {
+     "path": 353,
+     "name": "ProgressBar",
+     "type": "HUDProgressBar"
+    },
+    "CorrespondingItem": {
+     "path": 329,
+     "name": "DeckChairMother",
+     "type": "TrickItem"
+    },
+    "ProgressBarEmpty": {
+     "texture": "progress_back"
+    },
+    "ProgressBarFull": {
+     "texture": "progress_front"
+    },
+    "ProgressRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 0.11999999731779099,
+     "height": 0.029999999329447746
+    },
+    "DeltaProgressRect": {
+     "x": -0.03500000014901161,
+     "y": -0.07000000029802322,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "RottweilerHUDProgressFull": {
+     "texture": "HN_dis_001"
+    },
+    "MotherHUDProgressFull": {
+     "texture": "Mutter_dis_001"
+    },
+    "PlayPawnBlindAnimation": false,
+    "Actor": "Mother",
+    "AnimationSequences": [
+     {
+      "AnimationSequence": "MotherSecondUse",
+      "AnimationStartIndex": 0,
+      "AnimationEndIndex": 10,
+      "Duration": 57.70000076293945
+     },
+     {
+      "AnimationSequence": "MotherExtraUse",
+      "AnimationStartIndex": 2,
+      "AnimationEndIndex": 11,
+      "Duration": 57.70000076293945
+     }
+    ],
+    "DataStyle": {
+     "m_Name": "",
+     "m_Normal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Normal.r": 1.0,
+     "m_Normal.g": 1.0,
+     "m_Normal.b": 1.0,
+     "m_Normal.a": 1.0,
+     "m_Hover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Hover.r": 0.0,
+     "m_Hover.g": 0.0,
+     "m_Hover.b": 0.0,
+     "m_Hover.a": 1.0,
+     "m_Active.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Active.r": 0.0,
+     "m_Active.g": 0.0,
+     "m_Active.b": 0.0,
+     "m_Active.a": 1.0,
+     "m_Focused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_Focused.r": 0.0,
+     "m_Focused.g": 0.0,
+     "m_Focused.b": 0.0,
+     "m_Focused.a": 1.0,
+     "m_OnNormal.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnNormal.r": 0.0,
+     "m_OnNormal.g": 0.0,
+     "m_OnNormal.b": 0.0,
+     "m_OnNormal.a": 1.0,
+     "m_OnHover.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnHover.r": 0.0,
+     "m_OnHover.g": 0.0,
+     "m_OnHover.b": 0.0,
+     "m_OnHover.a": 1.0,
+     "m_OnActive.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnActive.r": 0.0,
+     "m_OnActive.g": 0.0,
+     "m_OnActive.b": 0.0,
+     "m_OnActive.a": 1.0,
+     "m_OnFocused.m_Background": {
+      "file": 0,
+      "path": 0
+     },
+     "m_OnFocused.r": 0.0,
+     "m_OnFocused.g": 0.0,
+     "m_OnFocused.b": 0.0,
+     "m_OnFocused.a": 1.0,
+     "m_Border.left": 0,
+     "m_Border.right": 0,
+     "m_Border.top": 0,
+     "m_Border.bottom": 0,
+     "m_Margin.left": 0,
+     "m_Margin.right": 0,
+     "m_Margin.top": 0,
+     "m_Margin.bottom": 0,
+     "m_Padding.left": 0,
+     "m_Padding.right": 0,
+     "m_Padding.top": 0,
+     "m_Padding.bottom": 0,
+     "m_Overflow.left": 0,
+     "m_Overflow.right": 0,
+     "m_Overflow.top": 0,
+     "m_Overflow.bottom": 0,
+     "m_Font": {
+      "font": "BLUEHIGB14"
+     },
+     "m_FontSize": 5,
+     "m_FontStyle": 0,
+     "m_Alignment": 4,
+     "m_WordWrap": 0,
+     "m_RichText": 1,
+     "m_TextClipping": 0,
+     "m_ImagePosition": 0,
+     "m_ContentOffset.x": 0.0,
+     "m_ContentOffset.y": 0.0,
+     "m_FixedWidth": 0.0,
+     "m_FixedHeight": 0.0,
+     "m_StretchWidth": 1,
+     "m_StretchHeight": 0
+    },
+    "TexturesGUIDepth": "BackHUD",
+    "HUDGUIDepth": "Menu",
+    "Mother210": false
    }
   ]
  }

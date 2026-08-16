@@ -72769,6 +72769,90 @@
   }
  },
  "hud": {
+  "DexterityComponent": [
+   {
+    "m_GameObject": {
+     "path": 55,
+     "name": "OlgaBag",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "TexturesGUIDepth": "HUD",
+    "ForegroundTexture": {
+     "texture": "strumpf_cursor"
+    },
+    "ForegroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "BackgroundTexture": {
+     "texture": "field"
+    },
+    "BackgroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 190.0,
+     "height": 190.0
+    },
+    "BackgroundTextureWrong": {
+     "texture": "field_alarm"
+    },
+    "BackgroundTextureItem": {
+     "texture": "strumpf_white"
+    },
+    "BackgroundTextureItemRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "MouseCursor": {
+     "path": 265,
+     "name": "MouseCursor",
+     "type": "MouseCursor"
+    },
+    "Woody": {
+     "path": 205,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "FieldAlarmFull": {
+     "texture": "field_full"
+    },
+    "Rottweiler": {
+     "path": 195,
+     "name": "Rottweiler2",
+     "type": "Rottweiler"
+    },
+    "alerter": {
+     "path": 233,
+     "name": "OlgaBag",
+     "type": "SearchItem"
+    },
+    "ForegroundRectAux": {
+     "x": 100.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundRectAux": {
+     "x": 100.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundTextureItemRectAux": {
+     "x": 100.0,
+     "y": 0.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "HideObjectDuringDexterity": false,
+    "GameCamera": null
+   }
+  ],
   "HUD": [
    {
     "m_GameObject": {

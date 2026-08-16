@@ -68817,6 +68817,90 @@
      "height": 1.0
     }
    }
+  ],
+  "DexterityComponent": [
+   {
+    "m_GameObject": {
+     "path": 65,
+     "name": "ToolBox",
+     "type": "GameObject"
+    },
+    "m_Name": "",
+    "TexturesGUIDepth": "HUD",
+    "ForegroundTexture": {
+     "texture": "hairpin_cursor"
+    },
+    "ForegroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "BackgroundTexture": {
+     "texture": "field"
+    },
+    "BackgroundRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 190.0,
+     "height": 190.0
+    },
+    "BackgroundTextureWrong": {
+     "texture": "field_alarm"
+    },
+    "BackgroundTextureItem": {
+     "texture": "hairpin_white"
+    },
+    "BackgroundTextureItemRect": {
+     "x": 0.0,
+     "y": 0.0,
+     "width": 80.0,
+     "height": 80.0
+    },
+    "MouseCursor": {
+     "path": 238,
+     "name": "MouseCursor",
+     "type": "MouseCursor"
+    },
+    "Woody": {
+     "path": 218,
+     "name": "Player2",
+     "type": "Woody"
+    },
+    "FieldAlarmFull": {
+     "texture": "field_full"
+    },
+    "Rottweiler": {
+     "path": 193,
+     "name": "Rottweiler2",
+     "type": "Rottweiler"
+    },
+    "alerter": {
+     "path": 263,
+     "name": "ToolBox",
+     "type": "SearchItem"
+    },
+    "ForegroundRectAux": {
+     "x": 0.0,
+     "y": 200.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundRectAux": {
+     "x": 0.0,
+     "y": 200.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "BackgroundTextureItemRectAux": {
+     "x": 0.0,
+     "y": 200.0,
+     "width": 0.0,
+     "height": 0.0
+    },
+    "HideObjectDuringDexterity": false,
+    "GameCamera": null
+   }
   ]
  },
  "bubble_icons": {

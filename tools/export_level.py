@@ -312,7 +312,8 @@ def hud_sections(sc, index, out):
     top-level section, leaving the raw objects untouched"""
     res = {}
     for pid, e in out['objects'].items():
-        if e.get('type') not in ('HUD', 'HUDProgressBar') or 'data' not in e:
+        if e.get('type') not in ('HUD', 'HUDProgressBar', 'ProgressBar',
+                                 'DexterityComponent') or 'data' not in e:
             continue
 
         def walk(v):
