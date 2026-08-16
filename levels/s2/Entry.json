@@ -6520,7 +6520,12 @@
   },
   "199": {
    "type": "Camera",
-   "class_id": 20
+   "class_id": 20,
+   "data": {
+    "orthographic": false,
+    "orthographic_size": 100.0,
+    "depth": -1.0
+   }
   },
   "200": {
    "type": "AudioListener",
@@ -6528,31 +6533,59 @@
   },
   "201": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "202": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "203": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "204": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "205": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 0.16300000250339508,
+    "loop": false
+   }
   },
   "206": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 0.16300000250339508,
+    "loop": true
+   }
   },
   "207": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "208": {
    "type": "cls92",
@@ -35829,26 +35862,21 @@
     "UseAlternateSounds": false,
     "LevelSounds": [
      {
-      "external": 6,
-      "path": 85
+      "clip": "titel~2"
      },
      {
-      "external": 6,
-      "path": 85
+      "clip": "titel~2"
      },
      {
-      "external": 6,
-      "path": 85
+      "clip": "titel~2"
      }
     ],
     "AlternateLevelSounds": [],
     "LevelStart": {
-     "external": 6,
-     "path": 82
+     "clip": "jingle_levelstart~2"
     },
     "EntranceSound": {
-     "external": 6,
-     "path": 84
+     "clip": "levelstart~2"
     },
     "EntranceSoundSource": {
      "path": 207,
@@ -35856,24 +35884,19 @@
      "type": "AudioSource"
     },
     "SuccessNormal": {
-     "external": 6,
-     "path": 87
+     "clip": "jingle_success_normal~2"
     },
     "SuccessPerfect": {
-     "external": 6,
-     "path": 83
+     "clip": "jingle_success_perfect~2"
     },
     "Caught": {
-     "external": 6,
-     "path": 86
+     "clip": "jingle_caught~2"
     },
     "Failed": {
-     "external": 6,
-     "path": 81
+     "clip": "jingle_failed~2"
     },
     "Joke": {
-     "external": 6,
-     "path": 88
+     "clip": "jingle_joke~2"
     },
     "LevelMusicSource": {
      "path": 206,
@@ -35886,8 +35909,7 @@
      "type": "AudioSource"
     },
     "EntranceClap": {
-     "external": 6,
-     "path": 82
+     "clip": "jingle_levelstart~2"
     },
     "ChangeVolume": {
      "path": 203,

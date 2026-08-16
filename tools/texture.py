@@ -24,12 +24,23 @@ LINEAR_BPP = {ALPHA8: 1, R16: 2, RGB565: 2, ARGB4444: 2, RGBA4444: 2,
               RGB24: 3, RGBA32: 4, ARGB32: 4, BGRA32: 4}
 
 
+# UnityEngine.TextureWrapMode (5.3: one mode for U and V)
+WRAP_REPEAT, WRAP_CLAMP = 0, 1
+WRAP_NAMES = {WRAP_REPEAT: 'repeat', WRAP_CLAMP: 'clamp'}
+
+
 class Texture:
-    __slots__ = ('name', 'width', 'height', 'fmt', 'mips', 'data', 'streamed')
+    __slots__ = ('name', 'width', 'height', 'fmt', 'mips', 'data', 'streamed',
+                 'wrap')
 
     def __init__(self, **kw):
+        self.wrap = WRAP_REPEAT
         for k, v in kw.items():
             setattr(self, k, v)
+
+    @property
+    def wrap_name(self):
+        return WRAP_NAMES.get(self.wrap, 'wrap%d' % self.wrap)
 
     @property
     def format_name(self):
@@ -56,7 +67,8 @@ def read_texture2d(sf, obj, resource_dirs=None):
     fmt = r.i32(); mips = r.i32()
     r.u8(); r.u8(); r.align(4)               # m_IsReadable, m_ReadAllowed
     r.i32(); r.i32()                         # m_ImageCount, m_TextureDimension
-    r.i32(); r.i32(); r.u('f', 4); r.i32()   # m_TextureSettings
+    r.i32(); r.i32(); r.u('f', 4)            # m_TextureSettings: m_FilterMode,
+    wrap = r.i32()                           #   m_Aniso, m_MipBias, m_WrapMode
     r.i32(); r.i32()                         # m_LightmapFormat, m_ColorSpace
     size = r.i32()
     streamed = False
@@ -73,7 +85,7 @@ def read_texture2d(sf, obj, resource_dirs=None):
                 with open(p, 'rb') as fh:
                     fh.seek(off); data = fh.read(sz)
     return Texture(name=name, width=width, height=height, fmt=fmt, mips=mips,
-                   data=data, streamed=streamed)
+                   data=data, streamed=streamed, wrap=wrap)
 
 
 # ---------------------------------------------------------------- decoding

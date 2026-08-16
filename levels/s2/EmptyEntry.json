@@ -5,6 +5,12 @@
   {
    "name": "Level",
    "texture": "house01",
+   "uv": [
+    1.0,
+    1.0,
+    0.0,
+    0.0
+   ],
    "active": true,
    "renderer_enabled": false,
    "go": 1,
@@ -319,19 +325,35 @@
   },
   "11": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "12": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "13": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "14": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "15": {
    "type": "RenderSettings",

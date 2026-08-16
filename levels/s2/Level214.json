@@ -5,6 +5,12 @@
   {
    "name": "Level",
    "texture": "house214",
+   "uv": [
+    1.0,
+    1.0,
+    0.0,
+    0.0
+   ],
    "active": true,
    "renderer_enabled": true,
    "go": 4,
@@ -5898,7 +5904,12 @@
   },
   "176": {
    "type": "Camera",
-   "class_id": 20
+   "class_id": 20,
+   "data": {
+    "orthographic": true,
+    "orthographic_size": 3.0,
+    "depth": -1.0
+   }
   },
   "177": {
    "type": "MeshRenderer",
@@ -6675,31 +6686,59 @@
   },
   "224": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "225": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "226": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "227": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "228": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 0.16300000250339508,
+    "loop": false
+   }
   },
   "229": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 0.16300000250339508,
+    "loop": true
+   }
   },
   "230": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "231": {
    "type": "cls92",
@@ -7907,7 +7946,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 160.0,
-      "OriginalHeight": 58.0
+      "OriginalHeight": 58.0,
+      "SheetTexture": "carpet"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -8200,8 +8240,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -8946,30 +8985,24 @@
     "IgnoreWoody": false,
     "MediumLaughs": [
      {
-      "external": 8,
-      "path": 1
+      "clip": "medium1"
      },
      {
-      "external": 9,
-      "path": 1
+      "clip": "medium2"
      },
      {
-      "external": 10,
-      "path": 1
+      "clip": "medium3"
      }
     ],
     "BigLaughs": [
      {
-      "external": 11,
-      "path": 1
+      "clip": "big1"
      },
      {
-      "external": 12,
-      "path": 1
+      "clip": "big2"
      },
      {
-      "external": 13,
-      "path": 1
+      "clip": "big3"
      }
     ],
     "LaughVolume": 0.15000000596046448,
@@ -9901,7 +9934,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 150.0,
-      "OriginalHeight": 180.0
+      "OriginalHeight": 180.0,
+      "SheetTexture": "door"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -9928,7 +9962,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 447.0,
-      "OriginalHeight": 537.0
+      "OriginalHeight": 537.0,
+      "SheetTexture": "Bridge_door_open"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -10150,8 +10185,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -10907,7 +10941,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 86.0,
-      "OriginalHeight": 65.0
+      "OriginalHeight": 65.0,
+      "SheetTexture": "bucket"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -10934,7 +10969,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 86.0,
-      "OriginalHeight": 64.0
+      "OriginalHeight": 64.0,
+      "SheetTexture": "bucket_fish"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -11153,8 +11189,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -11489,7 +11524,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 176.0,
-      "OriginalHeight": 226.0
+      "OriginalHeight": 226.0,
+      "SheetTexture": "glass"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -11710,8 +11746,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -12024,7 +12059,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 165.0,
-      "OriginalHeight": 154.0
+      "OriginalHeight": 154.0,
+      "SheetTexture": "shower_empty"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -12051,7 +12087,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 165.0,
-      "OriginalHeight": 154.0
+      "OriginalHeight": 154.0,
+      "SheetTexture": "shower_olga"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -12289,8 +12326,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -15715,7 +15751,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 128.0,
-      "OriginalHeight": 95.0
+      "OriginalHeight": 95.0,
+      "SheetTexture": "chair_paper"
      },
      {
       "Name": "N2TrickItemUseNormal",
@@ -15742,7 +15779,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 127.0,
-      "OriginalHeight": 97.0
+      "OriginalHeight": 97.0,
+      "SheetTexture": "chair_woody"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -16405,8 +16443,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -16876,7 +16913,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 184.0,
-      "OriginalHeight": 168.0
+      "OriginalHeight": 168.0,
+      "SheetTexture": "bird"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -17006,7 +17044,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1302.0,
-      "OriginalHeight": 875.0
+      "OriginalHeight": 875.0,
+      "SheetTexture": "bird_crash"
      },
      {
       "Name": "N2TrickItemUseNormal",
@@ -17140,7 +17179,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 645.0
+      "OriginalHeight": 645.0,
+      "SheetTexture": "bird_fly"
      },
      {
       "Name": "N2TrickItemUseTricked",
@@ -17279,7 +17319,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 668.0,
-      "OriginalHeight": 456.0
+      "OriginalHeight": 456.0,
+      "SheetTexture": "bird_return"
      },
      {
       "Name": "N2TrickItemPrimedNormal",
@@ -17306,7 +17347,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 105.0,
-      "OriginalHeight": 52.0
+      "OriginalHeight": 52.0,
+      "SheetTexture": "bird_fall"
      },
      {
       "Name": "N2TrickItemPrimedTricked",
@@ -17333,7 +17375,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 104.0,
-      "OriginalHeight": 52.0
+      "OriginalHeight": 52.0,
+      "SheetTexture": "bird_empty"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -24834,7 +24877,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 121.0,
-      "OriginalHeight": 93.0
+      "OriginalHeight": 93.0,
+      "SheetTexture": "chair"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -24884,7 +24928,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 91.0,
-      "OriginalHeight": 30.0
+      "OriginalHeight": 30.0,
+      "SheetTexture": "shards"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -25177,8 +25222,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -25514,7 +25558,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 62.0,
-      "OriginalHeight": 36.0
+      "OriginalHeight": 36.0,
+      "SheetTexture": "grog"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -25737,8 +25782,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -26063,7 +26107,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 62.0,
-      "OriginalHeight": 17.0
+      "OriginalHeight": 17.0,
+      "SheetTexture": "mat~2"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -26356,8 +26401,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -28742,7 +28786,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 62.0,
-      "OriginalHeight": 93.0
+      "OriginalHeight": 93.0,
+      "SheetTexture": "pistol~2"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -28769,7 +28814,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 63.0,
-      "OriginalHeight": 92.0
+      "OriginalHeight": 92.0,
+      "SheetTexture": "pistol_loaded"
      },
      {
       "Name": "N2TrickItemUseNormal",
@@ -28796,7 +28842,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 62.0,
-      "OriginalHeight": 92.0
+      "OriginalHeight": 92.0,
+      "SheetTexture": "pistol_empty"
      },
      {
       "Name": "N2TrickItemUseTricked",
@@ -28823,7 +28870,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 50.0,
-      "OriginalHeight": 22.0
+      "OriginalHeight": 22.0,
+      "SheetTexture": "pistol_ground"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -29056,8 +29104,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -30241,7 +30288,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 327.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "M_walk_down"
      },
      {
       "Name": "Walk_Left",
@@ -30289,7 +30337,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 327.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "M_walk_left"
      },
      {
       "Name": "Walk_Right",
@@ -30337,7 +30386,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 333.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "M_walk_right"
      },
      {
       "Name": "Walk_Up",
@@ -30385,7 +30435,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 324.0,
-      "OriginalHeight": 438.0
+      "OriginalHeight": 438.0,
+      "SheetTexture": "M_walk_up"
      },
      {
       "Name": "Stand_Down",
@@ -30430,7 +30481,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 282.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "M_stand_down"
      },
      {
       "Name": "Stand_Left",
@@ -30473,7 +30525,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 237.0,
-      "OriginalHeight": 290.0
+      "OriginalHeight": 290.0,
+      "SheetTexture": "M_stand_left"
      },
      {
       "Name": "Stand_Right",
@@ -30516,7 +30569,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 237.0,
-      "OriginalHeight": 288.0
+      "OriginalHeight": 288.0,
+      "SheetTexture": "M_stand_right"
      },
      {
       "Name": "Stand_Up",
@@ -30559,7 +30613,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 279.0,
-      "OriginalHeight": 286.0
+      "OriginalHeight": 286.0,
+      "SheetTexture": "M_stand_up"
      },
      {
       "Name": "Run_Down",
@@ -30611,7 +30666,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 512.0,
-      "OriginalHeight": 477.0
+      "OriginalHeight": 477.0,
+      "SheetTexture": "M_run_down"
      },
      {
       "Name": "Run_Left",
@@ -30663,7 +30719,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 596.0,
-      "OriginalHeight": 477.0
+      "OriginalHeight": 477.0,
+      "SheetTexture": "M_run_left"
      },
      {
       "Name": "Run_Right",
@@ -30715,7 +30772,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 620.0,
-      "OriginalHeight": 480.0
+      "OriginalHeight": 480.0,
+      "SheetTexture": "M_run_right"
      },
      {
       "Name": "Run_Up",
@@ -30767,7 +30825,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 512.0,
-      "OriginalHeight": 504.0
+      "OriginalHeight": 504.0,
+      "SheetTexture": "M_run_up"
      },
      {
       "Name": "Appear",
@@ -30830,7 +30889,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 424.0,
-      "OriginalHeight": 644.0
+      "OriginalHeight": 644.0,
+      "SheetTexture": "M_appear"
      },
      {
       "Name": "Disappear",
@@ -30893,7 +30953,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 424.0,
-      "OriginalHeight": 644.0
+      "OriginalHeight": 644.0,
+      "SheetTexture": "M_disappear"
      },
      {
       "Name": "WaitWatch",
@@ -31013,7 +31074,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 288.0,
-      "OriginalHeight": 288.0
+      "OriginalHeight": 288.0,
+      "SheetTexture": "M_wait"
      },
      {
       "Name": "MotherBawlRight",
@@ -31062,7 +31124,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 404.0,
-      "OriginalHeight": 612.0
+      "OriginalHeight": 612.0,
+      "SheetTexture": "M_bawl1"
      },
      {
       "Name": "MotherBawlLeft",
@@ -31111,7 +31174,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 400.0,
-      "OriginalHeight": 612.0
+      "OriginalHeight": 612.0,
+      "SheetTexture": "M_bawl3"
      },
      {
       "Name": "MotherCall",
@@ -31167,7 +31231,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 315.0,
-      "OriginalHeight": 312.0
+      "OriginalHeight": 312.0,
+      "SheetTexture": "M_call"
      },
      {
       "Name": "MotherHitNeighbor",
@@ -31286,7 +31351,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 772.0,
-      "OriginalHeight": 792.0
+      "OriginalHeight": 792.0,
+      "SheetTexture": "M_fight_neighbor"
      },
      {
       "Name": "MotherHitWoody",
@@ -31424,7 +31490,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1316.0,
-      "OriginalHeight": 1422.0
+      "OriginalHeight": 1422.0,
+      "SheetTexture": "M_fight_woody"
      },
      {
       "Name": "MotherOrder",
@@ -31477,7 +31544,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 635.0,
-      "OriginalHeight": 568.0
+      "OriginalHeight": 568.0,
+      "SheetTexture": "M_order"
      },
      {
       "Name": "MotherOrderLeft",
@@ -31530,7 +31598,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 610.0,
-      "OriginalHeight": 564.0
+      "OriginalHeight": 564.0,
+      "SheetTexture": "M_order_left"
      },
      {
       "Name": "MotherGetUpPillow",
@@ -31603,7 +31672,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 483.0,
-      "OriginalHeight": 453.0
+      "OriginalHeight": 453.0,
+      "SheetTexture": "M_getup_pillow"
      },
      {
       "Name": "MotherLook",
@@ -31777,7 +31847,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 536.0,
-      "OriginalHeight": 354.0
+      "OriginalHeight": 354.0,
+      "SheetTexture": "M_look"
      },
      {
       "Name": "MotherLookLoop",
@@ -31951,7 +32022,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 536.0,
-      "OriginalHeight": 354.0
+      "OriginalHeight": 354.0,
+      "SheetTexture": "M_look"
      },
      {
       "Name": "MotherSitFart",
@@ -32043,7 +32115,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 644.0,
-      "OriginalHeight": 568.0
+      "OriginalHeight": 568.0,
+      "SheetTexture": "M_sitdown_fart"
      },
      {
       "Name": "MotherSitPillow",
@@ -32104,7 +32177,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 483.0,
-      "OriginalHeight": 453.0
+      "OriginalHeight": 453.0,
+      "SheetTexture": "M_sitdown_pillow"
      },
      {
       "Name": "MotherSleepPillow",
@@ -32131,7 +32205,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 528.0,
-      "OriginalHeight": 351.0
+      "OriginalHeight": 351.0,
+      "SheetTexture": "M_sleep_pillow"
      },
      {
       "Name": "MotherThrowPillow",
@@ -32182,7 +32257,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1960.0,
-      "OriginalHeight": 652.0
+      "OriginalHeight": 652.0,
+      "SheetTexture": "M_Throw_Pillow"
      },
      {
       "Name": "MotherHoldPillow",
@@ -32279,7 +32355,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1100.0,
-      "OriginalHeight": 815.0
+      "OriginalHeight": 815.0,
+      "SheetTexture": "M_Hold_Pillow"
      },
      {
       "Name": "MotherStandDownInfinite",
@@ -32324,7 +32401,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 282.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "M_stand_down"
      },
      {
       "Name": "MotherStandDownSingle",
@@ -32369,7 +32447,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 282.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "M_stand_down"
      },
      {
       "Name": "StandLeftInfinite",
@@ -32412,7 +32491,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 237.0,
-      "OriginalHeight": 290.0
+      "OriginalHeight": 290.0,
+      "SheetTexture": "M_stand_left"
      },
      {
       "Name": "MotherSleepLoop",
@@ -32518,7 +32598,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 528.0,
-      "OriginalHeight": 351.0
+      "OriginalHeight": 351.0,
+      "SheetTexture": "M_sleep_pillow"
      },
      {
       "Name": "MotherSleepSingle",
@@ -32624,7 +32705,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 528.0,
-      "OriginalHeight": 351.0
+      "OriginalHeight": 351.0,
+      "SheetTexture": "M_sleep_pillow"
      },
      {
       "Name": "MotherRoomIdle",
@@ -32651,7 +32733,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 178.0,
-      "OriginalHeight": 176.0
+      "OriginalHeight": 176.0,
+      "SheetTexture": "M_room_idle"
      },
      {
       "Name": "Hide_In",
@@ -32708,7 +32791,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 537.0,
-      "OriginalHeight": 564.0
+      "OriginalHeight": 564.0,
+      "SheetTexture": "M_room_enter"
      },
      {
       "Name": "Hide_Out",
@@ -32769,7 +32853,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 537.0,
-      "OriginalHeight": 564.0
+      "OriginalHeight": 564.0,
+      "SheetTexture": "M_room_leave"
      },
      {
       "Name": "MotherPoolLadderEnter",
@@ -32874,7 +32959,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 660.0,
-      "OriginalHeight": 1045.0
+      "OriginalHeight": 1045.0,
+      "SheetTexture": "M_poolladder_enter"
      },
      {
       "Name": "MotherPoolLadderSwim",
@@ -33024,7 +33110,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 464.0,
-      "OriginalHeight": 312.0
+      "OriginalHeight": 312.0,
+      "SheetTexture": "M_poolladder_swim"
      },
      {
       "Name": "MotherPoolLadderLeave",
@@ -33134,7 +33221,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 620.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "M_poolladder_leave"
      },
      {
       "Name": "StandDownSingle",
@@ -33161,7 +33249,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 282.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "M_stand_down"
      },
      {
       "Name": "MotherPistolShotCrash",
@@ -33239,7 +33328,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 885.0,
-      "OriginalHeight": 1737.0
+      "OriginalHeight": 1737.0,
+      "SheetTexture": "M_shot"
      }
     ],
     "LogAnimationsOnStartup": false,
@@ -33727,7 +33817,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 194.0,
-      "OriginalHeight": 78.0
+      "OriginalHeight": 78.0,
+      "SheetTexture": "controls"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -33954,8 +34045,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -35327,39 +35417,31 @@
     "UseAlternateSounds": false,
     "LevelSounds": [
      {
-      "external": 31,
-      "path": 37
+      "clip": "ingame1_slow"
      },
      {
-      "external": 154,
-      "path": 1
+      "clip": "ingame_ship"
      },
      {
-      "external": 31,
-      "path": 36
+      "clip": "ingame1_fast"
      }
     ],
     "AlternateLevelSounds": [
      {
-      "external": 31,
-      "path": 33
+      "clip": "ingame2_slow"
      },
      {
-      "external": 31,
-      "path": 34
+      "clip": "ingame2_normal"
      },
      {
-      "external": 31,
-      "path": 35
+      "clip": "ingame2_fast~2"
      }
     ],
     "LevelStart": {
-     "external": 6,
-     "path": 82
+     "clip": "jingle_levelstart~2"
     },
     "EntranceSound": {
-     "external": 6,
-     "path": 84
+     "clip": "levelstart~2"
     },
     "EntranceSoundSource": {
      "path": 227,
@@ -35367,24 +35449,19 @@
      "type": "AudioSource"
     },
     "SuccessNormal": {
-     "external": 6,
-     "path": 87
+     "clip": "jingle_success_normal~2"
     },
     "SuccessPerfect": {
-     "external": 6,
-     "path": 83
+     "clip": "jingle_success_perfect~2"
     },
     "Caught": {
-     "external": 6,
-     "path": 86
+     "clip": "jingle_caught~2"
     },
     "Failed": {
-     "external": 6,
-     "path": 81
+     "clip": "jingle_failed~2"
     },
     "Joke": {
-     "external": 6,
-     "path": 88
+     "clip": "jingle_joke~2"
     },
     "LevelMusicSource": {
      "path": 229,
@@ -35397,8 +35474,7 @@
      "type": "AudioSource"
     },
     "EntranceClap": {
-     "external": 6,
-     "path": 82
+     "clip": "jingle_levelstart~2"
     },
     "ChangeVolume": {
      "path": 226,
@@ -35590,12 +35666,10 @@
     "FenceDepth": "LevelFence",
     "FenceTextures": [
      {
-      "external": 155,
-      "path": 1
+      "texture": "ms_0000~4"
      },
      {
-      "external": 156,
-      "path": 1
+      "texture": "ov_rel7"
      }
     ],
     "IgnoreFenceSize": false,
@@ -36486,7 +36560,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 128.0,
-      "OriginalHeight": 117.0
+      "OriginalHeight": 117.0,
+      "SheetTexture": "bouq"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -36513,7 +36588,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 127.0,
-      "OriginalHeight": 117.0
+      "OriginalHeight": 117.0,
+      "SheetTexture": "bouq_fish"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -36744,8 +36820,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -37599,7 +37674,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 257.0,
-      "OriginalHeight": 270.0
+      "OriginalHeight": 270.0,
+      "SheetTexture": "hatch"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -37626,7 +37702,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 262.0,
-      "OriginalHeight": 275.0
+      "OriginalHeight": 275.0,
+      "SheetTexture": "hatch_carpet"
      },
      {
       "Name": "N2TrickItemPrimedNormal",
@@ -37653,7 +37730,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 259.0,
-      "OriginalHeight": 270.0
+      "OriginalHeight": 270.0,
+      "SheetTexture": "hatch_closed"
      },
      {
       "Name": "N2TrickItemIdleFuckedup",
@@ -37680,7 +37758,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 258.0,
-      "OriginalHeight": 270.0
+      "OriginalHeight": 270.0,
+      "SheetTexture": "hatch_crash"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -37910,8 +37989,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -38568,8 +38646,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -38834,7 +38911,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 88.0,
-      "OriginalHeight": 43.0
+      "OriginalHeight": 43.0,
+      "SheetTexture": "ammo"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -40399,8 +40477,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -40717,7 +40794,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 73.0,
-      "OriginalHeight": 41.0
+      "OriginalHeight": 41.0,
+      "SheetTexture": "fish"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -41010,8 +41088,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -41736,7 +41813,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 894.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk"
      },
      {
       "Name": "Walk_Left",
@@ -41772,7 +41850,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 894.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk"
      },
      {
       "Name": "Walk_Right",
@@ -41808,7 +41887,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 894.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk"
      },
      {
       "Name": "Walk_Up",
@@ -41844,7 +41924,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 894.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk"
      },
      {
       "Name": "Run_Down",
@@ -41880,7 +41961,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1253.0,
-      "OriginalHeight": 1561.0
+      "OriginalHeight": 1561.0,
+      "SheetTexture": "N_Run"
      },
      {
       "Name": "Run_Up",
@@ -41916,7 +41998,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1253.0,
-      "OriginalHeight": 1561.0
+      "OriginalHeight": 1561.0,
+      "SheetTexture": "N_Run"
      },
      {
       "Name": "Run_Left",
@@ -41952,7 +42035,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1253.0,
-      "OriginalHeight": 1561.0
+      "OriginalHeight": 1561.0,
+      "SheetTexture": "N_Run"
      },
      {
       "Name": "Run_Right",
@@ -41988,7 +42072,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1253.0,
-      "OriginalHeight": 1561.0
+      "OriginalHeight": 1561.0,
+      "SheetTexture": "N_Run"
      },
      {
       "Name": "BuffetFlirt",
@@ -42088,7 +42173,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1256.0,
-      "OriginalHeight": 744.0
+      "OriginalHeight": 744.0,
+      "SheetTexture": "N_Buffet_Flirt"
      },
      {
       "Name": "BuffetCrash",
@@ -42174,7 +42260,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2010.0,
-      "OriginalHeight": 1152.0
+      "OriginalHeight": 1152.0,
+      "SheetTexture": "N_Buffet_Crash"
      },
      {
       "Name": "BuffetGetUp",
@@ -42210,7 +42297,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1608.0,
-      "OriginalHeight": 864.0
+      "OriginalHeight": 864.0,
+      "SheetTexture": "N_Buffet_GetUp"
      },
      {
       "Name": "CaptenHatTry",
@@ -42336,7 +42424,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 845.0,
-      "OriginalHeight": 930.0
+      "OriginalHeight": 930.0,
+      "SheetTexture": "N_Hat_Try"
      },
      {
       "Name": "CaptenHatSpaghetti",
@@ -42439,7 +42528,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 996.0,
-      "OriginalHeight": 910.0
+      "OriginalHeight": 910.0,
+      "SheetTexture": "N_Hat_Spaghetti"
      },
      {
       "Name": "WaterPuddleLeft",
@@ -42475,7 +42565,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1150.0,
-      "OriginalHeight": 1165.0
+      "OriginalHeight": 1165.0,
+      "SheetTexture": "N_Water_Puddle"
      },
      {
       "Name": "CrashShort",
@@ -42570,7 +42661,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1690.0,
-      "OriginalHeight": 960.0
+      "OriginalHeight": 960.0,
+      "SheetTexture": "N_Crash_Short"
      },
      {
       "Name": "CrashLong",
@@ -42606,7 +42698,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2020.0,
-      "OriginalHeight": 1396.0
+      "OriginalHeight": 1396.0,
+      "SheetTexture": "N_Crash_Long"
      },
      {
       "Name": "Stand_Down",
@@ -42633,7 +42726,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Left",
@@ -42660,7 +42754,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Right",
@@ -42687,7 +42782,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Up",
@@ -42714,7 +42810,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "WaterPuddleRight",
@@ -42750,7 +42847,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1150.0,
-      "OriginalHeight": 1165.0
+      "OriginalHeight": 1165.0,
+      "SheetTexture": "N_Water_Puddle"
      },
      {
       "Name": "LookRight",
@@ -42838,7 +42936,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 745.0,
-      "OriginalHeight": 915.0
+      "OriginalHeight": 915.0,
+      "SheetTexture": "N_Look"
      },
      {
       "Name": "LookAround",
@@ -42929,7 +43028,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 424.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "N_lookaround"
      },
      {
       "Name": "AngryEasyUp",
@@ -43004,7 +43104,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 915.0,
-      "OriginalHeight": 1125.0
+      "OriginalHeight": 1125.0,
+      "SheetTexture": "N_Shout"
      },
      {
       "Name": "AngryHard",
@@ -43120,7 +43221,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 665.0,
-      "OriginalHeight": 812.0
+      "OriginalHeight": 812.0,
+      "SheetTexture": "N_Shout_Hard"
      },
      {
       "Name": "FixLow",
@@ -43165,7 +43267,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 777.0,
-      "OriginalHeight": 1253.0
+      "OriginalHeight": 1253.0,
+      "SheetTexture": "N_Use"
      },
      {
       "Name": "FixMid",
@@ -43210,7 +43313,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 777.0,
-      "OriginalHeight": 1253.0
+      "OriginalHeight": 1253.0,
+      "SheetTexture": "N_Use"
      },
      {
       "Name": "BridgeLook",
@@ -43359,7 +43463,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 426.0,
-      "OriginalHeight": 408.0
+      "OriginalHeight": 408.0,
+      "SheetTexture": "N_bridge_look"
      },
      {
       "Name": "BridgeFall",
@@ -43440,7 +43545,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 568.0,
-      "OriginalHeight": 540.0
+      "OriginalHeight": 540.0,
+      "SheetTexture": "N_bridge_fall"
      },
      {
       "Name": "BridgeElectricity",
@@ -43528,7 +43634,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1144.0,
-      "OriginalHeight": 868.0
+      "OriginalHeight": 868.0,
+      "SheetTexture": "N_bridge_elec"
      },
      {
       "Name": "BridgeLeave",
@@ -43585,7 +43692,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 426.0,
-      "OriginalHeight": 426.0
+      "OriginalHeight": 426.0,
+      "SheetTexture": "N_bridge_leave"
      },
      {
       "Name": "RakeCrash",
@@ -43665,7 +43773,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 972.0,
-      "OriginalHeight": 668.0
+      "OriginalHeight": 668.0,
+      "SheetTexture": "N_rake_crash"
      },
      {
       "Name": "WaitSea",
@@ -43795,7 +43904,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 232.0,
-      "OriginalHeight": 304.0
+      "OriginalHeight": 304.0,
+      "SheetTexture": "N_waitsea"
      },
      {
       "Name": "SeeSub",
@@ -44000,7 +44110,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1290.0,
-      "OriginalHeight": 600.0
+      "OriginalHeight": 600.0,
+      "SheetTexture": "N_seesub"
      },
      {
       "Name": "SeeShark",
@@ -44260,7 +44371,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1840.0,
-      "OriginalHeight": 1547.0
+      "OriginalHeight": 1547.0,
+      "SheetTexture": "N_seeshark"
      },
      {
       "Name": "BeachGetBeer",
@@ -44413,7 +44525,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1650.0,
-      "OriginalHeight": 1210.0
+      "OriginalHeight": 1210.0,
+      "SheetTexture": "N_getbeer"
      },
      {
       "Name": "BeachGetUp",
@@ -44459,7 +44572,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_getup"
      },
      {
       "Name": "BeachLayDown",
@@ -44505,7 +44619,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_towel_layout"
      },
      {
       "Name": "BeachPinGetUp",
@@ -44550,7 +44665,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_pin_getup"
      },
      {
       "Name": "BeachPinLayDown",
@@ -44596,7 +44712,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_pin_laydown"
      },
      {
       "Name": "BeachCrabGetBeer",
@@ -44685,7 +44802,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1380.0,
-      "OriginalHeight": 968.0
+      "OriginalHeight": 968.0,
+      "SheetTexture": "N_takecrab"
      },
      {
       "Name": "BeachSleep",
@@ -44712,7 +44830,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 726.0
+      "OriginalHeight": 726.0,
+      "SheetTexture": "N_matsleep"
      },
      {
       "Name": "BeachSleepCrab",
@@ -44739,7 +44858,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 834.0,
-      "OriginalHeight": 726.0
+      "OriginalHeight": 726.0,
+      "SheetTexture": "N_matsleep_crab"
      },
      {
       "Name": "EnterSea",
@@ -44820,7 +44940,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 708.0,
-      "OriginalHeight": 684.0
+      "OriginalHeight": 684.0,
+      "SheetTexture": "N_entersea"
      },
      {
       "Name": "LeaveSea",
@@ -44892,7 +45013,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 885.0,
-      "OriginalHeight": 776.0
+      "OriginalHeight": 776.0,
+      "SheetTexture": "N_leavesea"
      },
      {
       "Name": "MelonCrash",
@@ -45066,7 +45188,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1800.0,
-      "OriginalHeight": 1392.0
+      "OriginalHeight": 1392.0,
+      "SheetTexture": "N_meloncrash"
      },
      {
       "Name": "MelonSplit",
@@ -45193,7 +45316,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1800.0,
-      "OriginalHeight": 1320.0
+      "OriginalHeight": 1320.0,
+      "SheetTexture": "N_melonsplit"
      },
      {
       "Name": "RiceToiletPaper",
@@ -45413,7 +45537,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1188.0,
-      "OriginalHeight": 1320.0
+      "OriginalHeight": 1320.0,
+      "SheetTexture": "N_papershit"
      },
      {
       "Name": "RiceToiletPaperChili",
@@ -45701,7 +45826,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1386.0,
-      "OriginalHeight": 1320.0
+      "OriginalHeight": 1320.0,
+      "SheetTexture": "N_paperchili"
      },
      {
       "Name": "RiceToiletFlush",
@@ -45848,7 +45974,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1188.0,
-      "OriginalHeight": 1100.0
+      "OriginalHeight": 1100.0,
+      "SheetTexture": "N_flush"
      },
      {
       "Name": "RiceToiletFlushFall",
@@ -45991,7 +46118,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1876.0,
-      "OriginalHeight": 1883.0
+      "OriginalHeight": 1883.0,
+      "SheetTexture": "N_flushfall"
      },
      {
       "Name": "Bike",
@@ -46229,7 +46357,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 5121.0,
-      "OriginalHeight": 1989.0
+      "OriginalHeight": 1989.0,
+      "SheetTexture": "N_bike"
      },
      {
       "Name": "BikeCrash",
@@ -46417,7 +46546,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1984.0,
-      "OriginalHeight": 2384.0
+      "OriginalHeight": 2384.0,
+      "SheetTexture": "N_bikecrash"
      },
      {
       "Name": "StageEnter",
@@ -46568,7 +46698,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 924.0,
-      "OriginalHeight": 765.0
+      "OriginalHeight": 765.0,
+      "SheetTexture": "N_stageenter"
      },
      {
       "Name": "StageSpeak",
@@ -46699,7 +46830,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 363.0,
-      "OriginalHeight": 420.0
+      "OriginalHeight": 420.0,
+      "SheetTexture": "N_stagespeak"
      },
      {
       "Name": "StageCrash",
@@ -46840,7 +46972,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 615.0,
-      "OriginalHeight": 1168.0
+      "OriginalHeight": 1168.0,
+      "SheetTexture": "N_stagecrash"
      },
      {
       "Name": "StageLeave",
@@ -46915,7 +47048,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 616.0,
-      "OriginalHeight": 612.0
+      "OriginalHeight": 612.0,
+      "SheetTexture": "N_stageleave"
      },
      {
       "Name": "Gong",
@@ -47041,7 +47175,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2010.0,
-      "OriginalHeight": 1350.0
+      "OriginalHeight": 1350.0,
+      "SheetTexture": "N_gong"
      },
      {
       "Name": "GongManip",
@@ -47197,7 +47332,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2800.0,
-      "OriginalHeight": 1440.0
+      "OriginalHeight": 1440.0,
+      "SheetTexture": "N_gonghit"
      },
      {
       "Name": "Hotdog",
@@ -47265,7 +47401,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 900.0,
-      "OriginalHeight": 585.0
+      "OriginalHeight": 585.0,
+      "SheetTexture": "N_hotdog"
      },
      {
       "Name": "HotdogManip",
@@ -47423,7 +47560,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1482.0,
-      "OriginalHeight": 1218.0
+      "OriginalHeight": 1218.0,
+      "SheetTexture": "N_hotdog_manip"
      },
      {
       "Name": "JadeLook",
@@ -47524,7 +47662,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 194.0,
-      "OriginalHeight": 298.0
+      "OriginalHeight": 298.0,
+      "SheetTexture": "N_jade_dummy"
      },
      {
       "Name": "VaseCrash",
@@ -47690,7 +47829,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1248.0,
-      "OriginalHeight": 910.0
+      "OriginalHeight": 910.0,
+      "SheetTexture": "N_vasecrash"
      },
      {
       "Name": "VaseCrashLong",
@@ -47909,7 +48049,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2044.0,
-      "OriginalHeight": 1704.0
+      "OriginalHeight": 1704.0,
+      "SheetTexture": "N_vasecrash_long"
      },
      {
       "Name": "Karate",
@@ -48024,7 +48165,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 992.0,
-      "OriginalHeight": 808.0
+      "OriginalHeight": 808.0,
+      "SheetTexture": "N_karate"
      },
      {
       "Name": "KarateBrick",
@@ -48131,7 +48273,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 984.0,
-      "OriginalHeight": 800.0
+      "OriginalHeight": 800.0,
+      "SheetTexture": "N_karatemanip"
      },
      {
       "Name": "CartPull",
@@ -48269,7 +48412,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 918.0,
-      "OriginalHeight": 495.0
+      "OriginalHeight": 495.0,
+      "SheetTexture": "N_cartpull"
      },
      {
       "Name": "CartPullGrease",
@@ -48393,7 +48537,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2540.0,
-      "OriginalHeight": 1084.0
+      "OriginalHeight": 1084.0,
+      "SheetTexture": "N_cartpull_grease"
      },
      {
       "Name": "EatEel",
@@ -48469,7 +48614,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 595.0,
-      "OriginalHeight": 596.0
+      "OriginalHeight": 596.0,
+      "SheetTexture": "N_eat_eel"
      },
      {
       "Name": "EatTyre",
@@ -48702,7 +48848,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1155.0,
-      "OriginalHeight": 1200.0
+      "OriginalHeight": 1200.0,
+      "SheetTexture": "N_eat_tyre"
      },
      {
       "Name": "KickLion",
@@ -48796,7 +48943,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 788.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "N_kick"
      },
      {
       "Name": "KickLionHurt",
@@ -48880,7 +49028,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 788.0,
-      "OriginalHeight": 560.0
+      "OriginalHeight": 560.0,
+      "SheetTexture": "N_kickhurt"
      },
      {
       "Name": "RocketStart",
@@ -48953,7 +49102,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 635.0,
-      "OriginalHeight": 685.0
+      "OriginalHeight": 685.0,
+      "SheetTexture": "N_rocket_start"
      },
      {
       "Name": "RocketRope",
@@ -49048,7 +49198,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 750.0,
-      "OriginalHeight": 1755.0
+      "OriginalHeight": 1755.0,
+      "SheetTexture": "N_rocket_rope"
      },
      {
       "Name": "RocketCrash",
@@ -49132,7 +49283,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 764.0,
-      "OriginalHeight": 1407.0
+      "OriginalHeight": 1407.0,
+      "SheetTexture": "N_rocket_crash"
      },
      {
       "Name": "Tennis",
@@ -49271,7 +49423,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 784.0,
-      "OriginalHeight": 868.0
+      "OriginalHeight": 868.0,
+      "SheetTexture": "N_tennis"
      },
      {
       "Name": "TennisEgg",
@@ -49370,7 +49523,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1080.0,
-      "OriginalHeight": 896.0
+      "OriginalHeight": 896.0,
+      "SheetTexture": "N_tennis_egg"
      },
      {
       "Name": "SkiWalk1",
@@ -49418,7 +49572,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 351.0,
-      "OriginalHeight": 513.0
+      "OriginalHeight": 513.0,
+      "SheetTexture": "N_skiwalk1"
      },
      {
       "Name": "SkiWalk2",
@@ -49466,7 +49621,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 366.0,
-      "OriginalHeight": 507.0
+      "OriginalHeight": 507.0,
+      "SheetTexture": "N_skiwalk2"
      },
      {
       "Name": "SkiStart",
@@ -49619,7 +49775,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2650.0,
-      "OriginalHeight": 2135.0
+      "OriginalHeight": 2135.0,
+      "SheetTexture": "N_ski_start"
      },
      {
       "Name": "SkiStartNail",
@@ -49770,7 +49927,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2650.0,
-      "OriginalHeight": 2045.0
+      "OriginalHeight": 2045.0,
+      "SheetTexture": "N_ski_start_nail"
      },
      {
       "Name": "Ski",
@@ -50034,7 +50192,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1869.0,
-      "OriginalHeight": 1071.0
+      "OriginalHeight": 1071.0,
+      "SheetTexture": "N_skiing"
      },
      {
       "Name": "SkiNail",
@@ -50330,7 +50489,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2697.0,
-      "OriginalHeight": 924.0
+      "OriginalHeight": 924.0,
+      "SheetTexture": "N_skiing_nailed"
      },
      {
       "Name": "SkiPut",
@@ -50381,7 +50541,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1542.0,
-      "OriginalHeight": 1245.0
+      "OriginalHeight": 1245.0,
+      "SheetTexture": "N_ski_put"
      },
      {
       "Name": "SkiHandleReturn",
@@ -50425,7 +50586,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1233.0,
-      "OriginalHeight": 906.0
+      "OriginalHeight": 906.0,
+      "SheetTexture": "N_ski_handlereturn"
      },
      {
       "Name": "SkiHandleReturnNail",
@@ -50469,7 +50631,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1464.0,
-      "OriginalHeight": 906.0
+      "OriginalHeight": 906.0,
+      "SheetTexture": "N_ski_handlereturn_nail"
      },
      {
       "Name": "BearNormal0",
@@ -50496,7 +50659,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1840.0,
-      "OriginalHeight": 1076.0
+      "OriginalHeight": 1076.0,
+      "SheetTexture": "N_Bear_Normal0"
      },
      {
       "Name": "BearNormal1",
@@ -50523,7 +50687,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1840.0,
-      "OriginalHeight": 1076.0
+      "OriginalHeight": 1076.0,
+      "SheetTexture": "N_Bear_Normal1"
      },
      {
       "Name": "BearNormal2",
@@ -50550,7 +50715,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1840.0,
-      "OriginalHeight": 1076.0
+      "OriginalHeight": 1076.0,
+      "SheetTexture": "N_Bear_Normal2"
      },
      {
       "Name": "BearNormal3",
@@ -50577,7 +50743,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1840.0,
-      "OriginalHeight": 807.0
+      "OriginalHeight": 807.0,
+      "SheetTexture": "N_Bear_Normal3"
      },
      {
       "Name": "BearManip0",
@@ -50604,7 +50771,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1960.0,
-      "OriginalHeight": 1132.0
+      "OriginalHeight": 1132.0,
+      "SheetTexture": "N_Bear_Elastic0"
      },
      {
       "Name": "BearManip1",
@@ -50631,7 +50799,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1960.0,
-      "OriginalHeight": 849.0
+      "OriginalHeight": 849.0,
+      "SheetTexture": "N_Bear_Elastic1"
      },
      {
       "Name": "BearManip2",
@@ -50658,7 +50827,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1960.0,
-      "OriginalHeight": 849.0
+      "OriginalHeight": 849.0,
+      "SheetTexture": "N_Bear_Elastic2"
      },
      {
       "Name": "FifiWalkDown",
@@ -50685,7 +50855,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 852.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk_Fifi"
      },
      {
       "Name": "FifiWalkRight",
@@ -50712,7 +50883,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 852.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk_Fifi"
      },
      {
       "Name": "FifiWalkUp",
@@ -50739,7 +50911,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 852.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk_Fifi"
      },
      {
       "Name": "FifiWalkLeft",
@@ -50766,7 +50939,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 852.0,
-      "OriginalHeight": 1098.0
+      "OriginalHeight": 1098.0,
+      "SheetTexture": "N_Walk_Fifi"
      },
      {
       "Name": "FifiPutRight",
@@ -50793,7 +50967,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1148.0,
-      "OriginalHeight": 1281.0
+      "OriginalHeight": 1281.0,
+      "SheetTexture": "N_PutTake_Fifi"
      },
      {
       "Name": "FifiPutLeft",
@@ -50820,7 +50995,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1148.0,
-      "OriginalHeight": 1281.0
+      "OriginalHeight": 1281.0,
+      "SheetTexture": "N_PutTake_Fifi"
      },
      {
       "Name": "FifiTakeRight",
@@ -50847,7 +51023,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1148.0,
-      "OriginalHeight": 1281.0
+      "OriginalHeight": 1281.0,
+      "SheetTexture": "N_PutTake_Fifi"
      },
      {
       "Name": "FifiTakeLeft",
@@ -50874,7 +51051,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1148.0,
-      "OriginalHeight": 1281.0
+      "OriginalHeight": 1281.0,
+      "SheetTexture": "N_PutTake_Fifi"
      },
      {
       "Name": "DynFish",
@@ -50901,7 +51079,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1810.0,
-      "OriginalHeight": 1685.0
+      "OriginalHeight": 1685.0,
+      "SheetTexture": "N_Dyn_Fish"
      },
      {
       "Name": "DynBoom",
@@ -50928,7 +51107,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1836.0,
-      "OriginalHeight": 1345.0
+      "OriginalHeight": 1345.0,
+      "SheetTexture": "N_Dyn_Boom"
      },
      {
       "Name": "FifiFire",
@@ -51137,7 +51317,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 3808.0,
-      "OriginalHeight": 1740.0
+      "OriginalHeight": 1740.0,
+      "SheetTexture": "N_fifi_normal"
      },
      {
       "Name": "FifiFireManip",
@@ -51314,7 +51495,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 3300.0,
-      "OriginalHeight": 1250.0
+      "OriginalHeight": 1250.0,
+      "SheetTexture": "N_fifi_manip"
      },
      {
       "Name": "Weights",
@@ -51488,7 +51670,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 784.0,
-      "OriginalHeight": 704.0
+      "OriginalHeight": 704.0,
+      "SheetTexture": "N_weights"
      },
      {
       "Name": "WeightsFlea",
@@ -51731,7 +51914,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1182.0,
-      "OriginalHeight": 895.0
+      "OriginalHeight": 895.0,
+      "SheetTexture": "N_weights_fleas"
      },
      {
       "Name": "ElephantSpit",
@@ -51898,7 +52082,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 980.0,
-      "OriginalHeight": 868.0
+      "OriginalHeight": 868.0,
+      "SheetTexture": "N_Elephant_wet"
      },
      {
       "Name": "ElephantRevenge",
@@ -52057,7 +52242,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1340.0,
-      "OriginalHeight": 1090.0
+      "OriginalHeight": 1090.0,
+      "SheetTexture": "N_Elephant_spit"
      },
      {
       "Name": "PoolDive",
@@ -52175,7 +52361,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2681.0,
-      "OriginalHeight": 1254.0
+      "OriginalHeight": 1254.0,
+      "SheetTexture": "N_pool_dive"
      },
      {
       "Name": "PoolSpring",
@@ -52251,7 +52438,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2060.0,
-      "OriginalHeight": 1145.0
+      "OriginalHeight": 1145.0,
+      "SheetTexture": "N_pool_spring"
      },
      {
       "Name": "PoolAwningFall",
@@ -52349,7 +52537,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2095.0,
-      "OriginalHeight": 1075.0
+      "OriginalHeight": 1075.0,
+      "SheetTexture": "N_pool_awning"
      },
      {
       "Name": "PoolSwim",
@@ -52499,7 +52688,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 464.0,
-      "OriginalHeight": 312.0
+      "OriginalHeight": 312.0,
+      "SheetTexture": "N_pool_swim"
      },
      {
       "Name": "PoolGetOut",
@@ -52575,7 +52765,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 516.0,
-      "OriginalHeight": 865.0
+      "OriginalHeight": 865.0,
+      "SheetTexture": "N_pool_leave"
      },
      {
       "Name": "BeachLogo",
@@ -52666,7 +52857,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2150.0,
-      "OriginalHeight": 1032.0
+      "OriginalHeight": 1032.0,
+      "SheetTexture": "N_beach_logo"
      },
      {
       "Name": "TowelSleep",
@@ -52739,7 +52931,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 834.0,
-      "OriginalHeight": 726.0
+      "OriginalHeight": 726.0,
+      "SheetTexture": "N_towel_sleep"
      },
      {
       "Name": "TowelLaydown",
@@ -52785,7 +52978,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_towel_layout"
      },
      {
       "Name": "TowelHedgehog",
@@ -52847,7 +53041,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 837.0,
-      "OriginalHeight": 744.0
+      "OriginalHeight": 744.0,
+      "SheetTexture": "N_towel_hedge"
      },
      {
       "Name": "TowelGetUp",
@@ -52892,7 +53087,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_towel_getup"
      },
      {
       "Name": "SandCastleFall",
@@ -52966,7 +53162,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1785.0,
-      "OriginalHeight": 788.0
+      "OriginalHeight": 788.0,
+      "SheetTexture": "N_sandcastle_fall"
      },
      {
       "Name": "SandCastleLift",
@@ -53056,7 +53253,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1896.0,
-      "OriginalHeight": 810.0
+      "OriginalHeight": 810.0,
+      "SheetTexture": "N_sandcastle_lift"
      },
      {
       "Name": "Shell",
@@ -53176,7 +53374,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 832.0,
-      "OriginalHeight": 483.0
+      "OriginalHeight": 483.0,
+      "SheetTexture": "N_shell"
      },
      {
       "Name": "ShellCrayfish",
@@ -53296,7 +53495,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1105.0,
-      "OriginalHeight": 676.0
+      "OriginalHeight": 676.0,
+      "SheetTexture": "N_shell_cray"
      },
      {
       "Name": "ElephantFool",
@@ -53384,7 +53584,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 780.0,
-      "OriginalHeight": 660.0
+      "OriginalHeight": 660.0,
+      "SheetTexture": "N_elephant_fool"
      },
      {
       "Name": "ElephantAttack",
@@ -53524,7 +53725,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1728.0,
-      "OriginalHeight": 1626.0
+      "OriginalHeight": 1626.0,
+      "SheetTexture": "N_elephant_attack"
      },
      {
       "Name": "ElectricShockGeneric",
@@ -53604,7 +53806,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 858.0,
-      "OriginalHeight": 828.0
+      "OriginalHeight": 828.0,
+      "SheetTexture": "N_elec_shock"
      },
      {
       "Name": "ShoeCleaner",
@@ -53731,7 +53934,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 716.0,
-      "OriginalHeight": 420.0
+      "OriginalHeight": 420.0,
+      "SheetTexture": "N_shoe_cleaner"
      },
      {
       "Name": "ShoeBlades",
@@ -53832,7 +54036,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 925.0,
-      "OriginalHeight": 616.0
+      "OriginalHeight": 616.0,
+      "SheetTexture": "N_shoe_blades"
      },
      {
       "Name": "TakeHigh",
@@ -53892,7 +54097,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 376.0,
-      "OriginalHeight": 544.0
+      "OriginalHeight": 544.0,
+      "SheetTexture": "N_take_up"
      },
      {
       "Name": "TakeLow",
@@ -53940,7 +54146,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 372.0,
-      "OriginalHeight": 408.0
+      "OriginalHeight": 408.0,
+      "SheetTexture": "N_take_low"
      },
      {
       "Name": "TakeLeft",
@@ -53999,7 +54206,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 372.0,
-      "OriginalHeight": 556.0
+      "OriginalHeight": 556.0,
+      "SheetTexture": "N_take_left"
      },
      {
       "Name": "TakeRight",
@@ -54059,7 +54267,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 332.0,
-      "OriginalHeight": 564.0
+      "OriginalHeight": 564.0,
+      "SheetTexture": "N_take_right"
      },
      {
       "Name": "TakeSnake",
@@ -54184,7 +54393,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1575.0,
-      "OriginalHeight": 616.0
+      "OriginalHeight": 616.0,
+      "SheetTexture": "N_take_snake"
      },
      {
       "Name": "PlatformHover",
@@ -54286,7 +54496,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2058.0,
-      "OriginalHeight": 2240.0
+      "OriginalHeight": 2240.0,
+      "SheetTexture": "N_platform_hover"
      },
      {
       "Name": "PlatformLand",
@@ -54380,7 +54591,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2058.0,
-      "OriginalHeight": 2240.0
+      "OriginalHeight": 2240.0,
+      "SheetTexture": "N_platform_land"
      },
      {
       "Name": "SeesawCrash",
@@ -54486,7 +54698,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1745.0,
-      "OriginalHeight": 2370.0
+      "OriginalHeight": 2370.0,
+      "SheetTexture": "N_seesaw_crash"
      },
      {
       "Name": "SeesawShovelCrash",
@@ -54670,7 +54883,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2328.0,
-      "OriginalHeight": 2495.0
+      "OriginalHeight": 2495.0,
+      "SheetTexture": "N_seesaw_shovel_crash"
      },
      {
       "Name": "RakeBazarCrash",
@@ -54750,7 +54964,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 956.0,
-      "OriginalHeight": 636.0
+      "OriginalHeight": 636.0,
+      "SheetTexture": "N_rakebazar_crash"
      },
      {
       "Name": "CoalWalk",
@@ -54867,7 +55082,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1986.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "N_coal_walk"
      },
      {
       "Name": "CoalFuelWalk",
@@ -54984,7 +55200,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1986.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "N_coal_fuel_walk"
      },
      {
       "Name": "CoalHotWalk",
@@ -55112,7 +55329,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2220.0,
-      "OriginalHeight": 1278.0
+      "OriginalHeight": 1278.0,
+      "SheetTexture": "N_coal_hot_walk"
      },
      {
       "Name": "CoalHotFuelWalk",
@@ -55270,7 +55488,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2576.0,
-      "OriginalHeight": 1284.0
+      "OriginalHeight": 1284.0,
+      "SheetTexture": "N_coal_hot_walk_fuel"
      },
      {
       "Name": "CowRide",
@@ -55532,7 +55751,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1242.0,
-      "OriginalHeight": 1278.0
+      "OriginalHeight": 1278.0,
+      "SheetTexture": "N_cow_ride"
      },
      {
       "Name": "CowOpenRide",
@@ -55607,7 +55827,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 704.0,
-      "OriginalHeight": 760.0
+      "OriginalHeight": 760.0,
+      "SheetTexture": "N_cow_open_ride"
      },
      {
       "Name": "CowCrash",
@@ -55803,7 +56024,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1309.0,
-      "OriginalHeight": 1368.0
+      "OriginalHeight": 1368.0,
+      "SheetTexture": "N_cow_crash"
      },
      {
       "Name": "DrainJump",
@@ -55851,7 +56073,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 495.0,
-      "OriginalHeight": 567.0
+      "OriginalHeight": 567.0,
+      "SheetTexture": "N_drain_jump"
      },
      {
       "Name": "DrainOpenJump",
@@ -56008,7 +56231,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1247.0,
-      "OriginalHeight": 1533.0
+      "OriginalHeight": 1533.0,
+      "SheetTexture": "N_drain_open_jump"
      },
      {
       "Name": "ShoeOn",
@@ -56094,7 +56318,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 765.0
+      "OriginalHeight": 765.0,
+      "SheetTexture": "N_shoe_on"
      },
      {
       "Name": "ShoeOff",
@@ -56172,7 +56397,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 765.0
+      "OriginalHeight": 765.0,
+      "SheetTexture": "N_shoe_off"
      },
      {
       "Name": "ShoeBurn",
@@ -56271,7 +56497,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1026.0,
-      "OriginalHeight": 1060.0
+      "OriginalHeight": 1060.0,
+      "SheetTexture": "N_shoe_burn"
      },
      {
       "Name": "IceCreamEat",
@@ -56514,7 +56741,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1086.0,
-      "OriginalHeight": 1146.0
+      "OriginalHeight": 1146.0,
+      "SheetTexture": "N_ice_eat"
      },
      {
       "Name": "IceCreamDirtEat",
@@ -56687,7 +56915,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 3396.0,
-      "OriginalHeight": 2742.0
+      "OriginalHeight": 2742.0,
+      "SheetTexture": "N_ice_dirt_eat"
      },
      {
       "Name": "TadjMahalEnter",
@@ -56754,7 +56983,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 708.0,
-      "OriginalHeight": 513.0
+      "OriginalHeight": 513.0,
+      "SheetTexture": "N_tadj_enter"
      },
      {
       "Name": "TadjMahalLeave",
@@ -56821,7 +57051,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 708.0,
-      "OriginalHeight": 513.0
+      "OriginalHeight": 513.0,
+      "SheetTexture": "N_tadj_leave"
      },
      {
       "Name": "FireChannelBurn",
@@ -56962,7 +57193,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1124.0,
-      "OriginalHeight": 972.0
+      "OriginalHeight": 972.0,
+      "SheetTexture": "N_fire_channel"
      },
      {
       "Name": "ChairAwake",
@@ -57086,7 +57318,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 346.0,
-      "OriginalHeight": 254.0
+      "OriginalHeight": 254.0,
+      "SheetTexture": "N_chair_awake"
      },
      {
       "Name": "ChairElectrify",
@@ -57142,7 +57375,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 858.0,
-      "OriginalHeight": 894.0
+      "OriginalHeight": 894.0,
+      "SheetTexture": "N_chair_electrify"
      },
      {
       "Name": "ChairEnter",
@@ -57189,7 +57423,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 456.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "N_chair_enter"
      },
      {
       "Name": "ChairHedgehogEnter",
@@ -57241,7 +57476,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 616.0,
-      "OriginalHeight": 690.0
+      "OriginalHeight": 690.0,
+      "SheetTexture": "N_chair_hedgehog_enter"
      },
      {
       "Name": "ChairHedgeHogLeave",
@@ -57322,7 +57558,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 652.0,
-      "OriginalHeight": 744.0
+      "OriginalHeight": 744.0,
+      "SheetTexture": "N_chair_hedgehog_leave"
      },
      {
       "Name": "ChairLeave",
@@ -57387,7 +57624,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 616.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "N_chair_leave"
      },
      {
       "Name": "ChairSun",
@@ -57449,7 +57687,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 480.0,
-      "OriginalHeight": 330.0
+      "OriginalHeight": 330.0,
+      "SheetTexture": "N_chair_sun"
      },
      {
       "Name": "ChairWakeup",
@@ -57493,7 +57732,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 342.0,
-      "OriginalHeight": 254.0
+      "OriginalHeight": 254.0,
+      "SheetTexture": "N_chair_wakeup"
      },
      {
       "Name": "PoolFall",
@@ -57620,7 +57860,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1285.0,
-      "OriginalHeight": 975.0
+      "OriginalHeight": 975.0,
+      "SheetTexture": "N_pool_fall"
      },
      {
       "Name": "PoolFallEmpty",
@@ -57802,7 +58043,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2274.0,
-      "OriginalHeight": 1105.0
+      "OriginalHeight": 1105.0,
+      "SheetTexture": "N_pool_fall_empty"
      },
      {
       "Name": "PoolFallWater",
@@ -57924,7 +58166,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2442.0,
-      "OriginalHeight": 1356.0
+      "OriginalHeight": 1356.0,
+      "SheetTexture": "N_pool_fall_water"
      },
      {
       "Name": "PoolLeaveEmpty",
@@ -58008,7 +58251,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 540.0,
-      "OriginalHeight": 660.0
+      "OriginalHeight": 660.0,
+      "SheetTexture": "N_pool_leave_empty"
      },
      {
       "Name": "ShopTryHedgehog",
@@ -58106,7 +58350,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1170.0,
-      "OriginalHeight": 1264.0
+      "OriginalHeight": 1264.0,
+      "SheetTexture": "N_shop_try_hedgehog"
      },
      {
       "Name": "ShopTryOctopus",
@@ -58272,7 +58517,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1911.0,
-      "OriginalHeight": 2233.0
+      "OriginalHeight": 2233.0,
+      "SheetTexture": "N_shop_try_octopus"
      },
      {
       "Name": "ShopTryTurban",
@@ -58381,7 +58627,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1175.0,
-      "OriginalHeight": 1264.0
+      "OriginalHeight": 1264.0,
+      "SheetTexture": "N_shop_try_turban"
      },
      {
       "Name": "EnterBoat",
@@ -58524,7 +58771,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1965.0,
-      "OriginalHeight": 920.0
+      "OriginalHeight": 920.0,
+      "SheetTexture": "N_enterboat"
      },
      {
       "Name": "FallBoat",
@@ -58662,7 +58910,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2406.0,
-      "OriginalHeight": 2370.0
+      "OriginalHeight": 2370.0,
+      "SheetTexture": "N_fallboat"
      },
      {
       "Name": "EquipCrash",
@@ -58832,7 +59081,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 725.0,
-      "OriginalHeight": 865.0
+      "OriginalHeight": 865.0,
+      "SheetTexture": "N_equip_crash"
      },
      {
       "Name": "EquipTry",
@@ -58976,7 +59226,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 472.0,
-      "OriginalHeight": 525.0
+      "OriginalHeight": 525.0,
+      "SheetTexture": "N_equip_try"
      },
      {
       "Name": "RodCrash",
@@ -59069,7 +59320,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 736.0,
-      "OriginalHeight": 696.0
+      "OriginalHeight": 696.0,
+      "SheetTexture": "N_Rod_Crash"
      },
      {
       "Name": "RodShow",
@@ -59218,7 +59470,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 712.0,
-      "OriginalHeight": 692.0
+      "OriginalHeight": 692.0,
+      "SheetTexture": "N_rod_show"
      },
      {
       "Name": "SweetsEat",
@@ -59295,7 +59548,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 780.0,
-      "OriginalHeight": 868.0
+      "OriginalHeight": 868.0,
+      "SheetTexture": "N_sweets_eat"
      },
      {
       "Name": "SweetsManip",
@@ -59376,7 +59630,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 636.0,
-      "OriginalHeight": 868.0
+      "OriginalHeight": 868.0,
+      "SheetTexture": "N_sweets_manip"
      },
      {
       "Name": "VestBoom",
@@ -59516,7 +59771,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 620.0,
-      "OriginalHeight": 915.0
+      "OriginalHeight": 915.0,
+      "SheetTexture": "N_vest_boom"
      },
      {
       "Name": "VestTry",
@@ -59671,7 +59927,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 670.0,
-      "OriginalHeight": 732.0
+      "OriginalHeight": 732.0,
+      "SheetTexture": "N_Vest_Try"
      },
      {
       "Name": "PukeMale",
@@ -59768,7 +60025,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 813.0,
-      "OriginalHeight": 501.0
+      "OriginalHeight": 501.0,
+      "SheetTexture": "N_puke_m"
      },
      {
       "Name": "PukeFemale",
@@ -59872,7 +60130,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1052.0,
-      "OriginalHeight": 501.0
+      "OriginalHeight": 501.0,
+      "SheetTexture": "N_puke_f"
      },
      {
       "Name": "BenchSit",
@@ -59926,7 +60185,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 704.0,
-      "OriginalHeight": 468.0
+      "OriginalHeight": 468.0,
+      "SheetTexture": "N_bench_sitdown"
      },
      {
       "Name": "BenchSleep",
@@ -59994,7 +60254,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 286.0,
-      "OriginalHeight": 262.0
+      "OriginalHeight": 262.0,
+      "SheetTexture": "N_bench_sleep"
      },
      {
       "Name": "BenchStand",
@@ -60134,7 +60395,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 880.0,
-      "OriginalHeight": 780.0
+      "OriginalHeight": 780.0,
+      "SheetTexture": "N_bench_standup"
      },
      {
       "Name": "BenchYawn",
@@ -60181,7 +60443,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 680.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "N_bench_yawn"
      },
      {
       "Name": "BenchPaintSit",
@@ -60240,7 +60503,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 700.0,
-      "OriginalHeight": 468.0
+      "OriginalHeight": 468.0,
+      "SheetTexture": "N_bench_paint_sitdown"
      },
      {
       "Name": "BenchPaintSleep",
@@ -60308,7 +60572,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 284.0,
-      "OriginalHeight": 262.0
+      "OriginalHeight": 262.0,
+      "SheetTexture": "N_bench_paint_sleep"
      },
      {
       "Name": "BenchPaintStand",
@@ -60380,7 +60645,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 680.0,
-      "OriginalHeight": 564.0
+      "OriginalHeight": 564.0,
+      "SheetTexture": "N_bench_paint_standup"
      },
      {
       "Name": "BenchCrash",
@@ -60465,7 +60731,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2970.0,
-      "OriginalHeight": 1220.0
+      "OriginalHeight": 1220.0,
+      "SheetTexture": "N_bench_crash"
      },
      {
       "Name": "BullActivate",
@@ -60516,7 +60783,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 580.0,
-      "OriginalHeight": 402.0
+      "OriginalHeight": 402.0,
+      "SheetTexture": "N_bull_activate"
      },
      {
       "Name": "BullRide",
@@ -60660,7 +60928,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1568.0,
-      "OriginalHeight": 1673.0
+      "OriginalHeight": 1673.0,
+      "SheetTexture": "N_bull_ride"
      },
      {
       "Name": "BullActivateManip",
@@ -60740,7 +61009,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 584.0
+      "OriginalHeight": 584.0,
+      "SheetTexture": "N_bull_manip_activate"
      },
      {
       "Name": "BullCrash",
@@ -60929,7 +61199,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2120.0,
-      "OriginalHeight": 2168.0
+      "OriginalHeight": 2168.0,
+      "SheetTexture": "N_bull_crash"
      },
      {
       "Name": "CigarSmoke",
@@ -61116,7 +61387,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 560.0,
-      "OriginalHeight": 560.0
+      "OriginalHeight": 560.0,
+      "SheetTexture": "N_cigar_smoke"
      },
      {
       "Name": "CigarBang",
@@ -61268,7 +61540,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1410.0,
-      "OriginalHeight": 1265.0
+      "OriginalHeight": 1265.0,
+      "SheetTexture": "N_cigar_bang"
      },
      {
       "Name": "HandsSit",
@@ -61425,7 +61698,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1542.0,
-      "OriginalHeight": 1005.0
+      "OriginalHeight": 1005.0,
+      "SheetTexture": "N_hands_sit"
      },
      {
       "Name": "HandsMiss",
@@ -61580,7 +61854,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1799.0,
-      "OriginalHeight": 1206.0
+      "OriginalHeight": 1206.0,
+      "SheetTexture": "N_hands_miss"
      },
      {
       "Name": "HandsHit",
@@ -61801,7 +62076,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1820.0,
-      "OriginalHeight": 1547.0
+      "OriginalHeight": 1547.0,
+      "SheetTexture": "N_hands_hit"
      },
      {
       "Name": "WhipSwing",
@@ -61940,7 +62216,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1450.0,
-      "OriginalHeight": 1300.0
+      "OriginalHeight": 1300.0,
+      "SheetTexture": "N_whip_swing"
      },
      {
       "Name": "WhipSwingFall",
@@ -62111,7 +62388,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1860.0,
-      "OriginalHeight": 1626.0
+      "OriginalHeight": 1626.0,
+      "SheetTexture": "N_whip_swing_manip"
      },
      {
       "Name": "WhipSpikesFall",
@@ -62270,7 +62548,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1812.0,
-      "OriginalHeight": 1602.0
+      "OriginalHeight": 1602.0,
+      "SheetTexture": "N_whip_swing_spikes"
      },
      {
       "Name": "BathWash",
@@ -62438,7 +62717,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1164.0,
-      "OriginalHeight": 740.0
+      "OriginalHeight": 740.0,
+      "SheetTexture": "N_bath_wash"
      },
      {
       "Name": "BathCement",
@@ -62715,7 +62995,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1400.0,
-      "OriginalHeight": 1253.0
+      "OriginalHeight": 1253.0,
+      "SheetTexture": "N_bath_cement"
      },
      {
       "Name": "BullBackThrow",
@@ -62833,7 +63114,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1498.0,
-      "OriginalHeight": 1134.0
+      "OriginalHeight": 1134.0,
+      "SheetTexture": "N_bull_back_throw"
      },
      {
       "Name": "BullBackCrash",
@@ -63042,7 +63324,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 5517.0,
-      "OriginalHeight": 2848.0
+      "OriginalHeight": 2848.0,
+      "SheetTexture": "N_bull_back_crash"
      },
      {
       "Name": "PicnicEnter",
@@ -63320,7 +63603,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2502.0,
-      "OriginalHeight": 1500.0
+      "OriginalHeight": 1500.0,
+      "SheetTexture": "N_picnic_enter"
      },
      {
       "Name": "PicnicLeave",
@@ -63436,7 +63720,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2592.0,
-      "OriginalHeight": 1494.0
+      "OriginalHeight": 1494.0,
+      "SheetTexture": "N_picnic_leave"
      },
      {
       "Name": "PicnicCrash",
@@ -63664,7 +63949,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 3496.0,
-      "OriginalHeight": 1750.0
+      "OriginalHeight": 1750.0,
+      "SheetTexture": "N_picnic_crash"
      },
      {
       "Name": "PinataHit",
@@ -63850,7 +64136,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1060.0,
-      "OriginalHeight": 970.0
+      "OriginalHeight": 970.0,
+      "SheetTexture": "N_pinata_hit"
      },
      {
       "Name": "PinataWasp",
@@ -63987,7 +64274,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1860.0,
-      "OriginalHeight": 1410.0
+      "OriginalHeight": 1410.0,
+      "SheetTexture": "N_pinata_wasp"
      },
      {
       "Name": "PlantAnnoy",
@@ -64098,7 +64386,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 808.0,
-      "OriginalHeight": 580.0
+      "OriginalHeight": 580.0,
+      "SheetTexture": "N_plant_annoy"
      },
      {
       "Name": "PlantBite",
@@ -64216,7 +64505,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1350.0,
-      "OriginalHeight": 735.0
+      "OriginalHeight": 735.0,
+      "SheetTexture": "N_plant_bite"
      },
      {
       "Name": "PlantBiteHard",
@@ -64333,7 +64623,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1140.0,
-      "OriginalHeight": 844.0
+      "OriginalHeight": 844.0,
+      "SheetTexture": "N_plant_bite_hard"
      },
      {
       "Name": "Tortilla",
@@ -64395,7 +64686,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 590.0,
-      "OriginalHeight": 544.0
+      "OriginalHeight": 544.0,
+      "SheetTexture": "N_tortilla"
      },
      {
       "Name": "TortillaChili",
@@ -64529,7 +64821,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 816.0,
-      "OriginalHeight": 720.0
+      "OriginalHeight": 720.0,
+      "SheetTexture": "N_tortilla_chili"
      },
      {
       "Name": "TortillaChiliTequila",
@@ -64704,7 +64997,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 816.0,
-      "OriginalHeight": 864.0
+      "OriginalHeight": 864.0,
+      "SheetTexture": "N_tortilla_chili_tequila"
      },
      {
       "Name": "Bouquet",
@@ -64810,7 +65104,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 796.0,
-      "OriginalHeight": 429.0
+      "OriginalHeight": 429.0,
+      "SheetTexture": "N_bouq"
      },
      {
       "Name": "BouquetFish",
@@ -64920,7 +65215,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1140.0,
-      "OriginalHeight": 604.0
+      "OriginalHeight": 604.0,
+      "SheetTexture": "N_bouq_fish"
      },
      {
       "Name": "HatchLook",
@@ -65044,7 +65340,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1212.0,
-      "OriginalHeight": 810.0
+      "OriginalHeight": 810.0,
+      "SheetTexture": "N_hatch_look"
      },
      {
       "Name": "HatchCarpet",
@@ -65148,7 +65445,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 918.0,
-      "OriginalHeight": 837.0
+      "OriginalHeight": 837.0,
+      "SheetTexture": "N_hatch_carpet"
      },
      {
       "Name": "HatchClose",
@@ -65222,7 +65520,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1288.0,
-      "OriginalHeight": 819.0
+      "OriginalHeight": 819.0,
+      "SheetTexture": "N_hatch_close"
      },
      {
       "Name": "HatchCrash",
@@ -65341,7 +65640,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1510.0,
-      "OriginalHeight": 1288.0
+      "OriginalHeight": 1288.0,
+      "SheetTexture": "N_hatch_crash"
      },
      {
       "Name": "PistolPlay",
@@ -65568,7 +65868,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1410.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "N_pistol_play"
      },
      {
       "Name": "PistolFire",
@@ -65780,7 +66081,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1494.0,
-      "OriginalHeight": 984.0
+      "OriginalHeight": 984.0,
+      "SheetTexture": "N_pistol_fire"
      },
      {
       "Name": "Steering",
@@ -65960,7 +66262,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 408.0,
-      "OriginalHeight": 400.0
+      "OriginalHeight": 400.0,
+      "SheetTexture": "N_steering"
      },
      {
       "Name": "SteeringCrash",
@@ -66218,7 +66521,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 792.0,
-      "OriginalHeight": 714.0
+      "OriginalHeight": 714.0,
+      "SheetTexture": "N_steering_crash"
      },
      {
       "Name": "BucketLook",
@@ -66416,7 +66720,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 825.0,
-      "OriginalHeight": 900.0
+      "OriginalHeight": 900.0,
+      "SheetTexture": "N_bucket_look"
      },
      {
       "Name": "BucketCrash",
@@ -66528,7 +66833,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1482.0,
-      "OriginalHeight": 1060.0
+      "OriginalHeight": 1060.0,
+      "SheetTexture": "N_bucket_crash"
      },
      {
       "Name": "OrderDrink",
@@ -66674,7 +66980,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 819.0,
-      "OriginalHeight": 1099.0
+      "OriginalHeight": 1099.0,
+      "SheetTexture": "N_order_drink"
      },
      {
       "Name": "JumpHurt",
@@ -66747,7 +67054,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 504.0,
-      "OriginalHeight": 672.0
+      "OriginalHeight": 672.0,
+      "SheetTexture": "N_jump_hurt"
      },
      {
       "Name": "JumpHurtLow",
@@ -66830,7 +67138,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 504.0,
-      "OriginalHeight": 896.0
+      "OriginalHeight": 896.0,
+      "SheetTexture": "N_jump_hurt_low"
      },
      {
       "Name": "PlatformFall",
@@ -66898,7 +67207,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1428.0,
-      "OriginalHeight": 1828.0
+      "OriginalHeight": 1828.0,
+      "SheetTexture": "N_platform_fall"
      },
      {
       "Name": "Stand_Down",
@@ -66925,7 +67235,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Left",
@@ -66952,7 +67263,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Right",
@@ -66979,7 +67291,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "Stand_Up",
@@ -67006,7 +67319,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "TadjMahalStay",
@@ -67134,7 +67448,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 708.0,
-      "OriginalHeight": 513.0
+      "OriginalHeight": 513.0,
+      "SheetTexture": "N_tadj_leave"
      },
      {
       "Name": "WaitInFear",
@@ -67161,7 +67476,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 261.0,
-      "OriginalHeight": 326.0
+      "OriginalHeight": 326.0,
+      "SheetTexture": "N_Fear"
      },
      {
       "Name": "FightWoody",
@@ -67302,7 +67618,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 880.0,
-      "OriginalHeight": 1395.0
+      "OriginalHeight": 1395.0,
+      "SheetTexture": "N_Fight_Woody"
      },
      {
       "Name": "StandLeftSingle",
@@ -67329,7 +67646,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandLeftInfinite",
@@ -67356,7 +67674,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandRightSingle",
@@ -67383,7 +67702,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandRightInfinite",
@@ -67410,7 +67730,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandUpSingle",
@@ -67437,7 +67758,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandUpInfinite",
@@ -67464,7 +67786,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandDownSingle",
@@ -67491,7 +67814,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "StandDownInfinite",
@@ -67518,7 +67842,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "TowelLaydown2",
@@ -67560,7 +67885,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 831.0,
-      "OriginalHeight": 484.0
+      "OriginalHeight": 484.0,
+      "SheetTexture": "N_towel_getup"
      },
      {
       "Name": "IdleKnock",
@@ -67676,7 +68002,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 633.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "N_Trydoor"
      },
      {
       "Name": "WaitWatch",
@@ -67703,7 +68030,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 345.0,
-      "OriginalHeight": 370.0
+      "OriginalHeight": 370.0,
+      "SheetTexture": "N_Wait"
      },
      {
       "Name": "LaughRightInfinite",
@@ -67779,7 +68107,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 624.0,
-      "OriginalHeight": 644.0
+      "OriginalHeight": 644.0,
+      "SheetTexture": "N_laughright"
      },
      {
       "Name": "LaughLeftInfinite",
@@ -67855,7 +68184,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 640.0
+      "OriginalHeight": 640.0,
+      "SheetTexture": "N_laughleft"
      },
      {
       "Name": "LaughRight",
@@ -67931,7 +68261,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 624.0,
-      "OriginalHeight": 644.0
+      "OriginalHeight": 644.0,
+      "SheetTexture": "N_laughright"
      },
      {
       "Name": "LaughLeft",
@@ -68007,7 +68338,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 640.0
+      "OriginalHeight": 640.0,
+      "SheetTexture": "N_laughleft"
      },
      {
       "Name": "CliffJump",
@@ -68105,7 +68437,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 645.0,
-      "OriginalHeight": 676.0
+      "OriginalHeight": 676.0,
+      "SheetTexture": "N_cliffjump"
      },
      {
       "Name": "CliffCrash",
@@ -68215,7 +68548,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 930.0,
-      "OriginalHeight": 1475.0
+      "OriginalHeight": 1475.0,
+      "SheetTexture": "N_cliffcrash"
      },
      {
       "Name": "CliffBoatCrash",
@@ -68314,7 +68648,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2155.0,
-      "OriginalHeight": 760.0
+      "OriginalHeight": 760.0,
+      "SheetTexture": "N_cliffboatcrash"
      },
      {
       "Name": "CliffDive",
@@ -68360,7 +68695,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 736.0,
-      "OriginalHeight": 804.0
+      "OriginalHeight": 804.0,
+      "SheetTexture": "N_cliffdive"
      },
      {
       "Name": "CliffExitWater",
@@ -68434,7 +68770,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 830.0,
-      "OriginalHeight": 772.0
+      "OriginalHeight": 772.0,
+      "SheetTexture": "N_cliffexitwater"
      },
      {
       "Name": "SearchNFH2",
@@ -68461,7 +68798,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 735.0,
-      "OriginalHeight": 905.0
+      "OriginalHeight": 905.0,
+      "SheetTexture": "N_Search"
      },
      {
       "Name": "PlataformHoverStay",
@@ -68532,7 +68870,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2058.0,
-      "OriginalHeight": 2240.0
+      "OriginalHeight": 2240.0,
+      "SheetTexture": "N_platform_hover"
      },
      {
       "Name": "AnswerPhoneNFH2",
@@ -68559,7 +68898,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1134.0,
-      "OriginalHeight": 1393.0
+      "OriginalHeight": 1393.0,
+      "SheetTexture": "N_Answer_Phone"
      },
      {
       "Name": "AnswerPhoneNFH2TrickedNFH2",
@@ -68586,7 +68926,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1134.0,
-      "OriginalHeight": 1393.0
+      "OriginalHeight": 1393.0,
+      "SheetTexture": "N_Answer_Phone"
      },
      {
       "Name": "WaitInFearSingle",
@@ -68613,7 +68954,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 261.0,
-      "OriginalHeight": 326.0
+      "OriginalHeight": 326.0,
+      "SheetTexture": "N_Fear"
      },
      {
       "Name": "WaitWatchSingle",
@@ -68640,7 +68982,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 345.0,
-      "OriginalHeight": 370.0
+      "OriginalHeight": 370.0,
+      "SheetTexture": "N_Wait"
      },
      {
       "Name": "SplashCrayfish",
@@ -68667,7 +69010,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1785.0,
-      "OriginalHeight": 1576.0
+      "OriginalHeight": 1576.0,
+      "SheetTexture": "N_splash_crayfish"
      },
      {
       "Name": "SandCastleFallOneFrame",
@@ -68694,7 +69038,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1785.0,
-      "OriginalHeight": 788.0
+      "OriginalHeight": 788.0,
+      "SheetTexture": "N_sandcastle_fall"
      },
      {
       "Name": "CrashMother",
@@ -68721,7 +69066,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 660.0,
-      "OriginalHeight": 1040.0
+      "OriginalHeight": 1040.0,
+      "SheetTexture": "N_crash_mother"
      },
      {
       "Name": "RottRightOneFrame",
@@ -68748,7 +69094,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "RottTickle",
@@ -68803,7 +69150,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 342.0,
-      "OriginalHeight": 429.0
+      "OriginalHeight": 429.0,
+      "SheetTexture": "N_tickle_fifi"
      },
      {
       "Name": "RottLookAroundFifi",
@@ -68859,7 +69207,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 282.0,
-      "OriginalHeight": 456.0
+      "OriginalHeight": 456.0,
+      "SheetTexture": "N_look_fifi"
      },
      {
       "Name": "StandRightLong",
@@ -68915,7 +69264,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 515.0,
-      "OriginalHeight": 935.0
+      "OriginalHeight": 935.0,
+      "SheetTexture": "N_Stand"
      },
      {
       "Name": "RottFreakoutShoe",
@@ -68971,7 +69321,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1577.0,
-      "OriginalHeight": 1736.0
+      "OriginalHeight": 1736.0,
+      "SheetTexture": "N_Freakout"
      },
      {
       "Name": "RottFreakoutHead",
@@ -69027,7 +69378,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1577.0,
-      "OriginalHeight": 1736.0
+      "OriginalHeight": 1736.0,
+      "SheetTexture": "N_Freakout"
      },
      {
       "Name": "RottLookHatchOpen",
@@ -69093,7 +69445,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 435.0,
-      "OriginalHeight": 450.0
+      "OriginalHeight": 450.0,
+      "SheetTexture": "N_Look_up"
      },
      {
       "Name": "RottComeBackHatch",
@@ -69144,7 +69497,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 900.0,
-      "OriginalHeight": 720.0
+      "OriginalHeight": 720.0,
+      "SheetTexture": "N_exit_hatch"
      },
      {
       "Name": "WaitInFear2",
@@ -69195,7 +69549,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 261.0,
-      "OriginalHeight": 326.0
+      "OriginalHeight": 326.0,
+      "SheetTexture": "N_Fear"
      }
     ],
     "LogAnimationsOnStartup": false,
@@ -69255,7 +69610,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 600.0,
-      "OriginalHeight": 498.0
+      "OriginalHeight": 498.0,
+      "SheetTexture": "W_Appear"
      },
      {
       "Name": "WoodyDoorBackLeave",
@@ -69282,7 +69638,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 560.0,
-      "OriginalHeight": 672.0
+      "OriginalHeight": 672.0,
+      "SheetTexture": "W_Disappear"
      },
      {
       "Name": "RottweilerDoorBackEnter",
@@ -69309,7 +69666,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 684.0,
-      "OriginalHeight": 700.0
+      "OriginalHeight": 700.0,
+      "SheetTexture": "N_Appear"
      },
      {
       "Name": "RottweilerDoorBackLeave",
@@ -69336,7 +69694,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 508.0,
-      "OriginalHeight": 740.0
+      "OriginalHeight": 740.0,
+      "SheetTexture": "N_Disappear"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -69386,7 +69745,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 58.0,
-      "OriginalHeight": 68.0
+      "OriginalHeight": 68.0,
+      "SheetTexture": "perch"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -69615,8 +69975,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -70962,7 +71321,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 351.0,
-      "OriginalHeight": 432.0
+      "OriginalHeight": 432.0,
+      "SheetTexture": "O_mg0"
      },
      {
       "Name": "Walk_Right",
@@ -71006,7 +71366,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 294.0,
-      "OriginalHeight": 426.0
+      "OriginalHeight": 426.0,
+      "SheetTexture": "O_mg1"
      },
      {
       "Name": "Walk_Down",
@@ -71050,7 +71411,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 357.0,
-      "OriginalHeight": 408.0
+      "OriginalHeight": 408.0,
+      "SheetTexture": "O_mg2"
      },
      {
       "Name": "Walk_Left",
@@ -71094,7 +71456,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 294.0,
-      "OriginalHeight": 423.0
+      "OriginalHeight": 423.0,
+      "SheetTexture": "O_mg3"
      },
      {
       "Name": "Run_Up",
@@ -71138,7 +71501,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 501.0
+      "OriginalHeight": 501.0,
+      "SheetTexture": "O_mr0"
      },
      {
       "Name": "Run_Right",
@@ -71182,7 +71546,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 596.0,
-      "OriginalHeight": 489.0
+      "OriginalHeight": 489.0,
+      "SheetTexture": "O_mr1"
      },
      {
       "Name": "Run_Down",
@@ -71226,7 +71591,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 512.0,
-      "OriginalHeight": 474.0
+      "OriginalHeight": 474.0,
+      "SheetTexture": "O_mr2"
      },
      {
       "Name": "Run_Left",
@@ -71270,7 +71636,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 564.0,
-      "OriginalHeight": 480.0
+      "OriginalHeight": 480.0,
+      "SheetTexture": "O_mr3"
      },
      {
       "Name": "Stand_Up",
@@ -71297,7 +71664,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 303.0,
-      "OriginalHeight": 280.0
+      "OriginalHeight": 280.0,
+      "SheetTexture": "O_ms0"
      },
      {
       "Name": "Stand_Right",
@@ -71324,7 +71692,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 255.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "O_ms1"
      },
      {
       "Name": "Stand_Down",
@@ -71351,7 +71720,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 294.0,
-      "OriginalHeight": 262.0
+      "OriginalHeight": 262.0,
+      "SheetTexture": "O_ms2"
      },
      {
       "Name": "Stand_Left",
@@ -71378,7 +71748,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 255.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "O_ms3"
      },
      {
       "Name": "HitPawn",
@@ -71513,7 +71884,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 740.0,
-      "OriginalHeight": 748.0
+      "OriginalHeight": 748.0,
+      "SheetTexture": "O_fight_neighbor"
      },
      {
       "Name": "BuffetCrash",
@@ -71592,7 +71964,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 372.0,
-      "OriginalHeight": 459.0
+      "OriginalHeight": 459.0,
+      "SheetTexture": "O_Buffet_Crash"
      },
      {
       "Name": "BuffetEat",
@@ -71693,7 +72066,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 496.0,
-      "OriginalHeight": 396.0
+      "OriginalHeight": 396.0,
+      "SheetTexture": "O_Buffet_Eat"
      },
      {
       "Name": "EatChinese",
@@ -71802,7 +72176,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 309.0,
-      "OriginalHeight": 426.0
+      "OriginalHeight": 426.0,
+      "SheetTexture": "O_eat_chinese"
      },
      {
       "Name": "Laugh",
@@ -71864,7 +72239,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 560.0,
-      "OriginalHeight": 556.0
+      "OriginalHeight": 556.0,
+      "SheetTexture": "O_Laugh_Left"
      },
      {
       "Name": "Marvel",
@@ -71950,7 +72326,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 336.0,
-      "OriginalHeight": 420.0
+      "OriginalHeight": 420.0,
+      "SheetTexture": "O_Marvel_Left"
      },
      {
       "Name": "Workout",
@@ -72100,7 +72477,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 357.0,
-      "OriginalHeight": 444.0
+      "OriginalHeight": 444.0,
+      "SheetTexture": "O_Workout"
      },
      {
       "Name": "Workout",
@@ -72250,7 +72628,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 357.0,
-      "OriginalHeight": 444.0
+      "OriginalHeight": 444.0,
+      "SheetTexture": "O_Workout"
      },
      {
       "Name": "Shout",
@@ -72368,7 +72747,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 429.0,
-      "OriginalHeight": 450.0
+      "OriginalHeight": 450.0,
+      "SheetTexture": "O_shout_chinese"
      },
      {
       "Name": "RickshawEnter",
@@ -72449,7 +72829,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1425.0,
-      "OriginalHeight": 885.0
+      "OriginalHeight": 885.0,
+      "SheetTexture": "O_rickshaw_enter"
      },
      {
       "Name": "RickshawWait",
@@ -72627,7 +73008,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 792.0,
-      "OriginalHeight": 318.0
+      "OriginalHeight": 318.0,
+      "SheetTexture": "O_rickshaw_wait"
      },
      {
       "Name": "RickshawWaitManip",
@@ -72754,7 +73136,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 792.0,
-      "OriginalHeight": 483.0
+      "OriginalHeight": 483.0,
+      "SheetTexture": "O_rickshaw_wait_manip"
      },
      {
       "Name": "RickshawLeave",
@@ -72839,7 +73222,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1425.0,
-      "OriginalHeight": 885.0
+      "OriginalHeight": 885.0,
+      "SheetTexture": "O_rickshaw_leave"
      },
      {
       "Name": "BeachGetUp",
@@ -72883,7 +73267,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 516.0,
-      "OriginalHeight": 474.0
+      "OriginalHeight": 474.0,
+      "SheetTexture": "O_mat_leave"
      },
      {
       "Name": "BeachLayDown",
@@ -72927,7 +73312,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 516.0,
-      "OriginalHeight": 474.0
+      "OriginalHeight": 474.0,
+      "SheetTexture": "O_mat_leave"
      },
      {
       "Name": "TowelSleep",
@@ -73074,7 +73460,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 744.0,
-      "OriginalHeight": 324.0
+      "OriginalHeight": 324.0,
+      "SheetTexture": "O_mat_sun"
      },
      {
       "Name": "TowelLaydown",
@@ -73144,7 +73531,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 696.0,
-      "OriginalHeight": 324.0
+      "OriginalHeight": 324.0,
+      "SheetTexture": "O_mat_wakeup"
      },
      {
       "Name": "OlgaShowerEnter",
@@ -73208,7 +73596,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1092.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "O_shower_enter"
      },
      {
       "Name": "OlgaShowerPutBra",
@@ -73249,7 +73638,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 633.0,
-      "OriginalHeight": 410.0
+      "OriginalHeight": 410.0,
+      "SheetTexture": "O_shower_putbra"
      },
      {
       "Name": "OlgaShowerWater",
@@ -73461,7 +73851,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 848.0,
-      "OriginalHeight": 615.0
+      "OriginalHeight": 615.0,
+      "SheetTexture": "O_shower_getwater"
      },
      {
       "Name": "OlgaShowerSearchBra",
@@ -73610,7 +74001,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1060.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "O_shower_searchbra"
      },
      {
       "Name": "OlgaShowerTakeBra",
@@ -73651,7 +74043,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 633.0,
-      "OriginalHeight": 410.0
+      "OriginalHeight": 410.0,
+      "SheetTexture": "O_shower_takebra"
      },
      {
       "Name": "OlgaShowerLeave",
@@ -73715,7 +74108,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1092.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "O_shower_leave"
      },
      {
       "Name": "OlgaStandDownInfinite",
@@ -73742,7 +74136,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 294.0,
-      "OriginalHeight": 262.0
+      "OriginalHeight": 262.0,
+      "SheetTexture": "O_ms2"
      },
      {
       "Name": "OlgaStandLeftInfinite",
@@ -73769,7 +74164,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 255.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "O_ms3"
      },
      {
       "Name": "OlgaStandUpInfinite",
@@ -73796,7 +74192,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 303.0,
-      "OriginalHeight": 280.0
+      "OriginalHeight": 280.0,
+      "SheetTexture": "O_ms0"
      },
      {
       "Name": "OlgaStandRightInfinite",
@@ -73823,7 +74220,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 255.0,
-      "OriginalHeight": 282.0
+      "OriginalHeight": 282.0,
+      "SheetTexture": "O_ms1"
      },
      {
       "Name": "OlgaShipShowerAngry",
@@ -73953,7 +74351,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 845.0,
-      "OriginalHeight": 830.0
+      "OriginalHeight": 830.0,
+      "SheetTexture": "O_shipshower_angry"
      },
      {
       "Name": "OlgaShipShowerBlubb",
@@ -73988,7 +74387,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 334.0,
-      "OriginalHeight": 306.0
+      "OriginalHeight": 306.0,
+      "SheetTexture": "O_shipshower_blubb"
      },
      {
       "Name": "OlgaShipShowerBucket",
@@ -74046,7 +74446,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 740.0,
-      "OriginalHeight": 510.0
+      "OriginalHeight": 510.0,
+      "SheetTexture": "O_shipshower_bucket"
      },
      {
       "Name": "OlgaShipShowerEnter",
@@ -74124,7 +74525,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 840.0,
-      "OriginalHeight": 696.0
+      "OriginalHeight": 696.0,
+      "SheetTexture": "O_shipshower_enter"
      },
      {
       "Name": "OlgaShipShowerSwiffer",
@@ -74174,7 +74576,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 543.0,
-      "OriginalHeight": 306.0
+      "OriginalHeight": 306.0,
+      "SheetTexture": "O_shipshower_swiffer"
      },
      {
       "Name": "OlgaShipShowerIdle",
@@ -74201,7 +74604,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 165.0,
-      "OriginalHeight": 154.0
+      "OriginalHeight": 154.0,
+      "SheetTexture": "O_shipshower_idle"
      },
      {
       "Name": "OlgaWCEnter",
@@ -74271,7 +74675,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1460.0,
-      "OriginalHeight": 696.0
+      "OriginalHeight": 696.0,
+      "SheetTexture": "O_wc_enter"
      },
      {
       "Name": "OlgaWCLeave",
@@ -74365,7 +74770,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1460.0,
-      "OriginalHeight": 696.0
+      "OriginalHeight": 696.0,
+      "SheetTexture": "O_wc_leave"
      },
      {
       "Name": "OlgaWCMad",
@@ -74475,7 +74881,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1545.0,
-      "OriginalHeight": 835.0
+      "OriginalHeight": 835.0,
+      "SheetTexture": "O_wc_mad"
      },
      {
       "Name": "OlgaWCUse",
@@ -74502,7 +74909,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 292.0,
-      "OriginalHeight": 154.0
+      "OriginalHeight": 154.0,
+      "SheetTexture": "O_wc_use"
      },
      {
       "Name": "PicnicEnter",
@@ -74575,7 +74983,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1675.0,
-      "OriginalHeight": 1205.0
+      "OriginalHeight": 1205.0,
+      "SheetTexture": "O_picnic_enter"
      },
      {
       "Name": "PicnicLeave",
@@ -74658,7 +75067,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1675.0,
-      "OriginalHeight": 1205.0
+      "OriginalHeight": 1205.0,
+      "SheetTexture": "O_picnic_leave"
      },
      {
       "Name": "PicnicWait",
@@ -74731,7 +75141,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": true,
       "OriginalWidth": 323.0,
-      "OriginalHeight": 147.0
+      "OriginalHeight": 147.0,
+      "SheetTexture": "O_picnic_wait"
      },
      {
       "Name": "BullRide",
@@ -74904,7 +75315,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1554.0,
-      "OriginalHeight": 1116.0
+      "OriginalHeight": 1116.0,
+      "SheetTexture": "O_bull_ride"
      },
      {
       "Name": "BullCrash",
@@ -75042,7 +75454,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2208.0,
-      "OriginalHeight": 1694.0
+      "OriginalHeight": 1694.0,
+      "SheetTexture": "O_bull_crash"
      },
      {
       "Name": "SandCastleLiftOlga",
@@ -75132,7 +75545,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1896.0,
-      "OriginalHeight": 810.0
+      "OriginalHeight": 810.0,
+      "SheetTexture": "N_sandcastle_lift_olga"
      }
     ],
     "LogAnimationsOnStartup": false,
@@ -75192,7 +75606,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 75.0,
-      "OriginalHeight": 36.0
+      "OriginalHeight": 36.0,
+      "SheetTexture": "bag"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -75485,8 +75900,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -76446,7 +76860,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "W_Stand"
      },
      {
       "Name": "Stand_Left",
@@ -76473,7 +76888,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "W_Stand"
      },
      {
       "Name": "Stand_Right",
@@ -76500,7 +76916,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "W_Stand"
      },
      {
       "Name": "Stand_Up",
@@ -76527,7 +76944,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "W_Stand"
      },
      {
       "Name": "Run_Down",
@@ -76563,7 +76981,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 822.0,
-      "OriginalHeight": 942.0
+      "OriginalHeight": 942.0,
+      "SheetTexture": "W_Walk"
      },
      {
       "Name": "Run_Left",
@@ -76599,7 +77018,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 822.0,
-      "OriginalHeight": 942.0
+      "OriginalHeight": 942.0,
+      "SheetTexture": "W_Walk"
      },
      {
       "Name": "Run_Right",
@@ -76635,7 +77055,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 822.0,
-      "OriginalHeight": 942.0
+      "OriginalHeight": 942.0,
+      "SheetTexture": "W_Walk"
      },
      {
       "Name": "Run_Up",
@@ -76671,7 +77092,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 822.0,
-      "OriginalHeight": 942.0
+      "OriginalHeight": 942.0,
+      "SheetTexture": "W_Walk"
      },
      {
       "Name": "ItemFoundUp",
@@ -76710,7 +77132,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "ItemFoundRight",
@@ -76749,7 +77172,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "ItemFoundDown",
@@ -76788,7 +77212,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "ItemFoundLeft",
@@ -76827,7 +77252,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "TakeRight",
@@ -76870,7 +77296,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1146.0,
-      "OriginalHeight": 1254.0
+      "OriginalHeight": 1254.0,
+      "SheetTexture": "W_Take_Right"
      },
      {
       "Name": "WhatsUp",
@@ -76902,7 +77329,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 596.0,
-      "OriginalHeight": 628.0
+      "OriginalHeight": 628.0,
+      "SheetTexture": "W_Whats_Up"
      },
      {
       "Name": "NoNo",
@@ -76949,7 +77377,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 471.0
+      "OriginalHeight": 471.0,
+      "SheetTexture": "W_NoNo"
      },
      {
       "Name": "MakeTrick",
@@ -76994,7 +77423,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 605.0,
-      "OriginalHeight": 785.0
+      "OriginalHeight": 785.0,
+      "SheetTexture": "W_Use"
      },
      {
       "Name": "TrickLaugh",
@@ -77026,7 +77456,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 484.0,
-      "OriginalHeight": 628.0
+      "OriginalHeight": 628.0,
+      "SheetTexture": "W_Smile"
      },
      {
       "Name": "TakeLeft",
@@ -77069,7 +77500,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 918.0,
-      "OriginalHeight": 1038.0
+      "OriginalHeight": 1038.0,
+      "SheetTexture": "W_Take_Left"
      },
      {
       "Name": "TakeMid",
@@ -77112,7 +77544,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1104.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "W_Take_Up"
      },
      {
       "Name": "TakeHigh",
@@ -77155,7 +77588,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1104.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "W_Take_Up"
      },
      {
       "Name": "TakeLow",
@@ -77198,7 +77632,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1104.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "W_Take_Up"
      },
      {
       "Name": "Appear",
@@ -77242,7 +77677,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 600.0,
-      "OriginalHeight": 498.0
+      "OriginalHeight": 498.0,
+      "SheetTexture": "W_Appear"
      },
      {
       "Name": "Disappear",
@@ -77286,7 +77722,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 560.0,
-      "OriginalHeight": 672.0
+      "OriginalHeight": 672.0,
+      "SheetTexture": "W_Disappear"
      },
      {
       "Name": "Entrance",
@@ -77322,7 +77759,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 605.0,
-      "OriginalHeight": 785.0
+      "OriginalHeight": 785.0,
+      "SheetTexture": "W_Triumph"
      },
      {
       "Name": "Triumph",
@@ -77366,7 +77804,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 605.0,
-      "OriginalHeight": 785.0
+      "OriginalHeight": 785.0,
+      "SheetTexture": "W_Triumph"
      },
      {
       "Name": "GameFailed",
@@ -77416,7 +77855,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 477.0,
-      "OriginalHeight": 618.0
+      "OriginalHeight": 618.0,
+      "SheetTexture": "W_Game_Failed"
      },
      {
       "Name": "TakeEel",
@@ -77470,7 +77910,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 472.0,
-      "OriginalHeight": 390.0
+      "OriginalHeight": 390.0,
+      "SheetTexture": "W_get_eel"
      },
      {
       "Name": "PutEel",
@@ -77500,7 +77941,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 472.0,
-      "OriginalHeight": 390.0
+      "OriginalHeight": 390.0,
+      "SheetTexture": "W_put_eel"
      },
      {
       "Name": "ElephantDraw",
@@ -77576,7 +78018,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1280.0,
-      "OriginalHeight": 820.0
+      "OriginalHeight": 820.0,
+      "SheetTexture": "W_elephant_draw"
      },
      {
       "Name": "ElephantRat",
@@ -77665,7 +78108,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 2825.0,
-      "OriginalHeight": 1475.0
+      "OriginalHeight": 1475.0,
+      "SheetTexture": "W_elephant_rat"
      },
      {
       "Name": "BasketLeave",
@@ -77715,7 +78159,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 524.0,
-      "OriginalHeight": 516.0
+      "OriginalHeight": 516.0,
+      "SheetTexture": "W_basket_leave"
      },
      {
       "Name": "BasketEnter",
@@ -77775,7 +78220,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 524.0,
-      "OriginalHeight": 516.0
+      "OriginalHeight": 516.0,
+      "SheetTexture": "W_basket_enter"
      },
      {
       "Name": "CoalHeat",
@@ -77852,7 +78298,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 980.0,
-      "OriginalHeight": 520.0
+      "OriginalHeight": 520.0,
+      "SheetTexture": "W_heatcoals"
      },
      {
       "Name": "BinHideIn",
@@ -77910,7 +78357,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 724.0,
-      "OriginalHeight": 516.0
+      "OriginalHeight": 516.0,
+      "SheetTexture": "W_bin_enter"
      },
      {
       "Name": "BinHideOut",
@@ -77964,7 +78412,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 724.0,
-      "OriginalHeight": 516.0
+      "OriginalHeight": 516.0,
+      "SheetTexture": "W_bin_leave"
      },
      {
       "Name": "ChairIn",
@@ -78025,7 +78474,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 432.0,
-      "OriginalHeight": 390.0
+      "OriginalHeight": 390.0,
+      "SheetTexture": "W_chair_in"
      },
      {
       "Name": "ChairOut",
@@ -78078,7 +78528,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 432.0,
-      "OriginalHeight": 390.0
+      "OriginalHeight": 390.0,
+      "SheetTexture": "W_chair_in"
      },
      {
       "Name": "BoatSaw",
@@ -78133,7 +78584,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1182.0,
-      "OriginalHeight": 396.0
+      "OriginalHeight": 396.0,
+      "SheetTexture": "W_boat_saw"
      },
      {
       "Name": "SpikesOpen",
@@ -78198,7 +78650,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1060.0,
-      "OriginalHeight": 780.0
+      "OriginalHeight": 780.0,
+      "SheetTexture": "W_spikes_open"
      },
      {
       "Name": "LorryEnter",
@@ -78250,7 +78703,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 580.0,
-      "OriginalHeight": 465.0
+      "OriginalHeight": 465.0,
+      "SheetTexture": "W_lorry_enter"
      },
      {
       "Name": "LorryLeave",
@@ -78306,7 +78760,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 580.0,
-      "OriginalHeight": 465.0
+      "OriginalHeight": 465.0,
+      "SheetTexture": "W_lorry_leave"
      },
      {
       "Name": "StatueEnter",
@@ -78363,7 +78818,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 417.0,
-      "OriginalHeight": 741.0
+      "OriginalHeight": 741.0,
+      "SheetTexture": "W_statue_enter"
      },
      {
       "Name": "StatueLeave",
@@ -78420,7 +78876,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 417.0,
-      "OriginalHeight": 741.0
+      "OriginalHeight": 741.0,
+      "SheetTexture": "W_statue_leave"
      },
      {
       "Name": "CatchBat",
@@ -78470,7 +78927,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 378.0,
-      "OriginalHeight": 588.0
+      "OriginalHeight": 588.0,
+      "SheetTexture": "W_catch_bat"
      },
      {
       "Name": "FearLeft",
@@ -78603,7 +79061,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 735.0
+      "OriginalHeight": 735.0,
+      "SheetTexture": "W_Fear"
      },
      {
       "Name": "FearRight",
@@ -78736,7 +79195,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 810.0,
-      "OriginalHeight": 735.0
+      "OriginalHeight": 735.0,
+      "SheetTexture": "W_Fear"
      },
      {
       "Name": "BeachChairEnter",
@@ -78788,7 +79248,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 636.0,
-      "OriginalHeight": 483.0
+      "OriginalHeight": 483.0,
+      "SheetTexture": "W_beachchair_enter"
      },
      {
       "Name": "BeachChairLeave",
@@ -78839,7 +79300,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 636.0,
-      "OriginalHeight": 483.0
+      "OriginalHeight": 483.0,
+      "SheetTexture": "W_beachchair_leave"
      },
      {
       "Name": "TakeOneFrameNFH2Right",
@@ -78866,7 +79328,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "TakeOneFrameNFH2Down",
@@ -78893,7 +79356,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "TakeOneFrameNFH2Left",
@@ -78920,7 +79384,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "TakeOneFrameNFH2Up",
@@ -78947,7 +79412,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 612.0,
-      "OriginalHeight": 519.0
+      "OriginalHeight": 519.0,
+      "SheetTexture": "W_Item_Found"
      },
      {
       "Name": "OpenToolBoxNFH2",
@@ -78974,7 +79440,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 345.0,
-      "OriginalHeight": 453.0
+      "OriginalHeight": 453.0,
+      "SheetTexture": "W_Hair_Pin"
      },
      {
       "Name": "DexterityFailed",
@@ -79006,7 +79473,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 480.0,
-      "OriginalHeight": 580.0
+      "OriginalHeight": 580.0,
+      "SheetTexture": "W_Game_Failed"
      },
      {
       "Name": "PutTrickDownNFH2",
@@ -79038,7 +79506,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1104.0,
-      "OriginalHeight": 1080.0
+      "OriginalHeight": 1080.0,
+      "SheetTexture": "W_Take_Up"
      },
      {
       "Name": "TakeDownNFH2",
@@ -79070,7 +79539,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 388.0,
-      "OriginalHeight": 459.0
+      "OriginalHeight": 459.0,
+      "SheetTexture": "W_Take_Down"
      },
      {
       "Name": "TakeDownRightNFH2",
@@ -79102,7 +79572,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1146.0,
-      "OriginalHeight": 1254.0
+      "OriginalHeight": 1254.0,
+      "SheetTexture": "W_Take_Right"
      },
      {
       "Name": "MakeTrickDownNFH2",
@@ -79134,7 +79605,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 605.0,
-      "OriginalHeight": 785.0
+      "OriginalHeight": 785.0,
+      "SheetTexture": "W_Use"
      },
      {
       "Name": "PipeEnter",
@@ -79161,7 +79633,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 568.0,
-      "OriginalHeight": 675.0
+      "OriginalHeight": 675.0,
+      "SheetTexture": "W_Hide_Pipe"
      },
      {
       "Name": "PipeLeave",
@@ -79201,7 +79674,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 568.0,
-      "OriginalHeight": 675.0
+      "OriginalHeight": 675.0,
+      "SheetTexture": "W_Hide_Pipe_Leave"
      },
      {
       "Name": "OpenDentureMachineNFH2",
@@ -79241,7 +79715,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 650.0,
-      "OriginalHeight": 764.0
+      "OriginalHeight": 764.0,
+      "SheetTexture": "W_Puzzle"
      },
      {
       "Name": "TakeDownLeftNFH2",
@@ -79286,7 +79761,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 918.0,
-      "OriginalHeight": 1038.0
+      "OriginalHeight": 1038.0,
+      "SheetTexture": "W_Take_Left"
      },
      {
       "Name": "GetCrayFishDexterity1",
@@ -79326,7 +79802,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 303.0,
-      "OriginalHeight": 390.0
+      "OriginalHeight": 390.0,
+      "SheetTexture": "W_get_crayfish"
      },
      {
       "Name": "GetOlgaBagDexterity",
@@ -79366,7 +79843,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 580.0,
-      "OriginalHeight": 476.0
+      "OriginalHeight": 476.0,
+      "SheetTexture": "W_Steal_olgahandbag"
      },
      {
       "Name": "GetToyMachineDexterity",
@@ -79406,7 +79884,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 536.0,
-      "OriginalHeight": 572.0
+      "OriginalHeight": 572.0,
+      "SheetTexture": "W_play_toyomat"
      },
      {
       "Name": "GetCrayFishDexterity2",
@@ -79446,7 +79925,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 303.0,
-      "OriginalHeight": 360.0
+      "OriginalHeight": 360.0,
+      "SheetTexture": "W_crayfish_tongs"
      },
      {
       "Name": "GetRatDexterity",
@@ -79486,7 +79966,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 369.0,
-      "OriginalHeight": 234.0
+      "OriginalHeight": 234.0,
+      "SheetTexture": "W_take_rat"
      },
      {
       "Name": "CloseAwning",
@@ -79551,7 +80032,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 469.0,
-      "OriginalHeight": 1480.0
+      "OriginalHeight": 1480.0,
+      "SheetTexture": "W_close_awning"
      },
      {
       "Name": "GetToolDexterity",
@@ -79591,7 +80073,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 255.0,
-      "OriginalHeight": 630.0
+      "OriginalHeight": 630.0,
+      "SheetTexture": "N_take_pole"
      },
      {
       "Name": "InflateNFH2",
@@ -79647,7 +80130,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 744.0,
-      "OriginalHeight": 543.0
+      "OriginalHeight": 543.0,
+      "SheetTexture": "W_Inflate"
      },
      {
       "Name": "PutRuby",
@@ -79708,7 +80192,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 414.0,
-      "OriginalHeight": 456.0
+      "OriginalHeight": 456.0,
+      "SheetTexture": "W_throne_putruby"
      },
      {
       "Name": "HatchDexterity",
@@ -79764,7 +80249,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 237.0,
-      "OriginalHeight": 246.0
+      "OriginalHeight": 246.0,
+      "SheetTexture": "W_cut_hatch"
      },
      {
       "Name": "ThrowBraNFH2",
@@ -79820,7 +80306,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1350.0,
-      "OriginalHeight": 1600.0
+      "OriginalHeight": 1600.0,
+      "SheetTexture": "W_throw_bra"
      },
      {
       "Name": "SpikesOpenLong",
@@ -79857,7 +80344,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 1060.0,
-      "OriginalHeight": 780.0
+      "OriginalHeight": 780.0,
+      "SheetTexture": "W_spikes_open"
      }
     ],
     "LogAnimationsOnStartup": false,
@@ -79917,7 +80405,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 58.0,
-      "OriginalHeight": 28.0
+      "OriginalHeight": 28.0,
+      "SheetTexture": "swiffer"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -80210,8 +80699,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -80515,7 +81003,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 600.0,
-      "OriginalHeight": 498.0
+      "OriginalHeight": 498.0,
+      "SheetTexture": "W_Appear"
      },
      {
       "Name": "WoodyDoorBackLeave",
@@ -80542,7 +81031,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 560.0,
-      "OriginalHeight": 672.0
+      "OriginalHeight": 672.0,
+      "SheetTexture": "W_Disappear"
      },
      {
       "Name": "RottweilerDoorBackEnter",
@@ -80569,7 +81059,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 684.0,
-      "OriginalHeight": 700.0
+      "OriginalHeight": 700.0,
+      "SheetTexture": "N_Appear"
      },
      {
       "Name": "RottweilerDoorBackLeave",
@@ -80596,7 +81087,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 508.0,
-      "OriginalHeight": 740.0
+      "OriginalHeight": 740.0,
+      "SheetTexture": "N_Disappear"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -80849,7 +81341,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 105.0,
-      "OriginalHeight": 52.0
+      "OriginalHeight": 52.0,
+      "SheetTexture": "bird_fall"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -80876,7 +81369,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 104.0,
-      "OriginalHeight": 52.0
+      "OriginalHeight": 52.0,
+      "SheetTexture": "bird_empty"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -81169,8 +81663,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 39.95000076293945,
@@ -81435,7 +81928,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 102.0,
-      "OriginalHeight": 98.0
+      "OriginalHeight": 98.0,
+      "SheetTexture": "wheel_locked"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -81462,7 +81956,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 102.0,
-      "OriginalHeight": 98.0
+      "OriginalHeight": 98.0,
+      "SheetTexture": "wheel"
      },
      {
       "Name": "N2TrickItemIdleFuckedup",
@@ -81489,7 +81984,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 99.0,
-      "OriginalHeight": 58.0
+      "OriginalHeight": 58.0,
+      "SheetTexture": "wheel_crash"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -81743,8 +82239,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -82580,7 +83075,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 695.0,
-      "OriginalHeight": 790.0
+      "OriginalHeight": 790.0,
+      "SheetTexture": "captain_drink"
      },
      {
       "Name": "N2TrickItemExtra1",
@@ -82668,7 +83164,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 510.0,
-      "OriginalHeight": 660.0
+      "OriginalHeight": 660.0,
+      "SheetTexture": "captain_sleep"
      },
      {
       "Name": "N2TrickItemIdleTricked",
@@ -82838,7 +83335,8 @@
       "ShowChildRenderersOnEnd": false,
       "InfiniteLoop": false,
       "OriginalWidth": 987.0,
-      "OriginalHeight": 996.0
+      "OriginalHeight": 996.0,
+      "SheetTexture": "captain_fall"
      }
     ],
     "LoadTexturesAsynchronously": false
@@ -83065,8 +83563,7 @@
     "MouseOverLockedIconName": "",
     "ItemTipIconDepth": "ItemsFront",
     "ItemTipIcon": {
-     "external": 7,
-     "path": 1
+     "texture": "Interaction-Icon"
     },
     "ItemTipDeltaPosition": {
      "x": 0.0,
@@ -83840,7 +84337,7 @@
      "m_StretchHeight": 0
     },
     "MainBackground": {
-     "texture": "bar_mid_HNonly"
+     "texture": "bar_mid_HNonly~2"
     },
     "MainBackgroundRect": {
      "x": 0.18100999295711517,
@@ -83849,7 +84346,7 @@
      "height": 99.0
     },
     "AlternateBackground": {
-     "texture": "bar_mid"
+     "texture": "bar_mid~2"
     },
     "AlternateBackgroundRect": {
      "x": 0.28200000524520874,
@@ -83858,7 +84355,7 @@
      "height": 99.0
     },
     "RottweilerOnlyBackground": {
-     "texture": "bar_left_HNonly"
+     "texture": "bar_left_HNonly~2"
     },
     "RottweilerOnlyBackgroundRect": {
      "x": 0.0,
@@ -84450,7 +84947,7 @@
      "texture": "abrechnungsscreen"
     },
     "NewScoreboard": {
-     "texture": "abrechnungsscreen"
+     "texture": "abrechnungsscreen~2"
     },
     "NewScoreRect": {
      "x": 0.10000000149011612,
@@ -85188,11 +85685,10 @@
      "height": 35.0
     },
     "WhistlingSound": {
-     "external": 104,
-     "path": 1
+     "clip": "obj2_bonus1"
     },
     "TrickCameraBackground": {
-     "texture": "camera"
+     "texture": "camera~2"
     },
     "TrickCameraBackgroundRect": {
      "x": 0.0,
@@ -85385,7 +85881,7 @@
      "texture": "HN_dis_001"
     },
     "MotherHUDProgressFull": {
-     "texture": "Mutter_dis_001"
+     "texture": "Mutter_dis_001~2"
     },
     "PlayPawnBlindAnimation": false,
     "Actor": "Mother",

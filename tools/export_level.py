@@ -1,5 +1,5 @@
 """Export one Unity scene to readable JSON: enums as names, PPtrs as object names."""
-import json, sys, os
+import json, sys, os, re
 import paths
 from unityser import SerializedFile, Reader
 from cli_meta import Assembly
@@ -105,6 +105,51 @@ def _world_transforms(sc):
     return out
 
 
+def _quad_texture(index, sf, comps):
+    """background_texture, but through the extraction's collision-numbered
+    names — four L201 chests all serialize a texture literally named
+    'ms_0000', and the bare m_Name would land them on L211's deck rail"""
+    from assets import read_renderer_materials, read_material_maintex_st
+    mr = next((pid for cid, _, pid in comps if cid == 23), None)
+    if mr is None:
+        return None
+    obj = next((o for o in sf.objects if o['path_id'] == mr), None)
+    if obj is None:
+        return None
+    try:
+        mats = read_renderer_materials(sf, obj)
+    except Exception:
+        return None
+    for fid, pid in mats:
+        mf, mo = index.deref(sf, fid, pid)
+        if mo is None:
+            continue
+        try:
+            st = read_material_maintex_st(mf, mo)
+        except Exception:
+            continue
+        if not st:
+            continue
+        tex, scale, offset = st
+        tf, to = index.deref(mf, tex[0], tex[1])
+        if to is None:
+            continue
+        # the material's _MainTex_ST: the Plane's 0..1 UVs go through
+        # uv * scale + offset — L101's Binoculars quad shows the
+        # (0.625..0.70, 0.34..0.52) window of its 256x256 sheet, not the
+        # whole texture
+        uv = [scale[0], scale[1], offset[0], offset[1]]
+        name = _extract_texture_names().get(
+            (os.path.basename(tf.path), to['path_id']))
+        if name:
+            return name, uv
+        try:
+            return Reader(tf.body(to), 0).astr(), uv
+        except Exception:
+            return None
+    return None
+
+
 def _quads(sc, index, world):
     """Every MeshRenderer quad: the level backdrop and the handful of static
     item overlays. All of them are the built-in 10x10 Plane laid into XY, so the
@@ -130,9 +175,10 @@ def _quads(sc, index, world):
         mesh_pid = (rr.i32(), rr.i64())[1]
         if mesh_pid != BUILTIN_PLANE:
             continue
-        tex = background_texture(index, sc.f, comps)
-        if not tex:
+        tex_uv = _quad_texture(index, sc.f, comps)
+        if not tex_uv:
             continue
+        tex, uv = tex_uv
         # Renderer.m_Enabled is the first byte after the GameObject pointer
         # (the layout read_renderer_materials documents); the tricked-overlay
         # objects ship with it off and SetTrickedObjectHidden flips it
@@ -141,7 +187,7 @@ def _quads(sc, index, world):
         renderer_enabled = bool(er.u8())
         p, s, _r = world.get(tr, ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0),
                                   (0.0, 0.0, 0.0, 1.0)))
-        out.append({'name': name, 'texture': tex, 'active': active,
+        out.append({'name': name, 'texture': tex, 'uv': uv, 'active': active,
                     'renderer_enabled': renderer_enabled,
                     'go': o['path_id'],
                     'x': p[0], 'y': p[1], 'z': p[2],
@@ -203,6 +249,9 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
         out['objects'][str(pid)] = e
 
     resolve_pattern_files(sc, index, out)
+    resolve_sheet_textures(sc, index, out)
+    resolve_texture_fields(sc, index, out)
+    resolve_audio_fields(sc, index, out)
     hud = hud_sections(sc, index, out)
     if hud:
         out['hud'] = hud
@@ -223,14 +272,24 @@ def _resolve_asset_ref(sc, index, v):
     tf, o = index.deref(sc.f, v.get('external', v.get('file', 0)), v['path'])
     if o is None:
         return None
-    if o['class_id'] == 28:                      # Texture2D: m_Name leads
-        return {'texture': Reader(tf.body(o), 0).astr()}
+    if o['class_id'] == 28:                      # Texture2D: the extraction's
+        name = _extract_texture_names().get(     # collision-numbered PNG name;
+            (os.path.basename(tf.path), o['path_id']))   # m_Name alone is not
+        if name is None:                         # unique (Mutter_dis_001 x2,
+            name = Reader(tf.body(o), 0).astr()  # progress_back x2, camera x2)
+        return {'texture': name}
     if o['class_id'] == 49:                      # TextAsset: m_Name, m_Script
         r = Reader(tf.body(o), 0)
         r.astr()
         return {'text': r.astr()}
     if o['class_id'] == 128:                     # Font: m_Name leads
         return {'font': Reader(tf.body(o), 0).astr()}
+    if o['class_id'] == 83:                      # AudioClip: the extraction's
+        name = _extract_audio_names().get(       # collision-numbered WAV name
+            (os.path.basename(tf.path), o['path_id']))
+        if name is None:
+            name = Reader(tf.body(o), 0).astr()
+        return {'clip': name}
     return None
 
 
@@ -305,6 +364,232 @@ def resolve_pattern_files(sc, index, out):
     for e in out['objects'].values():
         if 'data' in e and isinstance(e['data'], dict):
             walk(e['data'])
+
+
+_EXTRACT_NAMES = None
+_EXTRACT_AUDIO_NAMES = None
+
+
+def _extract_audio_names():
+    """(file basename, path_id) -> the WAV name extract_audio.py wrote,
+    replicating its collision numbering"""
+    global _EXTRACT_AUDIO_NAMES
+    if _EXTRACT_AUDIO_NAMES is not None:
+        return _EXTRACT_AUDIO_NAMES
+    import collections
+    from extract_textures import serialized_files
+    from audio import read_audioclip
+    used = collections.Counter()
+    table = {}
+    for p in serialized_files():
+        try:
+            sf = SerializedFile(p)
+        except Exception:
+            continue
+        for o in sf.objects:
+            if o['class_id'] != 83:
+                continue
+            try:
+                clip = read_audioclip(sf, o)
+            except Exception:
+                continue
+            name = re.sub(r'[^A-Za-z0-9_.-]', '_', clip.name) or 'unnamed'
+            used[name] += 1
+            table[(os.path.basename(p), o['path_id'])] = \
+                name if used[name] == 1 else '%s~%d' % (name, used[name])
+    _EXTRACT_AUDIO_NAMES = table
+    return table
+
+
+AUDIO_FIELDS = {
+    # MusicPlayer's whole soundtrack (MusicPlayer.cs:5-35)
+    'MusicPlayer': ('LevelSounds', 'AlternateLevelSounds', 'LevelStart',
+                    'EntranceSound', 'SuccessNormal', 'SuccessPerfect',
+                    'Caught', 'Failed', 'Joke', 'EntranceClap'),
+    # the audience laughs (Rottweiler.PlayAudienceLaugh, cs:805-818)
+    'Rottweiler': ('MediumLaughs', 'BigLaughs'),
+}
+
+
+def resolve_audio_fields(sc, index, out):
+    """resolve the AudioClip PPtrs the runtime's sound port consumes"""
+    for e in out['objects'].values():
+        fields = AUDIO_FIELDS.get(e.get('type'))
+        d = e.get('data')
+        if not fields or not isinstance(d, dict):
+            continue
+        for k in fields:
+            v = d.get(k)
+            if isinstance(v, dict) and ('external' in v or 'file' in v):
+                d[k] = _resolve_asset_ref(sc, index, v) or v
+            elif isinstance(v, list):
+                d[k] = [(_resolve_asset_ref(sc, index, x) or x)
+                        if isinstance(x, dict) and
+                        ('external' in x or 'file' in x) else x
+                        for x in v]
+
+
+def _extract_texture_names():
+    """(file basename, path_id) -> the PNG name extract_textures.py wrote,
+    replicating its collision numbering (m_Name, '~N' on repeats) so a PPtr
+    to one of the twelve 'ms_0000' textures still lands on the right file"""
+    global _EXTRACT_NAMES
+    if _EXTRACT_NAMES is not None:
+        return _EXTRACT_NAMES
+    import collections
+    from extract_textures import serialized_files
+    from texture import read_texture2d
+    used = collections.Counter()
+    table = {}
+    for p in serialized_files():
+        try:
+            sf = SerializedFile(p)
+        except Exception:
+            continue
+        rdirs = (os.path.dirname(p), paths.APK, paths.OBB)
+        for o in sf.objects:
+            if o['class_id'] != 28:
+                continue
+            try:
+                tex = read_texture2d(sf, o, resource_dirs=rdirs)
+            except Exception:
+                continue
+            name = re.sub(r'[^A-Za-z0-9_.-]', '_', tex.name) or 'unnamed'
+            used[name] += 1
+            table[(os.path.basename(p), o['path_id'])] = \
+                name if used[name] == 1 else '%s~%d' % (name, used[name])
+    _EXTRACT_NAMES = table
+    return table
+
+
+_RESOURCE_CONTAINER = None
+
+
+def _resource_container():
+    """Resources.Load's index: the ResourceManager container in
+    globalgamemanagers (class 147, path -> PPtr; tools/extract_gui.py walks
+    the same table). Keys are the lower-cased Resources paths — that is why
+    Resources.Load is case-insensitive. -> {path: (file basename, path_id)}
+    keeping the FIRST entry of a duplicated path: the container is a
+    multimap and Load returns its first match (7 paths repeat in S1, 9 in
+    S2 — the HUD bars, Mutter_dis_001, progress_back/front,
+    abrechnungsscreen, plus two sheet/pattern-file pairs; the Texture2D
+    entry comes first in every one of them)."""
+    global _RESOURCE_CONTAINER
+    if _RESOURCE_CONTAINER is not None:
+        return _RESOURCE_CONTAINER
+    from extract_gui import container
+    gg = SerializedFile(paths.GG)
+    index = AssetIndex()
+    table = {}
+    for p, fid, pid in container(gg):
+        if p in table:
+            continue
+        tf = index.resolve_file(gg, fid)
+        if tf is not None:
+            table[p] = (os.path.basename(tf.path), pid)
+    _RESOURCE_CONTAINER = table
+    return table
+
+
+def _resolve_resource_texture(path):
+    """Resources.Load(path) for a texture sheet -> the extraction's
+    collision-numbered PNG name, or None when the container has no such
+    path (Load returns null; AnimationInstance.LoadTexture, cs:136-140,
+    logs 'could not load' and the sheet stays empty). A path whose first
+    container entry is not a Texture2D also yields None (the cast in
+    LoadTexture would fail) — no such path exists in either season."""
+    if not path:
+        return None
+    ent = _resource_container().get(path.lower())
+    if ent is None:
+        return None
+    return _extract_texture_names().get(ent)
+
+
+def resolve_sheet_textures(sc, index, out):
+    """AnimationInstance.LoadTexture (AnimationInstance.cs:130-143):
+    SheetTexture = Resources.Load(BaseAnimationPath + TextureFileName) —
+    a Resources path, not a PPtr, so the collision numbering cannot come
+    from a pointer: walk the ResourceManager container the way Load does
+    and store the resolved PNG name as each animation's SheetTexture (the
+    runtime field LoadTexture fills; null where Load finds nothing: 162
+    references, 160 of them S1's mother-door strips under a path that
+    does not exist plus L213's two BoatPicnic strips). Without it the
+    runtime fell back to the bare basename, which lands 23 Season-2 sheet
+    references (18 distinct level/sheet pairs) on a same-named twin —
+    L212's live bull drew the 109x72 'bull' bubble icon instead of bull~2,
+    L202's rocks took L211's deck rail (ms_0000 for ms_0000~8)."""
+    for e in out['objects'].values():
+        d = e.get('data')
+        if not isinstance(d, dict) or 'BaseAnimationPath' not in d \
+                or not isinstance(d.get('Animations'), list):
+            continue
+        base = d.get('BaseAnimationPath') or ''
+        for a in d['Animations']:
+            if isinstance(a, dict) and 'TextureFileName' in a:
+                a['SheetTexture'] = _resolve_resource_texture(
+                    base + (a.get('TextureFileName') or ''))
+
+
+def resolve_texture_fields(sc, index, out):
+    """resolve the Texture PPtr fields the runtime's OnGUI ports consume in
+    place: the items' interaction-icon tips (Item.OnGUI, Item.cs:2740-2760)
+    and the Level fences (Level.OnGUI, Level.cs:322-341). Fence textures get
+    the extraction's collision-numbered name — their m_Name is not unique."""
+    for e in out['objects'].values():
+        d = e.get('data')
+        if not isinstance(d, dict):
+            continue
+        v = d.get('ItemTipIcon')
+        if isinstance(v, dict) and ('external' in v or 'file' in v):
+            d['ItemTipIcon'] = _resolve_asset_ref(sc, index, v) or v
+        v = d.get('FenceTextures')
+        if isinstance(v, list) and any(isinstance(x, dict) and
+                                       ('external' in x or 'file' in x)
+                                       for x in v):
+            d['FenceTextures'] = [_resolve_fence_texture(sc, index, x)
+                                  for x in v]
+        # Item.PrimedMaterial (Item.cs:1236-1239): the quad's material swap
+        # on prime — resolve it down to its _MainTex name
+        v = d.get('PrimedMaterial')
+        if isinstance(v, dict) and ('external' in v or 'file' in v):
+            d['PrimedMaterial'] = _resolve_material_texture(sc, index, v) or v
+
+
+def _resolve_material_texture(sc, index, v):
+    """a Material PPtr -> {'texture': its _MainTex extraction name}"""
+    from assets import read_material_maintex
+    mf, mo = index.deref(sc.f, v.get('external', v.get('file', 0)), v['path'])
+    if mo is None or mo['class_id'] != 21:
+        return None
+    try:
+        tex = read_material_maintex(mf, mo)
+    except Exception:
+        return None
+    if not tex:
+        return None
+    tf, to = index.deref(mf, tex[0], tex[1])
+    if to is None:
+        return None
+    name = _extract_texture_names().get(
+        (os.path.basename(tf.path), to['path_id']))
+    if name is None:
+        name = Reader(tf.body(to), 0).astr()
+    return {'texture': name}
+
+
+def _resolve_fence_texture(sc, index, v):
+    if not (isinstance(v, dict) and ('external' in v or 'file' in v)):
+        return v
+    tf, o = index.deref(sc.f, v.get('external', v.get('file', 0)), v['path'])
+    if o is None or o['class_id'] != 28:
+        return _resolve_asset_ref(sc, index, v) or v
+    name = _extract_texture_names().get(
+        (os.path.basename(tf.path), o['path_id']))
+    if name is None:
+        return _resolve_asset_ref(sc, index, v) or v
+    return {'texture': name}
 
 
 def hud_sections(sc, index, out):

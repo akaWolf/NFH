@@ -49,6 +49,27 @@ class AssetIndex:
         return None, None
 
 
+def read_material_maintex_st(sf, obj):
+    """Material -> ('_MainTex' PPtr (file_id, path_id), (scale_x, scale_y),
+    (offset_x, offset_y)) or None — the _MainTex_ST tiling the Plane's
+    0..1 UVs go through (Unity samples uv * scale + offset)"""
+    r = Reader(sf.body(obj), 0)
+    r.astr()                                  # m_Name
+    r.i32(); r.i64()                          # m_Shader
+    r.astr()                                  # m_ShaderKeywords
+    r.u32(); r.i32()                          # lightmap flags, custom queue
+    for _ in range(r.i32()):                  # stringTagMap
+        r.astr(); r.astr()
+    for _ in range(r.i32()):                  # m_TexEnvs
+        key = r.astr()
+        fid = r.i32(); pid = r.i64()
+        sx = r.u('f', 4); sy = r.u('f', 4)    # m_Scale
+        ox = r.u('f', 4); oy = r.u('f', 4)    # m_Offset
+        if key == '_MainTex':
+            return (fid, pid), (sx, sy), (ox, oy)
+    return None
+
+
 def read_material_maintex(sf, obj):
     """Material -> ('_MainTex' PPtr as (file_id, path_id)), or None"""
     r = Reader(sf.body(obj), 0)

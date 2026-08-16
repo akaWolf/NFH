@@ -247,7 +247,12 @@
   },
   "7": {
    "type": "Camera",
-   "class_id": 20
+   "class_id": 20,
+   "data": {
+    "orthographic": false,
+    "orthographic_size": 100.0,
+    "depth": -1.0
+   }
   },
   "8": {
    "type": "AudioListener",
@@ -255,19 +260,35 @@
   },
   "9": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "10": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "11": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "12": {
    "type": "AudioSource",
-   "class_id": 82
+   "class_id": 82,
+   "data": {
+    "volume": 1.0,
+    "loop": false
+   }
   },
   "13": {
    "type": "cls92",

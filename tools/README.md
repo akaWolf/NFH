@@ -24,13 +24,14 @@ data — recover the layout from the metadata and the scene blobs become readabl
 | `cli_meta.py` | ECMA-335 metadata reader: types, fields, enums, generic bases |
 | `monodeser.py` | Unity serialization rules → deserializes `MonoBehaviour` payloads |
 | `scene.py` | whole scene: `GameObject` / `Transform` / `BoxCollider` + scripts |
-| `export_level.py` | one scene → JSON, enums as names, pointers as object names; `PatternFile` TextAssets parsed into each animation's `Pattern` + `Sounds` (`AnimationInstance.SetupPattern`) — Season 2 keeps 3917 animations' frames and sound keys there |
+| `export_level.py` | one scene → JSON, enums as names, pointers as object names; `PatternFile` TextAssets parsed into each animation's `Pattern` + `Sounds` (`AnimationInstance.SetupPattern`) — Season 2 keeps 3917 animations' frames and sound keys there; every texture/clip reference named after the extraction's file (`SheetTexture`, see "Asset names") |
 | `summary.py` | human-readable digest of an exported level |
 | `zonegraph.py` | rebuilds the runtime zone graph from static data |
 | `texture.py` | Texture2D reader plus ETC1/ETC2/EAC and linear decoders, PNG out |
-| `extract_textures.py` | every Texture2D → PNG |
+| `extract_textures.py` | every Texture2D → PNG, plus `wrap.json` (each texture's `m_WrapMode`, `repeat`/`clamp` — the runtime needs it to draw a frame that ran past its sheet the way `Graphics.DrawTexture` samples it; `--wrap-only` rewrites just the sidecar) |
 | `audio.py` | AudioClip reader, FSB5 container walk, WAV out |
 | `extract_audio.py` | every AudioClip → WAV (or raw `.fsb`) |
+| `fsb_to_ogg.py` | rebuilds the FMOD-Vorbis `.fsb` banks (music, jingles) into `.ogg`; needs [python-fsb5](https://github.com/HearthSim/python-fsb5) |
 | `validate_all.py` | self-test (see below) |
 | `assets.py` | cross-file PPtr resolution: renderer → material → texture |
 | `decompile.sh` | ILSpy → `src/` (33.9k lines of C# across 241 files) |
@@ -120,6 +121,36 @@ Audio is wrapped by Unity in FMOD FSB5 containers inside `.resource` files.
 Almost all of it is PCM16 mono at 44.1 kHz, which unwraps straight to WAV. The
 music tracks are FMOD Vorbis, whose setup headers FMOD strips; those are written
 out as raw `.fsb` for a real FSB5 decoder to deal with later.
+
+### Asset names in the exported JSON
+
+`extract_textures.py` / `extract_audio.py` write flat files by `m_Name`, and
+names are not unique: Season 2 has twelve `ms_0000`, three `bull`, two of
+`bucket`, `controls`, `statue`, `phone`, `camera`, `Mutter_dis_001`... The
+extractors number repeats `name~2`, `name~3` in serialized-file order, and
+`export_level.py` replicates that numbering (`_extract_texture_names`,
+`_extract_audio_names`: `(file, path_id) -> name`) wherever it turns a
+reference into a name, so the JSON always names the exact file:
+
+- **PPtr fields** (quads' materials, `FenceTextures`, `ItemTipIcon`,
+  `PrimedMaterial`, the HUD / ProgressBar / DexterityComponent / MouseCursor
+  textures, `Zone.BubbleIcon*`, the MusicPlayer and laugh clips) resolve
+  through the pointer: `{'texture': 'bar_left_HNonly~2'}`.
+- **Animation sheets are `Resources.Load` strings**, not pointers:
+  `AnimationInstance.LoadTexture` loads `BaseAnimationPath + TextureFileName`.
+  `Resources.Load` resolves through the ResourceManager container in
+  `globalgamemanagers` (class 147, lower-cased path → PPtr; `extract_gui.py`
+  walks the same table), so `resolve_sheet_textures` does the same lookup
+  and stores the result as each animation's `SheetTexture` — the runtime
+  field `LoadTexture` fills. `null` means the container has no such path
+  and the original loads nothing (S1's `Textures/Items/Door/Back/Mother/
+  M_appear` — the file lives under `doornfh2/` — and L213's
+  `BoatPicnic/boat_rent`, `boat_unmount`, which live under `boatrent/`).
+  A path duplicated in the container (7 in S1, 9 in S2 — the HUD bars,
+  `Mutter_dis_001`, `progress_back/front`, `abrechnungsscreen`, plus two
+  sheet/pattern-file pairs) keeps its first entry, the multimap's order.
+- **Frame sounds** (`Sounds[].FileName`) stay bare names: the two colliding
+  clip names (`but_hover1`, `na_slip_up1`) extract to byte-identical twins.
 
 ### A trap worth knowing
 

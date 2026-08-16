@@ -37,7 +37,25 @@ def r_boxcollider(r):
             'size': _v3(r), 'center': _v3(r)}
 
 
-READERS = {1: r_gameobject, 4: r_transform, 65: r_boxcollider}
+def r_camera(r):
+    # Unity 5.3 Camera: GameObject(12) enabled(1+3) clearFlags(4) color(16)
+    # viewport(16) near/far/fov, orthographic@64 (+align), size@68, depth@72
+    b = r.d
+    return {'orthographic': bool(b[64]),
+            'orthographic_size': struct.unpack_from('<f', b, 68)[0],
+            'depth': struct.unpack_from('<f', b, 72)[0]}
+
+
+def r_audiosource(r):
+    # Unity 5.3 AudioSource: GameObject(12) enabled(1+3) mixerGroup(12)
+    # clip(12) playOnAwake(1+3) volume@44 pitch@48 loop@52
+    b = r.d
+    return {'volume': struct.unpack_from('<f', b, 44)[0],
+            'loop': bool(b[52])}
+
+
+READERS = {1: r_gameobject, 4: r_transform, 65: r_boxcollider,
+           20: r_camera, 82: r_audiosource}
 
 
 class Scene:
