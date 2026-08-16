@@ -384,6 +384,8 @@ class Pawn:
         self.sneak_toggle = False        # Woody.MbSneakToggle
         self.in_urgent = False           # Pawn.InUrgentMove
         self.movement_paused = False     # Pawn.MovementPaused
+        self.exit_confirmation_shown = False   # Pawn.ExitConfirmationShown
+        self.waiting_for_exit_confirmation = False  # WaitingforExitConfirmation
         self.hiding = False              # Woody.Hiding (SetHidden override)
         self.min_door_distance = spec.get('min_door_distance') or 0.0
         self.hiding_item = None
@@ -463,6 +465,7 @@ class Pawn:
         self.lose_animation = spec.get('lose_animation')
         self.hello_animation = spec.get('hello_animation')
         self.hello_animation_nfh2 = spec.get('hello_animation_nfh2')
+        self.exit_confirm_message = spec.get('exit_confirm_message') or ''
         self.idle_animations = spec.get('idle_animations') or []
         self.idle_threshold = spec.get('idle_threshold') or 30.0
         self.animations_in_progress = False  # Pawn.AnimationsInProgress
@@ -1120,8 +1123,46 @@ class Pawn:
             if up and self.anim.has(up):
                 self.anim.play_looping(up)
             return
+        # a finished-entrance pass through an ExitDoor asks first
+        # (Pawn.cs:1378-1383; ExitConfirmationShown latches for the retry):
+        # Woody.ShowExitConfirmation raises the dialog (Woody.cs:552-556)
+        # over the base's park (cs:1445-1450); the application hangs the
+        # dialog on World.show_exit_confirmation — the bare viewer has none
+        # and passes straight through
+        if door.exit_door and not self.exit_confirmation_shown \
+                and self.finished_entrance and self.role == 'Woody' \
+                and self.world is not None \
+                and self.world.show_exit_confirmation is not None:
+            self.exit_confirmation_shown = True
+            self.waiting_for_exit_confirmation = True
+            self.movement_paused = True   # PauseMovement, Velocity = 0
+            self.world.show_exit_confirmation(self)
+            return
         self.use_door_at_once = False     # Pawn.cs:1393
         self._transit_animations(door, other, sequential=False)
+
+    def continue_exit(self):
+        """Pawn.ContinueExit (Pawn.cs:1510-1515): ContinueMovement, the
+        portal flag and the wait dropped — the next arrival re-enters
+        MoveToDoor past the latched ExitConfirmationShown"""
+        self.movement_paused = False
+        self.portal_move = False
+        self.waiting_for_exit_confirmation = False
+
+    def abort_exit(self):
+        """Pawn.AbortExit (Pawn.cs:1500-1508): EndPortalMove(abort) drops
+        the portal flags without TakeNextStep, StopMovement + ContinueMovement
+        leave the move inert (MoveLocationChanged false: the path no longer
+        drives, as the alerter's RestartMovement models it), the latch
+        clears, SwitchToStandAnimation"""
+        self.portal_move = False
+        self.steps = []
+        self._step = None
+        self.state = self.IDLE
+        self.movement_paused = False
+        self.exit_confirmation_shown = False
+        self.waiting_for_exit_confirmation = False
+        self._stand()
 
     def _transit_animations(self, door, other, sequential):
         self.state = self.DOOR_ANIM
@@ -4606,7 +4647,7 @@ class ProgressBarState:
 
 
 class World:
-    def __init__(self, level, sound_sink=None, music=None):
+    def __init__(self, level, sound_sink=None, music=None, defer_music=False):
         self.level = level
         self.woody = None
         self.pawns = {}
@@ -4638,22 +4679,23 @@ class World:
         self.should_play_finish = False  # Woody.ShouldPlayFinish
         self.is_playing_finish = False   # Woody.IsPlayingFinish
         self._music_timer = None
-        if music is not None and level.music is not None:
-            # the port's t=0 is IntroAnimation.StartGame; the clap and the
-            # 15 s Invoke started intro_total earlier, at the scene load
-            # (MusicPlayer.Start cs:43-51, Level.cs:295-297): the clap
-            # resumes intro_total in, the track follows at 15 - intro_total
+        # the exit door's confirmation (Pawn.cs:1378-1383 ->
+        # Woody.ShowExitConfirmation, Woody.cs:552-556): the application
+        # hangs its ExitConfirmation dialog here; without one (the bare
+        # viewer) the pass runs straight through
+        self.show_exit_confirmation = None
+        if music is not None and level.music is not None and not defer_music:
+            # the viewer alone: its t=0 is IntroAnimation.StartGame; the clap
+            # and the 15 s Invoke started intro_total earlier, at the scene
+            # load (MusicPlayer.Start cs:43-51, Level.cs:295-297): the clap
+            # resumes intro_total in, the track follows at 15 - intro_total.
+            # The application runs the title cards itself and calls
+            # start_music(elapsed) at StartGame instead.
             intro = level.music.get('intro_total') or 0.0
             if level.music.get('clap'):
                 music.play_music(level.music['clap'], loop=False,
                                  offset=intro)
-            if level.music.get('level'):
-                self._music_timer = max(
-                    0.0, (level.music.get('delay') or 0.0) - intro)
-            # StartGame plays the EntranceSound on its own source
-            # (IntroAnimation.cs:309-312 -> PlayEntranceMusic)
-            if level.music.get('entrance'):
-                music.play_entrance(level.music['entrance'])
+            self.start_music(intro, clap=False)
         self.hud = None                  # set by the viewer; the description
                                          # bubble and whistle land here
         self.players = {id(s): AnimPlayer(s, sound_sink) for s in level.sprites}
@@ -4704,6 +4746,7 @@ class World:
         # the DexterityComponent minigames (DexterityComponent.cs)
         self.is_dexterity_on = False     # GameInfo.IsDexterityOn
         self.menu_open = False           # InGameMenu enabled (timeScale=0)
+        self.menu_toggle_hook = None     # the application's InGameMenu.Toggle
         self.screen_size = (800, 600)    # the viewer overrides these two
         self.screen_point = self._default_screen_point
         self.snap_camera = None          # CameraMover.SnapToWoodyImmediate
@@ -4759,9 +4802,13 @@ class World:
 
     def toggle_menu(self):
         """Woody.ToggleMenu -> InGameMenu.Toggle (InGameMenu.cs:28-61):
-        Enable freezes time, Disable resumes it. The menu's widget tree is
-        not modelled; the pause and the HUD fill hide are."""
-        self.menu_open = not self.menu_open
+        Enable freezes time, Disable resumes it. The application hangs the
+        widget tree on menu_toggle_hook (runtime/app.py's InGameMenu); the
+        bare viewer keeps the pause and the HUD fill hide alone."""
+        if self.menu_toggle_hook is not None:
+            self.menu_toggle_hook()
+        else:
+            self.menu_open = not self.menu_open
 
     def _default_screen_point(self, x, y):
         """WorldToScreenPoint with the y flip, camera on Woody — the viewer
@@ -7734,6 +7781,25 @@ class World:
             self._freeze_pawn(rott)       # Rottweiler.Freeze, cs:308-311
         self._play_jingle('success_perfect')   # cs:312
 
+    def start_music(self, elapsed, clap=True, music_on=True, audio_on=True):
+        """IntroAnimation.StartGame's sound side (cs:309-312 ->
+        PlayEntranceMusic) with the scene-load clocks `elapsed` seconds in:
+        the 15 s PlayLevelMusic Invoke (MusicPlayer.cs:71-80) keeps its
+        remainder; `clap` plays the EntranceClap MusicPlayer.Start fired at
+        the load (cs:43-47) when nobody did yet. The settings' gates:
+        the clap and the track ride Level.MusicEnabled (PlayEffectsMusic
+        cs:168-176, PlayMusic cs:90-96), the entrance Level.AudioEnabled
+        (IntroAnimation.cs:309-312); the bare viewer passes both True."""
+        music, m = self.music_bank, self.level.music
+        if music is None or m is None:
+            return
+        if clap and music_on and m.get('clap'):
+            music.play_music(m['clap'], loop=False, offset=elapsed)
+        if music_on and m.get('level'):
+            self._music_timer = max(0.0, (m.get('delay') or 0.0) - elapsed)
+        if audio_on and m.get('entrance'):
+            music.play_entrance(m['entrance'])
+
     def _play_jingle(self, key):
         """MusicPlayer.PlayEffectsMusic: the jingle stops the level track
         (MusicPlayer.cs:143-176)"""
@@ -7745,6 +7811,19 @@ class World:
             self.music_bank.play_music(name, loop=False)
         else:
             self.music_bank.stop_music()
+
+    def tick_ambient(self, dt):
+        """the title-card span: the item/door controllers animate
+        (AnimationControllerBase.OnGUI refreshes regardless of the intro,
+        cs:172-189) while every actor waits for CanStart
+        (IntroAnimation.StartGame, cs:293-299) and the clock holds
+        (GameInfo's timer gates on IntroAnimation.Finished, cs:241) — the
+        port's world clock starts at StartGame, so the cards phase advances
+        only the ambient AnimPlayers"""
+        pawn_players = {id(p.anim) for p in self.pawns.values()}
+        for p in self.players.values():
+            if id(p) not in pawn_players:
+                p.tick(dt)
 
     def tick(self, dt):
         self.time += dt                  # Time.time

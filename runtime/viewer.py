@@ -44,20 +44,37 @@ def texture_dirs(level_paths=()):
 
 
 class Viewer:
-    def __init__(self, level_paths, start=0, headless=False):
+    def __init__(self, level_paths, start=0, headless=False, window=None,
+                 renderer=None, cache=None, sounds=None, autoload=True):
         self.paths = level_paths
         self.i = start
         self.headless = headless
-        sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO)
-        flags = sdl2.SDL_WINDOW_HIDDEN if headless else sdl2.SDL_WINDOW_SHOWN
-        self.win = sdl2.SDL_CreateWindow(b'NFH viewer',
-                                         sdl2.SDL_WINDOWPOS_CENTERED,
-                                         sdl2.SDL_WINDOWPOS_CENTERED,
-                                         WIDTH, HEIGHT, flags)
-        self.rnd = sdl2.SDL_CreateRenderer(
-            self.win, -1, sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
-        self.cache = TextureCache(self.rnd, texture_dirs(level_paths))
-        self.sounds = None if headless else SoundBank.try_open(level_paths)
+        if window is None:
+            sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO)
+            flags = sdl2.SDL_WINDOW_HIDDEN if headless else sdl2.SDL_WINDOW_SHOWN
+            self.win = sdl2.SDL_CreateWindow(b'NFH viewer',
+                                             sdl2.SDL_WINDOWPOS_CENTERED,
+                                             sdl2.SDL_WINDOWPOS_CENTERED,
+                                             WIDTH, HEIGHT, flags)
+            self.rnd = sdl2.SDL_CreateRenderer(
+                self.win, -1, sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
+            self.cache = TextureCache(self.rnd, texture_dirs(level_paths))
+            self.sounds = None if headless else SoundBank.try_open(level_paths)
+        else:
+            # the application owns the window, the renderer, the sheets and
+            # the mixer; the viewer draws the level into them
+            self.win, self.rnd, self.cache, self.sounds = \
+                window, renderer, cache, sounds
+        # the application runs IntroAnimation's title cards itself and
+        # calls World.start_music at StartGame (see World.__init__)
+        self.defer_music = False
+        # the score screen's buttons (HUD.cs:1287-1299): the application
+        # hooks the level reload / the return to the level selection here;
+        # the bare viewer reloads / steps to the next level itself
+        self.on_score = None
+        # SettingKey.Language for the level strings (the bare viewer keeps
+        # the extraction default 0 = English)
+        self.language = 0
         self.cam = Camera()
         self.show_zones = False
         self.paused = False
@@ -68,7 +85,8 @@ class Viewer:
         self.virtual_mouse_down = False
         self.woody = None
         self.t = 0.0
-        self.load(self.i)
+        if autoload:
+            self.load(self.i)
 
     def load(self, i):
         self.i = i % len(self.paths)
@@ -77,7 +95,7 @@ class Viewer:
             self.cam.size = self.level.camera_size
         self.world = World(self.level,
                            sound_sink=self.sounds.play if self.sounds else None,
-                           music=self.sounds)
+                           music=self.sounds, defer_music=self.defer_music)
         for role in ('Woody', 'Rottweiler', 'Olga', 'Mother', 'Kid'):
             self.world.spawn_pawn(role)
         self.woody = self.world.pawns.get('Woody')
@@ -96,7 +114,8 @@ class Viewer:
             self.cam.y = self.woody.sprite.y
         self.t = 0.0
         self.hud = Hud(self.level, self.world, self.cache, self.rnd,
-                       WIDTH, HEIGHT) if self.level.hud else None
+                       WIDTH, HEIGHT, language=self.language) \
+            if self.level.hud else None
         if self.hud is not None:
             # Woody.PlayTrickDone -> the HUD celebration
             self.world.game.on_trick_done = self.hud.play_trick_done
@@ -248,13 +267,19 @@ class Viewer:
             return None                   # GameInfo.IsDexterityOn (Pawn.cs:351)
         if self.hud is not None:
             consumed = self.hud.check_click(sx, sy)
+            if consumed in ('restart', 'next') and self.on_score is not None:
+                # the application: Restart reloads the level, OK returns
+                # to the level selection (HUD.cs:1287-1299)
+                self.on_score(consumed)
+                return 'score'
             if consumed == 'restart':
                 self.load(self.i)
                 return 'restart'
             if consumed == 'next':
                 # viewer decision: the score screen's OK leads to the level
-                # selection menu in the original (LevelLoader, not modelled);
-                # here it opens the next level of the list
+                # selection menu in the original (LevelLoader; the
+                # application models it); here it opens the next level of
+                # the list
                 self.load(self.i + 1)
                 return 'restart'
             if consumed:
@@ -342,7 +367,10 @@ class Viewer:
             inv.used['type'] if inv.used else None,
             g.completed, g.total, tail))
 
-    def draw(self):
+    def draw(self, present=True, overlay=None, cursor=True):
+        """one frame; `overlay` draws between the HUD and the cursor (the
+        application's in-game menu / dialogs at the Menu GUI depths),
+        `present` False leaves the frame for the caller to present"""
         sdl2.SDL_SetRenderDrawColor(self.rnd, 20, 22, 28, 255)
         sdl2.SDL_RenderClear(self.rnd)
         for q in self.level.quads:                   # sorted back-to-front by z
@@ -407,8 +435,14 @@ class Viewer:
                                    wx, wy, my.value)
             self.hud.draw(self._frame_dt, (mx.value, my.value),
                           bool(buttons & sdl2.SDL_BUTTON_LMASK))
-            self.hud.draw_cursor(mx.value, my.value)
-        sdl2.SDL_RenderPresent(self.rnd)
+            if overlay is not None:
+                overlay()
+            if cursor:
+                self.hud.draw_cursor(mx.value, my.value)
+        elif overlay is not None:
+            overlay()
+        if present:
+            sdl2.SDL_RenderPresent(self.rnd)
         return drawn
 
     def screenshot(self, path):

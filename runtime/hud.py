@@ -42,14 +42,20 @@ WHISTLE_BASE = 'Textures/GUI/main/'
 BUBBLE_BASES = ('Textures/Bubbles/', 'Textures/NFH2/Bubbles/')
 
 
-def load_strings(level_path):
+def load_strings(level_path, language=0):
     """LocalizationManager.LoadLocalizationFile: 'KEY<>VALUE' lines from
-    Localization/Final/<language>; ';' comments. tools/extract_strings.py
+    Localization/Final/<language> — the file is picked by SettingKey.Language
+    (LocalizationManager.cs:80-117; 0 = Lang, the port keeps that default so
+    the bare viewer reads English); ';' comments. tools/extract_strings.py
     puts the extracted files under strings/{s1,s2}/."""
+    from menu import LANGUAGES
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     season = 's2' if '/s2/' in level_path.replace('\\', '/') else 's1'
     out = {}
-    p = os.path.join(root, 'strings', season, 'Lang.txt')
+    name = LANGUAGES[language] if 0 <= language < len(LANGUAGES) else 'Lang'
+    p = os.path.join(root, 'strings', season, name + '.txt')
+    if not os.path.exists(p):
+        p = os.path.join(root, 'strings', season, 'Lang.txt')
     if not os.path.exists(p):
         return out
     for line in open(p, encoding='utf-8', errors='replace'):
@@ -120,7 +126,8 @@ class HudAnim:
 
 
 class Hud:
-    def __init__(self, level, world, cache, renderer, width, height):
+    def __init__(self, level, world, cache, renderer, width, height,
+                 language=0):
         self.d = level.hud or {}
         self.level = level
         self.world = world
@@ -191,7 +198,7 @@ class Hud:
         self._tricks_rects = None
         self._angry_count_rect = None
         self._statue_rect = None
-        self.strings = load_strings(level.path)
+        self.strings = load_strings(level.path, language)
         self.woody_strings = {
             k: self.loc((level.pawns.get('Woody') or {}).get(k + '_string', ''))
             for k in ('use', 'with', 'empty_use', 'look_at',

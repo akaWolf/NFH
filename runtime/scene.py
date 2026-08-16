@@ -2119,6 +2119,9 @@ class Level:
                 # TakeNextStep never plays HelloAnimation (Pawn.cs:1064-1067;
                 # the S2 sheet has no Hello); the 14 S1 levels ship FALSE
                 'finished_entrance': bool(pd.get('FinishedEntrance')),
+                # Woody.ExitConfirmMessage: the localization key the exit
+                # door's dialog shows (Woody.cs:552-556)
+                'exit_confirm_message': pd.get('ExitConfirmMessage') or '',
                 # the 30-second boredom poses (Woody.FindInput, cs:612-623)
                 'idle_animations': [a for a in (pd.get('IdleAnimations') or [])
                                     if a and a != 'NONE'],

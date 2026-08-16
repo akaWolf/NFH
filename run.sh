@@ -1,7 +1,8 @@
 #!/bin/sh
-# Launch the level viewer, extracting the game assets on first run.
-#   ./run.sh                          # Level101
-#   ./run.sh levels/s2/Level208.json
+# Launch the game, extracting the game assets on first run.
+#   ./run.sh                          # the full game (menu, levels)
+#   ./run.sh Level108                 # the full flow, straight into a level
+#   ./run.sh levels/s2/Level208.json  # the bare level viewer
 set -e
 root=$(cd "$(dirname "$0")" && pwd)
 : "${NFH_DATA:=/tmp/nfh-data}"
@@ -26,4 +27,7 @@ if [ ! -f "$root/strings/s1/Lang.txt" ]; then
     (cd "$root" && NFH_DATA="$NFH_DATA" python3 tools/extract_strings.py strings/s1 fonts/s1)
 fi
 cd "$root"
-exec python3 runtime/viewer.py "${@:-levels/s1/Level101.json}"
+case "${1:-}" in
+*.json) exec python3 runtime/viewer.py "$@" ;;   # the bare level viewer
+*)      exec python3 runtime/app.py "$@" ;;      # the full game
+esac

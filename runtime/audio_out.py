@@ -33,6 +33,13 @@ class SoundBank:
         self._mixer = mixer
         self._dirs = dirs
         self._cache = {}
+        # Level.AudioEnabled / AudioLevel / MusicLevel as the settings leave
+        # them: Helpers.PlaySound is silent without AudioEnabled and scales
+        # by AudioLevel (Helpers.cs:457-463); the music sources take
+        # MusicLevel * AudioLevel (MusicPlayer.StartMusic, cs:98-105)
+        self.audio_enabled = True
+        self.sound_volume = 1.0
+        self.music_volume = 1.0
 
     @classmethod
     def try_open(cls, level_paths=()):
@@ -48,14 +55,18 @@ class SoundBank:
             if sdlmixer.Mix_OpenAudio(44100, sdl2.AUDIO_S16SYS, 2, 1024) != 0:
                 return None
             sdlmixer.Mix_AllocateChannels(16)
+            # the two music sources own the first channels; Mix_PlayChannel(-1)
+            # never lands an effect on a reserved one
+            sdlmixer.Mix_ReserveChannels(2)
             return cls(sdlmixer, dirs)
         except Exception:
             return None
 
-    MUSIC_CHANNEL = 15                    # reserved for the MusicPlayer port
-    ENTRANCE_CHANNEL = 14                 # MusicPlayer.EntranceSoundSource: its
+    MUSIC_CHANNEL = 0                     # reserved for the MusicPlayer port
+    ENTRANCE_CHANNEL = 1                  # MusicPlayer.EntranceSoundSource: its
                                           # own AudioSource, the level track
                                           # starts under it (MusicPlayer.cs:122-135)
+    EFFECT_CHANNELS = range(2, 16)        # Mix_PlayChannel(-1)'s pool
 
     def _load(self, name):
         """the clip named by an AnimationSound.FileName / MusicPlayer clip:
@@ -79,10 +90,28 @@ class SoundBank:
             self._cache[name] = chunk
         return chunk
 
+    def set_sound_volume(self, volume, enabled=True):
+        """Level.AudioEnabled / AudioLevel for the effects (Helpers.PlaySound
+        gates on AudioEnabled and scales by AudioLevel, Helpers.cs:457-463)"""
+        self.audio_enabled = bool(enabled)
+        self.sound_volume = max(0.0, min(1.0, float(volume)))
+        for ch in self.EFFECT_CHANNELS:
+            self._mixer.Mix_Volume(ch, int(round(self.sound_volume * 128)))
+
+    def set_music_volume(self, volume):
+        """MusicLevel * AudioLevel on the music and entrance sources
+        (MusicPlayer.StartMusic cs:101, PlayEntranceMusic cs:125,
+        PlayEffectsMusic cs:172)"""
+        self.music_volume = max(0.0, min(1.0, float(volume)))
+        for ch in (self.MUSIC_CHANNEL, self.ENTRANCE_CHANNEL):
+            self._mixer.Mix_Volume(ch, int(round(self.music_volume * 128)))
+
     def play(self, name):
         """one frame-keyed effect on a free channel (Helpers.PlaySound,
         Helpers.cs:452-470 — a null clip is skipped there too — behind
         AnimationControllerBase.PlaySound, cs:191-201)"""
+        if not self.audio_enabled:
+            return
         chunk = self._load(name)
         if chunk:
             self._mixer.Mix_PlayChannel(-1, chunk, 0)
