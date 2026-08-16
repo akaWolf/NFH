@@ -283,6 +283,7 @@ class Pawn:
         self.in_urgent = False           # Pawn.InUrgentMove
         self.movement_paused = False     # Pawn.MovementPaused
         self.hiding = False              # Woody.Hiding (SetHidden override)
+        self.min_door_distance = spec.get('min_door_distance') or 0.0
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
         # the NFH2 walk-through pathing state (Pawn.cs:150-183)
@@ -4841,11 +4842,17 @@ class World:
             if self.woody.anim.has('WhatsUp'):
                 self.woody.anim.play_single('WhatsUp')
             return False
-        # Item.cs (CanWoodyUse head): the FirstAid + key name-hack — the only
-        # way Level108's locked kit opens. FirstAidPos is not serialized in
-        # either season's data, so the teleport half is unverifiable; skipped.
+        # Item.cs:1407-1413 (CanWoodyUse head): the FirstAid + key name-hack
+        # — the only way Level108's locked kit opens. The key must come from
+        # a source item, and the kit teleports to FirstAidPos — internal
+        # initializers (-5.98, -2.544), Item.cs:640-646 — where the shipped
+        # L108 transform already sits, so the assignment is a no-op there.
         if item.name == 'FirstAid' and inv.used is not None \
+                and inv.used.get('item') is not None \
                 and inv.used['type'] == 'IT_Key':
+            item.x, item.y = -5.98, -2.544
+            if item.sprite is not None:
+                item.sprite.x, item.sprite.y = -5.98, -2.544
             item.locked = False
             self.woody_prime(item)
             return True
@@ -5504,6 +5511,12 @@ class World:
         def hit():
             seqs = [q for q in catcher.hit_action.get('sequences', [])
                     if all(catcher.anim.has(a) for a in q)]
+            # MoveToEmptySpace (Rottweiler.cs:1156-1203, Mother.cs:142): the
+            # catcher snaps onto Woody's exact position — the hit sheets are
+            # anchored there, not at the catcher's own floor line (his
+            # PlayerHeightDelta differs) — then backs off the nearest flat
+            # door of his zone by MinDistanceToNearestDoor
+            self._move_to_empty_space(catcher)
             woody.sprite.hidden = True    # the hit sheets contain Woody
             if seqs:
                 catcher.anim.play_sequence(random.choice(seqs),
@@ -5512,6 +5525,30 @@ class World:
                 self._finish_animation_ended()
         if not catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
             hit()
+
+    def _move_to_empty_space(self, catcher):
+        """Rottweiler.MoveToEmptySpace (Rottweiler.cs:1156-1203); Mother's
+        copy is identical. No flat door in the zone means no reposition."""
+        woody = self.woody
+        door = None
+        best = None
+        for d in self.level.doors:
+            if d.should_walk_up:
+                continue
+            if catcher.zone is None or d.zone != catcher.zone.pid:
+                continue
+            dist = ((woody.sprite.x - d.x) ** 2
+                    + (woody.sprite.y - d.y) ** 2) ** 0.5
+            if best is None or dist < best:
+                best, door = dist, d
+        if door is None:
+            return
+        catcher.sprite.x = woody.sprite.x
+        catcher.sprite.y = woody.sprite.y
+        dx = woody.sprite.x - door.x
+        if abs(dx) < catcher.min_door_distance:
+            catcher.sprite.x += catcher.min_door_distance \
+                * (1.0 if dx >= 0 else -1.0)
 
     def _finish_animation_ended(self):
         """GameInfo.FinishAnimationEnded: everything freezes"""

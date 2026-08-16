@@ -167,6 +167,7 @@ class Hud:
         self._angry_state = 'idle'
         self._mother_state = 'idle'
         self.cam = None                   # set by the viewer for the bars
+        self.cursor_tex = None            # MouseCursor.CurrentTexture
         self._tricks_rects = None
         self._angry_count_rect = None
         self._statue_rect = None
@@ -223,6 +224,13 @@ class Hud:
         if not key:
             return ''
         return self.strings.get(key, key)
+
+    def _align(self, style_key, default=4):
+        """the style's serialized TextAnchor (m_Alignment)"""
+        st = self.d.get(style_key)
+        if isinstance(st, dict) and st.get('m_Alignment') is not None:
+            return st['m_Alignment']
+        return default
 
     # -- geometry ----------------------------------------------------------
     def rect(self, name):
@@ -313,21 +321,37 @@ class Hud:
             s = sdl2.SDL_Rect(*[int(v) for v in src])
             sdl2.SDL_RenderCopy(self.rnd, tex, s, dst)
 
-    def _text(self, s, r, small=False, center=True, color=(255, 255, 255)):
+    def _text(self, s, r, small=False, center=True, color=(255, 255, 255),
+              align=None):
+        """GUI.Label/TextArea honor the style's TextAnchor (m_Alignment):
+        0-2 top, 3-5 middle, 6-8 bottom rows; left/center/right columns.
+        `align` overrides the legacy `center` flag when given."""
         font = self._font_small if small else self._font
         if font is None or not s or r is None:
             return
         col = sdl2.SDL_Color(*color)
         lines = s.split('\n')
-        y = r[1]
+        rendered = []
         for line in lines:
             surf = sdlttf.TTF_RenderUTF8_Blended(font, line.encode(), col)
             if not surf:
                 continue
             tex = sdl2.SDL_CreateTextureFromSurface(self.rnd, surf)
-            w, h = surf.contents.w, surf.contents.h
+            rendered.append((tex, surf.contents.w, surf.contents.h))
             sdl2.SDL_FreeSurface(surf)
-            x = r[0] + (r[2] - w) / 2 if center else r[0]
+        total_h = sum(h for _, _, h in rendered)
+        if align is None:
+            y = r[1]
+            col_kind = 1 if center else 0
+        else:
+            row, col_kind = align // 3, align % 3
+            y = r[1] if row == 0 else \
+                r[1] + (r[3] - total_h) / 2 if row == 1 else \
+                r[1] + r[3] - total_h
+        for tex, w, h in rendered:
+            x = r[0] if col_kind == 0 else \
+                r[0] + (r[2] - w) / 2 if col_kind == 1 else \
+                r[0] + r[2] - w
             dst = sdl2.SDL_Rect(int(x), int(y), w, h)
             sdl2.SDL_RenderCopy(self.rnd, tex, None, dst)
             sdl2.SDL_DestroyTexture(tex)
@@ -379,6 +403,7 @@ class Hud:
                     and item.tricked \
                     and not item.dont_change_tooltip_when_tricked:
                 self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+                self._swap_cursor_icon(item, item.mouse_over_after_trick)
             elif item.required_inventory in (None, '', 'IT_NONE') \
                     and not item.tricked \
                     and item.dont_change_tooltip_when_tricked:
@@ -389,6 +414,7 @@ class Hud:
                 self.tooltip = ws['use'] + loc(self._get_name_string(item))
             else:
                 self.tooltip = ws['look_at'] + loc(self._get_name_string(item))
+                self._swap_cursor_icon(item, item.mouse_over_after_trick)
         elif item.kind == 'HideItem':
             self.tooltip = ws['hide'] + loc(item.hide_string_key)
         elif item.kind == 'SearchItem':
@@ -415,6 +441,65 @@ class Hud:
         else:
             self.tooltip = None
 
+    def _swap_cursor_icon(self, item, name):
+        """UpdateMouseOver's MouseOverIcon reload
+        (MouseCursor.cs, MouseOverBasePath)"""
+        if item.change_mouse_over_after_trick and name:
+            item.mouse_over_icon = 'Textures/GUI/cursor/' + name
+
+    def update_cursor(self, item, door, zone, wx, wy, my):
+        """MouseCursor.UpdateCursor (MouseCursor.cs): the held-inventory
+        icons, the item/door MouseOverIcon, the walking cursor over other
+        zones and the floor band, else the default"""
+        w = self.world
+        mc = self.level.mouse_cursor
+        if mc is None:
+            self.cursor_tex = None
+            return
+        # Woody.MouseOverHUD: the bottom MinMouseY pixels (design 600)
+        over_hud = my > self.H - mc['min_mouse_y'] * self.H / 600.0
+        woody = w.woody
+        # UpdateHover's early out (GameEnding / a menu open)
+        if w.game.ending or w.menu_open or woody is None:
+            self.cursor_tex = mc['default_hud']
+            return
+        inv = w.inventory
+        if inv.used is not None:
+            self.cursor_tex = mc['use_inv'] if (item is not None
+                                                or door is not None) \
+                else mc['cancel_inv']
+            return
+        woody_zone = woody.zone.pid if woody.zone else None
+        cand = item if item is not None else door
+        cand_icon = cand.mouse_over_icon if cand is not None else None
+        cand_use = getattr(cand, 'can_use', True) if cand is not None else False
+        same_zone_door = door is None or door.zone == woody_zone
+        if cand is not None and cand_icon and cand_use and same_zone_door:
+            self.cursor_tex = mc['default_hud'] if over_hud else cand_icon
+            return
+        if door is not None and door.zone != woody_zone:
+            self.cursor_tex = door.mouse_over_icon if door.locked \
+                else mc['walking']
+            return
+        if zone is not None and (zone.pid != woody_zone
+                                 or -0.6 <= wy - woody.sprite.y <= 0.16):
+            self.cursor_tex = mc['walking']
+            return
+        self.cursor_tex = mc['default_hud'] if over_hud else mc['default']
+
+    def draw_cursor(self, mx, my):
+        """MouseCursor.OnGUI (MouseCursor.cs:60-91): the cursor texture at
+        the mouse, cursorSize through AdjustRectangle"""
+        mc = self.level.mouse_cursor
+        if mc is None or self.world.is_dexterity_on:
+            return
+        tex = self.cursor_tex or mc['default']
+        if tex is None:
+            return
+        r = mc['size']
+        self._blit(tex, (mx, my, r.get('width', 0.03) * self.W,
+                         r.get('height', 0.04) * self.H))
+
     def play_trick_done(self):
         """HUD.PlayTrickDone + Woody.PlayTrickDone's laugh"""
         self.trick_anim.restart()
@@ -439,7 +524,8 @@ class Hud:
         self._draw_base()
         self._draw_inventory(dt)
         if self.tooltip:
-            self._text(self.tooltip, self.rect('TooltipRect'), small=True)
+            self._text(self.tooltip, self.rect('TooltipRect'), small=True,
+                       align=self._align('TooltipStyle', 3))
         self._draw_buttons()
         self._draw_angry_meter(dt)
         if not g.is_tutorial:
@@ -517,7 +603,8 @@ class Hud:
                             self._text(self.loc(entry.get('desc') or
                                                 entry.get('name') or ''),
                                        bubble, small=True,
-                                       color=(40, 40, 40))
+                                       color=(40, 40, 40),
+                                       align=self._align('DescriptionStyle', 4))
         if not hover_any:
             self.hover_index = None
             self.hover_started = None
@@ -608,8 +695,10 @@ class Hud:
             s = '%02d:%02d' % (n // 60, n % 60)
         else:
             s = '--:--'
-        self._text(s, self.rect('TimeShadowRect'), color=(0, 0, 0))
-        self._text(s, self.rect('TimeRect'))
+        self._text(s, self.rect('TimeShadowRect'), color=(0, 0, 0),
+                   align=self._align('TimeShadowStyle', 4))
+        self._text(s, self.rect('TimeRect'),
+                   align=self._align('TimeStyle', 4))
 
     def _draw_characters(self, dt):
         """DrawCharacters: the face strips and the think bubbles with the
@@ -759,7 +848,9 @@ class Hud:
                     src = sdl2.SDL_Rect(0, 0, max(1, int(entry[1] * p)),
                                         entry[2])
                     self._blit(pb.spec['full'], (x, y, w * p, h), src=src)
-            self._text('%d%%' % int(round(p * 100)), (x, y, w, h), small=True)
+            # Helpers.DrawLabel with the bar's DataStyle (m_Alignment 4)
+            self._text('%d%%' % int(round(p * 100)), (x, y, w, h), small=True,
+                       align=4)
 
     def _think_bubble(self, routine, tex_key, rect_key, icon_rect_key):
         self._blit(self.d.get(tex_key), self.rect(rect_key))
@@ -798,7 +889,9 @@ class Hud:
                 (woody is not None and woody.nfh2):
             return
         self._tricks()
-        self._text('x%d' % rott.angry_count_ticks, self._angry_count_rect)
+        # Helpers.DrawLabel(AngryCountRect, ..., TimeStyle) — HUD.cs:669
+        self._text('x%d' % rott.angry_count_ticks, self._angry_count_rect,
+                   align=self._align('TimeStyle', 4))
 
     def _draw_score(self):
         """DrawScore (game over, Classic): the board, the ratings, the
@@ -808,18 +901,22 @@ class Hud:
         self._blit(self.d.get('OriginalScoreboard'), self.rect('OriginalScoreRect'))
         # the three TextFields: Rating, "GO_TRICKS\nC / T", "GO_VIEWER_RATING\nN%"
         self._text(self.loc(RATING_KEYS.get(g.rating, g.rating)),
-                   self.rect('RatingRatioRect'))
+                   self.rect('RatingRatioRect'),
+                   align=self._align('RatingStyle', 4))
         self._text(self.loc('GO_TRICKS') + '\n' + g.trick_ratio,
-                   self.rect('TrickRatioRect'))
+                   self.rect('TrickRatioRect'),
+                   align=self._align('ScoreStyle', 4))
         self._text(self.loc('GO_VIEWER_RATING') + '\n' + g.viewer_rating,
-                   self.rect('ViewerRatingRect'))
+                   self.rect('ViewerRatingRect'),
+                   align=self._align('ScoreStyle', 4))
         for rk, mk, key in (('RestartButtonRect', 'RestartMessageRect',
                              'RESTART_MESSAGE'),
                             ('OkButtonRect', 'OkMessageRect', 'OK_MESSAGE')):
             r = self.rect(rk)
             hover = self._hit(r, mx, my)
             self._blit(self.d.get('ScoreButtonHover' if hover else 'ScoreButton'), r)
-            self._text(self.loc(key), self.rect(mk), small=True)
+            self._text(self.loc(key), self.rect(mk), small=True,
+                       align=self._align('DescriptionStyle', 4))
 
     # -- input -------------------------------------------------------------
     def check_click(self, mx, my):

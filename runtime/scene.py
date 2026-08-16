@@ -254,6 +254,8 @@ class Item:
                  'with_string', 'with_tricked_string', 'with_primed_string',
                  'hide_string_key', 'dont_change_tooltip_when_tricked',
                  'item_that_changes_tooltip', 'is_floor', 'searching_item',
+                 'mouse_over_icon', 'mouse_over_after_trick',
+                 'change_mouse_over_after_trick',
                  'go_next_action', 'skip_action', 'is_mother_second_use',
                  'execute_once_mother', 'play_angry_after_toilet',
                  'restart_after_tricked', 'activate_item_after_fix',
@@ -657,6 +659,14 @@ class Item:
         self.item_that_changes_tooltip = ref('ItemThatChangesTooltip')
         self.is_floor = bool(d.get('IsFloor'))
         self.searching_item = bool(d.get('SearchingItem'))
+        # the hover cursor (MouseCursor.UpdateCursor; Item.MouseOverIconName
+        # loads from Textures/GUI/cursor/ and UpdateMouseOver swaps in the
+        # after-trick icon)
+        n = d.get('MouseOverIconName') or ''
+        self.mouse_over_icon = ('Textures/GUI/cursor/' + n) if n else None
+        self.mouse_over_after_trick = d.get('MouseOverAfterTrickIconName') or ''
+        self.change_mouse_over_after_trick = \
+            bool(d.get('ChangeMouseOverAfterTrick'))
         self.go_next_action = False        # Item.GoNextAction
         self.skip_action = False           # Item.SkipAction (Drawing.Fix)
         # the Mother's alternating DeckChair use (Item.cs:198, 1117-1137)
@@ -755,7 +765,7 @@ class Door:
                  'use_distance', 'item_use_height', 'delta_use_height',
                  'dx', 'dy', 'rott_exit', 'alternate_idle', 'use_alternate_idle',
                  'complex_move', 'nfh2_stairs', 'pawn_deltas', 'passing_nfh2',
-                 'is_transition')
+                 'is_transition', 'collider', 'mouse_over_icon', 'locked_name')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -797,6 +807,10 @@ class Door:
             self.pawn_deltas[role] = (v.get('x', 0.0), v.get('y', 0.0))
         self.passing_nfh2 = None            # Door.PassingPawnTransitionNFH2
         self.is_transition = False          # the component class, set by _build
+        self.collider = None                # BoxCollider (x, y, w, h)
+        n = d.get('MouseOverIconName') or ''
+        self.mouse_over_icon = ('Textures/GUI/cursor/' + n) if n else None
+        self.locked_name = d.get('NameString') or ''
 
 
 # every ActorBehavior / RoutineBehavior / SearchBehavior subclass shipped in
@@ -862,6 +876,7 @@ class Level:
         self.behaviors = []         # serialized *Behavior components
         self.progress_bars = []     # ProgressBar components
         self.dexterity = {}         # DexterityComponent pid -> spec
+        self.mouse_cursor = None    # MouseCursor component spec
         self._zone_comp = {}        # Zone component pid -> Zone
         self._build()
 
@@ -972,6 +987,29 @@ class Level:
                     spec[k_dst] = v['texture']
         self.dexterity[pid] = spec
 
+    def _add_mouse_cursor(self, pid, o):
+        """MouseCursor's serialized cursors (MouseCursor.cs:5-31); the
+        resolved names live under Textures/GUI/cursor/"""
+        d = o['data']
+        go = self._go_of(o)
+        spec = {'default': None, 'default_hud': None, 'use_inv': None,
+                'cancel_inv': None, 'walking': None,
+                'size': d.get('cursorSize') or {},
+                'min_mouse_y': d.get('MinMouseY') or 100}
+        resolved = {}
+        for e in (self._hud_raw.get('MouseCursor') or []):
+            if (e.get('m_GameObject') or {}).get('path') == go:
+                resolved = e
+        for k_src, k_dst in (('Default', 'default'),
+                             ('DefaultHUDIcon', 'default_hud'),
+                             ('UseInventoryIcon', 'use_inv'),
+                             ('CancelInventoryIcon', 'cancel_inv'),
+                             ('WalkingTexture', 'walking')):
+            v = resolved.get(k_src)
+            if isinstance(v, dict) and v.get('texture'):
+                spec[k_dst] = 'Textures/GUI/cursor/' + v['texture']
+        self.mouse_cursor = spec
+
     # -- build -----------------------------------------------------------
     def _build(self):
         for pid, o in self.objs.items():
@@ -995,6 +1033,8 @@ class Level:
                 self._add_progress_bar(int(pid), o)
             elif t == 'DexterityComponent' and 'data' in o:
                 self._add_dexterity(int(pid), o)
+            elif t == 'MouseCursor' and 'data' in o:
+                self._add_mouse_cursor(int(pid), o)
         self.sprites.sort(key=lambda s: -s.depth)      # far (high) first
         self._find_background()
         self._build_graph()
@@ -1099,6 +1139,10 @@ class Level:
                     self._zone_of(go), link,
                     bool(d.get('Locked')), d.get('DoorType'), d)
         door.is_transition = o['type'] == 'Transition'
+        box = self._component(go, 'BoxCollider')
+        if box is not None:
+            s = box['data']['size']; c = box['data']['center']
+            door.collider = (p[0] + c[0], p[1] + c[1], s[0], s[1])
         self.doors.append(door)
 
     def _add_item(self, pid, o):
@@ -1566,6 +1610,7 @@ class Level:
                 'animal_tutorial': bool(pd.get('AnimalTutorial')),
                 'nfh2': bool(pd.get('NFH2Path')),
                 'adjacent_zones': bool(pd.get('AdjacentZonesEnabled')),
+                'min_door_distance': pd.get('MinDistanceToNearestDoor') or 0.0,
                 # Woody.Start localizes these keys (Woody.cs:197-205)
                 'use_string': pd.get('UseString') or '',
                 'with_string': pd.get('WithString') or '',

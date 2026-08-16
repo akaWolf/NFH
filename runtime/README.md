@@ -394,8 +394,11 @@ a zero delay, else on a `GameInfo.Invoke` timer (Level206's Fifi chain uses
 The name-hack branches (hard-coded `name.Equals` sites in the source) are
 ported for every item on the documented list, each against its lines:
 
-- **FirstAid** + key (the only way Level108's kit opens; the `FirstAidPos`
-  teleport stays unverifiable — the fields are not serialized).
+- **FirstAid** + key (the only way Level108's kit opens). `FirstAidPos` is
+  not level data but internal initializers in the class body —
+  `(-5.98, -2.544, -0.001)`, Item.cs:640-646, assembled in `Start` — and
+  Level108's kit transform already sits exactly there, so the ported
+  teleport is a verified no-op on the shipped scene.
 - **ValveMain** — the Woody-click toggle owning the valve's state, the
   completion-arm exemptions, and the early-loop unprime animation swap
   (Item.cs:1335-1338).
@@ -952,11 +955,17 @@ y-tracker (Pawn.cs:319-342) now sit in both catch predicates as themselves
 (GameInfo.cs:189, 198). `AdjacentZonesEnabled` is per-pawn data — Season-2
 Olga ships without it and walks the stairs unclaimed, as shipped.
 
-One deliberate divergence, documented in the walking loop: the original's
-variable `Time.deltaTime` breaks up the y-axis approach, but a fixed 1/60
-step can oscillate forever around a target narrower than one velocity step
-(the arrival window `2*MinDist = 0.02` against a `0.0267` step). The port
-extends the existing x crossing guard to y — cross, snap, arrive.
+The y-axis arrival guard, closed with numbers: an urgent (running) vertical
+approach steps `RunningDoorForceMagnitude/60 = 1.6/60 = 0.0267` per tick
+against an item step's arrival window of `2*ItemUseHeight = 0.02` — under a
+fixed 1/60 clock the position oscillates around the target forever (walking
+speed, `0.8/60 = 0.0133`, always lands). The original runs the same
+arithmetic in `Update` under a *variable* `Time.deltaTime`, whose jitter is
+the only thing that ever breaks the loop; its resting error is anywhere up
+to `MinDist = 0.01`. The port extends the existing x crossing guard to y —
+cross, snap to the target, arrive — which rests at error 0, inside the
+original's envelope, on the first crossing. Not an open question: the
+outcome is the original's converged behavior, reached deterministically.
 
 ## The dexterity minigame
 

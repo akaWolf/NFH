@@ -89,6 +89,8 @@ class Viewer:
                 self.cam.y = self.woody.sprite.y + 0.6
                 self._clamp_camera()
         self.world.snap_camera = _snap
+        if not self.headless and self.level.mouse_cursor is not None:
+            sdl2.SDL_ShowCursor(sdl2.SDL_DISABLE)
         print('%s — %d sprites, %d zones, %d items, %d routines (%d actions)'
               % (self.level.name, len(self.level.sprites), len(self.level.zones),
                  len(self.level.items), len(self.world.routines),
@@ -111,6 +113,17 @@ class Viewer:
             self.cam.y = max(min_y + half_h, min(max_y - half_h, self.cam.y))
         else:
             self.cam.y = (min_y + max_y) * 0.5
+
+    def _door_at(self, wx, wy):
+        """hover hit-test against the doors' BoxColliders (the raycast in
+        MouseCursor.UpdateHover reaches Door colliders too)"""
+        for d in self.level.doors:
+            c = d.collider
+            if c is None:
+                continue
+            if abs(wx - c[0]) <= c[2] * 0.5 and abs(wy - c[1]) <= c[3] * 0.5:
+                return d
+        return None
 
     def _item_at(self, wx, wy):
         """click hit-test against the items' BoxColliders; a disabled
@@ -160,15 +173,20 @@ class Viewer:
             sdl2.SDL_GetMouseState(ctypes.byref(mx), ctypes.byref(my))
             # MouseCursor.UpdateHover: the item under the cursor drives the
             # permanent tooltip and the TrickItem hover pose
+            wx, wy = self.cam.screen_to_world(mx.value, my.value,
+                                               WIDTH, HEIGHT)
+            hit = None
+            zone = None
             if not self.world.game.ending and not self.world.menu_open:
-                wx, wy = self.cam.screen_to_world(mx.value, my.value,
-                                                  WIDTH, HEIGHT)
                 hit = self._item_at(wx, wy)
                 zone = self.level.zone_at(wx, wy)
                 if hit is not None:
                     self.world.on_mouse_hover(hit)
                 self.hud.update_hover(hit, zone)
+            self.hud.update_cursor(hit, self._door_at(wx, wy), zone,
+                                   wx, wy, my.value)
             self.hud.draw(self._frame_dt, (mx.value, my.value))
+            self.hud.draw_cursor(mx.value, my.value)
         sdl2.SDL_RenderPresent(self.rnd)
         return drawn
 
