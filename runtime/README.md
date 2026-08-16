@@ -664,6 +664,37 @@ lists. `tools/export_level.py` resolves all of it into a `hud` section
   `HUDProgressBar` depends on the unported `ProgressBar` actions and is
   skipped.
 
+## Testing against the original
+
+`runtime/record.py` drives the real `Viewer` deterministically — a fixed
+60 Hz clock, scripted input, a numbered frame every 1/fps seconds and a JSON
+state line every tick (Woody's position/state/animation/lock, active door
+animations, the HUD face frames, routine states, the clock):
+
+```sh
+python3 runtime/record.py levels/s1/Level101.json /tmp/rec --seconds=8 --fps=2
+# script lines: wait N | click X Y | clickworld WX WY | clickitem Name |
+#               key sneak | inv N        (--script=file)
+ffmpeg -pattern_type glob -i '/tmp/rec/f*.png' \
+    -filter_complex 'scale=200:150,tile=6x3' -frames:v 1 /tmp/rec/sheet.png
+```
+
+The contact sheet gets eyeballed, `state.jsonl` gets asserted on. For the
+reference side, pull the original's gameplay video (yt-dlp + ffmpeg), cut a
+coarse grid to locate the moment, then a fine one, and hstack a frame pair.
+This loop caught two real bugs the flag-level tests had passed over:
+
+- the texture cache tried every candidate exact-case before its
+  case-insensitive pass, so the base-name candidate kept hitting the old
+  colliding flat faces and the portraits sampled a third character's strip
+  (the flat `idle_0003` hash-matches neither Woody's nor the neighbour's);
+- the camera showed the void past the house — `CameraMover` clamps the
+  viewport corners into its serialized `[MinX,MaxX]×[MinY,MaxY]`
+  (CameraMover.cs:378-394), now applied after the follow. The reference
+  frame and the port's, side by side at the entrance moment, agree on
+  layout, clock, HUD and the door pass; the original's wider slice is the
+  phone's 16:9 against the design 800×600.
+
 ## Not implemented
 
 From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)

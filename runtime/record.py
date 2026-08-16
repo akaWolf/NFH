@@ -156,6 +156,7 @@ class Recorder:
             if v.follow and v.woody:
                 v.cam.x = v.woody.sprite.x
                 v.cam.y = v.woody.sprite.y + 0.6
+            v._clamp_camera()
             v.draw()
             self.log.write(json.dumps(self._state(t)) + '\n')
             if self.frame_every is not None and t + 1e-9 >= next_shot:

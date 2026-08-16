@@ -82,6 +82,24 @@ class Viewer:
                  len(self.level.items), len(self.world.routines),
                  sum(len(r.actions) for r in self.world.routines)))
 
+    def _clamp_camera(self):
+        """CameraMover clamps the viewport corners to the level bounds
+        (CameraMover.cs:378-394) — the camera never shows past the house."""
+        b = self.level.camera_bounds
+        if not b:
+            return
+        min_x, max_x, min_y, max_y = b
+        half_h = self.cam.size
+        half_w = self.cam.size * WIDTH / float(HEIGHT)
+        if max_x - min_x >= 2 * half_w:
+            self.cam.x = max(min_x + half_w, min(max_x - half_w, self.cam.x))
+        else:
+            self.cam.x = (min_x + max_x) * 0.5
+        if max_y - min_y >= 2 * half_h:
+            self.cam.y = max(min_y + half_h, min(max_y - half_h, self.cam.y))
+        else:
+            self.cam.y = (min_y + max_y) * 0.5
+
     def _item_at(self, wx, wy):
         """click hit-test against the items' BoxColliders; a disabled
         collider (the Pipe hack) takes no clicks"""
@@ -225,6 +243,7 @@ class Viewer:
                 if self.follow and self.woody:
                     self.cam.x = self.woody.sprite.x
                     self.cam.y = self.woody.sprite.y + 0.6
+            self._clamp_camera()
             drawn = self.draw()
             if shot and now - start > 0.4:
                 self.screenshot(shot)

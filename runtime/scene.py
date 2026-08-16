@@ -515,6 +515,15 @@ class Level:
         self._apply_zone_bounds()
         self._apply_level_locations()
         self._find_game_info()
+        # CameraMover's level bounds: the viewport corners clamp inside
+        # [MinX, MaxX] x [MinY, MaxY] (CameraMover.cs:378-394), which is why
+        # the original never shows the void beyond the house
+        self.camera_bounds = None
+        cm = next((o['data'] for o in self.objs.values()
+                   if o['type'] == 'CameraMover' and 'data' in o), None)
+        if cm and cm.get('MaxX') is not None:
+            self.camera_bounds = (cm.get('MinX') or 0.0, cm.get('MaxX') or 0.0,
+                                  cm.get('MinY') or 0.0, cm.get('MaxY') or 0.0)
         # Level.Start computes the entrance and start points from the named
         # zones' transforms plus the serialized offsets (Level.cs:199-208);
         # Woody.Start parks him at StartLocation and he walks to
