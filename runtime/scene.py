@@ -731,7 +731,9 @@ class Door:
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
                  'exit_anim', 'idle', 'sprite', 'passing', 'should_walk_up',
                  'use_distance', 'item_use_height', 'delta_use_height',
-                 'dx', 'dy', 'rott_exit', 'alternate_idle', 'use_alternate_idle')
+                 'dx', 'dy', 'rott_exit', 'alternate_idle', 'use_alternate_idle',
+                 'complex_move', 'nfh2_stairs', 'pawn_deltas', 'passing_nfh2',
+                 'is_transition')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -760,6 +762,19 @@ class Door:
         # Door.Unlock switches to the alternate idle (Door.cs:198-223)
         self.alternate_idle = _anim_name(d.get('AlternateIdleAnimation'))
         self.use_alternate_idle = False
+        # the NFH2 walk-through transitions (Item.ComplexMove, Door.NFH2Stairs)
+        self.complex_move = bool(d.get('ComplexMove'))
+        self.nfh2_stairs = bool(d.get('NFH2Stairs'))
+        # Item.GetTargetLocation's per-pawn door deltas (Item.cs:2010-2050)
+        self.pawn_deltas = {}
+        for role, key in (('Woody', 'DeltaWoodyDoorLocation'),
+                          ('Rottweiler', 'DeltaRottweilerDoorLocation'),
+                          ('Olga', 'DeltaOlgaDoorLocation'),
+                          ('Mother', 'DeltaMotherDoorLocation')):
+            v = d.get(key) or {}
+            self.pawn_deltas[role] = (v.get('x', 0.0), v.get('y', 0.0))
+        self.passing_nfh2 = None            # Door.PassingPawnTransitionNFH2
+        self.is_transition = False          # the component class, set by _build
 
 
 # every ActorBehavior / RoutineBehavior / SearchBehavior subclass shipped in
@@ -1024,9 +1039,11 @@ class Level:
             return
         p = self._pos(tr)
         link = (d.get('LinkTo') or {}).get('path')
-        self.doors.append(Door(self._o(go)['data']['name'], pid, p[0], p[1],
-                               self._zone_of(go), link,
-                               bool(d.get('Locked')), d.get('DoorType'), d))
+        door = Door(self._o(go)['data']['name'], pid, p[0], p[1],
+                    self._zone_of(go), link,
+                    bool(d.get('Locked')), d.get('DoorType'), d)
+        door.is_transition = o['type'] == 'Transition'
+        self.doors.append(door)
 
     def _add_item(self, pid, o):
         d = o['data']
@@ -1492,6 +1509,7 @@ class Level:
                 'ignore_woody': bool(pd.get('IgnoreWoody')),
                 'animal_tutorial': bool(pd.get('AnimalTutorial')),
                 'nfh2': bool(pd.get('NFH2Path')),
+                'adjacent_zones': bool(pd.get('AdjacentZonesEnabled')),
                 # Woody.Start localizes these keys (Woody.cs:197-205)
                 'use_string': pd.get('UseString') or '',
                 'with_string': pd.get('WithString') or '',

@@ -285,6 +285,21 @@ class Pawn:
         self.hiding = False              # Woody.Hiding (SetHidden override)
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
+        # the NFH2 walk-through pathing state (Pawn.cs:150-183)
+        self.nfh2 = spec.get('nfh2') or False
+        self.adjacent_zones = spec.get('adjacent_zones') or False
+        self.passing_complex = False     # Pawn.PassingComplexMove
+        self.done_passing = False        # Pawn.DonePassingToOtherZone
+        self.go_zone = None              # Pawn.GoZone
+        self.door_clicked = None         # Pawn.DoorClicked
+        self.item_aux = None             # Pawn.ItemAux
+        self.flag_aux = False            # Pawn.FlagAux
+        self.y_neg = 0.0                 # NewWoodyPositionYNegative
+        self.y_pos = 0.0                 # NewWoodyPositionYPositive
+        self.transition_enter = None     # Pawn.TransitionEnter
+        self.check_for_neighbour = False  # Pawn.CheckForNeighbour
+        self._last_zone2 = zone          # Pawn.lastZone2
+        self._move_index = -1            # Pawn.MoveIndex (per-route step count)
         # the neighbour's walking props (Rottweiler.cs:75-107): each swaps the
         # walking animation set in UpdateWalkingAnimation
         self.feel_sick = False           # Pawn.FeelSick
@@ -427,12 +442,19 @@ class Pawn:
         """Pawn.IsPawnAtZoneY"""
         return abs(self.sprite.y - self.floor_y()) < 0.1
 
+    def door_target(self, door):
+        """Item.GetTargetLocation (Item.cs:2010-2050): transform +
+        DeltaLocation + the per-pawn door delta"""
+        pd = door.pawn_deltas.get(self.role, (0.0, 0.0))
+        return door.x + door.dx + pd[0], door.y + door.dy + pd[1]
+
     def moving_to_adjacent_zone(self):
         """Pawn.IsMovingToAdjacentZone = TransitionMove: the current path
         step heads through a Transition door (Pawn.cs:1281-1283, 1712)."""
         s = self._step
         return (s is not None and s.get('kind') == 'door'
-                and s['door'].door_type == 'Transition')
+                and s['door'].is_transition
+                and not s['door'].complex_move)
 
     def at_use_range(self, it):
         """Item.IsAtUseRange — the walk-phase check, with the x term"""
@@ -483,10 +505,23 @@ class Pawn:
         if item.leave_animation and self.anim.has(item.leave_animation):
             self.anim.play_single(item.leave_animation)
 
+    def _capture_click(self, dest):
+        """GetMoveDestination's GoZone / y-threshold bookkeeping, common to
+        the item, door and zone branches (Pawn.cs:604-612, 645-653, 700-708)"""
+        if dest is not None and (self.go_zone is None
+                                 or self.go_zone.pid != dest.pid) \
+                and not self.done_passing:
+            self.go_zone = dest
+        self.y_neg = self.sprite.y - 0.15          # Interval (Pawn.cs:220)
+        if not self.done_passing:
+            self.y_pos = self.sprite.y + 0.15
+
     def goto(self, x, y, on_arrive=None):
         dest = self.level.zone_at(x, y)
         if dest is None:
             return False
+        self.item_aux = None                        # ItemAux = targetItem
+        self._capture_click(dest)
         return self._route(dest, {'kind': 'point',
                                   'x': min(max(x, dest.left), dest.right)},
                            on_arrive)
@@ -494,6 +529,7 @@ class Pawn:
     def goto_zone(self, dest, x, on_arrive=None):
         if dest is None:
             return False
+        self._capture_click(dest)
         return self._route(dest, {'kind': 'point', 'x': x}, on_arrive)
 
     def goto_item(self, it, on_arrive=None):
@@ -503,32 +539,157 @@ class Pawn:
         dest = self.level.zone_by_pid(it.zone)
         if dest is None:
             return False
+        self.item_aux = it                          # Pawn.cs:595
+        self._capture_click(dest)
         final = {'kind': 'item', 'item': it, 'x': it.move_x(self.role)}
         if it.should_walk_up:
             final = [{'kind': 'point', 'x': it.move_x(self.role)}, final]
         return self._route(dest, final, on_arrive)
 
+    def _helpers(self):
+        """the Helpers statics the NFH2 pathing consumes
+        (Helpers.cs:9-19)"""
+        w = self.world
+        if w is None:
+            return {'done_helper': False, 'step_index': 0,
+                    'first_step_index': 0, 'original_start_zone': None}
+        if not hasattr(w, 'helpers'):
+            w.helpers = {'done_helper': False, 'step_index': 0,
+                         'first_step_index': 0, 'original_start_zone': None}
+        return w.helpers
+
+    def _door_between(self, z1_pid, z2_pid):
+        """Helpers.GetDoorBetweenZones: a door in z1 linking into z2 returns
+        its LinkTo — the z2-side door (Helpers.cs:194-205)"""
+        for d in self.level.doors:
+            if d.locked or d.zone != z1_pid or d.link_to is None:
+                continue
+            other = self.level.door_by_pid(d.link_to)
+            if other is not None and other.zone == z2_pid:
+                return other
+        return None
+
     def _route(self, dest, final_step, on_arrive):
+        H = self._helpers()
+        woody = self.world.woody if self.world else None
+        # FindPath's head (Helpers.cs:81-85): the helper flag latches only
+        # when a door links Woody's zone to the destination
+        if woody is not None and woody.zone is not None \
+                and self._door_between(woody.zone.pid, dest.pid) is not None:
+            H['done_helper'] = self.done_passing
+        H['original_start_zone'] = self.zone.pid if self.zone else None
         self.on_arrive = on_arrive
         steps = []
-        # BuildPathToTarget: when starting elevated, first walk down to the floor
-        if not self.at_zone_y():
-            steps.append({'kind': 'point', 'x': self.sprite.x,
-                          'y': self.floor_y()})
-        if dest.pid != self.zone.pid:
+        hops = None
+        # FindPath: mid-stairs Woody logically paths from GoZone
+        # (Helpers.cs:86-106)
+        if dest.pid == self.zone.pid and self.done_passing \
+                and self.go_zone is not None \
+                and self.go_zone.pid != dest.pid:
+            hops = self.level.find_path(self.go_zone.pid, dest.pid)
+        if hops is None and dest.pid != self.zone.pid:
             hops = self.level.find_path(self.zone.pid, dest.pid)
             if hops is None:
                 self.on_arrive = None
                 return False
-            for _, door in hops:
-                steps.append({'kind': 'door', 'door': door})
+        for zone_pid, door in (hops or ()):
+            steps.extend(self._link_steps(door, H))
+        # BuildPathToTarget's floor-step insert: every non-Woody pawn starting
+        # off the floor walks down first; Woody only with FlagAux set
+        # (Pawn.cs:746-765)
+        if not self.at_zone_y() and (self.role != 'Woody' or self.flag_aux):
+            steps.insert(0, {'kind': 'point', 'x': self.sprite.x,
+                             'y': self.floor_y()})
         if isinstance(final_step, list):
             steps.extend(final_step)
         else:
             steps.append(final_step)
+        # AdjustEndMoveInZoneArea (Helpers.cs:125-136)
+        last = steps[-1]
+        if last.get('kind') == 'point' and 'x' in last:
+            last['x'] = min(max(last['x'], dest.left), dest.right)
+        H['step_index'] = len(steps)                # FindPath's StepIndex stamp
+        self._move_index = -1
         self.steps = steps
         self._next_step()
         return True
+
+    def _link_steps(self, door, H):
+        """Helpers.LinkNodes for one hop (Helpers.cs:225-357). `door` is the
+        near-side door; the complex Transitions expand into walk steps —
+        the walk-through stairs — instead of a warp."""
+        if not (door.is_transition and door.complex_move):
+            return [{'kind': 'door', 'door': door}]
+        other = self.level.door_by_pid(door.link_to)
+        if other is None:
+            return [{'kind': 'door', 'door': door}]
+        far_pid = other.zone
+        # zone1 is the hop's destination, zone2 its origin (BuildPath walks
+        # the chain backwards)
+        zone1_pid = far_pid
+        gtl_near = self.door_target(door)
+        gtl_far = self.door_target(other)
+        tl_near = (door.x + door.dx, door.y + door.dy)
+        tl_far = (other.x + other.dx, other.y + other.dy)
+
+        def plain(loc):
+            return {'kind': 'point', 'x': loc[0]}
+        def complex_step(loc, d):
+            return {'kind': 'cpoint', 'x': loc[0], 'y': loc[1], 'door': d}
+        def transfer(loc, complex_move):
+            s = {'kind': 'cpoint' if complex_move else 'point',
+                 'x': loc[0], 'transfer': far_pid, 'door': other}
+            if complex_move:
+                s['y'] = loc[1]
+            return s
+
+        if H['done_helper']:
+            if door.nfh2_stairs:
+                # the mid-stairs reroute shapes (Helpers.cs:253-304)
+                aux = H['step_index'] - H['first_step_index']
+                if aux in (2, 3, 4):
+                    if H['original_start_zone'] != zone1_pid:
+                        return [complex_step(gtl_far, other),
+                                transfer(gtl_far, True)]
+                    return [plain(gtl_near)]
+                if aux == 1:
+                    if H['original_start_zone'] != zone1_pid:
+                        return [plain(gtl_near),
+                                complex_step(gtl_far, other),
+                                transfer(gtl_far, True)]
+                    return [plain(gtl_near)]
+                return []
+            # the flat walk-through reroutes (Helpers.cs:307-335)
+            si = H['step_index'] - H['first_step_index']
+            H['step_index'] = si                    # StepIndex -= FirstStepIndex
+            if si == 2:
+                H['first_step_index'] = 2
+                return [complex_step(tl_near, door),
+                        complex_step(tl_far, other),
+                        transfer(tl_far, False)]
+            if si == 3:
+                H['first_step_index'] = 3
+                return [complex_step(tl_far, other),
+                        transfer(tl_far, False)]
+            if si == 4:
+                if H['original_start_zone'] == door.zone:
+                    H['first_step_index'] = 4
+                    return [complex_step(tl_near, door),
+                            complex_step(tl_far, other),
+                            transfer(tl_far, False)]
+                H['first_step_index'] = 1
+                return [transfer(tl_far, False)]
+            return []
+        if door.nfh2_stairs:
+            # the fresh stair shape (Helpers.cs:338-343)
+            return [plain(gtl_near),
+                    complex_step(gtl_far, other),
+                    transfer(gtl_far, True)]
+        # the fresh flat walk-through (Helpers.cs:344-350)
+        return [plain(tl_near),
+                complex_step(tl_near, door),
+                complex_step(tl_far, other),
+                transfer(tl_far, False)]
 
     # -- step machinery ----------------------------------------------------
     def _next_step(self):
@@ -542,6 +703,17 @@ class Pawn:
             if cb:
                 cb()
             return
+        # AdvanceToNextMove's bookkeeping (Pawn.cs:1093-1106): MoveIndex,
+        # the FlagAux clear at step 1, the DonePassing reset at the last
+        # step, and the global FirstStepIndex stamp
+        self._move_index += 1
+        if self._move_index == 1 and self.flag_aux:
+            self.flag_aux = False
+        if not self.steps and self.role == 'Woody':   # entering the last step
+            self.y_neg = self.sprite.y - 0.15
+            self.y_pos = self.sprite.y + 0.15
+            self.done_passing = False
+        self._helpers()['first_step_index'] = self._move_index
         self._step = self.steps.pop(0)
         self._step_sign = None
         self.state = self.WALK
@@ -551,6 +723,10 @@ class Pawn:
         the floor for door and item steps — climbs are separate states."""
         s = self._step
         if s['kind'] == 'point':
+            return s['x'], s.get('y', self.floor_y())
+        if s['kind'] == 'cpoint':
+            # ComplexMove keeps the step's own y (CheckMoveLocationY skips it,
+            # Pawn.cs:1135-1148)
             return s['x'], s.get('y', self.floor_y())
         if s['kind'] == 'door':
             d = s['door']
@@ -694,11 +870,125 @@ class Pawn:
         self._next_step()
 
     # -- tick ---------------------------------------------------------------
+    def _zone_watch(self):
+        """Pawn.Update's lastZone2 watch (Pawn.cs:291-313): crossing into a
+        new zone drops the complex-move state, releases the transition claim
+        and — for Woody — runs one catch check"""
+        if self._last_zone2 is not self.zone:
+            if self.role == 'Woody' and self.passing_complex:
+                self.check_for_neighbour = True
+            self.passing_complex = False
+            te = self.transition_enter
+            if te is not None:
+                link = self.level.door_by_pid(te.link_to)
+                if link is not None and link.passing_nfh2 is self:
+                    link.passing_nfh2 = None
+                if te.passing_nfh2 is self:
+                    te.passing_nfh2 = None
+            self.transition_enter = None
+        if self.check_for_neighbour:
+            self.check_for_neighbour = False
+            w = self.world
+            if w is not None and not w.game.got_caught:
+                if w.can_rottweiler_see_woody():
+                    w._catch()
+                elif w.can_mother_see_woody():
+                    w._catch(w.pawns.get('Mother'))
+        # ItemAux arms FlagAux for walk-up items in the same zone
+        # (Pawn.cs:314-317)
+        ia = self.item_aux
+        if ia is not None and ia.should_walk_up and self.role == 'Woody' \
+                and self.zone is not None and ia.zone == self.zone.pid:
+            self.flag_aux = True
+        self._last_zone2 = self.zone
+        # the DonePassingToOtherZone tracker (Pawn.cs:319-342)
+        if (self.go_zone is not None or self.door_clicked is not None) \
+                and self.nfh2 and self.role == 'Woody' \
+                and not self.done_passing and not self.flag_aux:
+            y = self.sprite.y
+            if y > 0.0:
+                if y < self.y_neg and self.y_neg > 0.0:
+                    self.done_passing = True
+            elif y < 0.0:
+                if y < self.y_neg and self.y_neg < 0.0:
+                    self.done_passing = True
+                elif y > self.y_pos and not self.done_passing:
+                    self.done_passing = True
+
+    def _complex_arrival(self):
+        """MoveToAdjacentZone's complex-step head (Pawn.cs:1220-1270): claim
+        the transition pair, stand while another pawn holds it, and set
+        PassingComplexMove — with Woody's entry catch check (cs:1228-1233).
+        Returns True when the pawn must stand and wait."""
+        s = self._step
+        nxt = self.steps[0] if self.steps else None
+        active = ((nxt is not None and nxt.get('kind') == 'cpoint')
+                  or (s is not None and s.get('kind') == 'cpoint'))
+        if not active:
+            te = self.transition_enter
+            if te is not None:
+                link = self.level.door_by_pid(te.link_to)
+                if link is not None and link.passing_nfh2 is self:
+                    link.passing_nfh2 = None
+                if te.passing_nfh2 is self:
+                    te.passing_nfh2 = None
+            self.transition_enter = None
+            self.passing_complex = False
+            return False
+        # MoveTransitionNFH2 (Pawn.cs:996-1030)
+        cd = None
+        if nxt is not None and nxt.get('kind') == 'cpoint' \
+                and nxt.get('door') is not None:
+            cd = nxt['door']
+        elif s is not None and s.get('kind') == 'cpoint' \
+                and s.get('door') is not None:
+            cd = s['door']
+        if cd is not None:
+            link = self.level.door_by_pid(cd.link_to)
+            if link is not None and (cd.passing_nfh2 is None
+                                     or link.passing_nfh2 is None):
+                self.transition_enter = cd
+                cd.passing_nfh2 = self
+                link.passing_nfh2 = self
+            elif self.transition_enter is not None \
+                    and self.transition_enter.passing_nfh2 is not None \
+                    and self.transition_enter.passing_nfh2 is not self:
+                st = self._stand_name()
+                if st:
+                    self.anim.play_looping(st)
+                return True
+        w = self.world
+        if self.role == 'Woody' and w is not None:
+            if w.can_rottweiler_see_woody() and not w.game.got_caught:
+                w._catch()
+                return True
+        self.passing_complex = True
+        return False
+
+    def _transfer_zone(self, zone_pid):
+        """TakeNextStep's TransferToZone -> ChangeZone (Pawn.cs:1054-1057,
+        1526-1534): the zone swap, the crab/search zone reactions and the
+        DonePassing reset"""
+        old = self.zone
+        new = self.level.zone_by_pid(zone_pid)
+        if new is None:
+            return
+        self.zone = new
+        if self.role in ('Woody', 'Rottweiler'):
+            self.done_passing = False        # CrabAnimations, Pawn.cs:1566
+        if self.world is not None:
+            if old is not None:
+                self.world.zone_reaction(old.pid, 'leave')
+            self.world.zone_reaction(new.pid, 'enter')
+            old_pid = old.pid if old is not None else None
+            self.world.on_pawn_zone_changed(self, old_pid)
+
     def tick(self, dt):
         self.anim.tick(dt)
         # Rottweiler.Update: the meter decays while allowed
         if self.can_decrease_angry and self.angry_meter > 0.0:
             self.angry_meter = max(0.0, self.angry_meter - self.angry_decay * dt)
+        self._zone_watch()
         if self.movement_paused:          # ProcessMovement's outer gate
             return
         scale = self.walk_speed_scale() * dt
@@ -718,6 +1008,12 @@ class Pawn:
                 self.sprite.x = tx        # MoveToItem snaps onto the target
             if mag <= self._min_dist() or passed:
                 s = self._step
+                # MoveToAdjacentZone runs at arrival for the NFH2 pawns
+                # (Pawn.cs:983); a held transition parks the pawn standing
+                if self.adjacent_zones and self._complex_arrival():
+                    return
+                if s.get('transfer') is not None:
+                    self._transfer_zone(s['transfer'])
                 if s['kind'] == 'door':
                     self._begin_transit(s['door'])
                 elif s['kind'] == 'item' and s['item'].should_walk_up:
@@ -4800,11 +5096,10 @@ class World:
                 hook_player(p, [b])
 
     def _detect_common(self, catcher):
-        """the zone/door/hiding/blocking chain both predicates share. The
-        IsMovingToAdjacentZone terms are the TransitionMove flag; the
-        PassingComplexMove terms are covered by is_warping here, since this
-        port routes Transition passages through the same transit code.
-        DonePassingToOtherZone rides the unported NFH2 GoZone pathing."""
+        """the zone/door/hiding/blocking chain both predicates share
+        (GameInfo.cs:189, 198): IsPassingDoor is is_warping here,
+        IsMovingToAdjacentZone the TransitionMove flag, and the NFH2 terms
+        are DonePassingToOtherZone and PassingComplexMove on both pawns"""
         woody = self.woody
         return (woody.zone is not None and catcher.zone is not None
                 and woody.zone.pid == catcher.zone.pid
@@ -4813,7 +5108,10 @@ class World:
                 and not catcher.moving_to_adjacent_zone()
                 and not catcher.ignore_woody and not woody.hiding
                 and (not catcher.anim.blocking or not woody.sneaking)
-                and not woody.anim.blocking)
+                and not woody.anim.blocking
+                and not woody.done_passing and not catcher.done_passing
+                and not woody.passing_complex
+                and not catcher.passing_complex)
 
     def can_rottweiler_see_woody(self):
         """GameInfo.CanRottweilerSeeWoody (GameInfo.cs:181-192), the Classic
