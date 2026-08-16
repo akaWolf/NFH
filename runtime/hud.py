@@ -143,18 +143,20 @@ class Hud:
         self.woody_laugh = HudAnim(d.get('WoodyLaughAnim'))
         self.rott_idle = HudAnim(d.get('RottweilerIdleAnim'))
         self.rott_sleep = HudAnim(d.get('RottweilerSleepAnim'))
+        self.rott_blind = HudAnim(d.get('RottweilerBlindAnim'))
         self.rott_angry = [HudAnim(d.get('RottweilerAngry1Anim')),
                            HudAnim(d.get('RottweilerAngry2Anim')),
                            HudAnim(d.get('RottweilerAngry3Anim'))]
         self.mother_idle = HudAnim(d.get('MotherIdleAnim'))
         self.mother_sleep = HudAnim(d.get('MotherSleepAnim'))
+        self.mother_blind = HudAnim(d.get('MotherBlindAnim'))
         # PlayRottweilerIdle / PlayWoodyIdle at Start; idles loop
         self.woody_active = self.woody_idle
         self.rott_active = self.rott_idle
         self.mother_active = self.mother_idle
         for a in (self.woody_idle, self.rott_idle, self.mother_idle,
-                  self.rott_sleep, self.mother_sleep, self.whistle_anim,
-                  self.statue_anim):
+                  self.rott_sleep, self.mother_sleep, self.rott_blind,
+                  self.mother_blind, self.whistle_anim, self.statue_anim):
             a.restart()
         self.displayed_begin = 0          # DisplayedItemsBegin
         self.max_items = d.get('MaxInventoryItemsDisplayed') or 5
@@ -163,6 +165,8 @@ class Hud:
         self.hover_index = None
         self.mouse = (0, 0)
         self._angry_state = 'idle'
+        self._mother_state = 'idle'
+        self.cam = None                   # set by the viewer for the bars
         self._tricks_rects = None
         self._angry_count_rect = None
         self._statue_rect = None
@@ -359,6 +363,7 @@ class Hud:
             self._draw_tricks(dt)
             self._draw_time()
         self._draw_characters(dt)
+        self._draw_progress_bars()
         if g.ended:
             self._draw_score()
         self._draw_angry_count()
@@ -527,14 +532,19 @@ class Hud:
         """DrawCharacters: the face strips and the think bubbles with the
         current action's item icon (RoutineAction.BubbleIcon)"""
         rott = self.world.pawns.get('Rottweiler')
-        # face-state selection (HUD.PlayRottweiler*)
+        # face-state selection (HUD.PlayRottweiler*); a ProgressBar's
+        # SetSleeping picks the blind strip over sleep
+        # (ProgressBar.cs:183-192)
         if rott is not None:
-            state = 'sleep' if rott.is_sleeping else \
+            state = ('blind' if rott.hud_blind else 'sleep') \
+                if rott.is_sleeping else \
                 ('angry' if not rott.can_decrease_angry else 'idle')
             if state != self._angry_state:
                 self._angry_state = state
                 if state == 'sleep':
                     self.rott_active = self.rott_sleep
+                elif state == 'blind':
+                    self.rott_active = self.rott_blind
                 elif state == 'angry':
                     self.rott_active = self.rott_angry[
                         min(2, rott.angry_count_ticks)]
@@ -554,22 +564,89 @@ class Hud:
             self._blit(ROTT_BASE + self.rott_faces[
                 min(self.rott_active.frame, len(self.rott_faces) - 1)],
                 self.rect('RottweilerFaceRect'))
-        routine = next((r for r in self.world.routines
-                        if r.role == 'Rottweiler'), None)
-        self._think_bubble(routine, 'RottweilerThinkBubble',
-                           'RottweilerThinkBubbleRect',
-                           'RottweilerThinkBubbleIconRect')
+        self._face_fill('Rottweiler', 'RottweilerFaceRect')
+        # DisableRottweilerThinkBubble skips the whole bubble (HUD.cs:1155)
+        if rott is None or not rott.hud_disable_think:
+            routine = next((r for r in self.world.routines
+                            if r.role == 'Rottweiler'), None)
+            self._think_bubble(routine, 'RottweilerThinkBubble',
+                               'RottweilerThinkBubbleRect',
+                               'RottweilerThinkBubbleIconRect')
         if self.has_mother:
+            mother = self.world.pawns.get('Mother')
+            # PlayMotherSleep/Blind/Idle (HUD.cs:1440-1460) via SetSleeping
+            if mother is not None:
+                mstate = ('blind' if mother.hud_blind else 'sleep') \
+                    if mother.is_sleeping else 'idle'
+                if mstate != self._mother_state:
+                    self._mother_state = mstate
+                    self.mother_active = {
+                        'sleep': self.mother_sleep,
+                        'blind': self.mother_blind}.get(mstate, self.mother_idle)
+                    self.mother_active.restart()
             self.mother_active.update(dt)
             if self.mother_faces:
                 self._blit(MOTHER_BASE + self.mother_faces[
                     min(self.mother_active.frame, len(self.mother_faces) - 1)],
                     self.rect('MotherFaceRect'))
-            mrt = next((r for r in self.world.routines
-                        if r.role == 'Mother'), None)
-            self._think_bubble(mrt, 'MotherThinkBubble',
-                               'MotherThinkBubbleRect',
-                               'MotherThinkBubbleIconRect')
+            self._face_fill('Mother', 'MotherFaceRect')
+            # DisableMotherThinkBubble (HUD.cs:1176)
+            if mother is None or not mother.hud_disable_think:
+                mrt = next((r for r in self.world.routines
+                            if r.role == 'Mother'), None)
+                self._think_bubble(mrt, 'MotherThinkBubble',
+                                   'MotherThinkBubbleRect',
+                                   'MotherThinkBubbleIconRect')
+
+    def _face_fill(self, actor, rect_key):
+        """HUDProgressBar.OnGUI (HUDProgressBar.cs:10-21): the face overlay
+        drains top-down — the group's height is (1 - progress) of the face
+        rect, cropping the overlay texture's bottom off"""
+        for pb in self.world.progress_bars:
+            if not (pb.visible and pb.is_pawn_hud
+                    and pb.spec['actor'] == actor):
+                continue
+            r = self.rect(rect_key)
+            p = min(1.0, max(0.0, pb.progress))
+            hh = (1.0 - p) * r[3]
+            if hh <= 0:
+                continue
+            entry = self._tex(pb.hud_tex)
+            if entry is None:
+                continue
+            th = entry[2]
+            import sdl2
+            src = sdl2.SDL_Rect(0, 0, entry[1], max(1, int(th * (1.0 - p))))
+            self._blit(pb.hud_tex, (r[0], r[1], r[2], hh), src=src)
+            return
+
+    def _draw_progress_bars(self):
+        """ProgressBar.OnGUI (ProgressBar.cs:247-272): the world-anchored
+        percent bar — empty backdrop, the full strip clipped to progress and
+        the percent label"""
+        if self.cam is None:
+            return
+        for pb in self.world.progress_bars:
+            if not pb.visible:
+                continue
+            sx, sy = self.cam.world_to_screen(pb.spec['x'], pb.spec['y'],
+                                              self.W, self.H)
+            d = pb.spec['delta']
+            r = pb.spec['rect']
+            x = sx + d.get('x', 0.0) * self.W
+            y = sy + d.get('y', 0.0) * self.H
+            w = r.get('width', 0.0) * self.W
+            h = r.get('height', 0.0) * self.H
+            p = min(1.0, max(0.0, pb.progress))
+            self._blit(pb.spec['empty'], (x, y, w, h))
+            if p > 0:
+                entry = self._tex(pb.spec['full'])
+                if entry is not None:
+                    import sdl2
+                    src = sdl2.SDL_Rect(0, 0, max(1, int(entry[1] * p)),
+                                        entry[2])
+                    self._blit(pb.spec['full'], (x, y, w * p, h), src=src)
+            self._text('%d%%' % int(round(p * 100)), (x, y, w, h), small=True)
 
     def _think_bubble(self, routine, tex_key, rect_key, icon_rect_key):
         self._blit(self.d.get(tex_key), self.rect(rect_key))

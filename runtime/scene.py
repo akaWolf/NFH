@@ -219,7 +219,41 @@ class Item:
                  'next_action_after_gramaphone', 'ignore_woody_when_use',
                  'harpoon_aux', 'child_renderers',
                  'object_to_show_before_angry_go', 'animate_after_use',
-                 'mother_rott_angry')
+                 'mother_rott_angry',
+                 # the full TrickItem.PlayAnimation dispatch
+                 'rott_compound_use_tricked', 'olga_compound_use_tricked',
+                 'rott_custom_tricked', 'olga_custom_tricked',
+                 'play_custom_tricked', 'rott_use_fuckedup',
+                 'olga_use_fuckedup', 'should_play_rott_fuckedup',
+                 'depends_nfh2', 'depends_on_shade_tricked',
+                 'use_olga_tricked_anim_flag',
+                 'linked_trick_rush_toilet', 'linked_trick_rush_toilet_target',
+                 'second_idle_tricked', 'second_already_tricked',
+                 'rott_use_second_tricked', 'use_multiple_times',
+                 'hover_anim', 'idle_linked_tricked',
+                 'compound_trick_score_v', 'extra_coin_linked',
+                 'compound_extra_coin', 'plant_carnivore_extra',
+                 'extra_coin_206', 'extra_coin_210', 'dog_basket_210',
+                 'enable_anim_index_control', 'anims_to_control',
+                 'current_sequence', 'current_seq_index',
+                 'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
+                 'dexterity_animation', 'play_dexterity_seq',
+                 'dexterity_sequence', 'dexterity_cannot_lose',
+                 'dexterity_keep_item', 'dexterity_keep_use_item',
+                 'take_item_count', 'hide_in_dexterity',
+                 'dexterity_run_other', 'activate_trick_if_search',
+                 'dexterity_hide_object', 'rabbit_206', 'extra_item_aux',
+                 'activate_item_after_using', 'delay_activate_after_using',
+                 'captain_door_1', 'captain_door_2', 'extra_item',
+                 'change_tooltip_when_tricked', 'name_string',
+                 'go_next_action', 'skip_action', 'is_mother_second_use',
+                 'execute_once_mother', 'play_angry_after_toilet',
+                 'restart_after_tricked', 'activate_item_after_fix',
+                 'fix_item_trick_linked', 'block_after_fix',
+                 'delta_woody_x', 'delta_woody_y',
+                 'rott_use_olga_seq', 'rott_use_tricked_olga_seq',
+                 'drawing_current', 'drawing_done_cleaning',
+                 'progress_bar_animation', 'progress_bar_object')
 
     def __init__(self, name, pid, kind, x, y, zone, dx, dy, d):
         self.name = name; self.pid = pid; self.kind = kind
@@ -541,6 +575,89 @@ class Item:
         self.animate_after_use = bool(d.get('AnimateAfterUse'))
         # the Mother's angry-at-the-neighbour set (Item.cs:1037-1041)
         self.mother_rott_angry = d.get('MotherRottweilerAngryAnimation') or []
+        # -- the full TrickItem.PlayAnimation dispatch (cs:791-916) -------
+        self.rott_compound_use_tricked = d.get('RottweilerCompoundUseTricked') or []
+        self.olga_compound_use_tricked = d.get('OlgaCompoundUseTricked') or []
+        self.rott_custom_tricked = d.get('RottweilerCustomTricked') or []
+        self.olga_custom_tricked = d.get('OlgaCustomTricked') or []
+        self.play_custom_tricked = bool(d.get('PlayCustomTrickedSequence'))
+        self.rott_use_fuckedup = d.get('RottweilerUseFuckedUp') or []
+        self.olga_use_fuckedup = d.get('OlgaUseFuckedUp') or []
+        self.should_play_rott_fuckedup = bool(d.get('ShouldPlayRottweilerFuckedUpAnim'))
+        self.depends_nfh2 = ref('DependsOnNFH2')
+        self.depends_on_shade_tricked = bool(d.get('DependsOnWhenShadeTricked'))
+        self.use_olga_tricked_anim_flag = bool(d.get('UseOlgaTrickedAnim'))
+        self.linked_trick_rush_toilet = ref('LinkedTrickRushToilet')
+        self.linked_trick_rush_toilet_target = ref('LinkedTrickRushToiletTarget')
+        # DoubleRequiredItemsBehavior's swap partners (Item.cs:1734-1758)
+        self.second_idle_tricked = _anim_name(d.get('SecondIdleTricked'))
+        self.second_already_tricked = False
+        self.rott_use_second_tricked = d.get('RottweilerUseSecondTrickedAnimation') or []
+        self.use_multiple_times = bool(d.get('UseMultipleTimes'))
+        self.hover_anim = _anim_name(d.get('HoverAnim'))
+        self.idle_linked_tricked = _anim_name(d.get('IdleLinkedTricked'))
+        self.compound_trick_score_v = d.get('CompoundTrickScore') or 0
+        # the extra-coin flags (Rottweiler.cs:613-693 Modern; the Classic
+        # build pays them through the Extra* calculations)
+        self.extra_coin_linked = bool(d.get('ExtraCoinLinkedTrick'))
+        self.compound_extra_coin = bool(d.get('CompoundExtraCoin'))
+        self.plant_carnivore_extra = bool(d.get('PlantCarnivoreExtraAnger'))
+        self.extra_coin_206 = bool(d.get('ExtraCoin206'))
+        self.extra_coin_210 = bool(d.get('ExtraCoin210'))
+        self.dog_basket_210 = ref('DogBasketBehavior210')
+        # AnimationsToControl (Item.cs:2676-2738)
+        self.enable_anim_index_control = bool(d.get('EnableAnimIndexControl'))
+        self.anims_to_control = d.get('AnimationsToControl') or []
+        self.current_sequence = None       # Item.CurrentAnimationSequence
+        self.current_seq_index = 0         # Item.CurrentSequenceIndex
+        # the dexterity minigame (Item.cs:478-497, 1438-1507)
+        self.dexterity = bool(d.get('Dexterity'))
+        self.dexterity_trick_item = bool(d.get('DexterityTrickItem'))
+        self.dexterity_unlocker = d.get('DexterityUnlocker') or 'IT_NONE'
+        self.dexterity_animation = _anim_name(d.get('DexterityAnimation'))
+        self.play_dexterity_seq = bool(d.get('PlayDexterityAnimationSequence'))
+        self.dexterity_sequence = d.get('DexterityAnimationSequence') or []
+        self.dexterity_cannot_lose = bool(d.get('DexterityCannotLose'))
+        self.dexterity_keep_item = bool(d.get('DexterityKeepItem'))
+        self.dexterity_keep_use_item = bool(d.get('DexterityKeepUseItem'))
+        self.take_item_count = d.get('TakeItemCount') or 0
+        self.hide_in_dexterity = bool(d.get('HideInDexterity'))
+        self.dexterity_run_other = bool(d.get('DexterityRunOtherAnimationWhenFinished'))
+        self.activate_trick_if_search = bool(d.get('ActivateTrickItemIfSearchItem'))
+        self.dexterity_hide_object = False  # DexterityComponent.HideObjectDuringDexterity
+        # the remaining name-hack targets
+        self.rabbit_206 = ref('Rabbit206')
+        self.extra_item_aux = ref('ExtraItemAux')
+        self.activate_item_after_using = ref('ActivateItemAfterUsingObject')
+        self.delay_activate_after_using = d.get('DelayActivateItemAfterUsingObject') or 0.0
+        self.captain_door_1 = ref('CaptainDoor214')
+        self.captain_door_2 = ref('SecondCaptainDoor214')
+        self.extra_item = ref('ExtraItem')
+        self.change_tooltip_when_tricked = bool(d.get('ChangeToolTipWhenTricked'))
+        self.name_string = d.get('NameString') or ''
+        self.go_next_action = False        # Item.GoNextAction
+        self.skip_action = False           # Item.SkipAction (Drawing.Fix)
+        # the Mother's alternating DeckChair use (Item.cs:198, 1117-1137)
+        self.is_mother_second_use = bool(d.get('IsMotherSecondUseAnimation'))
+        self.execute_once_mother = False   # Item.ExecuteOnceAnimationMother206
+        self.play_angry_after_toilet = False  # PlayAngryAnimationAfterGoingToiletNFH2
+        self.restart_after_tricked = bool(d.get('RestartCurrentActionAfterTricked'))
+        self.activate_item_after_fix = ref('ActivateItemAfterFix')
+        self.fix_item_trick_linked = ref('FixItemTrickLinked')
+        self.block_after_fix = bool(d.get('BlockAfterFix'))
+        dwl = d.get('DeltaWoodyLocation') or {}
+        self.delta_woody_x = dwl.get('x', 0.0)
+        self.delta_woody_y = dwl.get('y', 0.0)
+        # the neighbour's use dragging Olga along (TrickItem.cs:911-914,
+        # 1227-1238; ActionManager.OlgaExtraAnimations reads them too)
+        self.rott_use_olga_seq = d.get('RottweilerUseOlgaAnimationSequence') or []
+        self.rott_use_tricked_olga_seq = d.get('RottweilerUseTrickedOlgaAnimationSequence') or []
+        # the sleep bar the item's use activates (Item.cs:556-558)
+        self.progress_bar_animation = bool(d.get('ProgressBarAnimation'))
+        self.progress_bar_object = (d.get('ProgressBarObject') or {}).get('path')
+        # the Drawing subclass's cycling smear (Drawing.cs:7-79)
+        self.drawing_current = 1           # CurrentDrawingAnimation = Drawing1
+        self.drawing_done_cleaning = False
         self.cause_slip = bool(d.get('CauseSlip'))
         sd = d.get('SurpriseDeltaLocation') or {}
         self.surprise_delta = (sd.get('x', 0.0), sd.get('y', 0.0))
@@ -691,6 +808,7 @@ class Level:
         self.quads_by_go = {q['go']: q for q in self.quads if 'go' in q}
         # the HUD component's resolved textures/rects (tools/export_level.py)
         self.hud = ((raw.get('hud') or {}).get('HUD') or [None])[0]
+        self._hud_raw = raw.get('hud') or {}
         # Zone.BubbleIcon textures for MoveOnly think bubbles, keyed by the
         # component pid; the GO pid alias joins after the build
         self.bubble_icons = {int(k): v
@@ -705,6 +823,7 @@ class Level:
         self.routines = []          # ActionManager models
         self.game_info = {}         # GameInfo serialized fields
         self.behaviors = []         # serialized *Behavior components
+        self.progress_bars = []     # ProgressBar components
         self._zone_comp = {}        # Zone component pid -> Zone
         self._build()
 
@@ -752,6 +871,40 @@ class Level:
         o = self._o(go)
         return bool(o and 'data' in o and o['data'].get('active'))
 
+    def _add_progress_bar(self, pid, o):
+        """ProgressBar's serialized fields (ProgressBar.cs:5-69); the bar is
+        drawn at its own transform's screen position (cs:262-264)"""
+        d = o['data']
+        go = self._go_of(o)
+        tr = self._transform(go)
+        pos = self._pos(tr) if tr else [0.0, 0.0, 0.0]
+        self.progress_bars.append({
+            'pid': pid, 'go': go, 'active': self._active(go),
+            'item': (d.get('CorrespondingItem') or {}).get('path'),
+            'actor': d.get('Actor'),
+            'blind': bool(d.get('PlayPawnBlindAnimation')),
+            'mother_210': bool(d.get('Mother210')),
+            'seqs': d.get('AnimationSequences') or [],
+            'rect': d.get('ProgressRect') or {},
+            'delta': d.get('DeltaProgressRect') or {},
+            'empty': d.get('ProgressBarEmpty'),
+            'full': d.get('ProgressBarFull'),
+            'rott_hud': d.get('RottweilerHUDProgressFull'),
+            'mother_hud': d.get('MotherHUDProgressFull'),
+            'x': pos[0], 'y': pos[1]})
+        # the exporter's resolved copy carries the texture names
+        spec = self.progress_bars[-1]
+        for e in (self._hud_raw.get('ProgressBar') or []):
+            if (e.get('m_GameObject') or {}).get('path') != go:
+                continue
+            for k_src, k_dst in (('ProgressBarEmpty', 'empty'),
+                                 ('ProgressBarFull', 'full'),
+                                 ('RottweilerHUDProgressFull', 'rott_hud'),
+                                 ('MotherHUDProgressFull', 'mother_hud')):
+                v = e.get(k_src)
+                if isinstance(v, dict) and v.get('texture'):
+                    spec[k_dst] = v['texture']
+
     # -- build -----------------------------------------------------------
     def _build(self):
         for pid, o in self.objs.items():
@@ -761,7 +914,8 @@ class Level:
             elif t in ('Door', 'Transition') and 'data' in o:
                 self._add_door(int(pid), o)
             elif t in ('TrickItem', 'SearchItem', 'HideItem', 'GroundItem',
-                       'InspectItem', 'Alerter') and 'data' in o:
+                       'InspectItem', 'Alerter', 'Drawing', 'Rake',
+                       'Toilet', 'Television') and 'data' in o:
                 self._add_item(int(pid), o)
             elif t in ('ItemAnimationController', 'PawnAnimationController') and 'data' in o:
                 self._add_sprite(o)
@@ -770,6 +924,8 @@ class Level:
                 self.behaviors.append({'type': t, 'pid': int(pid),
                                        'go': go, 'data': o['data'],
                                        'active': self._active(go)})
+            elif t == 'ProgressBar' and 'data' in o:
+                self._add_progress_bar(int(pid), o)
         self.sprites.sort(key=lambda s: -s.depth)      # far (high) first
         self._find_background()
         self._build_graph()

@@ -77,6 +77,7 @@ class Viewer:
         if self.hud is not None:
             # Woody.PlayTrickDone -> the HUD celebration
             self.world.game.on_trick_done = self.hud.play_trick_done
+            self.hud.cam = self.cam       # the world-anchored progress bars
         print('%s — %d sprites, %d zones, %d items, %d routines (%d actions)'
               % (self.level.name, len(self.level.sprites), len(self.level.zones),
                  len(self.level.items), len(self.world.routines),
@@ -274,4 +275,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    sys.exit(main(sys.argv))
     sys.exit(main(sys.argv))

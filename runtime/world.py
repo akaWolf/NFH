@@ -297,6 +297,13 @@ class Pawn:
         self.normal_pos_aux = False      # Rottweiler.NormalPosAux
         self.item_to_ignore_next_time = None  # Rottweiler.ItemToIgnoreNextTime
         self.show_coins = False          # Rottweiler.ShowCoins
+        # Olga's shared animation-instance stores (Olga.cs:12-18) and the
+        # L211 toilet delay (Olga.cs:10)
+        self.olga_aux_anim = None        # animationAuxOlga
+        self.olga_workout_anim = None    # animationWorkoutOlga
+        self.olga_wait_picnic_anim = None  # animationWaitPicnicOlga
+        self.olga_workout2_anim = None   # animationWorkoutOlga2
+        self.delay_toilet_211 = 0.0      # DelayToiletBehavior211
         self.toilet_action = spec.get('toilet_action') or {}
         self.wait_in_fear_anim = spec.get('wait_in_fear_anim') or 'WaitInFear'
         self.hit_pawn_action = spec.get('hit_pawn_action') or {}
@@ -309,6 +316,8 @@ class Pawn:
         self.kid_using_remote = False
         self.kid_remote = False
         self.is_sleeping = spec.get('is_sleeping') or False
+        self.hud_blind = False           # ProgressBar.PlayPawnBlindAnimation
+        self.hud_disable_think = False   # HUD.Disable*ThinkBubble
         self.ignore_woody = spec.get('ignore_woody') or False
         self.fear_left = spec.get('fear_left') or 'FearLeft'
         self.fear_right = spec.get('fear_right') or 'FearRight'
@@ -1051,6 +1060,17 @@ class Routine:
         self._wait_in_fear_done = None   # the parked resume of the affect flow
         self._hit_target = None          # RoutineActionHitPawn.Target
         self._toilet_run = False         # the ToiletAction urgent is running
+        # ActionManager's per-manager animation-instance stores
+        # (ActionManager.cs:63-81)
+        self.anim_aux = None             # animationAux
+        self.anim_wc = None              # animationWC
+        self.anim_standing_left = None
+        self.anim_standing_up = None
+        self.anim_wc_flag = False
+        self.anim_standing_left_flag = False
+        self.anim_standing_up_flag = False
+        self.one_time_olga = False       # ActionManager.OneTime
+        self.second_one_time_olga = False  # ActionManager.SecondOneTime
         # Rottweiler.Start wires the controller delegates (Rottweiler.cs:152)
         if role == 'Rottweiler':
             self.pawn.anim.last_element_hook = self._on_last_seq_element
@@ -1091,11 +1111,16 @@ class Routine:
                 self.pawn.world.play_alert_animation(nxt)
 
     def _seq_step_hack(self, player, idx):
-        """PlayNextSequenceAnimation's two name-hacks
-        (AnimationControllerBase.cs:261-275): the ChairAssembly hide at
-        sequence index 1 when the book is armed, and Olga's TowelSleep
-        element turning its own instance into an infinite loop."""
+        """PlayNextSequenceAnimation's per-element bookkeeping: the two
+        name-hacks (AnimationControllerBase.cs:261-275), the
+        Item.CurrentSequenceIndex stamp for the Rottweiler and Mother owners
+        (cs:277-284), and the OnSequenceIndexChange run of
+        Item.OnSequenceIndexChanged (Item.cs:2693-2726)."""
         it = self.item if self.urgent_item is None else self.urgent_item
+        if it is not None and self.role in ('Rottweiler', 'Mother'):
+            it.current_seq_index = idx + 1        # assigned post-increment
+            if it.enable_anim_index_control:
+                self._anim_index_control(it, idx)
         if idx == 1 and it is not None and it.name == 'ChairAssembly':
             book = next((b for b in self.level.items.values()
                          if b.name == 'ChairAssemblyBook'), None)
@@ -1105,6 +1130,39 @@ class Routine:
                 and player.seq[idx] == 'TowelSleep' \
                 and player.has('TowelSleep'):
             player.sprite.anims[player.by_name['TowelSleep']].infinite = True
+
+    def _anim_index_control(self, it, idx):
+        """Item.OnSequenceIndexChanged (Item.cs:2693-2726): the controls
+        matching the running sequence hide/show the item — or another item —
+        at their start and end element indices (compared against
+        CurrentSequenceIndex - 1, which is this element's index)."""
+        w = self.pawn.world
+        if w is None:
+            return
+        for c in it.anims_to_control:
+            if not isinstance(c, dict):
+                continue
+            if c.get('AnimationSequence') != it.current_sequence:
+                continue
+            if c.get('AnimationStartIndex') == idx:
+                if c.get('HideObjectOnStartIndex', True):
+                    w.set_object_hidden(it, True)
+            elif c.get('AnimationLastIndex') == idx \
+                    and c.get('ShowObjectOnLastIndex'):
+                w.set_object_hidden(it, False)
+            if c.get('AnimationStartIndexItem') == idx:
+                tgt = self.level.items.get(
+                    (c.get('HideItemOnStartIndex') or {}).get('path'))
+                if tgt is not None:
+                    w.set_object_hidden(tgt, True)
+            elif c.get('AnimationLastIndexItem') == idx:
+                # the original shows the HIDE target here (Item.cs:2722-2725),
+                # a shipped quirk kept as-is
+                tgt = self.level.items.get(
+                    (c.get('HideItemOnStartIndex') or {}).get('path'))
+                if tgt is not None and c.get('ShowItemOnLastIndex') is not None:
+                    w.set_object_hidden(tgt, False)
+            return
 
     def _advance(self):
         self.index += 1
@@ -1163,6 +1221,103 @@ class Routine:
                 if p is not None and kid_it.idle and p.has(kid_it.idle):
                     p.play_looping(kid_it.idle)
 
+    def _olga_infinite_behavior(self, olga):
+        """ActionManager.OlgaInfiniteBehavior (ActionManager.cs:384-392)"""
+        if self.anim_aux is not None:
+            self.anim_aux.infinite = True
+        self.anim_aux = olga.anim.anim
+        olga.anim.anim.infinite = False
+
+    def _olga_extra_animations(self):
+        """ActionManager.OlgaExtraAnimations (ActionManager.cs:268-382):
+        the InfiniteLoop juggling that swaps Olga between her waiting poses
+        as the routines advance — Sweets, LifeBoat, FishingRod, Tortilla,
+        Pinata/BoatPicnic, MechanicalBullWait, CaptainDoor and Glass, each by
+        item name, mutating the shared animation instances."""
+        w = self.pawn.world
+        olga = w.pawns.get('Olga') if w is not None else None
+        if olga is None or not self.actions:
+            return
+        items = self.level.items
+        cur = items.get(self.action['item']) if self.action and \
+            self.action.get('item') else None
+        prev = items.get(self.actions[(self.index - 1) % len(self.actions)]
+                         ['item']) \
+            if self.actions[(self.index - 1) % len(self.actions)]['item'] \
+            else None
+        name = cur.name if cur is not None else None
+        if self.role == 'Rottweiler' and prev is not None and \
+                (prev.rott_use_olga_seq or prev.rott_use_tricked_olga_seq):
+            # cs:270-273: Olga returns to her default pose after the drag
+            if olga.default_anim and olga.anim.has(olga.default_anim):
+                olga.anim.play_looping(olga.default_anim)
+        if self.role == 'Rottweiler' and name == 'Sweets':   # cs:274-297
+            if self.anim_standing_left_flag:
+                self.anim_standing_left = olga.anim.anim
+            if self.anim_standing_left is not None:
+                self.anim_standing_left_flag = False
+                self.anim_standing_left.infinite = False
+            else:
+                self.anim_standing_left_flag = True
+            if self.anim_standing_up is not None:
+                self.anim_standing_up.infinite = True
+            if self.anim_wc is not None:
+                self.anim_wc.infinite = True
+        elif self.role == 'Rottweiler' and name == 'LifeBoat':   # cs:298-314
+            if not self.anim_standing_up_flag:
+                self.anim_standing_up_flag = True
+                self.anim_standing_up = olga.anim.anim
+            self.anim_standing_up.infinite = False
+            if self.anim_standing_left is not None:
+                self.anim_standing_left.infinite = True
+            if self.anim_wc is not None:
+                self.anim_wc.infinite = True
+        elif self.role == 'Rottweiler' and name == 'FishingRod':  # cs:315-331
+            if not self.anim_wc_flag:
+                self.anim_wc_flag = True
+                self.anim_wc = olga.anim.anim
+            self.anim_wc.infinite = False
+            if self.anim_standing_left is not None:
+                self.anim_standing_left.infinite = True
+            if self.anim_standing_up is not None:
+                self.anim_standing_up.infinite = True
+        if self.role == 'Rottweiler' and name == 'Tortilla':  # cs:332-336
+            self._olga_infinite_behavior(olga)
+            olga.olga_aux_anim = self.anim_aux
+        ort = next((r for r in w.routines if r.role == 'Olga'), None)
+        olga_cur = None
+        if ort is not None and ort.actions:
+            olga_cur = items.get(ort.actions[ort.index % len(ort.actions)]
+                                 ['item']) \
+                if ort.actions[ort.index % len(ort.actions)]['item'] else None
+        if self.role == 'Rottweiler' and name == 'Pinata' \
+                and olga_cur is not None and olga_cur.name == 'BoatPicnic' \
+                and not self.second_one_time_olga:    # cs:337-345
+            olga.anim.anim.infinite = False
+            olga.olga_wait_picnic_anim = olga.anim.anim
+        if self.role == 'Olga' and olga_cur is not None \
+                and olga_cur.name in ('BoatPicnic', 'MechanicalBullWait') \
+                and not self.one_time_olga:           # cs:346-350
+            self.one_time_olga = True
+            olga.olga_workout2_anim = olga.anim.anim
+        if self.role == 'Olga' and olga_cur is not None \
+                and olga_cur.name == 'MechanicalBullWait':   # cs:351-365
+            if olga.olga_wait_picnic_anim is not None:
+                olga.olga_wait_picnic_anim.infinite = True
+                self.second_one_time_olga = False
+            if olga.olga_workout2_anim is not None:
+                olga.olga_workout2_anim.infinite = True
+        if self.role == 'Rottweiler' and name == 'CaptainDoor':  # cs:366-377
+            if prev is not None and prev.name == 'Shower' and prev.got_tricked:
+                self._olga_infinite_behavior(olga)
+            if prev is not None and prev.name == 'Bouquet' \
+                    and not prev.got_tricked:
+                self._olga_infinite_behavior(olga)
+            olga.olga_aux_anim = self.anim_aux
+        elif self.role == 'Olga' and name == 'Glass' \
+                and olga.olga_aux_anim is not None:   # cs:378-381
+            olga.olga_aux_anim.infinite = True
+
     def _start_action(self, start_next=False):
         it = self.item
         a = self.action
@@ -1188,6 +1343,7 @@ class Routine:
                 if self.pawn.normal_pos_aux:
                     self.pawn.normal_pos_aux = False
             self._kid_actions()
+            self._olga_extra_animations()
             if w is not None and self.actions and len(self.actions) > 1:
                 # NextActionAfterGramaphoneTricked skips one action
                 # (ActionManager.cs:200-204)
@@ -1316,6 +1472,16 @@ class Routine:
         if a.get('remove_skates'):
             self.pawn.has_skates = False
         w = self.pawn.world
+        # Item.Use turns the item's sleep bar on: the Rottweiler-actor bar at
+        # its head (Item.cs:831-834), the Mother-actor bar at its tail
+        # (cs:861-864) and in MotherUse (cs:1110-1113); RottweilerPrime does
+        # its own (cs:1322-1325), covered by activating before the prime leg
+        if w is not None:
+            if self.role == 'Mother':
+                w.activate_progress_bar(it, 'Mother')
+            else:
+                w.activate_progress_bar(it, 'Rottweiler')
+                w.activate_progress_bar(it, 'Mother')
         # Item.Use's Rottweiler branch (Item.cs:1056-1095): a toggles-prime
         # item alternates prime / use; RequireUnprime makes it three-phase
         # (prime, use, unprime). The PigKeys and Pipe name-hacks are skipped.
@@ -1441,29 +1607,37 @@ class Routine:
             mseq = [x for x in it.mother_rott_angry if self.pawn.anim.has(x)]
             if mseq:
                 self.pawn.anim.play_sequence(mseq)
-        seq = it.sequence_for(self.role, tricked, self.level.items)
-        if self.role == 'Olga' and it.is_tricked(self.level.items) \
-                and it.use_olga_tricked_flag:
-            seq = it.use_tricked_anim.get('Olga') or []
-        # the LaunchPad name-hack (TrickItem.cs:896-902): an untricked pad
-        # with a tricked harpoon plays the harpoon's tricked set instead and
-        # arms the StopAction hand-off
-        linked = self.level.items.get(it.linked_item_trick) \
-            if it.linked_item_trick else None
-        if self.role == 'Rottweiler' and it.name == 'LaunchPad' \
-                and not it.tricked and linked is not None and linked.tricked:
-            it.harpoon_aux = True
-            seq = linked.sequence_for(self.role, True, self.level.items)
-            if w is not None:
-                w.play_tricked_item_anim(linked)
-        # the pig-pen gate (TrickItem.cs:837-841): primed-and-tricked keys
-        # with the milk still clean play the surprise set instead
-        if it.depends_pig_keys and self.role == 'Rottweiler' and w is not None:
-            keys = self.level.items.get(it.pig_keys)
-            milk = self.level.items.get(it.pig_milk)
-            if keys is not None and keys.primed and keys.tricked and \
-                    (milk is None or not milk.tricked):
-                seq = it.rott_surprise
+        # the Rake subclass skips its animations outside the compound trick
+        # (Rake.cs:3-11): the use goes straight to the stop flow
+        if it.kind == 'Rake' and self.role == 'Rottweiler' \
+                and not (it.tricked and it.compound_tricked):
+            self.state = self.USING
+            self.timer = a['duration']
+            self._after_use_side_effects(a, it)
+            self.log.append((it.name, tricked))
+            if self.on_use:
+                self.on_use(it, tricked)
+            self._finish()
+            return
+        # the Drawing subclass cycles its smears (Drawing.cs:44-68)
+        if it.kind == 'Drawing' and self.role == 'Rottweiler' and w is not None:
+            w.set_active(it, True)
+            if it.drawing_done_cleaning:
+                it.drawing_done_cleaning = False
+                ru = it.use_anim.get('Rottweiler') or []
+                if len(ru) > 1:                    # ResetUseAnimation
+                    it.use_anim['Rottweiler'] = [ru[1]]
+            if it.sprite is not None:
+                it.sprite.hidden = False
+            w.play_item_anim(it, 'Drawing%d' % it.drawing_current)
+            it.drawing_current += 1
+            if it.drawing_current >= 4:            # >= Drawing4
+                it.drawing_current = 1
+                ru = it.use_anim.get('Rottweiler') or []
+                it.use_anim['Rottweiler'] = \
+                    ['GoldCupClean'] + (ru[:1] if ru else [])
+                it.drawing_done_cleaning = True
+        seq, item_play = self._pick_use_sequence(it, tricked, w)
         # TrickItem.RottweilerUse's own side arms (TrickItem.cs:566-630)
         if self.role == 'Rottweiler' and w is not None:
             hoda = self.level.items.get(it.hide_object_during_animation) \
@@ -1517,11 +1691,18 @@ class Routine:
             self.on_use(it, tricked)
         # the item plays its own use pose alongside the pawn's sequence
         # (TrickItem.PlayUseAnimation / PlayTrickedAnimation, cs:947-994)
-        if w is not None and it.kind in TRICK_KINDS:
-            if tricked or (self.role == 'Rottweiler' and it.tricked):
-                w.play_tricked_item_anim(it)
-            elif not it.fucked_up:
-                w.play_use_item_anim(it)
+        if w is not None and item_play is not None:
+            item_play()
+        # the neighbour's use drags Olga through her set (TrickItem.cs:911-914)
+        if self.role == 'Rottweiler' and w is not None \
+                and (it.rott_use_olga_seq or it.rott_use_tricked_olga_seq):
+            olga = w.pawns.get('Olga')
+            if olga is not None:
+                oseq = it.rott_use_tricked_olga_seq if it.tricked \
+                    else it.rott_use_olga_seq
+                oseq = [x for x in oseq if olga.anim.has(x)]
+                if oseq:
+                    olga.anim.play_sequence(oseq)
         if seq:
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
         else:
@@ -1530,6 +1711,229 @@ class Routine:
             # StopAction(canPostponeStop: true)) — the invisible valves
             # of Level113 depend on this
             self._finish()
+
+    def _pick_use_sequence(self, it, tricked, w):
+        """the use-animation dispatch, branch for branch: the Rottweiler
+        runs TrickItem.PlayAnimation (TrickItem.cs:791-916) over the base
+        Item.PlayAnimation (Item.cs:894-905); the Mother runs
+        PlayMotherAnimation with the DeckChair alternation (Item.cs:1117-1137);
+        Olga runs PlayOlgaAnimation with its name-hacks (Item.cs:1144-1167)
+        and the TrickItem override's item-side plays (cs:964-975). Returns
+        the pawn's sequence and a callable that plays the item's own pose."""
+        items = self.level.items
+        linked = items.get(it.linked_item_trick) if it.linked_item_trick else None
+        dep = items.get(it.depends_on) if it.depends_on is not None else None
+        item_play = None
+        if self.role == 'Mother':
+            # PlayMotherAnimation (Item.cs:1117-1137); the Get* methods stamp
+            # CurrentAnimationSequence (Item.cs:907-940)
+            if not it.tricked:
+                if it.is_mother_second_use and it.execute_once_mother \
+                        and it.name == 'DeckChair':
+                    it.current_sequence = 'MotherSecondUse'
+                    return list(it.mother_second_use), None
+                it.execute_once_mother = True
+                it.current_sequence = 'MotherUse'
+                return list(it.use_anim.get('Mother') or []), None
+            it.execute_once_mother = False
+            it.current_sequence = 'MotherUseTricked'
+            return list(it.use_tricked_anim.get('Mother') or []), None
+        if self.role == 'Olga':
+            # PlayOlgaAnimation (Item.cs:1144-1167): the tricked name-hacks
+            # and flags all resolve to the tricked set; the TrickItem
+            # override adds the item-side pose (TrickItem.cs:964-975)
+            olga_tricked = it.is_tricked(items) and (
+                it.name in ('OlgaStandStill', 'MechanicalBull', 'PullKart')
+                or it.use_olga_tricked_flag or it.use_olga_tricked_anim_flag)
+            if it.kind in TRICK_KINDS:
+                if it.tricked:
+                    item_play = lambda: w.play_tricked_item_anim(it, self.pawn)
+                else:
+                    item_play = lambda: w.play_use_item_anim(it)
+            if olga_tricked:
+                return list(it.use_tricked_anim.get('Olga') or []), item_play
+            return list(it.use_anim.get('Olga') or []), item_play
+        # ---- the Rottweiler dispatch ----------------------------------
+        if it.kind not in TRICK_KINDS:
+            # base Item.PlayAnimation (Item.cs:894-905)
+            table = it.use_tricked_anim if it.tricked else it.use_anim
+            return list(table.get('Rottweiler') or []), None
+        # the Drawing subclass cycles its RottweilerUse set itself
+        # (Drawing.cs:44-68) — handled by _drawing_use before this call
+        it.current_sequence = 'RottweilerUse'      # the default stamp
+        if linked is not None and linked.tricked and it.tricked \
+                and it.use_tricked_linked:            # cs:804-817
+            it.current_sequence = 'RottweilerUseLinkedTricked'
+            if it.name == 'SandCastle':               # cs:806-811
+                it.rott_use_exit_delta[0] = 0.0
+                it.rott_prime_exit_delta = (0.0, it.rott_prime_exit_delta[1])
+                it.rott_use_item_exit_delta[0] = 0.0
+            self._extra_coin_210(it)                  # cs:812
+            self._extra_coin_206(it)                  # cs:813
+            self._change_animation_210(it)            # cs:814
+            self._depends_nfh2(it, linked)            # cs:816
+            return list(it.use_tricked_linked), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.play_custom_tricked and it.tricked:     # cs:818-823
+            return list(it.rott_custom_tricked), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.compound and it.compound_tricked and it.tricked:   # cs:824-830
+            self._extra_coin_compound(it)
+            return list(it.rott_compound_use_tricked), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.fucked_up and it.should_play_rott_fuckedup:        # cs:831-836
+            return list(it.rott_use_fuckedup), \
+                (lambda: w.play_item_anim(it, it.use_fucked_up))
+        if it.depends_pig_keys and w is not None:     # cs:837-842
+            keys = items.get(it.pig_keys)
+            milk = items.get(it.pig_milk)
+            if keys is not None and keys.primed and keys.tricked and \
+                    (milk is None or not milk.tricked):
+                return list(it.rott_surprise), \
+                    (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.tricked and not it.use_at_other_place and not it.neutral:
+            if it.name == 'SandCastle':               # cs:843-856
+                it.rott_use_exit_delta[0] = -0.9
+                it.rott_use_item_exit_delta[0] = 0.4
+            self._toilet_211(it)                      # cs:850
+            self._fish_plant(it)                      # cs:851
+            self._depends_nfh2(it, linked)            # cs:855
+            it.current_sequence = 'RottweilerUseTricked'
+            return list(it.use_tricked_anim.get('Rottweiler') or []), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))
+        shade = shez = None
+        if it.depends_on_shade_tricked:               # cs:799-803
+            shade = next((i for i in items.values()
+                          if i.name == 'SunShade'), None)
+            shez = next((i for i in items.values()
+                         if i.name == 'Shezlong'), None)
+        if dep is not None and dep.tricked and dep.got_tricked \
+                and (not it.use_depends_on_when_tricked or it.tricked) \
+                and not it.depends_on_shade_tricked:  # cs:857-862
+            return list(dep.use_tricked_anim.get('Rottweiler') or []), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.use_depends_on_when_tricked and it.tricked \
+                and not it.depends_on_shade_tricked and dep is not None:
+            return list(dep.use_anim.get('Rottweiler') or []), \
+                (lambda: w.play_tricked_item_anim(it, self.pawn))   # cs:863-868
+        if it.depends_on_shade_tricked and shade is not None \
+                and shade.tricked and dep is not None:
+            if not dep.tricked and (shez is None or not shez.tricked):
+                return list(dep.use_anim.get('Rottweiler') or []), \
+                    (lambda: w.play_tricked_item_anim(it, self.pawn))  # cs:869-874
+            if dep.tricked and (shez is None or not shez.tricked):
+                dep.got_tricked = True                # cs:875-881
+                return list(dep.use_tricked_anim.get('Rottweiler') or []), \
+                    (lambda: w.play_tricked_item_anim(it, self.pawn))
+        if it.fucked_up:                              # cs:882-887
+            return list(it.use_anim.get('Rottweiler') or []), \
+                (lambda: w.play_item_anim(it, it.use_fucked_up))
+        if it.name == 'SandCastle':                   # cs:888-895
+            it.rott_prime_exit_delta = (0.0, it.rott_prime_exit_delta[1])
+            it.rott_use_exit_delta[0] = 0.0
+            it.rott_use_item_exit_delta[0] = 0.0
+        if it.name == 'LaunchPad' and not it.tricked \
+                and linked is not None and linked.tricked:   # cs:896-902
+            it.harpoon_aux = True
+            return list(linked.use_tricked_anim.get('Rottweiler') or []), \
+                (lambda: w.play_tricked_item_anim(linked, self.pawn))
+        self._depends_nfh2(it, linked)                # cs:905
+        return list(it.use_anim.get('Rottweiler') or []), \
+            (lambda: w.play_use_item_anim(it))
+
+    def _extra_coin_compound(self, it):
+        """Item.ExtraCoinCompound (Item.cs:2398-2409): the Tortilla and the
+        carnivorous plant pay a second trick"""
+        w = self.pawn.world
+        if w is None:
+            return
+        if it.name == 'Tortilla' and it.tricked and it.compound_extra_coin:
+            w.game.trick_done(it.trick_score)
+        elif it.name == 'PlantCarnivore' and it.tricked \
+                and it.plant_carnivore_extra:
+            w.game.trick_done(it.trick_score)
+
+    def _extra_coin_206(self, it):
+        """Item.ExtraCoin206Calculation (Item.cs:2411-2418)"""
+        w = self.pawn.world
+        linked = self.level.items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        if w is not None and it.name == 'LaunchPad' and it.tricked \
+                and linked is not None and linked.tricked:
+            w.game.trick_done(it.trick_score)
+
+    def _extra_coin_210(self, it):
+        """Item.ExtraCoin210Calculation (Item.cs:2420-2427)"""
+        w = self.pawn.world
+        linked = self.level.items.get(it.linked_item_trick) \
+            if it.linked_item_trick else None
+        basket = self.level.items.get(it.dog_basket_210) \
+            if it.dog_basket_210 else None
+        if w is not None and it.name == 'DogBasket' and it.tricked \
+                and linked is not None and linked.tricked \
+                and basket is not None and basket.primed:
+            w.game.trick_done(it.trick_score)
+
+    def _change_animation_210(self, it):
+        """Item.ChangeAnimation210 (TrickItem.cs:918-929)"""
+        basket = self.level.items.get(it.dog_basket_210) \
+            if it.dog_basket_210 else None
+        if basket is not None and basket.primed and it.use_tricked_linked:
+            it.use_tricked_linked = ['RottTickle', 'PoolFallEmpty',
+                                     'PoolLeaveEmpty']
+
+    def _depends_nfh2(self, it, linked):
+        """TrickItem.DependsOnNFH2Behavior (TrickItem.cs:931-945): the
+        NFH2 dependency acts its own use sequence alongside"""
+        w = self.pawn.world
+        dep = self.level.items.get(it.depends_nfh2) if it.depends_nfh2 else None
+        if w is None or dep is None or linked is None:
+            return
+        p = w.players.get(id(dep.sprite)) if dep.sprite else None
+        if p is None:
+            return
+        if dep.tricked and not linked.tricked:
+            seq = [x for x in dep.use_tricked_sequence if p.has(x)]
+        elif not dep.tricked and not linked.tricked:
+            seq = [x for x in dep.use_normal_sequence if p.has(x)]
+        elif dep.tricked and linked.tricked:
+            seq = [x for x in dep.use_tricked_sequence if p.has(x)]
+        else:
+            seq = []
+        if seq:
+            p.play_sequence(seq)
+
+    def _toilet_211(self, it):
+        """Item.Toilet211Behavior (Item.cs:2373-2386): the tricked sweets
+        with the tricked linked toilet retarget the toilet run, arm the
+        after-toilet angry and pay the extra coin"""
+        w = self.pawn.world
+        rush = self.level.items.get(it.linked_trick_rush_toilet) \
+            if it.linked_trick_rush_toilet else None
+        if w is None or not it.tricked or rush is None or not rush.tricked \
+                or it.name != 'Sweets':
+            return
+        if it.linked_trick_rush_toilet_target:
+            self.pawn.toilet_action['item'] = it.linked_trick_rush_toilet_target
+        olga = w.pawns.get('Olga')
+        if olga is not None:
+            spec = self.level.pawns.get('Olga') or {}
+            it.pawn_to_affect = spec.get('pid')
+        it.play_angry_after_toilet = True
+        w.game.trick_done(it.trick_score)
+
+    def _fish_plant(self, it):
+        """Item.FishPlantBehavior (Item.cs:2388-2396): the tricked bouquet
+        strips Olga's next two actions"""
+        if it.name != 'Bouquet' or not it.tricked \
+                or self.role != 'Rottweiler':
+            return
+        ort = next((r for r in self.pawn.world.routines
+                    if r.role == 'Olga'), None) if self.pawn.world else None
+        if ort is not None and len(ort.actions) > 2:
+            del ort.actions[1]
+            del ort.actions[1]
+            ort.index = max(0, ort.index - 1)
 
     def _change_hit_pawn_animation_207(self, it):
         """TrickItem.ChangeHitPawnAnimation207 (TrickItem.cs:1264-1280)"""
@@ -2141,6 +2545,15 @@ class Routine:
             self._toilet_run = False
             self.pawn.feel_sick = False
             self.pawn.is_using_toilet = False
+            it2 = self.item
+            if it2 is not None and it2.play_angry_after_toilet \
+                    and self.pawn.world is not None:
+                # StopUrgentAction's after-toilet angry (ActionManager.cs:
+                # 597-603): the sweets' postponed rage fires now
+                it2.play_angry_after_toilet = False
+                it2.fix_item_trick = it2.linked_trick_rush_toilet
+                it2.angry_without_animations = False
+                self.pawn.world.play_angry(self.pawn, it2)
         self._same_zone = False
         self._same_zone_yelled = False
         self._alarm_use = False
@@ -2155,11 +2568,31 @@ class Routine:
         if finished is not None and finished.name == 'GroundMarbles':
             self.marbles_next = False
         it = self.item
-        if it is not None and it.got_tricked and not self.marbles_next and \
+        linked = self.level.items.get(it.linked_item_trick) \
+            if it is not None and it.linked_item_trick else None
+        if it is not None and it.skip_action:
+            # StopUrgentAction's SkipAction arm (ActionManager.cs:608-613):
+            # a wiped drawing skips its own redo
+            self._pending = 'skip'
+        elif it is not None and it.got_tricked and not self.marbles_next and \
                 it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
             # the skip goes straight to StartAction, without the
             # StartNextAction extras (ActionManager.cs:614-619)
             self._pending = 'skip'
+        elif it is not None and it.go_next_action and not self.marbles_next:
+            # Item.GoNextAction (ActionManager.cs:620-626)
+            it.go_next_action = False
+            self._pending = 'skip'
+        elif it is not None and linked is not None and linked.tricked \
+                and it.name == 'MechanicalBullWait':
+            # the bull-wait double skip (ActionManager.cs:627-639)
+            if self.actions:
+                cur = self.index % len(self.actions)
+                if cur >= len(self.actions) - 1 or cur + 2 > len(self.actions) - 1:
+                    self.index = 0
+                else:
+                    self.index = cur + 2
+            self._pending = 'start'
         else:
             self._pending = 'start'
         self.state = self.IDLE
@@ -2506,6 +2939,16 @@ class Routine:
     def tick(self, dt):
         if self.frozen:
             return
+        # ActionManager.OlgaActions (ActionManager.cs:501-509): the one-shot
+        # OlgaWCUse infinite release
+        w = self.pawn.world
+        olga = w.pawns.get('Olga') if w is not None else None
+        if w is not None and olga is not None and not w.flag_aux \
+                and self.index > 0 and self.actions \
+                and olga.anim.anim.name == 'OlgaWCUse':
+            w.flag_aux = True
+            olga.anim.anim.infinite = False
+            self.anim_aux = olga.anim.anim
         # Rottweiler.Update: a deferred alert fires once he moves again
         if self.was_alerted is not None and self.state == self.MOVING:
             it, self.was_alerted = self.was_alerted, None
@@ -2550,6 +2993,118 @@ class Routine:
                 self._finish()
 
 
+class ProgressBarState:
+    """One ProgressBar component (ProgressBar.cs): the sleep bar that fills
+    while its item's use sequence sits between two element indices, putting
+    the owning pawn to sleep for the duration."""
+
+    def __init__(self, world, spec):
+        self.world = world
+        self.spec = spec
+        self.item = world.level.items.get(spec['item'])
+        self.blind = spec['blind']
+        self.mother_210 = spec['mother_210']
+        self.active = spec['active']
+        # Start (cs:77-105)
+        self.visible = False
+        self.progress = 0.0
+        self.executed_once = True        # ExecutedOnce
+        self.execute_once_2 = True
+        self.execute_once_3 = True
+        self.execute_once_4 = True
+        self.seconds = 0.0               # SecondsCount
+        self.stop_progress = False       # StopProgressBar
+        self.is_pawn_hud = spec['actor'] in ('Rottweiler', 'Mother')
+        self.hud_tex = spec['rott_hud'] if spec['actor'] == 'Rottweiler' \
+            else spec['mother_hud']
+        # OnEnable (cs:108-114)
+        world.subscribe('mother_urgent', self.stop_for_urgency)
+        world.subscribe('mother_urgent_stop', self.resume_after_urgency)
+
+    @property
+    def pawn(self):
+        """SelectedPawn; resolved late — the pawns spawn after the level
+        components are built (Start does the same lookup, cs:82-105)"""
+        return self.world.pawns.get(self.spec['actor'])
+
+    def tick(self, dt):
+        """Update (ProgressBar.cs:123-173)"""
+        if not self.active or self.item is None or self.pawn is None:
+            return
+        w = self.world
+        # the once-only cancel when the pawn spots Woody or an urgency stops
+        # the bar (cs:125-142); a non-Mother210 bar dies for the level
+        if self.execute_once_3 and self.spec['actor'] == 'Mother' and \
+                (w.can_mother_see_woody() or self.stop_progress):
+            self.execute_once_3 = False
+            self.set_sleeping(False)
+            if not self.mother_210:
+                self.active = False
+        elif self.execute_once_4 and self.spec['actor'] == 'Rottweiler' and \
+                (w.can_rottweiler_see_woody() or self.stop_progress):
+            self.execute_once_4 = False
+            self.set_sleeping(False)
+            if not self.mother_210:
+                self.active = False
+        idx = self._check_state(self.item.current_sequence)   # cs:143
+        if idx == -1:
+            return
+        s = self.spec['seqs'][idx]
+        if s['AnimationStartIndex'] <= self.item.current_seq_index \
+                < s['AnimationEndIndex']:                      # cs:148
+            self.seconds += dt
+            if self.executed_once:
+                self.set_sleeping(True)
+            if self.seconds <= s['Duration']:
+                self.progress = self.seconds / s['Duration']
+            else:
+                self.progress = 1.0
+        elif self.execute_once_2 and self.visible:             # cs:164-172
+            self.execute_once_2 = False
+            self.set_sleeping(False)
+            if not self.mother_210:
+                self.active = False
+
+    def set_sleeping(self, value):
+        """SetSleeping (cs:175-225): the pawn's IsSleeping detection gate and
+        the HUD face swap with the think bubble disabled"""
+        self.executed_once = False
+        self.visible = value
+        self.pawn.is_sleeping = value
+        if self.spec['actor'] in ('Rottweiler', 'Mother'):
+            self.pawn.hud_blind = bool(value and self.blind)
+            self.pawn.hud_disable_think = value
+
+    def stop_for_urgency(self):
+        """StopForUrgency (cs:233-237)"""
+        self.set_sleeping(False)
+        self.stop_progress = True
+
+    def resume_after_urgency(self):
+        """ResumeAfterUrgency (cs:227-231)"""
+        if self.item is not None:
+            self.item.current_seq_index = -1
+        self.restore()
+
+    def restore(self):
+        """RestoreVariables (cs:291-301)"""
+        self.visible = False
+        self.progress = 0.0
+        self.executed_once = True
+        self.execute_once_2 = True
+        self.execute_once_3 = True
+        self.execute_once_4 = True
+        self.seconds = 0.0
+        self.stop_progress = False
+
+    def _check_state(self, state):
+        """CheckAnimationSequenceState (cs:279-289)"""
+        for i, s in enumerate(self.spec['seqs']):
+            if s['AnimationSequence'] == state:
+                return i
+        return -1
+
+
 class World:
     def __init__(self, level, sound_sink=None):
         self.level = level
@@ -2592,10 +3147,14 @@ class World:
         self._woody_show_after = []      # Woody.ItemToShowAfterAnim queue
         self._woody_layer_restore = []   # (pawn, depth) from the hide layers
         self._woody_use_anim_item = None  # Woody.itemAux (HideDuringWoodyUseAnim)
+        self.flag_aux = False            # GameInfo.flagAux (the OlgaWCUse shot)
         self._woody_use_anim_hidden = False
         self.behavior_objs = []          # live level-behavior instances
         self.search_behavior = None      # Woody.SearchBehavior
         self.events = {}                 # the behaviors' static C# events
+        # the ProgressBar components (ProgressBar.cs)
+        self.progress_bars = [ProgressBarState(self, s)
+                              for s in level.progress_bars]
         # Item.Start ends in SetPrimed(Primed): the initial primed visibility
         # (Item.cs:697, 1219-1235)
         for it in level.items.values():
@@ -2604,6 +3163,10 @@ class World:
                     it.sprite.hidden = not it.primed
                 if it.hide_when_primed and it.primed:
                     it.sprite.hidden = True
+        # Drawing.Start parks its smear hidden (Drawing.cs:17-22)
+        for it in level.items.values():
+            if it.kind == 'Drawing' and it.sprite is not None:
+                it.sprite.hidden = True
         # TrickItem.OnItemAnimationCompleted (TrickItem.cs:1059-1079): the
         # zone poses and an AnimateAfterUse use pose return to idle
         for it in level.items.values():
@@ -2612,6 +3175,18 @@ class World:
                 if p is not None:
                     p.single_end_hook = \
                         (lambda name, i=it: self._item_anim_completed(i, name))
+
+    def activate_progress_bar(self, item, actor):
+        """ProgressBarObject.SetActive(true) (Item.cs:831-834, 861-864,
+        1110-1113, 1322-1325): the bar's GameObject ships inactive; OnEnable
+        re-arms its variables (ProgressBar.cs:108-114)"""
+        if not item.progress_bar_animation or item.progress_bar_object is None:
+            return
+        for pb in self.progress_bars:
+            if pb.spec['go'] == item.progress_bar_object \
+                    and pb.spec['actor'] == actor and not pb.active:
+                pb.active = True
+                pb.restore()
 
     def _on_compound_trick_done(self, item):
         """Item.OnCompoundTrickDone (Item.cs:2161-2169): counts once while
@@ -2881,12 +3456,61 @@ class World:
         the item shows its normal idle again (Item.cs:2102, TrickItem.cs:443),
         plus the name-hack arms of both Fix bodies. The UseAtOtherPlace guard
         and the tricked-overlay swap come from TrickItem.Fix (cs:438-446)."""
-        item.tricked = False
+        # the Drawing subclass resets and skips its redo (Drawing.cs:30-42)
+        if item.kind == 'Drawing':
+            item.drawing_current = 1
+            self.set_active(item, False)
+            item.skip_action = True
+            item.drawing_done_cleaning = False
+            ru = item.use_anim.get('Rottweiler') or []
+            if len(ru) > 1:
+                item.use_anim['Rottweiler'] = [ru[1]]
+        # the Item.Fix body, in source order (Item.cs:2063-2119)
+        self._gold_cup_behavior(item)              # cs:2066
+        if item.restart_after_tricked and item.tricked:
+            rt = next((r for r in self.routines
+                       if r.role == 'Rottweiler'), None)
+            if rt is not None and rt.actions:      # StarActionAgain, cs:2365
+                rt.index = (rt.index - 1) % len(rt.actions)
+        act = self.level.items.get(item.activate_item_after_fix) \
+            if item.activate_item_after_fix else None
+        if act is not None:                        # ActivateItem, cs:2356-2363
+            self.set_active(act, True)
+        self._fix_kart_behavior(item)
+        self._fix_throne_behavior(item)
+        self._fix_bull_behavior(item)
+        self._fix_boat_behavior(item)
+        self._rabbit_behavior(item)
+        if item.name == 'TurbanShop':              # cs:2074-2077
+            item.used = False
+        if item.name == 'BeerMat' and item.rott_prime_anim:   # cs:2078-2081
+            item.rott_prime_anim[0] = 'BeachLayDown'
+        if item.name == 'MechanicalBullControls' and item.tricked:
+            rt = next((r for r in self.routines
+                       if r.role == 'Rottweiler'), None)
+            if rt is not None:                     # cs:2082-2085
+                rt.index += 2
+        self._fix_plant_carnivore(item)            # cs:2086
+        self._hatch_fix_behavior(item)             # cs:2087
+        self._stop_olga_infinite_loop(item)        # cs:2088
+        # FixItemTrickLinked before the Tricked clear (Item.cs:2097-2101)
+        fxl = self.level.items.get(item.fix_item_trick_linked) \
+            if item.fix_item_trick_linked else None
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        if fxl is not None and linked is not None and linked.tricked \
+                and item.tricked:
+            fxl.tricked = False
+            self._return_to_idle(fxl)
+        item.tricked = False                       # cs:2102
         fx = self.level.items.get(item.fix_item_trick) \
             if item.fix_item_trick else None
         if fx is not None:
             fx.tricked = False
             self._return_to_idle(fx)
+        if item.block_after_fix:                   # cs:2108-2112
+            item.can_undo_trick = False
+            item.use_once = True
         # TrickItem.Fix tail (TrickItem.cs:412-455)
         self.call_later(0.3, lambda it=item: self._bbq_dirty(it))
         if item.name == 'Rope' and item.got_tricked:
@@ -2922,6 +3546,112 @@ class World:
         if item.use_item_multiple_times:
             item.use_once = False
         self._return_to_idle(item)
+
+    def _gold_cup_behavior(self, item):
+        """Item.GoldCupBehavior (Item.cs:2770-2776)"""
+        extra = self.level.items.get(item.extra_item_aux) \
+            if item.extra_item_aux else None
+        if item.name == 'Polish' and extra is not None and not item.tricked:
+            self.set_object_hidden(extra, True)
+
+    def _fix_bull_behavior(self, item):
+        """Item.FixBullBehavior (Item.cs:2494-2504)"""
+        if not (item.fix_without_animations and item.name == 'LiveBull'):
+            return
+        if item.use_anim.get('Rottweiler'):
+            item.use_anim['Rottweiler'][0] = 'LookRight'
+        item.idle = 'N2TrickItemExtra1'
+        item.primed = True
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        if rt is not None and rt.action is not None:
+            rt.action['object_to_hide'] = None     # ObjectToHideDuringUse = null
+
+    def _fix_boat_behavior(self, item):
+        """Item.FixBoatBehavior (Item.cs:2519-2531): the picnic boat sinks
+        for good — both routines lose an action"""
+        if not (item.fix_without_animations and item.name == 'BoatPicnic'):
+            return
+        self.set_active(item, False)
+        olga = self.pawns.get('Olga')
+        if olga is not None and olga.olga_aux_anim is not None:
+            olga.olga_aux_anim.infinite = True
+            olga.olga_workout_anim = olga.olga_aux_anim
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        if rt is not None and len(rt.actions) > 3:
+            del rt.actions[3]
+            rt.index = max(0, rt.index - 1)
+        ort = next((r for r in self.routines if r.role == 'Olga'), None)
+        if ort is not None and len(ort.actions) > 1:
+            del ort.actions[1]
+            ort.index = max(0, ort.index - 1)
+
+    def _rabbit_behavior(self, item):
+        """Item.RabbitBehavior (Item.cs:2625-2631)"""
+        rabbit = self.level.items.get(item.rabbit_206) \
+            if item.rabbit_206 else None
+        if item.name == 'LaunchPad' and item.tricked and rabbit is not None:
+            self.set_active(rabbit, True)
+
+    def _fix_plant_carnivore(self, item):
+        """Item.FixPlantCarnivoreBehavior (Item.cs:2506-2517)"""
+        if item.name != 'PlantCarnivore':
+            return
+        if item.compound_tricked:
+            item.compound_tricked = False
+        else:
+            item.compound_required = 'IT_NONE'
+
+    def _hatch_fix_behavior(self, item):
+        """Item.HatchFixBehavior (Item.cs:2550-2579): the first fix turns
+        the hatch into its dexterity round, the second writes it off"""
+        if item.name != 'Hatch':
+            return
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        if not item.dexterity:
+            item.idle = 'N2TrickItemPrimedNormal'
+            item.idle_tricked = 'N2TrickItemPrimedNormal'
+            if item.use_anim.get('Rottweiler'):
+                item.use_anim['Rottweiler'][0] = 'HatchLook'
+            if rt is not None and rt.action is not None:
+                rt.action['hide_object'] = True
+            item.animation = 'TakeOneFrameNFH2Down'
+            item.already_tricked = False
+            item.dexterity = True
+            item.dexterity_trick_item = True
+            item.use_once = False
+            item.use_tricked_anim['Rottweiler'] = \
+                list(item.rott_use_second_tricked)
+        else:
+            item.use_once = True
+            item.idle = 'N2TrickItemIdleFuckedup'
+            if rt is not None and len(rt.actions) > 4:
+                del rt.actions[4]
+                rt.index = max(0, rt.index - 1)
+
+    def _stop_olga_infinite_loop(self, item):
+        """Item.StopOlgaInfiniteLoop (Item.cs:2581-2604): the tricked
+        bouquet rewires Olga's shower rage and the toilet delay"""
+        if item.name != 'Bouquet' or not item.tricked:
+            return
+        olga = self.pawns.get('Olga')
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        ort = next((r for r in self.routines if r.role == 'Olga'), None)
+        if olga is not None:
+            olga.anim.anim.infinite = False
+            if olga.hit_pawn_action.get('sequence') is not None:
+                olga.hit_pawn_action['sequence'] = \
+                    ['OlgaShipShowerAngry', 'HitPawn']
+            olga.delay_toilet_211 = 4.8
+        if ort is not None and ort.actions:
+            first = self.level.items.get(ort.actions[0]['item']) \
+                if ort.actions[0]['item'] else None
+            if first is not None:
+                first.use_anim['Rottweiler'] = ['LookAround', 'BucketLook']
+            ort.index = 0
+            ort.selected_index = 0
+        if rt is not None and len(rt.actions) > 1:
+            del rt.actions[1]
+            rt.index = max(0, rt.index - 1)
 
     def _bbq_dirty(self, item):
         """TrickItem.BbqDirty (TrickItem.cs:472-480), invoked 0.3 s after Fix"""
@@ -3244,6 +3974,95 @@ class World:
             for fsm in self.alerters.values():
                 fsm.wake_up()
 
+    def _kart_behavior(self, item):
+        """Item.KartBehavior (Item.cs:2638-2644)"""
+        olga = self.pawns.get('Olga')
+        if item.name == 'PullKart' and item.tricked and olga is not None \
+                and olga.anim.has('RickshawWaitManip'):
+            olga.anim.play_single('RickshawWaitManip')
+
+    def _fix_kart_behavior(self, item):
+        """Item.FixKartBehavior (Item.cs:2646-2652)"""
+        olga = self.pawns.get('Olga')
+        if item.name == 'PullKart' and item.tricked and olga is not None \
+                and olga.anim.has('RickshawWait'):
+            olga.anim.play_single('RickshawWait')
+
+    def _captain_door_behavior(self, item):
+        """Item.CaptainDoorBehavior (Item.cs:2606-2623): the tricked door
+        activates its two replacements and retargets every CaptainDoor
+        action at ExtraItem"""
+        if item.name != 'CaptainDoor' or not item.tricked:
+            return
+        item.clickable = False
+        for pid in (item.captain_door_1, item.captain_door_2):
+            d = self.level.door_by_pid(pid) if pid else None
+            if d is not None and d.sprite is not None:
+                d.sprite.hidden = False
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        if rt is not None and item.extra_item:
+            for a in rt.actions:
+                a_it = self.level.items.get(a['item']) if a['item'] else None
+                if a_it is not None and a_it.name == 'CaptainDoor':
+                    a['item'] = item.extra_item
+
+    def _throne_behavior_212(self, item):
+        """Item.ThroneBehavior212 (Item.cs:2450-2469): the two thrones
+        alternate their colliders and play the linked-tricked pose"""
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        if not (item.name in ('AztecThrone', 'AztecThrone2')
+                and (self.level.objs.get(str(item.pid), {}).get('data', {})
+                     .get('Throne212Behavior'))):
+            return
+        item.use_once = True
+        if linked is not None:
+            linked.use_once = True
+            linked.clickable = True
+        item.clickable = False
+        if linked is not None and item.tricked and linked.tricked:
+            if item.name == 'AztecThrone':
+                self.play_item_anim(item, item.idle_linked_tricked)
+            else:
+                self.play_item_anim(linked, linked.idle_linked_tricked)
+
+    def _fix_throne_behavior(self, item):
+        """Item.FixThroneBehavior (Item.cs:2471-2492)"""
+        if item.name not in ('AztecThrone', 'AztecThrone2'):
+            return
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        item.clickable = True
+        item.use_once = False
+        if linked is not None:
+            linked.clickable = False
+            linked.use_once = False
+        if linked is not None and linked.tricked:
+            item.idle = 'N2TrickItemExtra1'
+            self.play_item_anim(item, item.idle)
+        else:
+            act = self.level.items.get(item.activate_item_trick) \
+                if item.activate_item_trick else None
+            if act is not None:
+                act.tricked = False
+                self.play_item_anim(act, act.idle)
+
+    def _plant_carnivore_behavior(self, item):
+        """Item.PlantCarnivoreBehavior (Item.cs:2541-2548)"""
+        if item.name == 'PlantCarnivore':
+            item.compound_required = 'IT2_Piranha'
+
+    def _fifi_bone_behavior(self, item):
+        """Item.FifiBoneBehavior (Item.cs:2762-2768): the held bone at the
+        unprimed basket plays the beg pose"""
+        used = self.inventory.used
+        if item.name == 'DogBasket' and used is not None \
+                and used.get('item') is not None \
+                and used.get('type') == 'IT2_Bone' and not item.primed:
+            p = self.players.get(id(item.sprite)) if item.sprite else None
+            if p is not None and p.has('N2TrickItemExtra2'):
+                p.play_directly('N2TrickItemExtra2')
+
     def rott_hear_alerter(self, fsm, triggered_by_woody):
         """the CoRoutineRottweilerHearAlerter target"""
         rott = self.pawns.get('Rottweiler')
@@ -3397,12 +4216,21 @@ class World:
         """Item.CanWoodyUse, the always-live gates (Item.cs:1671-1704), plus
         TrickItem.CanWoodyUse's compound branch (TrickItem.cs:507-543)."""
         inv = self.inventory
-        # SecondRequiredInventory acts as an accepted alternative (Item.cs:1736)
+        # DoubleRequiredItemsBehavior (Item.cs:1734-1758): holding the second
+        # required inventory swaps the whole tricked identity — the required
+        # type, the tricked use set, the tricked idle and the paid flag
         required = item.required_inventory
         if item.second_required and item.second_required != 'IT_NONE' and \
                 inv.used is not None and inv.used['type'] == item.second_required:
             item.second_required, required = required, item.second_required
             item.required_inventory = required
+            item.use_tricked_anim['Rottweiler'], item.rott_use_second_tricked = \
+                item.rott_use_second_tricked, \
+                item.use_tricked_anim.get('Rottweiler') or []
+            item.idle_tricked, item.second_idle_tricked = \
+                item.second_idle_tricked, item.idle_tricked
+            item.already_tricked, item.second_already_tricked = \
+                item.second_already_tricked, item.already_tricked
         if item.compound and inv.used is not None and \
                 inv.used['type'] == item.compound_required and \
                 (item.name != 'Rake' or item.tricked):
@@ -3467,6 +4295,10 @@ class World:
             return True
         held_src = self.level.items.get(inv.used.get('item')) \
             if inv.used is not None and inv.used.get('item') else None
+        # a hidden drawing takes no clicks (Drawing.CanWoodyUse, cs:81-88)
+        if item.kind == 'Drawing' and item.sprite is not None \
+                and item.sprite.hidden:
+            return False
         # a slept-in bed refuses Woody outright (TrickItem.CanWoodyUse,
         # TrickItem.cs:537-541)
         if item.kind in TRICK_KINDS and item.is_bed \
@@ -3709,6 +4541,30 @@ class World:
                 if item.set_tricked_on_item else None
             if tgt is not None:
                 tgt.tricked = True
+        # the UseItem head name-hacks (Item.cs:1879-1914)
+        if item.name == 'Dove':
+            item.clickable = False
+            drawing = self.level.items.get(
+                (self.level.objs.get(str(item.pid), {}).get('data', {})
+                 .get('Drawing') or {}).get('path'))
+            if drawing is not None and drawing.use_anim.get('Rottweiler'):
+                da = drawing.use_anim['Rottweiler']
+                da[1 if len(da) > 1 else 0] = 'BalconyDrawingWithoutBird'
+        if item.name == 'CowCrap':
+            cow = self.level.items.get(item.cow_flowers) if False else \
+                self.level.items.get(
+                    (self.level.objs.get(str(item.pid), {}).get('data', {})
+                     .get('CrapBehaviorCow') or {}).get('path'))
+            if cow is not None:
+                p = self.players.get(id(cow.sprite)) if cow.sprite else None
+                name = cow.idle_tricked if cow.tricked else cow.idle
+                if p is not None and name and p.has(name):
+                    p.play_looping(name)
+            item.clickable = False
+        if item.name == 'Rabbit':
+            self.set_active(item, False)   # Item.cs:1911-1914
+        if item.name == 'RubyThrone':
+            self.set_active(item, False)   # InternalUse, Item.cs:1939-1942
         # Item.InternalUse's own hide/show flags (Item.cs:1919-1938)
         if item.hide_after_use:
             self.set_object_hidden(item, True)
@@ -3730,8 +4586,18 @@ class World:
         # Woody laughs (Woody.OnSingleAnimationEnded, Woody.cs:418)
         if not item.dont_laugh and self.woody.anim.has('TrickLaugh'):
             self.woody.anim.play_single('TrickLaugh')
-        # the use tail also runs the item's PhoneBehavior (Woody.cs:428)
+        # the BeerMat prime-pose swap (Woody.cs:421-424)
+        if item.name == 'BeerMat' and item.rott_prime_anim:
+            item.rott_prime_anim[0] = 'BeachPinLayDown'
+        # the use tail's name-hack run (Woody.cs:426-431)
+        self._kart_behavior(item)
+        self._captain_door_behavior(item)
         self._phone_behavior(item)
+        self._throne_behavior_212(item)
+        self._plant_carnivore_behavior(item)
+        self._fifi_bone_behavior(item)
+        if item.use_item_multiple_times:      # Woody.cs:432-435
+            item.use_once = True
 
     def _get_tricked(self, item, tricked):
         """Item.GetTricked (Item.cs:1957)"""
@@ -4116,10 +4982,19 @@ class World:
         for b in self.behavior_objs:
             if b.enabled:
                 b.update(dt)
+        for pb in self.progress_bars:
+            pb.tick(dt)
         # SearchItem.Update's animation switcher (SearchItem.cs:214-244)
+        # and TrickItem.Update's UseMultipleTimes sync (TrickItem.cs:226-241)
         for it in self.level.items.values():
             if it.kind == 'SearchItem' and it.sprite is not None:
                 self._search_switch(it)
+            if it.use_multiple_times:
+                linked = self.level.items.get(it.linked_item_trick) \
+                    if it.linked_item_trick else None
+                if linked is not None:
+                    linked.use_once = linked.tricked
+                it.use_once = it.tricked
         # the Kid pawn's flag machine (Kid.cs:25-51)
         kid = self.pawns.get('Kid')
         if kid is not None:
