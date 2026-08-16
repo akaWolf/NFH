@@ -188,6 +188,15 @@ class SceneData:
                 if go is not None:
                     self.resolved[(typ, go)] = e
         self.active = {}                  # go -> GameObject.active
+        # the port's Entry-scene switch (runtime/README.md): when set,
+        # SetObjectActive(obj, True) re-applies each direct child's
+        # AUTHORED activeSelf instead of forcing True — the original
+        # forces True (Control.cs:406-424), which the in-game menu needs
+        # (its whole widget set ships inactive), but in the Entry options
+        # it resurrects the two authored-off desktop buttons (Back, Lang)
+        # and paints BACK across RESET SAVED GAME DATA
+        self.restore_authored = False
+        self.authored_active = {}
         self.parent = {}
         self.children = {}
         self.name = {}
@@ -196,6 +205,7 @@ class SceneData:
             if o['type'] == 'GameObject':
                 g = int(pid)
                 self.active[g] = bool(o['data'].get('active', True))
+                self.authored_active[g] = self.active[g]
                 self.name[g] = o['data'].get('name')
         for pid, o in self.objs.items():
             dd = o.get('data') or {}
@@ -248,13 +258,18 @@ class SceneData:
         return True
 
     def set_active(self, go, active):
-        """Control.SetObjectActive (Control.cs:305-322): the object and its
-        direct children"""
+        """Control.SetObjectActive (Control.cs:406-424): the object and its
+        direct children — forced to `active`, except under the Entry
+        scene's restore_authored switch (see __init__), where enabling
+        re-applies each child's authored activeSelf"""
         if go is None:
             return
         self.active[go] = bool(active)
         for c in self.children.get(go, ()):
-            self.active[c] = bool(active)
+            if active and self.restore_authored:
+                self.active[c] = self.authored_active.get(c, True)
+            else:
+                self.active[c] = bool(active)
 
     def set_active_self(self, go, active):
         """GameObject.SetActive on the object alone"""

@@ -364,28 +364,49 @@ def main():
     check('exit door: YES walks through and ends the level',
           app.viewer.world.game.ending)
 
-    # -- the language reload -------------------------------------------------
+    # -- the authored-off desktop buttons stay hidden (the port's
+    # Entry-scene restore_authored switch) ---------------------------------
     app = fresh_app()
     m = app.menu
     if m.intro is not None and m.intro.enabled:
         app.tick(DT, events=(False, True, False, False))
     click(app, widget(m, 'MenuButtonOptions'))
-    click(app, widget(m, 'MenuButtonLang'))
-    check('lang: the flags window opens', windows(m) == ['MenuLangOptions'])
-    click(app, widget(m, 'MenuButtonLangRU'))
-    check('lang: a flag returns to the options',
-          windows(m) == ['MenuOptions'] and m.selected_lang == 8)
-    check('lang: nothing is written yet',
-          app.prefs.get_int('Language', 0) == 0)
+    step(app)
+    check('options: the authored-off Back/Lang stay hidden',
+          widget(m, 'MenuButtonBack') is None
+          and widget(m, 'MenuButtonLang') is None
+          and widget(m, 'MenuButtonOk') is not None
+          and widget(m, 'MenuButtonReset') is not None)
     click(app, widget(m, 'MenuButtonOk'))
+
+    # -- the language reload (the mobile path: the flag combo box) ---------
+    combo = m.combo
+    check('lang: the combo box binds', combo is not None)
+    sx, sy, num = combo._layout()
+    cw, ch = combo._flag_size(combo.selected[combo.current])
+    app._mouse = (num * 0.9 * sx + cw * sx / 2, ch * sy / 2)
+    app.tick(DT, events=(False, True, False, False))
+    app.draw_menu(DT)
+    check('lang: the head flag drops the list', combo.dropped)
+    for _ in range(30):                   # the 20-frame slide-in
+        app.tick(DT, events=(False, False, False, False))
+        app.draw_menu(DT)
+        if combo.counter >= 10.0:
+            break
+    idx = combo.types.index('NEW_LANG_RU')
+    fw, fh = combo._flag_size(combo.unselected[idx])
+    y = (fh * (idx + 1) + idx + 0.5) * (combo.counter / 10.0)
+    app._mouse = (num * 0.9 * sx + fw * sx / 2, y * sy + fh * sy / 2)
+    app.tick(DT, events=(False, True, False, False))
+    app.draw_menu(DT)
+    check('lang: the RU flag reloads Entry with the pref written',
+          m.reload_requested and app.prefs.get_int('Language', -1) == 8)
     step(app, 2)
     m = app.menu
-    check('lang: OK writes the pref and reloads Entry',
-          app.prefs.get_int('Language', -1) == 8
-          and m.settings.language == 8
-          and m.strings != {} and m is not app.menu or m is app.menu)
-    check('lang: the strings switch season files',
-          m.loc('L3T') != '' and m.strings.get('L3T') is not None)
+    check('lang: the reloaded Entry speaks the language',
+          m.settings.language == 8 and m.loc('L3T') != ''
+          and m.combo is not None and m.combo.current ==
+          m.combo.types.index('NEW_LANG_RU'))
 
     print()
     print('ALL OK' if _ok else 'FAILURES')

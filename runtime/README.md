@@ -1844,6 +1844,16 @@ Port decisions, each documented in place:
   Android decompile has no SettingKey for it): a synthesized
   `ControlToggle` in both options windows, the `Fullscreen` pref,
   SDL fullscreen-desktop over the 800×600 logical size.
+- **The Entry options honour the authored child flags.**
+  `Control.SetObjectActive` force-activates every direct child
+  (Control.cs:406-424) — the in-game menu depends on that (its whole
+  widget set ships inactive and only Enable turns it on) — but in the
+  Entry options it also resurrects the two desktop buttons the authors
+  serialized OFF (`MenuButtonBack`, `MenuButtonLang`), painting BACK
+  across RESET SAVED GAME DATA. The port's Entry scene alone re-applies
+  each child's authored activeSelf on enable
+  (`SceneData.restore_authored`); the language stays reachable through
+  the main menu's flag combo — the mobile path.
 - **The sliders' fill is clamped to the track.** `ControlSlider.LoadValue`
   reads the raw default 10 into a [0,1]-ranged control
   (ControlSlider.cs:47-70: `CalculatedScreenRect.width *= FloatValue`,

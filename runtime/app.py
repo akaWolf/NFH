@@ -441,6 +441,9 @@ class App:
         self.menu = Menu(path, WIDTH, HEIGHT, self.prefs,
                          sounds=self.banks['s1'],
                          texture_size=self.texture_size, app=self)
+        # the Entry scene honours the authored child flags (Back/Lang in
+        # the options ship inactive; see SceneData.restore_authored)
+        self.menu.scene.restore_authored = True
         # the fullscreen toggle rides the options window (port decision);
         # the label style borrows the trick-camera row's
         opt = next((go for go, e in self.menu.scene.find('ControlWindow')
