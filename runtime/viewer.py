@@ -78,6 +78,17 @@ class Viewer:
             # Woody.PlayTrickDone -> the HUD celebration
             self.world.game.on_trick_done = self.hud.play_trick_done
             self.hud.cam = self.cam       # the world-anchored progress bars
+        # the dexterity minigame anchors its GUI at the component's screen
+        # position (DexterityComponent.StartDexterity, cs:150-169)
+        self.world.screen_size = (WIDTH, HEIGHT)
+        self.world.screen_point = lambda x, y: self.cam.world_to_screen(
+            x, y, WIDTH, HEIGHT)
+        def _snap():
+            if self.woody is not None:
+                self.cam.x = self.woody.sprite.x
+                self.cam.y = self.woody.sprite.y + 0.6
+                self._clamp_camera()
+        self.world.snap_camera = _snap
         print('%s — %d sprites, %d zones, %d items, %d routines (%d actions)'
               % (self.level.name, len(self.level.sprites), len(self.level.zones),
                  len(self.level.items), len(self.world.routines),
@@ -210,7 +221,17 @@ class Viewer:
                         idx = (k - sdl2.SDLK_1) if k != sdl2.SDLK_0 else -1
                         self.world.inventory.select(idx)
                         self._print_state()
+                if ev.type == sdl2.SDL_MOUSEMOTION and \
+                        self.world.is_dexterity_on:
+                    # the touch delta drives the pick (DexterityComponent
+                    # FixedUpdate, cs:227); the mouse plays the touch role
+                    for ds in self.world.dex_states.values():
+                        if ds.enabled:
+                            ds.input = (ds.input[0] + ev.motion.xrel * 25.0,
+                                        ds.input[1] - ev.motion.yrel * 25.0)
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
+                    if self.world.is_dexterity_on:
+                        continue          # GameInfo.IsDexterityOn (Pawn.cs:351)
                     if self.woody.input_locked:
                         continue          # Woody.InputLocked (the entrance)
                     # Woody.Update: HUD.CheckClick() eats the click first
@@ -245,7 +266,11 @@ class Viewer:
                 self.t += dt
             if not self.paused:
                 self.world.tick(min(dt, 0.1))
-                if self.follow and self.woody:
+                if self.world.is_dexterity_on and self.woody:
+                    # GameCamera.Freeze + SnapToWoodyImmediate (cs:149, 171)
+                    self.cam.x = self.woody.sprite.x
+                    self.cam.y = self.woody.sprite.y + 0.6
+                elif self.follow and self.woody:
                     self.cam.x = self.woody.sprite.x
                     self.cam.y = self.woody.sprite.y + 0.6
             self._clamp_camera()

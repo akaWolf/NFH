@@ -333,6 +333,11 @@ class Pawn:
         self.is_sleeping = spec.get('is_sleeping') or False
         self.hud_blind = False           # ProgressBar.PlayPawnBlindAnimation
         self.hud_disable_think = False   # HUD.Disable*ThinkBubble
+        # the dexterity minigame's Woody flags (Woody.cs:158-178)
+        self.in_dexterity = False        # Woody.InDexterity
+        self.dexterity_done = False      # Woody.DexterityDone
+        self.mouse_click_after_dexterity = False
+        self.frozen = False              # Woody.Frozen
         self.ignore_woody = spec.get('ignore_woody') or False
         self.fear_left = spec.get('fear_left') or 'FearLeft'
         self.fear_right = spec.get('fear_right') or 'FearRight'
@@ -355,6 +360,7 @@ class Pawn:
         self.on_arrive = None
         self._step = None
         self._step_sign = None
+        self._step_sign_y = None
         self._exit_door = None
         self.world = None                # set by World, for zone reactions
         self.anim.stand_hook = self._stand_name
@@ -716,6 +722,7 @@ class Pawn:
         self._helpers()['first_step_index'] = self._move_index
         self._step = self.steps.pop(0)
         self._step_sign = None
+        self._step_sign_y = None
         self.state = self.WALK
 
     def _step_target(self):
@@ -998,14 +1005,25 @@ class Pawn:
             mag = (dx * dx + dy * dy) ** 0.5
             # HasPassedTarget: WalkOnPath also stops when the pawn has crossed
             # the target x — a step can be bigger than UseDistance, and without
-            # this the pawn oscillates around the goal forever
+            # this the pawn oscillates around the goal forever. The original
+            # tracked x only; a fixed 1/60 step makes the same loop possible
+            # on the y axis (arrival window 2*MinDist < one velocity step), so
+            # the same crossing check guards y too.
             sign = (dx > 0) - (dx < 0)
             passed = (self._step_sign is not None and sign != 0
                       and sign != self._step_sign)
             if self._step_sign is None and sign != 0:
                 self._step_sign = sign
+            sign_y = (dy > 0) - (dy < 0)
+            passed_y = (self._step_sign_y is not None and sign_y != 0
+                        and sign_y != self._step_sign_y)
+            if self._step_sign_y is None and sign_y != 0:
+                self._step_sign_y = sign_y
             if passed:
                 self.sprite.x = tx        # MoveToItem snaps onto the target
+            if passed_y:
+                self.sprite.y = ty
+                passed = True
             if mag <= self._min_dist() or passed:
                 s = self._step
                 # MoveToAdjacentZone runs at arrival for the NFH2 pawns
@@ -3289,6 +3307,207 @@ class Routine:
                 self._finish()
 
 
+def _dex_surprise(world, rt, item):
+    """SurpriseActionFar.Item = alerter; CheckHiddenItem;
+    StartSurpriseActionFar (DexterityComponent.cs:416-421). CheckHiddenItem
+    un-hides the routine item a HideObjectDuringUse action tucked away
+    (Rottweiler.cs)."""
+    a = rt.action
+    if a is not None and a.get('hide_object') and rt.item is not None:
+        world.set_active_object_hidden(rt.item, False)
+    rt.start_urgent(item)
+
+
+class DexterityState:
+    """One DexterityComponent (DexterityComponent.cs): the lockpick minigame.
+    A wandering cursor must be held inside the field; the fill drains outside
+    it and losing wakes the Rottweiler onto the item."""
+
+    def __init__(self, world, spec):
+        self.world = world
+        self.spec = spec
+        self.item = world.level.items.get(spec['item'])
+        self.enabled = False             # Behaviour.enabled — armed by CanWoodyUse
+        self.percent = 0.0               # PercentageDone
+        self.first_time = False          # FirstTimeOnly
+        self.fill_speed = 1.0
+        self.rott_in_animation = False   # RottInAnimation
+        self.start_again = False         # StartDexterityAgain
+        self.update_aux = True
+        self.wrong = False               # BackgroundTexture == Wrong
+        self.fg = [0.0, 0.0, 0.0, 0.0]   # ForegroundRect (x, y, w, h) px
+        self.bg = [0.0, 0.0, 0.0, 0.0]
+        self.item_rect = [0.0, 0.0, 0.0, 0.0]
+        self.rand_vec = [0.0, 0.0]       # UpdateMovementRandomVector
+        self.last_rand_time = 0.0
+        self.input = (0.0, 0.0)          # the frame's touch/mouse delta
+
+    def start(self):
+        """StartDexterity (DexterityComponent.cs:137-177)"""
+        import random
+        w = self.world
+        self.enabled = True
+        w.is_dexterity_on = True
+        self.percent = 20.0
+        self.first_time = False
+        self.wrong = False
+        self._rng = random.Random()
+        if w.snap_camera is not None:
+            w.snap_camera()              # SnapToWoodyImmediate (cs:149)
+        W, H = w.screen_size
+        sx, sy = w.screen_point(self.spec['x'], self.spec['y'])
+        fa = self.spec['fg_aux']; ba = self.spec['bg_aux']
+        ia = self.spec['item_aux']
+        fh = H * 80 / 800.0; fw = W * 80 / 1280.0
+        self.fg = [sx - fw / 1.2 + fa.get('x', 0.0),
+                   sy - fh * 2.5 + fa.get('y', 0.0), fw, fh]
+        bh = H * 190 / 800.0; bw = W * 190 / 1280.0
+        self.bg = [sx - bw / 1.5 + ba.get('x', 0.0),
+                   sy - (bh + bh / 3.0) + ba.get('y', 0.0), bw, bh]
+        ih = H * 80 / 800.0; iw = W * 80 / 1280.0
+        self.item_rect = [sx - iw / 1.2 + ia.get('x', 0.0),
+                          sy - ih * 2.5 + ia.get('y', 0.0), iw, ih]
+        if w.woody is not None:
+            w.woody.frozen = True                  # Woody.Freeze
+            w.woody.movement_paused = True
+        if self.spec['hide_object'] and self.item is not None:
+            w.set_object_hidden(self.item, True)
+
+    def tick(self, dt):
+        """FixedUpdate (DexterityComponent.cs:183-271), the running branch"""
+        if not self.enabled:
+            return
+        w = self.world
+        if self.start_again:
+            self.start_again = False
+            self.start()
+        if self.update_aux and (w.can_mother_see_woody()
+                                or w.can_rottweiler_see_woody()):
+            self.update_aux = False
+            self.cleanup()
+            self.start_again = True
+            return
+        dx, dy = self.input
+        self.input = (0.0, 0.0)
+        rx, ry = self._random_move()
+        if not self.first_time:
+            self.first_time = True
+        elif self._check_margins():
+            self.fg[0] += (dx + rx) * dt
+            self.fg[1] -= (dy + ry) * dt
+            if not self.wrong:
+                self.fill_speed = 1.0
+        W, H = w.screen_size
+        ratio_x = 1280.0 / W
+        ratio_y = 800.0 / H
+        w1 = abs(self.fg[0] + self.fg[2] / 2.0) * ratio_x
+        w2 = abs(self.bg[0] + self.bg[2] / 2.0) * ratio_x
+        h1 = abs(self.fg[1] + self.fg[3] / 2.0) * ratio_y
+        h2 = abs(self.bg[1] + self.bg[3] / 2.0) * ratio_y
+        sway = 25.0 - (abs(w1 - w2) + abs(h1 - h2))
+        sway = max(-25.0, min(25.0, sway))
+        self.percent += sway * self.fill_speed * dt
+        if self.percent >= 85.0:                   # CompletedPercentage
+            self._win()
+        elif self.percent <= 10.0:
+            if self.item is not None and self.item.dexterity_cannot_lose:
+                self.percent = 12.0
+            else:
+                self._lose()
+
+    def _random_move(self):
+        """UpdateRandomMovement (cs:341-359); Dificulty is 2"""
+        w = self.world
+        if w.time - self.last_rand_time > 1.0:
+            self.last_rand_time = w.time
+            self.rand_vec[0] = self._rng.randrange(-20, 20)
+            if self._rng.randrange(-1, 1) < 0:
+                self.rand_vec[0] = -self.rand_vec[0]
+            self.rand_vec[1] = self._rng.randrange(-20, 20)
+            if self._rng.randrange(-1, 1) < 0:
+                self.rand_vec[1] = -self.rand_vec[1]
+        return self.rand_vec[0] * 2.0, self.rand_vec[1] * 2.0
+
+    def _check_margins(self):
+        """CheckMargins (cs:273-339): clamp into the inner window; touching a
+        margin shows the alarm field and boosts the drain"""
+        mx = self.bg[2]; my = self.bg[3]
+        left = mx * 0.2 + self.bg[0]
+        up = my * 0.2 + self.bg[1]
+        right = self.bg[0] + self.bg[2] - mx * 0.6
+        down = self.bg[1] + self.bg[3] - my * 0.6
+        self.wrong = False
+        if self.fg[0] <= left:
+            self.fg[0] = left
+            self.wrong = True
+        elif self.fg[0] > right:
+            self.fg[0] = right
+            self.wrong = True
+        if self.fg[1] <= up:
+            self.fg[1] = up
+            self.wrong = True
+        elif self.fg[1] > down:
+            self.fg[1] = down
+            self.wrong = True
+        if self.wrong:
+            self.fill_speed = 1.2
+        return True
+
+    def _win(self):
+        """WinDexterity (cs:369-388)"""
+        w = self.world
+        woody = w.woody
+        if woody is not None:
+            woody.mouse_click_after_dexterity = True
+            woody.dexterity_done = True
+        self.cleanup()
+        it = self.item
+        if it is None:
+            return
+        if it.dexterity_run_other and it.sprite is not None:
+            # DexterityOtherAnimation = N2TrickItemUseNormal (cs:376-378)
+            w.play_item_anim(it, it.use_normal)
+        if it.activate_trick_if_search:
+            it.tricked = True
+        if it.dexterity_trick_item or it.take_item_count > 0:
+            self.start_again = True
+
+    def _lose(self):
+        """LoseDexterity (cs:361-367)"""
+        self.cleanup()
+        w = self.world
+        if w.woody is not None and w.woody.anim.has('DexterityFailed'):
+            w.woody.anim.play_single('DexterityFailed')
+        self.start_again = True
+        self.alert()
+
+    def cleanup(self):
+        """CleanUp (cs:390-406)"""
+        w = self.world
+        w.is_dexterity_on = False
+        self.enabled = False
+        self.wrong = False
+        if w.woody is not None:
+            w.woody.frozen = False                 # Woody.UnFreeze
+            w.woody.movement_paused = False
+        it = self.item
+        if it is not None and (it.hide_in_dexterity or self.spec['hide_object']):
+            w.set_object_hidden(it, False)
+
+    def alert(self):
+        """DexterityAlert (cs:414-426): a walking Rottweiler surprises onto
+        the item at once; otherwise the item's Update watcher waits for him"""
+        w = self.world
+        rott = w.pawns.get('Rottweiler')
+        if rott is None or self.item is None:
+            return
+        rt = next((r for r in w.routines if r.pawn is rott), None)
+        if rt is not None and rott.state == rott.WALK:
+            _dex_surprise(w, rt, self.item)
+        else:
+            self.rott_in_animation = True
+
+
 class ProgressBarState:
     """One ProgressBar component (ProgressBar.cs): the sleep bar that fills
     while its item's use sequence sits between two element indices, putting
@@ -3451,6 +3670,16 @@ class World:
         # the ProgressBar components (ProgressBar.cs)
         self.progress_bars = [ProgressBarState(self, s)
                               for s in level.progress_bars]
+        # the DexterityComponent minigames (DexterityComponent.cs)
+        self.is_dexterity_on = False     # GameInfo.IsDexterityOn
+        self.screen_size = (800, 600)    # the viewer overrides these two
+        self.screen_point = self._default_screen_point
+        self.snap_camera = None          # CameraMover.SnapToWoodyImmediate
+        self.dex_states = {pid: DexterityState(self, s)
+                           for pid, s in level.dexterity.items()}
+        for ds in self.dex_states.values():
+            if ds.item is not None:
+                ds.item.dexterity_hide_object = ds.spec['hide_object']
         # Item.Start ends in SetPrimed(Primed): the initial primed visibility
         # (Item.cs:697, 1219-1235)
         for it in level.items.values():
@@ -3471,6 +3700,17 @@ class World:
                 if p is not None:
                     p.single_end_hook = \
                         (lambda name, i=it: self._item_anim_completed(i, name))
+
+    def _default_screen_point(self, x, y):
+        """WorldToScreenPoint with the y flip, camera on Woody — the viewer
+        swaps in its real (clamped) camera"""
+        W, H = self.screen_size
+        cx = self.woody.sprite.x if self.woody is not None else 0.0
+        cy = self.woody.sprite.y if self.woody is not None else 0.0
+        aspect = W / float(H)
+        sx = (x - cx) / (3.0 * aspect) * (W * 0.5) + W * 0.5
+        sy = (y - cy) / 3.0 * (H * 0.5) + H * 0.5
+        return sx, H - sy
 
     def activate_progress_bar(self, item, actor):
         """ProgressBarObject.SetActive(true) (Item.cs:831-834, 861-864,
@@ -4601,12 +4841,18 @@ class World:
                 and item.is_rottweiler_sleeping:
             self._woody_cant_use()
             return False
-        # Item.cs:1510: holding anything at a plain (non-TrickItem) item that
-        # needs no priming is a flat no
-        if inv.used is not None and item.kind not in TRICK_KINDS \
-                and not item.require_priming:
-            self._woody_cant_use()
+        # the dexterity minigame gate (Item.cs:1438-1507); the cs:1510 check
+        # is the else of its chain
+        dex = self._dexterity_gate(item, inv)
+        if dex == 'armed':
             return False
+        if dex is None:
+            # Item.cs:1510: holding anything at a plain (non-TrickItem) item
+            # that needs no priming is a flat no
+            if inv.used is not None and item.kind not in TRICK_KINDS \
+                    and not item.require_priming:
+                self._woody_cant_use()
+                return False
         # Item.cs:1520-1535: a neighbour-primed item refuses Woody until the
         # neighbour has primed it
         if item.require_priming and not item.primed and item.rott_toggles_prime:
@@ -4726,6 +4972,59 @@ class World:
                 item.main_valve_open = True
                 self.set_primed(item, False)
         return True
+
+    def _dexterity_gate(self, item, inv):
+        """Item.CanWoodyUse's dexterity chain (Item.cs:1438-1507): the first
+        pass arms the minigame and blocks the use; after DexterityDone the
+        pass falls through as done, unlocking and consuming the unlocker."""
+        woody = self.woody
+        used = inv.used
+        unlocker_held = used is not None \
+            and used['type'] == item.dexterity_unlocker
+        no_req = item.dexterity_unlocker in (None, '', 'IT_NONE')
+        search_branch = (
+            item.dexterity
+            and (unlocker_held or no_req or woody.in_dexterity)
+            and not item.dexterity_trick_item
+            and item.kind == 'SearchItem' and item.inventory_items
+            and (not inv.has(item.inventory_items[0].get('type'))
+                 or item.name == 'WhipStonePlate'))
+        trick_branch = (
+            not search_branch and item.dexterity
+            and (unlocker_held or no_req)
+            and item.dexterity_trick_item and not item.tricked)
+        if not search_branch and not trick_branch:
+            return None
+        if not woody.in_dexterity:
+            self._dex_inv_used = used              # InvUsed
+            woody.in_dexterity = True
+        if not woody.dexterity_done:
+            if search_branch and item.hide_in_dexterity:
+                self.set_object_hidden(item, True)
+            if not item.play_dexterity_seq:
+                if item.dexterity_animation \
+                        and woody.anim.has(item.dexterity_animation):
+                    woody.anim.play_looping(item.dexterity_animation)
+            else:
+                seq = [x for x in item.dexterity_sequence
+                       if woody.anim.has(x)]
+                if seq:
+                    woody.anim.play_sequence(seq)
+            ds = self.dex_states.get(item.dexterity_alert) \
+                if item.dexterity_alert else None
+            if ds is not None:
+                ds.start()
+            return 'armed'
+        woody.in_dexterity = False
+        woody.dexterity_done = False
+        item.locked = False
+        if item.take_item_count == 1:
+            item.dexterity = False
+        if not no_req and not item.dexterity_keep_item \
+                and not item.dexterity_keep_use_item \
+                and getattr(self, '_dex_inv_used', None) is not None:
+            inv.remove(self._dex_inv_used['type'])
+        return 'done'
 
     def _woody_single_ended(self, name):
         """Woody.OnSingleAnimationEnded's ItemToShowAfterAnim restore
@@ -5282,6 +5581,22 @@ class World:
                 b.update(dt)
         for pb in self.progress_bars:
             pb.tick(dt)
+        for ds in self.dex_states.values():
+            ds.tick(dt)
+        # SearchItem/TrickItem.Update's deferred dexterity alert
+        # (SearchItem.cs:245-251, TrickItem.cs:243-249)
+        rott = self.pawns.get('Rottweiler')
+        if rott is not None and rott.state == rott.WALK:
+            for it in self.level.items.values():
+                if it.dexterity_alert is None:
+                    continue
+                ds = self.dex_states.get(it.dexterity_alert)
+                if ds is not None and ds.rott_in_animation:
+                    ds.rott_in_animation = False
+                    rt = next((r for r in self.routines if r.pawn is rott),
+                              None)
+                    if rt is not None and ds.item is not None:
+                        _dex_surprise(self, rt, ds.item)
         # SearchItem.Update's animation switcher (SearchItem.cs:214-244)
         # and TrickItem.Update's UseMultipleTimes sync (TrickItem.cs:226-241)
         for it in self.level.items.values():

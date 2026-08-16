@@ -242,7 +242,8 @@ class Item:
                  'dexterity_keep_item', 'dexterity_keep_use_item',
                  'take_item_count', 'hide_in_dexterity',
                  'dexterity_run_other', 'activate_trick_if_search',
-                 'dexterity_hide_object', 'rabbit_206', 'extra_item_aux',
+                 'dexterity_hide_object', 'dexterity_alert',
+                 'rabbit_206', 'extra_item_aux',
                  'activate_item_after_using', 'delay_activate_after_using',
                  'captain_door_1', 'captain_door_2', 'extra_item',
                  'change_tooltip_when_tricked', 'name_string',
@@ -625,6 +626,7 @@ class Item:
         self.dexterity_run_other = bool(d.get('DexterityRunOtherAnimationWhenFinished'))
         self.activate_trick_if_search = bool(d.get('ActivateTrickItemIfSearchItem'))
         self.dexterity_hide_object = False  # DexterityComponent.HideObjectDuringDexterity
+        self.dexterity_alert = ref('DexterityAlert')
         # the remaining name-hack targets
         self.rabbit_206 = ref('Rabbit206')
         self.extra_item_aux = ref('ExtraItemAux')
@@ -839,6 +841,7 @@ class Level:
         self.game_info = {}         # GameInfo serialized fields
         self.behaviors = []         # serialized *Behavior components
         self.progress_bars = []     # ProgressBar components
+        self.dexterity = {}         # DexterityComponent pid -> spec
         self._zone_comp = {}        # Zone component pid -> Zone
         self._build()
 
@@ -920,6 +923,35 @@ class Level:
                 if isinstance(v, dict) and v.get('texture'):
                     spec[k_dst] = v['texture']
 
+    def _add_dexterity(self, pid, o):
+        """DexterityComponent's serialized fields (DexterityComponent.cs);
+        the exporter's resolved copy carries the texture names"""
+        d = o['data']
+        go = self._go_of(o)
+        tr = self._transform(go)
+        pos = self._pos(tr) if tr else [0.0, 0.0, 0.0]
+        spec = {'pid': pid, 'go': go,
+                'item': (d.get('alerter') or {}).get('path'),
+                'hide_object': bool(d.get('HideObjectDuringDexterity')),
+                'fg_aux': d.get('ForegroundRectAux') or {},
+                'bg_aux': d.get('BackgroundRectAux') or {},
+                'item_aux': d.get('BackgroundTextureItemRectAux') or {},
+                'fg': None, 'bg': None, 'bg_wrong': None,
+                'bg_item': None, 'full': None,
+                'x': pos[0], 'y': pos[1]}
+        for e in (self._hud_raw.get('DexterityComponent') or []):
+            if (e.get('m_GameObject') or {}).get('path') != go:
+                continue
+            for k_src, k_dst in (('ForegroundTexture', 'fg'),
+                                 ('BackgroundTexture', 'bg'),
+                                 ('BackgroundTextureWrong', 'bg_wrong'),
+                                 ('BackgroundTextureItem', 'bg_item'),
+                                 ('FieldAlarmFull', 'full')):
+                v = e.get(k_src)
+                if isinstance(v, dict) and v.get('texture'):
+                    spec[k_dst] = v['texture']
+        self.dexterity[pid] = spec
+
     # -- build -----------------------------------------------------------
     def _build(self):
         for pid, o in self.objs.items():
@@ -941,6 +973,8 @@ class Level:
                                        'active': self._active(go)})
             elif t == 'ProgressBar' and 'data' in o:
                 self._add_progress_bar(int(pid), o)
+            elif t == 'DexterityComponent' and 'data' in o:
+                self._add_dexterity(int(pid), o)
         self.sprites.sort(key=lambda s: -s.depth)      # far (high) first
         self._find_background()
         self._build_graph()

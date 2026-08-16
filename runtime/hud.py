@@ -353,6 +353,7 @@ class Hud:
         self.mouse = mouse
         w = self.world
         g = w.game
+        self._draw_dexterity()
         self._draw_base()
         self._draw_inventory(dt)
         if self.tooltip:
@@ -619,6 +620,33 @@ class Hud:
             src = sdl2.SDL_Rect(0, 0, entry[1], max(1, int(th * (1.0 - p))))
             self._blit(pb.hud_tex, (r[0], r[1], r[2], hh), src=src)
             return
+
+    def _draw_dexterity(self):
+        """DexterityComponent.OnGUI (DexterityComponent.cs:428-454): the
+        field (rotated 180 with the alarm fill clipped to the percentage),
+        the item ghost and the pick cursor"""
+        for ds in getattr(self.world, 'dex_states', {}).values():
+            if not ds.enabled:
+                continue
+            bg = ds.spec['bg_wrong'] if ds.wrong else ds.spec['bg']
+            self._blit(bg, tuple(ds.bg))
+            # RotateAroundPivot(180) + a group of height p: the group clips
+            # the texture's top p, and the rotation lands it — upside down —
+            # on the BOTTOM of the field
+            p = min(1.0, max(0.0, ds.percent / 100.0))
+            fill_h = ds.bg[3] * p
+            entry = self._tex(ds.spec['full'])
+            if entry is not None and fill_h > 0:
+                import sdl2 as _sdl
+                th = entry[2]
+                srcr = _sdl.SDL_Rect(0, 0, entry[1], max(1, int(th * p)))
+                dstr = _sdl.SDL_Rect(int(ds.bg[0]),
+                                     int(ds.bg[1] + ds.bg[3] - fill_h),
+                                     int(ds.bg[2]), max(1, int(fill_h)))
+                _sdl.SDL_RenderCopyEx(self.rnd, entry[0], srcr, dstr,
+                                      180.0, None, _sdl.SDL_FLIP_NONE)
+            self._blit(ds.spec['bg_item'], tuple(ds.item_rect))
+            self._blit(ds.spec['fg'], tuple(ds.fg))
 
     def _draw_progress_bars(self):
         """ProgressBar.OnGUI (ProgressBar.cs:247-272): the world-anchored
