@@ -472,6 +472,17 @@ def _extract_texture_names():
 _RESOURCE_CONTAINER = None
 
 
+def reset_season_caches():
+    """every module cache binds to one season's files (paths.set_data) —
+    drop them all before exporting another season in the same process
+    (the bundle's first run chains s1 then s2)"""
+    global _EXTRACT_NAMES, _EXTRACT_AUDIO_NAMES, _RESOURCE_CONTAINER
+    SCENE_NAMES.clear()
+    _EXTRACT_NAMES = None
+    _EXTRACT_AUDIO_NAMES = None
+    _RESOURCE_CONTAINER = None
+
+
 def _resource_container():
     """Resources.Load's index: the ResourceManager container in
     globalgamemanagers (class 147, path -> PPtr; tools/extract_gui.py walks

@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import sdl2
 
-from base import asset_root, data_root
+from base import asset_root, data_root, levels_root
 from gui import Gfx, Text, adjust_rect, font_size
 from menu import (Menu, SceneData, ControlToggle, level_index,
                   load_strings)
@@ -39,7 +39,8 @@ from audio_out import SoundBank, audio_dirs
 from viewer import Viewer, WIDTH, HEIGHT
 
 ROOT = asset_root()                       # textures/, audio/, strings/, fonts/
-LEVELS = data_root()                      # levels/*.json ship with the port
+LEVELS = levels_root()                    # levels/*.json: the repo's, or the
+                                          # bundle's first-run exports
 
 
 def scene_path(name, season):
@@ -804,7 +805,10 @@ def have_assets():
     if not os.path.isdir(d):
         return False
     pngs = sum(1 for n in os.listdir(d) if n.endswith('.png'))
-    return pngs > 100
+    if pngs <= 100:
+        return False
+    return os.path.exists(os.path.join(levels_root(), 'levels', 's1',
+                                       'Entry.json'))
 
 
 def _message_box(title, text):

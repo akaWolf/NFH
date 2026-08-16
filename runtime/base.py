@@ -32,6 +32,15 @@ def data_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+def levels_root():
+    """levels/<season>/*.json — the repo's own exports in a checkout;
+    a frozen bundle generates them next to the executable on first run
+    (tools/extract_assets.export_levels), so they live with the assets"""
+    if is_frozen():
+        return asset_root()
+    return data_root()
+
+
 def asset_root():
     """textures/, audio/, strings/, fonts/ — next to the executable when
     frozen (NFH_ASSETS overrides), the repo otherwise"""

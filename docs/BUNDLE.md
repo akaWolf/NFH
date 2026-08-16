@@ -13,7 +13,7 @@ Season 2 "On Vacation") rebuilt against the game's own decompiled code.
    from your own copy on the first start.
 2. Start `nfh` (double-click, or from a terminal to watch the one-time
    extraction — it takes a few minutes and produces `textures/`,
-   `audio/`, `strings/`, `fonts/` beside the executable).
+   `audio/`, `strings/`, `fonts/` and `levels/` beside the executable).
 3. Play. Season 1 is required (it carries the menu); without Season 2 its
    episodes stay unplayable.
 

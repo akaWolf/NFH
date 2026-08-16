@@ -42,7 +42,12 @@ jobs:
         env:
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
-        run: ./dist/nfh/nfh --smoke
+        # the bundle ships no levels (the first run exports them from the
+        # user's game data) — the smoke borrows the repo's for the menu boot
+        run: |
+          cp -r levels dist/nfh/levels
+          ./dist/nfh/nfh --smoke
+          rm -rf dist/nfh/levels
 
       - name: Package (linux)
         if: matrix.archive == 'tar'

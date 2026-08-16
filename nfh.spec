@@ -17,8 +17,9 @@ from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
 root = os.path.abspath(SPECPATH)
 
-datas = [(os.path.join(root, 'levels'), 'levels'),
-         (os.path.join(root, 'tools'), 'tools')]
+# levels/*.json are NOT bundled: the first run exports them from the
+# user's game data, next to the executable (tools/extract_assets.py)
+datas = [(os.path.join(root, 'tools'), 'tools')]
 binaries = []
 # numpy is the texture extraction's block decoder (tools/texture.py):
 # without it the first run quietly extracts zero sheets
