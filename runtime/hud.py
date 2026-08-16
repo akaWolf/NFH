@@ -652,7 +652,10 @@ class Hud:
             if k >= len(inv.items):
                 break
             if self._hit(r, mx, my) and inv.used is not inv.items[k]:
-                inv.used = inv.items[k]          # SetCurrentInventory
+                # the held item's OnIconPressed gates the selection — the
+                # phone icons raise the alarm instead (HUD.cs:944)
+                if w.icon_pressed(inv.items[k]):
+                    inv.used = inv.items[k]      # SetCurrentInventory
                 return True
         if self._hit(self.rect('InventoryPreviousRect'), mx, my) \
                 and self.displayed_begin > 0:

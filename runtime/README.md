@@ -608,9 +608,10 @@ neighbour entering the zone of the tricked item runs `RunToTrickedItem` — a
 startled look (`PauseMovement` + single animation), then the urgent run.
 Verified on Level102's TV: 20 points and `FuckedUp`, since `CanFix` is false.
 
-Level112's dog is an *inactive* GameObject (a level script enables it later) —
-no `Update`, no FSM; the port gates the FSM on the sprite's existence, which
-only active objects get.
+Level112's dog is an *inactive* GameObject and nothing in the level's data
+references it — no `ActivateItemAfterFix`, no behavior, no script. It is dead
+content in this build; the port gates the FSM on the sprite's existence,
+which only active objects get.
 
 ## The HUD
 
@@ -664,6 +665,133 @@ lists. `tools/export_level.py` resolves all of it into a `hud` section
   `HUDProgressBar` depends on the unported `ProgressBar` actions and is
   skipped.
 
+## The level behaviors
+
+`runtime/behaviors.py` ports every `ActorBehavior` / `RoutineBehavior` /
+`SearchBehavior` subclass the scenes actually wire — 47 classes across both
+seasons — plus the hook plumbing they hang from:
+
+- **The hooks** come from the animation controller: `InitializeCurrentAnimation`
+  fires `Owner.BehaviorPlayAnimation(name)` on *every* animation set, and
+  `Refresh` fires `Owner.BehaviorOnAdvanceFrame(CurrentIndex)` right after each
+  frame advance (AnimationControllerBase.cs:112-114, 384; Actor.cs:93-115).
+  `AnimPlayer` exposes both as hook lists. The sequence-ended hook exists only
+  on the Rottweiler (Rottweiler.cs:448, 514-524) and fires when a *real*
+  `PlayAnimationSequence` drains — the `PlaySingleAnimation`-with-delegate
+  wrappers (door passes, startled looks, fears, Woody's single-shot uses) pass
+  `as_sequence=False` and stay silent. `CanSeeWoody`, `OnCaughtWoody` and
+  `CanCheckSurpriseActionFar` gate detection, the catch and the zone-change
+  alarm check (Rottweiler.cs:209-216, 1218-1239; Mother.cs:103-124), and
+  `Pawn.RoutineBehavior` gets `OnMoveToRoutineAction` / `OnStartRoutineAction`
+  from the two `StartAction` paths (ActionManager.cs:119-124, 165-168).
+- **Wiring is data**: `Actor.Behavior` plus `SecondaryBehaviors` on the pawns,
+  and on five items (the Vacuum, GroundSkates, PoolBoard, Bird perch, Mug) the
+  *same component instance* rides the item's controller too, so both frame
+  streams feed one state machine — the original relies on that.
+  An inactive GameObject's component neither updates nor hooks.
+- **`AnimationGUIDepth` is runtime state**: behaviors reshuffle draw depths
+  constantly (Level201/211/213, SandCastle, ParrotLedge), so the viewer now
+  re-sorts sprites by depth every frame instead of once at load.
+- **The sequence model** grew `SetSequenceOverride` (redirects the next
+  `PlayNextSequenceAnimation` pull; MotherWakeSleepBehavior and the Mother
+  urgent both use it), `OnLastSequenceElementPlaying` (the `AlertNext` phone
+  ring, Rottweiler.cs:256-263), and the two in-sequence name-hacks —
+  ChairAssembly's hide at index 1 and Olga's `TowelSleep` turning itself
+  infinite (AnimationControllerBase.cs:261-275).
+
+Alongside the behaviors this pass ported the triggers they sit on:
+
+- **The walk-nearby slip** (`Rottweiler.UpdateWalking`, cs:833-849 +
+  `RoutineActionSurpriseNear`): a tricked `NoticeWhenWalkNearby` item within
+  `NoticeWhenNearTrickedDistance` interrupts the walk with the facing-matched
+  surprise set; a tricked one goes angry at the stop. This is what starts the
+  Level112 skate ride.
+- **The SameZone yell** (ActionManager.cs:442-481, Rottweiler.cs:485-510): an
+  urgent run to *Dog* or *Chili* in the pawn's own zone starts the action at
+  once, walks him over, yells the `SurpriseSequenceLeft` within 0.05 of the
+  target, and a first element named `Angry` then fires the DirtyCarpet urgent
+  that `OnChangeZone` always skips.
+- **The phone alarm chain** (`Item.OnIconPressed` via HUD.cs:944,
+  `RaiseAlarm`, `Rottweiler.OnAlarmRaised`, `PhoneBehavior`;
+  Item.cs:2176-2209, 2429-2448): clicking the mobile's inventory icon stops
+  Woody, plays `DirectUse`, and `ActionDuration` later the neighbour runs to
+  the alarm item for a full use. `AlarmNextAction` (Level105RoutineBehavior's
+  gate) re-checks the pending alarm when the routine advances
+  (ActionManager.cs:39, Rottweiler.cs:897-901).
+- **`ActionsToAddInGame`** (ActionManager.cs:814-842): the Mother's use of the
+  tricked `ChangeActionsWhenTricked208` Fifi splices the serialized extras
+  into both her and the neighbour's routines (TrickItem.cs:1253-1262).
+- **KidActions and the Kid pawn** (ActionManager.cs:394-419, Kid.cs): the Rake
+  visit starts the kid crying, Olga's mat hands him the remote, the bridge
+  rail brings the submarine back — fired from `StartNextAction` only, which
+  is why the port distinguishes `first`/`advance` (StartNextAction) from
+  `skip`/`start` (bare StartAction) resumes; the urgent-skip resume never runs
+  the extras (ActionManager.cs:608-648).
+- **The walking props** (RoutineActionUse.cs:181-200, Rottweiler.cs:939-1030):
+  `CakeAction` / `GiveFifi` / `GiveSkates` and their removals swap the whole
+  walking set — pie, bowling, Fifi, ski and WC variants, including the portal
+  climbs; Mother and Olga run in urgent moves (Mother.cs:183-234).
+- **The SearchItem state switcher** (SearchItem.cs:214-244): each
+  Tricked x Primed combination plays its Full/Primed/Tricked/Empty animation
+  once — Level206's Fifi-harpoon poses ride on it.
+- **A frozen manager swallows urgents**: `StartUrgentAction` and
+  `StopUrgentAction` both return silently while `Frozen`
+  (ActionManager.cs:604-606, 657-660) — the skate ride depends on the parked
+  resume staying parked until `ScriptUnfreeze`.
+
+### The pattern files: Season 2's frames and sounds lived in TextAssets
+
+`AnimationInstance.SetupPattern` parses `PatternFile` — a TextAsset with the
+frame indices *and* the sound keys — and 3917 Season-2 animations (plus one in
+Season 1) carry their timing there rather than in the serialized
+`Pattern`/`Sounds` fields. The exporter now resolves those files inline
+(`tools/export_level.py`, `parse_pattern_file`), which changed every Season-2
+level JSON: animations that played a raw 1-frame range now run their real
+patterns — the ski slide is 116 frames long — and Season 2 gained its
+frame-keyed sounds. Season 1's re-export is byte-identical. Every frame-index
+check in the Season-2 behaviors (`FifiPutLeft` 12, `MotherPoolLadderLeave` 49,
+`RiceToiletPaper` 100/120/180, the Mug's 25/57, the pistol's 65, the cow's 27)
+was dead before this.
+
+### Divergences this pass caught or documents
+
+- **Pawns never actually hid.** `Pawn.SetHidden` sets `AnimController.Hidden`
+  (Pawn.cs:1464-1467), and the transit code hides the controller for every
+  pawn (Pawn.cs:1615-1635, 1661) — but the port kept a `Pawn.hidden` field the
+  renderer never read. Door passes, `HideOwnerDuringUse` and the mutex parks
+  now hide the sprite itself (`Pawn.set_hidden`; Woody's override still flips
+  `Hiding` instead, Woody.cs:1086-1089).
+- **The Level112 skate ride parks, by the source's own arithmetic.** The
+  comeback run's arrival door sits at x=5.03 with `ExitAnimation Stand_Left`;
+  `BreathLocation.x` is 5.0 and `MinXDelta` 0.3, so the door-exit stand
+  triggers `Breath()` — which the very next `UpdateWalkingAnimation` kills.
+  `Stand_Left` has 6 frames and `BreathEndFrame` is 29, so the Shout never
+  fires and the manager stays frozen; only a caught Woody (`OnCaughtWoody ->
+  End`) unparks him. The port reproduces exactly that. Also
+  `SurpriseSequenceLeft` on the skates is empty — the original throws in
+  `PlayNextSequenceAnimation` and parks the slip when he walks up leftward;
+  the port's empty sequence completes at once instead (the same convention
+  the invisible valves rely on).
+- **Audio-only arms are noted, not faked**: Level105's phone-ring and
+  Level114's gramophone toggles drive looping `AudioSource` objects, outside
+  the port's frame-keyed sound model; their gate flags and counters are kept.
+- **`TrickProgressBarBehavior` keeps state only** — the `ProgressBarTrick`
+  overlay belongs to the unported progress-bar rendering.
+- **`BirdMovementBehavior`'s cadence**: the original schedules one
+  `Invoke(MoveTowards-step, DelayTimeToMove)` per Update; the port keeps a
+  timer queue with one 1/60-s step per firing, which is the same movement at
+  the same delay.
+- **`GameObject.SetActive` is approximated** as sprite visibility plus the
+  click collider (`World.set_active`, and by-name quad toggling for the bare
+  wash-bucket objects).
+- **Dead hooks stay dead**: `ActorBehavior.OnPlayAngryAnimation` has no caller
+  in the build, `Level.LevelBehaviors` is empty in every scene (only the
+  no-op `LevelNFH2TutorialBehavior` subclasses `LevelBehavior`), and
+  `Level212Behavior`'s branches are empty in the shipped code.
+- **`RottweilerUseTrickedLinkedAnimation`** joined `sequence_for` — the
+  linked-pair head of `TrickItem.PlayAnimation` (TrickItem.cs:804-816) — since
+  Level207/210's behaviors rewrite it at runtime.
+
 ## Testing against the original
 
 `runtime/record.py` drives the real `Viewer` deterministically — a fixed
@@ -697,12 +825,16 @@ This loop caught two real bugs the flag-level tests had passed over:
 
 ## Not implemented
 
-From `docs/GAMEPLAY.md` §6–§7: the level scripts (`Level112Script` and kin)
-that enable alerters mid-level and inject `ActionsToAddInGame` (Level208's
-stop-fields live there), the in-game menu and `HUDProgressBar`/`ProgressBar`
-actions, the remaining use side-effect flags
-(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas,
-skates/toilet state), the `DonePassingToOtherZone` detection term — it rides
+From `docs/GAMEPLAY.md` §6–§7: the tutorial layer — `LevelScript` /
+`LevelScriptAction` (the arrows, message boxes and `DirectorAnimation` of the
+three intro scenes and the two NFH2 tutorial levels), the
+`TutorialScriptCamera*` scripts and the `SignalScript*` completion hooks that
+feed them; the in-game menu and `HUDProgressBar`/`ProgressBar` actions (the
+`ProgressBar` sleep bars also gate `IsSleeping`, so a couple of Season-2
+levels sleep less than the original); the remaining use side-effect flags
+(`HideObjectDuringUse` family, `TeleportRottweilerOnUse`, the exit deltas —
+`ParrotLedgeJumpBehavior`'s delta writes land in fields nothing applies yet —
+skates/toilet state); the `DonePassingToOtherZone` detection term — it rides
 the unported NFH2 `GoZone` pathing; `IsMovingToAdjacentZone` is ported as
 the TransitionMove flag, and `PassingComplexMove` is covered by `is_warping`
 since Transition passages route through the same transit code here — and the

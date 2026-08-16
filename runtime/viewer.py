@@ -102,10 +102,11 @@ class Viewer:
 
     def _item_at(self, wx, wy):
         """click hit-test against the items' BoxColliders; a disabled
-        collider (the Pipe hack) takes no clicks"""
+        collider (the Pipe hack) takes no clicks, and CanUse gates the
+        destination the way Pawn.GetMoveDestination does (Pawn.cs:598)"""
         for it in self.level.items.values():
             c = it.collider
-            if c is None or not it.clickable:
+            if c is None or not it.clickable or not it.can_use:
                 continue
             if abs(wx - c[0]) <= c[2] * 0.5 and abs(wy - c[1]) <= c[3] * 0.5:
                 return it
@@ -132,7 +133,10 @@ class Viewer:
         for q in self.level.quads:                   # sorted back-to-front by z
             draw_quad(self.rnd, self.cache, self.cam, q, WIDTH, HEIGHT)
         drawn = 0
-        for s in self.level.sprites:                 # already sorted far-to-near
+        # behaviors reassign AnimationGUIDepth at runtime (Level201, 211, 213,
+        # SandCastle, ParrotLedge...), so the far-to-near order is re-derived
+        # every frame instead of once at load
+        for s in sorted(self.level.sprites, key=lambda s: -s.depth):
             a = s.anims[s.current]
             if draw_sprite(self.rnd, self.cache, self.cam, s, a, self.t,
                            WIDTH, HEIGHT):

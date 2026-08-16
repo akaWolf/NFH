@@ -24,7 +24,8 @@ UNITY_PLANE_SIZE = 10.0
 class Anim:
     __slots__ = ('name', 'sheet', 'cols', 'rows', 'start', 'end', 'fps',
                  'ow', 'oh', 'dx', 'dy', 'loop', 'hold', 'pattern',
-                 'infinite', 'type_looping', 'sounds', 'blocking')
+                 'infinite', 'type_looping', 'sounds', 'blocking',
+                 'src_index')
 
     def __init__(self, d, base_path=''):
         self.name = d.get('Name')
@@ -167,7 +168,22 @@ class Item:
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'anger', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
-                 'use_at_other_place', 'neutral')
+                 'use_at_other_place', 'neutral',
+                 # behaviors and the alarm plumbing
+                 'use_tricked_linked', 'kid_item', 'behavior',
+                 'full_animation', 'primed_animation', 'tricked_animation',
+                 'looping_flag', 'hide_when_not_animating', 'use_anim_type',
+                 'aux1', 'aux2', 'aux3', 'aux4',
+                 'alarm_animation', 'alert_animation',
+                 'enable_collider_when_alerted',
+                 'cause_alarm', 'cause_alarm_when_trick', 'wake_alerter_flag',
+                 'direct_use', 'alarm_item', 'action_duration',
+                 'cause_alarm_interval', 'last_alarm_time', 'can_use',
+                 'mother_second_use', 'mother_extra_use',
+                 'use_tricked_sequence', 'rott_use_exit_delta',
+                 'rott_use_item_exit_delta', 'notice_near', 'cause_slip',
+                 'surprise_delta', 'surprise_left', 'surprise_right',
+                 'change_actions_208')
 
     def __init__(self, name, pid, kind, x, y, zone, dx, dy, d):
         self.name = name; self.pid = pid; self.kind = kind
@@ -341,6 +357,62 @@ class Item:
         self.tricked = bool(d.get('Tricked'))
         self.got_tricked = False
         self.already_tricked = False
+        # the linked-pair use set (TrickItem.PlayAnimation's first branch,
+        # TrickItem.cs:804-816); behaviors on 207/210 rewrite it at runtime
+        self.use_tricked_linked = d.get('RottweilerUseTrickedLinkedAnimation') or []
+        # ActionManager.KidActions reads Actions[last].Item.Kid (cs:415-418)
+        self.kid_item = (d.get('Kid') or {}).get('path')
+        # Actor.Behavior serialized on the item itself (Vacuum, GroundSkates,
+        # PoolBoard, Bird, Mug carry the shared behavior component)
+        self.behavior = (d.get('Behavior') or {}).get('path')
+        # SearchItem's four-state animation switcher (SearchItem.cs:222-244)
+        self.full_animation = _anim_name(d.get('FullAnimation'))
+        self.primed_animation = _anim_name(d.get('PrimedAnimation'))
+        self.tricked_animation = _anim_name(d.get('TrickedAnimation'))
+        self.looping_flag = bool(d.get('Looping'))
+        self.hide_when_not_animating = bool(d.get('HideWhenNotAnimating'))
+        self.use_anim_type = bool(d.get('UseAnimationType'))
+        self.aux1 = self.aux2 = self.aux3 = self.aux4 = True
+        # the alarm plumbing (Item.OnIconPressed / PhoneBehavior /
+        # PlayAlertAnimation; Item.cs:320-332, 2176-2209, 2429-2448)
+        self.alarm_animation = _anim_name(d.get('AlarmAnimation'))
+        self.alert_animation = _anim_name(d.get('AlertAnimation'))
+        self.enable_collider_when_alerted = bool(d.get('EnableColliderWhenAlerted'))
+        self.cause_alarm = bool(d.get('CauseAlarm'))
+        self.cause_alarm_when_trick = bool(d.get('CauseAlarmWhenTrickItem'))
+        self.wake_alerter_flag = bool(d.get('WakeAlerter'))
+        self.direct_use = _anim_name(d.get('DirectUse'))
+        self.alarm_item = (d.get('AlarmItem') or {}).get('path')
+        self.action_duration = d.get('ActionDuration') or 0.0
+        self.cause_alarm_interval = d.get('CauseAlarmInterval') \
+            if d.get('CauseAlarmInterval') is not None else 2.0
+        self.last_alarm_time = None
+        # Item.CanUse gates the click destination (Pawn.GetMoveDestination)
+        self.can_use = d.get('CanUse') if d.get('CanUse') is not None else True
+        # the Mother's alternate use sets (Item.cs:198-204)
+        self.mother_second_use = d.get('MotherSecondUseAnimation') or []
+        self.mother_extra_use = d.get('MotherExtraUseAnimation') or []
+        # the item's own tricked-use sequence (TrickItem.UseTrickedSequence)
+        self.use_tricked_sequence = d.get('UseTrickedSequence') or []
+        # exit deltas the ParrotLedgeJumpBehavior rewrites; their application
+        # is the unported use-flags block (RoutineActionUse.cs:428-457)
+        red = d.get('RottweilerUseExitDelta') or {}
+        self.rott_use_exit_delta = [red.get('x', 0.0), red.get('y', 0.0)]
+        red = d.get('RottweilerUseItemExitDelta') or {}
+        self.rott_use_item_exit_delta = [red.get('x', 0.0), red.get('y', 0.0)]
+        # the walk-nearby notice (TrickItem.Start registers into
+        # Zone.NoticeWhenNearItems; Rottweiler.UpdateWalking consumes it)
+        self.notice_near = bool(d.get('NoticeWhenWalkNearby'))
+        # TrickItem.MotherUse injects ActionsToAddInGame on a tricked use
+        # (TrickItem.cs:1253-1262)
+        self.change_actions_208 = bool(d.get('ChangeActionsWhenTricked208'))
+        self.cause_slip = bool(d.get('CauseSlip'))
+        sd = d.get('SurpriseDeltaLocation') or {}
+        self.surprise_delta = (sd.get('x', 0.0), sd.get('y', 0.0))
+        # the facing-matched surprise sets (RoutineActionSurpriseNear and the
+        # SameZone yell both read them)
+        self.surprise_left = d.get('SurpriseSequenceLeft') or []
+        self.surprise_right = d.get('SurpriseSequenceRight') or []
 
     @property
     def target_x(self):
@@ -356,9 +428,19 @@ class Item:
             return self.target_x + self.delta_mother_x
         return self.target_x
 
-    def sequence_for(self, role, tricked):
+    def sequence_for(self, role, tricked, items=None):
         """Item.PlayAnimation picks one array and plays it. No fallback: an
-        empty array means this character has no business using the item."""
+        empty array means this character has no business using the item.
+        The linked-pair head (TrickItem.cs:804-816) comes first: both halves
+        tricked plays RottweilerUseTrickedLinkedAnimation on the neighbour
+        (Olga and Mother fall back to their tricked sets there)."""
+        if items is not None and self.linked_item_trick is not None \
+                and self.tricked and self.use_tricked_linked:
+            linked = items.get(self.linked_item_trick)
+            if linked is not None and linked.tricked:
+                if role == 'Rottweiler':
+                    return self.use_tricked_linked
+                return self.use_tricked_anim.get(role) or []
         table = self.use_tricked_anim if tricked else self.use_anim
         return table.get(role) or []
 
@@ -388,7 +470,7 @@ class Door:
                  'door_type', 'enter', 'leave', 'rott_enter', 'rott_leave',
                  'exit_anim', 'idle', 'sprite', 'passing', 'should_walk_up',
                  'use_distance', 'item_use_height', 'delta_use_height',
-                 'dx', 'dy')
+                 'dx', 'dy', 'rott_exit')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -410,6 +492,33 @@ class Door:
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
         dl = d.get('DeltaLocation') or {}
         self.dx = dl.get('x', 0.0); self.dy = dl.get('y', 0.0)
+        # RoutineActionMove.SameZone reads the last door's exit offset
+        # (RoutineActionMove.cs:121)
+        rel = d.get('RottweilerExitLocation') or {}
+        self.rott_exit = (rel.get('x', 0.0), rel.get('y', 0.0))
+
+
+# every ActorBehavior / RoutineBehavior / SearchBehavior subclass shipped in
+# the two seasons' scenes, plus the Kid pawn's helper classes; the exporter
+# already wrote their serialized fields
+BEHAVIOR_TYPES = (
+    'Level101Behavior', 'Level105Behavior', 'Level105RoutineBehavior',
+    'Level108Behavior', 'Level109Behavior', 'Level110Behavior',
+    'Level113Behavior', 'Level114Behavior', 'Woody114Behavior',
+    'VacuumBehavior', 'RollerSkaterBehavior', 'TrickProgressBarBehavior',
+    'Level201Behavior', 'Level202Behavior', 'Level204Behavior',
+    'Level204OlgaBehavior', 'Level206Behavior', 'Level206MotherBehavior',
+    'Level206RoutineBehavior', 'Level207MotherBehavior', 'Level208Behaviors',
+    'Level210Behavior', 'Level211Behavior', 'Level211LifeBoatBehavior',
+    'Level212Behavior', 'Level213Behavior', 'Level213OlgaBehavior',
+    'FifiBehavior', 'SandCastleBehavior', 'SkiBehavior',
+    'BirdMovementBehavior', 'BirdPerchBehavior', 'ParrotLedgeBehavior',
+    'ParrotLedgeFallBehavior', 'ParrotLedgeJumpBehavior', 'PoolJumpBehavior',
+    'IndianPlatformBehavior', 'OlgaBraBehavior', 'OlgaSubmarineBehavior',
+    'BraSearchBehavior', 'MugBehavior', 'ToiletBehavior',
+    'MotherSleepBehaviour', 'MotherWakeSleepBehavior',
+    'RottweilerMotherBehaviour', 'WashbucketBehavior',
+)
 
 
 class Level:
@@ -447,6 +556,8 @@ class Level:
         self.items = {}             # component pid -> Item
         self.routines = []          # ActionManager models
         self.game_info = {}         # GameInfo serialized fields
+        self.behaviors = []         # serialized *Behavior components
+        self._zone_comp = {}        # Zone component pid -> Zone
         self._build()
 
     def _level_location_index(self):
@@ -498,7 +609,7 @@ class Level:
         for pid, o in self.objs.items():
             t = o['type']
             if t == 'Zone' and 'data' in o:
-                self._add_zone(o)
+                self._add_zone(int(pid), o)
             elif t in ('Door', 'Transition') and 'data' in o:
                 self._add_door(int(pid), o)
             elif t in ('TrickItem', 'SearchItem', 'HideItem', 'GroundItem',
@@ -506,6 +617,11 @@ class Level:
                 self._add_item(int(pid), o)
             elif t in ('ItemAnimationController', 'PawnAnimationController') and 'data' in o:
                 self._add_sprite(o)
+            elif t in BEHAVIOR_TYPES and 'data' in o:
+                go = self._go_of(o)
+                self.behaviors.append({'type': t, 'pid': int(pid),
+                                       'go': go, 'data': o['data'],
+                                       'active': self._active(go)})
         self.sprites.sort(key=lambda s: -s.depth)      # far (high) first
         self._find_background()
         self._build_graph()
@@ -561,18 +677,24 @@ class Level:
                 it.dx += sign * it.delta_primed_x
                 it.dy += sign * it.delta_primed_y
 
-    def _add_zone(self, o):
+    def _add_zone(self, pid, o):
         go = self._go_of(o)
         tr = self._transform(go)
         box = self._component(go, 'BoxCollider')
         if not tr or not box:
             return
         p = self._pos(tr); s = box['data']['size']; c = box['data']['center']
-        self.zones.append(Zone(self._o(go)['data']['name'], go,
-                               p[0] + c[0], p[1] + c[1], s[0], s[1],
-                               bool(o['data'].get('ExitZone')),
-                               ty=p[1], tx=p[0],
-                               height_delta=o['data'].get('HeightDelta') or 0.0))
+        z = Zone(self._o(go)['data']['name'], go,
+                 p[0] + c[0], p[1] + c[1], s[0], s[1],
+                 bool(o['data'].get('ExitZone')),
+                 ty=p[1], tx=p[0],
+                 height_delta=o['data'].get('HeightDelta') or 0.0)
+        self.zones.append(z)
+        self._zone_comp[pid] = z          # behaviors reference the component
+
+    def zone_by_component(self, pid):
+        """a serialized Zone reference names the component, not the object"""
+        return self._zone_comp.get(pid)
 
     def _zone_of(self, go):
         """the Zone component on this object's parent, as ZoneController does"""
@@ -770,14 +892,13 @@ class Level:
             if o['type'] != 'ActionManager' or 'data' not in o:
                 continue
             d = o['data']
-            acts = []
-            for a in (d.get('Actions') or []):
+            def parse_action(a):
                 ml = a.get('MoveLocation') or {}
                 mz = (a.get('MoveZone') or {}).get('path')
                 pa = bool(a.get('PostponeAlarm'))
                 def ref(field):
                     return (a.get(field) or {}).get('path')
-                acts.append({'item': ref('Item'),
+                return {'item': ref('Item'),
                              'duration': a.get('Duration') or 0.0,
                              'max_distance': a.get('MaximumPawnDistanceToAction') or 0.03,
                              'hide_object': bool(a.get('HideObjectDuringUse')),
@@ -802,13 +923,27 @@ class Level:
                              'prime_after_use_tricked': ref('GameObjectToPrimeAfterUseTricked'),
                              'prime_delay': a.get('PrimeDelay') or 0.0,
                              'prime_tricked_delay': a.get('PrimeTrickedDelay') or 0.0,
-                             'trick_after_use': ref('GameObjectToTrickAfterUse')})
+                             'trick_after_use': ref('GameObjectToTrickAfterUse'),
+                             # walking-prop toggles + the Level105 phone chain
+                             # (RoutineActionUse.cs:43-57, 181-200, 256-263)
+                             'cake': bool(a.get('CakeAction')),
+                             'give_fifi': bool(a.get('GiveFifi')),
+                             'remove_fifi': bool(a.get('RemoveFifi')),
+                             'give_skates': bool(a.get('GiveSkates')),
+                             'remove_skates': bool(a.get('RemoveSkates')),
+                             'alert_next': bool(a.get('AlertNext'))}
+            acts = [parse_action(a) for a in (d.get('Actions') or [])]
+            # ActionManager.ActionsToAddInGame, injected by the tricked
+            # Fifi's Mother use (ActionManager.cs:814-842)
+            to_add = [parse_action(a)
+                      for a in (d.get('ActionsToAddInGame') or [])]
             # Owner names the GameObject, which Season 2 calls "Rottweiler2";
             # the component type is the stable key
             ow = d.get('Owner') or {}
             self.routines.append({'owner': ow.get('type') or ow.get('name'),
                                   'owner_name': ow.get('name'),
                                   'actions': acts,
+                                  'actions_to_add': to_add,
                                   'start_index': d.get('ActionStartIndex') or 0,
                                   'loop_from_start': bool(d.get('LoopFromStartIndex')),
                                   'selected_index': d.get('ActionSelectedIndex') or 0,
@@ -879,6 +1014,10 @@ class Level:
             return
         base = d.get('BaseAnimationPath') or ''
         anims = [Anim(a, base) for a in (d.get('Animations') or [])]
+        # keep the serialized index: Level206MotherBehavior patches
+        # Animations[23]/[33] by position (Level206MotherBehavior.cs:26-28)
+        for i, a in enumerate(anims):
+            a.src_index = i
         anims = [a for a in anims if a.sheet]
         if not anims:
             return
@@ -1004,6 +1143,9 @@ class Level:
                 'portal_up': _anim_name(pd.get('PortalUpAnimation')),
                 'portal_down': _anim_name(pd.get('PortalDownAnimation')),
                 'angry_decay': pd.get('AngryMeterDecay') or 0.0,
+                'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')
+                    if pd.get('NoticeWhenNearTrickedDistance') is not None
+                    else 0.03,
                 'angry_max': pd.get('AngryMeterMaximum') or 100.0,
                 'fear_left': _anim_name(pd.get('FearAnimationLeft')) or 'FearLeft',
                 'fear_right': _anim_name(pd.get('FearAnimationRight')) or 'FearRight',
@@ -1044,6 +1186,21 @@ class Level:
                         'MaximumPawnDistanceToAction') or 0.03,
                 },
                 'default': pd.get('DefaultAnimation'),
+                # Actor.Behavior / SecondaryBehaviors, Pawn.RoutineBehavior,
+                # Woody.SearchBehavior — the level-behavior wiring
+                'behavior': (pd.get('Behavior') or {}).get('path'),
+                'secondary_behaviors': [
+                    (b or {}).get('path')
+                    for b in (pd.get('SecondaryBehaviors') or [])
+                    if (b or {}).get('path')],
+                'routine_behavior': (pd.get('RoutineBehavior') or {}).get('path'),
+                'search_behavior': (pd.get('SearchBehavior') or {}).get('path'),
+                # the Kid pawn's own animation set (Kid.cs:3-16)
+                'kid_crying': _anim_name(pd.get('Crying')),
+                'kid_use_crying_sequence': bool(pd.get('UseCryingSequence')),
+                'kid_crying_sequence': pd.get('CryingSequence') or [],
+                'kid_remote_sequence': _anim_name(pd.get('RemoteSequence')),
+                'kid_olga': (pd.get('olga') or {}).get('path'),
             }
 
     def _go_of_sprite(self, sprite):

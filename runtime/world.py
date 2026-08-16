@@ -24,7 +24,13 @@ class AnimPlayer:
         self.sprite = sprite
         self.by_name = {a.name: i for i, a in enumerate(sprite.anims)}
         self.mode = 'looping'            # how the current animation was started
-        self.queue = []
+        self.seq = []                    # AnimationSequence (state names)
+        self.seq_index = 0               # SequenceIndex
+        self.seq_override = None         # SetSequenceOverride, consumed at the
+                                         # next PlayNextSequenceAnimation
+        self.as_sequence = False         # a real PlayAnimationSequence runs —
+                                         # PlaySingleAnimation-with-callback
+                                         # wrappers pass as_sequence=False
         self.on_end = None
         self.acc = 0.0
         self.pat_idx = 0
@@ -35,6 +41,14 @@ class AnimPlayer:
         self.sound_sink = sound_sink
         self.stand_hook = None           # PawnAnimationController falls back to
                                          # a stand pose; item controllers don't
+        # behavior dispatch (Actor.BehaviorPlayAnimation / OnAdvanceFrame from
+        # InitializeCurrentAnimation and Refresh; the sequence-end hook is
+        # Rottweiler.OnAnimationSequenceEnded's BehaviorOnAnimationSequenceEnded)
+        self.on_play = []
+        self.on_advance = []
+        self.seq_end_hook = None
+        self.last_element_hook = None    # OnLastSequenceElementPlaying
+        self.seq_step_hook = None        # PlayNextSequenceAnimation's name-hacks
         self._set_start()
 
     # -- state -------------------------------------------------------------
@@ -67,31 +81,74 @@ class AnimPlayer:
         self.sprite.current = i
         self.mode = mode
         self._set_start()
+        # InitializeCurrentAnimation -> Owner.BehaviorPlayAnimation(name)
+        for h in self.on_play:
+            h(name)
         return True
 
     def play_single(self, name):
-        """PlaySingleAnimation: type forced to Single"""
+        """PlaySingleAnimation: type forced to Single. The pending sequence is
+        left alone, exactly as SetAnimation never touches AnimationSequence —
+        an interjected single resumes the sequence when it ends."""
         return self._set(name, 'single')
+
+    def play_directly(self, name):
+        """PlayAnimationDirectly -> SetAnimation(state): the animation keeps
+        its own serialized type instead of being forced Single."""
+        i = self.by_name.get(name)
+        if i is None:
+            raise RuntimeError('No direct animation found !!! State: %s, '
+                               'Owner: %s' % (name, self.sprite.name))
+        a = self.sprite.anims[i]
+        return self._set(name, 'looping' if a.type_looping else 'single')
 
     def play_looping(self, name, abort_if_playing=True):
         if abort_if_playing and self.anim.name == name and self.mode == 'looping':
             return True
-        self.queue = []
+        self.seq = []                     # PlayLoopingAnimation: sequence = null
+        self.as_sequence = False
         self.on_end = None
         return self._set(name, 'looping')
 
-    def play_sequence(self, names, on_end=None):
+    def play_sequence(self, names, on_end=None, as_sequence=True):
         """PlayAnimationSequence: each element via PlaySingleAnimation; the
-        sequence draining is what ends the owning action."""
+        sequence draining is what ends the owning action. as_sequence=False
+        marks the PlaySingleAnimation-plus-delegate wrappers, which must not
+        fire the sequence-end behavior hook."""
         names = list(names)
         if not names:
             if on_end:
                 on_end()
             return False
-        self.queue = names[1:]
+        self.seq = names
+        self.seq_index = 0
         self.on_end = on_end
-        self.play_single(names[0])
+        self.as_sequence = as_sequence
+        self._next_seq_anim()
         return True
+
+    def _next_seq_anim(self):
+        """PlayNextSequenceAnimation (AnimationControllerBase.cs:254-299):
+        consume a SequenceOverride, pull the element, advance the index, and
+        null the sequence past the end — the last element's completion is what
+        fires the sequence-end path."""
+        if self.seq_override is not None:
+            self.seq_index = max(0, min(self.seq_override, len(self.seq) - 1))
+            self.seq_override = None
+        if self.seq_step_hook is not None:
+            self.seq_step_hook(self, self.seq_index)
+        name = self.seq[self.seq_index]
+        self.seq_index += 1
+        if self.seq_index >= len(self.seq):
+            self.seq = []                 # AnimationSequence = null
+            if self.last_element_hook is not None:
+                self.last_element_hook()  # OnLastSequenceElementPlaying
+        self.play_single(name)
+
+    def set_sequence_override(self, index):
+        """AnimationControllerBase.SetSequenceOverride: redirects the next
+        PlayNextSequenceAnimation pull; persists until consumed."""
+        self.seq_override = index
 
     @property
     def blocking(self):
@@ -100,7 +157,7 @@ class AnimPlayer:
 
     def waiting(self):
         """diagnostic only: parked on something that cannot finish"""
-        return (self.anim.infinite or self.mode == 'looping') and not self.queue
+        return (self.anim.infinite or self.mode == 'looping') and not self.seq
 
     # -- stepping ----------------------------------------------------------
     def _reached_end(self):
@@ -127,12 +184,19 @@ class AnimPlayer:
 
     def _stop_single(self):
         """StopSingleAnimation: pull the next sequence element, fire the
-        callback, else SwitchToStandAnimation (a no-op on item controllers,
-        the facing-matched stand on pawns)."""
-        if self.queue:
-            self.play_single(self.queue.pop(0))
+        sequence-end behavior hook and the callback, else
+        SwitchToStandAnimation (a no-op on item controllers, the
+        facing-matched stand on pawns)."""
+        if self.seq:
+            self._next_seq_anim()
             return
         cb, self.on_end = self.on_end, None
+        was_seq, self.as_sequence = self.as_sequence, False
+        if was_seq and self.seq_end_hook is not None:
+            # Rottweiler.OnAnimationSequenceEnded opens with
+            # BehaviorOnAnimationSequenceEnded (Rottweiler.cs:448), before
+            # the ActionManager.StopCurrentAction the callback stands for
+            self.seq_end_hook()
         if cb:
             cb()
         elif self.stand_hook is not None:
@@ -151,6 +215,12 @@ class AnimPlayer:
                 if frame == idx:
                     self.sound_sink(name)
         self._advance()
+        # Refresh: Owner.BehaviorOnAdvanceFrame(CurrentAnimation.CurrentIndex),
+        # right after AdvanceFrame and before the end check
+        if self.on_advance:
+            idx = self.current_index()
+            for h in self.on_advance:
+                h(idx)
         if self._reached_end():
             looping = ((a.infinite and not self.ignore_infinite)
                        or self.mode == 'looping')
@@ -210,6 +280,22 @@ class Pawn:
         self.hiding = False              # Woody.Hiding (SetHidden override)
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
+        # the neighbour's walking props (Rottweiler.cs:75-107): each swaps the
+        # walking animation set in UpdateWalkingAnimation
+        self.feel_sick = False           # Pawn.FeelSick
+        self.holding_cake = False        # Rottweiler.HoldingCake
+        self.has_fifi = False            # Rottweiler.HasFifi
+        self.has_bowling = False         # Rottweiler.HasBowlingBall
+        self.has_skates = False          # Rottweiler.HasSkates
+        self.alarm_postponed = False     # Rottweiler.AlarmPostponed
+        self.behaviors = []              # Actor.Behavior + SecondaryBehaviors
+        self.routine_behavior = None     # Pawn.RoutineBehavior
+        self.walk_hook = None            # Rottweiler.UpdateWalking's notice run
+        self.notice_near_distance = spec.get('notice_near_distance') or 0.03
+        # the Kid pawn's flags (Kid.cs:19-23)
+        self.kid_start_crying = False
+        self.kid_using_remote = False
+        self.kid_remote = False
         self.is_sleeping = spec.get('is_sleeping') or False
         self.ignore_woody = spec.get('ignore_woody') or False
         self.fear_left = spec.get('fear_left') or 'FearLeft'
@@ -249,6 +335,66 @@ class Pawn:
         if self.default_anim and self.anim.has(self.default_anim):
             return self.default_anim
         return None
+
+    def set_hidden(self, hidden):
+        """Pawn.SetHidden sets AnimController.Hidden (Pawn.cs:1464-1467);
+        Woody's override flips Hiding instead (Woody.cs:1086-1089)."""
+        self.hidden = hidden
+        if self.role == 'Woody':
+            self.hiding = hidden
+        else:
+            self.sprite.hidden = hidden
+
+    def _walk_anim(self, direction):
+        """the walking animation per prop state: Rottweiler.
+        UpdateWalkingAnimation picks WC / Run / Pie / Bowling / Fifi / Ski
+        sets (Rottweiler.cs:939-1030); Woody runs unless sneaking
+        (Woody.cs:886-937); Mother and Olga run in an urgent move
+        (Mother.cs:183-234, Olga.cs:41-92); the base pawn walks
+        (Pawn.cs:1161-1190)."""
+        if self.role == 'Rottweiler':
+            if self.feel_sick:
+                return 'RunWC' + direction
+            if self.in_urgent:
+                return 'Run_' + direction
+            if self.holding_cake:
+                return 'WalkPie_' + direction
+            if self.has_bowling:
+                return 'WalkBowling'
+            if self.has_fifi:
+                return 'FifiWalk' + direction
+            if self.has_skates:
+                return 'SkiWalk1' if direction == 'Right' else 'SkiWalk2'
+            return 'Walk_' + direction
+        if self.role == 'Woody':
+            return ('Walk_' if self.sneaking else 'Run_') + direction
+        if self.role in ('Mother', 'Olga') and self.in_urgent:
+            return 'Run_' + direction
+        return 'Walk_' + direction
+
+    def _portal_up_anim(self):
+        """Rottweiler.GetPortalUpAnimation (Rottweiler.cs:398-413)"""
+        if self.role == 'Rottweiler':
+            if self.feel_sick:
+                return 'RunWCUp'
+            if self.in_urgent:
+                return 'Run_Up'           # PortalRunUpAnimation's default
+            if self.has_fifi:
+                return 'FifiWalkUp'
+        return self.portal_up
+
+    def _portal_down_anim(self):
+        """Rottweiler.GetPortalDownAnimation (Rottweiler.cs:415-434)"""
+        if self.role == 'Rottweiler':
+            if self.feel_sick:
+                return 'RunWCDown'
+            if self.in_urgent:
+                return 'Run_Down'         # PortalRunDownAnimation's default
+            if self.has_fifi:
+                return 'FifiWalkDown'
+            if self.has_skates:
+                return 'SkiWalk2'
+        return self.portal_down
 
     # -- geometry ----------------------------------------------------------
     def floor_y(self, zone=None):
@@ -432,14 +578,19 @@ class Pawn:
             return                        # IsOtherPawnPassing: wait standing
         if door.should_walk_up:
             self.state = self.DOOR_CLIMB
-            if self.portal_up and self.anim.has(self.portal_up):
-                self.anim.play_looping(self.portal_up)
+            up = self._portal_up_anim()
+            if up and self.anim.has(up):
+                self.anim.play_looping(up)
             return
         self._transit_animations(door, other, sequential=False)
 
     def _transit_animations(self, door, other, sequential):
         self.state = self.DOOR_ANIM
-        self.hidden = True                # PlayDoorLeaveAnimation: SetHidden(true)
+        # PlayDoorLeaveAnimation: SetHidden(true) hides the controller for
+        # every pawn, and the `is Woody` branch hides Woody's own too
+        # (Pawn.cs:1615-1635) — the door sheets contain the walking figure
+        self.hidden = True
+        self.sprite.hidden = True
         self.is_warping = True            # PlayDoorLeaveAnimation: IsWarping
         self._exit_door = other
         door.passing = other.passing = self
@@ -458,13 +609,16 @@ class Pawn:
                     self.world.zone_reaction(other.zone, 'enter')
                 self._play_enter(other, enter_anim)
             if door.sprite is not None and leave_anim:
-                door.sprite.play_sequence([leave_anim], on_end=leave_done)
+                # Door.PlayAnimation is a PlaySingleAnimation (Door.cs:141-153)
+                door.sprite.play_sequence([leave_anim], on_end=leave_done,
+                                          as_sequence=False)
             else:
                 leave_done()              # Door.PlayAnimation's null branch
         else:
             if door.sprite is not None and leave_anim:
                 door.sprite.play_sequence(
-                    [leave_anim], on_end=lambda: self._leave_played(door))
+                    [leave_anim], on_end=lambda: self._leave_played(door),
+                    as_sequence=False)
             else:
                 door.passing = None
             self._play_enter(other, enter_anim)
@@ -477,7 +631,8 @@ class Pawn:
 
     def _play_enter(self, other, enter_anim):
         if other.sprite is not None and enter_anim:
-            other.sprite.play_sequence([enter_anim], on_end=self._enter_played)
+            other.sprite.play_sequence([enter_anim], on_end=self._enter_played,
+                                       as_sequence=False)
         else:
             self._enter_played()
 
@@ -502,6 +657,7 @@ class Pawn:
         if self.role == 'Rottweiler' and not d.should_walk_up:
             self.sprite.y = self.floor_y()
         self.hidden = False
+        self.sprite.hidden = False        # SetHidden(false), Pawn.cs:1661
         self.is_warping = False           # OnDoorEnterAnimationFinished
         if self.world is not None and old_zone != (self.zone.pid if self.zone else None):
             if self.world.on_pawn_zone_changed(self, old_zone):
@@ -510,8 +666,9 @@ class Pawn:
             self.anim.play_looping(d.exit_anim)
         if d.should_walk_up and self.steps:
             self.state = self.DESCEND
-            if self.portal_down and self.anim.has(self.portal_down):
-                self.anim.play_looping(self.portal_down)
+            down = self._portal_down_anim()
+            if down and self.anim.has(down):
+                self.anim.play_looping(down)
             return
         self._next_step()
 
@@ -548,7 +705,8 @@ class Pawn:
                         self._next_step()
                         return
                     self.state = self.ITEM_CLIMB
-                    up = self.portal_down if it.should_walk_down else self.portal_up
+                    up = self._portal_down_anim() if it.should_walk_down \
+                        else self._portal_up_anim()
                     if up and self.anim.has(up):
                         self.anim.play_looping(up)
                 else:
@@ -556,21 +714,23 @@ class Pawn:
                 return
             nx, ny = dx / mag, dy / mag
             # WalkOnPath: dominant axis picks the force and the animation, and
-            # IsInUrgentMove switches to the Running magnitudes. Woody's
-            # override plays Run_* unless Sneaking (Woody.cs:890-936); every
-            # other pawn walks (Pawn.cs:1175-1188) — Season 2's Woody sheet
-            # has no Walk_* at all
-            run = self.role == 'Woody' and not self.sneaking
-            base = 'Run_' if run else 'Walk_'
+            # IsInUrgentMove switches to the Running magnitudes; _walk_anim
+            # holds each pawn's UpdateWalkingAnimation override
+            if self.walk_hook is not None:
+                # WalkOnPath -> UpdateWalking (Pawn.cs:981, Rottweiler.cs:833)
+                self.walk_hook()
+                if self.state != self.WALK:
+                    return                # a near-surprise took the pawn over
             if abs(nx) >= abs(ny):
                 f = self.run_force if self.in_urgent else self.force
                 vx, vy = nx * f, ny * f
                 self._face_towards(nx)
-                self.anim.play_looping(base + self.facing)
+                self.anim.play_looping(self._walk_anim(self.facing))
             else:
                 f = self.run_door_force if self.in_urgent else self.door_force
                 vx, vy = nx * f, ny * f
-                self.anim.play_looping(base + ('Up' if ny > 0 else 'Down'))
+                self.anim.play_looping(
+                    self._walk_anim('Up' if ny > 0 else 'Down'))
             self.sprite.x += vx * scale
             self.sprite.y += vy * scale
         elif self.state == self.DOOR_CLIMB:
@@ -848,6 +1008,7 @@ class Routine:
         self.pawn = pawn
         self.role = role
         self.actions = spec['actions']
+        self.actions_to_add = spec.get('actions_to_add') or []
         self.index = spec['start_index']
         self.start_index = spec['start_index']
         self.selected_index = spec['selected_index']
@@ -867,6 +1028,18 @@ class Routine:
         self.marbles_next = False        # ActionManager.MarblesNextAction
         self.remove_watering_can = False  # the L108 watering-can dance
         self.remove_now = False
+        self.routine_behavior = None     # Pawn.RoutineBehavior instance
+        self.alarm_next_action = False   # ActionManager.AlarmNextAction
+        self.action_changed = False      # ActionManager.ActionChanged
+        self.cont_aux = -1               # ActionManager.ContAux (KidActions)
+        self._same_zone = False          # ActionManager.SameZone (Dog/Chili)
+        self._same_zone_yelled = False   # ActionManager.AngryAnimationStarted
+        self._alarm_use = False          # the AlarmAction urgent runs a full Use
+        # Rottweiler.Start wires the controller delegates (Rottweiler.cs:152)
+        if role == 'Rottweiler':
+            self.pawn.anim.last_element_hook = self._on_last_seq_element
+            self.pawn.walk_hook = self._update_walking
+        self.pawn.anim.seq_step_hook = self._seq_step_hack
 
     @property
     def action(self):
@@ -881,7 +1054,41 @@ class Routine:
 
     def start(self):
         if self.actions and not self.frozen:
-            self._pending = 'start'
+            self._pending = 'first'      # StartFirstAction -> StartNextAction
+
+    def _on_last_seq_element(self):
+        """Rottweiler.OnLastSequenceElementPlaying (Rottweiler.cs:256-263):
+        an AlertNext use makes the next action's item ring while the last
+        sequence element still plays — Level105's phones."""
+        a = self.action
+        it = self.item
+        if (self.state == self.USING and self.urgent_item is None
+                and a is not None and a.get('alert_next') and it is not None
+                and not it.is_tricked(self.level.items)):
+            i = self.index + 1
+            if i >= len(self.actions):    # AdvanceActionIndex's wrap
+                i = self.start_index if self.loop_from_start else \
+                    (self.selected_index or 0)
+            nxt = self.level.items.get(self.actions[i]['item']) \
+                if self.actions[i]['item'] else None
+            if nxt is not None and self.pawn.world is not None:
+                self.pawn.world.play_alert_animation(nxt)
+
+    def _seq_step_hack(self, player, idx):
+        """PlayNextSequenceAnimation's two name-hacks
+        (AnimationControllerBase.cs:261-275): the ChairAssembly hide at
+        sequence index 1 when the book is armed, and Olga's TowelSleep
+        element turning its own instance into an infinite loop."""
+        it = self.item if self.urgent_item is None else self.urgent_item
+        if idx == 1 and it is not None and it.name == 'ChairAssembly':
+            book = next((b for b in self.level.items.values()
+                         if b.name == 'ChairAssemblyBook'), None)
+            if book is not None and book.got_tricked and it.sprite is not None:
+                it.sprite.hidden = True   # SetObjectHidden(true)
+        if self.role == 'Olga' and idx < len(player.seq) \
+                and player.seq[idx] == 'TowelSleep' \
+                and player.has('TowelSleep'):
+            player.sprite.anims[player.by_name['TowelSleep']].infinite = True
 
     def _advance(self):
         self.index += 1
@@ -893,9 +1100,61 @@ class Routine:
             else:
                 self.index = 0
 
-    def _start_action(self):
+    def _kid_actions(self):
+        """ActionManager.KidActions (ActionManager.cs:394-419), fired from
+        StartNextAction: the Rake starts the kid crying, Olga's mat hands him
+        the remote and hides the next action's item, the bridge rail brings
+        the submarine back, and the beach mat resets the kid's idle."""
+        w = self.pawn.world
+        it = self.item
+        kid = w.pawns.get('Kid') if w is not None else None
+        if it is not None and it.name == 'Rake' and kid is not None \
+                and self.role == 'Rottweiler':
+            kid.kid_start_crying = True
+        self.cont_aux += 1
+        if self.role == 'Olga' and it is not None and it.name == 'OlgaMat' \
+                and self.cont_aux > 0 and kid is not None:
+            kid.kid_using_remote = True
+            if self.actions:
+                nxt = self.level.items.get(
+                    self.actions[(self.index + 1) % len(self.actions)]['item'])
+                if nxt is not None:
+                    if nxt.sprite is not None:
+                        nxt.sprite.hidden = True   # SetObjectHidden(true)
+                    nxt.clickable = False          # collider disabled
+        if self.role == 'Rottweiler' and it is not None \
+                and it.name == 'BridgeRail' and w is not None:
+            sub = next((s for s in self.level.items.values()
+                        if s.name == 'Submarine'), None)
+            if sub is not None:
+                if sub.sprite is not None:
+                    sub.sprite.hidden = False
+                sub.clickable = True
+                p = w.players.get(id(sub.sprite)) if sub.sprite else None
+                if p is not None and sub.primed_fucked_up \
+                        and p.has(sub.primed_fucked_up):
+                    p.play_single(sub.primed_fucked_up)
+            if kid is not None:
+                kid.kid_remote = True
+        if self.role == 'Rottweiler' and self.actions and it is not None \
+                and it.name == 'OlgaMatBeach' and w is not None:
+            last = self.level.items.get(self.actions[-1]['item']) \
+                if self.actions[-1]['item'] else None
+            kid_it = self.level.items.get(last.kid_item) \
+                if last is not None and last.kid_item else None
+            if kid_it is not None and kid_it.sprite is not None:
+                p = w.players.get(id(kid_it.sprite))
+                if p is not None and kid_it.idle and p.has(kid_it.idle):
+                    p.play_looping(kid_it.idle)
+
+    def _start_action(self, start_next=False):
         it = self.item
         a = self.action
+        if start_next:
+            # the StartNextAction extras (ActionManager.cs:178-237): the kid
+            # hooks run and the AlarmNextAction gate re-arms
+            self._kid_actions()
+            self.action_changed = True    # ActionManager.cs:234
         # the watering-can round two (ActionManager.cs:196-199): reaching
         # index 2 with the parked can removes it for real
         if self.remove_watering_can and self.actions and \
@@ -921,6 +1180,9 @@ class Routine:
                 it = self.item
                 a = self.action
         if a is not None and a.get('move_only'):
+            if self.routine_behavior is not None:
+                # ActionManager.MoveToAction (ActionManager.cs:119-124)
+                self.routine_behavior.on_move_to_routine_action(None, a)
             zone = self.level.zone_by_pid(a.get('move_zone'))
             if zone is not None and self.pawn.goto_zone(zone, a['move_x'],
                                                         on_arrive=self._finish):
@@ -936,6 +1198,9 @@ class Routine:
         if self.pawn.at_use_range(it):
             self._use()
         else:
+            if self.routine_behavior is not None:
+                # ActionManager.MoveToAction (ActionManager.cs:119-124)
+                self.routine_behavior.on_move_to_routine_action(it, a)
             self.state = self.MOVING
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
@@ -946,6 +1211,10 @@ class Routine:
         a = self.action
         if it is None:
             self._pending = 'advance'; self.state = self.IDLE; return
+        if self.routine_behavior is not None:
+            # ActionManager.StartAction fires the hook right before the
+            # action itself starts (ActionManager.cs:165-168)
+            self.routine_behavior.on_start_routine_action(it, a)
         # RoutineActionUse.OnActionStarted fires on arrival (ActionManager.
         # StartAction interposes a MoveAction when the pawn is away); the
         # ignore-loop release opens it (RoutineActionUse.cs:152-171)
@@ -956,10 +1225,23 @@ class Routine:
             self.state = self.USING
             self.timer = 0.0
             if a.get('hide_owner'):
-                self.pawn.hidden = True   # HideOwnerDuringUse, cs:174-177
+                # HideOwnerDuringUse -> Owner.SetHidden(true), cs:174-177
+                self.pawn.set_hidden(True)
             if a.get('mutex_anim'):
                 self.pawn.anim.play_looping(a['mutex_anim'])
             return
+        # the walking-prop toggles (RoutineActionUse.cs:181-200): cake, Fifi
+        # and skates ride the action flags and swap the walking sets
+        if a.get('cake'):
+            self.pawn.holding_cake = not self.pawn.holding_cake
+        if a.get('give_fifi'):
+            self.pawn.has_fifi = True
+        if a.get('give_skates'):
+            self.pawn.has_skates = True
+        if a.get('remove_fifi'):
+            self.pawn.has_fifi = False
+        if a.get('remove_skates'):
+            self.pawn.has_skates = False
         w = self.pawn.world
         # Item.Use's Rottweiler branch (Item.cs:1056-1095): a toggles-prime
         # item alternates prime / use; RequireUnprime makes it three-phase
@@ -1009,7 +1291,7 @@ class Routine:
                 self.state = self.USING
                 self.timer = a['duration']
                 if a.get('hide_owner'):
-                    self.pawn.hidden = True
+                    self.pawn.set_hidden(True)   # cs:213-216
                 self._after_use_side_effects(a, it)
                 if seq:
                     self.pawn.anim.play_sequence(seq, on_end=self._finish)
@@ -1032,7 +1314,8 @@ class Routine:
             if tool is not None and self.pawn.fixing_item is tool:
                 w._fix(it)                     # Item.cs:854-857: Fix(); tool use
                 seq = tool.sequence_for(self.role,
-                                        tool.is_tricked(self.level.items))
+                                        tool.is_tricked(self.level.items),
+                                        self.level.items)
                 self.state = self.USING
                 self.timer = a['duration']
                 if seq:
@@ -1042,13 +1325,20 @@ class Routine:
                     self._pending = 'advance'
                     self.state = self.IDLE
                 return
+        # TrickItem.MotherUse: a tricked ChangeActionsWhenTricked208 item
+        # injects both managers' ActionsToAddInGame (TrickItem.cs:1253-1262)
+        if self.role == 'Mother' and it.change_actions_208 and it.tricked \
+                and self.pawn.world is not None:
+            for r in self.pawn.world.routines:
+                if r.role in ('Mother', 'Rottweiler'):
+                    r.add_in_game_actions()
         tricked = it.is_tricked(self.level.items)
         # Item.RottweilerUse opens with the raw-Tricked GotTricked mark
         # (Item.cs:836-838) — before any animation concern; the sink/valve
         # chains hang off it
         if it.tricked and self.role == 'Rottweiler':
             it.got_tricked = True
-        seq = it.sequence_for(self.role, tricked)
+        seq = it.sequence_for(self.role, tricked, self.level.items)
         # the pig-pen gate (TrickItem.cs:837-841): primed-and-tricked keys
         # with the milk still clean play the surprise set instead
         if it.depends_pig_keys and self.role == 'Rottweiler' and w is not None:
@@ -1060,7 +1350,7 @@ class Routine:
         self.state = self.USING
         self.timer = a['duration']
         if a.get('hide_owner'):
-            self.pawn.hidden = True       # HideOwnerDuringUse, cs:213-216
+            self.pawn.set_hidden(True)    # HideOwnerDuringUse, cs:213-216
         self._after_use_side_effects(a, it)
         self.log.append((it.name, tricked))
         if self.on_use:
@@ -1114,6 +1404,15 @@ class Routine:
                     return it
                 return dep
         return None
+
+    def add_in_game_actions(self, index=None):
+        """ActionManager.AddInGameActions (ActionManager.cs:814-842): insert
+        the serialized extras after the active action (or at the index)."""
+        if not self.actions_to_add:
+            return
+        at = (self.index % len(self.actions)) + 1 if index is None else index
+        for k, a in enumerate(self.actions_to_add):
+            self.actions.insert(at + k, a)
 
     def remove_actions_by_item(self, item_pid):
         """ActionManager.RemoveActionByItem (ActionManager.cs:748-790):
@@ -1249,7 +1548,7 @@ class Routine:
         if t is not None:
             t.ignore_infinite = t.ignore_infinite_once = True
         if a.get('hide_owner'):
-            self.pawn.hidden = False
+            self.pawn.set_hidden(False)   # cs:481-484
         if not a.get('mutex'):
             self._abort_parked_mutex(a.get('abort_mutex_pawn'))
 
@@ -1266,7 +1565,7 @@ class Routine:
             return
         for rt in self.pawn.world.routines:
             if rt.role == role:
-                rt.pawn.hidden = False
+                rt.pawn.set_hidden(False)
                 act = rt.action
                 if act is not None and act.get('mutex'):
                     rt._pending = 'advance'
@@ -1283,16 +1582,42 @@ class Routine:
         """Rottweiler.MovingToAlarm"""
         return self.urgent_item is not None and self.urgent_item.kind == 'Alerter'
 
-    def start_urgent(self, item, arrived=None):
+    def start_urgent(self, item, arrived=None, alarm_use=False):
         """Rottweiler.StartSurpriseActionFar -> ActionManager.StartUrgentAction:
         drop the move in progress and run (SurpriseActionFar.Urgent) to the
         item; the interrupted action stays current for the resume. A chain
-        step (the fixing-tool run) brings its own arrival handler."""
+        step (the fixing-tool run) brings its own arrival handler; alarm_use
+        marks the AlarmAction, whose arrival runs a full Item.Use."""
+        w = self.pawn.world
+        if self.role == 'Mother' and w is not None:
+            # ActionManager.StartUrgentAction fires the Mother event
+            # (ActionManager.cs:653-656)
+            w.fire_event('mother_urgent')
+        if self.frozen:
+            return                        # ActionManager.cs:657-660
         self.urgent_item = item
         self._urgent_handler = arrived
+        self._alarm_use = alarm_use
         self.pawn.steps = []
         self.pawn.in_urgent = True
         self.state = self.MOVING
+        # the SameZone shortcut (RoutineActionMove.SameZone + ActionManager.
+        # Update, ActionManager.cs:442-458): an urgent run to Dog or Chili in
+        # the pawn's own zone starts the action at once, and the walk with
+        # the proximity yell follows
+        if (item.name in ('Dog', 'Chili') and self.pawn.zone is not None
+                and item.zone == self.pawn.zone.pid
+                and not self.pawn.is_warping
+                and not self.pawn.at_use_range(item) and arrived is None):
+            self._same_zone = True
+            self._same_zone_yelled = False
+            self._urgent_arrived()
+            return
+        if self.routine_behavior is not None:
+            # StartAction interposes MoveToAction for the away case
+            # (ActionManager.cs:152-154, 119-124)
+            if not self.pawn.at_use_range(item):
+                self.routine_behavior.on_move_to_routine_action(item, None)
         if self.pawn.at_use_range(item):
             self._urgent_arrived()
         elif not self.pawn.goto_item(item, on_arrive=self._urgent_arrived):
@@ -1306,6 +1631,29 @@ class Routine:
             return
         it = self.urgent_item
         if it is None:
+            return
+        if self.routine_behavior is not None:
+            # StartAction's hook, on the urgent action too
+            # (ActionManager.cs:165-168)
+            self.routine_behavior.on_start_routine_action(it, None)
+        # the SameZone shortcut's completion chains into the walk instead of
+        # finishing the urgent (ActionManager.cs:459-481)
+        done = self._same_zone_walk if self._same_zone else self._urgent_finished
+        if self._alarm_use:
+            # Rottweiler.MoveToAlarm's AlarmAction is a RoutineActionUse: the
+            # arrival runs a full Item.Use (RoutineActionUse.cs:205)
+            self._alarm_use = False
+            if it.tricked and self.role == 'Rottweiler':
+                it.got_tricked = True                    # Item.cs:836-838
+            seq = [x for x in it.sequence_for(self.role,
+                                              it.is_tricked(self.level.items),
+                                              self.level.items)
+                   if self.pawn.anim.has(x)]
+            self.state = self.USING
+            if seq:
+                self.pawn.anim.play_sequence(seq, on_end=self._alarm_use_done)
+            else:
+                self._alarm_use_done()
             return
         # RoutineActionSurpriseFar.OnActionStarted
         # (RoutineActionSurpriseFar.cs:40-63): a tricked item goes straight
@@ -1321,22 +1669,86 @@ class Routine:
             # tricked-or-normal use sequence (Item.cs:836-838, 894-908)
             if it.tricked:
                 it.got_tricked = True
-            seq = [a for a in it.sequence_for(self.role, it.tricked)
+            seq = [a for a in it.sequence_for(self.role, it.tricked,
+                                              self.level.items)
                    if self.pawn.anim.has(a)]
             self.state = self.USING
             if seq:
-                self.pawn.anim.play_sequence(seq, on_end=self._urgent_finished)
+                self.pawn.anim.play_sequence(seq, on_end=done)
             else:
-                self._urgent_finished()
+                done()
         elif it.kind == 'Alerter' or it.rott_surprise:
             seq = [a for a in it.rott_surprise if self.pawn.anim.has(a)]
             self.state = self.USING
             if seq:
-                self.pawn.anim.play_sequence(seq, on_end=self._urgent_finished)
+                self.pawn.anim.play_sequence(seq, on_end=done)
             else:
-                self._urgent_finished()
+                done()
+        else:
+            done()
+
+    def _alarm_use_done(self):
+        """the AlarmAction use drains into StopAction(canPostponeStop: true):
+        a tricked item still plays the angry set first
+        (RoutineActionUse.cs:546-553)"""
+        it = self.urgent_item
+        if it is not None and it.kind in TRICK_KINDS \
+                and it.is_tricked(self.level.items) \
+                and self.pawn.world is not None:
+            self.pawn.world.play_angry(self.pawn, it,
+                                       on_done=self._urgent_finished)
         else:
             self._urgent_finished()
+
+    def _same_zone_walk(self):
+        """ActiveAction.Finished with SameZone set: walk to the target
+        (ActionManager.cs:461-469); the proximity check in tick plays the
+        yell when he closes within 0.05"""
+        it = self.urgent_item
+        if it is None:
+            self._urgent_finished()
+            return
+        self.state = self.MOVING
+        self.pawn.movement_paused = False       # Owner.ContinueMovement
+        if not self.pawn.goto_item(it, on_arrive=self._same_zone_yell):
+            self._same_zone_yell()
+
+    def _same_zone_yell(self):
+        """RottweilerPositionToDog < 0.05: StopAction and the surprise-left
+        yell (ActionManager.cs:470-480)"""
+        if self._same_zone_yelled:
+            return
+        self._same_zone_yelled = True
+        it = self.urgent_item
+        self.pawn.steps = []
+        self.pawn.state = self.pawn.IDLE
+        seq = [a for a in (it.surprise_left if it is not None else [])
+               if self.pawn.anim.has(a)]
+        self.state = self.USING
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=self._yell_done)
+        else:
+            self._yell_done()
+
+    def _yell_done(self):
+        """Rottweiler.OnAnimationSequenceEnded's Angry tail
+        (Rottweiler.cs:485-510): a SurpriseSequenceLeft opening on 'Angry'
+        resets the SameZone flags, and a tricked DirtyCarpet in the zone gets
+        its urgent run — the one OnChangeZone always skips"""
+        it = self.urgent_item
+        self._same_zone = False
+        self._same_zone_yelled = False
+        if it is not None and it.surprise_left \
+                and it.surprise_left[0] == 'Angry' \
+                and self.pawn.zone is not None and self.pawn.world is not None:
+            for carpet in self.pawn.world.notice_items.get(
+                    self.pawn.zone.pid, ()):
+                if carpet.tricked and carpet.name == 'DirtyCarpet' \
+                        and carpet.zone == self.pawn.zone.pid:
+                    self.pawn.movement_paused = False
+                    self.start_urgent(carpet)
+                    return
+        self._urgent_finished()
 
     def _urgent_finished(self):
         """ActionManager.StopUrgentAction (ActionManager.cs:586-649): a routine
@@ -1347,12 +1759,25 @@ class Routine:
         self.urgent_item = None
         self.pawn.in_urgent = False
         self.pawn.can_decrease_angry = True
+        self._same_zone = False
+        self._same_zone_yelled = False
+        self._alarm_use = False
+        if self.role == 'Mother' and self.pawn.world is not None:
+            # StopUrgentAction fires the Mother event (ActionManager.cs:592-595)
+            self.pawn.world.fire_event('mother_urgent_stop')
+        if self.frozen:
+            # a frozen manager swallows the resume (ActionManager.cs:604-606);
+            # the Unfreeze that lifts it starts the routine again
+            self.state = self.IDLE
+            return
         if finished is not None and finished.name == 'GroundMarbles':
             self.marbles_next = False
         it = self.item
         if it is not None and it.got_tricked and not self.marbles_next and \
                 it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
-            self._pending = 'advance'
+            # the skip goes straight to StartAction, without the
+            # StartNextAction extras (ActionManager.cs:614-619)
+            self._pending = 'skip'
         else:
             self._pending = 'start'
         self.state = self.IDLE
@@ -1426,7 +1851,8 @@ class Routine:
             # FixingItem.Use -> RottweilerUse plays the tool's tricked use
             # first (Item.cs:894-908); the angry flow rides its end through
             # StopAction's postpone, and RedoAction then re-enters here
-            seq = [x for x in tool.sequence_for('Rottweiler', True)
+            seq = [x for x in tool.sequence_for('Rottweiler', True,
+                                                self.level.items)
                    if self.pawn.anim.has(x)]
 
             def angry():
@@ -1479,10 +1905,17 @@ class Routine:
             returned()
 
     def hear_alerter(self, alerter_item, triggered_by_woody):
-        """Rottweiler.HearAlerter (Rottweiler.cs:265)"""
+        """Rottweiler.HearAlerter (Rottweiler.cs:265-301)"""
         if self.moving_to_alarm():
             return
-        if not self.pawn.is_warping and not self.is_alarm_postponed():
+        cur = self.item if self.state == self.USING else None
+        postponed = self.is_alarm_postponed() and \
+            not (cur is not None and cur.tricked)
+        if not self.pawn.is_warping and not postponed:
+            if self.pawn.alarm_postponed:
+                # Rottweiler.cs:275-279: a behavior's PostponeAlarm parks it
+                self.pending_alarm = alerter_item
+                return
             if self.state == self.MOVING:
                 self.start_urgent(alerter_item)
                 return
@@ -1497,6 +1930,74 @@ class Routine:
                 self.start_urgent(alerter_item)
         else:
             self.pending_alarm = alerter_item       # PostponeAlerterAction
+
+    def _update_walking(self):
+        """Rottweiler.UpdateWalking (Rottweiler.cs:833-849): a tricked
+        NoticeWhenWalkNearby item within NoticeWhenNearTrickedDistance slips
+        (CauseSlip -> FallAction) or startles (SurpriseActionNear) — both are
+        RoutineActionSurpriseNear instances."""
+        w = self.pawn.world
+        if w is None or self.pawn.zone is None or self.urgent_item is not None:
+            return
+        for it in w.near_items.get(self.pawn.zone.pid, ()):
+            if it.tricked and \
+                    abs(self.pawn.sprite.x - it.target_x) \
+                    < self.pawn.notice_near_distance:
+                self._on_surprise_near(it)
+                return
+
+    def _on_surprise_near(self, it):
+        """Rottweiler.OnSurpriseNear / OnFall -> StartUrgentAction ->
+        RoutineActionSurpriseNear.OnActionStarted (cs:12-37): pause, postpone
+        the alarm, and the facing-matched surprise sequence shifted by
+        SurpriseDeltaLocation."""
+        self.urgent_item = it
+        self.pawn.steps = []
+        self.pawn.state = self.pawn.IDLE
+        self.pawn.movement_paused = True      # Owner.PauseMovement
+        self.postpone_alarm()                 # Owner.PostponeAlarm
+        seq = it.surprise_right if self.pawn.facing == 'Right' \
+            else it.surprise_left             # Owner.IsMovingRight
+        self.pawn.sprite.x += it.surprise_delta[0]
+        self.pawn.sprite.y += it.surprise_delta[1]
+        self.state = self.USING
+        seq = [a for a in seq if self.pawn.anim.has(a)]
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=self._surprise_near_done)
+        else:
+            self._surprise_near_done()
+
+    def _surprise_near_done(self):
+        """the drain reaches StopAction(canPostponeStop: true): a tricked
+        item goes angry first (RoutineActionSurpriseNear.cs:47-57)"""
+        it = self.urgent_item
+        if it is not None and it.tricked and self.pawn.world is not None:
+            self.pawn.world.play_angry(self.pawn, it,
+                                       on_done=self._surprise_near_stopped)
+        else:
+            self._surprise_near_stopped()
+
+    def _surprise_near_stopped(self):
+        """OnActionStopped (cs:39-45): ContinueMovement, ContinueAlarm and
+        the pending-alarm check, then the interrupted action resumes"""
+        self.pawn.movement_paused = False
+        self.continue_alarm()
+        self._urgent_finished()
+
+    def postpone_alarm(self):
+        """Rottweiler.PostponeAlarm (Rottweiler.cs:1126-1130)"""
+        self.pawn.alarm_postponed = True
+
+    def continue_alarm(self):
+        """Rottweiler.ContinueAlarm (Rottweiler.cs:1132-1137): drop the
+        postpone and fire the parked alerter run; a frozen manager keeps it
+        parked until the Unfreeze"""
+        self.pawn.alarm_postponed = False
+        if self.pending_alarm is not None and not self.frozen:
+            it, self.pending_alarm = self.pending_alarm, None
+            self.start_urgent(it)
+            return True
+        return False
 
     def on_zone_changed(self):
         """Rottweiler.OnChangeZone: tricked noticing items, pending alarms,
@@ -1517,12 +2018,16 @@ class Routine:
                 startle = it.surprise_far_left if self.pawn.facing == 'Right' \
                     else it.surprise_far_right
                 if startle and self.pawn.anim.has(startle):
+                    # RunToTrickedItem is a PlaySingleAnimation, not a
+                    # sequence (Rottweiler.cs:329-342)
                     self.pawn.anim.play_sequence(
-                        [startle], on_end=lambda i=it: self.start_urgent(i))
+                        [startle], on_end=lambda i=it: self.start_urgent(i),
+                        as_sequence=False)
                 else:
                     self.start_urgent(it)
                 return True
-        if self.pending_alarm is not None and not self.is_alarm_postponed():
+        if self.pending_alarm is not None and not self.is_alarm_postponed() \
+                and self._can_check_surprise_far():
             it, self.pending_alarm = self.pending_alarm, None
             self.start_urgent(it)
             return True
@@ -1532,6 +2037,18 @@ class Routine:
                 fsm.on_rottweiler_enter()
         return False
 
+    def _can_check_surprise_far(self):
+        """Rottweiler.CanCheckSurpriseActionFar (Rottweiler.cs:209-229): the
+        fixing-tool chain with PostponeAlarm blocks it, then the primary
+        behavior gets its veto."""
+        if self._fix_tool is not None and \
+                (self.pawn.grab_action.get('postpone_alarm')
+                 or self.pawn.use_fixing_action.get('postpone_alarm')):
+            return False                  # IsFixingBlockingItem
+        if self.pawn.behaviors:
+            return self.pawn.behaviors[0].can_check_surprise_action_far()
+        return True
+
     def tick(self, dt):
         if self.frozen:
             return
@@ -1540,11 +2057,30 @@ class Routine:
             it, self.was_alerted = self.was_alerted, None
             self.start_urgent(it)
             return
+        # Rottweiler.Update (Rottweiler.cs:897-901): an AlarmNextAction gate
+        # re-checks the pending alarm when the routine advances
+        if self.action_changed and self.alarm_next_action:
+            self.action_changed = False
+            if self.pending_alarm is not None and not self.is_alarm_postponed():
+                it, self.pending_alarm = self.pending_alarm, None
+                self.start_urgent(it)
+                return
+        # the SameZone run's proximity yell (ActionManager.cs:459-481):
+        # closing within 0.05 of the target stops the walk and plays the
+        # surprise-left set once
+        if self._same_zone and self.state == self.MOVING \
+                and self.urgent_item is not None and not self._same_zone_yelled:
+            if abs(self.pawn.sprite.x
+                   - self.urgent_item.move_x(self.role)) < 0.05:
+                self._same_zone_yell()
+                return
         if self._pending:
             what, self._pending = self._pending, None
-            if what == 'advance':
+            if what in ('advance', 'skip'):
                 self._advance()
-            self._start_action()
+            # 'first' and 'advance' are StartNextAction; 'skip' and 'start'
+            # go straight to StartAction (ActionManager.cs:608-648)
+            self._start_action(start_next=what in ('first', 'advance'))
             return
         if self.state == self.USING and self.timer > 0.0:
             self.timer -= dt
@@ -1582,9 +2118,18 @@ class World:
         for it in level.items.values():
             if it.notice_enter:
                 self.notice_items.setdefault(it.zone, []).append(it)
+        # Zone.NoticeWhenNearItems from TrickItem.Start's NoticeWhenWalkNearby
+        self.near_items = {}
+        for it in level.items.values():
+            if it.notice_near:
+                self.near_items.setdefault(it.zone, []).append(it)
         self._delayed = []               # (seconds left, fn) Invoke timers
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         self._entrance_timer = None      # Woody's walk-in countdown
+        self.time = 0.0                  # Time.time for the alarm intervals
+        self.behavior_objs = []          # live level-behavior instances
+        self.search_behavior = None      # Woody.SearchBehavior
+        self.events = {}                 # the behaviors' static C# events
         # Item.Start ends in SetPrimed(Primed): the initial primed visibility
         # (Item.cs:697, 1219-1235)
         for it in level.items.values():
@@ -1750,6 +2295,139 @@ class World:
         if name and p.has(name):
             p.play_single(name)
 
+    def play_item_anim(self, item, name):
+        """TrickItem.PlayItemAnimation (TrickItem.cs:1018-1050): a no-op
+        unless Animating; NONE hides a HideWhenNotAnimating item; the type
+        comes from UseAnimationType / Looping. The AnimateDependant arm is
+        unused by the shipped behaviors."""
+        if not item.animating:
+            return
+        p = self.players.get(id(item.sprite)) if item.sprite else None
+        if name:
+            if item.hide_when_not_animating and item.sprite is not None:
+                item.sprite.hidden = False
+            if p is None or not p.has(name):
+                return
+            if item.use_anim_type:
+                p.play_directly(name)
+            elif item.looping_flag:
+                p.play_looping(name)
+            else:
+                p.play_single(name)
+        elif item.hide_when_not_animating and item.sprite is not None:
+            item.sprite.hidden = True
+
+    def search_play(self, it, name):
+        """SearchItem.PlayItemAnimation (SearchItem.cs:68-89): unhide and
+        play by the Looping flag, or hide a HideWhenNotAnimating item."""
+        p = self.players.get(id(it.sprite)) if it.sprite else None
+        if name:
+            if p is not None and p.has(name):
+                it.sprite.hidden = False       # SetObjectHidden(false)
+                if it.looping_flag:
+                    p.play_looping(name)
+                else:
+                    p.play_single(name)
+        elif it.hide_when_not_animating and it.sprite is not None:
+            it.sprite.hidden = True
+
+    def _search_switch(self, it):
+        """SearchItem.Update's four-state animation switcher
+        (SearchItem.cs:214-244): each Tricked x Primed combination plays its
+        animation once, re-arming the other three states."""
+        if it.aux1 and it.tricked and it.primed:
+            it.aux1 = False; it.aux2 = it.aux3 = it.aux4 = True
+            self.search_play(it, it.empty_animation)
+        elif it.aux2 and it.tricked and not it.primed:
+            it.aux2 = False; it.aux1 = it.aux3 = it.aux4 = True
+            self.search_play(it, it.tricked_animation)
+        elif it.aux3 and not it.tricked and it.primed:
+            it.aux3 = False; it.aux1 = it.aux2 = it.aux4 = True
+            self.search_play(it, it.primed_animation)
+        elif it.aux4 and not it.tricked and not it.primed:
+            it.aux4 = False; it.aux1 = it.aux2 = it.aux3 = True
+            self.search_play(it, it.full_animation)
+
+    def play_alert_animation(self, item):
+        """TrickItem.PlayAlertAnimation (TrickItem.cs:1150-1162): the ring
+        pose, the collider, and the Football's CanUse name-hack."""
+        self.play_item_anim(item, item.alert_animation)
+        if item.enable_collider_when_alerted:
+            item.clickable = True
+            if item.name == 'Football':
+                item.can_use = True
+
+    def set_active(self, item, active):
+        """GameObject.SetActive, approximated to what the port models: the
+        renderer and the click collider follow the flag."""
+        if item.sprite is not None:
+            item.sprite.hidden = not active
+        item.clickable = active
+
+    def icon_pressed(self, entry):
+        """HUD.CheckClick consults the held item's OnIconPressed before
+        selecting (HUD.cs:944); the phones raise the alarm instead
+        (Item.OnIconPressed, Item.cs:2176-2199). True lets the selection
+        happen."""
+        src = self.level.items.get(entry.get('item')) \
+            if entry.get('item') else None
+        w = self.woody
+        if src is None or w is None:
+            return True
+        if not w.is_warping:
+            if src.cause_alarm:
+                if src.last_alarm_time is None or \
+                        self.time - src.last_alarm_time > src.cause_alarm_interval:
+                    w.steps = []
+                    w.state = w.IDLE               # Woody.Stop
+                    src.last_alarm_time = self.time
+                    if src.direct_use and w.anim.has(src.direct_use):
+                        w.anim.play_single(src.direct_use)
+                    self.call_later(src.action_duration,
+                                    lambda s=src: self._raise_alarm(s))
+                return False
+            if src.wake_alerter_flag:
+                if src.direct_use and w.anim.has(src.direct_use):
+                    w.anim.play_single(src.direct_use)
+                for fsm in self.alerters.values():
+                    fsm.wake_up()                  # GameInfo.Alerter.WakeUp
+                return False
+        return True
+
+    def _raise_alarm(self, src):
+        """Item.RaiseAlarm (Item.cs:2201-2205) + Rottweiler.OnAlarmRaised
+        (Rottweiler.cs:1036-1045): run to the alarm item and answer it, or
+        park the alarm when passing a door or postponed."""
+        alarm = self.level.items.get(src.alarm_item) if src.alarm_item else None
+        if alarm is None:
+            return
+        rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
+        if rt is not None:
+            if not rt.pawn.is_warping and not rt.is_alarm_postponed():
+                rt.start_urgent(alarm, alarm_use=True)
+            else:
+                rt.pending_alarm = alarm
+        self.play_item_anim(alarm, alarm.alarm_animation)
+
+    def _phone_behavior(self, item):
+        """Item.PhoneBehavior (Item.cs:2429-2448), run from Woody's use tail
+        (Woody.cs:428): a tricked CauseAlarmWhenTrickItem item re-raises the
+        alarm or wakes the pet."""
+        if not item.tricked or not item.cause_alarm_when_trick:
+            return
+        if item.cause_alarm:
+            if item.last_alarm_time is None or \
+                    self.time - item.last_alarm_time > item.cause_alarm_interval:
+                if self.woody is not None:
+                    self.woody.steps = []
+                    self.woody.state = self.woody.IDLE     # Woody.Stop
+                item.last_alarm_time = self.time
+                self.call_later(item.action_duration,
+                                lambda s=item: self._raise_alarm(s))
+        elif item.wake_alerter_flag:
+            for fsm in self.alerters.values():
+                fsm.wake_up()
+
     def rott_hear_alerter(self, fsm, triggered_by_woody):
         """the CoRoutineRottweilerHearAlerter target"""
         rott = self.pawns.get('Rottweiler')
@@ -1778,7 +2456,9 @@ class World:
             if st:
                 w.anim.play_looping(st)
         if w.anim.has(fear):
-            w.anim.play_sequence([fear], on_end=restart_movement)
+            # PlayShortFearAnimation is a PlaySingleAnimation (Woody.cs:1005)
+            w.anim.play_sequence([fear], on_end=restart_movement,
+                                 as_sequence=False)
         else:
             restart_movement()
 
@@ -2131,7 +2811,9 @@ class World:
             else:
                 self._woody_trick_done(item, item_used_inventory)
         if seq:
-            self.woody.anim.play_sequence(seq, on_end=anim_ended)
+            # a bare Animation is a PlaySingleAnimation (Woody.cs:539-546)
+            self.woody.anim.play_sequence(seq, on_end=anim_ended,
+                                          as_sequence=item.use_woody_sequence)
         else:
             anim_ended()
 
@@ -2172,6 +2854,8 @@ class World:
         # Woody laughs (Woody.OnSingleAnimationEnded, Woody.cs:418)
         if not item.dont_laugh and self.woody.anim.has('TrickLaugh'):
             self.woody.anim.play_single('TrickLaugh')
+        # the use tail also runs the item's PhoneBehavior (Woody.cs:428)
+        self._phone_behavior(item)
 
     def _get_tricked(self, item, tricked):
         """Item.GetTricked (Item.cs:1957)"""
@@ -2189,7 +2873,8 @@ class World:
             take = [a for a in take if self.woody.anim.has(a)]
             if take:
                 self.woody.anim.play_sequence(
-                    take, on_end=lambda: self._woody_search_done(item))
+                    take, on_end=lambda: self._woody_search_done(item),
+                    as_sequence=item.use_take_sequence)
             else:
                 self._woody_search_done(item)
         elif self.woody.anim.has('WhatsUp'):
@@ -2200,6 +2885,10 @@ class World:
         (SearchItem.cs:114, 156): hand over the inventory, empty the item.
         Each Inventory keeps its source (inventory.Item = this,
         SearchItem.cs:172) — the priming gates read it."""
+        if self.search_behavior is not None:
+            # Woody.OnSearchItemUsed runs between the source stamps and the
+            # hand-over (SearchItem.cs:178, Woody.cs:985-991)
+            self.search_behavior.on_search_item_used(item)
         self.inventory.add([dict(e, item=item.pid)
                             for e in item.inventory_items])
         # SearchItem.InternalUse's emptying (SearchItem.cs:192-206): a keeper
@@ -2214,6 +2903,43 @@ class World:
         p = self.players.get(id(item.sprite)) if item.sprite else None
         if p is not None and item.empty_animation and p.has(item.empty_animation):
             p.play_single(item.empty_animation)
+
+    def _kid_update(self, kid):
+        """Kid.Update (Kid.cs:25-51): the crying and remote flags raised by
+        ActionManager.KidActions and SandCastleBehavior resolve into plays;
+        crying also breaks Olga's current infinite loop."""
+        spec = self.level.pawns.get('Kid') or {}
+        if kid.kid_start_crying:
+            kid.kid_start_crying = False
+            olga = self.pawns.get('Olga')
+            if olga is not None:
+                olga.anim.anim.infinite = False   # CurrentAnimation.InfiniteLoop
+            if spec.get('kid_use_crying_sequence'):
+                seq = [a for a in spec.get('kid_crying_sequence') or ()
+                       if kid.anim.has(a)]
+                if seq:
+                    kid.anim.play_sequence(seq)
+            elif spec.get('kid_crying') and kid.anim.has(spec['kid_crying']):
+                kid.anim.play_looping(spec['kid_crying'])
+        elif kid.kid_using_remote:
+            kid.kid_using_remote = False
+            rs = spec.get('kid_remote_sequence')
+            if rs and kid.anim.has(rs):
+                kid.anim.play_looping(rs)
+        if kid.kid_remote:
+            kid.kid_remote = False
+            if kid.default_anim and kid.anim.has(kid.default_anim):
+                kid.anim.play_looping(kid.default_anim)
+
+    def kid_start_crying(self):
+        """Kid.StartCrying (Kid.cs:53-59): plays only with UseCryingSequence"""
+        kid = self.pawns.get('Kid')
+        spec = self.level.pawns.get('Kid') or {}
+        if kid is not None and spec.get('kid_use_crying_sequence'):
+            seq = [a for a in spec.get('kid_crying_sequence') or ()
+                   if kid.anim.has(a)]
+            if seq:
+                kid.anim.play_sequence(seq)
 
     def spawn_pawn(self, role):
         spec = self.level.pawns.get(role)
@@ -2251,7 +2977,80 @@ class World:
             r = Routine(self.level, pawn, spec, role=spec['owner'])
             self.routines.append(r)
             r.start()
+        self._build_behaviors()
         return self.routines
+
+    # -- the level behaviors (Actor.Behavior / SecondaryBehaviors,
+    #    Pawn.RoutineBehavior, Woody.SearchBehavior) -----------------------
+    def subscribe(self, name, fn):
+        self.events.setdefault(name, []).append(fn)
+
+    def fire_event(self, name):
+        for fn in list(self.events.get(name, ())):
+            fn()
+
+    def _build_behaviors(self):
+        """wire the serialized behavior components to their owners the way
+        Actor.BehaviorPlayAnimation / BehaviorOnAdvanceFrame dispatch
+        (Actor.cs:93-115), Rottweiler adds the sequence-ended and caught
+        hooks (Rottweiler.cs:448, 514-524, 1218-1239), ActionManager consults
+        Pawn.RoutineBehavior (ActionManager.cs:119-124, 165-168) and
+        SearchItem reaches Woody.SearchBehavior (Woody.cs:985-991). An
+        inactive GameObject's component neither updates nor hooks."""
+        import behaviors as behaviors_mod
+        by_pid = {}
+        for spec in self.level.behaviors:
+            if not spec.get('active'):
+                continue
+            cls = behaviors_mod.REGISTRY.get(spec['type'])
+            if cls is None:
+                continue
+            by_pid[spec['pid']] = cls(self, spec['data'])
+        self.behavior_objs = list(by_pid.values())
+
+        def hook_player(player, blist):
+            player.on_play.append(
+                lambda name, bl=tuple(blist):
+                [b.play_animation(name) for b in bl])
+            player.on_advance.append(
+                lambda idx, bl=tuple(blist):
+                [b.on_advance_frame(idx) for b in bl])
+        for role, spec in self.level.pawns.items():
+            pawn = self.pawns.get(role)
+            if pawn is None:
+                continue
+            blist = []
+            b = by_pid.get(spec.get('behavior'))
+            if b is not None:
+                blist.append(b)
+            for pid in spec.get('secondary_behaviors') or ():
+                b2 = by_pid.get(pid)
+                if b2 is not None:
+                    blist.append(b2)
+            pawn.behaviors = blist
+            if blist:
+                hook_player(pawn.anim, blist)
+            if role == 'Rottweiler' and blist:
+                pawn.anim.seq_end_hook = \
+                    lambda bl=tuple(blist): \
+                    [b.on_animation_sequence_ended() for b in bl]
+            rb = by_pid.get(spec.get('routine_behavior'))
+            if rb is not None:
+                for r in self.routines:
+                    if r.pawn is pawn:
+                        r.routine_behavior = rb
+            sb = by_pid.get(spec.get('search_behavior'))
+            if sb is not None:
+                self.search_behavior = sb
+        # items carrying the shared component get its hooks on their own
+        # controller (the Vacuum, GroundSkates, PoolBoard, Bird, Mug)
+        for it in self.level.items.values():
+            b = by_pid.get(it.behavior) if it.behavior else None
+            if b is None or it.sprite is None:
+                continue
+            p = self.players.get(id(it.sprite))
+            if p is not None:
+                hook_player(p, [b])
 
     def _detect_common(self, catcher):
         """the zone/door/hiding/blocking chain both predicates share. The
@@ -2283,6 +3082,10 @@ class World:
             return False
         if not self._detect_common(rott):
             return False
+        # Rottweiler.CanSeeWoody defers to the primary behavior
+        # (Rottweiler.cs:1218-1221)
+        if rott.behaviors and not rott.behaviors[0].can_see_woody():
+            return False
         it = routine.item if routine else None
         if it is not None and it.name == 'Bed':
             moving = woody.state in (woody.WALK, woody.DOOR_CLIMB,
@@ -2299,6 +3102,9 @@ class World:
             return False
         routine = next((r for r in self.routines if r.pawn is mother), None)
         if routine is None:
+            return False
+        # Mother.CanSeeWoody defers to the primary behavior (Mother.cs:103-106)
+        if mother.behaviors and not mother.behaviors[0].can_see_woody():
             return False
         return self._detect_common(mother) and not mother.is_sleeping
 
@@ -2320,6 +3126,10 @@ class World:
             woody.anim.play_single(fear)
         woody.steps = []
         woody.state = woody.IDLE
+        # Rottweiler.OnCaughtWoody / Mother.OnCaughtWoody dispatch the
+        # behavior hook before HitWoody (Rottweiler.cs:1223-1239)
+        for b in catcher.behaviors:
+            b.on_caught_woody()
         # HitWoody: stop the routine, walk to Woody, then the hit
         for r in self.routines:
             if r.pawn is catcher:
@@ -2372,12 +3182,15 @@ class World:
         if w is not None and w.win_animation and w.anim.has(w.win_animation):
             w.steps = []
             w.state = w.IDLE
+            # Woody.PlayFinishAnimation is a PlaySingleAnimation (Woody.cs:1122)
             w.anim.play_sequence([w.win_animation],
-                                 on_end=self._finish_animation_ended)
+                                 on_end=self._finish_animation_ended,
+                                 as_sequence=False)
         else:
             self._finish_animation_ended()
 
     def tick(self, dt):
+        self.time += dt                  # Time.time
         # the MonoBehaviour.Invoke queue (GameInfo.InvokeMethodForSetPrime)
         for entry in self._delayed[:]:
             entry[0] -= dt
@@ -2406,6 +3219,18 @@ class World:
                 p.tick(dt)
         for r in self.routines:
             r.tick(dt)
+        # the behaviors' MonoBehaviour.Update bodies (enabled components only)
+        for b in self.behavior_objs:
+            if b.enabled:
+                b.update(dt)
+        # SearchItem.Update's animation switcher (SearchItem.cs:214-244)
+        for it in self.level.items.values():
+            if it.kind == 'SearchItem' and it.sprite is not None:
+                self._search_switch(it)
+        # the Kid pawn's flag machine (Kid.cs:25-51)
+        kid = self.pawns.get('Kid')
+        if kid is not None:
+            self._kid_update(kid)
         for fsm in self.alerters.values():
             fsm.tick(dt)
         if self.woody:
