@@ -33,6 +33,7 @@ from menu import (Menu, SceneData, ControlToggle, level_index,
                   load_strings)
 from prefs import Prefs
 from render import TextureCache
+from tutorial import build as build_tutorial
 from audio_out import SoundBank, audio_dirs
 from viewer import Viewer, WIDTH, HEIGHT
 
@@ -432,6 +433,8 @@ class App:
         self.viewer = None
         self.igm = None
         self.cards = None
+        self.tutorial = None
+        self.tutorial_camera = None
         self.state = 'menu'
         self.menu = Menu(path, WIDTH, HEIGHT, self.prefs,
                          sounds=self.banks['s1'],
@@ -490,6 +493,17 @@ class App:
         w = v.world
         w.menu_toggle_hook = self.igm.toggle
         w.show_exit_confirmation = self._show_exit_confirmation
+        # the tutorial layer (LevelScript + the scene's camera script);
+        # GameInfo.ShowTutorialTextAfterIntro activates it at StartGame
+        # (IntroAnimation.cs:305-307)
+        self.tutorial, self.tutorial_camera = build_tutorial(
+            self.igm.scene, WIDTH, HEIGHT, self.igm.loc, v)
+        if self.tutorial is not None:
+            w.level_script = self.tutorial
+        gi = next((o['data'] for o in self.igm.scene.objs.values()
+                   if o.get('type') == 'GameInfo'), {}) or {}
+        self._show_tutorial_after_intro = bool(
+            gi.get('ShowTutorialTextAfterIntro'))
         # HUD.Start stamps MenuLoader by Woody's path (HUD.cs:358-368)
         self.menu_loader = 2 if (v.woody is not None and v.woody.nfh2) else 1
         # the title cards (Level.Start -> IntroAnimation.StartAnimation);
@@ -519,6 +533,8 @@ class App:
             w.start_music(0.0, clap=True,
                           music_on=st.audio_enabled and st.music_enabled,
                           audio_on=st.audio_enabled)
+            if self.tutorial is not None and self._show_tutorial_after_intro:
+                self.tutorial.activate()
 
     def _draw_loading(self, name):
         """the blocking load's screen: LevelTransition's when a level is
@@ -678,6 +694,10 @@ class App:
                               music_on=st.audio_enabled and st.music_enabled,
                               audio_on=st.audio_enabled)
                 w.snap_request = 'Woody'
+                # StartGame's tutorial arm (IntroAnimation.cs:305-307)
+                if self.tutorial is not None \
+                        and self._show_tutorial_after_intro:
+                    self.tutorial.activate()
             v._frame_dt = dt
             v.virtual_mouse = self._mouse
             v.virtual_mouse_down = self._mouse_down
@@ -713,6 +733,11 @@ class App:
         w.menu_open = igm.enabled
         if igm.time_scale > 0.0 and not w.menu_open:
             w.tick(min(dt, 0.1))
+            if self.tutorial is not None and self.tutorial.active:
+                self.tutorial.tick(dt)
+            if self.tutorial_camera is not None \
+                    and self.tutorial_camera.active:
+                self.tutorial_camera.tick(dt)
             woody = v.woody
             if woody is not None and woody.stored_input is not None \
                     and not woody.input_locked and not woody.anim.blocking \
@@ -733,6 +758,13 @@ class App:
 
     def _draw_level_overlay(self, dt):
         igm = self.igm
+        if self.tutorial is not None and self.tutorial.active:
+            # LevelScript.OnGUI skips while a menu is open (cs:100)
+            self.tutorial.draw(self.gfx, dt,
+                               menu_open=igm.enabled
+                               or igm.is_exit_confirmation_shown())
+        if self.tutorial_camera is not None and self.tutorial_camera.active:
+            self.tutorial_camera.draw(self.gfx)
         if igm.enabled:
             igm.draw(self.gfx, dt)
         else:

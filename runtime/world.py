@@ -1306,6 +1306,10 @@ class Pawn:
         else:
             self._next_step()
         if self.role == 'Woody' and self.world is not None:
+            # the tutorial's door signal (Woody.OnDoorEnterAnimationFinished,
+            # Woody.cs:477-480: the far door is compared)
+            if self.world.level_script is not None:
+                self.world.level_script.on_woody_door_entered(d)
             # a finished-entrance pass through an ExitDoor ends the level —
             # after the ExitAnimation loop and EndPortalMove, so the win /
             # lose pose is what stays on screen (Pawn.cs:1652-1665)
@@ -1859,6 +1863,8 @@ class Routine:
         self.loop_from_start = spec['loop_from_start']
         self.loop_from_selected = spec.get('loop_from_selected', False)
         self.frozen = spec['frozen']
+        self.freeze_neighbour = False    # ActionManager.FreezeNeighbour
+        self.stop_dog_action = False     # ActionManager.StopDogAction
         self.state = self.IDLE
         self.timer = 0.0
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
@@ -2982,6 +2988,23 @@ class Routine:
                 return dep
         return None
 
+    def unfreeze(self, start_next=True, advance=False, idx_after=0):
+        """ActionManager.Unfreeze (ActionManager.cs:797-812): drop the
+        freeze, re-anchor at 0 when the caller says ...AfterForceAdvance
+        is 1, optionally advance, then StartNextAction"""
+        self.frozen = False
+        if idx_after == 1:
+            self.index = 0
+        if advance:
+            self._advance()
+        if start_next:
+            self._pending = 'first'      # StartNextAction on this index
+
+    def remove_action_by_index(self, index):
+        """ActionManager.RemoveActionByIndex (ActionManager.cs:844-850)"""
+        if 0 <= index < len(self.actions):
+            del self.actions[index]
+
     def add_in_game_actions(self, index=None):
         """ActionManager.AddInGameActions (ActionManager.cs:814-842): insert
         the serialized extras after the active action (or at the index)."""
@@ -3034,9 +3057,13 @@ class Routine:
         the Bed clear, the after-use hide/show and the layer restore. The
         original runs this on BOTH stop calls of a tricked use."""
         w = self.pawn.world
-        if w is None or a is None or a.get('move_only'):
+        if w is None or a is None:
             return
         items = self.level.items
+        # the unlocks and the tutorial's alternate switch run for EVERY
+        # action, a MoveOnly one included — only the tricked unlocks sit
+        # behind `Item != null` (RoutineActionUse.cs:390-407); Intro103's
+        # dog walk is a MoveOnly step whose ItemsToUnlock opens the Drawer
         for pid in a.get('doors_to_unlock') or ():     # cs:390-393
             d = self.level.door_by_pid(pid)
             if d is not None:
@@ -3045,11 +3072,18 @@ class Routine:
             tgt = items.get(pid)
             if tgt is not None:
                 tgt.locked = False
-        if it.tricked:                                 # cs:398-404
+        if it is not None and it.tricked:              # cs:398-404
             for pid in a.get('items_to_unlock_tricked') or ():
                 tgt = items.get(pid)
                 if tgt is not None:
                     tgt.locked = False
+        if w.level_script is not None:
+            # the tutorial's alternate-description switch
+            # (RoutineActionUse.cs:405-407)
+            w.level_script.on_rottweiler_action()
+        if a.get('move_only') or it is None:
+            # everything below reads the action's Item (cs:415-535)
+            return
         dont_on_owner = it.dont_use_on is not None and \
             w.pawn_by_pid(it.dont_use_on) is self.pawn
         dx, dy = it.rott_use_item_exit_delta
@@ -3131,8 +3165,10 @@ class Routine:
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
+        # the side effects run for EVERY stop — a MoveOnly step's unlocks
+        # and the tutorial switch included (RoutineActionUse.cs:386-412)
+        self._stop_side_effects(a, it)
         if it is not None:
-            self._stop_side_effects(a, it)
             if it.should_destroy() and it.is_tricked(self.level.items):
                 self.remove_actions_by_item(it.pid)
             dep = self.level.items.get(it.depends_on) \
@@ -3713,6 +3749,7 @@ class Routine:
         self._same_zone_yelled = False
         self._sz_watch = False
         self._alarm_use = False
+        self.stop_dog_action = True      # ActionManager.cs:596
         if self.role == 'Mother' and self.pawn.world is not None:
             # StopUrgentAction fires the Mother event (ActionManager.cs:592-595)
             self.pawn.world.fire_event('mother_urgent_stop')
@@ -4291,6 +4328,7 @@ class Routine:
                 cur = self.action
                 if cur is not None and cur.get('freeze_after_completion'):
                     self.frozen = True
+                    self.freeze_neighbour = True   # ActionManager.cs:541
                     self.state = self.IDLE
                     return
             if what in ('advance', 'skip'):
@@ -4684,6 +4722,9 @@ class World:
         # hangs its ExitConfirmation dialog here; without one (the bare
         # viewer) the pass runs straight through
         self.show_exit_confirmation = None
+        # the tutorial layer (runtime/tutorial.py): GameInfo.LevelScript;
+        # the signal sites below call its hooks when the application set it
+        self.level_script = None
         if music is not None and level.music is not None and not defer_music:
             # the viewer alone: its t=0 is IntroAnimation.StartGame; the clap
             # and the 15 s Invoke started intro_total earlier, at the scene
@@ -5021,6 +5062,8 @@ class World:
                 self._fix(item)
             if not item.dont_get_angry:
                 self._on_trick_done(item)          # cs:785-787
+            if self.level_script is not None:
+                self.level_script.on_trick_done()  # cs:789-792
             if rush and not fetch:
                 # the run started before the stop in the original (cs:721),
                 # so the meter latch of cs:793-796 holds through it — the
@@ -5054,6 +5097,8 @@ class World:
                 self._fix(item)
             if not item.dont_get_angry:
                 self._on_trick_done(item)          # cs:785-787
+            if self.level_script is not None:
+                self.level_script.on_trick_done()  # cs:789-792
             if not nfh2:
                 pawn.can_decrease_angry = False    # cs:793-796
             return
@@ -5073,6 +5118,8 @@ class World:
             self._fix(item)
         if not item.dont_get_angry:
             self._on_trick_done(item)              # cs:785-787
+        if self.level_script is not None:
+            self.level_script.on_trick_done()      # cs:789-792
         if not nfh2:
             # the meter stops decaying through the angry set — Classic only
             # (`!Woody.NFH2Path`, cs:793-796; Season 2 keeps decaying)
@@ -6097,6 +6144,10 @@ class World:
                              old_zone_pid)
         # Pawn.ChangeZone: CrabAnimations, then ElephantAnimations (Pawn.cs:1528-1529)
         self.elephant_animations(pawn, pawn.zone.pid if pawn.zone else None)
+        if pawn.role == 'Woody' and self.level_script is not None \
+                and pawn.zone is not None:
+            # the tutorial's zone signal (Pawn.cs:1592-1595)
+            self.level_script.on_woody_zone_entered(pawn.zone.pid)
         if pawn.role != 'Rottweiler':
             return False
         for fsm in self.alerters.values():
@@ -6961,6 +7012,9 @@ class World:
         req = item.required_inventory not in (None, '', 'IT_NONE')
         if inv.used is None and (req or item.ignore_required_for_desc):
             self.show_item_tooltip(item)
+            if self.level_script is not None:
+                # the tutorial's look-at signal (Item.cs:1817-1819)
+                self.level_script.on_item_lookat(item)
         elif inv.used is not None \
                 and inv.used['type'] != item.required_inventory:
             for t in item.inventory_tooltips:
@@ -7013,6 +7067,8 @@ class World:
             # HideItem.InternalUse's Woody.Hide + HideAnim (HideItem.cs:32-44)
             # and Woody plays Hide_In
             item.used = True                             # Item.cs:1893
+            if self.level_script is not None:
+                self.level_script.on_item_used(item)     # cs:1894-1897
             self._item_internal_use(item)
             self.woody.hide(item)
             if self.hud is not None:
@@ -7067,6 +7123,8 @@ class World:
                 da = drawing.use_anim['Rottweiler']
                 da[1 if len(da) > 1 else 0] = 'BalconyDrawingWithoutBird'
         item.used = True                                 # cs:1893
+        if self.level_script is not None:
+            self.level_script.on_item_used(item)         # cs:1894-1897
         if item.name == 'CowCrap':                       # cs:1898-1910
             cow = self.level.items.get(
                 (self.level.objs.get(str(item.pid), {}).get('data', {})
@@ -7347,7 +7405,13 @@ class World:
 
     def spawn_pawn(self, role):
         spec = self.level.pawns.get(role)
-        if not spec or spec['zone'] is None:
+        if not spec:
+            return None
+        if spec['zone'] is None and not (role == 'Woody'
+                                         and self.level.start_zone):
+            # a pawn with no serialized Zone never acts; Woody alone gets
+            # parked into Level.StartZone regardless (Woody.cs:187-192 —
+            # Intro102/103 ship his Zone empty)
             return None
         p = Pawn(self.level, spec['sprite'],
                  self.level.zone_by_pid(spec['zone']), spec,

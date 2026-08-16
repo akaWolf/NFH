@@ -1697,9 +1697,16 @@ class Menu:
             self.credits_go = go
             self.credits = Credits(cr[0][1], self, go if win else None)
             self._credits_was_active = False
-        dr = self.scene.find('DirectorAnimation')
-        director = DirectorAnimation(dr[0][1], W, H) if dr else None
         ec = self.scene.find('ExitConfirmation')
+        ec_go = ec[0][0] if ec else None
+        # the tutorial scenes carry a second DirectorAnimation on the
+        # LevelScript object (its own message faces); the dialog's is the
+        # one sharing the ExitConfirmation's GameObject (Start's
+        # GetComponentInChildren from that object, ExitConfirmation.cs:63)
+        drs = self.scene.find('DirectorAnimation')
+        dr = next((d for go, d in drs if go == ec_go),
+                  drs[0][1] if drs else None)
+        director = DirectorAnimation(dr, W, H) if dr else None
         self.exit_message = ExitConfirmation(ec[0][1] if ec else {},
                                              director, self, 0)
         # the menu cursor (MenuMouseController: the PC build's cursor

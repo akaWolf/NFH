@@ -980,12 +980,15 @@ class Door:
                  'delta_exit', 'delta_mother_exit', 'passable', 'ignore_idle',
                  'disabled', 'description_string', 'walk_deltas',
                  'exit_door', 'woody_delta_use_height', 'use_woody_extra',
-                 'can_use', 'dont_use_on', 'with_string')
+                 'can_use', 'dont_use_on', 'with_string', 'temporal_lock')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
         self.zone = zone; self.link_to = link_to; self.locked = locked
         self.door_type = door_type
+        # Door.TemporalLock (Door.cs): the zone edge exists from the start,
+        # the pass unlocks later — the Intro scenes' scripted doors
+        self.temporal_lock = bool(d.get('TemporalLock'))
         # enter/leave are ItemAnimationState and play on the door; ExitAnimation
         # is an AnimationState and loops on the pawn once it is through
         self.enter = _anim_name(d.get('WoodyEnterAnimation'))
@@ -1845,31 +1848,27 @@ class Level:
     def _build_graph(self):
         """ZoneController.Start() (ZoneController.cs:16-27): a door links its
         own zone to the zone of whatever it points at, `(!Locked ||
-        TemporalLock) && LinkTo != null`. Two departures, both documented:
-        the `|| TemporalLock` arm is not modelled — 22 doors carry it, 20 of
-        them Locked, all in s1/Intro101-103 (unported cutscenes); there the
-        original keeps the edge but LinkNodes then refuses the Locked door
-        (GetDoorBetweenZones wants !Locked, Helpers.cs:194-205, 245-248)
-        and returns a null path, while the port drops the edge — the same
-        None for every ordered zone pair of the three intros (they hold no
-        route made of unlocked doors except Intro103 Zone02<->Zone03, which
-        both graphs carry), so the missing arm has no observable effect and
-        the 28 playable levels ship no TemporalLock door at all. A
-        DisableOnStart door (Door.cs:63-66; only L214's captain DoorBack
-        pair, Zone03<->Zone05) KEEPS its edge: the pair ships active, so
-        ZoneController.Start sees it unless Door.Start deactivated it first
-        — and the level needs the edge (Item.CaptainDoorBehavior, Item.cs:
-        2606-2623, re-activates both doors and retargets the neighbour's
-        CaptainDoor action at CaptainControls in Zone05: with no edge that
-        action and the cabin's two tricks are dead). Zone.Neighbors never
-        changes afterwards; while the pair is inactive LinkNodes finds no
-        door between the zones (GetDoorBetweenZones, Helpers.cs:194-205,
-        245-248) and the path is null — find_path refuses a route through
-        a disabled door the same way."""
+        TemporalLock) && LinkTo != null` — a TemporalLock door (the Intro
+        scenes' scripted ones; the tutorial unlocks them action by action)
+        keeps its edge while Locked, and LinkNodes then refuses the
+        route until the door unlocks (GetDoorBetweenZones wants !Locked,
+        Helpers.cs:194-205, 245-248 — find_path's locked check). One
+        departure stays documented: a DisableOnStart door (Door.cs:63-66;
+        only L214's captain DoorBack pair, Zone03<->Zone05) KEEPS its edge:
+        the pair ships active, so ZoneController.Start sees it unless
+        Door.Start deactivated it first — and the level needs the edge
+        (Item.CaptainDoorBehavior, Item.cs:2606-2623, re-activates both
+        doors and retargets the neighbour's CaptainDoor action at
+        CaptainControls in Zone05: with no edge that action and the cabin's
+        two tricks are dead). Zone.Neighbors never changes afterwards;
+        while the pair is inactive LinkNodes finds no door between the
+        zones and the path is null — find_path refuses a route through a
+        disabled door the same way."""
         by_pid = {d.pid: d for d in self.doors}
         self.graph = {z.pid: [] for z in self.zones}
         for d in self.doors:
-            if d.zone is None or d.link_to is None or d.locked:
+            if d.zone is None or d.link_to is None \
+                    or (d.locked and not d.temporal_lock):
                 continue
             other = by_pid.get(d.link_to)
             if other is None or other.zone is None:
@@ -1915,8 +1914,12 @@ class Level:
                         out.append((n, dr))
                         n = c
                     out.reverse()
-                    if any(dr.disabled for _, dr in out):
-                        return None      # LinkNodes: no door -> null path
+                    if any(dr.disabled or dr.locked for _, dr in out):
+                        # LinkNodes: no active, unlocked door between the
+                        # zones -> null path (GetDoorBetweenZones wants
+                        # !Locked, Helpers.cs:194-205, 245-248) — a
+                        # TemporalLock edge opens only when the door unlocks
+                        return None
                     return out
                 q.append(nb)
         return None
