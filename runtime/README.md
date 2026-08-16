@@ -1844,12 +1844,14 @@ Port decisions, each documented in place:
   Android decompile has no SettingKey for it): a synthesized
   `ControlToggle` in both options windows, the `Fullscreen` pref,
   SDL fullscreen-desktop over the 800×600 logical size.
-- **The sliders' first run looks shipped.** `ControlSlider.LoadValue`
+- **The sliders' fill is clamped to the track.** `ControlSlider.LoadValue`
   reads the raw default 10 into a [0,1]-ranged control
   (ControlSlider.cs:47-70: `CalculatedScreenRect.width *= FloatValue`,
-  `ScreenUVRect.width = FloatValue`), so until first dragged the fill
-  rect is 10× the slider and the clamp-wrapped texture smears across the
-  screen — the original data does this; the port draws the same bands.
+  `ScreenUVRect.width = FloatValue`), so the original's untouched first
+  run paints a fill ten tracks wide, out to the screen edge. The port
+  clamps the drawn fill at 1 — a cosmetic departure; the stored value
+  and the volume (already clamped) are untouched, and the first drag
+  writes [0,1] in both.
 
 `tests/run_menu.py` drives the whole flow headless (the splash, the
 window graph, the tiles and prefs, the cards, the in-game menu, the

@@ -743,14 +743,22 @@ class ControlSlider(Control):
             self.calculate_float_rect()
 
     def calculate_float_rect(self):
+        """CalculateFloatRect (ControlSlider.cs:64-70) with the fill
+        clamped to the track: the serialized DefaultInt is 10 on a control
+        whose DoWork writes [0,1] (cs:47-52), so an untouched first run
+        computes a fill rect ten tracks wide, painted to the screen edge.
+        The port clamps the DRAWN fill at 1 — a documented cosmetic
+        departure; the stored value and the volume (already clamped by
+        the settings) are untouched, and the first drag lands both worlds
+        on the same [0,1]."""
         r = self.screen_mobile_rect
-        self.uv_width = self.float_value
-        self.calculated_rect = (r[0], r[1], r[2] * self.float_value, r[3])
+        self.uv_width = min(1.0, self.float_value)
+        self.calculated_rect = (r[0], r[1], r[2] * self.uv_width, r[3])
 
     def calculate_int_rect(self):
         r = self.screen_mobile_rect
-        self.uv_width = float(self.int_value)
-        self.calculated_rect = (r[0], r[1], r[2] * self.int_value, r[3])
+        self.uv_width = min(1.0, float(self.int_value))
+        self.calculated_rect = (r[0], r[1], r[2] * self.uv_width, r[3])
 
     def draw_texture(self, g):
         if self.background:
