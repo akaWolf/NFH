@@ -1299,7 +1299,6 @@ class FifiBehavior(Behavior):
         if tf.sprite is not None:
             tf.sprite.x += nx - tf.x
             tf.sprite.y += ny - tf.y
-            tf.pos_snap = True
         tf.x, tf.y = nx, ny
 
     def update(self, dt):
@@ -1324,7 +1323,6 @@ class FifiBehavior(Behavior):
             if tf.sprite is not None:
                 tf.sprite.x += self.start_position[0] - tf.x
                 tf.sprite.y += self.start_position[1] - tf.y
-                tf.pos_snap = True
             tf.x, tf.y = self.start_position
 
     def play_animation(self, name):
@@ -1543,7 +1541,6 @@ class BirdMovementBehavior(Behavior):
         if b.sprite is not None:
             b.sprite.x += nx - b.x
             b.sprite.y += ny - b.y
-            b.pos_snap = True
         b.x, b.y = nx, ny
 
     def update(self, dt):

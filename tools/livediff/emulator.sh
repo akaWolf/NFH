@@ -104,6 +104,18 @@ frida)
     echo "frida on 27042"
     ;;
 play) $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application ;;
+level)
+    # from a cold start to standing in Level201: the cross-promo screen,
+    # the title card, the menu and the episode map, at 320x640
+    $ADB shell am force-stop com.nordigames.nfh2; sleep 2
+    $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
+    sleep 55; $ADB shell input keyevent 4          # dismiss "play more games"
+    sleep 8;  $ADB shell input tap 320 160         # touch to continue
+    sleep 10; $ADB shell input tap 320 149         # START GAME
+    sleep 12; $ADB shell input tap 600 305         # the episode's play button
+    sleep 25; echo "in level"
+    ;;
+tap)  $ADB shell input tap "$2" "$3" ;;
 shot) $ADB exec-out screencap -p > $DIR/shot.png; echo $DIR/shot.png ;;
 adb)  shift; $ADB "$@" ;;
 *)    sed -n '2,20p' "$0" ;;

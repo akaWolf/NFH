@@ -1549,20 +1549,26 @@ class Pawn:
                 self.use_door_at_once = False           # Pawn.cs:1414
                 self._transit_animations(d, other, sequential=True)
                 return
-            self.sprite.y += self.door_force * scale
+            # the climb has the same urgent-move pair as the walk
+            # (Pawn.cs:1404-1411)
+            self.sprite.y += (self.run_door_force if self.in_urgent
+                              else self.door_force) * scale
         elif self.state == self.DESCEND:
             # IsAtPortalTargetLocation: signed, no snapping afterwards
             if self.sprite.y - self.floor_y() < self.zone_threshold:
                 self._next_step()
                 return
-            self.sprite.y -= self.door_force * scale
+            self.sprite.y -= (self.run_door_force if self.in_urgent
+                              else self.door_force) * scale   # Pawn.cs:1430-1437
         elif self.state == self.ITEM_CLIMB:
             it = self._step['item']
             if self.at_use_location(it):
                 self._next_step()         # velocity zero; on_arrive fires use
                 return
             direction = -1.0 if it.should_walk_down else 1.0
-            self.sprite.y += direction * self.door_force * scale
+            self.sprite.y += direction * (self.run_door_force if self.in_urgent
+                                          else self.door_force) * scale
+            # MoveToItem's climb (Pawn.cs:1771-1778)
 
 
 class AlerterFSM:

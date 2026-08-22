@@ -73,6 +73,35 @@ function offsets(k, names) {
     return out;
 }
 
+// --- the pinned clock ------------------------------------------------
+// The port steps a fixed 1/60 s (runtime/record.py); pinning the
+// original's dt to the same quantum makes the two advance in identical
+// steps, so a slow emulator changes nothing about the trace. The
+// property is an internal call, but its JIT-compiled wrapper is an
+// ordinary function and can be replaced outright.
+const DT = 1.0 / 60.0;
+const Time = klass(asmUnity, 'UnityEngine', 'Time');
+const pinned = [];
+['get_deltaTime', 'get_fixedDeltaTime', 'get_unscaledDeltaTime',
+ 'get_smoothDeltaTime'].forEach(function (name) {
+    const m = method(Time, name, 0);
+    if (m.isNull()) return;
+    Interceptor.replace(mono_compile_method(m),
+        new NativeCallback(function () { return DT; }, 'float', []));
+    pinned.push(name);
+});
+
+// Random.InitState: one seed, so the original's die rolls repeat
+const Random = klass(asmUnity, 'UnityEngine', 'Random');
+const initState = method(Random, 'InitState', 1);
+if (!initState.isNull()) {
+    const seed = Memory.alloc(4); seed.writeS32(0);
+    const args = Memory.alloc(Process.pointerSize); args.writePointer(seed);
+    const exc = Memory.alloc(Process.pointerSize); exc.writePointer(NULL);
+    mono_runtime_invoke(initState, NULL, args, exc);
+    pinned.push('Random.InitState(0)');
+}
+
 const GameInfo = klass(asmGame, '', 'GameInfo');
 const Component = klass(asmUnity, 'UnityEngine', 'Component');
 const Transform = klass(asmUnity, 'UnityEngine', 'Transform');
@@ -106,7 +135,7 @@ const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
                               'WinningTricksCount', 'FinalTrickScore',
                               'FinalViewerRating', 'Won', 'GameEnding',
                               'gotCaught', 'Woody', 'Rottweiler']);
-send({ type: 'ready', offsets: GI });
+send({ type: 'ready', offsets: GI, pinned: pinned });
 
 const bool8 = (p, o) => p.add(o).readU8() !== 0;
 const i32 = (p, o) => p.add(o).readS32();

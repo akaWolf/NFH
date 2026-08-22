@@ -69,7 +69,7 @@ def main(argv):
             }) + '\n')
             stats['frames'] += 1
         else:
-            print('[%s] %s' % (p.get('type'), json.dumps(p)[:160]))
+            print('[%s] %s' % (p.get('type'), json.dumps(p)[:400]))
 
     script.on('message', on_message)
     script.load()
