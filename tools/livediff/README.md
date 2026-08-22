@@ -293,3 +293,50 @@ by-arity lookup returns the `Type` overload, which crashes on a string —
 `mono_method_desc_search_in_class` with `:GetComponent(string)` picks
 the right one; and anything that calls into the engine has to run on
 the player's thread, which the hook on `GameInfo.Update` provides.
+
+## Every level's opening
+
+With `run.py --load` a level starts by name from inside the running
+game, and `sweep.py` records all 28 openings on both sides — 74 seconds
+of the original, 60 of the port, no input — and tabulates each level's
+neighbour and Woody: frames compared, mean and peak distance, the frames
+over 0.05 and where the first of them falls. Season 1's table sorted
+itself into four kinds of row.
+
+The first is the one-frame door phase already known from Level202:
+Level101/102 show two or three frames over 0.05, each the width of a
+warp taken a frame apart.
+
+The second is every walk-up door pass, and it is the original's, not a
+bug of the port: `PlayDoorLeaveAnimation` clears `MovingUp` and hides
+the pawn (Pawn.cs:1624-1635) but leaves `Velocity` at the climb's
+`DoorForceMagnitude`, `MoveToDoor`'s `PortalMove` arm returns without
+touching it (cs:1389-1440), and `ProcessMovement` keeps integrating
+(cs:855-880) — the hidden neighbour rises 1.7 units through the ceiling
+for the three seconds of the leave and enter animations until
+`WarpThroughDoor` (cs:1517-1522) puts him at the far door. The port
+parks him at the foot. Nothing reads the position meanwhile — the pawn
+is hidden, and the camera (`CameraMover`) follows touches, not pawns —
+so the differ is the only witness: 193 frames over 0.05 per pass, peak
+3.4, in Level103-106, 108, 110-114.
+
+The third was a bug, and Level103 showed it plainly. The neighbour comes
+down the front stairs while Woody stands at the door; the original
+catches him on the frame the door animation ends (18.92 s), the port a
+second later, after walking him down to the floor line and 0.5 to the
+right. `OnDoorEnterAnimationFinished` ends in `HasNeighborCaughtWoody`
+(Pawn.cs:1666-1670) → `HitWoody` → `StartUrgentAction` → `StartAction`,
+which walks only when `!IsAtActionLocation` (ActionManager.cs:146-155);
+`RoutineActionHitWoody`'s test is the x distance against
+`MaximumPawnDistanceToAction` (RoutineActionHitWoody.cs:15-18), which
+the levels serialize as 0.8 — so the hit starts where the neighbour
+stands, and `OnActionStarted`'s `MoveToEmptySpace` snaps him onto Woody
+(then 0.6 off the nearest door: (3.785, -2.059) in both). The port
+always walked. Two more things came with it: `HitWoody` stops the
+current action first (Rottweiler.cs:1088) and `OnActionStarted` pauses
+the movement (RoutineActionHitWoody.cs:27) — the port's neighbour still had the door descent
+and the LetterBox use queued, and `MailboxStart` played over
+`WhirlWoody`; and the catch check has to close the handler, after
+`EndPortalMove` has taken the next step, not precede it. With the three
+in place the port's neighbour is at (3.785, -2.059) on the same frame,
+`WhirlWoody` on the sheet.

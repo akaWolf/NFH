@@ -1303,14 +1303,13 @@ class Pawn:
         self.last_exit_door = d
         if self.role == 'Rottweiler':
             self.rott_last_door = d       # Pawn.cs:1645-1648
-        # the arrival catch check, run with the new zone in place
-        # (Woody.cs:495-496; the base runs it for the other pawns,
-        # Pawn.cs:1666-1670)
-        if self.world is not None:
-            self.world.door_exit_catch()
         if self.world is not None and old_zone != (self.zone.pid if self.zone else None):
             if self.world.on_pawn_zone_changed(self, old_zone):
-                return                    # OnChangeZone returned true: taken over
+                # OnChangeZone returned true: taken over — the catch check
+                # still closes OnDoorEnterAnimationFinished (Pawn.cs:1666)
+                if self.world is not None:
+                    self.world.door_exit_catch()
+                return
         if d.exit_anim and self.anim.has(d.exit_anim):
             self.anim.play_looping(d.exit_anim)
         if d.should_walk_up and self.steps:
@@ -1331,9 +1330,18 @@ class Pawn:
             if d.exit_door and self.finished_entrance:
                 self.world.finish_game_on_hud_click()
             # a finish that arrived mid-pass plays at the arrival
-            # (Woody.OnDoorEnterAnimationFinished, Woody.cs:490-493)
+            # (Woody.OnDoorEnterAnimationFinished, Woody.cs:490-493) and
+            # returns before the catch check
             if self.world.should_play_finish:
                 self.world._play_finish_animation()
+                return
+        # the arrival catch check closes the handler, after EndPortalMove
+        # has taken the next step and the routine may have started its
+        # use (Pawn.cs:1666-1670 for the other pawns, Woody.cs:495-496):
+        # HitWoody's StopCurrentAction then cuts that use short, and the
+        # hit sequence is what stays on the sheet
+        if self.world is not None:
+            self.world.door_exit_catch()
 
     # -- tick ---------------------------------------------------------------
     def _zone_watch(self):
@@ -7720,10 +7728,23 @@ class World:
         for r in self.routines:
             if r.pawn is catcher:
                 r.frozen = True           # ActionManager.Freeze in the action
+        # HitWoody's StopCurrentAction (Rottweiler.cs:1088) drops the move
+        # in progress with its arrival — the routine's use must not start
+        # under the hit
         catcher.steps = []
+        catcher.on_arrive = None
         catcher.in_urgent = False         # HitWoodyAction.Urgent = false
 
         def hit():
+            # RoutineActionHitWoody.OnActionStarted (cs:24-33) opens with
+            # Owner.PauseMovement: nothing integrates or arrives from here
+            # on — a door descent in progress would otherwise land on the
+            # floor and hand the walk's arrival to the stopped routine
+            catcher.movement_paused = True
+            catcher.velocity = (0.0, 0.0)
+            catcher.steps = []
+            catcher.on_arrive = None
+            catcher.state = catcher.IDLE
             seqs = [q for q in catcher.hit_action.get('sequences', [])
                     if all(catcher.anim.has(a) for a in q)]
             # MoveToEmptySpace (Rottweiler.cs:1156-1203, Mother.cs:142): the
@@ -7750,7 +7771,15 @@ class World:
                 self._finish_animation_ended()
         # HitWoodyAction serializes Urgent=false — the catcher walks over
         catcher.in_urgent = False
-        if not catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
+        # StartAction (ActionManager.cs:146-155) walks only when the action
+        # is not already at its location: RoutineActionHitWoody's test is
+        # the x distance to Woody against MaximumPawnDistanceToAction
+        # (RoutineActionHitWoody.cs:15-18; 0.8 in the levels' data) — a
+        # catch at the foot of a door starts the hit where the pawn stands
+        maxd = catcher.hit_action.get('max_distance') or 0.03
+        if abs(catcher.sprite.x - woody.sprite.x) <= maxd:
+            hit()
+        elif not catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
             hit()
 
     def _move_to_empty_space(self, catcher):
