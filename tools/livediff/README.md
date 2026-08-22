@@ -358,3 +358,107 @@ Season 1 table — the stop before a flat door, the far door's placement,
 the entrance — and the first thing to fix: shift each zone's descendant
 transforms by the zone's own runtime delta. (The Season 2 table, same
 sweep: 201/202/210 clean, 203/206/209/211/212/214 to triage after it.)
+
+With the zone children moved the Season 1 door rows collapse: Level111's
+Woody entrance goes from 143 frames over 0.05 to none, its neighbour from
+3371 to 275 — and what is left in both levels is the hidden drift during
+door passes plus the one-frame phase. The differ now skips the frames
+the port's pawn spends inside a pass (`door_anim`, one frame of padding
+either side; the recorders log the pawn state as `pstate`), so the
+tables show what the screen shows.
+
+Season 2 zones move too — by `ZonesY` alone, up to 1.25 in Level211 —
+and the shift took Level206's stairs with it: the neighbour's walk
+through the two upper-floor transitions, 751 frames apart before, now
+tracks the original to a few hundredths. What the same level showed next
+was a bug of another kind: after the Urgent DeckChair action the port's
+neighbour ran to the dog (2 units/s, arriving at 28.65 s) where the
+original walks (0.9, arriving near 30.3 s). A MoveOnly step is a plain
+`MoveToGoal` (RoutineActionMove.cs:76-79), and `MoveToGoal` clears
+`InUrgentMove` (Pawn.cs:428-432); the port's MoveOnly branch inherited
+the previous action's flag. Two Season 2 plans and one check had been
+tuned to the port's old geometry — the neighbour of Level206 parks by
+the dog for the next half minute in both games now, and Level211's
+fishing rod, no longer under the moved stairs' collider, is an item
+click (tests/checks/s2_plans.py F4).
+
+## The animation clock, closed
+
+The one frame per hand-over turned out to be one frame per sheet frame,
+and Level109 made it large: the neighbour's Bed use is BedIn and thirty
+BedSleep elements, 2 fps, two sheet frames each — 60 ticks apiece in the
+original (`clock.js`, every element), 61 in the port — and the alarm
+clock woke the port's neighbour 31 frames late, with every use after it
+displaced by as much. `animationTime` is a C# float
+(AnimationControllerBase.cs:17), Time.deltaTime too: 0.5f minus thirty
+0.016666668f lands below zero on the 30th tick, where the same sums in
+doubles leave +1e-17 and cost a 31st. `AnimPlayer.tick` now rounds its
+accumulator, the frame step and `1f / FrameRate` to single precision
+(`_f32`), and BedSleep takes 60. (The 43 of a sequence's first element
+was already right: `InitializeCurrentAnimation` zeroes the clock and
+the first tick advances at once.)
+
+## The hit from 0.8 away
+
+Six levels still showed the same shape after that — 203, 208, 211 and
+213 in Season 2, 108 and 113 in Season 1: the original's neighbour
+jumps 0.8 units ahead of where the port's still walks, then stands. A
+tracer on the ActionManager (`actions.js`: the active, urgent and move
+actions every frame) named it: `HitWoody` — the neighbour has caught
+Woody at the zone's edge and is walking up to him, and a walk toward a
+pawn ends when `RoutineActionMove.Finished` says so, which for a hit is
+the x distance to Woody under `MaximumPawnDistanceToAction`
+(RoutineActionMove.cs:26-41), 0.8 in the levels' data. The move stops
+there, `OnActionStarted` snaps him onto Woody (`MoveToEmptySpace`) and
+the hit sequence plays; the port walked the last 0.8. `World.tick` now
+carries that test for every walk toward a pawn — the catch and the
+Mother's and Olga's `HitPawn` runs, whose `IsAtActionLocation` adds the
+zone (RoutineActionHitPawn.cs:13-18) — before the pawns move, where
+`ActionManager.Update` reads it. Level213's catch lands on the same
+frame as the original's, 16.52 s, at (4.004, -0.800).
+
+Four of the trick plans stopped passing along the way — Level113's
+ElectricTrap wait, Level205's statue and glasses, Level206 from the
+DentureAdhesive on, Level208's ShoeMachine and cable — and none of them
+is a divergence the sweep can see: the plans were written against the
+port as it was, and the neighbour they wait for now walks, parks and
+catches as the original does (Level206's neighbour, for one, sits by
+the dog from 35 s to the end of a two-minute recording on both sides).
+They are follow-ups: each wants its legs re-timed against the
+original's routine, which `sweep.py` now gives per level.
+
+## Where the sweep stands
+
+After the fixes above, re-recorded on the port side (the original's
+recordings are the sweep's originals): frames over 0.05 in the
+neighbour's trace outside door passes, the mean distance, and where
+the first such frame falls. Woody's rows are clean on every level
+(no input past the entrance).
+
+| level | over 0.05 / mean / first | level | over 0.05 / mean / first |
+|---|---|---|---|
+| Level101 | 0 / 0.0080 /  | Level201 | 0 / 0.0002 /  |
+| Level102 | 0 / 0.0073 /  | Level202 | 0 / 0.0014 /  |
+| Level103 | 0 / 0.0011 /  | Level203 | 1 / 0.0064 / 58.08 |
+| Level104 | 0 / 0.0059 /  | Level204 | 1 / 0.0017 / 30.67 |
+| Level105 | 0 / 0.0046 /  | Level205 | 1 / 0.0135 / 25.83 |
+| Level106 | 0 / 0.0063 /  | Level206 | 0 / 0.0076 /  |
+| Level107 | 665 / 0.0183 / 24.67 | Level207 | 3 / 0.0092 / 17.13 |
+| Level108 | 3 / 0.0061 / 9.5 | Level208 | 1 / 0.0032 / 23.98 |
+| Level109 | 806 / 0.0205 / 37.45 | Level209 | 2 / 0.0099 / 47.45 |
+| Level110 | 3 / 0.0146 / 17.23 | Level210 | 0 / 0.0090 /  |
+| Level111 | 0 / 0.0031 /  | Level211 | 2 / 0.0076 / 49.77 |
+| Level112 | 84 / 0.0141 / 12.22 | Level212 | 3 / 0.0057 / 5.92 |
+| Level113 | 1 / 0.0122 / 51.35 | Level213 | 0 / 0.0023 /  |
+| Level114 | 2 / 0.0106 / 21.3 | Level214 | 0 / 0.0095 /  |
+
+What is left is small and of two kinds. The single frames (108, 110,
+113, 114, 203-205, 207-209, 211, 212) are the warp-phase frame the
+mask's padding does not cover: a pass that ends two frames apart.
+Level107 and Level109 carry a lag of two to four frames that starts
+at the end of an item use and rides the walk that follows — the
+original leaves the alarm clock, the camera, the teeth two frames
+before the port does — which is the last of the animation-clock
+business (a use's last element, the item's own sequence and the
+action's stop within one frame of each other) and reads as 0.03-0.09
+for the length of a walk. Both are below what a viewer sees.
