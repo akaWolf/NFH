@@ -43,6 +43,75 @@ def record_port(level):
     return ok
 
 
+CLICK_FRAME = 720                     # 12 s of level time
+
+
+def first_take(level):
+    """the first `take <Item>` leg of the level's plan"""
+    p = os.path.join(ROOT, 'tests', 'plans', season_of(level), level + '.txt')
+    if not os.path.exists(p):
+        return None
+    for line in open(p):
+        line = line.split('#')[0].strip()
+        if line.startswith('take '):
+            return line.split()[1]
+    return None
+
+
+def record_clicks_port(level):
+    it = first_take(level)
+    if it is None:
+        print('%-10s clicks: no take in the plan' % level, flush=True)
+        return False
+    out = os.path.join(OUT, level, 'port')
+    os.makedirs(out, exist_ok=True)
+    script = os.path.join(out, 'script.txt')
+    with open(script, 'w') as f:
+        f.write('wait %s\nclickitem %s\n' % (CLICK_FRAME / 60.0, it))
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'record_app.py'), level, out,
+                        '--script=' + script, '--seconds=%s' % SECONDS],
+                       capture_output=True, text=True, timeout=900,
+                       env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'))
+    ok = os.path.exists(os.path.join(out, 'state.jsonl'))
+    click = [l for l in r.stdout.splitlines() if 'clickitem' in l]
+    print('%-10s clicks port %s %s' % (level, 'ok' if ok else 'FAILED', click[-1] if click else ''), flush=True)
+    return ok
+
+
+def _relevel(level, adb='pcnew'):
+    """walk the season's game back into a level — the app dies after a
+    few LoadLevel calls in a row on the 2 GB emulator"""
+    em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
+    season = '1' if season_of(level) == 's1' else '2'
+    subprocess.run(['ssh', '-o', 'BatchMode=yes', adb,
+                    'NFH_SEASON=%s %s level' % (season, em)],
+                   capture_output=True, text=True, timeout=200)
+
+
+def record_clicks_live(level, adb='pcnew', retry=True):
+    it = first_take(level)
+    if it is None:
+        return False
+    out = os.path.join(OUT, level, 'live')
+    os.makedirs(out, exist_ok=True)
+    env = dict(os.environ, NFH_PKG=PKG[season_of(level)])
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'run.py'), out, '--attach',
+                        '--load=' + level, '--tap=%s@f%d' % (it, CLICK_FRAME),
+                        '--adb=' + adb, '--seconds=%s' % (SECONDS + 14)],
+                       capture_output=True, text=True, timeout=600, env=env)
+    n = 0
+    q = os.path.join(out, 'state.jsonl')
+    if os.path.exists(q):
+        n = sum(1 for _ in open(q))
+    tapline = [l for l in r.stdout.splitlines() if l.startswith('tap ')]
+    print('%-10s clicks live %d frames %s' % (level, n,
+          tapline[-1] if tapline else 'NO TAP ' + r.stdout[-200:].replace(chr(10), ' ')), flush=True)
+    if n <= 600 and retry:
+        _relevel(level, adb)
+        return record_clicks_live(level, adb, retry=False)
+    return n > 600
+
+
 def record_live(level):
     out = os.path.join(OUT, level, 'live')
     os.makedirs(out, exist_ok=True)
@@ -100,6 +169,10 @@ def main(argv):
         print(__doc__)
         return 2
     cmd, levels = argv[0], argv[1:] or all_levels()
+    if cmd == 'clicks-port':
+        return 0 if all([record_clicks_port(l) for l in levels]) else 1
+    if cmd == 'clicks-live':
+        return 0 if all([record_clicks_live(l) for l in levels]) else 1
     if cmd == 'port':
         return 0 if all(record_port(l) for l in levels) else 1
     if cmd == 'live':

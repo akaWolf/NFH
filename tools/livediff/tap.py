@@ -191,7 +191,8 @@ def main(argv):
     print('%s at world (%.3f, %.3f) -> tap %d %d' % (name, got['world'][0], got['world'][1], sx, sy))
     if 'dry' in opts:                      # resolve only, no tap
         return 0
-    adb = ['ssh', '-o', 'BatchMode=yes', opts['adb'], 'bash /tmp/emulator.sh tap %d %d' % (sx, sy)] \
+    adb = ['ssh', '-o', 'BatchMode=yes', opts['adb'],
+           '%s tap %d %d' % (os.environ.get('NFH_EM', 'bash /tmp/emulator.sh'), sx, sy)] \
         if 'adb' in opts else ['adb', 'shell', 'input', 'tap', str(sx), str(sy)]
     subprocess.run(adb, check=False, timeout=60)
     return 0

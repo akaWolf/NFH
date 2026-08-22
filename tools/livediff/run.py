@@ -62,7 +62,7 @@ def main(argv):
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
     extra_log = open(os.path.join(out_dir, 'extra.jsonl'), 'w')
-    stats = {'frames': 0, 'errors': []}
+    stats = {'frames': 0, 'errors': [], 'level_frames': 0, 'last_frame_wall': 0.0}
 
     def on_message(message, data):
         if message.get('type') == 'error':
@@ -75,6 +75,13 @@ def main(argv):
             extra_log.write(json.dumps(p) + '\n')
             return
         if p.get('type') == 'frame':
+            # frames arrive only while a level runs: a gap of over a second
+            # is the load, and the counter after it is level time
+            now = time.time()
+            if now - stats['last_frame_wall'] > 1.0:
+                stats['level_frames'] = 0
+            stats['last_frame_wall'] = now
+            stats['level_frames'] += 1
             # record.py's clock: the port steps a fixed 60 Hz, and the
             # original's dt is pinned to match (see README.md)
             woody = p.get('woody')
@@ -98,7 +105,15 @@ def main(argv):
     tap = opts.get('tap')                  # Item@seconds: click it mid-run,
     if tap:                                # through this same session
         name, at = tap.split('@')
-        time.sleep(float(at))
+        if at.startswith('f'):
+            # Item@f<N>: the tap on the level's frame N — the same game
+            # moment on every run, load time notwithstanding
+            want = int(at[1:])
+            deadline = time.time() + seconds
+            while stats['level_frames'] < want and time.time() < deadline:
+                time.sleep(0.05)
+        else:
+            time.sleep(float(at))
         import tap as tapper
         pt = tapper.resolve(session, name)
         if pt is None:
@@ -110,12 +125,14 @@ def main(argv):
                   [round(v, 3) for v in (pt[2] or [])]))
             pt = pt[:2]
             host = opts.get('adb')
+            em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
             cmd = (['ssh', '-o', 'BatchMode=yes', host,
-                    'bash /tmp/emulator.sh tap %d %d' % pt] if host
+                    '%s tap %d %d' % ((em,) + pt)] if host
                    else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])
             import subprocess
             subprocess.run(cmd, check=False, timeout=60)
-        seconds = max(0.0, seconds - float(at))
+        seconds = max(0.0, seconds - (stats['level_frames'] / 60.0
+                                      if at.startswith('f') else float(at)))
     time.sleep(seconds)
     log.close()
     extra_log.close()

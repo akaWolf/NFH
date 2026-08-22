@@ -19,24 +19,25 @@
 # runs natively on an x86_64 host.
 set -e
 DIR=${NFH_AOSP_DIR:-/tmp/nfh-aosp}
+KEEP=${NFH_KEEP_DIR:-/tmp/nfh-keep}
 R=$DIR/sdk
 # the season: both apps share the launcher Activity and the prefs layout;
 # NFH_SEASON=1 selects com.nordigames.nfh and its files
 SEASON=${NFH_SEASON:-2}
 if [ "$SEASON" = 1 ]; then
     PKG=com.nordigames.nfh
-    GAME=${NFH_GAME_DIR:-/tmp/nfh-keep/game-s1}
+    GAME=${NFH_GAME_DIR:-$KEEP/game-s1}
     PACKKEY=nfh.01pack_levels
 else
     PKG=com.nordigames.nfh2
-    GAME=${NFH_GAME_DIR:-/tmp/nfh-keep/game}
+    GAME=${NFH_GAME_DIR:-$KEEP/game}
     PACKKEY=nfh.02pack_levels
 fi
 CMDLINE_URL=https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
 export ANDROID_SDK_ROOT=$R ANDROID_HOME=$R
 export ANDROID_AVD_HOME=$DIR/avd ANDROID_EMULATOR_HOME=$DIR
 ADB=$R/platform-tools/adb
-mkdir -p "$DIR" "$ANDROID_AVD_HOME"
+mkdir -p "$DIR" "$ANDROID_AVD_HOME" "$R"
 [ -f $DIR/libs.path ] && export LD_LIBRARY_PATH=$(cat $DIR/libs.path)
 
 resumed() {   # the resumed Activity, e.g. com.nordigames.nfh2/com.hg.framework.MoreGamesActivity
@@ -124,7 +125,7 @@ game)
     $ADB shell svc power stayon true
     ;;
 frida)
-    $ADB push ${NFH_FRIDA:-/tmp/nfh-keep/fs-x86} /data/local/tmp/frida-server | tail -1
+    $ADB push ${NFH_FRIDA:-$KEEP/fs-x86} /data/local/tmp/frida-server | tail -1
     $ADB shell chmod 755 /data/local/tmp/frida-server
     $ADB root >/dev/null 2>&1 || true; sleep 3
     $ADB shell "setsid /data/local/tmp/frida-server -D" >/dev/null 2>&1 &
@@ -194,8 +195,9 @@ else:
 open(p, 'w').write(s)
 PY
     $ADB push $DIR/prefs.xml $P >/dev/null
-    U=$($ADB shell stat -c %U /data/data/$PKG | tr -d '\r')
-    $ADB shell "chown $U:$U $P; chmod 660 $P; restorecon $P; grep pack_levels $P"
+    # numeric ids: this image's toybox chown does not resolve u0_aNN names
+    U=$($ADB shell stat -c %u:%g /data/data/$PKG | tr -d '\r')
+    $ADB shell "chown $U $P; chmod 660 $P; restorecon $P; grep pack_levels $P"
     ;;
 tap)  $ADB shell input tap "$2" "$3" ;;
 shot) $ADB exec-out screencap -p > $DIR/shot.png; echo $DIR/shot.png ;;
