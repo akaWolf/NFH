@@ -55,6 +55,29 @@ const w2s = methodFrom(Camera, S('WorldToScreenPoint'), 1);
 const getTransform = methodFrom(GO, S('get_transform'), 0);
 const getPosition = methodFrom(Transform, S('get_position'), 0);
 const getHeight = methodFrom(Screen, S('get_height'), 0);
+// the original's camera follows touches, not pawns: an item off screen is
+// unreachable by a tap, so the camera is put on the item first —
+// GameInfo.Instance.GameCamera.SetFinalPosition(x, y) (CameraMover.cs:178),
+// the same call SnapToWoodyImmediate makes
+const fieldFrom = f('mono_class_get_field_from_name', 'pointer', ['pointer', 'pointer']);
+const fieldOff = f('mono_field_get_offset', 'int', ['pointer']);
+const classVtable = f('mono_class_vtable', 'pointer', ['pointer', 'pointer']);
+const staticGet = f('mono_field_static_get_value', 'void', ['pointer', 'pointer', 'pointer']);
+const CameraMover = classFrom(game, S(''), S('CameraMover'));
+const setFinal = CameraMover.isNull() ? NULL : methodFrom(CameraMover, S('SetFinalPosition'), 2);
+function frameOn(x, y) {
+    const fInst = fieldFrom(GameInfo, S('Instance')); if (fInst.isNull()) return 'no Instance field';
+    const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
+    const gi = out.readPointer(); if (gi.isNull()) return 'no GameInfo.Instance';
+    const fCam = fieldFrom(GameInfo, S('GameCamera')); if (fCam.isNull()) return 'no GameCamera field';
+    const cam = gi.add(fieldOff(fCam)).readPointer(); if (cam.isNull()) return 'no GameCamera';
+    if (setFinal.isNull()) return 'no SetFinalPosition';
+    const fx = Memory.alloc(4), fy = Memory.alloc(4); fx.writeFloat(x); fy.writeFloat(y);
+    const args = Memory.alloc(Process.pointerSize * 2); args.writePointer(fx); args.add(Process.pointerSize).writePointer(fy);
+    const exc = Memory.alloc(Process.pointerSize); exc.writePointer(NULL);
+    invoke(setFinal, cam, args, exc);
+    return exc.readPointer().isNull() ? 'framed' : 'SetFinalPosition threw';
+}
 [['GameObject', GO], ['Camera', Camera], ['Component', Component], ['Transform', Transform],
  ['Screen', Screen], ['GameInfo', GameInfo], ['Object', UObject]].forEach(function (kv) {
     if (kv[1].isNull()) throw new Error('class not found: ' + kv[0]);
@@ -82,6 +105,7 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             const pos = t.isNull() ? NULL : call(getPosition, t, []);   // boxed Vector3
             if (pos.isNull()) { send({ error: 'no transform' }); return; }
             if (STAGE === 1) { send({ world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()], x: 0, y: 0, h: 0, stage: 1 }); return; }
+            const framed = frameOn(pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat());
             const arr = call(allCameras, NULL, []);
             const count = arr.isNull() ? 0 : arr.add(12).readU32();
             const cam = count ? arr.add(16).readPointer() : NULL;
@@ -93,7 +117,7 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             const hb = call(getHeight, NULL, []);
             const h = hb.isNull() ? 0 : hb.add(BOX).readS32();
             send({ world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()],
-                   x: sp.add(BOX).readFloat(), y: sp.add(BOX + 4).readFloat(), h: h });
+                   x: sp.add(BOX).readFloat(), y: sp.add(BOX + 4).readFloat(), h: h, framed: framed });
         } catch (e) { send({ error: '' + e }); }
     }
 });
