@@ -152,6 +152,28 @@ menu)
     sleep 10; $ADB shell input tap 320 149
     sleep 12; echo "on the episode map"
     ;;
+purchased)
+    # mirror the owner's own purchase onto the test bench: the level packs
+    # are recorded as a PlayerPrefs key (LevelUnlocker.cs:65-86,
+    # Purchaser.GetPurchasePackName), and this install has no store
+    # account to restore it from. Only for a copy whose packs were bought.
+    P=/data/data/com.nordigames.nfh2/shared_prefs/com.nordigames.nfh2.v2.playerprefs.xml
+    $ADB root >/dev/null 2>&1; sleep 1
+    $ADB shell am force-stop com.nordigames.nfh2
+    $ADB pull $P $DIR/prefs.xml >/dev/null
+    python3 - "$DIR/prefs.xml" <<'PY'
+import re, sys
+p = sys.argv[1]; s = open(p).read()
+key = 'nfh.02pack_levels'
+if re.search(r'name="%s"' % re.escape(key), s):
+    s = re.sub(r'(<int name="%s" value=")0(" />)' % re.escape(key), r'\g<1>1\2', s)
+else:
+    s = s.replace('</map>', '    <int name="%s" value="1" />\n</map>' % key)
+open(p, 'w').write(s)
+PY
+    $ADB push $DIR/prefs.xml $P >/dev/null
+    $ADB shell "chown u0_a63:u0_a63 $P; chmod 660 $P; restorecon $P; grep 02pack $P"
+    ;;
 tap)  $ADB shell input tap "$2" "$3" ;;
 shot) $ADB exec-out screencap -p > $DIR/shot.png; echo $DIR/shot.png ;;
 adb)  shift; $ADB "$@" ;;

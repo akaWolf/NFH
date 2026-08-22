@@ -158,20 +158,19 @@ anyway; and the original repeats the post-use snap on every frame of
 the use, which only matters if something moves the x meanwhile, and
 nothing in the port does.
 
-## Past the tutorial: not from here
+## Past the tutorial
 
-Level201 is the tutorial, and a poor reference: its first eight seconds
-are the director's introduction, the neighbour stays frozen off to the
-left until the script releases him, and a bare `record.py` run has no
-tutorial layer at all. Every other node on the episode map is locked —
-and the lock is not progress: `LevelUnlocker.CheckUnlockedLevels`
-(LevelUnlocker.cs:76-86) opens a node only when its purchase pack is
-recorded as bought (`PlayerPrefs "nfh.02pack_levels" == 1`, written by
-the store `Purchaser`) or in `Purchaser.TestMode`. Writing that key
-would be bypassing paid content, so the emulator stays on the free
-episode. A copy with the packs bought (the owner's own device, with its
-purchase record) is what the ordinary episodes need; Frida attaches
-over USB or Wi-Fi the same way.
+Level201 is the tutorial: its first eight seconds are the title cards,
+the neighbour stays frozen until the script releases him, and every
+item and door is locked until its step. Every other node on the episode
+map is locked too, and that lock is not progress: `LevelUnlocker.
+CheckUnlockedLevels` (LevelUnlocker.cs:76-86) opens a node only when its
+purchase pack is recorded as bought — a PlayerPrefs key,
+`nfh.02pack_levels`, written by the store `Purchaser`. The apk on the
+bench came from the owner's own purchased copy, but the bench has no
+store account to restore the purchase from, so `emulator.sh purchased`
+mirrors the owner's entitlement onto it by writing that key. It is for a
+copy whose packs were bought, and nothing else.
 
 ## Clicking the original by item name
 
@@ -212,6 +211,29 @@ skips them, and the differ aligns on the first move.
 (The neighbour question from an earlier pass — the port at (-0.325,
 1.656) against the original's (-7.33, 1.54) — was `routines[0]`, which
 is Olga on this level; the neighbour stands at (-7.33, 1.54) in both.)
+
+## An ordinary episode: Level202's neighbour
+
+With the packs mirrored, Level202 gives the first comparison that is not
+the tutorial: 78 seconds of the neighbour's routine with no input at all
+— BeerMat, the Rake, the Swimming ring, then a zone transit up to the
+BridgeRail. Against the port recorded from the same start:
+
+| | |
+|---|---|
+| frames compared | 3511 |
+| mean distance | 0.0036 |
+| identical (<=0.002) | the first 963 frames (16.05 s) |
+| segments over 0.02 | 3, the longest 72 frames at 0.023, one frame at 0.30 |
+
+What is left is timing at the action boundaries: the port is one to
+three frames ahead of the original at each hand-over, and the positions
+between them agree. `frames.js` reads the original's own order — inside
+a frame each `ActionManager.Update` runs, `Pawn.ProcessMovement` moves,
+and a finished action advances (`AdvanceToNextAction`, `StartAction`)
+only after that, so the next walk starts on the following frame. The
+port's `World.tick` already ticks pawns before routines, which is why
+the gap is frames rather than shape.
 
 ## Reading the original's state
 
