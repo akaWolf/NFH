@@ -235,13 +235,28 @@ After that fix:
 | peak | 0.0154 — one walking step |
 | identical (<=0.002) | the first 963 frames (16.05 s) |
 
-What is left is exactly one frame at each action hand-over. `frames.js`
-reads the original's own order inside a frame — `ActionManager.Update`,
-then `Pawn.ProcessMovement`, and a finished action advancing
-(`AdvanceToNextAction`, `StartAction`) only after the move, so the next
-walk begins on the following frame — and the port's `World.tick` already
-ticks pawns before routines. Where the single frame enters is the next
-thing `frames.js` is for.
+What is left is one frame at each hand-over, and it comes from the
+animation clock rather than from the movement. `frames.js` shows the
+original's order inside a frame — `ActionManager.Update`, then
+`Pawn.ProcessMovement`, and a finished action advancing only after the
+move — which is the order `World.tick` already keeps. `clock.js` then
+reads the controller's own `animationTime` and current sheet frame every
+frame; against the port's, playing the same use:
+
+| | sequence element lengths, in 60 Hz ticks |
+|---|---|
+| original | 43, 48, 49, 49, 48, 48, 49 |
+| port | 43, 49, 49, 49, 49, 49, 49 |
+
+The original advances a sheet frame every six ticks (0.1 s at 10 fps
+against a 1/60 step is exactly six, so the `animationTime <= 0` test
+sits on a knife edge) and its leftover drifts, spending 48 ticks on an
+element as often as 49; the port always spends 49. Rounding the port's
+accumulator to single precision, which is what Unity's `animationTime`
+is, does not move it — the two land on the same side of that test — so
+the change was dropped rather than kept on a guess. **Open**: an element
+runs 0–1 ticks long in the port, which is the whole of the residual
+0.0014.
 
 ## Reading the original's state
 
