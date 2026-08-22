@@ -217,23 +217,31 @@ is Olga on this level; the neighbour stands at (-7.33, 1.54) in both.)
 With the packs mirrored, Level202 gives the first comparison that is not
 the tutorial: 78 seconds of the neighbour's routine with no input at all
 — BeerMat, the Rake, the Swimming ring, then a zone transit up to the
-BridgeRail. Against the port recorded from the same start:
+BridgeRail. The first pass showed 3511 frames at a mean distance of
+0.0036 with a 0.30 spike, and `steps.js` (every `TakeNextStep` of the
+original with its new `MoveLocation` and `MinDistToNextMove`) explained
+the spike: `BuildPathToItem` (Pawn.cs:811-825) adds the floor step
+before an elevated item only when the pawn is not already within 0.1 of
+the item's x (`IsAtItemLocation`, cs:827-830), and that step targets
+`TargetLocation.x` — the port added it always, at `GetMoveLocation`,
+so the neighbour walked to an extra corner and stood a frame there.
+
+After that fix:
 
 | | |
 |---|---|
 | frames compared | 3511 |
-| mean distance | 0.0036 |
+| mean distance | 0.0014 |
+| peak | 0.0154 — one walking step |
 | identical (<=0.002) | the first 963 frames (16.05 s) |
-| segments over 0.02 | 3, the longest 72 frames at 0.023, one frame at 0.30 |
 
-What is left is timing at the action boundaries: the port is one to
-three frames ahead of the original at each hand-over, and the positions
-between them agree. `frames.js` reads the original's own order — inside
-a frame each `ActionManager.Update` runs, `Pawn.ProcessMovement` moves,
-and a finished action advances (`AdvanceToNextAction`, `StartAction`)
-only after that, so the next walk starts on the following frame. The
-port's `World.tick` already ticks pawns before routines, which is why
-the gap is frames rather than shape.
+What is left is exactly one frame at each action hand-over. `frames.js`
+reads the original's own order inside a frame — `ActionManager.Update`,
+then `Pawn.ProcessMovement`, and a finished action advancing
+(`AdvanceToNextAction`, `StartAction`) only after the move, so the next
+walk begins on the following frame — and the port's `World.tick` already
+ticks pawns before routines. Where the single frame enters is the next
+thing `frames.js` is for.
 
 ## Reading the original's state
 

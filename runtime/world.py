@@ -803,17 +803,21 @@ class Pawn:
         return self._route(dest, {'kind': 'point', 'x': x}, on_arrive)
 
     def goto_item(self, it, on_arrive=None):
-        """BuildPathToItem: route to the zone; an elevated item gets a plain
-        floor step at its x first (min-dist 0.03 plus the passed-target snap),
-        so the climb starts with no horizontal error."""
+        """BuildPathToItem (Pawn.cs:811-825): route to the zone, then a
+        plain floor step at the item's TargetLocation.x before the item
+        step — but only for an elevated item the pawn is not already
+        standing under (IsAtItemLocation, cs:827-830: within 0.1 of the
+        item's own x). The floor step takes TargetLocation.x itself, where
+        the item step takes GetMoveLocation, which offsets Olga and the
+        Mother (Item.cs:2245-2262)."""
         dest = self.level.zone_by_pid(it.zone)
         if dest is None:
             return False
         self.item_aux = it                          # Pawn.cs:595
         self._capture_click(dest)
         final = {'kind': 'item', 'item': it, 'x': it.move_x(self.role)}
-        if it.should_walk_up:
-            final = [{'kind': 'point', 'x': it.move_x(self.role)}, final]
+        if it.should_walk_up and abs(self.sprite.x - it.x) >= 0.1:
+            final = [{'kind': 'point', 'x': it.target_x}, final]
         return self._route(dest, final, on_arrive)
 
     def _helpers(self):
