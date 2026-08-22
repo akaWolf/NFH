@@ -119,7 +119,7 @@ def resolve(session, name, wait=15.0):
     time.sleep(1.0)                        # let the hooked frame finish
     if 'error' in got or 'x' not in got:
         return None
-    return int(round(got['x'])), int(round(got['h'] - got['y']))
+    return int(round(got['x'])), int(round(got['h'] - got['y'])), got.get('world')
 
 
 def main(argv):

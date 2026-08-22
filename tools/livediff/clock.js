@@ -31,7 +31,7 @@ let n = 0;
 Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
     onEnter: function (a) {
         n++;
-        if (n > 400) return;
+        if (typeof LIMIT !== "undefined" && n > LIMIT) return;
         const r = a[0].add(rottOff).readPointer(); if (r.isNull()) return;
         const c = r.add(ctrlOff).readPointer(); if (c.isNull()) return;
         const cur = curOff >= 0 ? c.add(curOff).readPointer() : NULL;

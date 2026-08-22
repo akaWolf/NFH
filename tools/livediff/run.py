@@ -104,7 +104,11 @@ def main(argv):
         if pt is None:
             print('tap: could not resolve %s' % name)
         else:
-            print('tap %s at %d %d' % (name, pt[0], pt[1]))
+            # the item's runtime transform position rides along — the
+            # scene file's is not always where the original keeps it
+            print('tap %s at %d %d (world %s)' % (name, pt[0], pt[1],
+                  [round(v, 3) for v in (pt[2] or [])]))
+            pt = pt[:2]
             host = opts.get('adb')
             cmd = (['ssh', '-o', 'BatchMode=yes', host,
                     'bash /tmp/emulator.sh tap %d %d' % pt] if host
