@@ -9,7 +9,7 @@ screen point (on the player's thread — engine calls are main-thread
 only), and the tap goes through adb; Unity's screen y grows upwards,
 adb's downwards, so it is flipped against Screen.height.
 """
-import subprocess, sys, time
+import os, subprocess, sys, time
 
 JS = r'''
 'use strict';
@@ -132,8 +132,9 @@ def main(argv):
     name = args[0]
     import frida
     dev = frida.get_device_manager().add_remote_device(opts.get('host', 'localhost:27042'))
+    pkg = opts.get('package', os.environ.get('NFH_PKG', 'com.nordigames.nfh2'))
     app = [a for a in dev.enumerate_applications()
-           if a.identifier == 'com.nordigames.nfh2' and a.pid]
+           if a.identifier == pkg and a.pid]
     if not app:
         print('the game is not running')
         return 2

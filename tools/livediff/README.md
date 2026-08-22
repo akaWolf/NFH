@@ -258,6 +258,31 @@ the change was dropped rather than kept on a guess. **Open**: an element
 runs 0–1 ticks long in the port, which is the whole of the residual
 0.0014.
 
+## Both seasons
+
+`NFH_SEASON=1` points the whole set at `com.nordigames.nfh` — the same
+launcher Activity, the same prefs layout, its own pack key
+(`nfh.01pack_levels`, Purchaser.cs:39) and one extra tap for the
+season page that Season 1's menu shows before the episode book.
+`NFH_PKG` does the same for `run.py` and `tap.py`.
+
+Level101, recorded the same way — 80 seconds from the play button, no
+input beyond it:
+
+| | neighbour | Woody's walk-in |
+|---|---|---|
+| frames compared | 3511 | 3572 |
+| mean distance | 0.0109 | 0.0017 |
+| identical (<=0.002) | the first 1167 (19.45 s) | the first 24 |
+
+Both excursions over 0.05 in the neighbour's trace are single frames
+where he is mid-warp through a door — 0.89 and 0.91, which is the width
+of the warp, taken one frame apart. Woody's entrance is one step to the
+level's EntranceLocation in both (`steps.js` with `ROLE = 'Woody'` shows
+the original taking no door step at all); the two pause together partway
+and resume, 1.5 frames apart. So Season 1 shows the same one-frame phase
+as Season 2 and nothing else.
+
 ## Reading the original's state
 
 `state.js` reads by name through Mono's C API (`libmono.so` exports

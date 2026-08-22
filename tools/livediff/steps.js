@@ -39,14 +39,15 @@ const tns = methodFrom(Pawn, S('TakeNextStep'), 0);
 Interceptor.attach(compile(tns), {
     onEnter: function (args) {
         this.self = args[0];
-        this.rott = className(classGet(args[0])).readCString() === 'Rottweiler';
+        this.who = className(classGet(args[0])).readCString();
+        this.rott = (typeof ROLE === 'undefined') ? this.who === 'Rottweiler' : this.who === ROLE;
         if (this.rott) this.at = pos(args[0]);
     },
     onLeave: function () {
         if (!this.rott) return;
         const w = this.self;
         const ml = w.add(off.MoveLocation);
-        send({ f: frame, at: this.at,
+        send({ f: frame, who: this.who, at: this.at,
                to: [ml.readFloat(), ml.add(4).readFloat()],
                min: w.add(off.MinDistToNextMove).readFloat(),
                idx: w.add(off.MoveIndex).readS32(),

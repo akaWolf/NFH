@@ -12,7 +12,7 @@ which is the original's per-frame tick.
 import json, os, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PKG = 'com.nordigames.nfh2'
+PKG = os.environ.get('NFH_PKG', 'com.nordigames.nfh2')   # Season 1: com.nordigames.nfh
 
 
 def main(argv):

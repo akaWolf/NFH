@@ -20,7 +20,18 @@
 set -e
 DIR=${NFH_AOSP_DIR:-/tmp/nfh-aosp}
 R=$DIR/sdk
-GAME=${NFH_GAME_DIR:-/tmp/nfh-keep/game}
+# the season: both apps share the launcher Activity and the prefs layout;
+# NFH_SEASON=1 selects com.nordigames.nfh and its files
+SEASON=${NFH_SEASON:-2}
+if [ "$SEASON" = 1 ]; then
+    PKG=com.nordigames.nfh
+    GAME=${NFH_GAME_DIR:-/tmp/nfh-keep/game-s1}
+    PACKKEY=nfh.01pack_levels
+else
+    PKG=com.nordigames.nfh2
+    GAME=${NFH_GAME_DIR:-/tmp/nfh-keep/game}
+    PACKKEY=nfh.02pack_levels
+fi
 CMDLINE_URL=https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
 export ANDROID_SDK_ROOT=$R ANDROID_HOME=$R
 export ANDROID_AVD_HOME=$DIR/avd ANDROID_EMULATOR_HOME=$DIR
@@ -104,11 +115,11 @@ wait)
     echo "booted $($ADB shell getprop ro.build.version.release | tr -d '\r') abi=$($ADB shell getprop ro.product.cpu.abi | tr -d '\r')"
     ;;
 game)
-    $ADB install -r $GAME/com.nordigames.nfh2.apk | tail -1
-    $ADB shell mkdir -p /sdcard/Android/obb/com.nordigames.nfh2
-    $ADB push $GAME/main.14.com.nordigames.nfh2.obb /sdcard/Android/obb/com.nordigames.nfh2/ | tail -1
+    $ADB install -r $GAME/*.apk | tail -1
+    $ADB shell mkdir -p /sdcard/Android/obb/$PKG
+    $ADB push $GAME/*.obb /sdcard/Android/obb/$PKG/ | tail -1
     for p in READ_EXTERNAL_STORAGE WRITE_EXTERNAL_STORAGE; do
-        $ADB shell pm grant com.nordigames.nfh2 android.permission.$p
+        $ADB shell pm grant $PKG android.permission.$p
     done
     $ADB shell svc power stayon true
     ;;
@@ -121,7 +132,7 @@ frida)
     $ADB forward tcp:27042 tcp:27042
     echo "frida on 27042"
     ;;
-play) $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application ;;
+play) $ADB shell am start -n $PKG/com.hg.android.cocos2dx.Application ;;
 level)
     # from a cold start to standing in Level201: the cross-promo screen,
     # the title card, the menu and the episode map, at 320x640
@@ -129,11 +140,12 @@ level)
     # WebView shell, a separate app that then stays on top of every
     # later launch — put it down first
     $ADB shell am force-stop org.chromium.webview_shell
-    $ADB shell am force-stop com.nordigames.nfh2; sleep 2
-    $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
+    $ADB shell am force-stop $PKG; sleep 2
+    $ADB shell am start -n $PKG/com.hg.android.cocos2dx.Application >/dev/null
     past_promo                                     # "play more games"
     sleep 8;  $ADB shell input tap 320 160         # touch to continue
     sleep 10; $ADB shell input tap 320 149         # START GAME
+    [ "$SEASON" = 1 ] && { sleep 8; $ADB shell input tap 320 149; }   # SEASON 1 - AT HOME
     sleep 12; $ADB shell input tap 600 305         # the episode's play button
     sleep 25; echo "in level"
     ;;
@@ -145,11 +157,12 @@ menu)
     # WebView shell, a separate app that then stays on top of every
     # later launch — put it down first
     $ADB shell am force-stop org.chromium.webview_shell
-    $ADB shell am force-stop com.nordigames.nfh2; sleep 2
-    $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
+    $ADB shell am force-stop $PKG; sleep 2
+    $ADB shell am start -n $PKG/com.hg.android.cocos2dx.Application >/dev/null
     past_promo
     sleep 8;  $ADB shell input tap 320 160
     sleep 10; $ADB shell input tap 320 149
+    [ "$SEASON" = 1 ] && { sleep 8; $ADB shell input tap 320 149; }   # the season pick
     sleep 12; echo "on the episode map"
     ;;
 purchased)
@@ -157,14 +170,14 @@ purchased)
     # are recorded as a PlayerPrefs key (LevelUnlocker.cs:65-86,
     # Purchaser.GetPurchasePackName), and this install has no store
     # account to restore it from. Only for a copy whose packs were bought.
-    P=/data/data/com.nordigames.nfh2/shared_prefs/com.nordigames.nfh2.v2.playerprefs.xml
+    P=/data/data/$PKG/shared_prefs/$PKG.v2.playerprefs.xml
     $ADB root >/dev/null 2>&1; sleep 1
-    $ADB shell am force-stop com.nordigames.nfh2
+    $ADB shell am force-stop $PKG
     $ADB pull $P $DIR/prefs.xml >/dev/null
-    python3 - "$DIR/prefs.xml" <<'PY'
+    python3 - "$DIR/prefs.xml" "$PACKKEY" <<'PY'
 import re, sys
 p = sys.argv[1]; s = open(p).read()
-key = 'nfh.02pack_levels'
+key = sys.argv[2]
 if re.search(r'name="%s"' % re.escape(key), s):
     s = re.sub(r'(<int name="%s" value=")0(" />)' % re.escape(key), r'\g<1>1\2', s)
 else:
@@ -172,7 +185,8 @@ else:
 open(p, 'w').write(s)
 PY
     $ADB push $DIR/prefs.xml $P >/dev/null
-    $ADB shell "chown u0_a63:u0_a63 $P; chmod 660 $P; restorecon $P; grep 02pack $P"
+    U=$($ADB shell stat -c %U /data/data/$PKG | tr -d '\r')
+    $ADB shell "chown $U:$U $P; chmod 660 $P; restorecon $P; grep pack_levels $P"
     ;;
 tap)  $ADB shell input tap "$2" "$3" ;;
 shot) $ADB exec-out screencap -p > $DIR/shot.png; echo $DIR/shot.png ;;
