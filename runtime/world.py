@@ -16,6 +16,16 @@ _RAT_ENTRY_208 = {'type': 'IT2_Rat', 'use_count': 0, 'name': 'MOUSE_NAME',
                   'desc': 'RAT2_DESC', 'wrong_zone': '', 'long': False}
 
 
+import struct as _struct
+_f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
+
+
+def _f32(x):
+    """round to the nearest C# float — the runtime's single-precision
+    arithmetic, where it decides a tick"""
+    return _f32_unpack(_f32_pack(x))[0]
+
+
 class AnimPlayer:
     """AnimationControllerBase.Refresh, one animation controller.
 
@@ -307,7 +317,12 @@ class AnimPlayer:
         arms need `CurrentAnimation != null`)."""
         if self.sprite.hidden or self.sprite.current is None:
             return
-        self.acc -= dt
+        # animationTime is a C# float (AnimationControllerBase.cs:17), and
+        # so is Time.deltaTime: 0.5f - 30 * 0.016666668f lands below zero on
+        # the 30th tick, where the same sums in doubles leave +1e-17 and
+        # cost a 31st — one frame per sheet frame, 61 ticks for a 60-tick
+        # BedSleep, 49 for a 48-tick use element (tools/livediff/README.md)
+        self.acc = _f32(self.acc - _f32(dt))
         if self.acc > 0.0:
             return
         a = self.anim
@@ -339,9 +354,11 @@ class AnimPlayer:
                 else:
                     self._stop_single()
         fps = self.anim.fps or 10.0
-        self.acc += 1.0 / fps
+        # ResetAnimationTime (cs:144-150): `1f / FrameRate` in single
+        # precision, the slow factor likewise
+        self.acc = _f32(self.acc + _f32(1.0 / _f32(fps)))
         if self.slow_factor:
-            self.acc *= self.slow_factor
+            self.acc = _f32(self.acc * _f32(self.slow_factor))
 
 
 class Pawn:
@@ -2386,6 +2403,10 @@ class Routine:
             if self.routine_behavior is not None:
                 # ActionManager.MoveToAction (ActionManager.cs:119-124)
                 self.routine_behavior.on_move_to_routine_action(None, a)
+            # a MoveOnly step is a plain MoveToGoal (RoutineActionMove.cs:
+            # 76-79), and MoveToGoal drops InUrgentMove (Pawn.cs:428-432):
+            # the walk after an Urgent action is a walk
+            self.pawn.in_urgent = False
             zone = self.level.zone_by_pid(a.get('move_zone'))
             if zone is not None and self.pawn.goto_zone(zone, a['move_x'],
                                                         on_arrive=self._finish):
@@ -4229,6 +4250,12 @@ class Routine:
                 target_pawn.zone, target_pawn.sprite.x,
                 on_arrive=self._hit_pawn_arrived):
             self._hit_pawn_arrived()
+        elif self.pawn.world is not None:
+            # the move ends by distance inside the target's zone
+            # (RoutineActionHitPawn.IsAtActionLocation, cs:13-18, read by
+            # RoutineActionMove.Finished every frame)
+            self.pawn.world._hit_watches.append(
+                (self.pawn, target_pawn, maxd, True, self._hit_pawn_arrived))
 
     def _hit_pawn_arrived(self):
         """RoutineActionHitPawn.OnActionStarted (cs:20-38): the target —
@@ -4237,6 +4264,9 @@ class Routine:
         plays. The Olga toilet-delay arm rides the unported Bouquet hack."""
         target = getattr(self, '_hit_target', None)
         w = self.pawn.world
+        if w is not None:
+            w._hit_watches = [x for x in w._hit_watches
+                              if x[4] != self._hit_pawn_arrived]
         if target is None or w is None:
             self._urgent_finished()
             return
@@ -4772,6 +4802,9 @@ class World:
         self.woody = None
         self.pawns = {}
         self.routines = []
+        # (catcher, target, maxd, same_zone, reach): a walk toward a pawn
+        # that RoutineActionMove.Finished ends by distance
+        self._hit_watches = []
         self.game = GameState(level.game_info)
         self.inventory = InventoryState()
         # InventoryManager.InventoryItems is a serialized List<Inventory>
@@ -7736,6 +7769,8 @@ class World:
         catcher.in_urgent = False         # HitWoodyAction.Urgent = false
 
         def hit():
+            self._hit_watches = [w for w in self._hit_watches
+                                 if w[4] is not hit]
             # RoutineActionHitWoody.OnActionStarted (cs:24-33) opens with
             # Owner.PauseMovement: nothing integrates or arrives from here
             # on — a door descent in progress would otherwise land on the
@@ -7779,7 +7814,12 @@ class World:
         maxd = catcher.hit_action.get('max_distance') or 0.03
         if abs(catcher.sprite.x - woody.sprite.x) <= maxd:
             hit()
-        elif not catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
+        elif catcher.goto_zone(woody.zone, woody.sprite.x, on_arrive=hit):
+            # MoveToAction: the walk ends the frame the distance drops under
+            # MaximumPawnDistanceToAction (RoutineActionMove.Finished,
+            # cs:39-40), 0.8 in the data — well short of Woody himself
+            self._hit_watches.append((catcher, woody, maxd, False, hit))
+        else:
             hit()
 
     def _move_to_empty_space(self, catcher):
@@ -8117,6 +8157,27 @@ class World:
         for p in self.players.values():
             if id(p) not in pawn_players:
                 p.tick(dt)
+        # RoutineActionMove.Finished for a move toward a pawn (RoutineAction
+        # Move.cs:26-41): the x distance to the target under
+        # MaximumPawnDistanceToAction — and for a HitPawn, its zone
+        # (RoutineActionHitPawn.cs:13-18) — ends the move and starts the
+        # action; ActionManager.Update reads it before ProcessMovement
+        for w in list(self._hit_watches):
+            catcher, target, maxd, same_zone, reach = w
+            if catcher.is_warping:
+                continue
+            if same_zone and (catcher.zone is None or target.zone is None
+                              or catcher.zone.pid != target.zone.pid):
+                continue
+            if abs(catcher.sprite.x - target.sprite.x) < maxd:
+                self._hit_watches.remove(w)
+                # MoveAction.OnActionStopped: Velocity = 0, PauseMovement
+                # (RoutineActionMove.cs:98-103) — the hit takes it from here
+                catcher.steps = []
+                catcher.on_arrive = None
+                catcher.velocity = (0.0, 0.0)
+                catcher.state = catcher.IDLE
+                reach()
         for p in self.pawns.values():
             if p is not self.woody:
                 p.tick(dt)

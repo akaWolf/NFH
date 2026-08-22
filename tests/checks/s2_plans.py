@@ -218,16 +218,22 @@ def run(record, check, outdir):
                 and all(not d.disabled for d in doors),
                 (before, after, [d.disabled for d in doors]))
 
-    # -- F4 (data fact): the L211 FishingRod box lies inside the Zone04
-    #    TransitionDownwards box, whose near face the click ray meets first
-    #    (Physics.Raycast nearest hit, Pawn.cs:403) — the rod is a door click
+    # -- F4 (data fact): in the scene file the L211 FishingRod box lies
+    #    inside the Zone04 TransitionDownwards box, whose near face the click
+    #    ray would meet first (Physics.Raycast nearest hit, Pawn.cs:403) — but
+    #    Level.Start moves Zone04 to ZonesY[4], 1.07 lower (Level.cs:186), and
+    #    the transition rides along with its zone: the rod stands clear of it
+    #    and a click on the rod is the rod's
     rec = _rec('levels/s2/Level211.json', outdir, 'rod')
     rod = _item(rec, 'FishingRod')
+    stairs = next(d for d in rec.v.level.doors
+                  if d.name == 'TransitionDownwards'
+                  and rec.v.level.zone_by_pid(d.zone).name == 'Zone04')
     it, door = rec.v._hit_at(rod.collider[0], rod.collider[1])
-    ok &= check('s2_plans: FishingRod click resolves to TransitionDownwards',
-                it is None and door is not None
-                and door.name == 'TransitionDownwards'
-                and (door.collider[4] - door.collider[5])
-                < (rod.collider[4] - rod.collider[5]),
-                (it.name if it else None, door.name if door else None))
+    ok &= check('s2_plans: FishingRod click resolves to the rod, above the moved stairs',
+                it is not None and it.name == 'FishingRod' and door is None
+                and stairs.collider[1] + stairs.collider[3] * 0.5 < rod.collider[1],
+                (it.name if it else None, door.name if door else None,
+                 round(stairs.collider[1] + stairs.collider[3] * 0.5, 3),
+                 round(rod.collider[1], 3)))
     return ok
