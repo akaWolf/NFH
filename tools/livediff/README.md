@@ -340,3 +340,21 @@ and the LetterBox use queued, and `MailboxStart` played over
 `EndPortalMove` has taken the next step, not precede it. With the three
 in place the port's neighbour is at (3.785, -2.059) on the same frame,
 `WhirlWoody` on the sheet.
+
+The fourth kind took `pawn.js` — the pawn's own fields every frame,
+riding the recorder's session through `run.py --extra`. Level107's
+neighbour walks his flat door to `MoveLocation.x = 3.451`, not the
+3.427 the level data gives the door; Level111's Woody runs at 6.283,
+not 5.913, and starts the pass there, 0.37 short of where the port has
+the door. The difference is `Level.cs:186`: at start every zone is
+moved to `(x, ZonesY[i], z) + ZoneController.position` — the
+controller's offset, which the zone's world position already contains
+once, is added a second time, and the zone's children (the doors, the
+transitions) move with it: (0.024, -0.049) for Zone06 of the 107-110
+house, (0.37, -0.031) for Zone05 of 111-114. The port applies the move
+to the zone (scene.py:1627) and leaves the children where the scene
+file has them. That is the 0.02-0.37 in every door-related row of the
+Season 1 table — the stop before a flat door, the far door's placement,
+the entrance — and the first thing to fix: shift each zone's descendant
+transforms by the zone's own runtime delta. (The Season 2 table, same
+sweep: 201/202/210 clean, 203/206/209/211/212/214 to triage after it.)
