@@ -110,18 +110,61 @@ Driven into Level201 and recorded at 60 Hz, the original reports
 confirmation that the export is faithful to what the game actually
 loads.
 
-Clicking the SoapChest on both sides:
+## The first two fixes
 
-| | port | original |
+With `Time.deltaTime` pinned to 1/60 (`state.js` replaces the property's
+JIT-compiled getter) the two sides step in the same quanta, and a click
+on the SoapChest could be compared frame for frame. It found two
+departures, both settled against the decompile:
+
+1. **A climb ignored the urgent-move pair.** The original picks
+   `RunningDoorForceMagnitude` while `InUrgentMove` in the door climb
+   (Pawn.cs:1404-1411), the descent (cs:1430-1437) and the climb to an
+   item (cs:1771-1778); the port used `DoorForceMagnitude` in all three.
+   Woody runs whenever he is not sneaking, and his two magnitudes are
+   0.8 and 1.6, so every approach ran at half speed: 0.0133 a frame
+   against the original's 0.0265.
+
+2. **Velocity is a field, and the position integrates it after
+   WalkOnPath.** `ProcessMovement` (cs:855-880) runs `WalkOnPath` — which
+   may snap the x onto the target and switch the move — and only then
+   adds `Velocity * dt * Speed`. Nothing zeroes the velocity when
+   `MoveToItem` or `MoveToDoor` first takes over (only `TakeNextStep`,
+   cs:1052, and `TryUseItem`, cs:1795, do), so the walk's last velocity
+   lands once more on the frame a climb begins. That is where the
+   original's 3.417 came from: snapped to 3.384, then one more walk
+   step; the climb runs on `(0, 1.6)` and leaves x alone; `TryUseItem`
+   clears `MovingUp`, and the next `MoveToItem` snaps x onto the target
+   again (cs:1735-1738). The port integrated inside each branch and never
+   carried a velocity; it now keeps `Pawn.velocity` across frames and
+   integrates after the state machine, exactly in the original's order.
+
+After both, the SoapChest walk matches the original on all 50 frames
+(mean distance 0.00006, the peak being the trace's third decimal):
+
+| frame | original | port |
 |---|---|---|
-| start | (2.190, -2.209) | (2.190, -2.209) |
-| end | (3.384, **-2.033**) | (3.384, **-2.021**) |
-| x range walked | 2.190..3.389 | 2.190..**3.417** |
+| 37 | (3.389, -2.259) | (3.389, -2.259) |
+| 38 | (3.417, -2.261) | (3.417, -2.261) |
+| 39..47 | x 3.417, y rising 0.0267 a frame | same |
+| 49 | (3.384, -2.021) | (3.384, -2.021) |
 
-The walk agrees to about a centimetre of world space, and the original
-overshoots its target before settling while the port does not. That
-difference is not yet a finding: the original was still running on its
-own clock. Pinning `Time.deltaTime` to 1/60 — the next step — is what
-makes the two traces comparable frame for frame instead of only in
-aggregate.
+Two details of the same code are deliberately not reproduced, both
+invisible: the leave animation of a door does not zero the velocity
+either (cs:1615-1626), so the original's hidden, warping pawn keeps
+integrating until the far door places it — the port's `DOOR_ANIM`
+state does not integrate, and the placement overwrites the position
+anyway; and the original repeats the post-use snap on every frame of
+the use, which only matters if something moves the x meanwhile, and
+nothing in the port does.
 
+## Reading the original's state
+
+`state.js` reads by name through Mono's C API (`libmono.so` exports
+`mono_class_from_name`, `mono_class_get_field_from_name`,
+`mono_field_get_offset`, `mono_runtime_invoke`). Two things it took a
+while to learn: `GameObject.GetComponent` is overloaded, and the
+by-arity lookup returns the `Type` overload, which crashes on a string —
+`mono_method_desc_search_in_class` with `:GetComponent(string)` picks
+the right one; and anything that calls into the engine has to run on
+the player's thread, which the hook on `GameInfo.Update` provides.

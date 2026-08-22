@@ -122,6 +122,22 @@ plain click is an urgent move (`IsInUrgentMove = !Sneaking`, Woody.cs:858-861
 the sneak toggle gives the `1.25 x 0.8 = 1.0` walk. (The reference footage
 measures 1.99–2.06 u/s, docs/audit/verified/pass5_video.md.)
 
+The order inside `ProcessMovement` matters as much as the numbers
+(Pawn.cs:855-880): `WalkOnPath` runs first — it may snap the x onto a
+crossed target and hand the move to `MoveToItem` or `MoveToDoor` — and
+only then does the position integrate `Velocity`. `Velocity` is a field
+that outlives the frame: `TakeNextStep` (cs:1052) and `TryUseItem`
+(cs:1795) zero it, the entries of `MoveToItem` and `MoveToDoor` do not.
+So on the frame a climb begins the walk's last velocity lands once more
+— Woody snaps onto the SoapChest's x and then overshoots it by one step,
+climbs there, and the `MoveToItem` call after `TryUseItem` snaps him
+back (cs:1735-1738). The climbs themselves take the Running door
+magnitude while in urgent move, exactly as the walk does (cs:1404-1411,
+1430-1437, 1771-1778): at `1.6 x 1.0` Woody climbs 0.0267 units a frame.
+`Pawn.tick` keeps that shape — `_walk_on_path` settles `Pawn.velocity`,
+the integration follows — and the running original, traced through
+`tools/livediff`, agrees with it on every frame of that walk.
+
 Walking limits are `Zone.PlayLeft` / `PlayRight`, set in `Level.Start()` from
 `ZonesPlayLeft` / `ZonesPlayRight` as deltas either side of the zone's x — not
 the collider box, which is only for containment. Zone03 of Level101 spans
@@ -1169,6 +1185,14 @@ Input, HUD, and timing:
   unimplemented.
 - **The ExitConfirmation dialog** before an exit door is a menu widget
   (Control*); the port ends the level directly on the pass.
+- **Two invisible tails of `ProcessMovement`** are not reproduced: the
+  door's leave animation leaves `Velocity` standing (Pawn.cs:1615-1626),
+  so the hidden, warping pawn keeps integrating until the far door places
+  it (`OnDoorEnterAnimationFinished` overwrites the position) — the port's
+  `DOOR_ANIM` state does not integrate; and `MoveToItem` repeats its
+  post-use x snap on every frame of a use (cs:1735-1738), where the port
+  snaps once on the frame after `TryUseItem` — the same result unless
+  something moved the x meanwhile, and nothing in the port does.
 - **Dead fields with data but no reader in any .cs**:
   `AlternateStartFrame` (11644 values), `OverridesTransformation` (56; its
   only reader Pawn.cs:893 has no caller), `SlowAnimationsFactor` (=100

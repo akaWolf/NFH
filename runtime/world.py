@@ -351,6 +351,7 @@ class Pawn:
     IDLE, WALK = 'idle', 'walk'
     DOOR_CLIMB, DOOR_ANIM, DESCEND, ITEM_CLIMB = \
         'door_climb', 'door_anim', 'descend', 'item_climb'
+    MOVING = (WALK, DOOR_CLIMB, DESCEND, ITEM_CLIMB)   # the states that integrate
 
     def __init__(self, level, sprite, zone, spec=None, player=None, role='Woody'):
         self.level = level
@@ -390,6 +391,10 @@ class Pawn:
         self.min_door_distance = spec.get('min_door_distance') or 0.0
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
+        self.velocity = (0.0, 0.0)       # Pawn.Velocity — a field that
+                                         # outlives the frame (cs:855-880)
+        self._item_snap = None           # MoveToItem's head, deferred one
+                                         # frame past TryUseItem (cs:1735)
         self.pos_snap = False            # marks the frame of a legal position
                                          # snap (tests/invariants.py reads it)
         # the NFH2 walk-through pathing state (Pawn.cs:150-183)
@@ -987,6 +992,8 @@ class Pawn:
 
     # -- step machinery ----------------------------------------------------
     def _next_step(self):
+        self.velocity = (0.0, 0.0)       # TakeNextStep (cs:1052), TryUseItem
+                                         # (cs:1795) for an item's arrival
         self._step = None
         if not self.steps:
             self.state = self.IDLE
@@ -1102,6 +1109,7 @@ class Pawn:
         every frame, so the retry rides the state that called"""
         if (door.passing is not None and door.passing is not self) or \
                 (other.passing is not None and other.passing is not self):
+            self.velocity = (0.0, 0.0)   # Velocity = zero, then the stand
             self._stand()
             return True
         return False
@@ -1120,10 +1128,10 @@ class Pawn:
             return                        # IsOtherPawnPassing: wait standing
         self.portal_move = False          # the pre-arm is consumed
         if door.should_walk_up:
+            # MoveToDoor's first call raises PortalMove and MovingUp and
+            # returns (cs:1367-1371): the climb strip and its velocity start
+            # next frame, and the walk's Velocity integrates once more now
             self.state = self.DOOR_CLIMB
-            up = self._portal_up_anim()
-            if up and self.anim.has(up):
-                self.anim.play_looping(up)
             return
         # a finished-entrance pass through an ExitDoor asks first
         # (Pawn.cs:1378-1383; ExitConfirmationShown latches for the retry):
@@ -1138,6 +1146,7 @@ class Pawn:
             self.exit_confirmation_shown = True
             self.waiting_for_exit_confirmation = True
             self.movement_paused = True   # PauseMovement, Velocity = 0
+            self.velocity = (0.0, 0.0)
             self.world.show_exit_confirmation(self)
             return
         self.use_door_at_once = False     # Pawn.cs:1393
@@ -1406,6 +1415,7 @@ class Pawn:
                 cd.passing_nfh2 = self
                 link.passing_nfh2 = self
             elif cd.passing_nfh2 is not None and cd.passing_nfh2 is not self:
+                self.velocity = (0.0, 0.0)
                 self._stand()
                 return True
         w = self.world
@@ -1442,7 +1452,36 @@ class Pawn:
         self._zone_watch()
         if self.movement_paused:          # ProcessMovement's outer gate
             return
-        scale = self.walk_speed_scale() * dt
+        # ProcessMovement (Pawn.cs:855-880): WalkOnPath settles this frame's
+        # Velocity — snapping and switching moves on the way — and only then
+        # does the position integrate it. Velocity outlives the frame:
+        # TakeNextStep (cs:1052) and TryUseItem (cs:1795) zero it, the
+        # entries of MoveToItem and MoveToDoor do not, so the walk's last
+        # velocity lands once more on the frame a climb begins — the
+        # SoapChest trace in tools/livediff/README.md is the reference
+        self._walk_on_path()
+        vx, vy = self.velocity
+        if self.state in self.MOVING and (vx or vy):
+            # MinimumVelocitySquared is 0 on all 84 shipped pawns
+            scale = self.walk_speed_scale() * dt
+            self.sprite.x += vx * scale
+            self.sprite.y += vy * scale
+
+    def _walk_on_path(self):
+        """WalkOnPath with MoveToItem and MoveToDoor as the port's states:
+        every branch leaves the frame's Velocity behind instead of moving"""
+        snap = self._item_snap
+        if snap is not None:
+            # MoveToItem's head on the frame after TryUseItem (cs:1735-1738):
+            # MovingUp is clear, so a target the walk crossed (HasPassedTarget
+            # against the current x, cs:1037-1040) and can pass snaps the x.
+            # The original repeats this every frame of the use; nothing
+            # moves the x meanwhile here, so once is the same
+            tx, was_left, passable = snap
+            self._item_snap = None
+            if passable and ((tx < self.sprite.x) != was_left):
+                self.sprite.x = tx
+                self.pos_snap = True
         if self.state == self.WALK:
             if self.portal_move and self._step.get('kind') == 'door':
                 # a pre-armed PortalMove skips the walk (WalkOnPath's guard,
@@ -1496,17 +1535,15 @@ class Pawn:
                 if s['kind'] == 'door':
                     self._begin_transit(s['door'])
                 elif s['kind'] == 'item' and s['item'].should_walk_up:
-                    it = s['item']
-                    if self.at_use_location(it):
-                        self._next_step()
-                        return
+                    # MoveToItem's first call (cs:1740-1752) raises ItemMove
+                    # and MovingUp and returns: the climb strip, the velocity
+                    # and the use-location test start next frame, and the
+                    # walk's Velocity integrates once more below
                     self.state = self.ITEM_CLIMB
-                    up = self._portal_down_anim() if it.should_walk_down \
-                        else self._portal_up_anim()
-                    if up and self.anim.has(up):
-                        self.anim.play_looping(up)
                 else:
-                    self._next_step()
+                    if s['kind'] == 'item':
+                        self._arm_item_snap(s['item'], tx)
+                    self._next_step()     # TryUseItem / TakeNextStep: zero
                 return
             nx, ny = dx / mag, dy / mag
             # WalkOnPath: dominant axis picks the force and the animation, and
@@ -1517,18 +1554,15 @@ class Pawn:
                 self.walk_hook()
                 if self.state != self.WALK:
                     return                # a near-surprise took the pawn over
-            if abs(nx) >= abs(ny):
+            if nx != 0.0 and abs(nx) > abs(ny):   # cs:961-969
                 f = self.run_force if self.in_urgent else self.force
-                vx, vy = nx * f, ny * f
                 self._face_towards(nx)
                 self.anim.play_looping(self._walk_anim(self.facing))
-            else:
+            else:                                  # cs:970-979
                 f = self.run_door_force if self.in_urgent else self.door_force
-                vx, vy = nx * f, ny * f
                 self.anim.play_looping(
                     self._walk_anim('Up' if ny > 0 else 'Down'))
-            self.sprite.x += vx * scale
-            self.sprite.y += vy * scale
+            self.velocity = (nx * f, ny * f)
         elif self.state == self.DOOR_CLIMB:
             # checks run before the move, as MoveToDoor runs before
             # ProcessMovement applies the velocity
@@ -1545,30 +1579,47 @@ class Pawn:
             up = self._portal_up_anim()
             if up and self.anim.has(up):
                 self.anim.play_looping(up)
+            # the velocity precedes the arrival test (cs:1404-1416), and the
+            # leave animation leaves it standing (cs:1615-1626): the hidden,
+            # warping pawn keeps rising in the original until the far door
+            # places it (OnDoorEnterAnimationFinished) — DOOR_ANIM is not a
+            # MOVING state here, the placement makes the drift moot
+            self.velocity = (0.0, self.run_door_force if self.in_urgent
+                             else self.door_force)
             if self.at_use_location(d) or self.use_door_at_once:
                 self.use_door_at_once = False           # Pawn.cs:1414
                 self._transit_animations(d, other, sequential=True)
                 return
-            # the climb has the same urgent-move pair as the walk
-            # (Pawn.cs:1404-1411)
-            self.sprite.y += (self.run_door_force if self.in_urgent
-                              else self.door_force) * scale
         elif self.state == self.DESCEND:
             # IsAtPortalTargetLocation: signed, no snapping afterwards
             if self.sprite.y - self.floor_y() < self.zone_threshold:
-                self._next_step()
+                self._next_step()         # EndPortalMove -> TakeNextStep
                 return
-            self.sprite.y -= (self.run_door_force if self.in_urgent
-                              else self.door_force) * scale   # Pawn.cs:1430-1437
+            self.velocity = (0.0, -(self.run_door_force if self.in_urgent
+                                    else self.door_force))    # cs:1430-1437
         elif self.state == self.ITEM_CLIMB:
+            # MoveToItem's climb (cs:1756-1787): the strip re-asserted, the
+            # velocity set, then the use-location test — where TryUseItem
+            # zeroes the velocity in the same frame (cs:1795)
             it = self._step['item']
-            if self.at_use_location(it):
-                self._next_step()         # velocity zero; on_arrive fires use
-                return
+            up = self._portal_down_anim() if it.should_walk_down \
+                else self._portal_up_anim()
+            if up and self.anim.has(up):
+                self.anim.play_looping(up)
             direction = -1.0 if it.should_walk_down else 1.0
-            self.sprite.y += direction * (self.run_door_force if self.in_urgent
-                                          else self.door_force) * scale
-            # MoveToItem's climb (Pawn.cs:1771-1778)
+            self.velocity = (0.0, direction * (self.run_door_force
+                                               if self.in_urgent
+                                               else self.door_force))
+            if self.at_use_location(it):
+                self.velocity = (0.0, 0.0)
+                self._arm_item_snap(it, self._step_target()[0])
+                self._next_step()         # on_arrive fires the use
+
+    def _arm_item_snap(self, item, tx):
+        """the state MoveToItem's head will test next frame (cs:1735-1738):
+        WasMovingLeft as TakeNextStep set it (cs:1109) and Passable"""
+        self._item_snap = (tx, self._step_sign == -1,
+                           getattr(item, 'passable', True))
 
 
 class AlerterFSM:

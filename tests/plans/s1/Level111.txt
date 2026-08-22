@@ -18,6 +18,12 @@ take TableShovel IT_Shovel            # Z07 at once, behind him (Z01->Z02->Z06->
 take Detergent IT_Detergent           # Z03 after his [0] use
 take RubbishBinCable IT_Cable         # Z03
 # he comes up Z01(38) -> Z02(46) -> Z06(50) -> Iron(64) ...
+wait 14                               # his Z01 -> Z02 -> Z06 pass (44..58): with the
+                                      # climb at the original's running speed Woody
+                                      # is back from the cable by 44 s, the gate
+                                      # sees Z02 empty, and he is standing there
+                                      # when the neighbour arrives (55) — the alarm
+                                      # then restarts the Iron action in a loop
 take Perch IT_Birdfood                # Z02 (auto-sneak: the dog)
 prime PlantSoil IT_Shovel             # the shovel's source primes on its PrimingItem
                                       # (Item.cs:1537-1572); the held type becomes IT_Soil
