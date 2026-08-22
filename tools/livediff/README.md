@@ -59,30 +59,44 @@ exactly).
   animation, the routines, the game counters — so the existing tooling
   diffs the two streams and names the first frame that disagrees.
 
-## Open: the guest's graphics buffers
+## The graphics-buffer wall, and how it fell
 
-The player runs on 7.1 where it would not on 9, but the app process
-cannot get a graphics buffer in any QEMU configuration tried, and the
-game dies once Unity asks for its surface:
+Android-x86 under plain QEMU gets its own system up (SurfaceFlinger
+draws through virgl on the host GPU, or through SwiftShader) but never
+lets an *app process* map a graphics buffer, so the player dies asking
+for its surface:
 
 | guest | app-side failure |
 |---|---|
-| 9.0, SwiftShader | `android.hardware.graphics.mapper@2.0-impl.so` — "not accessible for the namespace" (Treble keeps vendor HALs away from apps) |
+| 9.0, SwiftShader | `graphics.mapper@2.0-impl.so` — "not accessible for the namespace" (Treble keeps vendor HALs away from apps) |
 | 7.1, virtio-gpu + virgl | `gralloc.gbm.so` — `libdrm.so` not found inside the app |
 | 7.1, SwiftShader | `Gralloc1On0Adapter: gralloc0 register failed`, then the game stops |
 
-SurfaceFlinger itself is fine in all three (GLES 3.1 through virgl on
-the host GPU, or GLES 2.0 through SwiftShader) — it is only the app
-process that cannot map buffers. The next thing to try is the AOSP
-emulator's own x86 system image (its goldfish gralloc is built for
-exactly this) or Waydroid, whose container shares the host's gralloc.
+The AOSP emulator has none of that: its goldfish gralloc is built for
+virtual machines. On API 25 x86 the game runs — Unity logs its GL
+extension list, the THQ Nordic card and the title screen come up, and
+`vm.sh`'s Android-x86 route is kept only as the record of what did not
+work. `emulator.sh` is the working recipe.
 
-Everything else in the chain is proven and scripted: the machine boots
-unattended, adb and a root console are up, the game and its 402 MB OBB
-install, and Frida — running on the developer's laptop, through an ssh
-tunnel — spawns the game, injects into its 32-bit process and hooks
-native code there (that is how the failures above were traced).
+Getting Google's prebuilts to run on NixOS took one more trick: there is
+no FHS loader, `nix-ld` is not enabled on the machine used, `steam-run`'s
+sandbox hides the SDK's own directory, and pulling the emulator into the
+nix store took the root filesystem to 96% — so `emulator.sh patch`
+rewrites the interpreter and rpath of every prebuilt ELF in place, and
+everything stays in `/tmp`.
 
-`probe.js` is written against that access but has not run yet: it walks
-libmono to `Assembly-CSharp`'s `GameInfo`, and libmono is only loaded
-once the player itself starts.
+## Where this stands
+
+Proven end to end: the emulator boots headless and unattended, the game
+and its 402 MB OBB install, the original runs, and Frida — on the
+developer's machine, through an ssh tunnel — spawns it, injects into the
+32-bit process and resolves its managed side by name. `state.js` walks
+libmono to `Assembly-CSharp`, finds `GameInfo` and reads its field
+offsets out of the live runtime (`CompletedTricksCount` at 172,
+`TotalTricksCount` at 164, `FinalViewerRating` at 232), then arms a hook
+on `GameInfo.Update`.
+
+What is left is the input half: `GameInfo.Update` only ticks inside a
+level, so the recorder returns no frames until the game is driven from
+its title screen into one. That is the same scripted-input work the diff
+needs anyway — the plan above — rather than a new obstacle.
