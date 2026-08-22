@@ -64,6 +64,8 @@ def main(argv):
                 't': round(p['n'] / 60.0, 3),
                 'woody': None if not woody else {'x': round(woody[0], 3),
                                                  'y': round(woody[1], 3)},
+                'locked': p.get('locked'),
+                'sneak': p.get('sneak'),
                 'rott': p.get('rott'),
                 'game': p['game'],
             }) + '\n')

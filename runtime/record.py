@@ -248,7 +248,10 @@ class Recorder:
             'routines': [{'role': r.role,
                           'state': r.state,
                           'item': r.item.name if r.item else None,
-                          'anim': r.pawn.anim.anim.name}
+                          'anim': r.pawn.anim.anim.name,
+                          'x': round(r.pawn.sprite.x, 3),
+                          'y': round(r.pawn.sprite.y, 3),
+                          'zone': r.pawn.zone.name if r.pawn.zone else None}
                          for r in w.routines],
         }
 

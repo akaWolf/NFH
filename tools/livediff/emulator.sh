@@ -115,6 +115,17 @@ level)
     sleep 12; $ADB shell input tap 600 305         # the episode's play button
     sleep 25; echo "in level"
     ;;
+menu)
+    # the same walk, stopping on the episode map: attach the recorder
+    # here, then `tap 600 305` starts the level with its first frame
+    # already hooked
+    $ADB shell am force-stop com.nordigames.nfh2; sleep 2
+    $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
+    sleep 55; $ADB shell input keyevent 4
+    sleep 8;  $ADB shell input tap 320 160
+    sleep 10; $ADB shell input tap 320 149
+    sleep 12; echo "on the episode map"
+    ;;
 tap)  $ADB shell input tap "$2" "$3" ;;
 shot) $ADB exec-out screencap -p > $DIR/shot.png; echo $DIR/shot.png ;;
 adb)  shift; $ADB "$@" ;;

@@ -131,6 +131,8 @@ function position(component) {
 
 // the counters GameState mirrors (runtime/world.py) plus the actors the
 // score depends on
+const Woody = klass(asmGame, '', 'Woody');
+const WD = offsets(Woody, ['InputLocked', 'Sneaking']);
 const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
                               'WinningTricksCount', 'FinalTrickScore',
                               'FinalViewerRating', 'Won', 'GameEnding',
@@ -160,6 +162,10 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
                 caught: bool8(gi, GI.gotCaught),
             },
             woody: position(woody),
+            locked: woody.isNull() || WD.InputLocked < 0 ? null
+                    : woody.add(WD.InputLocked).readU8() !== 0,
+            sneak: woody.isNull() || WD.Sneaking < 0 ? null
+                   : woody.add(WD.Sneaking).readU8() !== 0,
             rott: position(rott),
         });
     }

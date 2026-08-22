@@ -158,6 +158,21 @@ anyway; and the original repeats the post-use snap on every frame of
 the use, which only matters if something moves the x meanwhile, and
 nothing in the port does.
 
+## Past the tutorial: not from here
+
+Level201 is the tutorial, and a poor reference: its first eight seconds
+are the director's introduction, the neighbour stays frozen off to the
+left until the script releases him, and a bare `record.py` run has no
+tutorial layer at all. Every other node on the episode map is locked —
+and the lock is not progress: `LevelUnlocker.CheckUnlockedLevels`
+(LevelUnlocker.cs:76-86) opens a node only when its purchase pack is
+recorded as bought (`PlayerPrefs "nfh.02pack_levels" == 1`, written by
+the store `Purchaser`) or in `Purchaser.TestMode`. Writing that key
+would be bypassing paid content, so the emulator stays on the free
+episode. A copy with the packs bought (the owner's own device, with its
+purchase record) is what the ordinary episodes need; Frida attaches
+over USB or Wi-Fi the same way.
+
 ## Reading the original's state
 
 `state.js` reads by name through Mono's C API (`libmono.so` exports
