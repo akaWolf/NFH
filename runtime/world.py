@@ -390,6 +390,8 @@ class Pawn:
         self.min_door_distance = spec.get('min_door_distance') or 0.0
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
+        self.pos_snap = False            # marks the frame of a legal position
+                                         # snap (tests/invariants.py reads it)
         # the NFH2 walk-through pathing state (Pawn.cs:150-183)
         self.nfh2 = spec.get('nfh2') or False
         self.adjacent_zones = spec.get('adjacent_zones') or False
@@ -1477,9 +1479,11 @@ class Pawn:
             can_pass = target is not None and getattr(target, 'passable', True)
             if passed and can_pass:
                 self.sprite.x = tx        # MoveToItem snaps onto the target
+                self.pos_snap = True
             if passed_y:
                 if can_pass:
                     self.sprite.y = ty
+                    self.pos_snap = True
                 passed = True
             if mag <= self._min_dist() or passed:
                 s = self._step
@@ -2617,8 +2621,10 @@ class Routine:
         if it.teleport_rott_on_use and self.role == 'Rottweiler':
             self.pawn.sprite.x = it.x + it.rott_teleport_offset[0]
             self.pawn.sprite.y = it.y + it.rott_teleport_offset[1]
+            self.pawn.pos_snap = True
         if it.set_olga_x_on_use and self.role == 'Olga':
             self.pawn.sprite.x = it.x
+            self.pawn.pos_snap = True
         self.log.append((it.name, tricked))
         if self.on_use:
             self.on_use(it, tricked)
@@ -3091,6 +3097,7 @@ class Routine:
             if not dont_on_owner:                      # cs:428-440
                 self.pawn.sprite.x += dx
                 self.pawn.sprite.y += dy
+                self.pawn.pos_snap = True
                 it.exit_delta_aux = True
         else:
             it.exit_delta_aux = False                  # cs:441-444
@@ -3101,6 +3108,7 @@ class Routine:
             if not dont_on_owner:                      # cs:445-453
                 self.pawn.sprite.x += dx
                 self.pawn.sprite.y += dy
+                self.pawn.pos_snap = True
                 it.exit_delta_not_tricked_aux = True
         else:
             it.exit_delta_not_tricked_aux = False      # cs:454-457
@@ -3111,6 +3119,7 @@ class Routine:
         if not dont_on_owner:
             self.pawn.sprite.x += delta[0]
             self.pawn.sprite.y += delta[1]
+            self.pawn.pos_snap = True
         if a.get('hide_object'):                       # cs:485-488
             w.set_active_object_hidden(it, False)
         if a.get('hide_object_tricked') and it.tricked:  # cs:489-492
@@ -4088,6 +4097,7 @@ class Routine:
             else it.surprise_left             # Owner.IsMovingRight
         self.pawn.sprite.x += it.surprise_delta[0]
         self.pawn.sprite.y += it.surprise_delta[1]
+        self.pawn.pos_snap = True
         self.state = self.USING
         seq = [a for a in seq if self.pawn.anim.has(a)]
         if seq:
@@ -5900,6 +5910,7 @@ class World:
             else:
                 pawn.sprite.x += fx
                 pawn.sprite.y += fy
+            pawn.pos_snap = True
             return
         fx, fy = item.final_linked
         if (fx or fy) and linked is not None and linked.tricked \
@@ -5910,6 +5921,7 @@ class World:
             else:
                 pawn.sprite.x += fx
                 pawn.sprite.y += fy
+            pawn.pos_snap = True
             return
         fx, fy = item.final_tricked
         if (fx or fy) and item.tricked and \
@@ -5920,6 +5932,7 @@ class World:
             else:
                 pawn.sprite.x += fx
                 pawn.sprite.y += fy
+            pawn.pos_snap = True
 
     def icon_pressed(self, entry):
         """Item.OnIconPressed (Item.cs:2176-2199), polled every frame by
@@ -7047,10 +7060,13 @@ class World:
         # the use teleports (Woody.cs:520-533)
         if item.teleport_woody_on_use:
             self.woody.sprite.x, self.woody.sprite.y = item.x, item.y
+            self.woody.pos_snap = True
         if item.set_woody_x_on_use:
             self.woody.sprite.x = item.x
+            self.woody.pos_snap = True
         if item.woody_target_y:
             self.woody.sprite.y = item.woody_target_y
+            self.woody.pos_snap = True
         # Item.PreUse for the end-of-animation users (Item.cs:2225-2235)
         if item.kind == 'SearchItem':
             # SearchItem.PreUse opens the furniture (SearchItem.cs:125-152)
@@ -7436,6 +7452,7 @@ class World:
             # the title cards are not modelled) and he walks in
             # (Woody.cs:223-231); Season 2 ships it TRUE: no walk-in
             p.sprite.x, p.sprite.y = self.level.start_location
+            p.pos_snap = True
             z = self.level.zone_by_pid(self.level.start_zone)
             if z is not None:
                 p.zone = z

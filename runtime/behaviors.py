@@ -560,6 +560,7 @@ class RollerSkaterBehavior(Behavior):
         rott.sprite.hidden = False
         rott.movement_paused = False                  # ContinueMovement
         rott.sprite.x, rott.sprite.y = self.entrance_location
+        rott.pos_snap = True
         if self.entrance_zone is not None:
             rott.zone = self.entrance_zone
         if self.breath_zone is not None:
@@ -683,8 +684,10 @@ class Level204Behavior(Behavior):
             if self.rottweiler is not None:
                 self.rottweiler.sprite.x += self.rott_pos[0]
                 self.rottweiler.sprite.y += self.rott_pos[1]
+                self.rottweiler.pos_snap = True
         if name == 'CartPullGrease' and self.olga is not None:   # cs:50-54
             self.olga.sprite.x += self.olga_new_position[0]
+            self.olga.pos_snap = True
             self.olga.sprite.y += self.olga_new_position[1]
         if name == 'WaitInFear':                      # cs:55-59
             self.hide_obj(self.kart, False)
@@ -724,6 +727,7 @@ class Level204OlgaBehavior(Behavior):
                 if st:
                     self.olga.anim.play_looping(st)
                 self.olga.sprite.x, self.olga.sprite.y = self.olga_pos
+                self.olga.pos_snap = True
             self.olga_kart_ready = True
         if self.go_back_to_kart:                      # cs:39-43
             self.go_back_to_kart = False
@@ -1295,6 +1299,7 @@ class FifiBehavior(Behavior):
         if tf.sprite is not None:
             tf.sprite.x += nx - tf.x
             tf.sprite.y += ny - tf.y
+            tf.pos_snap = True
         tf.x, tf.y = nx, ny
 
     def update(self, dt):
@@ -1319,6 +1324,7 @@ class FifiBehavior(Behavior):
             if tf.sprite is not None:
                 tf.sprite.x += self.start_position[0] - tf.x
                 tf.sprite.y += self.start_position[1] - tf.y
+                tf.pos_snap = True
             tf.x, tf.y = self.start_position
 
     def play_animation(self, name):
@@ -1384,6 +1390,7 @@ class SandCastleBehavior(Behavior):
             if rott is not None:
                 rott.sprite.x += self.rott_angry_pos[0]
                 rott.sprite.y += self.rott_angry_pos[1]
+                rott.pos_snap = True
             rt = self.routine('Rottweiler')
             if rt is not None and len(rt.actions) > 4:
                 rt.actions.pop(4)                     # RemoveActionByIndex(4)
@@ -1439,6 +1446,7 @@ class SkiBehavior(Behavior):
             self.ski_aux1 = False
             if rott is not None:
                 rott.sprite.x, rott.sprite.y = self.rott_pos_aux
+                rott.pos_snap = True
             self.set_active(self.skii_aux, False)
         if self.sky_nail:                             # cs:77-81
             self.sky_nail = False
@@ -1459,6 +1467,7 @@ class SkiBehavior(Behavior):
         self.enabled = True
         self.original_position = (rott.sprite.x, rott.sprite.y)
         rott.sprite.x = self.start_x
+        rott.pos_snap = True
         self.velocity = self.right_velocity
 
     def _stop(self):
@@ -1467,6 +1476,7 @@ class SkiBehavior(Behavior):
         self.enabled = False
         if rott is not None:
             rott.sprite.x, rott.sprite.y = self.original_position
+            rott.pos_snap = True
 
     def update(self, dt):
         rott = self.rott()
@@ -1533,6 +1543,7 @@ class BirdMovementBehavior(Behavior):
         if b.sprite is not None:
             b.sprite.x += nx - b.x
             b.sprite.y += ny - b.y
+            b.pos_snap = True
         b.x, b.y = nx, ny
 
     def update(self, dt):
@@ -1665,6 +1676,7 @@ class ParrotLedgeBehavior(Behavior):
             return
         if item is self.parrot_ledge:                 # cs:36-49
             rott.sprite.x, rott.sprite.y = self.ledge_start
+            rott.pos_snap = True
             self.original_height_delta = rott.height_delta
             rott.height_delta = self.ledge_height_delta
             self.depth(rott, 'Woody')
@@ -1675,6 +1687,7 @@ class ParrotLedgeBehavior(Behavior):
                     self.set_active(self.parrot_crap, True)
         elif item is self.aztec_throne and self.is_jumping:  # cs:50-57
             rott.sprite.x, rott.sprite.y = self.ledge_end
+            rott.pos_snap = True
             rott.height_delta = self.original_height_delta
             self.depth(rott, 'Rottweiler')
             self.depth(self.fence, 'LevelFence')
@@ -1706,6 +1719,7 @@ class ParrotLedgeFallBehavior(Behavior):
             dist = (dx * dx + dy * dy) ** 0.5
             if dist <= step or dist == 0.0:
                 rott.sprite.x, rott.sprite.y = tx, ty
+                rott.pos_snap = True
             else:
                 rott.sprite.x += dx / dist * step
                 rott.sprite.y += dy / dist * step
@@ -1787,6 +1801,7 @@ class ParrotLedgeJumpBehavior(Behavior):
             dist = (dx * dx + dy * dy) ** 0.5
             if dist <= step or dist == 0.0:
                 rott.sprite.x, rott.sprite.y = tx, ty
+                rott.pos_snap = True
             else:
                 rott.sprite.x += dx / dist * step
                 rott.sprite.y += dy / dist * step
@@ -1830,6 +1845,7 @@ class PoolJumpBehavior(Behavior):
             if self.rottweiler is not None:
                 self.rottweiler.sprite.x, self.rottweiler.sprite.y = \
                     self.rott_pos
+                self.rottweiler.pos_snap = True
             self.last_animation_linked = False
         if name == 'PoolGetOut' and self.pool_board is not None \
                 and self.pool_board.tricked and self.pool_awning is not None \

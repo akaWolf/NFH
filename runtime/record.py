@@ -71,6 +71,8 @@ class Recorder:
         self._tour_i = 0
         self.v.virtual_mouse = self.mouse
         self.paused = False
+        self.frame_hooks = []    # fn(t, DT) after each tick — the test
+                                 # layers (tests/invariants.py) ride here
 
     # -- scripted input ----------------------------------------------------
     def _click(self, sx, sy):
@@ -281,6 +283,8 @@ class Recorder:
             v.cam.y = v.woody.sprite.y + 0.6
         v._clamp_camera()
         v.draw()
+        for hook in self.frame_hooks:
+            hook(t, DT)
         self.log.write(json.dumps(self._state(t)) + '\n')
         if self.frame_every is not None and t + 1e-9 >= self._next_shot:
             v.screenshot(os.path.join(self.outdir,
@@ -321,7 +325,21 @@ def main(argv):
     rec = Recorder(args[0], args[1], script=opts.get('script'),
                    seconds=float(opts.get('seconds', 10)),
                    fps=float(opts.get('fps', 4)))
+    inv = None
+    if 'invariants' in opts:
+        sys.path.insert(0, os.path.join(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))), 'tests'))
+        from invariants import Invariants
+        inv = Invariants(rec.v)
+        rec.frame_hooks.append(inv.frame)
     rec.run()
+    if inv is not None:
+        vio = inv.finish()
+        json.dump(vio, open(os.path.join(args[1], 'invariants.json'), 'w'),
+                  indent=1)
+        for x in vio:
+            print('INV %-14s %-28s %s' % (x['kind'], x['subject'],
+                                          x['detail']))
     return 0
 
 

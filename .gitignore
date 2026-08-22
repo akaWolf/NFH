@@ -23,3 +23,11 @@ __pycache__/
 
 # levels/*.json stay in the repo (the tests and CI need them without the
 # game's data); the bundle generates them on first run instead
+
+# PyInstaller's workspace (nfh.spec)
+/build/
+/dist/
+
+# dotnet build output of the differential-test runner (tools/csdiff)
+bin/
+obj/

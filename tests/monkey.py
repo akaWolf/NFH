@@ -461,6 +461,9 @@ class Monkey(Recorder):
         self.rng = random.Random(seed)
         self.seed = seed
         self.inv = Invariants(self.v.level.name, seed)
+        from invariants import Invariants as FrameInvariants
+        self.frame_inv = FrameInvariants(self.v)
+        self.frame_hooks.append(self.frame_inv.frame)
         self.next_click_ok = 0.0
         self.pause_until = None
 
@@ -570,6 +573,10 @@ class Monkey(Recorder):
             self.inv.check(self.v, t, self.paused)
             t += DT
         self.log.close()
+        # fold the shared frame checker (tests/invariants.py) into the
+        # same findings stream — emit dedupes per (invariant, subject)
+        for x in self.frame_inv.finish():
+            self.inv.emit(x['t'], x['kind'], x['subject'], x['detail'])
         out = os.path.join(self.outdir, 'findings.jsonl')
         with open(out, 'w') as f:
             for x in self.inv.findings:

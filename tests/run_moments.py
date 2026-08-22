@@ -13,6 +13,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REC = os.path.join(ROOT, 'runtime', 'record.py')
 
 
+INVARIANTS = []      # frame-checker findings across every recording
+
+
 def record(level, out, script_text, seconds, fps=1):
     os.makedirs(out, exist_ok=True)
     sp = os.path.join(out, 'script.txt')
@@ -20,8 +23,12 @@ def record(level, out, script_text, seconds, fps=1):
     env = dict(os.environ, SDL_VIDEODRIVER='offscreen')
     subprocess.run([sys.executable, REC, os.path.join(ROOT, level), out,
                     '--script=' + sp, '--seconds=%s' % seconds,
-                    '--fps=%s' % fps],
+                    '--fps=%s' % fps, '--invariants'],
                    check=True, env=env, capture_output=True)
+    ipath = os.path.join(out, 'invariants.json')
+    if os.path.exists(ipath):
+        for x in json.load(open(ipath)):
+            INVARIANTS.append(dict(x, case=os.path.basename(out)))
     return [json.loads(l) for l in open(os.path.join(out, 'state.jsonl'))]
 
 
@@ -141,7 +148,11 @@ def main(outdir):
             ok = False
 
     print('---')
-    print('moments:', 'ALL OK' if ok else 'FAILURES')
+    for x in INVARIANTS:
+        print('INV %-12s %-14s %-24s %s'
+              % (x['case'], x['kind'], x['subject'], x['detail']))
+    print('moments:', 'ALL OK' if ok else 'FAILURES',
+          '(%d invariant findings)' % len(INVARIANTS))
     return 0 if ok else 1
 
 

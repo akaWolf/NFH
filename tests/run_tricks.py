@@ -79,6 +79,9 @@ class Driver(Recorder):
         self.paid = {}                   # item pid -> score it was paid
         self._apply_collider_enabled()
         self._install_anim_probes()
+        from invariants import Invariants
+        self.inv = Invariants(self.v)
+        self.frame_hooks.append(self.inv.frame)
 
     def _install_anim_probes(self):
         """count each pawn's AnimPlayer.tick calls per world tick: the port
@@ -2416,6 +2419,12 @@ def main(argv):
         results = d.run_plan()
         json.dump(results, open(os.path.join(outdir, 'results.json'), 'w'),
                   indent=1)
+        vio = d.inv.finish()
+        json.dump(vio, open(os.path.join(outdir, 'invariants.json'), 'w'),
+                  indent=1)
+        for x in vio:
+            print('INV %-14s %-28s %s' % (x['kind'], x['subject'],
+                                          x['detail']))
         bad = [r for r in results if r['ok'] is False]
         for r in results:
             mark = {True: 'ok  ', False: 'FAIL', None: 'MAN '}[r['ok']]
@@ -2436,10 +2445,18 @@ def main(argv):
             bad = [r for r in data if r['ok'] is False]
             man = [r for r in data if r['ok'] is None]
             total_bad += len(bad)
-            print('%-18s %d legs, %d failed, %d manual'
-                  % (name, len(data), len(bad), len(man)))
+            base = os.path.splitext(name)[0]
+            season = os.path.basename(os.path.dirname(plan))
+            ipath = os.path.join(outroot, '%s_%s' % (season, base),
+                                 'invariants.json')
+            vio = json.load(open(ipath)) if os.path.exists(ipath) else []
+            print('%-18s %d legs, %d failed, %d manual, %d invariant'
+                  % (name, len(data), len(bad), len(man), len(vio)))
             for r in bad:
                 print('    FAIL %-36s %s' % (r['leg'], r.get('why') or ''))
+            for x in vio:
+                print('    INV  %-14s %-22s %s'
+                      % (x['kind'], x['subject'], x['detail']))
     return 1 if total_bad else 0
 
 
