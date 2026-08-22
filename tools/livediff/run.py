@@ -2,7 +2,8 @@
 the port's, so the two can be diffed line by line.
 
     python3 tools/livediff/run.py <out-dir> [--seconds=60] [--host=localhost:27042]
-                                 [--attach] [--tap=<Item>@<seconds> --adb=<ssh host>]
+                                 [--attach] [--load=<SceneName>]
+                                 [--tap=<Item>@<seconds> --adb=<ssh host>]
 
 frida-server runs inside the emulator; the host reaches it through a
 forwarded port (see README.md). The script spawns the game, injects
@@ -45,7 +46,11 @@ def main(argv):
     else:
         pid = dev.spawn([pkg])
         session = dev.attach(pid)
-    script = session.create_script(open(os.path.join(HERE, 'state.js')).read())
+    js = open(os.path.join(HERE, 'state.js')).read()
+    # --load=<scene>: Application.LoadLevel from the player's thread before
+    # recording (an empty name leaves the running level alone)
+    js = js.replace('LOAD_LEVEL_NAME', opts.get('load', ''))
+    script = session.create_script(js)
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
     stats = {'frames': 0, 'errors': []}

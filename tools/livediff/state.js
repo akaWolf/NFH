@@ -62,6 +62,9 @@ const asmGame = image('Assembly-CSharp');
 const asmUnity = image('UnityEngine');
 
 const klass = (img, ns, n) => mono_class_from_name(img, str(ns), str(n));
+const mono_method_desc_new = fn('mono_method_desc_new', 'pointer', ['pointer', 'int']);
+const mono_method_desc_search_in_class = fn('mono_method_desc_search_in_class', 'pointer', ['pointer', 'pointer']);
+const mono_method_desc_search = (desc, k) => mono_method_desc_search_in_class(mono_method_desc_new(str(desc), 1), k);
 const method = (k, n, argc) => mono_class_get_method_from_name(k, str(n), argc);
 
 function offsets(k, names) {
@@ -82,12 +85,31 @@ function offsets(k, names) {
 const DT = 1.0 / 60.0;
 const Time = klass(asmUnity, 'UnityEngine', 'Time');
 const pinned = [];
+// --- loading a level by name ---------------------------------------
+// Application.LoadLevel(string) is an engine call and wants the player's
+// thread; the deltaTime getter runs there every frame, so the first call
+// after arming carries the load (LOAD is filled in by run.py --load)
+const LOAD = 'LOAD_LEVEL_NAME';
+const Application = klass(asmUnity, 'UnityEngine', 'Application');
+const loadLevel = LOAD ? mono_method_desc_search(':LoadLevel(string)', Application) : NULL;
+const mono_string_new = fn('mono_string_new', 'pointer', ['pointer', 'pointer']);
+let loaded = !LOAD;
+function loadOnce() {
+    if (loaded) return;
+    loaded = true;
+    if (loadLevel.isNull()) { send({ type: 'error', message: 'no LoadLevel(string)' }); return; }
+    const args = Memory.alloc(Process.pointerSize);
+    args.writePointer(mono_string_new(domain, str(LOAD)));
+    const exc = Memory.alloc(Process.pointerSize); exc.writePointer(NULL);
+    mono_runtime_invoke(loadLevel, NULL, args, exc);
+    send({ type: 'load', level: LOAD, ok: exc.readPointer().isNull() });
+}
 ['get_deltaTime', 'get_fixedDeltaTime', 'get_unscaledDeltaTime',
  'get_smoothDeltaTime'].forEach(function (name) {
     const m = method(Time, name, 0);
     if (m.isNull()) return;
     Interceptor.replace(mono_compile_method(m),
-        new NativeCallback(function () { return DT; }, 'float', []));
+        new NativeCallback(function () { loadOnce(); return DT; }, 'float', []));
     pinned.push(name);
 });
 

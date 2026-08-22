@@ -149,6 +149,15 @@ level)
     sleep 12; $ADB shell input tap 600 305         # the episode's play button
     sleep 25; echo "in level"
     ;;
+up)     # the game running past the cross-promotion, nothing more: the
+        # sweep loads levels from inside (run.py --load)
+    $ADB shell am force-stop org.chromium.webview_shell
+    $ADB shell am force-stop $PKG; sleep 2
+    $ADB shell am start -n $PKG/com.hg.android.cocos2dx.Application >/dev/null
+    past_promo
+    sleep 8; $ADB shell input tap 320 160         # touch to continue
+    sleep 6; echo "$PKG up"
+    ;;
 menu)
     # the same walk, stopping on the episode map: attach the recorder
     # here, then `tap 600 305` starts the level with its first frame
