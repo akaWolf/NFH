@@ -1687,6 +1687,9 @@ class Level:
                     'compound_trick_score': d.get('CompoundTrickScore', 4),
                     'is_tutorial': bool(d.get('IsTutorial')),
                     'dont_show_angry_count': bool(d.get('DontShowAngryCount')),
+                    # GameInfo.cs:117; no shipped level sets it — kept for
+                    # parity (the NFH2 tick bonus honors it, cs:414-419)
+                    'ignore_score': bool(d.get('IgnoreScore')),
                 }
                 return
 

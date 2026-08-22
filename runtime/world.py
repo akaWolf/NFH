@@ -1784,6 +1784,7 @@ class GameState:
         self.time_up = False
         self.is_tutorial = bool(info.get('is_tutorial'))
         self.compound_trick_score = info.get('compound_trick_score') or 0
+        self.ignore_score = bool(info.get('ignore_score'))
         self.dont_show_angry_count = bool(info.get('dont_show_angry_count'))
         # the score screen strings (GameInfo.CalculateScore)
         self.rating = ''
@@ -1806,7 +1807,9 @@ class GameState:
             final = self.final_trick_score + self.completed * compound
         else:
             final = int(self.completed * 90.0 / max(1, self.total))
-            if angry_count_ticks == 1:
+            # the tick bonus honors IgnoreScore (GameInfo.cs:414-419);
+            # no shipped level sets it (tests/run_csdiff.py caught the gap)
+            if angry_count_ticks == 1 and not self.ignore_score:
                 final += 10
         self.final_viewer_rating = min(final, 100)
         self.trick_ratio = '%d / %d' % (self.completed, self.total)
