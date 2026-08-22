@@ -50,9 +50,18 @@ def main(argv):
     # --load=<scene>: Application.LoadLevel from the player's thread before
     # recording (an empty name leaves the running level alone)
     js = js.replace('LOAD_LEVEL_NAME', opts.get('load', ''))
+    # --extra=<file.js> [--role=<Pawn class>]: a second tracer (steps.js,
+    # clock.js ...) in the same session — a second frida client on the
+    # process has taken the game down; its own messages (no 'type') go to
+    # extra.jsonl
+    if 'extra' in opts:
+        extra = open(os.path.join(HERE, opts['extra'])).read()
+        js += "\n;(function () { const ROLE = %s;\n%s\n})();\n" % (
+            json.dumps(opts.get('role', 'Rottweiler')), extra)
     script = session.create_script(js)
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
+    extra_log = open(os.path.join(out_dir, 'extra.jsonl'), 'w')
     stats = {'frames': 0, 'errors': []}
 
     def on_message(message, data):
@@ -61,6 +70,9 @@ def main(argv):
             return
         p = message.get('payload')
         if not isinstance(p, dict):
+            return
+        if 'type' not in p:               # the --extra tracer's rows
+            extra_log.write(json.dumps(p) + '\n')
             return
         if p.get('type') == 'frame':
             # record.py's clock: the port steps a fixed 60 Hz, and the
@@ -102,6 +114,7 @@ def main(argv):
         seconds = max(0.0, seconds - float(at))
     time.sleep(seconds)
     log.close()
+    extra_log.close()
     print('%d frames -> %s' % (stats['frames'],
                                os.path.join(out_dir, 'state.jsonl')))
     for e in stats['errors'][:5]:
