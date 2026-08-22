@@ -32,6 +32,32 @@ def load(path, pawn):
     return out
 
 
+def passing(path, pawn, pad=1):
+    """per frame: the port's pawn is inside a door pass (DOOR_ANIM — hidden,
+    the original keeps integrating its Velocity meanwhile, Pawn.cs:855-880,
+    and nothing on screen shows it), padded by `pad` frames for the
+    one-frame phase at either end; the original's trace carries no such
+    flag and masks nothing"""
+    out = []
+    for line in open(path):
+        r = json.loads(line)
+        if pawn == 'woody':
+            w = r.get('woody')
+            out.append(bool(w and w.get('state') == 'door_anim'))
+        else:
+            rs = [q for q in (r.get('routines') or [])
+                  if q.get('role') == 'Rottweiler' and 'pstate' in q]
+            out.append(bool(rs and rs[0]['pstate'] == 'door_anim'))
+    if pad:
+        m = list(out)
+        for i, v in enumerate(out):
+            if v:
+                for j in range(max(0, i - pad), min(len(m), i + pad + 1)):
+                    m[j] = True
+        out = m
+    return out
+
+
 def first_move(pts, eps=0.005):
     """the frame before the pawn first stands more than `eps` from its
     start (a lone jittered sample is not a move)"""

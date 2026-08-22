@@ -73,12 +73,16 @@ def diff(level):
             row[pawn] = None
             continue
         a, b = dt.first_move(L), dt.first_move(P)
+        M = dt.passing(port, pawn)[b:]          # the port's door passes
         L, P = L[a:], P[b:]
         n = min(len(L), len(P))
         d = []
         for i in range(n):
             p, q = L[i], P[i]
-            d.append(None if p is None or q is None else ((p[0]-q[0])**2 + (p[1]-q[1])**2) ** 0.5)
+            if p is None or q is None or (i < len(M) and M[i]):
+                d.append(None)
+                continue
+            d.append(((p[0]-q[0])**2 + (p[1]-q[1])**2) ** 0.5)
         v = [x for x in d if x is not None]
         if not v:
             row[pawn] = None

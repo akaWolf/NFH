@@ -251,7 +251,8 @@ class Recorder:
                           'anim': r.pawn.anim.anim.name,
                           'x': round(r.pawn.sprite.x, 3),
                           'y': round(r.pawn.sprite.y, 3),
-                          'zone': r.pawn.zone.name if r.pawn.zone else None}
+                          'zone': r.pawn.zone.name if r.pawn.zone else None,
+                          'pstate': r.pawn.state}
                          for r in w.routines],
         }
 
