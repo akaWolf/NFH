@@ -96,7 +96,32 @@ offsets out of the live runtime (`CompletedTricksCount` at 172,
 `TotalTricksCount` at 164, `FinalViewerRating` at 232), then arms a hook
 on `GameInfo.Update`.
 
-What is left is the input half: `GameInfo.Update` only ticks inside a
-level, so the recorder returns no frames until the game is driven from
-its title screen into one. That is the same scripted-input work the diff
-needs anyway — the plan above — rather than a new obstacle.
+`run.py --attach` rides the running game (frida names the process by its
+application label, so the package is looked up among the applications),
+which is what the menus require: `GameInfo.Update` only ticks inside a
+level, and the game has to be walked from its title card through the
+episode map first.
+
+## The first numbers
+
+Driven into Level201 and recorded at 60 Hz, the original reports
+`TotalTricksCount` 4 and puts Woody at **(2.190, -2.209)** — the exact
+`start_location` in `levels/s2/Level201.json`, which is the first
+confirmation that the export is faithful to what the game actually
+loads.
+
+Clicking the SoapChest on both sides:
+
+| | port | original |
+|---|---|---|
+| start | (2.190, -2.209) | (2.190, -2.209) |
+| end | (3.384, **-2.033**) | (3.384, **-2.021**) |
+| x range walked | 2.190..3.389 | 2.190..**3.417** |
+
+The walk agrees to about a centimetre of world space, and the original
+overshoots its target before settling while the port does not. That
+difference is not yet a finding: the original was still running on its
+own clock. Pinning `Time.deltaTime` to 1/60 — the next step — is what
+makes the two traces comparable frame for frame instead of only in
+aggregate.
+

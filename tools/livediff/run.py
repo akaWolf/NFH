@@ -28,8 +28,22 @@ def main(argv):
 
     import frida
     dev = frida.get_device_manager().add_remote_device(host)
-    pid = dev.spawn([opts.get('package', PKG)])
-    session = dev.attach(pid)
+    pkg = opts.get('package', PKG)
+    pid = None
+    if 'attach' in opts:
+        # ride an already-running game: the menus have to be walked
+        # before GameInfo exists at all
+        # on Android frida names a process by its application label,
+        # so the package has to be looked up among the applications
+        live = [a for a in dev.enumerate_applications()
+                if a.identifier == pkg and a.pid]
+        if not live:
+            print('%s is not running' % pkg)
+            return 2
+        session = dev.attach(live[0].pid)
+    else:
+        pid = dev.spawn([pkg])
+        session = dev.attach(pid)
     script = session.create_script(open(os.path.join(HERE, 'state.js')).read())
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
@@ -59,7 +73,8 @@ def main(argv):
 
     script.on('message', on_message)
     script.load()
-    dev.resume(pid)
+    if pid is not None:
+        dev.resume(pid)
     time.sleep(seconds)
     log.close()
     print('%d frames -> %s' % (stats['frames'],
