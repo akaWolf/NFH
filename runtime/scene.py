@@ -1296,6 +1296,7 @@ class Level:
 
     # -- build -----------------------------------------------------------
     def _build(self):
+        self._shift_zone_children()
         for pid, o in self.objs.items():
             t = o['type']
             if t == 'Zone' and 'data' in o:
@@ -1619,6 +1620,69 @@ class Level:
         return (wp[0] + c[0], wp[1] + c[1], 2.0 * w, 2.0 * h,
                 (wp[2] if len(wp) > 2 else 0.0) + c[2], dz)
 
+    def _level_component(self):
+        for o in self.objs.values():
+            if o['type'] == 'Level' and 'data' in o:
+                return o['data']
+        return None
+
+    def _zone_controller_pos(self):
+        """the ZoneController's transform position (Level.cs:172, the
+        tagged object) — Level.Start adds it to every zone's position"""
+        for o in self.objs.values():
+            if o['type'] == 'ZoneController' and 'data' in o:
+                tr = self._transform(self._go_of(o))
+                if tr:
+                    p = self._pos(tr)
+                    return (p[0], p[1])
+                break
+        return (0.0, 0.0)
+
+    def _shift_zone_children(self):
+        """Level.Start (Level.cs:172-186) writes every zone's
+        transform.position: (x, ZonesY[i], z) + ZoneController.position — a
+        move of the whole subtree, so the zone's children (its doors and
+        transitions, with their sprites and colliders) travel by the same
+        delta; the ZoneController offset, already inside the zone's world
+        position once through the hierarchy, lands a second time. The
+        exporter composed the scene file's hierarchy only. This applies the
+        runtime delta to every descendant's world position before anything
+        reads it; _apply_zone_bounds moves the zones themselves."""
+        lvl = self._level_component()
+        if not lvl:
+            return
+        ctrl = self._zone_controller_pos()
+        ys = lvl.get('ZonesY') or []
+        for o in self.objs.values():
+            if o['type'] != 'Zone' or 'data' not in o:
+                continue
+            go = self._go_of(o)
+            tr = self._transform(go)
+            if not tr:
+                continue
+            name = (self._o(go) or {}).get('data', {}).get('name', '')
+            try:
+                i = int(name[4:])
+            except (ValueError, IndexError):
+                continue
+            if i >= len(ys):
+                continue
+            p = self._pos(tr)
+            dx, dy = ctrl[0], ys[i] + ctrl[1] - p[1]
+            if abs(dx) < 1e-9 and abs(dy) < 1e-9:
+                continue
+            stack = list(tr.get('children') or [])
+            while stack:
+                c = self._o(stack.pop())
+                cd = c.get('data') if c else None
+                if not cd:
+                    continue
+                wp = cd.get('world_position')
+                if wp:
+                    wp[0] += dx
+                    wp[1] += dy
+                stack.extend(cd.get('children') or [])
+
     def _apply_zone_bounds(self):
         """Level.Start() rebuilds every zone from lists on the Level component,
         indexed by the number in the zone's name. The serialized zone transforms
@@ -1629,22 +1693,10 @@ class Level:
             zone.collider.size = ZonesSizes[i]
             zone.SetPlayLeft/Right(ZonesPlayLeft/Right[i])   # around the NEW x
         """
-        lvl = None
-        for o in self.objs.values():
-            if o['type'] == 'Level' and 'data' in o:
-                lvl = o['data']
-                break
+        lvl = self._level_component()
         if not lvl:
             return
-        ctrl = (0.0, 0.0)
-        for pid, o in self.objs.items():
-            if o['type'] == 'ZoneController' and 'data' in o:
-                go = self._go_of(o)
-                tr = self._transform(go)
-                if tr:
-                    p = self._pos(tr)
-                    ctrl = (p[0], p[1])
-                break
+        ctrl = self._zone_controller_pos()
         ys = lvl.get('ZonesY') or []
         sizes = lvl.get('ZonesSizes') or []
         left = lvl.get('ZonesPlayLeft') or []
