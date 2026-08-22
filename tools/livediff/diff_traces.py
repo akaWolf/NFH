@@ -32,9 +32,15 @@ def load(path, pawn):
     return out
 
 
-def first_move(pts):
+def first_move(pts, eps=0.005):
+    """the frame before the pawn first stands more than `eps` from its
+    start (a lone jittered sample is not a move)"""
+    start = next((q for q in pts if q is not None), None)
+    if start is None:
+        return 0
     for i in range(1, len(pts)):
-        if pts[i] is not None and pts[i - 1] is not None and pts[i] != pts[i - 1]:
+        q = pts[i]
+        if q is not None and abs(q[0] - start[0]) + abs(q[1] - start[1]) > eps:
             return i - 1
     return 0
 

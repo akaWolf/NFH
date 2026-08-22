@@ -2,6 +2,7 @@
 the port's, so the two can be diffed line by line.
 
     python3 tools/livediff/run.py <out-dir> [--seconds=60] [--host=localhost:27042]
+                                 [--attach] [--tap=<Item>@<seconds> --adb=<ssh host>]
 
 frida-server runs inside the emulator; the host reaches it through a
 forwarded port (see README.md). The script spawns the game, injects
@@ -77,6 +78,23 @@ def main(argv):
     script.load()
     if pid is not None:
         dev.resume(pid)
+    tap = opts.get('tap')                  # Item@seconds: click it mid-run,
+    if tap:                                # through this same session
+        name, at = tap.split('@')
+        time.sleep(float(at))
+        import tap as tapper
+        pt = tapper.resolve(session, name)
+        if pt is None:
+            print('tap: could not resolve %s' % name)
+        else:
+            print('tap %s at %d %d' % (name, pt[0], pt[1]))
+            host = opts.get('adb')
+            cmd = (['ssh', '-o', 'BatchMode=yes', host,
+                    'bash /tmp/emulator.sh tap %d %d' % pt] if host
+                   else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])
+            import subprocess
+            subprocess.run(cmd, check=False, timeout=60)
+        seconds = max(0.0, seconds - float(at))
     time.sleep(seconds)
     log.close()
     print('%d frames -> %s' % (stats['frames'],

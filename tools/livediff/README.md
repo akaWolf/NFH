@@ -173,6 +173,46 @@ episode. A copy with the packs bought (the owner's own device, with its
 purchase record) is what the ordinary episodes need; Frida attaches
 over USB or Wi-Fi the same way.
 
+## Clicking the original by item name
+
+`tap.py <ItemName>` is the emulator side of the port's `clickitem`: Frida
+finds the item's GameObject, asks the scene's camera for its screen
+point and adb taps it, with Unity's bottom-up screen y flipped against
+`Screen.height`. `run.py --tap=<Item>@<seconds>` does the same from
+inside the recorder's own session — two Frida clients on one process
+crashed the recorder. Three things cost a game process each to learn:
+`GameObject.Find` returns a GameObject, so it is `GameObject.get_transform`
+(`Component.get_transform` on it reads a field that is not there);
+`Camera.main` is null (no MainCamera tag), so the camera is the first of
+`Camera.allCameras`; and the session must not be torn down while the
+player is still inside the hooked `Update` — a second's grace before
+exit. Every pointer is checked before use, because an engine call on a
+null object takes the game down with it.
+
+Driving the game to a level (`emulator.sh level`) had its own lessons:
+the cross-promotion after launch is the game's own `MoreGamesActivity`,
+up within ten seconds, and BACK closes it; a tap that lands on it opens
+the store link in the WebView shell — a separate app that then sits on
+top of every later launch, so the shell is force-stopped before the game
+is started; and BACK on the loading screen finishes the Activity.
+
+## What the tutorial level allows
+
+Level201 locks every item and door the script has not reached
+(`ItemsToUnlock`, LevelScriptAction.cs:152): a click on the ToolBox
+before the chest does nothing in the original, and `record_app.py` —
+the port recorded through the whole application, tutorial layer and
+all, in `record.py`'s schema — does nothing either: 2161 frames, no
+difference. The chest, the tutorial's first target, walked through the
+application matches the original on all 1109 frames of the walk and the
+use that follows (mean 0.0000, peak one third-decimal). The original's
+first eight seconds in a level are the title cards; the application
+skips them, and the differ aligns on the first move.
+
+(The neighbour question from an earlier pass — the port at (-0.325,
+1.656) against the original's (-7.33, 1.54) — was `routines[0]`, which
+is Olga on this level; the neighbour stands at (-7.33, 1.54) in both.)
+
 ## Reading the original's state
 
 `state.js` reads by name through Mono's C API (`libmono.so` exports

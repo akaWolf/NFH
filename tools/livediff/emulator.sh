@@ -28,6 +28,24 @@ ADB=$R/platform-tools/adb
 mkdir -p "$DIR" "$ANDROID_AVD_HOME"
 [ -f $DIR/libs.path ] && export LD_LIBRARY_PATH=$(cat $DIR/libs.path)
 
+resumed() {   # the resumed Activity, e.g. com.nordigames.nfh2/com.hg.framework.MoreGamesActivity
+    $ADB shell "dumpsys activity activities" | grep mResumedActivity | head -1 \
+        | sed 's/.*u0 //; s/ t[0-9]*}.*//' | tr -d '\r'
+}
+past_promo() {
+    # the cross-promotion is the game's own MoreGamesActivity, up within
+    # ten seconds of launch (sampled: tools/livediff/README.md); BACK
+    # closes it and the game's Activity resumes
+    for i in $(seq 1 30); do
+        sleep 3
+        case "$(resumed)" in
+        *MoreGamesActivity*) $ADB shell input keyevent 4; sleep 3 ;;
+        *cocos2dx.Application*) [ $i -gt 3 ] && return 0 ;;
+        esac
+    done
+    echo "the game's Activity never came back" >&2
+}
+
 case "${1:-}" in
 sdk)
     cd $DIR
@@ -107,9 +125,13 @@ play) $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Applica
 level)
     # from a cold start to standing in Level201: the cross-promo screen,
     # the title card, the menu and the episode map, at 320x640
+    # a stray tap into the cross-promotion opens the store link in the
+    # WebView shell, a separate app that then stays on top of every
+    # later launch — put it down first
+    $ADB shell am force-stop org.chromium.webview_shell
     $ADB shell am force-stop com.nordigames.nfh2; sleep 2
     $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
-    sleep 55; $ADB shell input keyevent 4          # dismiss "play more games"
+    past_promo                                     # "play more games"
     sleep 8;  $ADB shell input tap 320 160         # touch to continue
     sleep 10; $ADB shell input tap 320 149         # START GAME
     sleep 12; $ADB shell input tap 600 305         # the episode's play button
@@ -119,9 +141,13 @@ menu)
     # the same walk, stopping on the episode map: attach the recorder
     # here, then `tap 600 305` starts the level with its first frame
     # already hooked
+    # a stray tap into the cross-promotion opens the store link in the
+    # WebView shell, a separate app that then stays on top of every
+    # later launch — put it down first
+    $ADB shell am force-stop org.chromium.webview_shell
     $ADB shell am force-stop com.nordigames.nfh2; sleep 2
     $ADB shell am start -n com.nordigames.nfh2/com.hg.android.cocos2dx.Application >/dev/null
-    sleep 55; $ADB shell input keyevent 4
+    past_promo
     sleep 8;  $ADB shell input tap 320 160
     sleep 10; $ADB shell input tap 320 149
     sleep 12; echo "on the episode map"
