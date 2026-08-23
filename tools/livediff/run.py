@@ -148,7 +148,11 @@ def main(argv):
             while stats['level_frames'] < want and time.time() < deadline:
                 time.sleep(0.02)
             sel = types.get(row.get('type')) if row.get('type') else -1
-            pt = tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'))
+            try:
+                pt = tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'))
+            except Exception as e:          # the game died under the run: keep what landed
+                print('[taps] frame %d: %s — the rest of the clicks dropped' % (want, e))
+                break
             if pt is None:
                 print('[taps] frame %d: could not resolve %s' % (want, row.get('item') or row.get('world')))
                 continue

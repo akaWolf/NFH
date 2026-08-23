@@ -1865,6 +1865,17 @@ class Driver(Recorder):
         if typ is not None and not self.select_type(typ):
             return False, '%s not in inventory' % typ
         pred = pred_of(it)
+        if typ is not None and pred():
+            # a repeat use — Level201's second soap on the puddle after the
+            # camera script turned UseOnce off (TutorialScriptCameraNFH2.cs:
+            # 159): the trick flags still hold from the first use and the
+            # leg would pass without the click; success is then the
+            # inventory entry consumed (Item.cs' UseCount tail) or a fresh
+            # Tricked
+            inv = self.world.inventory
+            sig = lambda: [(e['type'], e['use_count']) for e in inv.items if e['type'] == typ]
+            before, tricked0 = sig(), it.tricked
+            pred = lambda: sig() != before or (it.tricked and not tricked0)
         def poke():
             if typ is not None and not self.select_type(typ):
                 return
@@ -2172,7 +2183,9 @@ class Driver(Recorder):
         deadline = self.t + 60.0
         next_click = self.t
         while self.t < deadline:
-            if abs(w.sprite.x - x) < 0.05 and w.state == w.IDLE:
+            # the tutorial's own threshold is 0.5 (LevelScriptAction's
+            # Threshold); Woody stops a little short of the click point
+            if abs(w.sprite.x - x) < 0.25 and w.state == w.IDLE:
                 return True, None
             if self.world.game.got_caught or self.world.game.ending:
                 return False, 'caught on the walk'
