@@ -94,9 +94,13 @@ function call(meth, self, args) {
     if (!exc.readPointer().isNull()) throw new Error('managed exception');
     return r;
 }
-// the inventory in hand: Woody.SetUsedInventory(Inventory) (Woody.cs:1062)
-// with the InventoryManager's entry of the wanted InventoryType — what the
-// HUD's icon click does, for a `usewith` replayed on the original
+// the inventory in hand, the way the HUD's icon click does it: the click
+// on an icon calls Woody.SetCurrentInventory(entry) (HUD.cs:1311-1314,
+// Woody.cs:1046: Action = UseWith) and the world click that follows
+// promotes it — SetUsedInventory(CurrentInventory), SetCurrentInventory(
+// null) (HUD.cs:1320-1322). A second click on the selected icon clears it
+// (HUD.cs:942-958). Calling SetUsedInventory straight left Woody in a
+// state the taps did not act on (Level206's Pillows, Level113's Drawer).
 const parentOf = f('mono_class_get_parent', 'pointer', ['pointer']);
 function offOf(k0, name) { let k = k0; while (!k.isNull()) { const fl = fieldFrom(k, S(name)); if (!fl.isNull()) return fieldOff(fl); k = parentOf(k); } return -1; }
 const WoodyK = classFrom(game, S(''), S('Woody'));
@@ -107,10 +111,16 @@ function selectInventory(typeId) {
     const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
     const gi = out.readPointer(); if (gi.isNull()) return 'no GameInfo';
     const woody = gi.add(offOf(GameInfo, 'Woody')).readPointer(); if (woody.isNull()) return 'no Woody';
-    const setUsed = methodFrom(WoodyK, S('SetUsedInventory'), 1); if (setUsed.isNull()) return 'no SetUsedInventory';
+    const setCurrent = methodFrom(WoodyK, S('SetCurrentInventory'), 1); if (setCurrent.isNull()) return 'no SetCurrentInventory';
     const args = Memory.alloc(Process.pointerSize); const exc = Memory.alloc(Process.pointerSize); exc.writePointer(NULL);
-    if (typeId < 0) { args.writePointer(NULL); invoke(setUsed, woody, args, exc); return 'cleared'; }
     const mgr = woody.add(offOf(WoodyK, 'InvManager')).readPointer(); if (mgr.isNull()) return 'no InvManager';
+    if (typeId < 0) {
+        // nothing selected on the port's side: clear a selection left
+        // over (the second icon click), else leave Woody alone
+        const curOff = offOf(InvMgrK, '_CurrentInventory');
+        if (curOff >= 0 && !mgr.add(curOff).readPointer().isNull()) { args.writePointer(NULL); invoke(setCurrent, woody, args, exc); return 'cleared'; }
+        return 'nothing selected';
+    }
     const list = mgr.add(offOf(InvMgrK, 'InventoryItems')).readPointer(); if (list.isNull()) return 'no list';
     const listK = f('mono_object_get_class', 'pointer', ['pointer'])(list);
     const items = list.add(offOf(listK, '_items')).readPointer(); const size = list.add(offOf(listK, '_size')).readS32();
@@ -119,7 +129,7 @@ function selectInventory(typeId) {
         // MonoArray: the object header, the bounds pointer, the length, then the data
         const inv = items.add(4 * Process.pointerSize + i * Process.pointerSize).readPointer();
         if (inv.isNull()) continue;
-        if (inv.add(typeOff).readS32() === typeId) { args.writePointer(inv); invoke(setUsed, woody, args, exc); return exc.readPointer().isNull() ? 'selected' : 'threw'; }
+        if (inv.add(typeOff).readS32() === typeId) { args.writePointer(inv); invoke(setCurrent, woody, args, exc); return exc.readPointer().isNull() ? 'selected' : 'threw'; }
     }
     return 'type ' + typeId + ' not in the inventory (' + size + ' entries)';
 }

@@ -98,6 +98,7 @@ def main(argv):
                 'sneak': p.get('sneak'),
                 'rott': p.get('rott'),
                 'mother': p.get('mother'),
+                'rott_action': p.get('rott_action'),
                 'cam': p.get('cam'),
                 'script': p.get('script'),
                 'game': p['game'],

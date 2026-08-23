@@ -157,6 +157,17 @@ const Woody = klass(asmGame, '', 'Woody');
 const WD = offsets(Woody, ['InputLocked', 'Sneaking', 'Frozen']);   // Frozen: a tutorial's Freeze() (CheckMouseClick drops the click)
 const PawnK = klass(asmGame, '', 'Pawn');
 const PD = offsets(PawnK, ['CanStart']);   // StartGame's flag (IntroAnimation.cs:282-285)
+const RottK = klass(asmGame, '', 'Rottweiler');
+const RD = RottK.isNull() ? { ActionManager: -1 } : offsets(RottK, ['ActionManager']);   // Rottweiler.cs:22
+// the neighbour's routine: ActionManager.ActiveActionIndex / Frozen
+const AMK = klass(asmGame, '', 'ActionManager');
+const AM = AMK.isNull() ? { ActiveActionIndex: -1, Frozen: -1 } : offsets(AMK, ['ActiveActionIndex', 'Frozen']);
+function routine(pawn) {
+    if (pawn.isNull() || RD.ActionManager < 0 || AM.ActiveActionIndex < 0) return null;
+    const am = pawn.add(RD.ActionManager).readPointer();
+    if (am.isNull()) return null;
+    return { index: am.add(AM.ActiveActionIndex).readS32(), frozen: AM.Frozen < 0 ? null : am.add(AM.Frozen).readU8() !== 0 };
+}
 const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
                               'WinningTricksCount', 'FinalTrickScore',
                               'FinalViewerRating', 'Won', 'GameEnding',
@@ -204,6 +215,7 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
             },
             woody: position(woody),
             mother: mother.isNull() ? null : position(mother),
+            rott_action: routine(rott),
             cam: gcam.isNull() ? null : position(gcam),
             script: script.isNull() || LS.ActionIndex < 0 ? null : i32(script, LS.ActionIndex),
             start: rott.isNull() || PD.CanStart < 0 ? null : bool8(rott, PD.CanStart),

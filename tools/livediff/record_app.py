@@ -36,6 +36,7 @@ def state(app, t):
         'started': app.cards is None or not app.cards.running,
         'routines': [{'role': r.role, 'state': r.state,
                       'item': r.item.name if r.item else None,
+                      'index': r.index, 'frozen': r.frozen,
                       'anim': r.pawn.anim.anim.name,
                       'x': round(r.pawn.sprite.x, 3),
                       'y': round(r.pawn.sprite.y, 3),

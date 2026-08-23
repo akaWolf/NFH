@@ -619,3 +619,15 @@ run — Level208's neighbour left his platform at 1584 on the original and
 script clicks at `at +N` from the port's own StartGame (record_app.py
 tracks the cards' end) and the report counts both sides' frames from
 their StartGame.
+
+## Level201's zone actions never completed
+
+With the runner in the App, Level201's plan stalled at `tutorial 5`: the
+LevelScript's action 4 — Woody enters Zone02, UnfreezeNeighbor +
+ForceAdvanceAction — never completed although he stood in Zone02. The
+action's Zone reference is the Zone component's path (228) and the
+pawn's zone carries the GameObject's id (48); the port compared the two
+raw ids (the original compares Zone components, Pawn.cs:1592-1595). The
+tutorial resolves the reference through the level's component map now
+(`zone_by_component`, which the item behaviours already used). Doors and
+items were never affected: both are keyed by their component ids.

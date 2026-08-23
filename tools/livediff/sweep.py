@@ -318,6 +318,18 @@ def replay_report(level):
     if lsc or psc:
         print('  script:   original %s, port %s' % (' '.join('%s@%d' % (e.split()[1], f) for f, e in lsc),
                                                      ' '.join('%s@%d' % (e.split()[1], f) for f, e in psc)))
+    # the neighbour's routine: ActionManager.ActiveActionIndex steps
+    def rott_index(rows, get, frame):
+        out, last = [], None
+        for r in rows:
+            v = get(r)
+            if v is not None and v != last:
+                out.append('%s@%d' % (v, frame(r))); last = v
+        return out
+    li = rott_index(L, lambda r: (r.get('rott_action') or {}).get('index'), lframe)
+    pi = rott_index(P, lambda r: next((x.get('index') for x in r.get('routines') or [] if x.get('role') == 'Rottweiler'), None), pframe)
+    if li or pi:
+        print('  routine:  original %s, port %s' % (' '.join(li[:40]), ' '.join(pi[:40])))
     print('  original: ' + ', '.join('%s@%d' % (e, f) for f, e in le))
     print('  port:     ' + ', '.join('%s@%d' % (e, f) for f, e in pe))
     return {'level': level, 'live': le, 'port': pe}
