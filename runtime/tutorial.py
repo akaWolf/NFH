@@ -214,10 +214,17 @@ class Tutorial:
             self.complete_current_action()
 
     def on_woody_zone_entered(self, zone_pid):
-        """Pawn.ChangeZone's SignalScriptZone arm (Pawn.cs:1592-1595)"""
+        """Pawn.ChangeZone's SignalScriptZone arm (Pawn.cs:1592-1595):
+        `Zone == SignalScriptZone` compares Zone components; the action's
+        reference is the component's path and the pawn's zone carries the
+        GameObject's, so the reference resolves through the level's
+        component map first (Level201's actions 4 / 9 / 14 never completed
+        on the raw ids)"""
         a = self.current
-        if a is not None and self._signal_kind(a) == 'zone' \
-                and self._pid(a.get('Zone')) == zone_pid:
+        if a is None or self._signal_kind(a) != 'zone':
+            return
+        z = self.level.zone_by_component(self._pid(a.get('Zone')))
+        if z is not None and z.pid == zone_pid:
             self.complete_current_action()
 
     def on_trick_done(self):
