@@ -1893,6 +1893,7 @@ class GameState:
         self.winning = info.get('winning', 0)
         self.completed = 0
         self.won = False
+        self.caught_by = None            # the port's record: 'Rottweiler' / 'Mother'
         self.linked_trick = False
         self.compound_tricks = 0
         self.log = []
@@ -7779,11 +7780,19 @@ class World:
         HitWoody too, Mother.cs:108-111) +
         RoutineActionHitWoody.OnActionStarted."""
         import random
-        self.game.got_caught = True
+        # gotCaught is the neighbour's flag alone: every caller of
+        # OnNeighborCaughtWoody sets it first (GameInfo.cs:216-218,
+        # Pawn.cs:370-372, 1228-1230); OnMotherCaughtWoody's callers do not
+        # (cs:222-224), so a Mother's catch ends the game with gotCaught
+        # false. caught_by is the port's own record of who did it (the
+        # runner / the recorder read it; no game rule hangs off it)
+        catcher = catcher or self.pawns.get('Rottweiler')
+        if catcher is None or catcher.role == 'Rottweiler':
+            self.game.got_caught = True
+        self.game.caught_by = catcher.role if catcher is not None else 'Rottweiler'
         self.game.won = False             # GameInfo.cs:325/335
         self._finish_game()               # FinishGame (cs:326/336)
         self._play_jingle('caught')       # PlayCaughtMusic (cs:329/339)
-        catcher = catcher or self.pawns.get('Rottweiler')
         woody = self.woody
         # Woody.PlayFearAnimation(catcher): face whoever caught him
         fear = woody.fear_left if catcher.sprite.x < woody.sprite.x \
@@ -8283,8 +8292,7 @@ class World:
             if not self.game.got_caught:
                 self._catch()             # cs:214-221
         elif self.can_mother_see_woody():
-            if not self.game.got_caught:
-                self._catch(self.pawns.get('Mother'))   # cs:222-225
+            self._catch(self.pawns.get('Mother'))   # cs:222-225, no gotCaught guard
         elif self.game.all_done():
             # cs:226-236: WinGameOnCompleteAllTricks sets GameEnding at once
             # and starts the 2.5 s coroutine (cs:292-302) — the clock, the
