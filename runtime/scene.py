@@ -126,6 +126,31 @@ def _anim_name(v):
     return None if v in (None, 'NONE') else v
 
 
+def _mono_qsort(a, cmp, low0, high0):
+    """Mono's classic Array.qsort (mcs/class/corlib/System/Array.cs) — what
+    List<T>.Sort(Comparison<T>) ran on the game's Mono: the middle element
+    is the pivot, the two walls move in past the elements strictly on their
+    side, and every pair that meets is swapped (equal elements included),
+    then both halves recurse. Unstable: [A, B] with A == B comes out [B, A]."""
+    if low0 >= high0:
+        return
+    low, high = low0, high0
+    pivot = a[(low + high) // 2]
+    while low <= high:
+        while low < high0 and cmp(a[low], pivot) < 0:
+            low += 1
+        while high > low0 and cmp(pivot, a[high]) < 0:
+            high -= 1
+        if low <= high:
+            a[low], a[high] = a[high], a[low]
+            low += 1
+            high -= 1
+    if low0 < high:
+        _mono_qsort(a, cmp, low0, high)
+    if low < high0:
+        _mono_qsort(a, cmp, low, high0)
+
+
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
                  'play_left', 'play_right', 'ty', 'height_delta', 'tx',
@@ -1747,7 +1772,11 @@ class Level:
 
     def _apply_level_locations(self):
         """Actor.Start: transform.position = LevelLocations[idx]. Shift each
-        actor and its sprite by the same delta."""
+        actor, its sprite and its collider by the same delta — the collider
+        rides on the same transform, so the click box moves with the item
+        (Level113's Drawer: the transform at y=-0.46, the level's location
+        at -1.61; the original's tap on the old box was a walk to the
+        floor under it, the port's a take)."""
         idx = self._level_location_index()
         if idx < 0:
             return
@@ -1769,6 +1798,9 @@ class Level:
             if it.sprite is not None:
                 it.sprite.x += dx
                 it.sprite.y += dy
+            if it.collider is not None:
+                c = it.collider
+                it.collider = (c[0] + dx, c[1] + dy) + tuple(c[2:])
         for d in self.doors:
             o = self._o(d.pid)
             pos = shift(o['data'], d)
@@ -1779,6 +1811,9 @@ class Level:
             if d.sprite is not None:
                 d.sprite.x += ddx
                 d.sprite.y += ddy
+            if d.collider is not None:
+                c = d.collider
+                d.collider = (c[0] + ddx, c[1] + ddy) + tuple(c[2:])
         for role, spec in self.pawns.items():
             for pid, o in self.objs.items():
                 if o['type'] == role and 'data' in o:
@@ -1931,53 +1966,77 @@ class Level:
             self.graph.setdefault(d.zone, []).append((other.zone, d))
 
     def find_path(self, start_pid, end_pid):
-        """Zone pids from start to end, each with the door to walk through.
-        Uniform edge cost, so BFS — Helpers.GetShortestPath adds 1.0 per hop
-        (Helpers.cs:158-192). The LENGTH always agrees; the CHOICE among
-        equal-length routes is a documented open question: 720 of the 786
-        reachable ordered zone pairs (every Season-1 pair) have a unique
-        shortest route, the other 66 (4-6 per Season-2 level, the opposite
-        corners of the 4-cycles) have two, and there the original's pick
-        depends on ZoneController.Zones order (FindGameObjectsWithTag) and
-        Mono's unstable List.Sort at equal Cost — not recoverable from the
-        decompile. This BFS takes the first door in scene order (a faithful
-        Dijkstra under four plausible tie-breaks — stable/reversed sort x
-        scene/reversed zone order — agrees with it on 19 to 47 of those 66
-        pairs, never on all; tests/checks/assets_refs.py re-derives the
-        length equality over every pair). A route through a door whose
-        object is inactive (Door.disabled: L214's captain pair before the
-        CaptainDoor trick) is refused: GetShortestPath walks Zone.Neighbors
-        blind to door state, then BuildPath -> LinkNodes finds no active
-        door between the two zones (GetComponentsInChildren skips inactive
-        objects; Helpers.cs:194-205, 243-248) and the path is null."""
-        import collections
+        """Zone pids from start to end, each with the door to walk through:
+        Helpers.GetShortestPath (Helpers.cs:158-192) step for step. Dijkstra
+        over ZoneController.Zones with 1.0 per hop: every zone's Cost is
+        infinite but the start's, the current zone relaxes its Neighbors in
+        their order (a strict `<`, so the first zone to reach a neighbour at
+        a cost keeps it as Previous), leaves the list, and the list is
+        sorted by Cost — and its head is next. ZoneComparer returns 0 at
+        equal Cost (Helpers.cs:383-395) and List.Sort is Mono's classic
+        Array.qsort (mcs/class/corlib/System/Array.cs, the game's Mono):
+        the middle element the pivot, the walls moved in, every pair that
+        meets swapped — which turns a run of equal costs around, so two
+        routes of equal length part on the list's order the way that
+        quicksort leaves it (_mono_qsort below, step for step). The list
+        starts as ZoneController.Zones, which FindGameObjectsWithTag(
+        "Zone") fills (ZoneController.cs:10-15) in the scene's own order
+        (zone_order; read off the running original with tools/livediff/
+        zones.js). Level205's Zone03 -> Zone01 goes through Zone04 on the
+        original, and the scene order under that quicksort is what
+        reproduces it (a stable sort sends it through Zone02). Zone.
+        Neighbors' order (ZoneController.cs:16-25) does not bear on the
+        route: every neighbour a zone relaxes gets that zone as Previous.
+        BuildPath -> LinkNodes then wants an active,
+        unlocked door between consecutive zones (Helpers.cs:194-205,
+        245-248): a route through a door whose object is inactive (Door.
+        disabled: L214's captain pair before the CaptainDoor trick) or
+        locked is null."""
         if start_pid == end_pid:
             return []
-        prev = {start_pid: None}
-        q = collections.deque([start_pid])
-        while q:
-            cur = q.popleft()
-            for nb, door in self.graph.get(cur, ()):
-                if nb in prev:
-                    continue
-                prev[nb] = (cur, door)
-                if nb == end_pid:
-                    out = []
-                    n = nb
-                    while prev[n]:
-                        c, dr = prev[n]
-                        out.append((n, dr))
-                        n = c
-                    out.reverse()
-                    if any(dr.disabled or dr.locked for _, dr in out):
-                        # LinkNodes: no active, unlocked door between the
-                        # zones -> null path (GetDoorBetweenZones wants
-                        # !Locked, Helpers.cs:194-205, 245-248) — a
-                        # TemporalLock edge opens only when the door unlocks
-                        return None
-                    return out
-                q.append(nb)
+        INF = float('inf')
+        order = self.zone_order
+        if start_pid not in order or end_pid not in order:
+            return None
+        cost = {pid: INF for pid in order}
+        prev = {pid: None for pid in order}
+        cost[start_pid] = 0.0
+        pending = list(order)
+        zone = start_pid
+        while zone is not None:
+            for nb, door in self.graph.get(zone, ()):
+                if cost[zone] + 1.0 < cost.get(nb, INF):
+                    cost[nb] = cost[zone] + 1.0
+                    prev[nb] = (zone, door)
+            pending.remove(zone)
+            if zone == end_pid:
+                out = []
+                n = zone
+                while prev[n] is not None:
+                    c, dr = prev[n]
+                    out.append((n, dr))
+                    n = c
+                out.reverse()
+                if any(dr.disabled or dr.locked for _, dr in out):
+                    return None
+                return out
+            if not pending:
+                return None
+            # List.Sort(ZoneComparer): Mono's classic Array.qsort, unstable
+            _mono_qsort(pending, lambda a, b: (cost[a] > cost[b]) - (cost[a] < cost[b]),
+                        0, len(pending) - 1)
+            zone = pending[0]
+            if cost[zone] >= INF:
+                return None
         return None
+
+    @property
+    def zone_order(self):
+        """ZoneController.Zones' order: FindGameObjectsWithTag("Zone")
+        hands the zones back in the scene's own order (tools/livediff/
+        zones.js on the running original: Level101's Zone05, Zone02,
+        Zone01, Zone04, Zone03 is the scene file's order)"""
+        return [z.pid for z in self.zones]
 
     def zone_at(self, x, y):
         """the zone under a click: the port's stand-in for the raycast's
