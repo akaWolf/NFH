@@ -29,7 +29,7 @@ def state(app, t):
             'x': round(wd.sprite.x, 3), 'y': round(wd.sprite.y, 3),
             'zone': wd.zone.name if wd.zone else None,
             'state': wd.state, 'anim': wd.anim.anim.name,
-            'locked': wd.input_locked},
+            'locked': wd.input_locked, 'frozen': wd.frozen},
         'game': {'caught': w.game.got_caught, 'ending': w.game.ending,
                  'tricks': w.game.completed},
         'routines': [{'role': r.role, 'state': r.state,
@@ -94,6 +94,7 @@ def main(argv):
     log = open(os.path.join(out, 'state.jsonl'), 'w')
     t, wait_until = 0.0, 0.0
     pending = list(steps)
+    frame = 0
     while t < seconds + 1e-9:
         while pending and t + 1e-9 >= wait_until:
             parts = pending[0]
@@ -101,10 +102,22 @@ def main(argv):
                 wait_until = t + float(parts[1])
                 pending.pop(0)
                 break
+            if parts[0] == 'at':                  # an absolute level frame
+                if frame < int(parts[1]):
+                    break
+                pending.pop(0)
+                continue
             pending.pop(0)
             if parts[0] == 'clickitem':
-                print('t=%6.2f clickitem %s -> %s' % (t, parts[1], click_item(parts[1])))
+                print('t=%6.2f f=%d clickitem %s -> %s' % (t, frame, parts[1], click_item(parts[1])))
+            elif parts[0] in ('select', 'deselect'):
+                inv = v.world.inventory
+                idx = next((i for i, e in enumerate(inv.items)
+                            if parts[0] == 'select' and e['type'] == parts[1]), -1)
+                inv.select(idx)
+                print('t=%6.2f f=%d %s %s -> %s' % (t, frame, parts[0], parts[1] if len(parts) > 1 else '', idx))
         app.tick(DT, events=(False, False, False, False))
+        frame += 1
         log.write(json.dumps(state(app, t)) + '\n')
         t += DT
     log.close()

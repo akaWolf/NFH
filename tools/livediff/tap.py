@@ -94,16 +94,49 @@ function call(meth, self, args) {
     if (!exc.readPointer().isNull()) throw new Error('managed exception');
     return r;
 }
+// the inventory in hand: Woody.SetUsedInventory(Inventory) (Woody.cs:1062)
+// with the InventoryManager's entry of the wanted InventoryType — what the
+// HUD's icon click does, for a `usewith` replayed on the original
+const parentOf = f('mono_class_get_parent', 'pointer', ['pointer']);
+function offOf(k0, name) { let k = k0; while (!k.isNull()) { const fl = fieldFrom(k, S(name)); if (!fl.isNull()) return fieldOff(fl); k = parentOf(k); } return -1; }
+const WoodyK = classFrom(game, S(''), S('Woody'));
+const InvMgrK = classFrom(game, S(''), S('InventoryManager'));
+const InvK = classFrom(game, S(''), S('Inventory'));
+function selectInventory(typeId) {
+    const fInst = fieldFrom(GameInfo, S('Instance')); if (fInst.isNull()) return 'no Instance';
+    const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
+    const gi = out.readPointer(); if (gi.isNull()) return 'no GameInfo';
+    const woody = gi.add(offOf(GameInfo, 'Woody')).readPointer(); if (woody.isNull()) return 'no Woody';
+    const setUsed = methodFrom(WoodyK, S('SetUsedInventory'), 1); if (setUsed.isNull()) return 'no SetUsedInventory';
+    const args = Memory.alloc(Process.pointerSize); const exc = Memory.alloc(Process.pointerSize); exc.writePointer(NULL);
+    if (typeId < 0) { args.writePointer(NULL); invoke(setUsed, woody, args, exc); return 'cleared'; }
+    const mgr = woody.add(offOf(WoodyK, 'InvManager')).readPointer(); if (mgr.isNull()) return 'no InvManager';
+    const list = mgr.add(offOf(InvMgrK, 'InventoryItems')).readPointer(); if (list.isNull()) return 'no list';
+    const listK = f('mono_object_get_class', 'pointer', ['pointer'])(list);
+    const items = list.add(offOf(listK, '_items')).readPointer(); const size = list.add(offOf(listK, '_size')).readS32();
+    const typeOff = offOf(InvK, 'Type');
+    for (let i = 0; i < size; i++) {
+        // MonoArray: the object header, the bounds pointer, the length, then the data
+        const inv = items.add(4 * Process.pointerSize + i * Process.pointerSize).readPointer();
+        if (inv.isNull()) continue;
+        if (inv.add(typeOff).readS32() === typeId) { args.writePointer(inv); invoke(setUsed, woody, args, exc); return exc.readPointer().isNull() ? 'selected' : 'threw'; }
+    }
+    return 'type ' + typeId + ' not in the inventory (' + size + ' entries)';
+}
 let done = false;
 Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
     onEnter: function () {
         if (done) return; done = true;
         try {
+            if (SELECT !== null) { const r = selectInventory(SELECT); send({ select: r }); }
             const go = call(find, NULL, [newStr(dom, S(NAME))]);
             if (go.isNull()) { send({ error: 'no GameObject ' + NAME }); return; }
             const t = call(getTransform, go, []);
             const pos = t.isNull() ? NULL : call(getPosition, t, []);   // boxed Vector3
             if (pos.isNull()) { send({ error: 'no transform' }); return; }
+            // the point to tap: the item's transform, or the collider point
+            // the port clicked (WORLD) — a pivot can sit outside the box
+            if (WORLD !== null) { pos.add(BOX).writeFloat(WORLD[0]); pos.add(BOX + 4).writeFloat(WORLD[1]); }
             if (STAGE === 1) { send({ world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()], x: 0, y: 0, h: 0, stage: 1 }); return; }
             const framed = frameOn(pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat());
             const arr = call(allCameras, NULL, []);
@@ -125,14 +158,20 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
 '''
 
 
-def resolve(session, name, wait=15.0):
+def resolve(session, name, wait=15.0, select=None, world=None):
     """the item's tap point on the running game, through an existing
-    frida session: (x, y) in adb's top-down screen space, or None"""
+    frida session: (x, y, world) in adb's top-down screen space, or None;
+    `select` puts an InventoryType id in Woody's hand first (-1 clears);
+    `world` = (x, y) taps that point instead of the item's transform"""
     got = {}
-    sc = session.create_script(JS.replace('NAME', repr(name)).replace('STAGE', '9'))
+    sc = session.create_script(JS.replace('NAME', repr(name)).replace('STAGE', '9')
+                               .replace('SELECT', 'null' if select is None else str(int(select)))
+                               .replace('WORLD', 'null' if world is None else '[%r, %r]' % (float(world[0]), float(world[1]))))
     def on_msg(m, d):
         p = m.get('payload')
         if isinstance(p, dict) and 'step' not in p:
+            if 'select' in p:
+                print('select:', p['select'])
             got.update(p)
     sc.on('message', on_msg)
     sc.load()
@@ -165,7 +204,7 @@ def main(argv):
     sess = dev.attach(app[0].pid)
     got = {}
     stage = int(opts.get('stage', 9))          # stop after engine call N (debugging)
-    sc = sess.create_script(JS.replace('NAME', repr(name)).replace('STAGE', str(stage)))
+    sc = sess.create_script(JS.replace('NAME', repr(name)).replace('STAGE', str(stage)).replace('SELECT', 'null').replace('WORLD', 'null'))
     def on_msg(m, d):
         p = m.get('payload')
         if isinstance(p, dict) and 'step' in p:

@@ -154,7 +154,7 @@ function position(component) {
 // the counters GameState mirrors (runtime/world.py) plus the actors the
 // score depends on
 const Woody = klass(asmGame, '', 'Woody');
-const WD = offsets(Woody, ['InputLocked', 'Sneaking']);
+const WD = offsets(Woody, ['InputLocked', 'Sneaking', 'Frozen']);   // Frozen: a tutorial's Freeze() (CheckMouseClick drops the click)
 const PawnK = klass(asmGame, '', 'Pawn');
 const PD = offsets(PawnK, ['CanStart']);   // StartGame's flag (IntroAnimation.cs:282-285)
 const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
@@ -199,6 +199,8 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
             start: rott.isNull() || PD.CanStart < 0 ? null : bool8(rott, PD.CanStart),
             locked: woody.isNull() || WD.InputLocked < 0 ? null
                     : woody.add(WD.InputLocked).readU8() !== 0,
+            frozen: woody.isNull() || WD.Frozen < 0 ? null
+                    : woody.add(WD.Frozen).readU8() !== 0,
             sneak: woody.isNull() || WD.Sneaking < 0 ? null
                    : woody.add(WD.Sneaking).readU8() !== 0,
             rott: position(rott),

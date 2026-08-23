@@ -141,6 +141,162 @@ def record_clicks_live(level, adb=ADB_HOST, retry=True):
     return n >= want
 
 
+PLANS = os.environ.get('NFH_PLANS', '/tmp/nfh-tricks2')   # the plan runner's --out
+
+
+def plan_clicks(level):
+    """the port's clicks from a plan run (tests/run_tricks.py logs them):
+    rows {frame, item, type, result}, frames from play"""
+    p = os.path.join(PLANS, '%s_%s' % (season_of(level), level), 'clicks.json')
+    if not os.path.exists(p):
+        print('%-10s replay: no %s' % (level, p), flush=True)
+        return None
+    rows = json.load(open(p))
+    # a run restarted by the runner logs every attempt; the last one counts
+    cut = 0
+    for i in range(1, len(rows)):
+        if rows[i]['frame'] < rows[i - 1]['frame']:
+            cut = i
+    return rows[cut:]
+
+
+def replay_live(level, adb=ADB_HOST, retry=True):
+    """the plan's clicks replayed on the original: each click on the
+    frame the port made it (from StartGame), with the port's inventory
+    entry in Woody's hand"""
+    rows = plan_clicks(level)
+    if not rows:
+        return False
+    out = os.path.join(OUT, level, 'live')
+    os.makedirs(out, exist_ok=True)
+    clicks = os.path.join(out, 'clicks.json')
+    json.dump(rows, open(clicks, 'w'))
+    seconds = rows[-1]['frame'] / 60.0 + 30
+    env = dict(os.environ, NFH_PKG=PKG[season_of(level)])
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'run.py'), out, '--attach',
+                        '--load=' + level, '--taps=' + clicks,
+                        '--seconds=%s' % (seconds + 14)] + (['--adb=' + adb] if adb else []),
+                       capture_output=True, text=True, timeout=int(seconds) + 300, env=env)
+    open(os.path.join(out, 'run.log'), 'w').write(r.stdout + r.stderr)
+    n = 0
+    q = os.path.join(out, 'state.jsonl')
+    if os.path.exists(q):
+        n = sum(1 for _ in open(q))
+    tj = os.path.join(out, 'tap.json')
+    tap = json.load(open(tj)) if os.path.exists(tj) else {}
+    start = tap.get('start')
+    planned = tap.get('planned') or []
+    print('%-10s replay live %d frames, start %s, %d/%d clicks landed' % (
+        level, n, start, len(planned), len(rows)), flush=True)
+    if start is not None and start < 440:
+        print('%-10s replay live: the intro was cut at frame %d' % (level, start), flush=True)
+        n = 0
+    want = int(0.8 * seconds * 60)
+    if (n < want or len(planned) < len(rows)) and retry:
+        _relevel(level, adb)
+        return replay_live(level, adb, retry=False)
+    return n >= want
+
+
+def replay_port(level):
+    """the port run again on the original's frames: each click on the
+    frame the original acted on it (its first ProcessMoveInput at or
+    after the tap), the title cards played"""
+    tj = os.path.join(OUT, level, 'live', 'tap.json')
+    if not os.path.exists(tj):
+        print('%-10s replay port: no live tap.json' % level, flush=True)
+        return False
+    tap = json.load(open(tj))
+    taps = sorted(tap.get('taps') or [])
+    out = os.path.join(OUT, level, 'port')
+    os.makedirs(out, exist_ok=True)
+    lines = []
+    last = 0
+    planned = tap.get('planned') or []
+    for k, c in enumerate(planned):
+        # the original's ProcessMoveInput for this tap: the first one
+        # between it and the next tap; none — the click did not land
+        # there, and the port clicks on the tap's own frame
+        end = planned[k + 1]['at'] if k + 1 < len(planned) else 10 ** 9
+        n = next((t for t in taps if c['at'] <= t < end), None)
+        if n is None:
+            print('%-10s replay port: the original did not act on %s@%d' % (level, c['item'], c['at']), flush=True)
+            n = c['at']
+        lines.append('at %d' % n)
+        lines.append('select %s' % c['type'] if c.get('type') else 'deselect')
+        lines.append('clickitem %s' % c['item'])
+        last = n
+    script = os.path.join(out, 'script.txt')
+    open(script, 'w').write('\n'.join(lines) + '\n')
+    seconds = tap.get('level_frames', last + 1800) / 60.0
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'record_app.py'), level, out,
+                        '--script=' + script, '--cards', '--seconds=%s' % seconds],
+                       capture_output=True, text=True, timeout=int(seconds) + 600,
+                       env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'))
+    open(os.path.join(out, 'run.log'), 'w').write(r.stdout + r.stderr)
+    ok = os.path.exists(os.path.join(out, 'state.jsonl'))
+    print('%-10s replay port %s, %d clicks' % (level, 'ok' if ok else 'FAILED', len(lines) // 3), flush=True)
+    return ok
+
+
+def _events(rows, tricks, caught, frame):
+    """(frame, event) of every tricks-count step and the catch"""
+    ev = []
+    last = 0
+    got = False
+    for r in rows:
+        t = tricks(r)
+        if t is not None and t != last:
+            ev.append((frame(r), 'tricks %d' % t))
+            last = t
+        if caught(r) and not got:
+            ev.append((frame(r), 'caught'))
+            got = True
+    return ev
+
+
+def replay_report(level):
+    """the two sides' trick counts and catches, frame by frame"""
+    live = os.path.join(OUT, level, 'live', 'state.jsonl')
+    port = os.path.join(OUT, level, 'port', 'state.jsonl')
+    if not (os.path.exists(live) and os.path.exists(port)):
+        print('%-10s replay: missing a side' % level)
+        return None
+    L = [json.loads(l) for l in open(live)]
+    P = [json.loads(l) for l in open(port)]
+    le = _events(L, lambda r: (r.get('game') or {}).get('tricks'),
+                 lambda r: (r.get('game') or {}).get('caught'),
+                 lambda r: int(round(r['t'] * 60)))         # run.py: t = n / 60
+    pe = _events(P, lambda r: (r.get('game') or {}).get('tricks'),
+                 lambda r: (r.get('game') or {}).get('caught'),
+                 lambda r: int(round(r['t'] * 60)) + 1)
+    tap = json.load(open(os.path.join(OUT, level, 'live', 'tap.json')))
+    print('%s: start %s, clicks %s' % (level, tap.get('start'),
+          ' '.join('%s@%d' % (c['item'], c['at']) for c in tap.get('planned') or [])))
+    # Woody.Frozen (a tutorial's Freeze): the frames the clicks are dropped
+    def frozen_runs(rows, get, frame):
+        runs, cur = [], None
+        for r in rows:
+            v = get(r)
+            if v and cur is None:
+                cur = [frame(r), frame(r)]
+            elif v and cur is not None:
+                cur[1] = frame(r)
+            elif not v and cur is not None:
+                runs.append(tuple(cur)); cur = None
+        if cur is not None:
+            runs.append(tuple(cur))
+        return runs
+    lf = frozen_runs(L, lambda r: r.get('frozen'), lambda r: int(round(r['t'] * 60)))
+    pf = frozen_runs(P, lambda r: (r.get('woody') or {}).get('frozen'),
+                     lambda r: int(round(r['t'] * 60)) + 1)
+    if lf or pf:
+        print('  frozen:   original %s, port %s' % (lf, pf))
+    print('  original: ' + ', '.join('%s@%d' % (e, f) for f, e in le))
+    print('  port:     ' + ', '.join('%s@%d' % (e, f) for f, e in pe))
+    return {'level': level, 'live': le, 'port': pe}
+
+
 def record_live(level):
     out = os.path.join(OUT, level, 'live')
     os.makedirs(out, exist_ok=True)
@@ -219,6 +375,15 @@ def main(argv):
         return 0 if all([record_clicks_live(l) for l in levels]) else 1
     if cmd == 'port':
         return 0 if all(record_port(l) for l in levels) else 1
+    if cmd == 'replay-live':
+        return 0 if all([replay_live(l) for l in levels]) else 1
+    if cmd == 'replay-port':
+        return 0 if all([replay_port(l) for l in levels]) else 1
+    if cmd == 'replay-report':
+        return 0 if all([replay_report(l) is not None for l in levels]) else 1
+    if cmd == 'replay':
+        return 0 if all([replay_live(l) and replay_port(l) and replay_report(l) is not None
+                         for l in levels]) else 1
     if cmd == 'live':
         return 0 if all([record_live(l) for l in levels]) else 1
     if cmd == 'diff':

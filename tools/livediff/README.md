@@ -544,3 +544,54 @@ two `AlerterDelay` countdowns follow that now; the port's StartGame,
 entrance, routine start, placements and flinch land within a frame of
 the original's, which is the jitter of the recording itself. Level111's
 Woody row after the click: 0 frames over 0.05, peak 0.034.
+
+## Replaying a plan on the original
+
+The plans in `tests/plans` are written against the port; the four that
+fail (113, 205, 206, 208) and Level213's ninth trick can only be settled by
+the original playing the same clicks. The runner now logs every click it
+makes — `clicks.json` next to `results.json`: the frame from play (its own
+60 Hz clock, StartGame at 0), the item, the inventory entry in Woody's hand
+(the port's enum name, `IT_Egg`), the result. `sweep.py replay <Level>`
+(`NFH_PLANS` = the runner's `--out`, `NFH_SWEEP` = where to write) plays it
+back in three steps.
+
+- `replay-live`: `run.py --taps=clicks.json`. The script waits for
+  StartGame (Rottweiler.CanStart, the same frame the sweep anchors on),
+  then, for each row, waits for level frame `start + frame`, puts the
+  inventory in Woody's hand — `Woody.SetUsedInventory` (Woody.cs:1062)
+  with the `InventoryManager.InventoryItems` entry of that `InventoryType`
+  (the enum's ordinal, `invtypes.py` reads it off InventoryType.cs) — and
+  taps the item through `tap.py` (the camera framed on it first). The tap
+  lands some frames after the one asked for (frida, the emulator's input
+  queue); `tap.json` keeps both — `planned[].want` and `planned[].at` — and
+  the frame Woody.ProcessMoveInput actually ran, in `taps`.
+- `replay-port`: the port again, on the original's frames: `record_app.py`
+  with a script of `at N` / `select TYPE` / `clickitem Item` per click,
+  `N` = the original's first ProcessMoveInput at or after the tap; the
+  title cards played so both clocks start at the load.
+- `replay-report`: the two sides' `CompletedTricksCount` steps and the
+  catch, as level frames.
+
+So the comparison is on the original's timing, not the plan's: a plan
+that waited for a routine state on the port becomes fixed frames, and where
+the original's neighbour is somewhere else on that frame the click does
+something else — which is the divergence to look at, either the port's
+routine or the plan.
+
+The first replay, Level206, showed the runner's own gap before any of the
+port's: the original dropped every click of the plan's first thirty
+seconds — Woody stood at his start until the Pipe click at frame 2515 —
+while the port's plan had taken the toy box one second in. Level206 is a
+tutorial level: TutorialScriptCameraNFH2206 freezes Woody at its Start
+and unfreezes him when the neighbour reaches his fourth in-game action
+(cs:76-87), and CheckMouseClick drops a click while `Frozen` (Woody.cs:637).
+The port models the script (runtime/tutorial.py, the App builds and ticks
+it), and headless with the cards it freezes Woody over frames 475-2201 —
+but `tests/run_tricks.py` ran the level in a bare Viewer with a bare
+`world.tick`, no tutorial layer, so its clicks went through. The runner
+now runs the level in the App (`Driver._enter_level`, `Driver.tick`), the
+title cards skipped, as record_app.py does; the plans of the tutorial
+levels (102, 103, 201, 206) were written against the runner without it.
+`state.js` reads `Woody.Frozen` and the report prints both sides' frozen
+windows.

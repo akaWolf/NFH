@@ -14,9 +14,10 @@ Plan commands, one per line ('#' comments):
     usewith <Item> <Type>    select Type, click; success = tricked/armed
     prime <Item> [<Type>]    same click, success = item.primed flips (or
                              the held Type's source item primes on it)
-    tutorial <n>             apply the serialized LevelScript action n
-                             (unlocks / neighbour unfreeze — the unported
-                             tutorial layer); recorded as a manual step
+    tutorial <n>             park safe until the App's LevelScript has
+                             completed its action n (the unlocks / the
+                             neighbour's unfreeze); `tutorial end` — the
+                             camera script's End state
     unlock <Item> <Type>     dexterity unlock: select Type, click, drive
                              the minigame to the win
     await <Item> [<score>]   park safe until the trick pays; assert the
@@ -51,6 +52,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'runtime'))
 
 from record import Recorder, DT, WIDTH, HEIGHT     # noqa: E402
+from app import App                                 # noqa: E402
+from prefs import MemoryPrefs                       # noqa: E402
+from menu import GameIntroAnimation                 # noqa: E402
 
 LEG_TIMEOUT = 75.0      # a walk + search anywhere fits well inside this
 AWAIT_TIMEOUT = 150.0   # a routine lap is ~35 s; alarms and toilets stall it
@@ -71,11 +75,21 @@ class Driver(Recorder):
     def __init__(self, level_path, plan_path, outdir):
         Recorder.__init__(self, level_path, outdir, script=None,
                           seconds=1e9, fps=0)
+        # the level runs in the App, not the bare Viewer: the App builds
+        # and ticks the tutorial layer (LevelScript + the camera script,
+        # app.py load_level / _tick_level) — Level206's script freezes
+        # Woody until the neighbour's fourth in-game action, and a bare
+        # Viewer took clicks the original drops (Woody.Frozen, cs:637)
+        self.level_name = os.path.splitext(os.path.basename(level_path))[0]
+        GameIntroAnimation.finished = False
+        self.app = App(headless=True, prefs=MemoryPrefs())
+        self._enter_level()
         self.plan_path = plan_path
         self.legs = parse_plan(plan_path)
         self.results = []                # one dict per leg
         self.restarts = 0
         self.t = 0.0
+        self.clicks = []
         self.paid = {}                   # item pid -> score it was paid
         self._apply_collider_enabled()
         self._install_anim_probes()
@@ -1531,6 +1545,15 @@ class Driver(Recorder):
         sx, sy = self.v.cam.world_to_screen(wx, wy, WIDTH, HEIGHT)
         self.mouse[0], self.mouse[1] = sx, sy
         r = self._click(sx, sy)
+        # the click log (clicks.json): the level frame — the runner's clock
+        # runs from play, the title cards are not modelled — the item and
+        # the inventory type in hand, for a replay on the original
+        # (tools/livediff/run.py --taps)
+        inv = self.world.inventory
+        cur = inv.used or inv.current      # the entry the click went out with
+        self.clicks.append({'frame': int(round(self.t * 60)), 'item': it.name,
+                            'type': cur['type'] if cur else None, 'result': r,
+                            'world': [round(wx, 4), round(wy, 4)]})
         if os.environ.get('TRICKS_DEBUG'):
             w = self.v.woody
             print('t=%.2f click %s -> %s (woody %s x=%.2f %s%s)' % (
@@ -1915,87 +1938,41 @@ class Driver(Recorder):
         return self._use_leg(name, typ, pred_of)
 
     def leg_tutorial(self, index):
-        """LevelScriptAction.Complete for the serialized LevelScript's
-        Actions[index] (LevelScriptAction.cs:110-160): the tutorial layer
-        (LevelScript / LevelScriptAction / TutorialScriptCameraNFH2, README
-        "Not implemented") gates Level201's whole trick loop — its actions
-        unlock VanityBag / DeckRail / CaptainHat and unfreeze the neighbour
-        (ActionManager.Frozen ships true). The driver applies the action's
-        effects from the data (DoorsToUnlock, ItemsToUnlock, ItemsToLock,
-        DoorsToLock, UnfreezeNeighbor -> ActionManager.Unfreeze
-        cs:797-812) and records the leg as a manual step (ok=None): what
-        the human sees the tutorial do at that point. `tutorial end` is
-        TutorialScriptCameraNFH2's End1 state (cs:186-196): the
-        FreezeAfterCompletion move-only action the script juggled
-        (AddAction/RemoveAction, cs:213-249) is gone and the neighbour's
-        routine loops on its own — without it the port's manager parks
-        for good after action [5] (ActionManager.cs:539-543)."""
-        L = self.v.level
-        rott = next((r for r in self.world.routines
-                     if r.role == 'Rottweiler'), None)
+        """`tutorial N`: the App's own LevelScript (runtime/tutorial.py) —
+        the level runs in the App now — completes its Actions[N]
+        (LevelScriptAction.Complete, cs:110-160: DoorsToUnlock,
+        ItemsToUnlock, UnfreezeNeighbor); the leg parks safe until
+        LevelScript.ActionIndex has moved past N. `tutorial end`: the
+        camera script reached its End state (TutorialScriptCameraNFH2's
+        End1, cs:186-196). Before the runner ran the level in the App the
+        driver applied the actions' effects itself and recorded a manual
+        step; the plans keep the legs as the points the human sees the
+        tutorial act."""
+        tut = getattr(self.app, 'tutorial', None)
+        cam = getattr(self.app, 'tutorial_camera', None)
         if index == 'end':
-            if rott is None:
-                return False, 'no Rottweiler routine'
-            for k in range(len(rott.actions) - 1, -1, -1):
-                a = rott.actions[k]
-                if a.get('move_only') and a.get('freeze_after_completion'):
-                    rott.actions.pop(k)
-                    if rott.index > k or rott.index >= len(rott.actions):
-                        rott.index = max(0, min(rott.index - 1,
-                                                len(rott.actions) - 1))
-            if rott.frozen:
-                rott.frozen = False
-                if rott.state == rott.IDLE and rott._pending is None:
-                    rott._pending = 'first'
-            return None, 'tutorial end applied by the driver (unported ' \
-                'TutorialScriptCameraNFH2 End1): the freeze action removed, ' \
-                'the routine loops'
-        script = next((o['data'] for o in L.objs.values()
-                       if o['type'] == 'LevelScript' and 'data' in o), None)
-        if script is None:
-            return False, 'no LevelScript in the level'
-        acts = script.get('Actions') or []
-        i = int(index)
-        if not 0 <= i < len(acts):
-            return False, 'no LevelScript action %d' % i
-        a = acts[i]
-        def refs(key):
-            return [(x or {}).get('path') for x in (a.get(key) or [])]
-        for pid in refs('DoorsToUnlock'):
-            d = L.door_by_pid(pid)
-            if d is not None:
-                self.world.unlock_door(d)
-        for pid in refs('ItemsToUnlock'):
-            it = L.items.get(pid)
-            if it is not None:
-                it.locked = False
-        for pid in refs('ItemsToLock'):
-            it = L.items.get(pid)
-            if it is not None:
-                it.locked = True
-        for pid in refs('DoorsToLock'):
-            d = L.door_by_pid(pid)
-            if d is not None:
-                d.locked = True
-        if a.get('UnfreezeNeighbor'):
-            # the script completes these actions with the neighbour parked
-            # (TutorialScriptCameraNFH2's Moving/Hold4/TableTrick2/End1
-            # states wait for the freeze action's index) — a running
-            # manager is left alone
-            r = rott
-            if r is not None and r.frozen:
-                r.frozen = False
-                if (a.get('ActionIndexAfterForceAdvanceAction') or 0) == 1:
-                    r.index = 0
-                if a.get('ForceAdvanceAction'):
-                    r._advance()
-                if r.state == r.IDLE and r._pending is None:
-                    r._pending = 'first'          # StartNextAction
-        return None, 'tutorial LevelScript action %d applied by the ' \
-            'driver (unported layer): %s' % (
-                i, ' '.join(k for k in ('DoorsToUnlock', 'ItemsToUnlock',
-                                        'ItemsToLock', 'UnfreezeNeighbor')
-                            if a.get(k)))
+            if cam is None:
+                return False, 'no tutorial camera script in the level'
+            done = lambda: cam.state == 'End' or not cam.active
+            what = 'the camera script\'s End'
+        else:
+            if tut is None:
+                return False, 'no LevelScript in the level'
+            i = int(index)
+            done = lambda: tut.action_index > i or not tut.active
+            what = 'LevelScript action %d' % i
+        self._leg_zone = None
+        self._leg_item = None
+        self._leg_x = 0.0
+        deadline = self.t + GATE_TIMEOUT
+        while self.t < deadline:
+            if done():
+                return True, None
+            if self.world.game.got_caught or self.world.game.ending:
+                return False, 'caught before %s' % what
+            self._dodge_tick()
+            self.step_world()
+        return False, '%s never completed' % what
 
     def leg_unlock(self, name, typ=None):
         """the dexterity gate: click with the unlocker held, then hold the
@@ -2250,10 +2227,34 @@ class Driver(Recorder):
         return ok, None if ok else 'never hidden'
 
     # -- the run ------------------------------------------------------------
+    def _enter_level(self):
+        """the App's load, the title cards skipped: the clock then runs
+        from play, as the original's StartGame"""
+        self.app.load_level(self.level_name)
+        self.app.tick(DT, events=(False, True, False, False))
+        self.v = self.app.viewer
+        self.v.virtual_mouse = self.mouse
+
+    def tick(self, t):
+        """Recorder.tick on the App: its level frame is the world tick,
+        the tutorial layer, the stored-click replay, the camera, the draw"""
+        v = self.v
+        if self.tour:
+            self._tour_tick()
+        self._mouse_tick()
+        v._frame_dt = DT
+        if not self.paused and not v.world.menu_open:
+            v.t += DT
+            self.app.tick(DT, events=(False, False, False, False))
+        for hook in self.frame_hooks:
+            hook(t, DT)
+        self.log.write(json.dumps(self._state(t)) + '\n')
+
     def restart(self):
-        self.v.load(self.v.i)
+        self._enter_level()
         self.restarts += 1
         self.t = 0.0
+        self.clicks = []                  # the click log is the last attempt's
         self.paid = {}
         self._alerter_zones = None
         # the flee throttle is a clock stamp: left over from the previous
@@ -2418,6 +2419,8 @@ def main(argv):
         d.run_entrance()                     # the entrance walk-in / greeting
         results = d.run_plan()
         json.dump(results, open(os.path.join(outdir, 'results.json'), 'w'),
+                  indent=1)
+        json.dump(d.clicks, open(os.path.join(outdir, 'clicks.json'), 'w'),
                   indent=1)
         vio = d.inv.finish()
         json.dump(vio, open(os.path.join(outdir, 'invariants.json'), 'w'),

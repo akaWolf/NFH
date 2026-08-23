@@ -94,6 +94,7 @@ def main(argv):
                 'woody': None if not woody else {'x': round(woody[0], 3),
                                                  'y': round(woody[1], 3)},
                 'locked': p.get('locked'),
+                'frozen': p.get('frozen'),
                 'sneak': p.get('sneak'),
                 'rott': p.get('rott'),
                 'game': p['game'],
@@ -123,6 +124,39 @@ def main(argv):
         print('no frames: the game is not in a level')
         log.close(); extra_log.close()
         return 1
+    taps = opts.get('taps')                # a plan's clicks replayed: JSON rows
+    if taps:                               # {frame, item, type}, frames from play
+        import tap as tapper
+        import invtypes
+        types = invtypes.load()
+        rows = json.load(open(taps))
+        host = opts.get('adb')
+        em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
+        deadline = time.time() + seconds
+        # the runner's clock runs from play; the original's level frames
+        # from the load — StartGame (the neighbour's CanStart) is the offset
+        while stats.get('start') is None and time.time() < deadline:
+            time.sleep(0.05)
+        start = stats.get('start') or 0
+        print('[taps] StartGame at level frame %d, %d clicks' % (start, len(rows)))
+        for row in rows:
+            want = start + int(row['frame'])
+            while stats['level_frames'] < want and time.time() < deadline:
+                time.sleep(0.02)
+            sel = types.get(row.get('type')) if row.get('type') else -1
+            pt = tapper.resolve(session, row['item'], select=sel, world=row.get('world'))
+            if pt is None:
+                print('[taps] frame %d: could not resolve %s' % (want, row['item']))
+                continue
+            print('[taps] frame %d (%d) %s with %s at %d %d' % (want, stats['level_frames'], row['item'], row.get('type'), pt[0], pt[1]))
+            stats.setdefault('planned', []).append({'want': want, 'at': stats['level_frames'],
+                                                    'item': row['item'], 'type': row.get('type')})
+            cmd = (['ssh', '-o', 'BatchMode=yes', host, '%s tap %d %d' % (em, pt[0], pt[1])] if host
+                   else ['bash', '-c', '%s tap %d %d' % (em, pt[0], pt[1])] if 'NFH_EM' in os.environ
+                   else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])
+            import subprocess
+            subprocess.run(cmd, check=False, timeout=60)
+        seconds = max(0.0, deadline - time.time())
     tap = opts.get('tap')                  # Item@seconds: click it mid-run,
     if tap:                                # through this same session
         name, at = tap.split('@')
@@ -160,7 +194,7 @@ def main(argv):
     time.sleep(seconds)
     log.close()
     extra_log.close()
-    json.dump({'taps': stats['taps'], 'level_frames': stats['level_frames'],
+    json.dump({'taps': stats['taps'], 'level_frames': stats['level_frames'], 'planned': stats.get('planned', []),
                'start': stats.get('start')},
               open(os.path.join(out_dir, 'tap.json'), 'w'))
     print('%d frames -> %s' % (stats['frames'],
