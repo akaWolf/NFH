@@ -135,6 +135,21 @@ function selectInventory(typeId) {
 }
 let done = false;
 let lastCam = null, still = 0;
+// CameraMover's own interpolation (cs:355-365): while Interpolating, every
+// Update lerps the transform back toward TargetPosition, so a framing set
+// on the transform is undone the next frame — Level208's Balloons tap at
+// frame 604 landed on the floor under the intro's still-running snap to
+// Woody, though the camera had looked still for a hundred frames
+const cmInterp = CameraMover.isNull() ? -1 : offOf(CameraMover, 'Interpolating');
+function cameraInterpolating() {
+    if (cmInterp < 0) return false;
+    const fInst = fieldFrom(GameInfo, S('Instance')); if (fInst.isNull()) return false;
+    const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
+    const gi = out.readPointer(); if (gi.isNull()) return false;
+    const fCam = fieldFrom(GameInfo, S('GameCamera')); if (fCam.isNull()) return false;
+    const cam = gi.add(fieldOff(fCam)).readPointer(); if (cam.isNull()) return false;
+    return cam.add(cmInterp).readU8() !== 0;
+}
 function camPos() {
     const arr = call(allCameras, NULL, []);
     const count = arr.isNull() ? 0 : arr.add(12).readU32();
@@ -155,6 +170,7 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             const c = camPos();
             if (c !== null && lastCam !== null && Math.abs(c[0] - lastCam[0]) < 1e-4 && Math.abs(c[1] - lastCam[1]) < 1e-4) still++; else still = 0;
             lastCam = c;
+            if (cameraInterpolating()) { still = 0; return; }
             if (still < 3) return;
         } catch (e) { send({ error: 'camera: ' + e }); return; }
         done = true;

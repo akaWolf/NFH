@@ -631,3 +631,21 @@ raw ids (the original compares Zone components, Pawn.cs:1592-1595). The
 tutorial resolves the reference through the level's component map now
 (`zone_by_component`, which the item behaviours already used). Doors and
 items were never affected: both are keyed by their component ids.
+
+## Two more things the tap had to wait for
+
+Level208's Balloons tap at frame 604 walked the original's Woody to
+x=-0.35 and took nothing, twice, while the click sweep's tap at 720 took
+the balloons. The camera log showed why: at 604 CameraMover was still
+`Interpolating` the intro's snap to Woody — the camera had looked still
+for a hundred frames, but while the flag holds every Update lerps the
+transform back toward TargetPosition (cs:355-365), so the framing tap.py
+sets on the transform is undone the next frame and the point it read
+under the framed camera lands on the floor under the real one. tap.py
+waits for the flag to drop, then for three still frames, then frames and
+reads.
+
+run.py restarted its level-frame count on any gap of over a second
+between frames — the load's gap — and a stall mid-level (the emulator
+pausing) restarted it too: Level206's replay burst its last 25 clicks the
+moment the count came back small. The reset holds only until StartGame.

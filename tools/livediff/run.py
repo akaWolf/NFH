@@ -78,7 +78,10 @@ def main(argv):
             # frames arrive only while a level runs: a gap of over a second
             # is the load, and the counter after it is level time
             now = time.time()
-            if now - stats['last_frame_wall'] > 1.0:
+            # ...but only until StartGame: a stall mid-level (the emulator
+            # pausing over a second) must not restart the count the taps are
+            # scheduled on (Level206's replay burst its last 25 clicks)
+            if now - stats['last_frame_wall'] > 1.0 and stats.get('start') is None:
                 stats['level_frames'] = 0
             stats['last_frame_wall'] = now
             stats['level_frames'] += 1
