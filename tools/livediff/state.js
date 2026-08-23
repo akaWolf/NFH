@@ -165,6 +165,16 @@ const bool8 = (p, o) => p.add(o).readU8() !== 0;
 const i32 = (p, o) => p.add(o).readS32();
 
 let frame = 0;
+// the frame the original acts on a click: Woody.ProcessMoveInput
+// (Woody.cs:702) runs for a touch that ends on the world — and for a
+// stored one replayed at a door (cs:339, 487); the sweep's port side
+// clicks on this frame
+const processMove = method(Woody, 'ProcessMoveInput', 2);
+if (!processMove.isNull()) {
+    Interceptor.attach(mono_compile_method(processMove), {
+        onEnter: function () { send({ type: 'tap', n: frame }); }
+    });
+}
 Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
     onEnter: function (args) {
         const gi = args[0];

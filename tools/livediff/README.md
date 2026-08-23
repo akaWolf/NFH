@@ -462,3 +462,24 @@ before the port does — which is the last of the animation-clock
 business (a use's last element, the item's own sequence and the
 action's stop within one frame of each other) and reads as 0.03-0.09
 for the length of a walk. Both are below what a viewer sees.
+
+## Clicking, and the clock the click is on
+
+`sweep.py clicks-live` / `clicks-port` add one click to the opening:
+the first `take` of the level's plan, tapped on both sides. The first
+pass tapped "level frame 720" on both, and every Season 1 row came out
+diverged from 5.3 s to the click — because the two sides count level
+time differently: the original's frames run from the load and include
+the title cards (about 500 frames), the port's recorder skipped the
+cards with a click and counted from play. Season 2 hid the same offset
+behind the differ's alignment on the first move — there Woody's first
+move *is* the click. Two things fixed it. `record_app.py --cards` plays
+the cards out, so the port's clock runs from the load too (IntroCards
+takes its times from the same data; the first move lands on frame 500
+on both sides). And the original's tap does not land on the frame it
+was asked for — frida, ssh and adb put it a second or two later — so
+`state.js` reports the frame `Woody.ProcessMoveInput` (Woody.cs:702)
+ran, run.py files it in `tap.json`, and the port side, recorded second,
+clicks on exactly that frame. The bench itself now lives in
+`~/nfh-bench` on its host (the host wipes `/tmp` nightly); `shell.nix`
+carries the port's Python environment.

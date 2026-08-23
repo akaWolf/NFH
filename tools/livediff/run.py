@@ -62,7 +62,7 @@ def main(argv):
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
     extra_log = open(os.path.join(out_dir, 'extra.jsonl'), 'w')
-    stats = {'frames': 0, 'errors': [], 'level_frames': 0, 'last_frame_wall': 0.0}
+    stats = {'frames': 0, 'errors': [], 'level_frames': 0, 'last_frame_wall': 0.0, 'taps': []}
 
     def on_message(message, data):
         if message.get('type') == 'error':
@@ -95,6 +95,12 @@ def main(argv):
                 'game': p['game'],
             }) + '\n')
             stats['frames'] += 1
+        elif p.get('type') == 'tap':
+            # the original's own count runs from its attach; the level's
+            # count restarts at the load (see the frame branch)
+            n = p['n'] - (stats['frames'] - stats['level_frames'])
+            stats['taps'].append(n)
+            print('[tap] level frame %d' % n)
         else:
             print('[%s] %s' % (p.get('type'), json.dumps(p)[:400]))
 
@@ -136,6 +142,8 @@ def main(argv):
     time.sleep(seconds)
     log.close()
     extra_log.close()
+    json.dump({'taps': stats['taps'], 'level_frames': stats['level_frames']},
+              open(os.path.join(out_dir, 'tap.json'), 'w'))
     print('%d frames -> %s' % (stats['frames'],
                                os.path.join(out_dir, 'state.jsonl')))
     for e in stats['errors'][:5]:

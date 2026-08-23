@@ -70,7 +70,13 @@ def main(argv):
     GameIntroAnimation.finished = False
     app = App(headless=True, prefs=MemoryPrefs())
     app.load_level(level)
-    app.tick(DT, events=(False, True, False, False))     # the title cards
+    if opts.get('cards'):
+        # the title cards, played out: the recording's clock then runs from
+        # the load, as the original's frame count does (IntroAnimation's
+        # times come from the same data on both sides)
+        app.tick(DT, events=(False, False, False, False))
+    else:
+        app.tick(DT, events=(False, True, False, False))     # the title cards skipped
     v = app.viewer
 
     def click_item(name):

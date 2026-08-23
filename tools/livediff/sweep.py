@@ -65,11 +65,21 @@ def record_clicks_port(level):
         return False
     out = os.path.join(OUT, level, 'port')
     os.makedirs(out, exist_ok=True)
+    # the original's tap lands a second or two after the frame it was asked
+    # for (frida, ssh, adb): its own count of the click — the frame
+    # Woody.ProcessMoveInput ran — is the port's click frame, with the
+    # title cards played on both sides
+    frame = CLICK_FRAME
+    tp = os.path.join(OUT, level, 'live', 'tap.json')
+    if os.path.exists(tp):
+        taps = json.load(open(tp)).get('taps') or []
+        if taps:
+            frame = taps[0]
     script = os.path.join(out, 'script.txt')
     with open(script, 'w') as f:
-        f.write('wait %s\nclickitem %s\n' % (CLICK_FRAME / 60.0, it))
+        f.write('wait %s\nclickitem %s\n' % (frame / 60.0, it))
     r = subprocess.run([sys.executable, os.path.join(HERE, 'record_app.py'), level, out,
-                        '--script=' + script, '--seconds=%s' % SECONDS],
+                        '--script=' + script, '--cards', '--seconds=%s' % (SECONDS + 10)],
                        capture_output=True, text=True, timeout=900,
                        env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'))
     ok = os.path.exists(os.path.join(out, 'state.jsonl'))
@@ -103,7 +113,7 @@ def record_clicks_live(level, adb='pcnew', retry=True):
     q = os.path.join(out, 'state.jsonl')
     if os.path.exists(q):
         n = sum(1 for _ in open(q))
-    tapline = [l for l in r.stdout.splitlines() if l.startswith('tap ')]
+    tapline = [l for l in r.stdout.splitlines() if l.startswith('tap ') or l.startswith('[tap]')]
     print('%-10s clicks live %d frames %s' % (level, n,
           tapline[-1] if tapline else 'NO TAP ' + r.stdout[-200:].replace(chr(10), ' ')), flush=True)
     if n <= 600 and retry:
