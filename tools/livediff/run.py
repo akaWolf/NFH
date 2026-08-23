@@ -82,6 +82,10 @@ def main(argv):
                 stats['level_frames'] = 0
             stats['last_frame_wall'] = now
             stats['level_frames'] += 1
+            # the frame StartGame let the neighbour go (the title cards
+            # played out, or cut short by a stray touch)
+            if p.get('start') and stats.get('start') is None:
+                stats['start'] = stats['level_frames']
             # record.py's clock: the port steps a fixed 60 Hz, and the
             # original's dt is pinned to match (see README.md)
             woody = p.get('woody')
@@ -108,6 +112,17 @@ def main(argv):
     script.load()
     if pid is not None:
         dev.resume(pid)
+    # no frames within 20 s means no level is running (a menu, a score
+    # screen): there is nothing to record, and the sweep's retry walks the
+    # game back into a level sooner
+    for _ in range(400):
+        if stats['frames']:
+            break
+        time.sleep(0.05)
+    else:
+        print('no frames: the game is not in a level')
+        log.close(); extra_log.close()
+        return 1
     tap = opts.get('tap')                  # Item@seconds: click it mid-run,
     if tap:                                # through this same session
         name, at = tap.split('@')
@@ -145,7 +160,8 @@ def main(argv):
     time.sleep(seconds)
     log.close()
     extra_log.close()
-    json.dump({'taps': stats['taps'], 'level_frames': stats['level_frames']},
+    json.dump({'taps': stats['taps'], 'level_frames': stats['level_frames'],
+               'start': stats.get('start')},
               open(os.path.join(out_dir, 'tap.json'), 'w'))
     print('%d frames -> %s' % (stats['frames'],
                                os.path.join(out_dir, 'state.jsonl')))

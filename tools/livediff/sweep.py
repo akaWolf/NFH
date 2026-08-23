@@ -47,13 +47,18 @@ CLICK_FRAME = 720                     # 12 s of level time
 
 
 def first_take(level):
-    """the first `take <Item>` leg of the level's plan"""
+    """the first `take <Item>` leg of the level's plan whose GameObject is
+    active at load — GameObject.Find, which the tap resolves through, does
+    not see an inactive one (Level214's HatchFish)"""
     p = os.path.join(ROOT, 'tests', 'plans', season_of(level), level + '.txt')
     if not os.path.exists(p):
         return None
+    objs = json.load(open(os.path.join(ROOT, 'levels', season_of(level), level + '.json')))['objects']
+    active = {o['data']['name'] for o in objs.values()
+              if o['type'] == 'GameObject' and o['data'].get('active', True)}
     for line in open(p):
         line = line.split('#')[0].strip()
-        if line.startswith('take '):
+        if line.startswith('take ') and line.split()[1] in active:
             return line.split()[1]
     return None
 
@@ -122,6 +127,14 @@ def record_clicks_live(level, adb=ADB_HOST, retry=True):
     # a settling emulator renders under 60 fps right after its boot and the
     # recording comes out short in frames: once, walk back in and retry
     want = int(0.8 * SECONDS * 60)
+    # the title cards run ~470 frames; StartGame earlier than that means a
+    # stray touch cut them, and the neighbour's routine is ahead of the
+    # port's by the difference — not a comparison
+    tj = os.path.join(out, 'tap.json')
+    start = json.load(open(tj)).get('start') if os.path.exists(tj) else None
+    if start is not None and start < 440:
+        print('%-10s clicks live: the intro was cut at frame %d' % (level, start), flush=True)
+        n = 0
     if n < want and retry:
         _relevel(level, adb)
         return record_clicks_live(level, adb, retry=False)
@@ -158,6 +171,21 @@ def diff(level):
             row[pawn] = None
             continue
         a, b = dt.first_move(L), dt.first_move(P)
+        # a click sweep aligns on the click itself: the original's tap frame
+        # (tap.json, in level frames; the recording's rows run from the
+        # attach) against the port's script frame — the title cards run a
+        # few frames apart on the two sides, which would otherwise read as
+        # a lag in every reply to the click
+        # (Woody only: the neighbour's routine is the level's own clock, and
+        # the port's cards end three frames before the original's — his
+        # rows keep the first-move alignment of the opening sweep)
+        tj = os.path.join(OUT, level, 'live', 'tap.json')
+        if pawn == 'woody' and os.path.exists(tj):
+            t = json.load(open(tj))
+            if t.get('taps'):
+                rows = sum(1 for _ in open(live))
+                a = rows - t['level_frames'] + t['taps'][0]
+                b = t['taps'][0]
         M = dt.passing(port, pawn)[b:]          # the port's door passes
         L, P = L[a:], P[b:]
         n = min(len(L), len(P))

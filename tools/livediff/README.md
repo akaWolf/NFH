@@ -483,3 +483,42 @@ ran, run.py files it in `tap.json`, and the port side, recorded second,
 clicks on exactly that frame. The bench itself now lives in
 `~/nfh-bench` on its host (the host wipes `/tmp` nightly); `shell.nix`
 carries the port's Python environment.
+
+## What one click showed
+
+With the clock settled (the cards played on both sides, the port
+clicking on the frame `Woody.ProcessMoveInput` ran, the differ
+anchoring Woody on that frame and the neighbour on his first move),
+the click sweep — the first `take` of every level's plan, on the
+level's frame ~800 — comes out like this: Woody's reply to the click
+matches the original on all 28 levels, to the frame on 27 of them
+(Level206 both sides ignore the click; Level214's HatchFish is inactive
+at load, so `first_take` skips to an item `GameObject.Find` can see),
+and the neighbour's rows are the opening table's.
+
+One thing it found. After a walk-up door Woody comes down the stairs
+at the NEAR door's x in the original — 3.890 in Level101 where the port
+had 3.774, -1.551 in Level111 against -1.652 — not at the far door's
+exit point. `WalkOnPath`'s else-branch runs `MoveToItem` before
+`MoveToDoor` on every frame of the descent as well (Pawn.cs:983), and
+its head (cs:1735-1738) snaps x to the step's `TargetLocation.x`, the
+near door's, when the walk has crossed it (`HasPassedTarget` against
+`WasMovingLeft`) and the door is Passable; `WarpThroughDoor` and
+Woody's `DeltaExitLocation` set the y, the snap takes the x back on the
+next frame. The port's DESCEND state now does the same. Level101's
+Woody then matches to 0.034; Level111's to 0.067 — the residual there
+is two frames: the two door animations hand over a frame or two
+shorter in the port (Woody is placed at the far door on frame 372 of
+the click, the original's on 375), and the alerter's `WaitForSeconds`
+delay runs a frame longer in doubles than in floats, so the flinch
+(`PlayShortFearAnimation`, Woody.cs:1005) comes two frames early and
+Woody stops two running steps short. Both belong to the one-frame
+family above.
+
+Two things the recording itself needed on the bench: a stray touch
+can cut the title cards short (Level202/204 came out with the
+neighbour 100-200 frames ahead), so `state.js` reports the frame
+`StartGame` set the neighbour's `CanStart` and a recording whose
+intro ended before frame 440 is retried; and the game dies after a few
+`LoadLevel` calls in a row on the 2 GB emulator, so a recording with no
+frames walks the game back into a level and tries once more.

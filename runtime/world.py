@@ -1620,6 +1620,24 @@ class Pawn:
                 self._transit_animations(d, other, sequential=True)
                 return
         elif self.state == self.DESCEND:
+            # WalkOnPath's else-branch runs MoveToItem before MoveToDoor on
+            # every frame of the descent as well (Pawn.cs:983), and its head
+            # (cs:1735-1738) snaps x to the step's TargetLocation.x — the
+            # NEAR door's — when the walk has crossed it (HasPassedTarget
+            # against WasMovingLeft as the walk set it) and the door is
+            # Passable: the far door's placement (WarpThroughDoor, Woody's
+            # DeltaExitLocation) keeps its y, but the pawn comes down the
+            # stairs at the near door's x. Level101/111 click traces
+            # (tools/livediff/README.md).
+            d = self._step.get('door')
+            if d is not None and self._step_sign is not None \
+                    and getattr(d, 'passable', True):
+                tx = self._step_target()[0]
+                sign = (tx > self.sprite.x) - (tx < self.sprite.x)
+                if sign != 0 and sign != self._step_sign \
+                        and abs(self.sprite.x - tx) > 1e-9:
+                    self.sprite.x = tx
+                    self.pos_snap = True
             # IsAtPortalTargetLocation: signed, no snapping afterwards
             if self.sprite.y - self.floor_y() < self.zone_threshold:
                 self._next_step()         # EndPortalMove -> TakeNextStep
