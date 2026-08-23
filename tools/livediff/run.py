@@ -97,6 +97,9 @@ def main(argv):
                 'frozen': p.get('frozen'),
                 'sneak': p.get('sneak'),
                 'rott': p.get('rott'),
+                'mother': p.get('mother'),
+                'cam': p.get('cam'),
+                'script': p.get('script'),
                 'game': p['game'],
             }) + '\n')
             stats['frames'] += 1
@@ -144,13 +147,14 @@ def main(argv):
             while stats['level_frames'] < want and time.time() < deadline:
                 time.sleep(0.02)
             sel = types.get(row.get('type')) if row.get('type') else -1
-            pt = tapper.resolve(session, row['item'], select=sel, world=row.get('world'))
+            pt = tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'))
             if pt is None:
-                print('[taps] frame %d: could not resolve %s' % (want, row['item']))
+                print('[taps] frame %d: could not resolve %s' % (want, row.get('item') or row.get('world')))
                 continue
-            print('[taps] frame %d (%d) %s with %s at %d %d' % (want, stats['level_frames'], row['item'], row.get('type'), pt[0], pt[1]))
+            print('[taps] frame %d (%d) %s with %s at %d %d' % (want, stats['level_frames'], row.get('item') or row.get('world'), row.get('type'), pt[0], pt[1]))
             stats.setdefault('planned', []).append({'want': want, 'at': stats['level_frames'],
-                                                    'item': row['item'], 'type': row.get('type')})
+                                                    'item': row.get('item'), 'type': row.get('type'),
+                                                    'world': row.get('world')})
             cmd = (['ssh', '-o', 'BatchMode=yes', host, '%s tap %d %d' % (em, pt[0], pt[1])] if host
                    else ['bash', '-c', '%s tap %d %d' % (em, pt[0], pt[1])] if 'NFH_EM' in os.environ
                    else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])

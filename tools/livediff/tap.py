@@ -124,16 +124,43 @@ function selectInventory(typeId) {
     return 'type ' + typeId + ' not in the inventory (' + size + ' entries)';
 }
 let done = false;
+let lastCam = null, still = 0;
+function camPos() {
+    const arr = call(allCameras, NULL, []);
+    const count = arr.isNull() ? 0 : arr.add(12).readU32();
+    const cam = count ? arr.add(16).readPointer() : NULL;
+    if (cam.isNull()) return null;
+    const t = call(methodFrom(Component, S('get_transform'), 0), cam, []);
+    const b = t.isNull() ? NULL : call(getPosition, t, []);
+    return b.isNull() ? null : [b.add(BOX).readFloat(), b.add(BOX + 4).readFloat()];
+}
 Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
     onEnter: function () {
-        if (done) return; done = true;
+        if (done) return;
+        // the opening pans the camera for a couple of seconds; a point
+        // computed mid-pan lands elsewhere by the time the tap arrives —
+        // wait for three frames of a still camera (the wait is bounded by
+        // resolve()'s timeout)
+        try {
+            const c = camPos();
+            if (c !== null && lastCam !== null && Math.abs(c[0] - lastCam[0]) < 1e-4 && Math.abs(c[1] - lastCam[1]) < 1e-4) still++; else still = 0;
+            lastCam = c;
+            if (still < 3) return;
+        } catch (e) { send({ error: 'camera: ' + e }); return; }
+        done = true;
         try {
             if (SELECT !== null) { const r = selectInventory(SELECT); send({ select: r }); }
-            const go = call(find, NULL, [newStr(dom, S(NAME))]);
-            if (go.isNull()) { send({ error: 'no GameObject ' + NAME }); return; }
-            const t = call(getTransform, go, []);
-            const pos = t.isNull() ? NULL : call(getPosition, t, []);   // boxed Vector3
-            if (pos.isNull()) { send({ error: 'no transform' }); return; }
+            let pos;
+            if (NAME === null) {
+                // a bare world point (the driver's dodge / staging clicks)
+                pos = Memory.alloc(BOX + 12); pos.add(BOX).writeFloat(0); pos.add(BOX + 4).writeFloat(0); pos.add(BOX + 8).writeFloat(0);
+            } else {
+                const go = call(find, NULL, [newStr(dom, S(NAME))]);
+                if (go.isNull()) { send({ error: 'no GameObject ' + NAME }); return; }
+                const t = call(getTransform, go, []);
+                pos = t.isNull() ? NULL : call(getPosition, t, []);   // boxed Vector3
+                if (pos.isNull()) { send({ error: 'no transform' }); return; }
+            }
             // the point to tap: the item's transform, or the collider point
             // the port clicked (WORLD) — a pivot can sit outside the box
             if (WORLD !== null) { pos.add(BOX).writeFloat(WORLD[0]); pos.add(BOX + 4).writeFloat(WORLD[1]); }
@@ -164,7 +191,7 @@ def resolve(session, name, wait=15.0, select=None, world=None):
     `select` puts an InventoryType id in Woody's hand first (-1 clears);
     `world` = (x, y) taps that point instead of the item's transform"""
     got = {}
-    sc = session.create_script(JS.replace('NAME', repr(name)).replace('STAGE', '9')
+    sc = session.create_script(JS.replace('NAME', 'null' if name is None else repr(name)).replace('STAGE', '9')
                                .replace('SELECT', 'null' if select is None else str(int(select)))
                                .replace('WORLD', 'null' if world is None else '[%r, %r]' % (float(world[0]), float(world[1]))))
     def on_msg(m, d):

@@ -595,3 +595,27 @@ title cards skipped, as record_app.py does; the plans of the tutorial
 levels (102, 103, 201, 206) were written against the runner without it.
 `state.js` reads `Woody.Frozen` and the report prints both sides' frozen
 windows.
+
+## A Mother's catch, and the flag it does not set
+
+Level208's replay ended on the original at frame 7928 with `GameEnding`
+true and `gotCaught` false: a Mother's catch. `gotCaught` is the
+neighbour's flag alone — every caller of `OnNeighborCaughtWoody` sets it
+first (GameInfo.cs:216-218, Pawn.cs:370-372, 1228-1230) and
+`OnMotherCaughtWoody`'s callers do not (cs:222-224) — and the port's
+`_catch` set it for either catcher. It sets it for the neighbour only now
+and keeps its own `caught_by` for the runner; the report shows the ending
+on both sides next to the catch.
+
+## The two clocks meet at StartGame
+
+The original's title cards do not take the same number of frames from
+run to run: Level208's StartGame (Rottweiler.CanStart) came at level
+frame 464 in one replay and 474 in the click sweep, Level205's and
+206's at 473. The port's cards take 474 every time. A port script on the
+original's absolute frames is then off by the difference for the whole
+run — Level208's neighbour left his platform at 1584 on the original and
+1596 on the port, 10 of the 12 frames the cards. The replay's port
+script clicks at `at +N` from the port's own StartGame (record_app.py
+tracks the cards' end) and the report counts both sides' frames from
+their StartGame.

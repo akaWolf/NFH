@@ -14,6 +14,8 @@ Plan commands, one per line ('#' comments):
     usewith <Item> <Type>    select Type, click; success = tricked/armed
     prime <Item> [<Type>]    same click, success = item.primed flips (or
                              the held Type's source item primes on it)
+    walk <x> <y>             click the world point, wait until Woody
+                             stands there (a tutorial's location action)
     tutorial <n>             park safe until the App's LevelScript has
                              completed its action n (the unlocks / the
                              neighbour's unfreeze); `tutorial end` — the
@@ -1514,7 +1516,21 @@ class Driver(Recorder):
                 return 'transit'
         else:
             self._passing_since = None
-        return Recorder._click(self, sx, sy)
+        r = Recorder._click(self, sx, sy)
+        # the click log (clicks.json): every click the driver makes — the
+        # item clicks and the dodges / stagings / detours alike, so a
+        # replay on the original (tools/livediff/run.py --taps) walks
+        # Woody the same way: the frame from play (the runner's clock,
+        # the title cards skipped), the item when it was one, the
+        # inventory in hand, the world point, the viewer's answer
+        wx, wy = self.v.cam.screen_to_world(sx, sy, WIDTH, HEIGHT)
+        inv = self.world.inventory
+        cur = inv.used or inv.current
+        self.clicks.append({'frame': int(round(self.t * 60)),
+                            'item': getattr(self, '_click_item_name', None),
+                            'type': cur['type'] if cur else None, 'result': r,
+                            'world': [round(wx, 4), round(wy, 4)]})
+        return r
 
     def _click_point_of(self, it):
         """the world point to click for `it`: its collider centre unless a
@@ -1544,16 +1560,9 @@ class Driver(Recorder):
         self.look_at(wx, wy)
         sx, sy = self.v.cam.world_to_screen(wx, wy, WIDTH, HEIGHT)
         self.mouse[0], self.mouse[1] = sx, sy
+        self._click_item_name = it.name    # for the click log (_click)
         r = self._click(sx, sy)
-        # the click log (clicks.json): the level frame — the runner's clock
-        # runs from play, the title cards are not modelled — the item and
-        # the inventory type in hand, for a replay on the original
-        # (tools/livediff/run.py --taps)
-        inv = self.world.inventory
-        cur = inv.used or inv.current      # the entry the click went out with
-        self.clicks.append({'frame': int(round(self.t * 60)), 'item': it.name,
-                            'type': cur['type'] if cur else None, 'result': r,
-                            'world': [round(wx, 4), round(wy, 4)]})
+        self._click_item_name = None
         if os.environ.get('TRICKS_DEBUG'):
             w = self.v.woody
             print('t=%.2f click %s -> %s (woody %s x=%.2f %s%s)' % (
@@ -2147,6 +2156,35 @@ class Driver(Recorder):
         return ok, None if ok else 'state changed: %s -> %s' % (before,
                                                                 after)
 
+    def leg_walk(self, x, y):
+        """`walk <x> <y>`: click the world point and wait for Woody to
+        stand there — a tutorial's location action (LevelScriptAction's
+        Location / Threshold, Woody.IsAtLocation on x alone, cs:293-296:
+        Level201's action 1 wants him at x=5.0 before the neighbour
+        unfreezes)"""
+        x, y = float(x), float(y)
+        w = self.v.woody
+        if w is None:
+            return False, 'no Woody'
+        self._leg_zone = None
+        self._leg_item = None
+        self._leg_x = x
+        deadline = self.t + 60.0
+        next_click = self.t
+        while self.t < deadline:
+            if abs(w.sprite.x - x) < 0.05 and w.state == w.IDLE:
+                return True, None
+            if self.world.game.got_caught or self.world.game.ending:
+                return False, 'caught on the walk'
+            if self.t >= next_click:
+                self.look_at(x, y)
+                sx, sy = self.v.cam.world_to_screen(x, y, WIDTH, HEIGHT)
+                self.mouse[0], self.mouse[1] = sx, sy
+                self._click(sx, sy)
+                next_click = self.t + 3.0
+            self.step_world()
+        return False, 'never arrived at x=%.2f (at %.2f)' % (x, w.sprite.x)
+
     def leg_park(self, arg):
         if arg == 'auto':
             z = self.safe_zone()
@@ -2304,7 +2342,7 @@ class Driver(Recorder):
                 self._extra_need = float(args[-1][1:])
                 args = args[:-1]
             g = self.world.game
-            if g.ending and not g.got_caught and (g.won or g.all_done()):
+            if g.ending and g.caught_by is None and (g.won or g.all_done()):
                 # the win, not a catch: WinGameOnCompleteAllTricks froze
                 # the world (GameInfo.cs:226-231, 304-313) — a plan that
                 # scores every trick ends here; the awaits still read the
@@ -2359,7 +2397,8 @@ class Driver(Recorder):
                   'unlock': self.leg_unlock, 'await': self.leg_await,
                   'reclick': self.leg_reclick, 'park': self.leg_park,
                   'hide': self.leg_hide, 'icon': self.leg_icon,
-                  'tutorial': self.leg_tutorial}.get(op)
+                  'tutorial': self.leg_tutorial,
+                  'walk': self.leg_walk}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,
                                      'why': 'unknown op'})

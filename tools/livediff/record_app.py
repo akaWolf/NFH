@@ -32,6 +32,8 @@ def state(app, t):
             'locked': wd.input_locked, 'frozen': wd.frozen},
         'game': {'caught': w.game.got_caught, 'ending': w.game.ending,
                  'tricks': w.game.completed},
+        # StartGame's side of the clock: the title cards are over
+        'started': app.cards is None or not app.cards.running,
         'routines': [{'role': r.role, 'state': r.state,
                       'item': r.item.name if r.item else None,
                       'anim': r.pawn.anim.anim.name,
@@ -83,33 +85,49 @@ def main(argv):
         it = next((i for i in v.level.items.values() if i.name == name), None)
         if it is None or it.collider is None:
             return 'no item %s' % name
-        # frame Woody first, as the game's camera does once the cards are
-        # over — parked on the neighbour, the click lands off the world
-        if v.woody is not None:
-            v.cam.x, v.cam.y = v.woody.sprite.x, v.woody.sprite.y + 0.6
-            v._clamp_camera()
+        # frame the item first, as the original's tap does (tap.py puts
+        # the camera on it with CameraMover.SetFinalPosition before the
+        # screen point is read): framed on Woody instead, an item across
+        # the level lands off the world or under the HUD strip
+        v.cam.x, v.cam.y = it.collider[0], it.collider[1]
+        v._clamp_camera()
         sx, sy = v.cam.world_to_screen(it.collider[0], it.collider[1], WIDTH, HEIGHT)
+        return v.handle_click(sx, sy) or 'none'
+
+    def click_at(x, y):
+        """a bare world point, the camera framed on it as click_item does"""
+        v.cam.x, v.cam.y = x, y
+        v._clamp_camera()
+        sx, sy = v.cam.world_to_screen(x, y, WIDTH, HEIGHT)
         return v.handle_click(sx, sy) or 'none'
 
     log = open(os.path.join(out, 'state.jsonl'), 'w')
     t, wait_until = 0.0, 0.0
     pending = list(steps)
     frame = 0
+    start_frame = None                            # the first frame past the cards
     while t < seconds + 1e-9:
+        if start_frame is None and (app.cards is None or not app.cards.running):
+            start_frame = frame
         while pending and t + 1e-9 >= wait_until:
             parts = pending[0]
             if parts[0] == 'wait':
                 wait_until = t + float(parts[1])
                 pending.pop(0)
                 break
-            if parts[0] == 'at':                  # an absolute level frame
-                if frame < int(parts[1]):
+            if parts[0] == 'at':                  # a level frame: absolute, or
+                if parts[1].startswith('+'):      # `at +N` from StartGame
+                    if start_frame is None or frame < start_frame + int(parts[1][1:]):
+                        break
+                elif frame < int(parts[1]):
                     break
                 pending.pop(0)
                 continue
             pending.pop(0)
             if parts[0] == 'clickitem':
                 print('t=%6.2f f=%d clickitem %s -> %s' % (t, frame, parts[1], click_item(parts[1])))
+            elif parts[0] == 'clickat':
+                print('t=%6.2f f=%d clickat %s %s -> %s' % (t, frame, parts[1], parts[2], click_at(float(parts[1]), float(parts[2]))))
             elif parts[0] in ('select', 'deselect'):
                 inv = v.world.inventory
                 idx = next((i for i, e in enumerate(inv.items)

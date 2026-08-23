@@ -167,6 +167,9 @@ def replay_live(level, adb=ADB_HOST, retry=True):
     rows = plan_clicks(level)
     if not rows:
         return False
+    until = os.environ.get('NFH_REPLAY_UNTIL')     # play frames: the clicks past it dropped
+    if until:
+        rows = [r for r in rows if r['frame'] <= int(until)]
     out = os.path.join(OUT, level, 'live')
     os.makedirs(out, exist_ok=True)
     clicks = os.path.join(out, 'clicks.json')
@@ -208,6 +211,10 @@ def replay_port(level):
         return False
     tap = json.load(open(tj))
     taps = sorted(tap.get('taps') or [])
+    # the two clocks meet at StartGame: the original's cards run a few
+    # frames more or less from run to run (Level208: 464 once, 474 the
+    # next), so the port clicks at `at +N` from its own StartGame
+    start = tap.get('start') or 0
     out = os.path.join(OUT, level, 'port')
     os.makedirs(out, exist_ok=True)
     lines = []
@@ -220,11 +227,14 @@ def replay_port(level):
         end = planned[k + 1]['at'] if k + 1 < len(planned) else 10 ** 9
         n = next((t for t in taps if c['at'] <= t < end), None)
         if n is None:
-            print('%-10s replay port: the original did not act on %s@%d' % (level, c['item'], c['at']), flush=True)
+            print('%-10s replay port: the original did not act on %s@%d' % (level, c.get('item') or c.get('world'), c['at']), flush=True)
             n = c['at']
-        lines.append('at %d' % n)
+        lines.append('at +%d' % (n - start))
         lines.append('select %s' % c['type'] if c.get('type') else 'deselect')
-        lines.append('clickitem %s' % c['item'])
+        if c.get('item'):
+            lines.append('clickitem %s' % c['item'])
+        else:
+            lines.append('clickat %r %r' % (c['world'][0], c['world'][1]))
         last = n
     script = os.path.join(out, 'script.txt')
     open(script, 'w').write('\n'.join(lines) + '\n')
@@ -239,11 +249,12 @@ def replay_port(level):
     return ok
 
 
-def _events(rows, tricks, caught, frame):
-    """(frame, event) of every tricks-count step and the catch"""
+def _events(rows, tricks, caught, frame, ending=None):
+    """(frame, event) of every tricks-count step, the catch, the ending"""
     ev = []
     last = 0
     got = False
+    ended = False
     for r in rows:
         t = tricks(r)
         if t is not None and t != last:
@@ -252,6 +263,9 @@ def _events(rows, tricks, caught, frame):
         if caught(r) and not got:
             ev.append((frame(r), 'caught'))
             got = True
+        if ending is not None and ending(r) and not ended:
+            ev.append((frame(r), 'ending'))
+            ended = True
     return ev
 
 
@@ -264,15 +278,20 @@ def replay_report(level):
         return None
     L = [json.loads(l) for l in open(live)]
     P = [json.loads(l) for l in open(port)]
-    le = _events(L, lambda r: (r.get('game') or {}).get('tricks'),
-                 lambda r: (r.get('game') or {}).get('caught'),
-                 lambda r: int(round(r['t'] * 60)))         # run.py: t = n / 60
-    pe = _events(P, lambda r: (r.get('game') or {}).get('tricks'),
-                 lambda r: (r.get('game') or {}).get('caught'),
-                 lambda r: int(round(r['t'] * 60)) + 1)
     tap = json.load(open(os.path.join(OUT, level, 'live', 'tap.json')))
-    print('%s: start %s, clicks %s' % (level, tap.get('start'),
-          ' '.join('%s@%d' % (c['item'], c['at']) for c in tap.get('planned') or [])))
+    # frames from StartGame on both sides (the cards' length differs)
+    ls = tap.get('start') or 0
+    ps = next((i + 1 for i, r in enumerate(P) if r.get('started')), 0)
+    lframe = lambda r: int(round(r['t'] * 60)) - ls         # run.py: t = n / 60
+    pframe = lambda r: int(round(r['t'] * 60)) + 1 - ps
+    le = _events(L, lambda r: (r.get('game') or {}).get('tricks'),
+                 lambda r: (r.get('game') or {}).get('caught'), lframe,
+                 lambda r: (r.get('game') or {}).get('ending'))
+    pe = _events(P, lambda r: (r.get('game') or {}).get('tricks'),
+                 lambda r: (r.get('game') or {}).get('caught'), pframe,
+                 lambda r: (r.get('game') or {}).get('ending'))
+    print('%s: StartGame at %s (port %s), frames from it; clicks %s' % (level, ls, ps,
+          ' '.join('%s@%d' % (c.get('item') or 'pt', c['at'] - ls) for c in tap.get('planned') or [])))
     # Woody.Frozen (a tutorial's Freeze): the frames the clicks are dropped
     def frozen_runs(rows, get, frame):
         runs, cur = [], None
@@ -287,11 +306,18 @@ def replay_report(level):
         if cur is not None:
             runs.append(tuple(cur))
         return runs
-    lf = frozen_runs(L, lambda r: r.get('frozen'), lambda r: int(round(r['t'] * 60)))
-    pf = frozen_runs(P, lambda r: (r.get('woody') or {}).get('frozen'),
-                     lambda r: int(round(r['t'] * 60)) + 1)
+    lf = frozen_runs(L, lambda r: r.get('frozen'), lframe)
+    pf = frozen_runs(P, lambda r: (r.get('woody') or {}).get('frozen'), pframe)
     if lf or pf:
         print('  frozen:   original %s, port %s' % (lf, pf))
+    # the tutorial's steps: LevelScript.ActionIndex on the original, the
+    # port's tutorial layer's action
+    lsc = _events(L, lambda r: r.get('script'), lambda r: False, lframe)
+    psc = _events(P, lambda r: (r.get('tutorial') or {}).get('action') if r.get('tutorial') else None,
+                  lambda r: False, pframe)
+    if lsc or psc:
+        print('  script:   original %s, port %s' % (' '.join('%s@%d' % (e.split()[1], f) for f, e in lsc),
+                                                     ' '.join('%s@%d' % (e.split()[1], f) for f, e in psc)))
     print('  original: ' + ', '.join('%s@%d' % (e, f) for f, e in le))
     print('  port:     ' + ', '.join('%s@%d' % (e, f) for f, e in pe))
     return {'level': level, 'live': le, 'port': pe}

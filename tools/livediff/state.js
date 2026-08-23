@@ -160,7 +160,11 @@ const PD = offsets(PawnK, ['CanStart']);   // StartGame's flag (IntroAnimation.c
 const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
                               'WinningTricksCount', 'FinalTrickScore',
                               'FinalViewerRating', 'Won', 'GameEnding',
-                              'gotCaught', 'Woody', 'Rottweiler']);
+                              'gotCaught', 'Woody', 'Rottweiler', 'Mother',
+                              'LevelScript', 'GameCamera']);
+// the tutorial layer's step: LevelScript.ActionIndex (cs:148-166)
+const LevelScriptK = klass(asmGame, '', 'LevelScript');
+const LS = LevelScriptK.isNull() ? { ActionIndex: -1 } : offsets(LevelScriptK, ['ActionIndex']);
 send({ type: 'ready', offsets: GI, pinned: pinned });
 
 const bool8 = (p, o) => p.add(o).readU8() !== 0;
@@ -183,6 +187,9 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
         frame++;
         const woody = GI.Woody >= 0 ? gi.add(GI.Woody).readPointer() : NULL;
         const rott = GI.Rottweiler >= 0 ? gi.add(GI.Rottweiler).readPointer() : NULL;
+        const mother = GI.Mother >= 0 ? gi.add(GI.Mother).readPointer() : NULL;
+        const script = GI.LevelScript >= 0 ? gi.add(GI.LevelScript).readPointer() : NULL;
+        const gcam = GI.GameCamera >= 0 ? gi.add(GI.GameCamera).readPointer() : NULL;
         send({
             type: 'frame',
             n: frame,
@@ -196,6 +203,9 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
                 caught: bool8(gi, GI.gotCaught),
             },
             woody: position(woody),
+            mother: mother.isNull() ? null : position(mother),
+            cam: gcam.isNull() ? null : position(gcam),
+            script: script.isNull() || LS.ActionIndex < 0 ? null : i32(script, LS.ActionIndex),
             start: rott.isNull() || PD.CanStart < 0 ? null : bool8(rott, PD.CanStart),
             locked: woody.isNull() || WD.InputLocked < 0 ? null
                     : woody.add(WD.InputLocked).readU8() !== 0,
