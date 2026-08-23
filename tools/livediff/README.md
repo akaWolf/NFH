@@ -522,3 +522,25 @@ neighbour 100-200 frames ahead), so `state.js` reports the frame
 intro ended before frame 440 is retried; and the game dies after a few
 `LoadLevel` calls in a row on the 2 GB emulator, so a recording with no
 frames walks the game back into a level and tries once more.
+
+## The frames a wait takes
+
+The last two frames in Level111 came from timers. `events.js` hooks a
+list of the original's methods and reports the frame each ran — the
+intro's `StartGame`, Woody's `StartMoveToLocation`, every door
+animation's start and end, the alerter's flinch, the routine's action
+boundaries — and three intervals came out the same on every run:
+StartGame on frame 475 from the load, the entrance walk 30 frames
+after it, the flinch 32 frames after the far door placed Woody in the
+dog's zone. All three are `WaitForSeconds` or a `-= Time.deltaTime`
+countdown, and all three read as: the wait ends on the first frame at
+or past its seconds (2.0 s is 120 frames, 0.5 is 30 — a double's
+countdown leaves +1e-16 and costs a 31st, hence `WAIT_EPS`), and a
+coroutine goes on the frame after its wait ran out — seven waits in
+`DoIntroLogic`, 468 + 7 = 475; a coroutine started from an animation's
+end (the door's `OnAnimationEnded`, after the frame's coroutine phase)
+takes two more, 30 + 2 = 32. `IntroCards`, the entrance timer and the
+two `AlerterDelay` countdowns follow that now; the port's StartGame,
+entrance, routine start, placements and flinch land within a frame of
+the original's, which is the jitter of the recording itself. Level111's
+Woody row after the click: 0 frames over 0.05, peak 0.034.

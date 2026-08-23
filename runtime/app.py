@@ -134,6 +134,10 @@ class LoadingScreen:
 
 
 # ---------------------------------------------------------------------------
+# a WaitForSeconds ends on the first frame at or past its seconds; a
+# double's countdown of an exact multiple of 1/60 leaves +1e-16 behind
+WAIT_EPS = 1e-6
+
 # the title cards (IntroAnimation.cs)
 
 class IntroCards:
@@ -180,22 +184,33 @@ class IntroCards:
         self.episode_in_max = (W - ew) / 2.0
         self.state = 0
         self.timer = self.times[0]
+        self.hold = 0
         self.running = True
 
     def tick(self, dt, clicked, escape):
-        """Update (cs:118-124) + the DoIntroLogic coroutine (cs:257-276)"""
+        """Update (cs:118-124) + the DoIntroLogic coroutine (cs:257-276):
+        seven `yield return new WaitForSeconds(t)` in a row. A wait ends on
+        the first frame at or past its seconds — 2.0 s is 120 frames, 0.9
+        is 54, 0.69 is 42 (a double's 0.5 - 30/60 leaves +1e-16, hence the
+        epsilon) — and the coroutine goes on the frame after: 468 + 7 =
+        475 frames to StartGame from the load, the frame the original's
+        Rottweiler.CanStart flips on (tools/livediff/README.md)."""
         if not self.running:
             return False
         if clicked or escape:
             self.running = False          # StopIntroAnimation -> StartGame
             return True
+        if self.hold:
+            self.hold -= 1
+            return False
         self.timer -= dt
-        if self.timer <= 0.0:
+        if self.timer <= WAIT_EPS:
             self.state += 1
             if self.state >= len(self.times):
                 self.running = False      # DoIntroLogic's tail: StartGame
                 return True
             self.timer = self.times[self.state]
+            self.hold = 1                 # the resume frame
         return False
 
     def _inc_cap(self, rect, inc, mx, dt):

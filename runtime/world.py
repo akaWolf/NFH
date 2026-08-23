@@ -20,6 +20,9 @@ import struct as _struct
 _f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
 
 
+WAIT_EPS = 1e-6      # a WaitForSeconds / timer ends on the first frame at or past its seconds
+
+
 def _f32(x):
     """round to the nearest C# float — the runtime's single-precision
     arithmetic, where it decides a tick"""
@@ -1685,6 +1688,8 @@ class AlerterFSM:
         self.can_start = True            # IntroAnimation.cs:293 sets it post-intro
         self.start_timer = item.alert_on_start_timer
         self._see_delay = None           # CoRoutineWoodySeeAlerter
+        self._see_hold = 0
+        self._hear_hold = 0
         self._hear_delay = None          # CoRoutineRottweilerHearAlerter
         if self.player is not None:
             self._play(item.sleep_sequence, chain=True)
@@ -1745,24 +1750,40 @@ class AlerterFSM:
             if self.start_timer <= 0.0:
                 self.triggered_by_woody = False
                 self.on_notice_woody()
+        # the two AlerterDelay coroutines (Alerter.cs:92-99, 106-113): a
+        # WaitForSeconds started from an animation's end — the door's
+        # OnAnimationEnded that brought Woody into the zone — and counted in
+        # single precision; the original's flinch comes 32 frames after the
+        # placement for a 0.5 s delay (Level111, tools/livediff/README.md):
+        # the 30 frames of the wait, and two for the coroutine's start and
+        # resume around the frame's phases — three holds here, the first
+        # of which the same tick's FSM pass consumes
         if self._see_delay is not None:
-            self._see_delay -= dt
-            if self._see_delay <= 0.0:
-                self._see_delay = None
-                if self.can_see_woody():
-                    self.world.woody_see_alerter(self.item)
+            if self._see_hold:
+                self._see_hold -= 1
+            else:
+                self._see_delay -= dt
+                if self._see_delay <= WAIT_EPS:
+                    self._see_delay = None
+                    if self.can_see_woody():
+                        self.world.woody_see_alerter(self.item)
         if self._hear_delay is not None:
-            self._hear_delay -= dt
-            if self._hear_delay <= 0.0:
-                self._hear_delay = None
-                self.world.rott_hear_alerter(self, self.triggered_by_woody)
+            if self._hear_hold:
+                self._hear_hold -= 1
+            else:
+                self._hear_delay -= dt
+                if self._hear_delay <= WAIT_EPS:
+                    self._hear_delay = None
+                    self.world.rott_hear_alerter(self, self.triggered_by_woody)
 
     def on_notice_woody(self):
         self.wake_up()
         self._see_delay = self.item.alerter_delay
+        self._see_hold = 3
 
     def wake_up(self):
         self._hear_delay = self.item.alerter_delay
+        self._hear_hold = 3
         self.awake = True
         self.alert = True
         if self.animation_type == 1:
@@ -8085,8 +8106,11 @@ class World:
         # to Level.EntranceLocation, and arrival unlocks the input
         # (OnFinishedEntrance)
         if self._entrance_timer is not None and self.woody is not None:
+            # EntranceTimer -= Time.deltaTime in Woody.Update (Woody.cs:225):
+            # 0.5 s runs out on the 30th frame (a double's countdown would
+            # leave +1e-16 for a 31st)
             self._entrance_timer -= dt
-            if self._entrance_timer <= 0.0:
+            if self._entrance_timer <= WAIT_EPS:
                 self._entrance_timer = None
                 self.woody.start_move_flags()   # StartMoveToLocation(0)
                 ex, ey = self.level.entrance_location or \
