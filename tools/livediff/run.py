@@ -132,8 +132,11 @@ def main(argv):
             pt = pt[:2]
             host = opts.get('adb')
             em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
+            # the bench may be this very host (NFH_EM set, no --adb): the
+            # tap runs through the same entry locally
             cmd = (['ssh', '-o', 'BatchMode=yes', host,
                     '%s tap %d %d' % ((em,) + pt)] if host
+                   else ['bash', '-c', '%s tap %d %d' % ((em,) + pt)] if 'NFH_EM' in os.environ
                    else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])
             import subprocess
             subprocess.run(cmd, check=False, timeout=60)

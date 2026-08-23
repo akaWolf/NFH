@@ -88,17 +88,20 @@ def record_clicks_port(level):
     return ok
 
 
-def _relevel(level, adb='pcnew'):
+ADB_HOST = os.environ.get('NFH_ADB_HOST', '')   # '' — the bench is this host
+
+
+def _relevel(level, adb=ADB_HOST):
     """walk the season's game back into a level — the app dies after a
     few LoadLevel calls in a row on the 2 GB emulator"""
     em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
     season = '1' if season_of(level) == 's1' else '2'
-    subprocess.run(['ssh', '-o', 'BatchMode=yes', adb,
-                    'NFH_SEASON=%s %s level' % (season, em)],
+    cmd = 'NFH_SEASON=%s %s level' % (season, em)
+    subprocess.run(['ssh', '-o', 'BatchMode=yes', adb, cmd] if adb else ['bash', '-c', cmd],
                    capture_output=True, text=True, timeout=200)
 
 
-def record_clicks_live(level, adb='pcnew', retry=True):
+def record_clicks_live(level, adb=ADB_HOST, retry=True):
     it = first_take(level)
     if it is None:
         return False
@@ -107,7 +110,7 @@ def record_clicks_live(level, adb='pcnew', retry=True):
     env = dict(os.environ, NFH_PKG=PKG[season_of(level)])
     r = subprocess.run([sys.executable, os.path.join(HERE, 'run.py'), out, '--attach',
                         '--load=' + level, '--tap=%s@f%d' % (it, CLICK_FRAME),
-                        '--adb=' + adb, '--seconds=%s' % (SECONDS + 14)],
+                        '--seconds=%s' % (SECONDS + 14)] + (['--adb=' + adb] if adb else []),
                        capture_output=True, text=True, timeout=600, env=env)
     n = 0
     q = os.path.join(out, 'state.jsonl')
@@ -116,10 +119,13 @@ def record_clicks_live(level, adb='pcnew', retry=True):
     tapline = [l for l in r.stdout.splitlines() if l.startswith('tap ') or l.startswith('[tap]')]
     print('%-10s clicks live %d frames %s' % (level, n,
           tapline[-1] if tapline else 'NO TAP ' + r.stdout[-200:].replace(chr(10), ' ')), flush=True)
-    if n <= 600 and retry:
+    # a settling emulator renders under 60 fps right after its boot and the
+    # recording comes out short in frames: once, walk back in and retry
+    want = int(0.8 * SECONDS * 60)
+    if n < want and retry:
         _relevel(level, adb)
         return record_clicks_live(level, adb, retry=False)
-    return n > 600
+    return n >= want
 
 
 def record_live(level):
