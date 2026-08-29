@@ -103,6 +103,8 @@ def main(argv):
                 'rott': p.get('rott'),
                 'mother': p.get('mother'),
                 'rott_action': p.get('rott_action'),
+                'olga': p.get('olga'),
+                'olga_action': p.get('olga_action'),
                 'cam': p.get('cam'),
                 'script': p.get('script'),
                 'game': p['game'],

@@ -159,12 +159,15 @@ const PawnK = klass(asmGame, '', 'Pawn');
 const PD = offsets(PawnK, ['CanStart']);   // StartGame's flag (IntroAnimation.cs:282-285)
 const RottK = klass(asmGame, '', 'Rottweiler');
 const RD = RottK.isNull() ? { ActionManager: -1 } : offsets(RottK, ['ActionManager']);   // Rottweiler.cs:22
+const OlgaK = klass(asmGame, '', 'Olga');
+const OD = OlgaK.isNull() ? { ActionManager: -1 } : offsets(OlgaK, ['ActionManager']);
 // the neighbour's routine: ActionManager.ActiveActionIndex / Frozen
 const AMK = klass(asmGame, '', 'ActionManager');
 const AM = AMK.isNull() ? { ActiveActionIndex: -1, Frozen: -1 } : offsets(AMK, ['ActiveActionIndex', 'Frozen']);
-function routine(pawn) {
-    if (pawn.isNull() || RD.ActionManager < 0 || AM.ActiveActionIndex < 0) return null;
-    const am = pawn.add(RD.ActionManager).readPointer();
+function routine(pawn, off) {
+    if (off === undefined) off = RD.ActionManager;
+    if (pawn.isNull() || off < 0 || AM.ActiveActionIndex < 0) return null;
+    const am = pawn.add(off).readPointer();
     if (am.isNull()) return null;
     return { index: am.add(AM.ActiveActionIndex).readS32(), frozen: AM.Frozen < 0 ? null : am.add(AM.Frozen).readU8() !== 0 };
 }
@@ -172,7 +175,7 @@ const GI = offsets(GameInfo, ['CompletedTricksCount', 'TotalTricksCount',
                               'WinningTricksCount', 'FinalTrickScore',
                               'FinalViewerRating', 'Won', 'GameEnding',
                               'gotCaught', 'Woody', 'Rottweiler', 'Mother',
-                              'LevelScript', 'GameCamera']);
+                              'LevelScript', 'GameCamera', 'Olga']);
 // the tutorial layer's step: LevelScript.ActionIndex (cs:148-166)
 const LevelScriptK = klass(asmGame, '', 'LevelScript');
 const LS = LevelScriptK.isNull() ? { ActionIndex: -1 } : offsets(LevelScriptK, ['ActionIndex']);
@@ -201,6 +204,7 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
         const mother = GI.Mother >= 0 ? gi.add(GI.Mother).readPointer() : NULL;
         const script = GI.LevelScript >= 0 ? gi.add(GI.LevelScript).readPointer() : NULL;
         const gcam = GI.GameCamera >= 0 ? gi.add(GI.GameCamera).readPointer() : NULL;
+        const olga = GI.Olga >= 0 ? gi.add(GI.Olga).readPointer() : NULL;
         send({
             type: 'frame',
             n: frame,
@@ -216,6 +220,8 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
             woody: position(woody),
             mother: mother.isNull() ? null : position(mother),
             rott_action: routine(rott),
+            olga: olga.isNull() ? null : position(olga),
+            olga_action: routine(olga, OD.ActionManager),
             cam: gcam.isNull() ? null : position(gcam),
             script: script.isNull() || LS.ActionIndex < 0 ? null : i32(script, LS.ActionIndex),
             start: rott.isNull() || PD.CanStart < 0 ? null : bool8(rott, PD.CanStart),
