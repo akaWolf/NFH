@@ -23,20 +23,25 @@
 # cs:96-130) that unfreezes him into the loop from [4]; without the hide
 # he stays parked by the dog for good (the original's replay parked him
 # for nine minutes until the Pipe click).
+# The rabbit is inventory, not the Rabbit item: SearchItem.InternalUse hands
+# over every entry of InventoryItems (SearchItem.cs:179, Woody.AddInventory),
+# and the FleaBlanket's list is [IT2_Fleablanket, IT2_Rabbit] — the Rabbit
+# item (inactive in the scene) is the rabbit's return after the pad's Fix
+# (Item.RabbitBehavior, cs:2626-2631), for a second launch.
 take ToyBox IT2_Fartbag           # LevelScript action 1 (the take waits out the freeze, ~29 s)
 usewith! Pillows IT2_Fartbag      # action 2: ActivateItemTrick -> DeckChair (action [3])
 take SportsBag IT2_Rubber
 hide Pipe                         # action 3: the Mother's sequence, the neighbour resumes at [4]
 await DeckChair 0                 # the cushion pays on his DeckChair sit (Item.OnTrickDone credits the DeckChair, the linked item), ~37 s after the hide on the original
-usewith Harpoon IT2_Rubber        # Neutral, RottweilerUseTogglesPrime: pays through the LaunchPad's harpoonAux hand-off
-take Rabbit IT2_Rabbit            # KeepFull, TakeItemMultipleTimes
-usewith LaunchPad IT2_Rabbit      # RequireUnprime toggles (prime [5], use [7], unprime [9]); DependsOn/LinkedItemTrick Harpoon
-await Harpoon 0
+take FleaBlanket IT2_Fleablanket  # TrickAfterWoodyUse; hands the rabbit too (InventoryItems[1])
+usewith Weights IT2_Fleablanket   # action [11]
+usewith Harpoon IT2_Rubber        # Neutral, RottweilerUseTogglesPrime
+usewith LaunchPad IT2_Rabbit      # RequireUnprime toggles (prime [5], use [7], unprime [9]); DependsOn/LinkedItemTrick Harpoon: with both tricked his launch pays the pair and the ExtraCoin206 third
 await LaunchPad 0
+await Harpoon 0
+activated Rabbit                  # the LaunchPad's Fix (Item.RabbitBehavior) puts the rabbit back for a second launch
 unlock DentureAdhesive            # Dexterity, DexterityUnlocker IT_NONE (Zone04, the Mother's zone)
 take DentureAdhesive IT2_Kukident
 usewith DynamiteBox IT2_Kukident  # action [14]
-take FleaBlanket IT2_Fleablanket  # TrickAfterWoodyUse; hands the rabbit too
-usewith Weights IT2_Fleablanket   # action [11]
 await Weights 0
 await DynamiteBox 0

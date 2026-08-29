@@ -6,29 +6,43 @@
 # The Mother alternates MumWaitZone4 / MumWaitZone3 (~20 s each: Zone03 at
 # 27-47, 77-94, 124-...). Zone05 (the thrones) is a dead end behind Zone03's
 # DoorBack: Zone03 is clear 48-76 and 95-120. Woody starts in Zone01.
+# Rubies: the ParrotNest's, the WhipStonePlate's (a dexterity SearchItem
+# opened with the crowbar, InventoryItems [IT2_Ruby, IT2_Coin] — the coin for
+# the boat's slot comes with it) and the RubyThrone's after every throne Fix
+# (ActivateItemAfterFix; TakeItemMultipleTimes/KeepFull). Item.OnTrickDone
+# pays an item once (AlreadyTricked, cs:2148-2152); the pair's second coin
+# is the linked branch (cs:2123-2146): both halves armed for one sit.
+# Woody's ruby on AztecThrone moves the click box to AztecThrone2
+# (ThroneBehavior212, cs:2450-2469); his Fix moves it back (FixThroneBehavior,
+# cs:2471-2477), so the second ruby goes on before he sits. The BoatCoinSlot
+# is nobody's routine item: its coin pays through the ParrotLedge's linked
+# visit (the CliffCrash sequence, LinkedItemTrick 275), so the corn waits
+# for the coin.
 take Skeleton IT2_Dagger_rusty         # Zone01 (RequirePrimingOnlyWhenTricked: primes at the tricked RotatingStoneDisc)
-take MechanicalBullCoins IT2_Coin      # Zone01 (KeepFull)
-take ParrotNest IT2_Ruby               # Zone03: one ruby (the RubyThrone gives the other and deactivates after its take, Item.cs:1939-1942)
+take ParrotNest IT2_Ruby               # Zone03: the first ruby
 take Resin IT2_Resin                   # Zone03 (KeepFull)
 usewith AztecThrone IT2_Ruby           # Zone05: PutRuby; ActivateItemTrick -> RotatingStoneDisc.Tricked; ThroneBehavior212 swaps the colliders to AztecThrone2 (Item.cs:2450-2469)
 prime RotatingStoneDisc IT2_Dagger_rusty  # Zone05, same visit: the rusty dagger sharpens on the TRICKED disc (RequirePrimingOnlyWhenTricked, Item.cs:1599-1613) -> IT2_Dagger
-take RubyThrone IT2_Ruby               # Zone05: the second ruby (TakeItemMultipleTimes refuses while a ruby is held — hence after the first throne)
-usewith AztecThrone2 IT2_Ruby          # Zone05: the linked pair, armed together before his sit (his angry+Fix swaps the colliders back and pays the first alone)
 take Crowbar IT2_Crowbar               # Zone05 (RequirePriming: primes at ClosedMine1 -> IT2_Tnt)
 take Corn IT2_Corn                     # Zone05
 usewith Whip IT2_Dagger                # Zone03 (KeepAfterUse; LinkedItemTrick WhipStonePlate)
+unlock WhipStonePlate IT2_Crowbar      # Zone03: the spike plate is a dexterity search item (Dexterity, DexterityUnlocker IT2_Crowbar, DexterityKeepUseItem) whose take hands over the ruby and the coin; CanWoodyUse's name-hack opens it with a ruby in hand (Item.cs:1438)
+usewith AztecThrone2 IT2_Ruby          # Zone05: the pair's second half, while the first ruby is still armed — his sit pays both (OnTrickDone, the fresh-pair branch)
 prime ClosedMine1 IT2_Crowbar          # Zone01: Item.cs:1561-1566 — the crowbar becomes IT2_Tnt (PrimedInventoryType), a fresh crowbar lands back, ClosedMine1 deactivates and the ClosedMine search item activates
 usewith MechanicalBull IT2_Resin       # Zone01 (LinkedItemTrick MechanicalBullCoins)
 usewith CigarBox IT2_Tnt               # Zone04
 take PaintPot IT2_Paint                # Zone04
 usewith SleepBench IT2_Paint           # Zone04
-usewith BoatCoinSlot IT2_Coin          # Zone02: ActivateItemTrick -> BoatRent; LinkedItemTrick of the ParrotLedge
-usewith ParrotLedge IT2_Corn           # Zone02
+usewith BoatCoinSlot IT2_Coin          # Zone02: the plate's coin; ActivateItemTrick -> BoatRent (TrickItem.cs:325)
+usewith ParrotLedge IT2_Corn           # Zone02: armed together with the slot — his visit plays the linked CliffCrash and OnTrickDone pays the pair
 await AztecThrone 0
 await AztecThrone2 0
+activated RubyThrone                   # the throne's Fix (ActivateItemAfterFix, Item.cs:2356-2363)
+take RubyThrone IT2_Ruby               # Zone05: a third ruby (TakeItemMultipleTimes refuses while a ruby is held)
 await Whip 0
 await CigarBox 0
 await SleepBench 0
 await MechanicalBull 0
+activated MechanicalBullCoins          # ShowObjects on his tricked ride (Item.cs:2662-2667): a second coin, unused here
 await ParrotLedge 0
 await BoatCoinSlot 0

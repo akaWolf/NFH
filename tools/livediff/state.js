@@ -156,7 +156,7 @@ function position(component) {
 const Woody = klass(asmGame, '', 'Woody');
 const WD = offsets(Woody, ['InputLocked', 'Sneaking', 'Frozen']);   // Frozen: a tutorial's Freeze() (CheckMouseClick drops the click)
 const PawnK = klass(asmGame, '', 'Pawn');
-const PD = offsets(PawnK, ['CanStart']);   // StartGame's flag (IntroAnimation.cs:282-285)
+const PD = offsets(PawnK, ['CanStart', 'IsSleeping']);   // StartGame's flag (IntroAnimation.cs:282-285); the sleep bars' flag (ProgressBar.SetSleeping)
 const RottK = klass(asmGame, '', 'Rottweiler');
 const RD = RottK.isNull() ? { ActionManager: -1 } : offsets(RottK, ['ActionManager']);   // Rottweiler.cs:22
 const OlgaK = klass(asmGame, '', 'Olga');
@@ -232,6 +232,8 @@ Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
             sneak: woody.isNull() || WD.Sneaking < 0 ? null
                    : woody.add(WD.Sneaking).readU8() !== 0,
             rott: position(rott),
+            msleep: mother.isNull() || PD.IsSleeping < 0 ? null : bool8(mother, PD.IsSleeping),
+            rsleep: rott.isNull() || PD.IsSleeping < 0 ? null : bool8(rott, PD.IsSleeping),
         });
     }
 });

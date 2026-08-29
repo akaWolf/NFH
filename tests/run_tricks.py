@@ -61,6 +61,7 @@ from prefs import MemoryPrefs                       # noqa: E402
 from menu import GameIntroAnimation                 # noqa: E402
 
 LEG_TIMEOUT = 75.0      # a walk + search anywhere fits well inside this
+STATE_EVERY = 10          # state.jsonl rows per 60 Hz ticks (6 Hz)
 AWAIT_TIMEOUT = 150.0   # a routine lap is ~35 s; alarms and toilets stall it
 GATE_TIMEOUT = 160.0    # a Season-2 lap is ~100 s (L210: 98 s) — the room may open only next lap
 MAX_RESTARTS = 4
@@ -79,6 +80,7 @@ class Driver(Recorder):
     def __init__(self, level_path, plan_path, outdir):
         Recorder.__init__(self, level_path, outdir, script=None,
                           seconds=1e9, fps=0)
+        self._tick_i = 0
         # the level runs in the App, not the bare Viewer: the App builds
         # and ticks the tutorial layer (LevelScript + the camera script,
         # app.py load_level / _tick_level) — Level206's script freezes
@@ -2322,7 +2324,11 @@ class Driver(Recorder):
             self.app.tick(DT, events=(False, False, False, False))
         for hook in self.frame_hooks:
             hook(t, DT)
-        self.log.write(json.dumps(self._state(t)) + '\n')
+        # the state line every STATE_EVERY ticks: a plan run is minutes of
+        # 60 Hz rows, and a stuck one grew a 190 MB log on /tmp
+        self._tick_i += 1
+        if self._tick_i % STATE_EVERY == 0:
+            self.log.write(json.dumps(self._state(t)) + '\n')
 
     def restart(self):
         self._enter_level()

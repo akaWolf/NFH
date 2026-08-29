@@ -14,25 +14,38 @@
 # ProgressBar.cs:164-172) but her next DeckChairMother use re-activates it
 # (Item.MotherUse -> ProgressBarObject.SetActive(true), Item.cs:1108-1116;
 # OnEnable -> RestoreVariables), so the window repeats every lap (~165-223,
-# ...). The Zone03 raid and the cabin fit into the first one; then Woody hides
-# in Zone03's DeckChair (HideItem) while the neighbour walks through to the
-# swapped CaptainControls (Zone05) and back to the Pistol.
-take HatchFish IT2_Fish                # Zone02 (two fish)
+# ...). The Zone03 raid and the cabin fit into one of them; the awaits park
+# Woody themselves (Zone03's DeckChair is a HideItem the await legs use when
+# its zone is clear) while the neighbour walks through to the swapped
+# CaptainControls (Zone05) and back to the Pistol.
+# The fish: his first fall only arms the hatch's dexterity round
+# (HatchFixBehavior, Item.cs:2560); Item.ShowObjects (cs:2668) activates the
+# HatchFish on the second fall, after Woody's shards round.
 take Carpet IT2_Carpet                 # Zone01
 take Ammo IT2_Ammo                     # Zone01
-usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash; FixItemTrick Washbucket)
 usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his 71 s Hatch visit
-take BirdDead IT2_Key                  # Zone04 while he plays the pistol in Zone03 (32-60)
-usewith Bouquet IT2_Fish               # Zone04 (BouquetFish; FishPlantBehavior strips Olga's next two actions, Item.cs:2388-2396)
-take Handbag IT2_Pills                 # Zone03 — the Mother's first IsSleeping window (~61-119 s), the neighbour gone at 60
-take Mat IT2_Code                      # Zone03
+await Hatch 0                          # his first fall: ShowObjects runs at every angry (Rottweiler.cs:593) but the Hatch's arm needs Dexterity (Item.cs:2668-2672), which his first Fix sets (HatchFixBehavior, cs:2550-2570: the hatch turns into its dexterity round)
+take Shards IT2_Shards                 # Zone03: the hatch's DexterityUnlocker
+unlock Hatch IT2_Shards                # Zone02: the shards round on the DexterityTrickItem hatch arms it again
+await 2                                # his second fall (a bare count: the hatch's AlreadyTricked was reset by the first Fix): the angry's ShowObjects activates the fish, the second Fix writes the hatch off
+activated HatchFish
+take HatchFish IT2_Fish                # Zone02 (two fish)
+usewith Bouquet IT2_Fish               # Zone04 (BouquetFish; PawnToAffectWhenTricked Olga): her trick sends her to the Shower — her routine never reaches it on its own (ActionStartIndex 1, LoopFromSelectedIndex)
+activated Washbucket                   # her OlgaShipShowerSwiffer pose activates the bucket (WashbucketBehavior.cs:22-29), her Idle pose the cloth (cs:33-36)
+usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash; FixItemTrick Washbucket)
+activated Cloth
+take Cloth IT2_Swiffer                 # the glass wants the swiffer
+usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
 usewith Pistol IT2_Ammo                # Zone03 (PistolFire; PawnToAffectWhenTricked Mother; FixItemTrick DeckChairMother)
-usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBacks (DisableOnStart) and swaps his CaptainDoor action for CaptainControls
-usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel after 11 s (TrickItem.cs:333-351: the CaptainControls action becomes the wheel). The mug itself never pays: no neighbour use animation and no linked pay reaches it — the level's 6th count is dead by data (winning=4)
+activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156)
+take BirdDead IT2_Key                  # Zone04
+await Pistol 0                         # his pistol play (Zone03, 32-60 of the lap) puts the Mother to sleep and sends him on to the Hatch: the cabin raid fits between his exit and his return through Zone03 to the swapped CaptainWheel (~50 s)
+usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
+take Handbag IT2_Pills                 # Zone03 — the Mother's first IsSleeping window, the neighbour away
+take Mat IT2_Code                      # Zone03
+usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
 usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the mug
-hide DeckChair                         # Zone03: out of both predicates (Woody.Hiding) while he crosses to the cabin and back to the pistol
 await Shower 0
-await Hatch 0
 await Bouquet 0
+await Glass 0
 await CaptainWheel 0
-await Pistol 0
