@@ -649,3 +649,46 @@ run.py restarted its level-frame count on any gap of over a second
 between frames — the load's gap — and a stall mid-level (the emulator
 pausing) restarted it too: Level206's replay burst its last 25 clicks the
 moment the count came back small. The reset holds only until StartGame.
+
+## The click box that stayed behind
+
+Level113's Drawer was the first take of every replay and never a take on
+the original: Woody walked to x=3.50 and stood, the port climbed and took.
+The click sweep's tap at frame 803 had taken it — that tap went to the
+GameObject's runtime transform, the replays to the port's collider centre,
+and the two are 1.15 apart. Actor.Start moves every actor to
+LevelLocations[i] for the level's index; the port moved the actor's use
+location and sprite with it and left the BoxCollider where the prefab's
+transform serializes it (3.49, -0.46 against the level's 3.45, -1.61). The
+collider is on the same transform, so it moves too now — Season 1's
+shared prefabs are the ones this reaches: the Drawer (104-106, 108-110,
+112-114), the Fridge, the FirstAid, the PinsBoard, the Toilet, by up to
+1.15 units; a player's tap in the port landed on air above the drawer.
+
+The injected click (inject.js) showed the same thing without a tap in
+between, which is what it is for: the click at the frame asked for, under
+the frame's own camera, through Woody.CheckMouseClick's gates
+(Woody.cs:637-671) and the HUD's world-click tail (HUD.cs:1320-1322). Its
+replies name the gate a click died on — `hud-strip`, `on stairs`,
+`stored`, `frozen` — where the port's runner had clicked without one.
+
+## Two routes of equal length
+
+Level205's replay parted at the Banger: the original's Woody went from
+the upper-right deck to the lower-left one through Zone04 (the left
+stairs), the port's through Zone02 (the right stairs), and the neighbour
+found the original's Woody on the way. Both routes are two doors long.
+Helpers.GetShortestPath (Helpers.cs:158-192) is a Dijkstra over
+ZoneController.Zones whose list is re-sorted by Cost after every step
+with ZoneComparer, which returns 0 at equal Cost; the sort is Mono's
+classic Array.qsort — the game is Unity 5.3.4f1, its Mono the old mcs
+corlib — and that quicksort swaps every pair its two walls meet on,
+equal elements included, so a run of equal costs comes out turned
+around. The port ran the same Dijkstra with that quicksort, step for
+step, over the zones in the scene's order (ZoneController.Zones is
+FindGameObjectsWithTag("Zone"), and tools/livediff/zones.js reads the
+list off the running original to check the order), and Level205's route
+came out through Zone04. The plan suite moved with it: Level208's plan
+passes now, Level212's loses three legs to a route its author had not
+seen — a plan to re-time, once its replay says the original walks it the
+same way.

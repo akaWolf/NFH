@@ -41,7 +41,9 @@ const F = {};
  'MovingUp', 'MovingDown', 'IsWarping', 'MovementPaused', 'TransitionMove', 'ExitingDoor',
  'UseDoorAtOnce', 'AtDoorLocation', 'InUrgentMove', 'MoveLocationChanged', 'WasMovingLeft',
  'Speed', 'SneakFlag', 'AnimController'].forEach(n => { F[n] = offOf(Pawn, n); });
-const animOff = offOf(PAC, 'AnimState');
+// AnimState is a property of AnimationControllerBase<T> (cs:59): its getter
+const getAnimState = methodFrom(PAC, S('get_AnimState'), 0);
+const animOff = getAnimState.isNull() ? -1 : 0;
 send({ off: F, anim: animOff, role: who, pawnOff: pawnOff });
 function call0(meth, self) { const e = Memory.alloc(4); e.writePointer(NULL); const r = invoke(meth, self, NULL, e); return e.readPointer().isNull() ? r : NULL; }
 function pos(c) { const t = call0(getTransform, c); if (t.isNull()) return null; const b = call0(getPosition, t); return b.isNull() ? null : [b.add(BOX).readFloat(), b.add(BOX + 4).readFloat()]; }
@@ -59,7 +61,7 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
                min: F.MinDistToNextMove >= 0 ? p.add(F.MinDistToNextMove).readFloat() : null,
                idx: F.MoveIndex >= 0 ? p.add(F.MoveIndex).readS32() : null,
                spd: F.Speed >= 0 ? p.add(F.Speed).readFloat() : null,
-               anim: (!ctrl.isNull() && animOff >= 0) ? ctrl.add(animOff).readS32() : null,
+               anim: (!ctrl.isNull() && animOff >= 0) ? call0(getAnimState, ctrl).add(BOX).readS32() : null,
                fl: { portal: b8(p, 'PortalMove'), item: b8(p, 'ItemMove'), up: b8(p, 'MovingUp'),
                      down: b8(p, 'MovingDown'), warp: b8(p, 'IsWarping'), paused: b8(p, 'MovementPaused'),
                      trans: b8(p, 'TransitionMove'), exiting: b8(p, 'ExitingDoor'), atonce: b8(p, 'UseDoorAtOnce'),

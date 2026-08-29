@@ -13,6 +13,7 @@ which is the original's per-frame tick.
 import json, os, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
 PKG = os.environ.get('NFH_PKG', 'com.nordigames.nfh2')   # Season 1: com.nordigames.nfh
 
 
@@ -131,6 +132,46 @@ def main(argv):
         print('no frames: the game is not in a level')
         log.close(); extra_log.close()
         return 1
+    inject = opts.get('inject')            # a plan's clicks injected in-process
+    if inject:                             # (inject.js), frame-exact
+        import invtypes, re
+        types = invtypes.load()
+        anims = [l.strip().rstrip(',') for l in open(os.path.join(ROOT, 'src', 'Assembly-CSharp', 'AnimationState.cs'))
+                 if re.match(r'^\s*[A-Za-z0-9_]+,?\s*$', l) and l.strip() not in ('{', '}')]
+        anim_id = {n: i for i, n in enumerate(anims)}
+        rows = []
+        for r in json.load(open(inject)):
+            if not r.get('world'):
+                continue
+            rows.append({'f': int(r['frame']), 'w': [float(r['world'][0]), float(r['world'][1])],
+                         't': types.get(r['type'], -1) if r.get('type') else -1,
+                         'item': r.get('item'), 'typeName': r.get('type')})
+        rows.sort(key=lambda r: r['f'])
+        js = open(os.path.join(HERE, 'inject.js')).read()
+        js = js.replace('ROWS_JSON', json.dumps(rows)).replace('ANIM_RUN_UP', str(anim_id['Run_Up'])) \
+               .replace('ANIM_WALK_UP', str(anim_id['Walk_Up'])).replace('ANIM_HIDE_IN', str(anim_id['Hide_In']))
+        def on_inject(message, data):
+            p = message.get('payload')
+            if isinstance(p, dict) and 'injected' in p:
+                q = p['injected']
+                stats.setdefault('planned', []).append({'want': q['want'], 'at': q['at'], 'item': q.get('item'),
+                                                        'type': q.get('typeName'), 'world': q['world'], 'result': q['result']})
+                print('[inject] frame %d (%d) %s with %s -> %s' % (q['want'], q['at'], q.get('item') or q['world'], q.get('typeName'), q['result']), flush=True)
+            elif isinstance(p, dict) and 'inject' in p:
+                print('[inject] %s' % json.dumps(p)[:300], flush=True)
+            elif message.get('type') == 'error':
+                print('[inject error] %s' % message.get('description'), flush=True)
+        inj = session.create_script(js)
+        inj.on('message', on_inject)
+        inj.load()
+        last = rows[-1]['f'] if rows else 0
+        deadline = time.time() + seconds
+        while stats.get('start') is None and time.time() < deadline:
+            time.sleep(0.05)
+        want_end = (stats.get('start') or 0) + last + 1800     # 30 s past the last click
+        while stats['level_frames'] < want_end and time.time() < deadline:
+            time.sleep(0.05)
+        seconds = max(0.0, deadline - time.time())
     taps = opts.get('taps')                # a plan's clicks replayed: JSON rows
     if taps:                               # {frame, item, type}, frames from play
         import tap as tapper

@@ -176,8 +176,9 @@ def replay_live(level, adb=ADB_HOST, retry=True):
     json.dump(rows, open(clicks, 'w'))
     seconds = rows[-1]['frame'] / 60.0 + 30
     env = dict(os.environ, NFH_PKG=PKG[season_of(level)])
+    mode = os.environ.get('NFH_REPLAY_MODE', 'inject')   # inject (in-process, frame-exact) or tap (adb)
     r = subprocess.run([sys.executable, os.path.join(HERE, 'run.py'), out, '--attach',
-                        '--load=' + level, '--taps=' + clicks,
+                        '--load=' + level, '--%s=%s' % ('inject' if mode == 'inject' else 'taps', clicks),
                         '--seconds=%s' % (seconds + 14)] + (['--adb=' + adb] if adb else []),
                        capture_output=True, text=True, timeout=int(seconds) + 300, env=env)
     open(os.path.join(out, 'run.log'), 'w').write(r.stdout + r.stderr)
@@ -226,6 +227,11 @@ def replay_port(level):
         # there, and the port clicks on the tap's own frame
         end = planned[k + 1]['at'] if k + 1 < len(planned) else 10 ** 9
         n = next((t for t in taps if c['at'] <= t < end), None)
+        if n is None and 'result' in c:
+            # an injected click (inject.js) acts on its own frame; the
+            # ProcessMoveInput hook does not see a call made through
+            # mono_runtime_invoke, so the frame is the click's
+            n = c['at'] if 'world' in c['result'] or 'stored' in c['result'] or 'unhide' in c['result'] else None
         if n is None:
             print('%-10s replay port: the original did not act on %s@%d' % (level, c.get('item') or c.get('world'), c['at']), flush=True)
             n = c['at']
