@@ -2,13 +2,14 @@
 # Routine (Rottweiler2): OlgaMatBeach (mutex, Zone02) -> TabbleTennis
 # (Zone02) -> WaterSkiis x2 (Zone01) -> Chef (Zone04) -> Rockets ->
 # SandSculpture (Zone01); Olga: OlgaMatBeach / TabbleTennis (the mutex
-# handshake, README). PORT (plans_s2a.md): after lap 1 the neighbour parks on
-# the mat mutex and Olga on the tennis mutex for good — the port ends
-# Olga's use only when HER sequence drains and never plays the item's
-# UseNormalSequence with olga.OnItemAnimationSequenceEnded
-# (TrickItem.cs:964-975 -> Olga.cs:154-158), the second release of the
-# handshake — so only lap 1 (~70 s) is playable: the plan is ordered by
-# that lap (Chef at ~47 s, Rockets at ~59 s, SandSculpture at ~64 s).
+# handshake, README: the item's UseNormalSequence drains into
+# olga.OnItemAnimationSequenceEnded, TrickItem.cs:964-975 -> Olga.cs:154-158,
+# the second release — modelled now, the laps repeat every ~70 s). The plan
+# is ordered by lap 1 (Chef at ~47 s, Rockets at ~59 s, SandSculpture at
+# ~64 s). Open: the LionStatue leg walks into Zone01 while he finishes the
+# WaterSkiis there and is caught as he turns (the runner's dwell estimate
+# reads his use's end a second late) — 10 of 12 legs until the runner
+# learns that margin.
 # Dead data: Fence1/Fence2, BridgeRailFront, WaterSkiisAux,
 # RocketsBackground, OlgaKid, OlgaMatBeach as a trick (colliders off; no
 # crayfish source), Chef's own click (IT_Fuel — it pays through Eals'

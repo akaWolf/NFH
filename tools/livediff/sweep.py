@@ -240,7 +240,10 @@ def replay_port(level):
             n = c['at']
         lines.append('at +%d' % (n - start))
         lines.append('select %s' % c['type'] if c.get('type') else 'deselect')
-        if c.get('item'):
+        if c.get('item') and c.get('world'):
+            # the world point disambiguates a name several items share
+            lines.append('clickitem %s %r %r' % (c['item'], c['world'][0], c['world'][1]))
+        elif c.get('item'):
             lines.append('clickitem %s' % c['item'])
         else:
             lines.append('clickat %r %r' % (c['world'][0], c['world'][1]))

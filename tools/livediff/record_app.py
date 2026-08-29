@@ -4,8 +4,9 @@ tutorial level can be compared with the original frame for frame.
 
     python3 tools/livediff/record_app.py <Level> <out-dir> [--script=<file>] [--seconds=40]
 
-Script lines: `wait <s>` and `clickitem <Item>` (the item's collider
-centre, through the viewer's click handling — a locked tutorial item is
+Script lines: `wait <s>` and `clickitem <Item> [x y]` (the item's collider
+centre — the nearest item of that name to the world point when several
+share it — through the viewer's click handling — a locked tutorial item is
 ignored here as it is in the game).
 """
 import json, os, sys
@@ -82,9 +83,16 @@ def main(argv):
         app.tick(DT, events=(False, True, False, False))     # the title cards skipped
     v = app.viewer
 
-    def click_item(name):
-        it = next((i for i in v.level.items.values() if i.name == name), None)
-        if it is None or it.collider is None:
+    def click_item(name, near=None):
+        # several items may share a name (L113's GroundMarbles, one per
+        # room): the click's recorded world point picks the nearest one
+        cands = [i for i in v.level.items.values()
+                 if i.name == name and i.collider is not None]
+        if near is not None and cands:
+            cands.sort(key=lambda i: (i.collider[0] - near[0]) ** 2
+                       + (i.collider[1] - near[1]) ** 2)
+        it = cands[0] if cands else None
+        if it is None:
             return 'no item %s' % name
         # frame the item first, as the original's tap does (tap.py puts
         # the camera on it with CameraMover.SetFinalPosition before the
@@ -126,7 +134,8 @@ def main(argv):
                 continue
             pending.pop(0)
             if parts[0] == 'clickitem':
-                print('t=%6.2f f=%d clickitem %s -> %s' % (t, frame, parts[1], click_item(parts[1])))
+                near = (float(parts[2]), float(parts[3])) if len(parts) >= 4 else None
+                print('t=%6.2f f=%d clickitem %s -> %s' % (t, frame, parts[1], click_item(parts[1], near)))
             elif parts[0] == 'clickat':
                 print('t=%6.2f f=%d clickat %s %s -> %s' % (t, frame, parts[1], parts[2], click_at(float(parts[1]), float(parts[2]))))
             elif parts[0] in ('select', 'deselect'):

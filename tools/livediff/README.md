@@ -881,3 +881,15 @@ camera that had gone back to Woody on the original (a floor point, no
 walk) and against the framed item on the port (a walk up the stairs into
 the parked neighbour, caught at 9554). A tap while a blocking animation
 runs is the same hazard as a tap mid-walk.
+
+## Level113, replayed: a name shared by four items
+
+The first 113 replay parted at the neighbour's second step (1741 on the
+original, 3477 on the port) and it was the replay tool: `clickitem
+GroundMarbles` picked the first item of that name, and the level has one
+per room. The port's Woody carried the marbles to the wrong room, the
+neighbour found him on the way and searched instead of grinding. A
+`clickitem` carries the click's recorded world point now and takes the
+nearest item of the name. Replayed: routine steps 563/564, 1741/1743,
+3423/3423, 4400/4387, 5301/5287; the runner's dodge got Woody caught at
+5704 on the original and 5701 on the port.

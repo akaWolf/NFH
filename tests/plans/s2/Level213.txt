@@ -8,6 +8,7 @@
 take CementBag IT2_Cement              # Zone03
 take ChickenWings IT2_Chickenwing      # Zone01 (KeepFull)
 take Skeleton IT2_Tequila              # Zone01
+take Piranha IT2_Piranha               # Zone01: the plant's compound (CompoundRequiredInventory becomes IT2_Piranha at Woody's chicken-wing use, PlantCarnivoreBehavior, Woody.cs:430)
 take Jar IT2_Jar_empty                 # Zone04 (RequirePriming: primes at the Termite -> IT2_Termites)
 prime Termite IT2_Jar_empty            # Zone01: the jar's PrimingItem (Item.cs:1548-1572)
 take Chili IT2_Chili                   # Zone02 (KeepFull)
@@ -16,6 +17,7 @@ take StatueHand IT2_Hand               # Zone05 (behind Zone03's DoorBack; the M
 take Flowers IT2_Flowers               # Zone05
 usewith LiveBull IT2_Flowers           # Zone04 (LinkedItemTrick Wasp; his angry activates the Wasp search item, Rottweiler.cs:583-590)
 usewith PlantCarnivore IT2_Chickenwing # Zone03 (Compound; PlantCarnivoreExtraAnger)
+usewith PlantCarnivore IT2_Piranha     # Zone03: CompoundTricked — his PlantBiteHard pays the PlantCarnivoreExtraAnger coin on top (TrickItem.cs:824-830, Item.ExtraCoinCompound)
 usewith Tortilla IT2_Chili             # Zone03
 usewith Tortilla IT2_Tequila           # Zone03: the compound (CompoundRequiredInventory IT2_Tequila, TrickItem.CanWoodyUse cs:509-529) — CompoundExtraCoin pays a second trick (Item.ExtraCoinCompound cs:2398-2409)
 usewith BoatPicnic IT2_Termites        # Zone02
@@ -29,4 +31,4 @@ await MechanicalBullControls 0
 take Wasp IT2_Beehive                  # Zone04: the wasp nest activated by the bull's angry (LinkedItemTrick of LiveBull)
 unlock Pinata IT2_Beehive              # Zone01: the dexterity trick item (unlocker IT2_Beehive)
 await Pinata 0
-await 9                                # the compound extra coin (Tortilla) and the plant's: TotalTricksCount
+await 9                                # TotalTricksCount: seven items, the Tortilla's CompoundExtraCoin and the plant's PlantCarnivoreExtraAnger
