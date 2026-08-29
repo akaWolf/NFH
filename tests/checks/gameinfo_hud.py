@@ -327,7 +327,8 @@ def run(record, check, outdir):
     woody.is_warping = False
     early = w.can_rottweiler_see_woody()
     for r in w.routines:
-        r.delay_start = 0.0                # the first StartAction happened
+        r.delay_start = 0.0
+        r.started = True                   # the first StartAction happened
     late = w.can_rottweiler_see_woody()
     ok &= check('gameinfo: detection needs CurrentAction (DelayStart)',
                 not early and late, (early, late))

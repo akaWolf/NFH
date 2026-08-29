@@ -808,3 +808,76 @@ explains; two of the explanations were port bugs.
   the plan's `activated Washbucket` timed out at 384 s. Fixed:
   `go_set_active` goes through `World.set_active` for an object that
   carries an Item.
+
+## Season 2 replays: 205, 213, 212
+
+| level | original | port |
+|---|---|---|
+| 205 routine steps 1…5, second lap | 7612, 8052, 10484, 10956, 11785 | 7614, 8056, 10487, 10960, 11790 |
+| 205 the trick, the catch | 10236, 11846 | 10239, 11845 |
+| 213 the catch (the plan's own early one) | 639 | 638 |
+
+212 parted at frame 1374 with the same clicks, and the cause is the
+bench, not the model: the runner's dodge onto the StatueHidden was tapped
+at 1221 and registered ten frames later, while Woody was on the stairs out
+of Zone02. The port's Woody topped the stairs at 1226 and turned for the
+statue at 1231; the original's reached the top at about 1230, dropped the
+click (a click during a transition is not taken, Woody.cs:637-671), kept
+walking to the Resin and was caught at 1374 when the neighbour came in
+for the Whip. Four frames of walk residual over four hundred, on the
+wrong side of a transition's last frame — a hazard of tapping mid-walk,
+noted, not fixed. The port replay ran on to the end of its clicks and its
+routine kept the original's step frames up to that point (1@447, 2@1048
+on both).
+
+## Level201, replayed: four port bugs behind ninety frames
+
+The first tutorial level's replay (the plan's 34 clicks tapped on the
+original, replayed on the port at the landed frames) opened with the
+neighbour ninety frames late and ended with a different game. Four
+things, each fixed per the original's code:
+
+1. **DelayStart under Frozen.** The routine ships Frozen (the LevelScript
+   holds the neighbour until its action 2); the port counted the pawn's
+   1.5 s DelayStart only after the unfreeze (`Routine.tick` returned on
+   `frozen` first), while Rottweiler.Update counts it from CanStart
+   regardless of the manager (Rottweiler.cs:916-932) and the unfreeze's
+   StartNextAction starts him at once. Freeze start 591 vs the original's
+   503; the routine's first step 1340 vs 1249. The detection gates that
+   used `delay_start > 0` as "no CurrentAction yet" (GameInfo.cs:189,
+   196) read a `started` flag now, set by StartAction and
+   StartUrgentAction.
+2. **The puddle's teleport, undone.** The WaterPuddle carries
+   `TeleportRottweilerOnUse` (−0.26, −0.32): RoutineActionUse.OnActionStarted
+   (cs:205-208) stands the neighbour at 3.46 the moment the use starts.
+   The port teleported too — and two frames later its deferred MoveToItem
+   snap (`_walk_on_path`'s head) read the new x as "passed the target"
+   and put him back on the walk target, 3.12. Every later walk started
+   0.34 to the left: the DeckRail action +24 frames, the MoveOnly walk
+   +51, and the Hold's `ActiveActionIndex = 1` found him still walking
+   instead of parked and frozen — the port's neighbour restarted his loop
+   at 3690 with the Buffet, the original's waited frozen until the
+   script's step 5 (3886). A teleporting use now cancels the pending snap.
+3. **The prime leg's teleport.** RottweilerPrime and RottweilerUnprime
+   return true (Item.cs:1356, 1370), so the same teleport applies to the
+   toggle-prime legs; the port's prime path returned before it (4.32 on
+   the second visit instead of 3.46).
+4. **Woody.Freeze pauses the walk.** Freeze is `Frozen = true` plus
+   `PauseMovement()` (Woody.cs:993-997); the port only set the flag, so a
+   frozen Woody finished his walk (to the click's 4.02) while the
+   original's stopped at the foot of the stairs (5.12) — and every later
+   click started from a different spot. `Pawn.freeze` / `unfreeze` now
+   do both, at all fourteen sites.
+
+After all four the replay agrees through both tutorial laps and beyond:
+freeze windows (501, 3060) and (3888, 5354) against (503, 3058) and
+(3889, 5355), script steps within two frames, the routine's twelve steps
+within two, the puddle's payout 4704 against 4702, and Woody's position
+frame for frame — the frozen stop at the foot of the stairs, the vanity
+bag, the tool box, the buffet, the second soap chest — until 9290. The
+split at 9358 is the replay's: the puddle click landed during the empty
+chest's take animation, was stored by both, and was replayed against a
+camera that had gone back to Woody on the original (a floor point, no
+walk) and against the framed item on the port (a walk up the stairs into
+the parked neighbour, caught at 9554). A tap while a blocking animation
+runs is the same hazard as a tap mid-walk.

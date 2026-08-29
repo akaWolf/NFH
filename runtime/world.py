@@ -676,6 +676,20 @@ class Pawn:
         """Pawn.IsPawnAtZoneY"""
         return abs(self.sprite.y - self.floor_y()) < 0.1
 
+    def freeze(self):
+        """Woody.Freeze (Woody.cs:993-997): Frozen — CheckMouseClick drops
+        the clicks (cs:637) — and PauseMovement, so a walk in progress
+        stops where it is (L201's second tutorial freeze caught Woody at
+        the foot of the stairs, 5.12, on the original; the port walked on
+        to the click's 4.02)"""
+        self.frozen = True
+        self.movement_paused = True
+
+    def unfreeze(self):
+        """Woody.UnFreeze (Woody.cs:999-1003): Frozen off, UnPauseMovement"""
+        self.frozen = False
+        self.movement_paused = False
+
     def door_target(self, door):
         """Item.GetTargetLocation (Item.cs:2010-2050): transform +
         DeltaLocation + the per-pawn door delta"""
@@ -2001,6 +2015,7 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
+        self.started = False             # ActionManager.CurrentAction != null
         self.on_use = None
         self.log = []
         self._pending = None
@@ -2353,6 +2368,7 @@ class Routine:
             olga.olga_aux_anim.infinite = True
 
     def _start_action(self, start_next=False):
+        self.started = True              # StartAction: CurrentAction = ...
         it = self.item
         a = self.action
         if start_next:
@@ -2588,6 +2604,15 @@ class Routine:
                 if a.get('hide_owner'):
                     self.pawn.set_hidden(True)   # cs:213-216
                 self._after_use_side_effects(a, it)
+                # RottweilerPrime / RottweilerUnprime return true (Item.cs:
+                # 1356, 1359-1370), so RoutineActionUse.OnActionStarted's
+                # teleport (cs:205-208) applies to the prime legs too —
+                # L201's puddle stands the neighbour at 3.46 on every visit
+                if it.teleport_rott_on_use:
+                    self.pawn.sprite.x = it.x + it.rott_teleport_offset[0]
+                    self.pawn.sprite.y = it.y + it.rott_teleport_offset[1]
+                    self.pawn.pos_snap = True
+                    self.pawn._item_snap = None
                 if seq:
                     self.pawn.anim.play_sequence(seq, on_end=self._finish)
                 else:
@@ -2755,6 +2780,12 @@ class Routine:
             self.pawn.sprite.x = it.x + it.rott_teleport_offset[0]
             self.pawn.sprite.y = it.y + it.rott_teleport_offset[1]
             self.pawn.pos_snap = True
+            # the walk's deferred MoveToItem snap (_walk_on_path's head) would
+            # read the teleported x as "passed the target" and put him back
+            # on the walk target two frames later; the original holds the
+            # teleported stand for the whole use (L201's WaterPuddle: 3.46
+            # through both uses, not 3.12 / 4.32)
+            self.pawn._item_snap = None
         if it.set_olga_x_on_use and self.role == 'Olga':
             self.pawn.sprite.x = it.x
             self.pawn.pos_snap = True
@@ -3575,6 +3606,7 @@ class Routine:
         Pawn.cs:444-448) — SurpriseActionFar and ToiletAction serialize it,
         the AlarmAction and the Return leg do not, Grab/UseFixingItem do on
         L110/L113 only."""
+        self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
             # ActionManager.StartUrgentAction fires the Mother event
@@ -4422,15 +4454,20 @@ class Routine:
         return True
 
     def tick(self, dt):
-        if self.frozen:
-            return
         # the 1.5 s DelayStart before the first action (Rottweiler.cs:153,
         # 916-932; Mother.cs:18, Olga.cs:8) — the intro gate (CanStart) is
-        # immediate here since the title cards are not modelled
+        # immediate here since the title cards are not modelled. It counts
+        # on the pawn, not the manager: a routine that ships Frozen (L201's
+        # LevelScript holds the neighbour until its action 2) has spent it
+        # long before the unfreeze, and StartFirstAction under Frozen is a
+        # no-op (ActionManager.cs:106) — the Unfreeze's StartNextAction is
+        # what starts him, at once
         if self.delay_start > 0.0:
             self.delay_start -= dt
             if self.delay_start > 0.0:
                 return
+        if self.frozen:
+            return
         # ActionManager.OlgaActions (ActionManager.cs:501-509): the one-shot
         # OlgaWCUse infinite release
         w = self.pawn.world
@@ -4566,7 +4603,7 @@ class DexterityState:
         self.item_rect = [sx - iw / 1.2 + ia.get('x', 0.0),
                           sy - ih * 2.5 + ia.get('y', 0.0), iw, ih]
         if w.woody is not None:
-            w.woody.frozen = True                  # Woody.Freeze
+            w.woody.freeze()                  # Woody.Freeze
             w.woody.movement_paused = True
         if self.spec['hide_object'] and self.item is not None:
             w.set_object_hidden(self.item, True)
@@ -4689,7 +4726,7 @@ class DexterityState:
         self.enabled = False
         self.wrong = False
         if w.woody is not None:
-            w.woody.frozen = False                 # Woody.UnFreeze
+            w.woody.unfreeze()                 # Woody.UnFreeze
             w.woody.movement_paused = False
         it = self.item
         if it is not None and (it.hide_in_dexterity or self.spec['hide_object']):
@@ -7745,7 +7782,7 @@ class World:
         # never nulled again — so no detection during the 1.5 s DelayStart,
         # nor for a manager that never starts (no actions / frozen at start)
         routine = next((r for r in self.routines if r.pawn is rott), None)
-        if routine is None or not routine.actions or routine.delay_start > 0.0:
+        if routine is None or not routine.actions or not routine.started:
             return False
         if not self._detect_common(rott):
             return False
@@ -7769,7 +7806,7 @@ class World:
             return False
         # ActionManager.CurrentAction != null (GameInfo.cs:196), as above
         routine = next((r for r in self.routines if r.pawn is mother), None)
-        if routine is None or not routine.actions or routine.delay_start > 0.0:
+        if routine is None or not routine.actions or not routine.started:
             return False
         # Mother.CanSeeWoody defers to the primary behavior (Mother.cs:103-106)
         if mother.behaviors and not mother.behaviors[0].can_see_woody():

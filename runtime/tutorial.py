@@ -625,12 +625,12 @@ class TutorialCameraNFH2(CameraScriptBase):
                 if wp is not None:
                     wp.final_normal = (-0.6, wp.final_normal[1])
                 if woody is not None:
-                    woody.frozen = True             # Woody.Freeze
+                    woody.freeze()             # Woody.Freeze
                 self.state = 'Moving'
         elif self.state == 'Moving':
             if r is not None and r.index == 5:
                 if woody is not None:
-                    woody.frozen = False
+                    woody.unfreeze()
                 self.snap_woody()
                 if ls is not None:
                     ls.complete_current_action()
@@ -651,7 +651,7 @@ class TutorialCameraNFH2(CameraScriptBase):
             self._set_locks(left=True, right=True)
             if self.rott_moving() and r is not None and r.index == 2:
                 if woody is not None:
-                    woody.frozen = True
+                    woody.freeze()
                 self.add_action(5)
                 self.state = 'Hold3'
         elif self.state == 'Hold3':
@@ -663,7 +663,7 @@ class TutorialCameraNFH2(CameraScriptBase):
             if r is not None and r.index == 5:
                 r.index = -1
                 if woody is not None:
-                    woody.frozen = False
+                    woody.unfreeze()
                 self.snap_woody()
                 if ls is not None:
                     ls.complete_current_action()
@@ -674,14 +674,14 @@ class TutorialCameraNFH2(CameraScriptBase):
                     and ls is not None and ls.action_index == 10:
                 self.remove_action(5)
                 if woody is not None:
-                    woody.frozen = True
+                    woody.freeze()
                 self.add_action(2)
                 self.state = 'TableTrick2'
         elif self.state == 'TableTrick2':
             self._set_locks(left=False, right=False, up=False)
             if r is not None and r.index == 2:
                 if woody is not None:
-                    woody.frozen = False
+                    woody.unfreeze()
                 if wp is not None:
                     wp.use_once = False
                     wp.primed = True
@@ -695,7 +695,7 @@ class TutorialCameraNFH2(CameraScriptBase):
                     and rail.tricked and self.rott_moving() \
                     and ls is not None and ls.action_index == 15:
                 if woody is not None:
-                    woody.frozen = True
+                    woody.freeze()
                 if wp is not None:
                     wp.use_once = True
                 self.remove_action(2)
@@ -709,7 +709,7 @@ class TutorialCameraNFH2(CameraScriptBase):
         elif self.state == 'End1':
             self._set_locks(left=False, right=False, up=False, down=False)
             if woody is not None:
-                woody.frozen = False
+                woody.unfreeze()
             if wp is not None:
                 wp.primed = True
                 wp.dx, wp.dy = -wp.dx, -wp.dy
@@ -777,12 +777,12 @@ class TutorialCameraNFH2206(CameraScriptBase):
         throw = self.item('DeckChairThrow')
         if self.state == 'Start':
             if woody is not None:
-                woody.frozen = True
+                woody.freeze()
             self.state = 'Moving'
         elif self.state == 'Moving':
             if r is not None and r.index == 4:
                 if woody is not None:
-                    woody.frozen = False
+                    woody.unfreeze()
                 self.snap_woody()
                 if ls is not None:
                     ls.complete_current_action()
@@ -791,7 +791,7 @@ class TutorialCameraNFH2206(CameraScriptBase):
             self._set_locks(up=True, down=True)
             if ls is not None and ls.action_index == 4:
                 if woody is not None:
-                    woody.frozen = True
+                    woody.freeze()
                 if throw is not None:
                     throw.use_anim['Mother'] = ['MotherGetUpPillow',
                                                 'MotherHoldPillow',
@@ -852,7 +852,7 @@ class TutorialCameraNFH2206(CameraScriptBase):
                 if seq:
                     mp.anim.play_sequence(seq)
             if woody is not None:
-                woody.frozen = False
+                woody.unfreeze()
             if ls is not None:
                 ls.deactivate()
             self.state = 'End'
