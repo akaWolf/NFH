@@ -721,3 +721,26 @@ door order on most levels (the original's is each zone's child doors as
 GetComponentsInChildren walks them), and it does not bear on the route:
 every neighbour a zone relaxes gets that zone as Previous, whichever
 comes first.
+
+## What the bench itself does under a replay
+
+Two things end replays before their clicks do. The game dies under frida
+on a managed null dereference: Mono raises NullReferenceException through
+SIGSEGV, frida's handler runs first and faults inside frida-agent (the
+tombstone's first frame), and the process is gone — a tap replay of
+Level201 lost its session a minute in, the injected replays of Level213
+and Level205 stopped at frames 1162 and 8827 with no click near. And the
+emulator itself goes: three boots on the afternoon of 2026-09-03 ended
+within minutes with a clean shutdown in the emulator log, one after an
+hour and nine minutes under load with crashpad's handler in the log. The
+emulator is started in its own systemd user scope now — the harness's
+background-task kills reach everything in the session's cgroup — and a
+run that dies is run again; the sweep's second attempt covers a death
+between levels, not one inside a level. Mono's own way out of the
+signal-based null check, `MONO_DEBUG=explicit-null-checks`, cannot be
+handed to the game: the `wrap.<package>` property is the only door to an
+app's environment on the emulator, and with it set the app never starts.
+The injected replays (inject.js) lost the game sooner than the tapped
+ones — Level213 at frame 1162, Level205 at 8827, against 14,000 to 66,000
+frames of tapped replays — so the long replays run through adb taps, the
+port replaying the frames the taps landed on.

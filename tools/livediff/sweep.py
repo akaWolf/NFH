@@ -102,8 +102,11 @@ def _relevel(level, adb=ADB_HOST):
     em = os.environ.get('NFH_EM', 'bash /tmp/emulator.sh')
     season = '1' if season_of(level) == 's1' else '2'
     cmd = 'NFH_SEASON=%s %s level' % (season, em)
-    subprocess.run(['ssh', '-o', 'BatchMode=yes', adb, cmd] if adb else ['bash', '-c', cmd],
-                   capture_output=True, text=True, timeout=200)
+    try:
+        subprocess.run(['ssh', '-o', 'BatchMode=yes', adb, cmd] if adb else ['bash', '-c', cmd],
+                       capture_output=True, text=True, timeout=200)
+    except subprocess.TimeoutExpired:      # the wrapper hung on a dead emulator
+        print('%-10s relevel: the wrapper timed out' % level, flush=True)
 
 
 def record_clicks_live(level, adb=ADB_HOST, retry=True):
