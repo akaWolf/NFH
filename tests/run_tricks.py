@@ -16,6 +16,8 @@ Plan commands, one per line ('#' comments):
                              the held Type's source item primes on it)
     walk <x> <y>             click the world point, wait until Woody
                              stands there (a tutorial's location action)
+    activated <Item>         park safe until the item's GameObject is
+                             active (it ships inactive, an event activates it)
     tutorial <n>             park safe until the App's LevelScript has
                              completed its action n (the unlocks / the
                              neighbour's unfreeze); `tutorial end` — the
@@ -2167,6 +2169,27 @@ class Driver(Recorder):
         return ok, None if ok else 'state changed: %s -> %s' % (before,
                                                                 after)
 
+    def leg_activated(self, name):
+        """`activated <Item>`: park safe until the item's GameObject is
+        active — an item that ships inactive and a game event activates
+        (SetActive(true)): Level206's Rabbit on the LaunchPad's Fix
+        (Item.cs:2626-2631), Level212's coins on the bull's ShowObjects
+        (cs:2662-2667), Level214's dead bird two seconds after the shot
+        (BirdMovementBehavior.cs:149-156). A take before that clicks air."""
+        it = self.item(name)
+        self._leg_zone = None
+        self._leg_item = None
+        self._leg_x = 0.0
+        deadline = self.t + AWAIT_TIMEOUT
+        while self.t < deadline:
+            if it.active:
+                return True, None
+            if self.world.game.got_caught or self.world.game.ending:
+                return False, 'caught before %s activated' % name
+            self._dodge_tick()
+            self.step_world()
+        return False, '%s never activated' % name
+
     def leg_walk(self, x, y):
         """`walk <x> <y>`: click the world point and wait for Woody to
         stand there — a tutorial's location action (LevelScriptAction's
@@ -2411,7 +2434,8 @@ class Driver(Recorder):
                   'reclick': self.leg_reclick, 'park': self.leg_park,
                   'hide': self.leg_hide, 'icon': self.leg_icon,
                   'tutorial': self.leg_tutorial,
-                  'walk': self.leg_walk}.get(op)
+                  'walk': self.leg_walk,
+                  'activated': self.leg_activated}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,
                                      'why': 'unknown op'})

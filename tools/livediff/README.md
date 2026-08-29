@@ -711,3 +711,13 @@ WaterSkiisAux and RocketsBackground, 206's Rabbit, 207's MopedPool,
 Wasp, 214's Washbucket, HatchFish, Cloth, BirdDead and CaptainWheel —
 the replay's tap.py could never resolve 206's Rabbit before its
 activation for the same reason.
+
+The dump, one row per level loaded (zones.js sends a row whenever the
+GameInfo instance changes — the first Update after the script loads still
+belongs to the level the game was in): on every one of the 27 levels it
+reached, ZoneController.Zones is the scene file's order, Zone01…Zone09
+as their GameObjects come. Zone.Neighbors' order differs from the port's
+door order on most levels (the original's is each zone's child doors as
+GetComponentsInChildren walks them), and it does not bear on the route:
+every neighbour a zone relaxes gets that zone as Previous, whichever
+comes first.
