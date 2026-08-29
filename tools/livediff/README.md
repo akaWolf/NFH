@@ -744,3 +744,67 @@ The injected replays (inject.js) lost the game sooner than the tapped
 ones — Level213 at frame 1162, Level205 at 8827, against 14,000 to 66,000
 frames of tapped replays — so the long replays run through adb taps, the
 port replaying the frames the taps landed on.
+
+## Level206, replayed
+
+The plan's clicks — the toy box's eleven tries through the freeze, the
+cushion, the sports bag, the hide in the pipe at frame 2922, the harpoon,
+the driver's dodges — tapped on the original and clicked on the port at
+the frames the taps landed, 46,906 frames of level:
+
+| what | original | port |
+|---|---|---|
+| LevelScript actions 1, 2, 3, 4 | 1725, 1937, 2581, 11822 | 1727, 1931, 2581, 11822 |
+| the neighbour's routine, first loop 1…14 | 12479 … 18514 | 12480 … 18527 |
+| the routine's third loop, 4…11 | 24750 … 27870 | 24775 … 27902 |
+| the cushion pays | 13706 | 13710 |
+| Woody caught | 28176 | 28232 |
+
+The routine drifts by a frame every fifteen seconds or so — the use-end
+residual the opening sweep had already measured on 107 and 109 — and
+nothing else parts. The plan's own failures on 206 are the plan's: the
+Rabbit ships inactive and the plan asked for it before the launch pad's
+Fix could activate it.
+
+## What the Season-2 plans taught
+
+The plan runs on 206, 212 and 214 failed on legs the original's code
+explains; two of the explanations were port bugs.
+
+- **206, the rabbit.** `IT2_Rabbit` is inventory: `SearchItem.InternalUse`
+  hands over every entry of `InventoryItems` (SearchItem.cs:179,
+  `Woody.AddInventory`), and the FleaBlanket's list is
+  `[IT2_Fleablanket, IT2_Rabbit]`. The Rabbit *item* ships inactive and is
+  the rabbit's return for a second launch — `Item.RabbitBehavior`
+  (cs:2626-2631) activates it in the LaunchPad's Fix while the pad is
+  Tricked. The plan asked for the item before the pad had ever been
+  tricked. Reordered: 17/17, the pad and the harpoon pay together at
+  224 s, the Rabbit item activates at 242 s.
+- **212, the rubies and the coin.** `Item.OnTrickDone` pays an item once
+  (`AlreadyTricked`, cs:2148-2152); the throne pair's second coin is the
+  linked branch (cs:2123-2146) and wants both halves armed for one sit.
+  Woody's ruby on AztecThrone moves the click box to AztecThrone2
+  (`ThroneBehavior212`, cs:2450-2469) and his Fix moves it back
+  (`FixThroneBehavior`, cs:2471-2477) — so the second ruby goes on before
+  he sits, and the second ruby is the WhipStonePlate's: a dexterity
+  SearchItem opened with the crowbar (`DexterityUnlocker IT2_Crowbar`,
+  `InventoryItems [IT2_Ruby, IT2_Coin]`, and the `WhipStonePlate` name-hack
+  in `CanWoodyUse`, cs:1438, lets the round open with a ruby in hand). The
+  BoatCoinSlot is nobody's routine item: its coin pays through the
+  ParrotLedge's linked visit (`LinkedItemTrick 275`), so the corn waits for
+  the coin. The RubyThrone (`ActivateItemAfterFix`) is only the third ruby.
+- **214, the fish (port bug).** `Item.ShowObjects` (cs:2668) activates the
+  HatchFish only when the Hatch's `Dexterity` is set, and his first Fix is
+  what sets it (`HatchFixBehavior`, cs:2560): the fish come out on his
+  *second* fall, after Woody's shards round (`DexterityUnlocker
+  IT2_Shards`). The port activated them at the first angry — 88 s into the
+  run, a lap early. Fixed: `_show_objects` gates on `item.dexterity`.
+- **214, the bucket and the cloth (port bug).** `WashbucketBehavior`
+  activates the Washbucket on Olga's `OlgaShipShowerSwiffer` pose and the
+  Cloth on `OlgaShipShowerIdle` (cs:22-37, `GameObject.SetActive`). The
+  port's `Behavior.go_set_active` only unhid the sprite: Olga reached the
+  shower at 336 s and played the poses at 341/342 s, the bucket appeared,
+  and its click box stayed off — `Item.active`/`clickable` never flipped,
+  the plan's `activated Washbucket` timed out at 384 s. Fixed:
+  `go_set_active` goes through `World.set_active` for an object that
+  carries an Item.

@@ -5300,9 +5300,10 @@ class World:
                 and rott is not None and not rott.show_coins:
             rott.show_coins = True
             self.set_active(linked, True)
-        if item.name == 'Hatch' and linked is not None:
-            # the Dexterity arm rides the unported dexterity flow; the
-            # LinkedItemTrick activation is the live half
+        if item.name == 'Hatch' and item.dexterity and linked is not None:
+            # cs:2668 wants Dexterity, which his first Fix sets
+            # (HatchFixBehavior, cs:2560): the fish come out on his second
+            # fall, after Woody's shards round — not on the carpet's
             item.item_anim_when_angry = 'N2TrickItemIdleFuckedup'
             self.set_active(linked, True)
 

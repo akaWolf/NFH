@@ -96,10 +96,17 @@ class Behavior:
             self.world.set_active(it, active)
 
     def go_set_active(self, field, active):
-        """GameObject.SetActive on a bare visual object (a sound or overlay
-        GameObject): toggles its sprite, else its backdrop quad by name"""
+        """GameObject.SetActive: an object carrying an Item goes through
+        World.set_active — the renderer, the click box and the active flag
+        together (the Washbucket and the Cloth of L214 are items Woody must
+        click); a bare visual object toggles its sprite, else its backdrop
+        quad by name"""
         go = (self.d.get(field) or {}).get('path')
         if go is None:
+            return
+        it = next((x for x in self.level.items.values() if x.go == go), None)
+        if it is not None:
+            self.world.set_active(it, active)
             return
         for s in self.level.sprites:
             if s.go == go:
