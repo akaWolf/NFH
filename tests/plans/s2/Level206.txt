@@ -14,13 +14,23 @@
 # DeckChair, Weights, DynamiteBox, Harpoon + LaunchPad linked (Item.OnTrickDone
 # pays both, and the ExtraCoin206Calculation name-hack a third,
 # Item.cs:2409-2416 from TrickItem.PlayAnimation cs:813).
-take ToyBox IT2_Fartbag
-usewith! Pillows IT2_Fartbag      # action [2] at ~18 s (urgent run): ActivateItemTrick -> DeckChair (action [3])
+# The level is a tutorial (TutorialScriptCameraNFH2206 + the LevelScript):
+# Woody is frozen until the neighbour's fourth in-game action (his first
+# lap: DogFifi, DeckChair, Pillows, DeckChair, then the park at ~32 s,
+# frozen), the cushion goes on the pillows while he is parked, and the
+# LevelScript's action 3 — Woody hides in the Pipe — starts the Mother's
+# pillow sequence (Hold -> Moving2 -> Moving3 -> WaitForMotherCall,
+# cs:96-130) that unfreezes him into the loop from [4]; without the hide
+# he stays parked by the dog for good (the original's replay parked him
+# for nine minutes until the Pipe click).
+take ToyBox IT2_Fartbag           # LevelScript action 1 (the take waits out the freeze, ~29 s)
+usewith! Pillows IT2_Fartbag      # action 2: ActivateItemTrick -> DeckChair (action [3])
 take SportsBag IT2_Rubber
+hide Pipe                         # action 3: the Mother's sequence, the neighbour resumes at [4]
+await DeckChair 0                 # the cushion pays on his DeckChair sit (Item.OnTrickDone credits the DeckChair, the linked item), ~37 s after the hide on the original
 usewith Harpoon IT2_Rubber        # Neutral, RottweilerUseTogglesPrime: pays through the LaunchPad's harpoonAux hand-off
 take Rabbit IT2_Rabbit            # KeepFull, TakeItemMultipleTimes
 usewith LaunchPad IT2_Rabbit      # RequireUnprime toggles (prime [5], use [7], unprime [9]); DependsOn/LinkedItemTrick Harpoon
-await Pillows 0
 await Harpoon 0
 await LaunchPad 0
 unlock DentureAdhesive            # Dexterity, DexterityUnlocker IT_NONE (Zone04, the Mother's zone)
@@ -30,4 +40,3 @@ take FleaBlanket IT2_Fleablanket  # TrickAfterWoodyUse; hands the rabbit too
 usewith Weights IT2_Fleablanket   # action [11]
 await Weights 0
 await DynamiteBox 0
-await DeckChair 0
