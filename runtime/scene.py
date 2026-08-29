@@ -182,7 +182,7 @@ class Zone:
 
 class Item:
     """Anything the neighbour's routine can act on, or Woody can trick."""
-    __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy',
+    __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy', 'active',
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone',
@@ -506,6 +506,7 @@ class Item:
         # to its puddle (TrickItem.cs:1240-1251)
         self.only_once_water_puddle = False
         self.clickable = True                  # Collider.enabled (the Pipe hack)
+        self.active = True                     # the GameObject's active state (SetActive)
         self.prime_item_aux = False            # Item.PrimeItemAux (DogFifi)
         self.double_priming_item = bool(d.get('DoublePrimingItem'))
         self.second_required = d.get('SecondRequiredInventory')
@@ -1560,6 +1561,13 @@ class Level:
                   p[0], p[1], zgo,
                   dl.get('x', 0.0), dl.get('y', 0.0), d)
         it.go = go
+        # a GameObject inactive in the scene has no collider in Physics
+        # until SetActive(true) (Level212's ClosedMine under ClosedMine1,
+        # Level206's Rabbit, Level214's HatchFish): its sprite is skipped
+        # already (_add_sprite), its click box goes with it
+        it.active = self._active(go)
+        if not it.active:
+            it.clickable = False
         self.items[pid] = it
 
     def _link_item_sprites(self):
@@ -1598,7 +1606,8 @@ class Level:
                 # Physics.Raycast never hits them; the enable sites are the
                 # ported ones (Item.cs:1326-1333, TrickItem.cs:599-606, 1154-1157,
                 # 2455-2476, the behaviors' collider toggles)
-                it.clickable = bool(b.get('enabled', True))
+                # ...and an inactive GameObject's collider is not in Physics at all
+                it.clickable = bool(b.get('enabled', True)) and it.active
         for d in self.doors:
             d.sprite = find(self._go_of(self._o(d.pid)))
 

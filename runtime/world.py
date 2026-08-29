@@ -5917,6 +5917,7 @@ class World:
         if q is not None:
             q['active'] = active
         item.clickable = active
+        item.active = active
 
     def set_go_renderer(self, go, enabled):
         """Renderer.enabled on a bare object: its backdrop quad or sprite"""

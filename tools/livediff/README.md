@@ -692,3 +692,22 @@ came out through Zone04. The plan suite moved with it: Level208's plan
 passes now, Level212's loses three legs to a route its author had not
 seen — a plan to re-time, once its replay says the original walks it the
 same way.
+
+## An inactive object's click box
+
+Level212's plan lost its crowbar leg under the route change: the runner
+clicked the mine's collider centre and the port answered with NoNo. Two
+items sit there with the same box — ClosedMine1, the shut mine, and
+ClosedMine, the open one that ClosedMine1's priming activates — and the
+open one ships with its GameObject inactive. The port skipped the
+inactive object's sprite and kept its collider, so the hit test's tie
+went to the first in scene order, the open mine, and the crowbar was
+refused. An inactive GameObject has no collider in Physics: the loader
+now carries the object's active state on the item (`Item.active`), the
+box is off until SetActive(true) (`set_active` turns both on), and the
+click lands on the shut mine. Fourteen items ship inactive: Level205's
+WaterSkiisAux and RocketsBackground, 206's Rabbit, 207's MopedPool,
+212's MechanicalBullCoins, ClosedMine, RubyThrone and ParrotCrap, 213's
+Wasp, 214's Washbucket, HatchFish, Cloth, BirdDead and CaptainWheel —
+the replay's tap.py could never resolve 206's Rabbit before its
+activation for the same reason.
