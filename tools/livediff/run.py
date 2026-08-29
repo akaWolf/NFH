@@ -100,6 +100,8 @@ def main(argv):
                 'locked': p.get('locked'),
                 'frozen': p.get('frozen'),
                 'sneak': p.get('sneak'),
+                'msleep': p.get('msleep'),      # Mother.IsSleeping (the sleep bars)
+                'rsleep': p.get('rsleep'),      # Rottweiler.IsSleeping
                 'rott': p.get('rott'),
                 'mother': p.get('mother'),
                 'rott_action': p.get('rott_action'),
