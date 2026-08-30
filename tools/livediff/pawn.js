@@ -42,7 +42,15 @@ const F = {};
  'UseDoorAtOnce', 'AtDoorLocation', 'InUrgentMove', 'MoveLocationChanged', 'WasMovingLeft',
  'Speed', 'SneakFlag', 'AnimController'].forEach(n => { F[n] = offOf(Pawn, n); });
 // AnimState is a property of AnimationControllerBase<T> (cs:59): its getter
-const getAnimState = methodFrom(PAC, S('get_AnimState'), 0);
+// lives on the generic parent, so the lookup walks up from the controller
+// class the way offOf does for fields (a subclass lookup returned null and
+// every row read anim: null)
+function methodUp(klass, name, argc) {
+    let k = klass;
+    while (!k.isNull()) { const m = methodFrom(k, S(name), argc); if (!m.isNull()) return m; k = parentOf(k); }
+    return NULL;
+}
+const getAnimState = methodUp(PAC, 'get_AnimState', 0);
 const animOff = getAnimState.isNull() ? -1 : 0;
 send({ off: F, anim: animOff, role: who, pawnOff: pawnOff });
 function call0(meth, self) { const e = Memory.alloc(4); e.writePointer(NULL); const r = invoke(meth, self, NULL, e); return e.readPointer().isNull() ? r : NULL; }
