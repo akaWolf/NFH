@@ -179,7 +179,11 @@ class Driver(Recorder):
         out = []
         for role in ('Rottweiler', 'Mother'):
             p = self.world.pawns.get(role)
-            if p is not None and not p.ignore_woody:
+            if p is not None:
+                # an IgnoreWoodyWhenUse use (Level205's WaterSkiis,
+                # Item.cs:828-831) blinds him only until the use ends and
+                # OnUseEnded clears the flag — a catcher again where he
+                # stands; eta_to_zone reads the use's remainder for him
                 out.append(p)
         return out
 
@@ -390,8 +394,12 @@ class Driver(Recorder):
             if dwell is None or dwell >= after:
                 # a sleeping catcher (IsSleeping gates both catch
                 # predicates, GameInfo.cs:189/198) is harmless until his
-                # bar's window ends
-                return self.sleep_left(p) if p.is_sleeping else 0.0
+                # bar's window ends; an ignoring one until his use ends
+                if p.is_sleeping:
+                    return self.sleep_left(p)
+                if p.ignore_woody:
+                    return self._anim_left(p.anim)
+                return 0.0
             # else: gone before `after` — fall through to his return
         exit_door = getattr(p, '_exit_door', None)
         if p.is_warping and exit_door is not None:

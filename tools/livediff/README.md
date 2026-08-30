@@ -793,6 +793,12 @@ explains; two of the explanations were port bugs.
   BoatCoinSlot is nobody's routine item: its coin pays through the
   ParrotLedge's linked visit (`LinkedItemTrick 275`), so the corn waits for
   the coin. The RubyThrone (`ActivateItemAfterFix`) is only the third ruby.
+- **205, the skier who ignores Woody (runner).** The WaterSkiis carry
+  `IgnoreWoodyWhenUse` (Item.cs:828-831): on the water he cannot catch,
+  and the runner's catcher list dropped him — Woody walked in for the
+  banger, and the frame his use ended and OnUseEnded cleared the flag he
+  turned and caught him. He counts now, at his use's remaining time;
+  19/19.
 - **214, the fish (port bug).** `Item.ShowObjects` (cs:2668) activates the
   HatchFish only when the Hatch's `Dexterity` is set, and his first Fix is
   what sets it (`HatchFixBehavior`, cs:2560): the fish come out on his

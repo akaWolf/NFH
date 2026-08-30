@@ -6,10 +6,10 @@
 # olga.OnItemAnimationSequenceEnded, TrickItem.cs:964-975 -> Olga.cs:154-158,
 # the second release — modelled now, the laps repeat every ~70 s). The plan
 # is ordered by lap 1 (Chef at ~47 s, Rockets at ~59 s, SandSculpture at
-# ~64 s). Open: the LionStatue leg walks into Zone01 while he finishes the
-# WaterSkiis there and is caught as he turns (the runner's dwell estimate
-# reads his use's end a second late) — 10 of 12 legs until the runner
-# learns that margin.
+# ~64 s). The WaterSkiis use carries IgnoreWoodyWhenUse (Item.cs:828-831):
+# he is blind on the water and a catcher again the frame OnUseEnded clears
+# the flag — the runner counts him by his use's remainder (eta_to_zone),
+# not as absent, so the banger/statue/glasses raid waits for his Chef walk.
 # Dead data: Fence1/Fence2, BridgeRailFront, WaterSkiisAux,
 # RocketsBackground, OlgaKid, OlgaMatBeach as a trick (colliders off; no
 # crayfish source), Chef's own click (IT_Fuel — it pays through Eals'
