@@ -44,7 +44,6 @@ usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is
 usewith Pistol IT2_Ammo                # Zone03 (PistolFire; PawnToAffectWhenTricked Mother; FixItemTrick DeckChairMother)
 activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156)
 take BirdDead IT2_Key                  # Zone04
-await Pistol 0                         # his pistol play (Zone03, 32-60 of the lap) puts the Mother to sleep and sends him on to the Hatch: the cabin raid fits between his exit and his return through Zone03 to the swapped CaptainWheel (~50 s)
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
 take Handbag IT2_Pills                 # Zone03 — the Mother's first IsSleeping window, the neighbour away
 take Mat IT2_Code                      # Zone03
@@ -54,3 +53,4 @@ await Shower 0
 await Bouquet 0
 await Glass 0
 await CaptainWheel 0
+await Pistol 0
