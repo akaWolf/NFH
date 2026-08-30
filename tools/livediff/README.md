@@ -987,3 +987,15 @@ bar-less MotherSleepLoop seen in the 214 plan run is ForceSleep's tricked
 arm (cs:79-82: MotherUseTrickedAnimation, no stamp), reached only when
 his play lands while she already sleeps; which stamp the original's bar
 reads there is the part still unmeasured.
+
+A third run, with a poke tap after the arrival and a deck-chair hide:
+the first pistol tap armed the trick by itself (the ammo was gone when
+the second tap looked for it), the deck-chair taps left Woody standing
+at the chair's foot (5.1, 0.2) twice, and the neighbour's return caught
+him there at 6990, before his pistol play; her regular nap read
+3677–7154 again. The hide's refusal at the foot is the next thing to
+read (HideItem has no CanWoodyUse of its own; the base gates decide),
+and until it lands the tricked-arm nap stays unmeasured. On the port a
+click on the pistol from a standing Woody uses it at once (MakeTrick at
+the climb's top); the "stand at the top" of the plan runs is the click
+that lands mid-walk.
