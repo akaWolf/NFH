@@ -893,3 +893,38 @@ neighbour found him on the way and searched instead of grinding. A
 nearest item of the name. Replayed: routine steps 563/564, 1741/1743,
 3423/3423, 4400/4387, 5301/5287; the runner's dodge got Woody caught at
 5704 on the original and 5701 on the port.
+
+## Level214, replayed: the bench cannot play a dexterity round
+
+The plan's clicks (the carpet, the shards, the bouquet, the pistol, the
+cabin) tapped on the original and clicked on the port at the landed
+frames, 28,421 frames of level:
+
+| what | original | port |
+|---|---|---|
+| the neighbour's first lap 1…4 | 476, 1553, 2742, 3678 | 478, 1556, 2746, 3683 |
+| the carpet's payout (his first fall) | 5278 | 5284 |
+| the shards round (Woody frozen) | 6289–6410 | 6255–6454 |
+| second lap 1…4 | 6198, 8468, 9656, 10592 | 6205, 8532, 9721, 10658 |
+| Woody caught (the runner's dodges) | 17445 | 17515 |
+
+The lap-two drift of sixty-odd frames is the round's: the tap script
+cannot steer the dexterity cursor, so the original's round ran out in
+121 frames and the hatch stayed untricked, while the runner won the
+port's in 199. Everything the plan does after the fish — the bouquet,
+Olga's shower, the cloth, the glass, the bird — has no original to
+compare against from this bench; the pistol nap question (the Mother's
+tricked-arm MotherSleepLoop and her IsSleeping) is a separate two-click
+run.
+
+## Level206, replayed again with the reordered plan
+
+The reordered plan's clicks (the flea blanket before the harpoon and the
+pad), 18,072 frames: the neighbour's routine 1…13 of the second lap at
+9837 … 14941 on the original against 9838 … 14953 on the port, the
+cushion's payout 11064 against 11068. The flea blanket's take landed on
+neither side (Woody was still in the pipe; the tap and the click both
+un-hid him and went nowhere), so the rabbit never reached the pad on
+either, and the original's run ended at 15095 in the denture dexterity
+round the bench cannot steer. The pad-and-harpoon path is the port's
+plan run alone (17/17) until a replay lands the blanket.
