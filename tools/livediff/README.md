@@ -951,3 +951,27 @@ The port replays the same three clicks to the same end (caught 3226):
 the basement back door's box hides the trap's from the click ray on
 both, as the plan's geometry note said. The plan no longer asks for
 that coin.
+
+## Level214's pistol nap: not reached, but the regular nap measured
+
+Two short runs on the original (the ammo at 1500, the pistol with the
+ammo at 4000 and again at 4300, the deck chair at 5000): Woody walked to
+the pistol's foot (1.0, 0.5) and stood, twice, and to the deck chair's
+foot (5.1, 0.2) and stood — the first click on a walk-up item from a
+walk ends in a stand on the original exactly as the port's first click
+does (the runner's second click is what fires the port's use), and a tap
+that lands mid-walk is only a re-target. The Mother's IsSleeping flag
+(state.js reads it now) went up at 3681 and down at 7158 — her regular
+nap, 61.3 s to 119.3 s — against the port's bar window 61.5 s to
+119.3 s. The tricked-arm nap after his pistol play stays an open
+question; the plan's cabin raid (two legs) waits on it.
+
+## The injector, retired for now
+
+Three injected Drawer clicks on Level113: one stalled Woody at the
+drawer's foot with MovingUp set and no take (a tap takes), two killed
+the game thirteen frames into the walk. The injector mirrors
+Woody.CheckMouseClick including its second ProcessMoveInput when itemAux
+is a Door (cs:666-669); whatever it gets wrong there is not worth the
+chase while taps land and the pinned clock aligns them. Tap mode is the
+reference for every replay above.

@@ -18,6 +18,11 @@
 # Woody themselves (Zone03's DeckChair is a HideItem the await legs use when
 # its zone is clear) while the neighbour walks through to the swapped
 # CaptainControls (Zone05) and back to the Pistol.
+# Open: the cabin raid (CaptainDoor … CaptainWheel) fits the Mother's
+# regular nap only if it starts as he leaves Zone03; after his pistol play
+# the port's forced nap shows no bar (MotherSleepLoop, tricked arm) and the
+# runner's gate reads her as awake — 25 of 27 legs until the original's
+# tricked nap is measured (README, "Level214's pistol nap").
 # The fish: his first fall only arms the hatch's dexterity round
 # (HatchFixBehavior, Item.cs:2560); Item.ShowObjects (cs:2668) activates the
 # HatchFish on the second fall, after Woody's shards round.
