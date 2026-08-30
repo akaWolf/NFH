@@ -1005,3 +1005,24 @@ and until it lands the tricked-arm nap stays unmeasured. On the port a
 click on the pistol from a standing Woody uses it at once (MakeTrick at
 the climb's top); the "stand at the top" of the plan runs is the click
 that lands mid-walk.
+
+Fourth run, the deck chair alone (the ammo first, to be out of Zone02
+when he comes for the hatch): the tap at 4243 walked Woody the whole
+route, and at 4808 he stood at (5.04, 0.20), set ItemMove and MovingUp,
+climbed for twelve frames and played ChairIn at the same spot — hidden,
+exactly the port's ChairIn at (5.04, 0.20); the second tap at 5143
+played ChairOut. The hide is not refused at the foot: the third run's
+stand was something the pistol use left behind, which the fifth run
+(the pistol, then the chair, through his play) is meant to show.
+
+Sixth and seventh runs, the pistol then one deck-chair tap (a second
+tap is ChairOut — it un-hides him): hidden from 5907 on, Woody outlived
+his return, and his pistol play paid at 166.0 s. The Mother walked over
+to hit him (166–168 s), came back and sat at 177.7 s, and IsSleeping went
+up at 179.3 s and held to the run's end at 237.2 s — the port's headless
+probe had her sit at 177.7 s and sleep from 179.5 s to 237.5 s on the
+MotherExtraUse stamp. The forced nap after his play on an awake Mother
+matches to two tenths of a second. The one case still unmeasured is his
+play landing inside her regular nap (ForceSleep's tricked arm, no stamp,
+the bar-less loop of the plan run); the plan's raid-first order does not
+depend on it.
