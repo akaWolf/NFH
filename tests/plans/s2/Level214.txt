@@ -18,8 +18,12 @@
 # Woody themselves (Zone03's DeckChair is a HideItem the await legs use when
 # its zone is clear) while the neighbour walks through to the swapped
 # CaptainControls (Zone05) and back to the Pistol.
-# Open: the cabin raid (CaptainDoor … CaptainWheel) fits the Mother's
-# regular nap only if it starts as he leaves Zone03 — 25 of 27 legs. Her
+# The cabin raid (CaptainDoor … CaptainWheel) must be short and start as
+# the bird dies: the handbag and the mat come first (388 s, the nap's
+# top), the key at 396 s, the door at 402 s, the wheel at 419 s, and Woody
+# is out before she wakes at 431.6 s and he comes in at 444 s; the pistol
+# follows (425 s). With the pistol first the wheel came at 429.6 s and the
+# cabin was a trap. Her
 # forced nap after his play on an awake Mother is measured on the original
 # (sits 177.7 s, IsSleeping 179.3 s on, README "Level214's pistol nap") and
 # the port matches; his play landing inside her regular nap (the bar-less
@@ -42,16 +46,16 @@ usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (hi
 activated Cloth
 take Cloth IT2_Swiffer                 # the glass wants the swiffer
 usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
-usewith Pistol IT2_Ammo                # Zone03 (PistolFire; PawnToAffectWhenTricked Mother; FixItemTrick DeckChairMother)
-activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156)
+take Handbag IT2_Pills                # Zone03 at the top of the Mother's nap (373 s), before the bird dies: the raid itself must be short
+take Mat IT2_Code                   # Zone03, the same visit
+activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156): the key is ready long before the raid
 take BirdDead IT2_Key                  # Zone04
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
-take Handbag IT2_Pills                 # Zone03 — the Mother's first IsSleeping window, the neighbour away
-take Mat IT2_Code                      # Zone03
 usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
 usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the mug
+usewith Pistol IT2_Ammo        # after the raid: the same nap, and the trick has no deadline of its own
 await Shower 0
 await Bouquet 0
-await Glass 0
+# (no `await Glass`: Olga's glass never pays — OnTrickDone runs from the neighbour's angry alone (Rottweiler.cs:787); its trick is the bird's flight and the key. Six coins: the hatch twice, the bouquet, the shower, the wheel, the pistol.)
 await CaptainWheel 0
 await Pistol 0

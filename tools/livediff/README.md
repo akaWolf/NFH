@@ -1026,3 +1026,16 @@ matches to two tenths of a second. The one case still unmeasured is his
 play landing inside her regular nap (ForceSleep's tricked arm, no stamp,
 the bar-less loop of the plan run); the plan's raid-first order does not
 depend on it.
+
+## Level214's plan, whole
+
+27 of 27 with no restart once two things moved: the handbag and the mat
+are taken at the top of the Mother's nap (388 s) before the bird dies
+(390 s), so the cabin raid runs key 396 s, door 402 s, mug 406 s, wheel
+419 s and Woody is out of the cabin before she wakes (431.6 s) and the
+neighbour comes in for the swapped wheel (444 s); the pistol follows the
+raid (425 s) instead of preceding it. And `await Glass` is gone: Olga's
+glass pays no coin — OnTrickDone runs from the neighbour's angry alone
+(Rottweiler.cs:787) — its trick is the bird's flight and the key. Six
+coins, the level's TotalTricksCount: the hatch twice, the bouquet, the
+shower, the wheel, the pistol.
