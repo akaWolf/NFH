@@ -1039,3 +1039,44 @@ glass pays no coin — OnTrickDone runs from the neighbour's angry alone
 (Rottweiler.cs:787) — its trick is the bird's flight and the key. Six
 coins, the level's TotalTricksCount: the hatch twice, the bouquet, the
 shower, the wheel, the pistol.
+
+## The Mother's forced nap after a trick, and the one live gap
+
+The port's MotherSleepBehaviour has two forced-sleep arms, read against
+the decompiled original line for line (MotherSleepBehaviour.cs:73-88):
+ForceSleep plays the untricked MotherSecondUse (the stamped window the
+bar reads) or, once the item is Tricked, the raw MotherUseTrickedAnimation
+with no stamp; ForceSleepAfterTrick plays MotherExtraUse on the sit that
+follows, gated by RepeatSleep && AlreadyTricked. On the bench:
+
+- His pistol play on an AWAKE Mother — measured: she hits him, sits at
+  177.7 s, IsSleeping 179.3 s to the run's end (237.2 s); the port's
+  headless probe sits at 177.7 s and sleeps 179.5-237.5 s. Match.
+- Her regular naps, four of them in one 500 s run: 69.2-127.2, 173.3-231.2,
+  277.3-335.3, 381.4-439.4 s — a 58 s window every ~104 s, the same
+  MotherSecondUse the port's bar fills.
+
+The one case not captured live is his pistol play landing *inside* one of
+those regular naps (ForceSleep's tricked arm, the bar-less loop): it needs
+his routine's pistol visit to coincide with a nap window, a phase
+alignment of two fixed cadences that nine timed runs did not hit before
+the game died under frida (~8 min). The port models the branch per the
+code above; no plan depends on it. Left here as the open item, with the
+numbers that bound it.
+
+## dexterity.js: the bench plays a dexterity round
+
+A frida script for run.py's `--extra`: after every
+DexterityComponent.FixedUpdate (cs:183-262; the per-frame method is
+FixedUpdate, not Update) it puts the pick (ForegroundRect) on the field's
+centre (BackgroundRect), so the sway term reads MaxSway and
+PercentageDone climbs at 25/s. On 214's shards round the original's fill
+went 20 → 80 over 158 held frames and the round closed at 203 frames
+(6760–6963 from StartGame) — won, where the unsteered round had lost at
+121. What the replay still lacks is the done-pass: the runner's second
+hatch click is scheduled at its own round's end (the port's ran
+6254–6604, 350 frames, starting the moment the click landed), and on
+the original that frame fell inside the round, so the hatch never got
+its second trick and the fish never came. The next step for the tool is
+a tap rule — a click on a dexterity item while a round runs waits for
+DexterityDone — not a model question: the round itself now plays.
