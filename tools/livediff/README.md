@@ -975,3 +975,15 @@ Woody.CheckMouseClick including its second ProcessMoveInput when itemAux
 is a Door (cs:666-669); whatever it gets wrong there is not worth the
 chase while taps land and the pinned clock aligns them. Tap mode is the
 reference for every replay above.
+
+The port's side of the same question, probed headlessly (a three-leg plan:
+the ammo, the pistol during her first nap, a wait): the regular nap runs
+61.4–119.3 s on the MotherSecondUse stamp (indices 1…9 inside the bar's
+[0, 10) window, progress 0 → 1); his pistol play at 161 s sends her to
+hit him, and her return at 177.7 s is ForceSleepAfterTrick's
+MotherExtraUse (MotherSleepBehaviour.cs:85-88, the [2, 11) window):
+IsSleeping and the bar from 179.5 s to 237.5 s, a second full nap. The
+bar-less MotherSleepLoop seen in the 214 plan run is ForceSleep's tricked
+arm (cs:79-82: MotherUseTrickedAnimation, no stamp), reached only when
+his play lands while she already sleeps; which stamp the original's bar
+reads there is the part still unmeasured.
