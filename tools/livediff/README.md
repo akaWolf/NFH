@@ -928,3 +928,26 @@ un-hid him and went nowhere), so the rabbit never reached the pad on
 either, and the original's run ended at 15095 in the denture dexterity
 round the bench cannot steer. The pad-and-harpoon path is the port's
 plan run alone (17/17) until a replay lands the blanket.
+
+## Level212, replayed with the three-ruby plan
+
+15,204 frames: the neighbour's first five steps at 445, 1046, 1958, 3175,
+4266 on the original against 447, 1048, 1960, 3178, 4269 on the port.
+Then the spike plate: a dexterity search item, which the tap script
+cannot steer — the original's round ran from 4234 to 4579 and lost, and
+its game ended at 4691; the runner won the port's in 72 frames and went
+on. The rubies, the pair's second coin and the boat slot's coin are the
+port's plan run alone (28/28), as 214's fish and 206's rabbit are: every
+Season-2 plan that passes through a dexterity round is verified on the
+original only up to it.
+
+## Level113's electric trap: the door owns the click
+
+A three-tap run on the original — the cable at 535, the tatter at 1069,
+the trap with the cable at 1669 (frames from StartGame): the tatter's
+prime played (Woody locked 1608–1758 at the trap's foot), the trap tap
+moved nothing, and the neighbour's basement visit caught him at 3225.
+The port replays the same three clicks to the same end (caught 3226):
+the basement back door's box hides the trap's from the click ray on
+both, as the plan's geometry note said. The plan no longer asks for
+that coin.

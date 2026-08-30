@@ -53,5 +53,9 @@ await Sink 12
 # z -0.219 (near -4.219) and wins the ray.  The tatter's prime works (its
 # box peeks out to x 1.58).
 prime ElectricTrapTatter              # bare click primes the trap (Item.cs:1643-1651)
-usewith ElectricTrap IT_Cable         # never lands: the door takes the click
-await ElectricTrap 8
+# usewith ElectricTrap IT_Cable / await ElectricTrap 8 — not in the plan:
+# tapped on the original (2026-09-04, cable + tatter + trap at frames 535,
+# 1069, 1669 from StartGame) the trap tap moved nothing: Woody stood at
+# (1.8, -4.6) with the cable selected until the neighbour's basement visit
+# caught him at 3225; the port's replay of the same clicks reads the same
+# (caught 3226). The door's box owns that screen point on both.
