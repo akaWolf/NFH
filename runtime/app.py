@@ -893,6 +893,25 @@ def ensure_assets():
         tmp = tempfile.mkdtemp(prefix='nfh-data-')
         try:
             unpack(sources[season], tmp)
+            dll = os.path.join(tmp, 'apk', 'assets', 'bin', 'Data', 'Managed',
+                               'Assembly-CSharp.dll')
+            if not os.path.exists(dll):
+                # the IL2CPP successors (1.5.14, 3.2.13) carry no
+                # Assembly-CSharp.dll and a stripped type tree: the
+                # export cannot read them (docs/BUILDS.md) — say so instead
+                # of the extractor's own "run tools/extract.sh first"
+                _message_box('Neighbours from Hell', (
+                    'The %s data in %s is an IL2CPP build (no '
+                    'Assembly-CSharp.dll): the game can only be extracted '
+                    'from the Mono builds — Season 1 version 1.5.5, '
+                    'Season 2 version 3.2.5. Put that apk/obb (or xapk) '
+                    'next to the executable instead.'
+                    % (season, os.path.basename(str(
+                        sources[season].get('xapk')
+                        or sources[season].get('apk'))))))
+                if season == 's1':
+                    return False
+                continue
             extract_season(tmp, root, season)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
