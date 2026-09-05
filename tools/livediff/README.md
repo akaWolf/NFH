@@ -1080,3 +1080,151 @@ the original that frame fell inside the round, so the hatch never got
 its second trick and the fish never came. The next step for the tool is
 a tap rule — a click on a dexterity item while a round runs waits for
 DexterityDone — not a model question: the round itself now plays.
+
+## Level214, replayed past the shards round: Olga's way back to the glass
+
+The tap rule went into tap.py: the GameInfo.Update hook holds a click
+while `GameInfo.Instance.Woody.InDexterity` is set (`dexterityRunning()`),
+so the runner's done-pass click on the hatch — scheduled at its own
+round's end, a frame that fell inside the original's round — waits the
+round out. With dexterity.js winning the round the chain went on where
+replay18 had stopped: the hatch's second trick, the fish (HatchFish
+resolved at level frame 12590 and taken), the bouquet with the fish
+(14455), trick 3. The port side had been losing the same round —
+record_app replays clicks and nobody moved the pick — and Woody was
+caught at 6551: sweep.py's replay-port now passes NFH_DEX_AUTOPLAY=1 to
+record_app when the live side's extra.jsonl carries dexterity.js rows,
+and record_app then steers the pick onto the field's centre every frame
+(run_tricks' _dex_tick). The two sides over the whole 530 s, frames from
+StartGame (original 475, port 473):
+
+| | original | port |
+|---|---|---|
+| the shards round (Frozen) | 6288–6488 | 6254–6431 |
+| tricks 1 / 2 / 3 | 5278 / 11325 / 18648 | 5284 / 11336 / 18665 |
+| caught | 26971 | 26970 |
+
+The same catch on both because the same click is missing on both: the
+runner clicks the bucket the moment it activates in the port — 332.0 s
+of play, frame 19920 — and on the original that frame (20395 of the
+level) found no active Washbucket, so the tap was dropped and the port's
+replay, built from the taps that landed, has no bucket click either.
+Her OlgaShipShowerSwiffer, which activates the bucket
+(WashbucketBehavior.cs:14-22), plays on the original at 341.92 s of
+level time = 334.0 of play, 120 frames after the click. Everything after
+— Cloth 20682, Glass 20854, BirdDead unresolved at 23877, CaptainDoor,
+CaptainMug, CaptainWheel unresolved four times, the catch at 26971 — is
+the missing bucket trick: no BucketCrash, no Shower trick, and she stands
+in OlgaShipShowerIdle from 342.68 s to the catch.
+
+Where the two seconds come from — calls.js on her ActionManager (level
+seconds; play = level − 7.92):
+
+| level s | Olga |
+|---|---|
+| 312.65 | HitPawn — the bouquet's OlgaUseTrickedAnimation at his tricked use (Item.cs:868-876); Item.FishPlantBehavior (cs:2388-2396) strips her Glass and BirdPerch entries and steps ActiveActionIndex 1 → 0, the Shower — while ActiveAction stays the Glass use |
+| 318.77 | StartUrgentAction(HitPawn): OriginalAction = ActiveAction = the Glass use (ActionManager.cs:715-718); the run to −3.87 |
+| 319.12 | the hit sequence |
+| 323.23 | StopCurrentAction → AdvanceToNextAction → StopUrgentAction's last arm, StartAction(OriginalAction) (cs:647) → not at its location → MoveToAction (cs:150-155): Walk_Left back to the glass |
+| 324.00 | the Glass use starts: OlgaStandDownInfinite |
+| 325.75 | Item.Fix(Bouquet) → StopOlgaInfiniteLoop (Item.cs:2581-2604): the pose's InfiniteLoop off, LoopFromSelectedIndex off |
+| 326.22 | the pose's cycle ends → AdvanceActionIndex on a one-entry list, 0 + 1 ≥ 1 → 0 (cs:566-584) → StartNextAction → the Shower; Walk_Left |
+| 337.48 | the Shower use starts; Enter 337.50, Blubb 339.63, Bucket 340.15, Swiffer 341.92, Idle 342.68 |
+
+The port's routine took its current action from the list entry at the
+index, so after the hit — 315.6 s of play, 323.5 of level time, the same
+frame as the original — she went to the Shower at once: Walk_Left 315.6,
+Walk_Down at the stairs 316.8, the shower's foot 326.1, Enter 327.6,
+Swiffer 332.0 (339.9 of level time), 2.0 s before the original's. The
+port now keeps ActiveAction as the object StartAction started (`_active`,
+until AdvanceActionIndex), records it as the urgent's OriginalAction at
+StartUrgentAction (`_original_action`) and restarts that object from
+StopUrgentAction's last arm when it is no longer the entry at the index
+(`_override`, until AdvanceActionIndex); the arm's checks read the
+OriginalAction's item. The plan run after the change (play seconds; the original's, level − 7.92, in brackets): Walk_Left back to the glass 315.6, the pose 316.3 [316.08], the walk to the Shower 318.6 [318.30], Enter 329.8 [329.58], Swiffer 334.3 [334.00], Idle 335.1 [334.76]; the runner's `activated Washbucket` moved from 332.0 to 334.3 s and the plan stays 27/27.
+
+calls.js is the ActionManager call by call — StartAction, MoveToAction,
+StartUrgentAction, StopUrgentAction, AdvanceToNextAction,
+AdvanceActionIndex, StartNextAction, StopCurrentAction with the owner,
+the index, the active action's class, item and OriginalAction's item;
+Item.Fix, Item.StopOlgaInfiniteLoop, Pawn.RunToHitPawn,
+Olga.OnItemAnimationSequenceEnded; the ROLE pawn's AnimState changes —
+and run.py's `--extra` now takes a comma-separated list, each tracer in
+its own closure (`--extra=dexterity.js,calls.js --role=Olga`).
+
+### The tap rules, and what each one taught
+
+The replay of the fixed port's clicks landed the bucket (the tap at
+20528 of the level, executed at 20600) — and lost its trick anyway: the
+runner clicks the cloth the instant the bucket leg completes, 151 frames
+after the bucket click, and the replay executed each tap ~70 frames
+after its frame (resolve()'s full second after the hooked frame), so the
+cloth click reached Woody 65 frames into the bucket's use, which a click
+cancels (the use is not a Blocking animation, Woody.cs:652-656). Both
+sides lost the trick the same way — the port replays the frames the
+original acted on. Four rounds of a tap rule followed, each run finding
+the next thing the rule must know about Woody:
+
+1. ItemMove or an AnimState outside Stand/Walk/Run/Hide, hidden by
+   AnimController.Hidden: the Shards tap waited its whole bound behind the
+   deck-chair hide (the hide is Woody.Hiding, and ItemMove outlives a
+   walk), and the chain broke there.
+2. A walking state with ItemMove, or any state outside Stand/Walk/Run,
+   Woody.Hiding free — and the sleep cut to 0.2 s (the tap now lands ~22
+   frames after its frame): the ammo tap, always dropped before inside
+   the carpet take's InputLocked, now landed, so the carpet tap fell
+   into the ammo take's lock and was dropped instead — a click during
+   InputLocked is stored and, the take not being Blocking, never
+   replayed — and the first trick never came. Then FearRight, a finished
+   single that lingers as the state, held a tap 600 frames.
+3. The controller's CurrentAnimation: a Single not at its last frame
+   (Refresh, AnimationControllerBase.cs:102-142; ReachedEndFrame,
+   AnimationInstance.cs:196-203), InfiniteLoop poses free: the takes
+   waited right (the ammo tap 32 frames, the carpet's hatch tap 61),
+   but the parking click recorded 300 frames after the hatch click came
+   46 frames before Woody reached the hatch and was lost in the climb;
+   Woody stood on the hatch when the Rottweiler came (caught at 4765,
+   the level restarted under the replay).
+4. The rule as it stands: Woody.InputLocked, or a Blocking
+   CurrentAnimation (the original's own gate), or a Single not at its
+   last frame, or a walking state with ItemMove (the walk to an item) —
+   Woody.Hiding free — for an item tap and for a parking or staging
+   click; a dodge never waits. The runner now tags its clicks
+   (`kind`: `leg` / `dodge` — the dodge loop's flee is the only dodge),
+   run.py passes the kind to tap.py's resolve(), and a click log without
+   kinds waits on item taps alone. Two more rounds: a single counts as playing through its last frame
+(ReachedEndFrame is one step past it and Refresh swaps the next
+animation in the same call — a tap sent on the last frame reached Woody
+in the laugh after a use), and an item tap that finds no item is retried
+every 3 s between the scheduled taps, for 15 s past the last recorded
+click (a retry loop that held the schedule held the dodges too, and Woody
+was caught at 4765). The replay then runs the plan's chain to its fifth
+trick on both sides, frames from StartGame:
+
+| | original | port |
+|---|---|---|
+| tricks 1 / 2 / 3 | 5278 / 11325 / 18648 | 5284 / 11336 / 18665 |
+| trick 4, the shower | 24174 | 24193 |
+| trick 5, the pistol | 28688 | 28980 |
+
+The one click still lost is the mug's. The tap reached
+Woody.ProcessMoveInput at level frame 24735 with the pills in hand and
+the two DoorBack doors active since 24710 (CaptainDoorBehavior at the
+door's MakeTrick end, GameObject.SetActive traced), and MoveToLocation
+returned false: Woody stayed at the door's spot, so the wheel never
+came (five recorded clicks and their retries found no CaptainWheel to
+25489 + 900), the Rottweiler's retargeted CaptainControls visit was a
+4.2 s LookAround (452.1–456.3 s of level time) and his pistol came
+earlier than the port's, whose replayed mug click did land (the port's
+Woody went up, the wheel came, and the Rottweiler steered it for 13.4 s
+before the pistol: 28980 against 28688 is that visit, not a model
+difference). The same tap on the same screen point, sent in the level's
+end state, walks Woody through the DoorBack to the mug — so the point
+and the doors are right and the rejection is the moment's: the walk to
+the mug crosses the DoorBack pair, a ComplexMove door whose LinkNodes
+expansion reads Helpers' StepIndex / FirstStepIndex / DonePassingHelper
+statics from Woody's last walk (Helpers.cs:225-335 — the shape the
+runner's _click guard is about). Open: whether the port's find_path
+accepts that click where the original's LinkNodes does not, which would
+be a port difference in the pathing, or the original wants the walk's
+statics settled first.

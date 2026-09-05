@@ -2056,6 +2056,15 @@ class Routine:
         self._angry_target = None        # the item the current angry set is for
         self._wait_in_fear_done = None   # the parked resume of the affect flow
         self._hit_target = None          # RoutineActionHitPawn.Target
+        # StartUrgentAction's OriginalAction (ActionManager.cs:715-718): the
+        # routine action an urgent interrupted, restarted by StopUrgentAction
+        # (cs:647) even when the list or the index moved underneath
+        self._original_action = None
+        self._override = None            # that restart, while it runs
+        # ActionManager.ActiveAction: the action StartAction started, until
+        # AdvanceActionIndex — the list entry at the index can move under it
+        # (Item.FishPlantBehavior, HatchFixBehavior, StopOlgaInfiniteLoop)
+        self._active = None
         self._toilet_run = False         # the ToiletAction urgent is running
         # ActionManager's per-manager animation-instance stores
         # (ActionManager.cs:63-81)
@@ -2077,6 +2086,12 @@ class Routine:
 
     @property
     def action(self):
+        return self._active if self._active is not None else self._entry()
+    def _entry(self):
+        """Actions[ActiveActionIndex] — or the OriginalAction a
+        StopUrgentAction restarts in its place (ActionManager.cs:647)"""
+        if self._override is not None:
+            return self._override
         if not self.actions:
             return None
         return self.actions[self.index % len(self.actions)]
@@ -2183,6 +2198,8 @@ class Routine:
         return index
 
     def _advance(self):
+        self._override = None
+        self._active = None
         self.index = self._next_index(self.index)
 
     def _trick_kid_actions(self, it):
@@ -2369,6 +2386,7 @@ class Routine:
 
     def _start_action(self, start_next=False):
         self.started = True              # StartAction: CurrentAction = ...
+        self._active = None              # the entry at the index from here on
         it = self.item
         a = self.action
         if start_next:
@@ -2455,6 +2473,7 @@ class Routine:
                 self._advance()
                 it = self.item
                 a = self.action
+        self._active = a                 # ActiveAction = action (cs:169)
         if a is not None and a.get('move_only'):
             if self.routine_behavior is not None:
                 # ActionManager.MoveToAction (ActionManager.cs:119-124)
@@ -3633,6 +3652,8 @@ class Routine:
             name = kind
         if arrived is None and self._urgent_action is not None:
             self._stash_interrupted_urgent(name)
+        if self._urgent_action is None:
+            self._original_action = self.action   # cs:715-718
         self.urgent_item = item
         self._urgent_action = {
             'kind': kind, 'name': name, 'postpone_alarm': bool(postpone_alarm),
@@ -3933,6 +3954,7 @@ class Routine:
             # StopUrgentAction never runs (ActionManager.cs:530-538, 544-548)
             # — nor does its OriginalAction replay
             self._urgent_stack = []
+            self._original_action = None
             self._pending = 'advance'
             self.state = self.IDLE
             self._release_at_urgent_stop(ua, finished)
@@ -3941,6 +3963,7 @@ class Routine:
             # a frozen manager swallows the resume (ActionManager.cs:604-606);
             # the Unfreeze that lifts it starts the routine again
             self._urgent_stack = []
+            self._original_action = None
             self.state = self.IDLE
             return
         if self._urgent_stack:
@@ -3965,9 +3988,14 @@ class Routine:
             return
         if finished is not None and finished.name == 'GroundMarbles':
             self.marbles_next = False
-        it = self.item
+        # the branches read ActiveAction.OriginalAction.Item (cs:607-647):
+        # the interrupted action's, wherever the routine's index went
+        orig, self._original_action = self._original_action, None
+        it = self.level.items.get(orig['item']) \
+            if orig is not None and orig.get('item') else self.item
         linked = self.level.items.get(it.linked_item_trick) \
             if it is not None and it.linked_item_trick else None
+        replay = False
         if it is not None and it.skip_action:
             # StopUrgentAction's SkipAction arm (ActionManager.cs:608-613):
             # a wiped drawing skips its own redo
@@ -3993,6 +4021,17 @@ class Routine:
             self._pending = 'start'
         else:
             self._pending = 'start'
+            replay = True
+        if replay and orig is not None and orig is not self._entry():
+            # StartAction(ActiveAction.OriginalAction) (cs:647) restarts the
+            # interrupted action itself, not the routine's current entry:
+            # Level214's tricked bouquet strips Olga's Glass and BirdPerch
+            # and steps her index to the Shower while her HitPawn urgent
+            # runs (Item.FishPlantBehavior, Item.cs:2388-2396), and she
+            # still walks back to the glass for one more cycle of her pose
+            # before AdvanceActionIndex sends her to the shower (bench,
+            # Level214 at 323.2-326.2 s of level time)
+            self._override = orig
         self.state = self.IDLE
         self._release_at_urgent_stop(ua, finished)
 
@@ -4249,6 +4288,8 @@ class Routine:
             # the run it lands on becomes its OriginalAction (cs:679-718) —
             # unless that is a SurpriseNear itself (cs:681-691)
             self._stash_interrupted_urgent('surprise_near')
+        if self._urgent_action is None:
+            self._original_action = self.action   # cs:715-718
         self.urgent_item = it
         self._urgent_handler = None
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
@@ -4307,6 +4348,8 @@ class Routine:
             self._advance()
         self._pending = None
         self._hit_target = target_pawn
+        if self._urgent_action is None:
+            self._original_action = self.action   # cs:715-718
         self.urgent_item = None
         self._urgent_action = {'kind': 'hit_pawn'}
         self.pawn.steps = []
