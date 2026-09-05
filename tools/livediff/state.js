@@ -195,10 +195,32 @@ if (!processMove.isNull()) {
         onEnter: function () { send({ type: 'tap', n: frame }); }
     });
 }
+// the game's thread gets a 1 MB alternate signal stack: Mono gives its
+// managed threads 8 KB (sigaltstack on UnityMain read 0xa7b11000, 8192),
+// and frida's SIGSEGV handler — the exceptor that a managed null
+// dereference reaches first, on that stack — overran it: the tombstones
+// of the bench's deaths show the handler faulting at esp-4 = 0xa7b104dc,
+// just under that stack's bottom, before Mono's own handler could turn the
+// fault into a NullReferenceException. Set once, from inside the first
+// Update (sigaltstack is per thread); the buffer must stay referenced.
+const libc = Process.getModuleByName('libc.so');
+const sigaltstack = new NativeFunction(libc.findExportByName('sigaltstack'), 'int', ['pointer', 'pointer']);
+const altStack = Memory.alloc(1 << 20);
+let altDone = false;
+function growAltStack() {
+    altDone = true;
+    const old = Memory.alloc(12);
+    sigaltstack(NULL, old);
+    const ss = Memory.alloc(12);
+    ss.writePointer(altStack); ss.add(4).writeS32(0); ss.add(8).writeU32(1 << 20);
+    const r = sigaltstack(ss, NULL);
+    send({ altstack: { old_sp: old.readPointer(), old_size: old.add(8).readU32(), set: r, size: 1 << 20 } });
+}
 Interceptor.attach(mono_compile_method(method(GameInfo, 'Update', 0)), {
     onEnter: function (args) {
         const gi = args[0];
         frame++;
+        if (!altDone) growAltStack();
         const woody = GI.Woody >= 0 ? gi.add(GI.Woody).readPointer() : NULL;
         const rott = GI.Rottweiler >= 0 ? gi.add(GI.Rottweiler).readPointer() : NULL;
         const mother = GI.Mother >= 0 ? gi.add(GI.Mother).readPointer() : NULL;
