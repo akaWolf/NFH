@@ -2496,17 +2496,26 @@ class Routine:
                 self._advance()
                 it = self.item
                 a = self.action
-        if it is not None and not it.active:
-            # StartAction on an item whose object is inactive: MoveToAction's
-            # Item.LoadRottweilerAnimations (ActionManager.cs:119-127,
-            # Item.cs:785-811) dereferences the item's Rottweiler, unset
-            # because Item.Start never ran — a NullReferenceException that
-            # leaves the action unstarted (ActiveAction stays the finished
-            # one) and the next Update's AdvanceToNextAction moves the index
-            # on. Bench, Level214's wheel race (the mug used late, the wheel
-            # still 11 s from its DelayActivateItem): his index 1 at level
-            # frame 25717, 2 at 25718, and off to the pistol. Under a hook on
-            # that chain the exception cannot unwind and the game dies.
+        if it is not None and not it.active and not it.started:
+            # StartAction on an item whose object has never been active:
+            # MoveToAction's Item.LoadRottweilerAnimations (ActionManager.
+            # cs:119-127, Item.cs:785-811) dereferences the item's
+            # Rottweiler, unset because Item.Start never ran (Item.cs:677-
+            # 690 sets the pawn fields on the first active frame) — a
+            # NullReferenceException that leaves the action unstarted
+            # (ActiveAction stays the finished one) and the next Update's
+            # AdvanceToNextAction moves the index on. Bench, Level214's
+            # wheel race (the mug used late, the wheel still 11 s from its
+            # DelayActivateItem): his index 1 at level frame 25717, 2 at
+            # 25718, and off to the pistol. Under a hook on that chain the
+            # exception cannot unwind and the game dies. An item that
+            # started and was deactivated since is walked to and used as
+            # any other — its fields are set, its animations loaded once
+            # (RottweilerAnimationsLoaded): Level101's binoculars, glued to
+            # his face by the trick (Level101Behavior.cs:29-33 SetActive
+            # (false) on PeepTrick, the use rewritten to RottLookNoBin),
+            # still take him to the window every round; skipped, he sat
+            # on the sofa for good (the sofa is the routine's other action).
             self._pending = 'advance'
             self.state = self.IDLE
             return
@@ -6044,6 +6053,8 @@ class World:
             q['active'] = active
         item.clickable = active
         item.active = active
+        if active:
+            item.started = True          # Start runs on its first active frame
 
     def set_go_renderer(self, go, enabled):
         """Renderer.enabled on a bare object: its backdrop quad or sprite"""

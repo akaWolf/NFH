@@ -183,6 +183,7 @@ class Zone:
 class Item:
     """Anything the neighbour's routine can act on, or Woody can trick."""
     __slots__ = ('name', 'pid', 'kind', 'x', 'y', 'zone', 'dx', 'dy', 'active',
+                 'started',
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone',
@@ -507,6 +508,7 @@ class Item:
         self.only_once_water_puddle = False
         self.clickable = True                  # Collider.enabled (the Pipe hack)
         self.active = True                     # the GameObject's active state (SetActive)
+        self.started = True                    # Item.Start has run (the first frame active)
         self.prime_item_aux = False            # Item.PrimeItemAux (DogFifi)
         self.double_priming_item = bool(d.get('DoublePrimingItem'))
         self.second_required = d.get('SecondRequiredInventory')
@@ -1573,6 +1575,10 @@ class Level:
         # Level206's Rabbit, Level214's HatchFish): its sprite is skipped
         # already (_add_sprite), its click box goes with it
         it.active = self._active(go)
+        # Start runs on the first frame the object is active (Item.cs:677-
+        # 690: the pawn fields); an object inactive from the load has not
+        # started until its SetActive(true)
+        it.started = it.active
         if not it.active:
             it.clickable = False
         self.items[pid] = it

@@ -1330,6 +1330,25 @@ at 421.1 s he walks to the pistol (WaitWatch at 439.3, the original at
 the pistol by 438.7), no cabin, no catch, and the plan completes 27/27
 with no restart.
 
+That rule, as first written — any routine item whose object is
+inactive — was too wide, and Level101 showed it: a player who glues
+the binoculars before the other tricks saw the neighbour sit on the
+sofa for the rest of the level. Level101Behavior.cs:29-33 deactivates
+the Binoculars object on his PeepTrick (they are stuck to his face; the
+use is rewritten to RottLookNoBin), and his routine is [Sofa,
+Binoculars]: the port skipped the binoculars at each round (the sofa-
+first plan: index 1 to idle with the advance queued at 158.87 s, 175.88,
+192.90, … every 17 s, the sofa's use, and 'zone never clear' for the
+television), while the original walks him to the window every round —
+the exception needs Item.Start never to have run (Item.cs:677-690 sets
+the item's Rottweiler on its first active frame; LoadRottweilerAnimations
+loads once), and the binoculars started with the level. The skip now
+requires an item that was never active (Item.started, set at the load
+for active objects and by SetActive(true)); the wheel, inactive from
+the load until its DelayActivateItem, still qualifies. The sofa-first
+plan then completes 12/12 (the microwave paid, the television's zone
+clear), the standard one 12/12, Level214's 28/28.
+
 ### The in-process click, tried once more
 
 With the deaths understood, the injector was put behind tap.py's waits
