@@ -1244,3 +1244,22 @@ the behaviour being enabled from Start): the port's mug now goes off at
 3.00 s and on at 7.00 s from the load, then every 8 s. The tap rule
 treats a hidden item (Item.IsHidden) as not there and retries it like
 an absent one, each absent item on its own 3 s clock.
+
+With the mug retried into its visible window (resolved at level frame
+24925, the raycast on the mug at 24933, Woody up through the DoorBack
+408-410 s and at the mug 411-419 s of play), the replay ends the same
+way twice: the game dies at level frame 25719 (428 s of play), the last
+calls the Rottweiler's StopCurrentAction → AdvanceToNextAction →
+StopUrgentAction → AdvanceActionIndex → StartAction → MoveToAction —
+his shower angry over, his next action starting — with the CaptainWheel
+still inactive (no SetActive by then: the mug's DelayActivateItem had
+not run out, the mug being used nine seconds later than in the port's
+own run) and Woody on the DoorBack at (1.07, 4.1) on his way to the
+pistol. Under frida a managed null dereference takes the game down (the
+death class noted for the bench); the plain game would throw the
+NullReferenceException in Update and go on. In the port's own run the
+wheel came at ~417 s and he steered it at 447 s; how the plain original
+carries a routine action whose item is not yet active is not measured —
+the replay cannot reach it, and that is where Level214's replay stands:
+five of six tricks on both sides to the frame, the sixth behind a race
+the runner never runs into.
