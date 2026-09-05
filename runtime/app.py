@@ -882,6 +882,13 @@ def ensure_assets():
 
 
 def main(argv):
+    # a stuck or crashing bundle can say where it is: SIGUSR1 (or a fatal
+    # signal) dumps every thread's Python stack to stderr — the dump runs
+    # from the C signal handler, so it works inside a native call too
+    import faulthandler, signal
+    faulthandler.enable(all_threads=True)
+    if hasattr(signal, 'SIGUSR1'):
+        faulthandler.register(signal.SIGUSR1, all_threads=True)
     if '--smoke' in argv:
         # the CI's bundle check: boot the menu headless and exit; the
         # extraction dependencies must import frozen (numpy decodes the
