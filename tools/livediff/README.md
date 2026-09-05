@@ -1266,9 +1266,13 @@ same way. (The bench's other death class — the tombstones inside
 frida-agent at esp-4 under Mono's 8 KB alternate signal stack — is a
 different one; state.js now gives the game's thread a 1 MB sigaltstack
 against it, which this run, dying in Mono, could not test.) In the port's
-own run the wheel came at ~417 s and he steered it at 447 s; the port
-starts that action on the inactive wheel without dying, which the
-original does not survive — nothing to match there. That is where
+own run the wheel came at ~417 s and he steered it at 447 s. The port
+in the same race (the plan with `wait 9` before the mug: the mug used
+at ~415 s, the Rottweiler off the shower at 421.1 with the wheel still
+11 s away) does not die: he walks to the cabin for the inactive wheel,
+reaches it at 444 s and catches Woody there, and the runner restarts
+the level in a loop — a state the original does not live through, so
+nothing to match there. That is where
 Level214's replay stands: five of six tricks on both sides to the frame,
 the sixth behind a race the runner never runs into and the original
 does not live through.
