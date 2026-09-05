@@ -257,6 +257,13 @@ def main(argv):
             except Exception as e:          # the game died under the run: keep what landed
                 print('[taps] frame %d: %s — the rest of the clicks dropped' % (want, e))
                 break
+            if pt is not None and row.get('item'):
+                # a recorded click on the item landed: an earlier miss on it
+                # is answered — its retry would be a second click on the
+                # item Woody is already walking to, bare-handed (the used
+                # inventory drops at a click, Woody.cs:361/739), and the use
+                # at his arrival then fails (Level214's mug, replay50)
+                pending = [q for q in pending if q['row'].get('item') != row.get('item')]
             if pt is None:
                 if row.get('item'):
                     print('[taps] frame %d: %s not there yet, retrying' % (want, row.get('item')))
