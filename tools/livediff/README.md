@@ -1269,10 +1269,63 @@ against it, which this run, dying in Mono, could not test.) In the port's
 own run the wheel came at ~417 s and he steered it at 447 s. The port
 in the same race (the plan with `wait 9` before the mug: the mug used
 at ~415 s, the Rottweiler off the shower at 421.1 with the wheel still
-11 s away) does not die: he walks to the cabin for the inactive wheel,
-reaches it at 444 s and catches Woody there, and the runner restarts
-the level in a loop — a state the original does not live through, so
-nothing to match there. That is where
+11 s away) did not die and did something of its own: he walked to the
+cabin for the inactive wheel, reached it at 444 s and caught Woody
+there, and the runner restarted the level in a loop. What the original
+does is in the next section. That is where
 Level214's replay stands: five of six tricks on both sides to the frame,
 the sixth behind a race the runner never runs into and the original
 does not live through.
+
+### What kills the game under the bench: an exception under a hook
+
+A test that puts the fault where it can be watched — nullderef.js, an
+--extra that on its 600th GameInfo.Update sets `this` to null, so the
+method's first field read faults on the null page — ends the same way
+whichever alternate signal stack the thread has (Mono's 8 KB, or the
+1 MB state.js now sets): logcat's `E mono: Unhandled Exception:
+System.NullReferenceException at GameInfo.Update ()`, the process gone,
+no tombstone. GameInfo.Update is hooked (state.js's frame counter), and
+a managed exception thrown under an Interceptor hook cannot unwind
+through the trampoline's frame: Mono's unwinder finds no handler above
+it and aborts. The same fault in an unhooked method is Unity's to
+catch and log. So the deaths the bench has seen are, first of all, the
+hooks' — a null under a hooked method or its callees — and the 8 KB
+stack was the manner of one of them, not the cause; the guard in
+state.js stays, but it is not what keeps a run alive. calls.js hooks
+ActionManager.MoveToAction, and Level214's wheel race threw its
+NullReferenceException three frames below it (Item.LoadPawnAnimations):
+the replays that died there all carried calls.js. What the original
+does with that exception when nothing hooks the chain — Unity logs it,
+StartAction never reaches StartAction(MoveAction), the manager's
+ActiveAction stays the finished shower use, and the next Update's
+AdvanceToNextAction walks the index past the wheel to the pistol, by
+the code (ActionManager.cs:421-499, 566-584) — is the hook-free replay
+queued after this note.
+
+### The wheel race on the original, hooks off: the action is skipped
+
+The hook-free replay (state.js and dexterity.js only, the act25 clicks
+in tap mode) lived through the race — 43203 rows, the whole 720 s
+budget. The mug's tap resolved at 24925 (its visible window), Woody used
+it at 411-419 s of play, and at level frame 25717 (420.7 s) his
+ActiveActionIndex went to 1, the wheel action — and to 2, the pistol,
+on frame 25718: StartAction's MoveToAction threw on the inactive wheel
+(Item.LoadRottweilerAnimations → LoadPawnAnimations over the item's
+Rottweiler reference, unset because Item.Start never ran for an object
+inactive from the load), Unity logged it, ActiveAction stayed the
+finished shower use, and the next Update's AdvanceToNextAction
+(ActionManager.cs:421-499 → 566-584) walked the index past it. He went
+to the pistol (at (1.0, 0.94) by 438.7 s); the wheel came out at ~26050
+(11 s after the mug, DelayActivateItem) and Woody's retried click
+tricked it at 26088; the Rottweiler's steering of it waits for his next
+loop, and this run's dodges — recorded for the port's own timeline —
+left Woody caught at 27199. So the original's answer to a routine
+action on a not-yet-active item is one frame of exception and the next
+action; the port now does the same: Routine._start_action on an item
+whose object is inactive leaves the action unstarted and queues the
+advance (world.py), instead of walking to the invisible wheel. The
+late-mug plan on the port then reads like the original: off the shower
+at 421.1 s he walks to the pistol (WaitWatch at 439.3, the original at
+the pistol by 438.7), no cabin, no catch, and the plan completes 27/27
+with no restart.

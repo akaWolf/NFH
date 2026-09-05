@@ -2473,6 +2473,20 @@ class Routine:
                 self._advance()
                 it = self.item
                 a = self.action
+        if it is not None and not it.active:
+            # StartAction on an item whose object is inactive: MoveToAction's
+            # Item.LoadRottweilerAnimations (ActionManager.cs:119-127,
+            # Item.cs:785-811) dereferences the item's Rottweiler, unset
+            # because Item.Start never ran — a NullReferenceException that
+            # leaves the action unstarted (ActiveAction stays the finished
+            # one) and the next Update's AdvanceToNextAction moves the index
+            # on. Bench, Level214's wheel race (the mug used late, the wheel
+            # still 11 s from its DelayActivateItem): his index 1 at level
+            # frame 25717, 2 at 25718, and off to the pistol. Under a hook on
+            # that chain the exception cannot unwind and the game dies.
+            self._pending = 'advance'
+            self.state = self.IDLE
+            return
         self._active = a                 # ActiveAction = action (cs:169)
         if a is not None and a.get('move_only'):
             if self.routine_behavior is not None:
