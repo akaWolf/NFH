@@ -1329,3 +1329,23 @@ late-mug plan on the port then reads like the original: off the shower
 at 421.1 s he walks to the pistol (WaitWatch at 439.3, the original at
 the pistol by 438.7), no cabin, no catch, and the plan completes 27/27
 with no restart.
+
+### The in-process click, tried once more
+
+With the deaths understood, the injector was put behind tap.py's waits
+(a `--tapmode=inject`: the same camera, dexterity, busy and hidden
+rules, then inject.js's CheckMouseClick mirror instead of an adb tap).
+A bare point walked Woody as before; the first item click (the Carpet,
+level frame 1585) left the game logging a NullReferenceException on
+every frame and dead within a second on a native SIGSEGV at address
+0xd. Whatever state a real touch sets that the mirror does not — the
+HUD's and the cursor's, most likely — it is still not worth the chase;
+the mode is not kept. The adb tap costs ~21 frames (a 0.2 s settle
+after the hooked frame, 0.12 s for `input tap`, the input dispatch), and
+that, over the raid's five back-to-back legs, is what puts the mug's
+click into the captain's hidden window on the original: its retry lands
+4 s later, the wheel comes 41 frames after the Rottweiler's action
+starts, and the sixth trick waits for his next loop — outside a replay
+of the port's clicks, whose dodges no longer fit the branch. A runner
+that executes the plan's legs against the original's own state is the
+tool that would close it.
