@@ -46,6 +46,7 @@ usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (hi
 activated Cloth
 take Cloth IT2_Swiffer                 # the glass wants the swiffer
 usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
+park Zone02                            # the hatch room, free once the Mother has walked to her chair (361 s): the raid starts the moment he leaves Zone03 for the shower (378 s), not after Woody's own way round the ring (Zone04 -> Zone01 -> Zone02 -> Zone03, 382 s) — the mug's visible window and his wheel visit are 4 s apart on the original
 take Handbag IT2_Pills                # Zone03 at the top of the Mother's nap (373 s), before the bird dies: the raid itself must be short
 take Mat IT2_Code                   # Zone03, the same visit
 activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156): the key is ready long before the raid

@@ -724,13 +724,14 @@ class Driver(Recorder):
         return False
 
     def gate_open(self, zone_pid, x, item=None):
+        self._gate_why = 0
         """start (or retry) a leg aimed at (zone, x)? The target zone must
         stay clear for the whole job, and every zone Woody crosses on the
         way must be clear while he passes it (he is through zone k of the
         path about (k+1) hops after the click) — a human reads the whole
         route, not just the room he is heading for"""
         if self.in_use_now(item):
-            return False
+            self._gate_why = 1; return False
         need = self.woody_need(zone_pid, x, item) + self.MARGIN \
             + getattr(self, '_extra_need', 0.0)      # the plan's `+N`
         w = self.v.woody
@@ -778,7 +779,7 @@ class Driver(Recorder):
                 and (p.zone is None or p.zone.pid != zone_pid)
             if eta is not None and eta < need + (
                     self.ESCAPE_MARGIN if heading else 0.0):
-                return False
+                self._gate_why = 2; return False
             # a dead-end target with no wardrobe (Level110's balcony): the
             # job must end AND Woody must be through its only door before
             # the catcher walks in — the door pair he passes is held
@@ -791,11 +792,11 @@ class Driver(Recorder):
                 _oz, exit_door = exits[0]
                 walk_out = abs(exit_door.x - x) / self.woody_speed(zone_pid)
                 if eta < need + walk_out + self.woody_door_time(exit_door):
-                    return False
+                    self._gate_why = 3; return False
             if leave is not None:
                 eta = self.eta_to_zone(p, w.zone.pid, horizon=30.0)
                 if eta is not None and eta < leave:
-                    return False
+                    self._gate_why = 4; return False
         # the route: the shortest one first; when a room on it is hot, the
         # way round it (Level210's Zone03 -> Zone01 goes by Zone02 OR
         # Zone04) — the leg then clicks that waypoint before the item
@@ -805,7 +806,7 @@ class Driver(Recorder):
             alt = self.find_path_avoiding(w.zone.pid, zone_pid, hot) \
                 if w is not None and w.zone is not None else None
             if not alt or [z for z, _d in alt] == [z for z, _d in path]:
-                return False
+                self._gate_why = 5; return False
             arrive2 = []
             t = 2.0 if w.hiding else 0.0
             wx = w.sprite.x
@@ -819,7 +820,7 @@ class Driver(Recorder):
                 cur = zp
                 arrive2.append(t)
             if not self._route_clear(alt, arrive2, zone_pid):
-                return False
+                self._gate_why = 6; return False
             self._route_via = alt[0][0]
         # and the way back out: a dead-end room (Level104's bathroom, only
         # through the hall) is a trap when the catcher walks into its
@@ -833,7 +834,7 @@ class Driver(Recorder):
         if not (item is not None and item.kind == 'HideItem') \
                 and (not soon or min(soon) < 30.0) \
                 and self._escape_slack(zone_pid, x, need) < 1.0:
-            return False
+            self._gate_why = 7; return False
         return True
 
     def _click_via(self, it, click):
@@ -1777,9 +1778,22 @@ class Driver(Recorder):
         deadline = self.t + timeout
         next_stage = self.t
         next_detour = self.t + 4.0
+        last_why = None
         while self.t < deadline:
             if self.gate_open(zone_pid, x, item):
                 return True
+            if os.environ.get('NFH_GATE_LOG') and self._gate_why != last_why:
+                # the gate's reason, numbered by its `return False` in
+                # gate_open (1: the item in use, 2: a catcher's ETA short of
+                # the need, 3: a dead end's exit, 4: the leaving zone, 5/6:
+                # the route, 7: no escape slack), with the catchers' ETAs
+                last_why = self._gate_why
+                w = self.v.woody
+                print('gate t=%.1f zone=%s why=%d need=%.1f woody=%s etas=%s' % (
+                    self.t, zone_pid, self._gate_why,
+                    self.woody_need(zone_pid, x, item) + self.MARGIN + getattr(self, '_extra_need', 0.0),
+                    (w.zone.pid if w is not None and w.zone is not None else None),
+                    [(p.role, self.eta_to_zone(p, zone_pid), p.zone.pid if p.zone else None, p.is_sleeping) for p in self.catchers()]), flush=True)
             if self.world.game.got_caught or self.world.game.ending:
                 return False
             self._dodge_tick()
