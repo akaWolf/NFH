@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import sdl2
 
-from base import asset_root, data_root, levels_root
+from base import asset_root, data_root, levels_root, sdl_open
 from gui import Gfx, Text, adjust_rect, font_size
 from menu import (Menu, SceneData, ControlToggle, level_index,
                   load_strings)
@@ -365,14 +365,8 @@ class App:
     loading screens run inline between them"""
 
     def __init__(self, headless=False, prefs=None):
-        sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO)
-        flags = sdl2.SDL_WINDOW_HIDDEN if headless else sdl2.SDL_WINDOW_SHOWN
-        self.win = sdl2.SDL_CreateWindow(
-            b'Neighbours from Hell', sdl2.SDL_WINDOWPOS_CENTERED,
-            sdl2.SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, flags)
-        self.rnd = sdl2.SDL_CreateRenderer(
-            self.win, -1,
-            sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
+        self.win, self.rnd = sdl_open(b'Neighbours from Hell', WIDTH, HEIGHT,
+                                      headless)
         sdl2.SDL_RenderSetLogicalSize(self.rnd, WIDTH, HEIGHT)
         self.headless = headless
         # per-season caches: each build's Resources only saw its own season,
@@ -911,7 +905,16 @@ def main(argv):
     if not ensure_assets():
         return 1
     start = argv[1] if len(argv) > 1 else 'Entry'
-    app = App()
+    try:
+        app = App()
+    except RuntimeError as e:
+        # no display for SDL: say so and stop, instead of the headless spin
+        _message_box('Neighbours from Hell',
+                     '%s\n\nThe game needs a display: an X server (with '
+                     'libX11 where SDL can load it) or Wayland, and DISPLAY '
+                     'or WAYLAND_DISPLAY set. SDL_VIDEODRIVER, if set, must '
+                     'name a driver this SDL has.' % e)
+        return 1
     if start != 'Entry':
         app.load_level(start)
     app.run()

@@ -51,14 +51,8 @@ class Viewer:
         self.i = start
         self.headless = headless
         if window is None:
-            sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO)
-            flags = sdl2.SDL_WINDOW_HIDDEN if headless else sdl2.SDL_WINDOW_SHOWN
-            self.win = sdl2.SDL_CreateWindow(b'NFH viewer',
-                                             sdl2.SDL_WINDOWPOS_CENTERED,
-                                             sdl2.SDL_WINDOWPOS_CENTERED,
-                                             WIDTH, HEIGHT, flags)
-            self.rnd = sdl2.SDL_CreateRenderer(
-                self.win, -1, sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC)
+            from base import sdl_open
+            self.win, self.rnd = sdl_open(b'NFH viewer', WIDTH, HEIGHT, headless)
             self.cache = TextureCache(self.rnd, texture_dirs(level_paths))
             self.sounds = None if headless else SoundBank.try_open(level_paths)
         else:
