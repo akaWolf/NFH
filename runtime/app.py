@@ -890,9 +890,15 @@ def ensure_assets():
         if season not in sources or _season_installed(season):
             continue
         print('== extracting %s (one-time, a few minutes) ==' % season)
+        # the same log into a file next to the assets: a game started by a
+        # double click or a launcher has no console to show it on
+        logf = open(os.path.join(root, 'extract-%s.log' % season), 'a', encoding='utf-8')
+        def log(msg):
+            print(msg, flush=True)
+            logf.write(msg + '\n'); logf.flush()
         tmp = tempfile.mkdtemp(prefix='nfh-data-')
         try:
-            unpack(sources[season], tmp)
+            unpack(sources[season], tmp, log=log)
             dll = os.path.join(tmp, 'apk', 'assets', 'bin', 'Data', 'Managed',
                                'Assembly-CSharp.dll')
             if not os.path.exists(dll):
@@ -912,8 +918,20 @@ def ensure_assets():
                 if season == 's1':
                     return False
                 continue
-            extract_season(tmp, root, season)
+            failed = extract_season(tmp, root, season, log=log)
+            if failed:
+                _message_box('Neighbours from Hell', (
+                    'Season %s: %d scene(s) did not export (%s) — those '
+                    'levels will not start. The reasons are in %s' % (
+                        season[1], len(failed),
+                        ', '.join(n for _b, n, _e in failed),
+                        os.path.join(root, 'extract-%s.log' % season))))
+        except Exception:
+            import traceback
+            log(traceback.format_exc())
+            raise
         finally:
+            logf.close()
             shutil.rmtree(tmp, ignore_errors=True)
     return have_assets()
 

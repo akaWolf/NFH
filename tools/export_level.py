@@ -260,7 +260,7 @@ def export(path, out_path=None, asm=None, layouts=None, script_names=None,
         out['bubble_icons'] = bi
 
     if out_path:
-        with open(out_path, 'w') as f:
+        with open(out_path, 'w', encoding='utf-8') as f:   # ensure_ascii=False: the bytes must be UTF-8 under any locale
             json.dump(out, f, indent=1, ensure_ascii=False)
     return sc, out
 

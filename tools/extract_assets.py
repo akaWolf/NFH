@@ -37,8 +37,10 @@ def extract_season(data_dir, out_root, season, log=print):
     log('extracting %s strings and fonts...' % season)
     extract_strings.main(os.path.join(out_root, 'strings', season),
                          os.path.join(out_root, 'fonts', season))
-    export_levels(data_dir, out_root, season, log=log)
-    log('%s assets ready under %s' % (season, out_root))
+    failed = export_levels(data_dir, out_root, season, log=log)
+    log('%s assets ready under %s%s' % (season, out_root,
+        '' if not failed else ' — %d scene(s) missing, see above' % len(failed)))
+    return failed
 
 
 def export_levels(data_dir, out_root, season, log=print):
@@ -71,14 +73,29 @@ def export_levels(data_dir, out_root, season, log=print):
     names = SerializedFile(paths.GG_ASSETS).mono_scripts()
     index = AssetIndex()
     log('exporting %s scenes...' % season)
+    failed = []
     for p in paths.scene_files():
         base = os.path.basename(p)
         uname = export_level.SCENE_NAMES.get(base)
         name = os.path.splitext(os.path.basename(uname))[0] if uname else base
-        export_level.export(p, os.path.join(out_dir, name + '.json'),
-                            asm=asm, layouts=layouts, script_names=names,
-                            index=index)
+        try:
+            export_level.export(p, os.path.join(out_dir, name + '.json'),
+                                asm=asm, layouts=layouts, script_names=names,
+                                index=index)
+        except Exception as e:
+            # one scene must not take the rest of the season with it; the
+            # failure is said here and summed up below
+            import traceback
+            failed.append((base, name, '%s: %s' % (type(e).__name__, e)))
+            log('  %s -> %s.json FAILED: %s: %s' % (base, name, type(e).__name__, e))
+            log(traceback.format_exc())
+            continue
         log('  %s -> %s.json' % (base, name))
+    if failed:
+        log('%s: %d of %d scenes did not export: %s' % (
+            season, len(failed), len(paths.scene_files()),
+            ', '.join(n for _b, n, _e in failed)))
+    return failed
 
 
 def main(argv):

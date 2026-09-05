@@ -1134,7 +1134,7 @@ BEHAVIOR_TYPES = (
 
 class Level:
     def __init__(self, path):
-        raw = json.load(open(path))
+        raw = json.load(open(path, encoding='utf-8'))
         self.path = path
         self._raw_scene = raw.get('scene')
         self._season2 = '/s2/' in path.replace('\\', '/')
