@@ -941,12 +941,19 @@ class Item:
         return self.x + self.dx
 
     def move_x(self, role):
-        """Item.GetMoveLocation: Olga and Mother stand offset, everyone else
-        at TargetLocation itself."""
+        """the x a pawn walks to for the item: Item.GetMoveLocation offsets
+        Olga and the Mother (Item.cs:2245-2255); Woody's own step is built
+        by Woody.AddItemStep as Step(item, item.DeltaWoodyLocation) —
+        TargetLocation + DeltaWoodyLocation (Woody.cs:757-767, Step.cs:93-98;
+        31 items carry one, from Level101's Sofa at +0.5 to Level209's Coal
+        at +1.8, and HatchFixBehavior gives Level214's hatch +1.5 for its
+        second use); everyone else stands at TargetLocation itself."""
         if role == 'Olga':
             return self.target_x + self.delta_olga_x
         if role == 'Mother':
             return self.target_x + self.delta_mother_x
+        if role == 'Woody':
+            return self.target_x + self.delta_woody_x
         return self.target_x
 
     def sequence_for(self, role, tricked, items=None):

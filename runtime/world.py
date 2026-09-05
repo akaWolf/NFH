@@ -62,6 +62,10 @@ class AnimPlayer:
         self.ignore_infinite = False     # SetIgnoreInfiniteLoop
         self.ignore_infinite_once = False
         self.sound_sink = sound_sink
+        # a PlayAnimationSequence whose owner has no ActionManager ends its
+        # last element twice (see _stop_single): Woody's controller
+        self.double_end = False
+        self._second_end = False
         self.stand_hook = None           # PawnAnimationController falls back to
                                          # a stand pose; item controllers don't
         self.busy_hook = None            # the owner is moving (a delegate that
@@ -128,6 +132,7 @@ class AnimPlayer:
         self.sprite.current = i
         self.mode = mode
         self._play_serial += 1
+        self._second_end = False         # a new play ends the extra period
         self._set_start()
         # InitializeCurrentAnimation -> Owner.BehaviorPlayAnimation(name)
         for h in self.on_play:
@@ -277,13 +282,31 @@ class AnimPlayer:
             self.sprite.hidden = True
         if self.anim.show_child_on_end and self.show_child_hook is not None:
             self.show_child_hook()
-        cb, self.on_end = self.on_end, None
         was_seq, self.as_sequence = self.as_sequence, False
         if was_seq and self.seq_end_hook is not None:
             # Rottweiler.OnAnimationSequenceEnded opens with
             # BehaviorOnAnimationSequenceEnded (Rottweiler.cs:448), before
             # the ActionManager.StopCurrentAction the callback stands for
             self.seq_end_hook()
+        if was_seq and self.double_end and not self._second_end:
+            # the last element of a PlayAnimationSequence on a controller
+            # whose owner has no ActionManager — Woody's — ends twice: the
+            # first end is the sequence path (StopSingleAnimation cs:239-
+            # 246: ShouldStopAction, OnAnimationSequenceEnded — Pawn's
+            # returns false, Woody overrides nothing — then ActionManager.
+            # StopCurrentAction on a null field, the exception Unity logs)
+            # which starts no animation, so the element runs one more
+            # period past its end, the last pattern entry standing, and the
+            # second end is the single path (cs:234-238): OnAnimationEnded
+            # (Woody.OnSingleAnimationEnded: the take's InternalUse) and the
+            # stand. Bench, Level214's Carpet take: TakeLow's pattern index
+            # 0..5 six ticks each, then index 6 for six more, InternalUse
+            # and Stand_Down at the seventh — 90 frames from TryUseItem
+            # where the single-ended port took 84.
+            self._second_end = True
+            return
+        self._second_end = False
+        cb, self.on_end = self.on_end, None
         serial = self._play_serial
         if self.single_end_hook is not None:
             # OnAnimationEnded delegates: Item.OnItemAnimationCompleted and
@@ -5701,6 +5724,14 @@ class World:
             item.use_once = False
             item.use_tricked_anim['Rottweiler'] = \
                 list(item.rott_use_second_tricked)
+            # cs:2567-2569: Woody's spot for the round moves 1.5 to the
+            # right (onto the hatch itself) and 0.3 lower — the original
+            # stands him at (3.14, -2.86) for the shards round and the
+            # done pass, the port stood him at (1.65, -2.57) and so walked
+            # him down and up again for the pass, 60 frames the original
+            # does not spend (replay49)
+            item.delta_woody_x = 1.5
+            item.woody_delta_use_height = 0.7
         else:
             item.use_once = True
             item.idle = 'N2TrickItemIdleFuckedup'
@@ -7685,6 +7716,7 @@ class World:
             # items, and OnBlockingAnimationEnded the swapped layers
             # (Woody.cs:381-385, 304-307)
             p.anim.single_end_hook = self._woody_single_ended
+            p.anim.double_end = True      # no ActionManager on Woody's controller
         if role == 'Woody' and self.level.start_location is not None:
             # Woody.Start parks him at StartLocation in the StartZone with
             # InputLocked = !FinishedEntrance (Woody.cs:187-192); with the

@@ -1404,8 +1404,65 @@ his index 1 from 25243 (the steering from ~27100, the crash at 27950),
 the pistol at index 2 from 28282 (PistolFire, the Mother's crash,
 29641), the level over at 29642 — six tricks on the original within
 14–24 frames of the port's own six. The port-side replay of the same
-clicks (record_app on the original's frames) no longer runs the level
-out: since the tap's settle dropped to 0.05 s its Woody is caught at
-7738, in the deck chair leg after the shards round — an artifact of the
-replay's port half, not of the port (the plan run is 28/28), noted
-here and not chased.
+clicks (record_app on the original's frames) at first no longer ran
+the level out: since the tap's settle dropped to 0.05 s its Woody was
+caught at 7738, in the deck chair leg after the shards round. That was
+the port's, not the replay's (the next section): with Woody's
+DeltaWoodyLocation and his sequence's double end in, the port-side
+replay runs the level out (replay52) — tricks at 5284, 11336, 18665,
+24193, 27969, 29660 and the ending at 29660, within 6–19 frames of the
+original's.
+
+## Two port bugs behind the replay's port half and the take's six frames
+
+Both came out of the sixth trick's replay (replay49/51), whose port
+half — record_app on the original's click frames — had lost Woody at
+7738 while the original ran the level out.
+
+**Woody's use spot ignores DeltaWoodyLocation.** Woody.AddItemStep
+builds his item step as Step(item, item.DeltaWoodyLocation) — the
+item's TargetLocation plus his own offset (Woody.cs:757-767, Step.cs:
+93-98); the port's Item.move_x offset Olga and the Mother (Item.
+GetMoveLocation) and sent Woody to TargetLocation itself. 31 items
+carry the offset (Level101's Sofa +0.5, Level107's Camera −1.2 and
+DieselGenerator +1.48, Level209's Coal +1.8 …), and Level214's hatch
+gets one at its first fix: HatchFixBehavior (Item.cs:2550-2579) sets
+DeltaWoodyLocation.x = 1.5 and WoodyDeltaUseHeight = 0.7 with the
+dexterity flags. On the original Woody stands at (3.14, −2.86) for the
+shards round and the done pass; the port stood him at (1.65, −2.57),
+so the pass was a walk down and a climb back (60 frames) where the
+original's is a short climb (11), and the replayed deck-chair click at
+7049 met the port's Woody mid-climb — refused, he stayed on the hatch,
+and the Rottweiler's second fall caught him. move_x now adds
+DeltaWoodyLocation.x for Woody and the hatch's fix sets the two fields.
+(DeltaWoodyLocation.y — Level110's FireExtinguisher +0.2 and Beer
+−0.2 — is not in the step's y yet: the item step carries no y in the
+port; noted, not measured.)
+
+**A Woody take is six frames short.** The take's lock spans TryUseItem
+→ Item.InternalUse: 90 frames on the original (takes.js, the Carpet:
+TryUseItem at 1718, TakeOneFrameNFH2Up 1719, ItemFoundUp 1720-1765,
+TakeLow from 1766, InternalUse 1808), 84 on the port. The animations
+are the same length on both sides (1 + 46 + 43 rows); what differs is
+where InternalUse falls in TakeLow. Refresh traced per frame on
+Woody's controller: TakeLow's pattern index runs 0..5 six ticks each
+and then sits at 6 — past its six entries, the last standing — for six
+more ticks, and InternalUse and Stand_Down come at the seventh. The
+mechanism is StopSingleAnimation's two tails (AnimationControllerBase.
+cs:219-246): a PlayAnimationSequence's last element ends first through
+the sequence path — ShouldStopAction, OnAnimationSequenceEnded (Pawn's
+returns false; Woody overrides nothing), then ActionManager.
+StopCurrentAction on Woody's null ActionManager, the
+NullReferenceException Unity logs — which starts no animation, so the
+element runs one more period and ends again through the single path:
+OnAnimationEnded = Woody.OnSingleAnimationEnded, the SearchAnimation
+branch, OnFinishAnimationCompelted → InternalUse, then the stand. The
+port fired the sequence's callback at the first end. AnimPlayer now
+ends a Woody sequence twice (double_end): the first end runs the
+sequence hook and keeps the element for a period, the second runs the
+single hook, the callback and the stand; the take's lock reads 90 on
+the port. The same null-manager path exists on the item controllers
+(Item.OnAnimationSequenceCompleted returns false too); whether an item
+sequence's completion also comes a period late is not measured — the
+neighbours' sequences end in StopCurrentAction, which starts the next
+animation in the same frame, and their timings already matched.
