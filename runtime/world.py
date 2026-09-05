@@ -3449,7 +3449,13 @@ class Routine:
             self._stop_side_effects(self.action, it)
         target = getattr(self, '_angry_target', None)
         self._angry_target = None
-        self._action_stopped()
+        if getattr(self, '_stopped_for_urgent', False):
+            # OnActionStopped already ran at the WaitInFear urgent's start
+            # (_start_wait_in_fear): the action is no longer Active, and the
+            # next StartAction stops nothing (ActionManager.cs:157-160)
+            self._stopped_for_urgent = False
+        else:
+            self._action_stopped()
         if target is not None and target.reuse_after_fix:
             self._pending = 'start'
         else:
@@ -4390,12 +4396,30 @@ class Routine:
         (RoutineActionHitPawn.cs:13-45)."""
         if self.frozen:
             return
+        # a use still running (no advance queued by its end) is the active
+        # action StartAction stops below; a queued advance means it ended
+        in_use = self.state == self.USING and self._pending is None \
+            and self.action is not None
         if self._pending in ('advance', 'skip'):
             self._advance()
         self._pending = None
         self._hit_target = target_pawn
         if self._urgent_action is None:
             self._original_action = self.action   # cs:715-718
+        # StartUrgentAction -> StartAction stops the active action first
+        # (ActionManager.cs:157-160, through MoveToAction's StartAction
+        # (MoveAction) in the far case too): a use in progress runs its
+        # OnActionStopped, whose HideOwnerDuringUse unhides the owner
+        # (RoutineActionUse.cs:481-484 — outside the !MutexAction block,
+        # which closes at cs:363). A Hidden controller never refreshes
+        # (AnimationControllerBase.OnGUI), so Olga parked hidden on her
+        # Level205 table-tennis mutex must be shown for her HitPawnSequence
+        # to run out: without the stop the port's hit never ended and the
+        # neighbour waited in fear for the rest of the level (the sofa-
+        # first-style reverse plan of Level205; the standard plan tricks
+        # the table last and never saw it).
+        if in_use:
+            self._action_stopped()
         self.urgent_item = None
         self._urgent_action = {'kind': 'hit_pawn'}
         self.pawn.steps = []
@@ -5441,6 +5465,25 @@ class World:
         routine = next((r for r in self.routines if r.pawn is pawn), None)
         pawn.movement_paused = True
         if routine is not None:
+            if routine.state == routine.USING and routine.action is not None \
+                    and routine._pending is None:
+                # StartWaitInFearAction -> StartUrgentAction -> StartAction
+                # stops the use in progress right here (ActionManager.cs:
+                # 157-160 -> RoutineAction.StopAction(next), cs:116-120:
+                # Active = false, OnActionStopped) — at the tricked use's
+                # FIRST StopAction (canPostponeStop: true), not after the
+                # angry: the second StopAction(false) only sets Finished and
+                # the next StartAction finds the action inactive. Bench,
+                # Level205's tennis tricked first (olga.js): Olga unhidden
+                # and her parked mutex aborted at 133.03, the WaitInFear's
+                # start; nothing at 141.18, the fix's end — so she sits
+                # down on the mat at 139.4 hidden and stays, her sequence
+                # frozen, until his mat visit drains the item's loop. The
+                # port ran OnActionStopped at 141.18: her unhide let her
+                # mat animation run out, she left for the tennis park and
+                # the two waited for each other for good.
+                routine._action_stopped()
+                routine._stopped_for_urgent = True
             routine.postpone_alarm()
             routine._wait_in_fear_done = resume
             routine.state = routine.USING
