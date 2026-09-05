@@ -403,8 +403,11 @@ def resolve(session, name, wait=15.0, select=None, world=None, busy=None):
     # let the hooked frame finish: the point was read after the framing
     # inside GameInfo.Update; a full second here put every tap ~70 frames
     # behind its schedule, and a chain the runner clicks back to back
-    # (Level214's bucket then cloth) breaks on that much
-    time.sleep(0.2)
+    # (Level214's bucket then cloth) breaks on that much; 0.2 s still left
+    # ~21 frames with adb's `input tap` (0.12 s) and the dispatch, and the
+    # raid's five legs summed that into the mug's hidden window — three
+    # frames cover the framing's own frame
+    time.sleep(0.05)
     if 'error' in got or 'x' not in got:
         return None
     if got.get('busy'):

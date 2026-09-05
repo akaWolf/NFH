@@ -1349,3 +1349,19 @@ starts, and the sixth trick waits for his next loop — outside a replay
 of the port's clicks, whose dodges no longer fit the branch. A runner
 that executes the plan's legs against the original's own state is the
 tool that would close it.
+
+With the settle after the hooked frame cut from 0.2 s to 0.05 s the tap
+lands 12-13 frames after its frame instead of 21-22 (the pt at 535 →
+547, the Carpet 1576 → 1588, the DeckChair 4780 → 4793), and the raid's
+waits shrink with it (the ammo's 22 frames, the hatch's 44) — and the
+mug still misses: the door's MakeTrick ends at ~24700 on the original,
+the mug's window closed at 24664, the retry lands at 25070, the wheel
+comes at 26069, after his action. In the port the door's use ends at
+410.4 s from the load, 0.6 s before that window closes; on the original
+at 411.7 — the raid's four taps at ~0.2 s each are most of the 1.3 s,
+and the take animations keep Woody locked (BlockWhenItemPick: a click
+under the lock is stored and dropped at the unlock, Woody.cs:534-537,
+Item.cs), so a tap cannot be sent early to hide its latency. The adb
+`input tap` itself is 0.12 s; the emulator console's raw events would
+take that to ~0.03 s and still leave the chain short by half a second.
+The sixth trick's replay stands where the section above leaves it.
