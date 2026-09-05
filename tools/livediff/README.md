@@ -1255,11 +1255,20 @@ his shower angry over, his next action starting — with the CaptainWheel
 still inactive (no SetActive by then: the mug's DelayActivateItem had
 not run out, the mug being used nine seconds later than in the port's
 own run) and Woody on the DoorBack at (1.07, 4.1) on his way to the
-pistol. Under frida a managed null dereference takes the game down (the
-death class noted for the bench); the plain game would throw the
-NullReferenceException in Update and go on. In the port's own run the
-wheel came at ~417 s and he steered it at 447 s; how the plain original
-carries a routine action whose item is not yet active is not measured —
-the replay cannot reach it, and that is where Level214's replay stands:
-five of six tricks on both sides to the frame, the sixth behind a race
-the runner never runs into.
+pistol. This one is the game's own death, not the bench's: logcat has
+Mono's `Unhandled Exception: System.NullReferenceException` at
+Item.LoadPawnAnimations ← Item.LoadRottweilerUseAnimations ←
+Item.LoadRottweilerAnimations ← ActionManager.MoveToAction, and the
+process is gone the same instant (no tombstone, no frida frame) — a
+routine action started on an item whose object is still inactive loads
+its neighbour animations off a null, and the plain game would die the
+same way. (The bench's other death class — the tombstones inside
+frida-agent at esp-4 under Mono's 8 KB alternate signal stack — is a
+different one; state.js now gives the game's thread a 1 MB sigaltstack
+against it, which this run, dying in Mono, could not test.) In the port's
+own run the wheel came at ~417 s and he steered it at 447 s; the port
+starts that action on the inactive wheel without dying, which the
+original does not survive — nothing to match there. That is where
+Level214's replay stands: five of six tricks on both sides to the frame,
+the sixth behind a race the runner never runs into and the original
+does not live through.
