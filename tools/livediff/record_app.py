@@ -101,7 +101,12 @@ def main(argv):
         v.cam.x, v.cam.y = it.collider[0], it.collider[1]
         v._clamp_camera()
         sx, sy = v.cam.world_to_screen(it.collider[0], it.collider[1], WIDTH, HEIGHT)
-        return v.handle_click(sx, sy) or 'none'
+        r = v.handle_click(sx, sy) or 'none'
+        # Helpers' LinkNodes statics after the click (world.helpers) and
+        # whether Woody got a path: the original's calls.js logs the same
+        # at Pawn.MoveToLocation / LinkNodes
+        w = v.woody
+        return '%s helpers=%s steps=%d' % (r, getattr(v.world, 'helpers', None), len(getattr(w, 'steps', None) or []))
 
     def click_at(x, y):
         """a bare world point, the camera framed on it as click_item does"""

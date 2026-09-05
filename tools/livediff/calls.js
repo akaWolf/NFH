@@ -109,6 +109,65 @@ hook(GOK, 'SetActive', 1, { onEnter: function (a) {
     const n = uname(a[0]);
     if (n !== null && WATCH.indexOf(n) >= 0) send({ f: frame, m: 'SetActive', go: n, active: on });
 } });
+// the pathing at a click: Pawn.MoveToLocation's answer, Woody's abort,
+// GetDoorBetweenZones' door and LinkNodes with Helpers' statics
+const Helpers = classFrom(game, S(''), S('Helpers'));
+const staticGet = f('mono_field_static_get_value', 'void', ['pointer', 'pointer', 'pointer']);
+const classVtable = f('mono_class_vtable', 'pointer', ['pointer', 'pointer']);
+function statics() {
+    const out = {};
+    if (Helpers.isNull()) return out;
+    const vt = classVtable(dom, Helpers);
+    ['StepIndex', 'FirstStepIndex', 'Aux'].forEach(n => {
+        const fl = fieldFrom(Helpers, S(n)); if (fl.isNull()) return;
+        const o = Memory.alloc(8); staticGet(vt, fl, o); out[n] = o.readS32();
+    });
+    ['DonePassingHelper'].forEach(n => {
+        const fl = fieldFrom(Helpers, S(n)); if (fl.isNull()) return;
+        const o = Memory.alloc(8); staticGet(vt, fl, o); out[n] = o.readU8();
+    });
+    ['OriginalStartZone'].forEach(n => {
+        const fl = fieldFrom(Helpers, S(n)); if (fl.isNull()) return;
+        const o = Memory.alloc(8); staticGet(vt, fl, o); out[n] = uname(o.readPointer());
+    });
+    return out;
+}
+hook(Pawn, 'MoveToLocation', 0, {
+    onEnter: function (a) { this.who = cls(a[0]); },
+    onLeave: function (r) { send({ f: frame, m: 'MoveToLocation', owner: this.who, ret: r.toInt32() & 0xff }); }
+});
+const WoodyK2 = classFrom(game, S(''), S('Woody'));
+hook(WoodyK2, 'ShouldAbortMove', 5, {
+    onEnter: function (a) { this.item = uname(a[1].readPointer()); },
+    onLeave: function (r) { send({ f: frame, m: 'ShouldAbortMove', item: this.item, ret: r.toInt32() & 0xff }); }
+});
+if (!Helpers.isNull()) {
+    hook(Helpers, 'GetDoorBetweenZones', 2, {
+        onEnter: function (a) { this.z = [uname(a[0]), uname(a[1])]; },
+        onLeave: function (r) { send({ f: frame, m: 'GetDoorBetweenZones', zones: this.z, door: uname(r) }); }
+    });
+    hook(Helpers, 'LinkNodes', 4, {
+        onEnter: function (a) { this.z = [uname(a[1]), uname(a[2])]; this.st = statics(); },
+        onLeave: function (r) { send({ f: frame, m: 'LinkNodes', zones: this.z, statics: this.st, ret: r.toInt32() & 0xff }); }
+    });
+}
+// the click's raycast: the collider Helpers.GetItemFromCollider is given
+// (its GameObject's name) and the Item it answers, with that item's CanUse
+const Comp = classFrom(unity, S('UnityEngine'), S('Component'));
+const getGO = methodUp(Comp, 'get_gameObject', 0);
+const iCanUse = offOf(Item, 'CanUse');
+if (!Helpers.isNull()) {
+    hook(Helpers, 'GetItemFromCollider', 1, {
+        onEnter: function (a) { const go = getGO.isNull() ? NULL : call0(getGO, a[0]); this.go = uname(go); },
+        onLeave: function (r) { send({ f: frame, m: 'GetItemFromCollider', collider: this.go, item: uname(r), canUse: (r.isNull() || iCanUse < 0) ? null : r.add(iCanUse).readU8() }); }
+    });
+}
+// Collider.enabled on the mug: MugBehavior's frames 25-57 of the captain's idle
+const ColK = classFrom(unity, S('UnityEngine'), S('Collider'));
+hook(ColK, 'set_enabled', 1, { onEnter: function (a) {
+    const n = uname(a[0]);
+    if (n === 'CaptainMug') send({ f: frame, m: 'Collider.enabled', go: n, on: a[1].toInt32() & 0xff });
+} });
 let lastAnim = null;
 Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
     onEnter: function (a) {

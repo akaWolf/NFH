@@ -134,6 +134,33 @@ function selectInventory(typeId) {
     return 'type ' + typeId + ' not in the inventory (' + size + ' entries)';
 }
 let done = false;
+// GameObject.GetComponent(string) — the String overload among the
+// one-argument GetComponents — and the Item's IsHidden behind it
+const ItemK = classFrom(game, S(''), S('Item'));
+const iHidden = ItemK.isNull() ? -1 : offOf(ItemK, 'IsHidden');
+const getMethods = f('mono_class_get_methods', 'pointer', ['pointer', 'pointer']);
+const methName = f('mono_method_get_name', 'pointer', ['pointer']);
+const methSig = f('mono_method_signature', 'pointer', ['pointer']);
+const sigParams = f('mono_signature_get_params', 'pointer', ['pointer', 'pointer']);
+const sigCount = f('mono_signature_get_param_count', 'uint32', ['pointer']);
+const typeName = f('mono_type_get_name', 'pointer', ['pointer']);
+function getComponentByString() {
+    const iter = Memory.alloc(Process.pointerSize); iter.writePointer(NULL);
+    while (true) {
+        const m = getMethods(GO, iter); if (m.isNull()) return NULL;
+        if (methName(m).readUtf8String() !== 'GetComponent') continue;
+        const sig = methSig(m); if (sigCount(sig) !== 1) continue;
+        const it2 = Memory.alloc(Process.pointerSize); it2.writePointer(NULL);
+        const pt = sigParams(sig, it2); if (pt.isNull()) continue;
+        if (typeName(pt).readUtf8String() === 'System.String') return m;
+    }
+}
+const getCompStr = getComponentByString();
+function itemHidden(go) {
+    if (getCompStr.isNull() || iHidden < 0) return false;
+    const it = call(getCompStr, go, [newStr(dom, S('Item'))]);
+    return !it.isNull() && it.add(iHidden).readU8() !== 0;
+}
 let lastCam = null, still = 0;
 // CameraMover's own interpolation (cs:355-365): while Interpolating, every
 // Update lerps the transform back toward TargetPosition, so a framing set
@@ -310,6 +337,13 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             } else {
                 const go = call(find, NULL, [newStr(dom, S(NAME))]);
                 if (go.isNull()) { send({ error: 'no GameObject ' + NAME }); return; }
+                // an item hidden by a behaviour (Item.IsHidden — MugBehavior
+                // hides the captain's mug and drops its collider for frames
+                // 25-57 of his idle, cs:16-33) takes no click: the raycast
+                // meets the zone, and with something in hand the click is
+                // abandoned (Woody.ShouldAbortMove) — report it absent, so
+                // run.py retries it like an item that is not there yet
+                if (itemHidden(go)) { send({ error: 'hidden ' + NAME }); return; }
                 const t = call(getTransform, go, []);
                 pos = t.isNull() ? NULL : call(getPosition, t, []);   // boxed Vector3
                 if (pos.isNull()) { send({ error: 'no transform' }); return; }

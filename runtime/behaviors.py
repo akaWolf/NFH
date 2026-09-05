@@ -13,6 +13,7 @@ Serialized references resolve against the live world: Items by component pid,
 Pawns by the owning component's pid, Zones via Level.zone_by_component.
 """
 
+import os
 from scene import GUI_DEPTH
 
 NONE = ('NONE', None)
@@ -150,6 +151,8 @@ class Behavior:
         """((Component)it).GetComponent<Collider>().enabled"""
         if it is not None:
             it.clickable = on
+            if os.environ.get('NFH_TRACE_COLLIDER'):    # the bench's Collider.enabled trace
+                print('collider %s %s t=%s' % (it.name, on, getattr(self.world, 't', None)), flush=True)
 
     # -- hook defaults (ActorBehavior.cs, RoutineBehavior.cs) --------------
     def play_animation(self, name):

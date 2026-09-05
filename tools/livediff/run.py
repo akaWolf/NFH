@@ -210,37 +210,38 @@ def main(argv):
             busy = (row['kind'] != 'dodge') if row.get('kind') else None
             return tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'), busy=busy)
         i = 0
-        pending = None                     # an item tap that found no item yet
-        while (i < len(rows) or pending is not None) and time.time() < deadline:
+        pending = []                       # item taps that found no item yet
+        while (i < len(rows) or pending) and time.time() < deadline:
             now = stats['level_frames']
-            if pending is not None and now >= pending['next']:
+            due = next((p for p in pending if now >= p['next']), None)
+            if due is not None:
                 # the runner's poke: a click on an item that is not there
                 # yet is repeated every 3 s until it is (Level214's wheel
-                # comes 11 s after the mug, and the original's mug use ran
-                # later than the port's under the busy waits, so the five
-                # recorded clicks all came before the wheel) — the replay
-                # retries between the scheduled taps, never holding them
-                # (a retry loop that did held the dodges and Woody was
-                # caught), for 15 s past the last recorded click
-                row = pending['row']
+                # comes 11 s after the mug; the mug itself is clickable
+                # only 4 s in 8 of the captain's idle, MugBehavior.cs) —
+                # the replay retries between the scheduled taps, never
+                # holding them (a retry loop that did held the dodges and
+                # Woody was caught), for 15 s past the last recorded click;
+                # every absent item keeps its own retry
+                row = due['row']
                 try:
                     pt = resolve_row(row)
                 except Exception as e:
                     print('[taps] retry: %s — the rest of the clicks dropped' % e)
                     break
                 if pt is not None:
-                    print('[taps] frame %d: %s resolved after retries at %d' % (pending['want'], row.get('item'), stats['level_frames']))
-                    send_tap(row, pending['want'], pt)
+                    print('[taps] frame %d: %s resolved after retries at %d' % (due['want'], row.get('item'), stats['level_frames']))
+                    send_tap(row, due['want'], pt)
                     # the recorded pokes on the same item that follow were
                     # the runner's own retries: one landed click answers them
                     while i < len(rows) and rows[i].get('item') == row.get('item'):
                         i += 1
-                    pending = None
-                elif stats['level_frames'] >= pending['give_up']:
-                    print('[taps] frame %d: could not resolve %s (retried 15 s)' % (pending['want'], row.get('item')))
-                    pending = None
+                    pending = [p for p in pending if p['row'].get('item') != row.get('item')]
+                elif stats['level_frames'] >= due['give_up']:
+                    print('[taps] frame %d: could not resolve %s (retried 15 s)' % (due['want'], row.get('item')))
+                    pending.remove(due)
                 else:
-                    pending['next'] = stats['level_frames'] + 180
+                    due['next'] = stats['level_frames'] + 180
                 continue
             if i >= len(rows):
                 time.sleep(0.02)
@@ -259,8 +260,14 @@ def main(argv):
             if pt is None:
                 if row.get('item'):
                     print('[taps] frame %d: %s not there yet, retrying' % (want, row.get('item')))
-                    pending = {'row': row, 'want': want, 'next': stats['level_frames'] + 180,
-                               'give_up': want + 900}
+                    # a later recorded click on an item already pending
+                    # extends its window; a new item gets its own entry
+                    same = next((p for p in pending if p['row'].get('item') == row.get('item')), None)
+                    if same is not None:
+                        same['give_up'] = want + 900
+                    else:
+                        pending.append({'row': row, 'want': want, 'next': stats['level_frames'] + 180,
+                                        'give_up': want + 900})
                 else:
                     print('[taps] frame %d: could not resolve %s' % (want, row.get('world')))
                 continue
