@@ -826,10 +826,15 @@ def have_assets():
     return _season_installed('s1')
 
 
-def _message_box(title, text):
+def _message_box(title, text, box=True):
     """a last-resort dialog for the double-click user (works before any
-    window exists); the console gets the text either way"""
-    print(text)
+    window exists); the console gets the text either way — flushed first,
+    the box is SDL's and can take the process down (its zenity fallback
+    under a foreign LD_LIBRARY_PATH segfaulted after zenity failed to
+    load), and with no display there is nothing to show it on: box=False"""
+    print(text, flush=True)
+    if not box:
+        return
     try:
         sdl2.SDL_ShowSimpleMessageBox(sdl2.SDL_MESSAGEBOX_INFORMATION,
                                       title.encode(), text.encode(), None)
@@ -916,11 +921,13 @@ def main(argv):
         app = App()
     except RuntimeError as e:
         # no display for SDL: say so and stop, instead of the headless spin
+        # (no box: there is no display to show one on)
         _message_box('Neighbours from Hell',
-                     '%s\n\nThe game needs a display: an X server (with '
-                     'libX11 where SDL can load it) or Wayland, and DISPLAY '
-                     'or WAYLAND_DISPLAY set. SDL_VIDEODRIVER, if set, must '
-                     'name a driver this SDL has.' % e)
+                     '%s\n\nThe game needs a display: an X server (with the '
+                     'libX* libraries where SDL can load them) or Wayland, '
+                     'and DISPLAY or WAYLAND_DISPLAY set. SDL_VIDEODRIVER, '
+                     'if set, must name a driver this SDL has.' % e,
+                     box=False)
         return 1
     if start != 'Entry':
         app.load_level(start)
