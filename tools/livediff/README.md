@@ -1570,3 +1570,113 @@ by hand — sweep.py's replay-live does not pass dexterity.js, and a
 plan whose first click opens a dexterity round lands one tap of 25
 without it. Walk taps whose world point is off the original's screen
 are dropped ('could not resolve'); the item taps still land.
+
+## The rating: what EXCELLENT takes, level by level
+
+The runner now lets the level end after the plan and reports the rating
+the player would see (GameInfo.CalculateScore, cs:392-431): a Season 1
+game rates FinalTrickScore + CompletedTricksCount × min(CompoundTrick
+Score, Rottweiler.AngryCountTicks), capped at 100; a Season 2 game
+(Woody.NFH2Path) rates CompletedTricksCount × 90 / TotalTricksCount plus
+10 when AngryCountTicks is exactly 1. EXCELLENT (Perfect) is 100. The
+bench agrees with the port on the arithmetic: the standard Level101
+clicks replayed on the original (score.js on CalculateScore and the
+meter per frame) give 4/4, 91 points, CompoundTrickScore 1, 95% — the
+port's 95%, with the four payments at 29.9/55.2/119.8/190.8 s against
+the port's 30.0/55.3/120.0.
+
+AngryCountTicks is the two seasons' different counter. Season 1 counts
+the angries that land while his meter is still up from the previous one
+(Rottweiler.cs:598-611: AngryMeter > 0 → EasyDown + Hard and a tick, then
+the meter tops up to 100; it decays 4.23/s only while CanDecreaseAngry
+Meter, which the angry clears and OnUseEnded sets — cs:795, 891, 910): a
+chain of tricks paid within ~24 s of each other, or a little more across
+his angry and his fix. Season 2 counts the freak-outs: the meter adds each
+trick's AngerAmount (the linked half's and the extra coins' on top,
+cs:640-658), decays 0.37/s without pause (the CanDecreaseAngryMeter clear
+is Classic-only, cs:793-796), and the tick comes when the sum reaches the
+maximum (cs:659-692) — the rating wants that once, not twice.
+
+Season 1: the plans now arm every trick first and let one lap pay them —
+Level101 (91 points, compound 5) needs three chained angries: the sofa,
+the microwave on his kitchen walk, the binoculars, the TV as he comes
+back in; Level109-rev the bed's jump, the alarm clock and the teeth within
+seconds on one lap; Level113 the valves on the first basement visit so
+that the radiator and the sink, the chair and the grinder, the ladder and
+the drill pay on one lap. Every Season 1 plan rates 100 except:
+
+- Level108: 5 of 6 — the ToothBrush's action is removed at his first
+  use (~14 s), and the brush race is lost on the original as well: the
+  drawer at frame 533 and the brush at 560 from StartGame, Woody caught
+  in the bathroom at 14.4 s (CalculateScore at frame 1340, 0 tricks).
+  73 points + 5 × 3 = 88.
+- Level114: 7 of 9 — the Gramaphone (RequirePriming + RequireUnprime,
+  primed from his [4] to his [8]) and the Pipe (ShowOnlyWhenPrimed, his
+  [3] to [7]) are usable only during his Zone02 stretch, where
+  CanRottweilerSeeWoody is zone-level and Zone02 has no hiding place;
+  taps on both at 100-108 s on the original ended with Woody caught.
+  57 points + 7 × 3 = 78.
+- Level113 is EXCELLENT at 7 of 8 (the trap under the door's collider):
+  99 points + 7 × 3.
+
+Season 2: the 10 needs the meter to reach 100 exactly once, and the meter
+decays 37 points a lap of 100 s. The plans arm the tricks against his lap
+— each right after his visit, so that the whole set pays on the next one
+— and keep the payment that crosses 100 the lap's last (a second crossing
+costs the 10). Level203 (30 + 20 + 30 + 30 + 30 over ~80 s, the bicycle
+last: 86.8 before it, 100 at it), Level209 (his lap is ~107 s; the fire
+channel goes in only after his lap-2 fakir visit, the ice cream after his
+lap-2 ice cream, the knife on the cow after his second ride, so that the
+fakir 20, the shoe 40, the coal 40, the ice cream 20 and the cow 20 all
+pay on lap 3: 39.9, 72.5, 81.1, 91.5, then the cow), Level212, Level213
+(the pinata armed right after the bull's angry pays just before the
+controls: 85 after the boat, 93.6 at the pinata, 100 at the controls),
+Level214 (the wheel's 80 tops the meter at 466 s; the pistol waits 110 s
+so its 40 does not) and Level201 rate 100. The ones that cannot, by the
+shipped amounts against his lap:
+
+- Level204: 25 + 20 + 30 + 20 + 45 = 140 spread over his ~130 s lap
+  (the kart and the karate in Zone01, the gong, the hot dog, the
+  necklace) — 48 points of decay, a peak of 83-92.
+- Level205: 25 + 30 + 40 + 30 + 20 = 145, his tennis-to-sculpture stretch
+  113-127 s (the skis 45 s, the chef 44) — a peak of 83, 98 with all five.
+- Level207: 150 over a ~150 s lap — a peak of 32 in the runner's order,
+  95 at best.
+- Level211: 7 of 8 — the FishingRod's collider lies inside the door's
+  (x −5.27..−4.42, y 1.91..2.25 within −5.86..−4.06, 1.67..2.93, the
+  door's near face nearer to the camera); on the original the tap
+  walked Woody through the door and into a catch at 33 s. 78 + 10 at
+  the most.
+- Level202, 206, 208, 210: arithmetically within reach (135-160 against
+  a 55-110 s lap) but the runner's arming — each leg waits for its zone's
+  window — spreads the payments over two laps; the closest runs peak at
+  78 (Level202: the rake pays ~30 s after the rail's slot, the rail a lap
+  later when the rake is armed first) and 77 (Level206: the harpoon and
+  the pad have to be armed before his [5] at 105 s, and the flea
+  blanket's take waits for the Mother until ~115 s). Level210 also pays
+  6 of 8 (the empty pool's coins are not in the plan yet).
+- The reverse plans of Season 2 are at 90 too: their arming order runs
+  against the lap the other way, and the payments spread the same.
+
+The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
+
+| plan | S1 | -rev | plan | S2 | -rev |
+|---|---|---|---|---|---|
+| 101 | 100 | 100 | 201 | 100 | — |
+| 102 | 100 | 100 | 202 | 90 | 90 |
+| 103 | 100 | 100 | 203 | 100 | 90 |
+| 104 | 100 | 100 | 204 | 90 | 90 |
+| 105 | 100 | 100 | 205 | 90 | 90 |
+| 106 | 100 | 100 | 206 | 90 | 90 |
+| 107 | 100 | 100 | 207 | 90 | 90 |
+| 108 | 78 (5/6) | 73 (5/6) | 208 | 90 | 90 |
+| 109 | 100 | 100 | 209 | 100 | 90 |
+| 110 | 100 | 100 | 210 | 67 (6/8) | 78 (7/8) |
+| 111 | 100 | 100 | 211 | 78 (7/8) | 78 (7/8) |
+| 112 | 100 | 100 | 212 | 100 | 90 |
+| 113 | 100 (7/8) | 100 (7/8) | 213 | 100 | 90 |
+| 114 | 80 (7/9) | 80 (7/9) | 214 | 100 | — |
+
+Every plan passes its legs; a `manual` leg is a trick the data leaves
+unreachable (the plan headers say which). The runner's summary marks a
+plan short of PERFECT, and `--all` exits 1 while any is.

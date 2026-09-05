@@ -1,13 +1,19 @@
-# Level101 — 4 tricks, 91 points total (the data: TrickScore per item)
+# Level101 — 4 tricks, 91 points total (the data: TrickScore per item).
+# EXCELLENT needs 100: 91 + 4 x min(CompoundTrickScore 5, AngryCountTicks)
+# (GameInfo.CalculateScore cs:394-405) — three of his four angries must
+# come while the meter of the previous one is still up (AngryMeterDecay
+# 4.23/s from 100: 23.6 s, Rottweiler.cs:598-611, 910-913), so the four
+# tricks are armed first and paid on one lap: the microwave on his
+# kitchen walk, the binoculars, the TV as he comes back in, the sofa.
+# The TV (NoticeWhenEnterZone) goes last — it pays on his very next entry.
 take Fridge IT_Egg
-usewith Microwave IT_Egg          # NoticeWhenWalkNearby, score 16
-reclick Microwave                 # armed: a second click is WrongTrick/NoNo
-await Microwave 16
-use Television                    # bare-hand, NoticeWhenEnterZone, score 20
-await Television 20
 take Drawer IT_Fartbag
-usewith Sofa IT_Fartbag           # score 25
-await Sofa 25
 take FirstAid IT_Superglue
-usewith Binoculars IT_Superglue   # score 30
+usewith Binoculars IT_Superglue   # score 30, while he sits
+usewith Sofa IT_Fartbag           # score 25, while he is at the window
+usewith Microwave IT_Egg          # NoticeWhenWalkNearby, score 16 (the reclick check lives in Level101-rev: a payment landing under it here trips its state snapshot)
+use Television                    # bare-hand, NoticeWhenEnterZone, score 20
+await Microwave 16
 await Binoculars 30
+await Television 20
+await Sofa 25

@@ -2526,7 +2526,6 @@ class Driver(Recorder):
                     {True: 'ok  ', False: 'FAIL', None: 'MAN '}[ok],
                     ' '.join(leg), why or ''), flush=True)
             i += 1
-        self.log.close()
         return self.results
 
 
@@ -2573,6 +2572,7 @@ def main(argv):
         json.dump(results, open(os.path.join(outdir, 'results.json'), 'w'),
                   indent=1)
         rating = d.finish_level()
+        d.log.close()
         json.dump(rating, open(os.path.join(outdir, 'rating.json'), 'w'),
                   indent=1)
         print('RATING %s: %d/%d tricks, %d points, %d angry ticks -> %d%% '

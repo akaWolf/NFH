@@ -1,25 +1,29 @@
-# Level109 in reverse: the kitchen during his first sleep, the bedroom on
-# his second — the teeth while primed lead (their wait lands in the sleep),
-# the keys hang on the hook only from his [10] to his [4], i.e. through
-# that sleep — the alarm clock, the bed once he is out of it, the pig last.
+# Level109 in another order: the bedroom on his first sleep — the teeth
+# while primed, the keys off the hook, the alarm clock — the bed the moment
+# he is out of it, then the kitchen and the pig, everything armed before
+# his second lap. EXCELLENT (83 points + 7 x min(3, AngryCountTicks),
+# GameInfo.cs:394-405) needs three compound angries (Rottweiler.cs:598-611:
+# the meter of the previous one still up, 23.6 s): the bed's jump, the
+# alarm clock and the teeth come within seconds of each other on that lap,
+# the nitro milk and the freed pig at the pig.
 take PinsBoard IT_Pins               # Z01
-take ChemicalSet IT_Nitro            # Z02
-take SpicyChips IT_Chips             # Z02
-take RubbishBinBanana2 IT_Banana     # Z03
-take Fridge IT_Tabasco               # Z03
-usewith Ground@Zone03 IT_Banana      # 7
-usewith PigMilk IT_Nitro             # 20 at the pig
-usewith CornChips IT_Chips           # 0, the dog
+take Fridge IT_Tabasco               # Z03 while he sleeps
 take Cactus IT_Cactus                # Z07
-await Ground@Zone03 7
-await CornChips 0
 usewith Teeth IT_Tabasco             # Z06 while primed (his sleep), 15
 take PigKeys IT_Pigkey               # Z06, the same sleep: the hook holds them
 usewith AlarmClock IT_Cactus         # Z06, 13
 usewith Bed IT_Pins                  # Z06 with the bed empty, 8
+take ChemicalSet IT_Nitro            # Z02
+take SpicyChips IT_Chips             # Z02
+take RubbishBinBanana2 IT_Banana     # Z03
+usewith Ground@Zone03 IT_Banana      # 7
+usewith PigMilk IT_Nitro             # 20 at the pig
+usewith CornChips IT_Chips           # 0, the dog
 usewith Pig IT_Pigkey                # Z01, 20
-await Teeth 15
-await AlarmClock 13
-await Pig 20
-await PigMilk 20
 await Bed 8
+await AlarmClock 13
+await Teeth 15
+await Ground@Zone03 7
+await PigMilk 20
+await Pig 20
+await CornChips 0

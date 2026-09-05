@@ -252,7 +252,11 @@ class Recorder:
                           'x': round(r.pawn.sprite.x, 3),
                           'y': round(r.pawn.sprite.y, 3),
                           'zone': r.pawn.zone.name if r.pawn.zone else None,
-                          'pstate': r.pawn.state}
+                          'pstate': r.pawn.state,
+                          # Rottweiler.AngryMeter / AngryCountTicks, the
+                          # rating's inputs (GameInfo.CalculateScore)
+                          'meter': round(getattr(r.pawn, 'angry_meter', 0.0), 1),
+                          'ticks': getattr(r.pawn, 'angry_count_ticks', 0)}
                          for r in w.routines],
         }
 

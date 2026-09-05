@@ -5,6 +5,10 @@
 # 71-97) -> CementBath (Zone04, 106-112). Mother: MotherWaitZone5 (Zone05,
 # 3-24, 65-84 ...) <-> MotherWaitZone2 (Zone02, 40-51, 97-112 ...) through
 # Zone03. Woody starts in Zone03.
+# EXCELLENT is 90 + 10 for exactly one meter overflow (GameInfo.cs:413-416;
+# 0.37/s decay, no pause in Season 2): the bull, the plant and the tortilla
+# with their compounds, the boat, then the pinata and the bull controls on
+# the same lap cross 100 once, at the controls.
 take CementBag IT2_Cement              # Zone03
 take ChickenWings IT2_Chickenwing      # Zone01 (KeepFull)
 take Skeleton IT2_Tequila              # Zone01
@@ -24,11 +28,11 @@ usewith BoatPicnic IT2_Termites        # Zone02
 usewith MechanicalBullControls IT2_Hand # Zone01: ActivateItemTrick -> MechanicalBull (Olga's ride)
 await CementBath 0
 await LiveBull 0
+take Wasp IT2_Beehive                  # Zone04: the wasp nest activated by the bull's angry (LinkedItemTrick of LiveBull)
+unlock Pinata IT2_Beehive              # Zone01: the dexterity trick item (unlocker IT2_Beehive) — before his next Zone01 visit: the pinata then pays just before the controls
 await PlantCarnivore 0
 await Tortilla 0
 await BoatPicnic 0
-await MechanicalBullControls 0
-take Wasp IT2_Beehive                  # Zone04: the wasp nest activated by the bull's angry (LinkedItemTrick of LiveBull)
-unlock Pinata IT2_Beehive              # Zone01: the dexterity trick item (unlocker IT2_Beehive)
 await Pinata 0
+await MechanicalBullControls 0         # the overflow: 15 + 40 + 20 + 20 + 40 + 15 + 20 less the lap's decay, at his last item
 await 9                                # TotalTricksCount: seven items, the Tortilla's CompoundExtraCoin and the plant's PlantCarnivoreExtraAnger

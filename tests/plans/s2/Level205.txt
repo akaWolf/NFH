@@ -2,35 +2,32 @@
 # Routine (Rottweiler2): OlgaMatBeach (mutex, Zone02) -> TabbleTennis
 # (Zone02) -> WaterSkiis x2 (Zone01) -> Chef (Zone04) -> Rockets ->
 # SandSculpture (Zone01); Olga: OlgaMatBeach / TabbleTennis (the mutex
-# handshake, README: the item's UseNormalSequence drains into
-# olga.OnItemAnimationSequenceEnded, TrickItem.cs:964-975 -> Olga.cs:154-158,
-# the second release — modelled now, the laps repeat every ~70 s). The plan
-# is ordered by lap 1 (Chef at ~47 s, Rockets at ~59 s, SandSculpture at
-# ~64 s). The WaterSkiis use carries IgnoreWoodyWhenUse (Item.cs:828-831):
-# he is blind on the water and a catcher again the frame OnUseEnded clears
-# the flag — the runner counts him by his use's remainder (eta_to_zone),
-# not as absent, so the banger/statue/glasses raid waits for his Chef walk.
+# handshake). The WaterSkiis use carries IgnoreWoodyWhenUse (Item.cs:828-831).
 # Dead data: Fence1/Fence2, BridgeRailFront, WaterSkiisAux,
 # RocketsBackground, OlgaKid, OlgaMatBeach as a trick (colliders off; no
 # crayfish source), Chef's own click (IT_Fuel — it pays through Eals'
 # SetTrickedOnItem), LionStatue alone (not in the routine — it is the
 # Glasses' PrimingItem, accepted only once tricked, Item.cs:1544).
+# EXCELLENT is 90 + 10 for exactly one meter overflow (GameInfo.cs:413-416):
+# the tennis 25, the skis 30, the chef 40 and the rockets 30 on one lap
+# cross 100 at the rockets; the sand sculpture's 20 a lap later, under the
+# decay since (0.37/s, Rottweiler.cs:910-913).
+unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
+take DuckCage IT2_Egg
+usewith TabbleTennis IT2_Egg      # action [1], PawnToAffectWhenTricked Olga
+take HammerNails IT2_Tools
+usewith WaterSkiis IT2_Tools      # Primed at load, RottweilerUseTogglesPrime, no RequirePriming
 take BicycleTubeBox IT2_Tube
 usewith Eals IT2_Tube             # SetTrickedOnItem -> Chef
 take Anchor IT2_Rope
 usewith Rockets IT2_Rope          # action [5]
-await Chef 0                      # action [4]
-await Rockets 0
-take HammerNails IT2_Tools
-usewith WaterSkiis IT2_Tools      # Primed at load, RottweilerUseTogglesPrime, no RequirePriming
-await WaterSkiis 0                # actions [2]/[3]: the use visit pays (lap 2 — never comes)
 take Banger IT2_Bangers
-usewith LionStatue IT2_Bangers    # the statue must be tricked before it accepts the glasses
+usewith LionStatue IT2_Bangers    # the statue must be tricked before it accepts the glasses (no coin of its own)
+await TabbleTennis 0
+await WaterSkiis 0                # actions [2]/[3]: the use visit pays
+await Chef 0                      # action [4]
+await Rockets 0                   # the overflow
 take Glasses IT2_Glasses          # RequirePriming, PrimingItem LionStatue -> IT2_Lionhead
 prime LionStatue IT2_Glasses
-usewith SandSculpture IT2_Lionhead   # action [6], KidActions on the OlgaKid pawn
+usewith SandSculpture IT2_Lionhead   # action [6], KidActions on the OlgaKid pawn — the next lap
 await SandSculpture 0
-unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
-take DuckCage IT2_Egg
-usewith TabbleTennis IT2_Egg      # action [1], PawnToAffectWhenTricked Olga
-await TabbleTennis 0

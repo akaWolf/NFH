@@ -16,23 +16,23 @@
 # primed pose is cut before frame 27 unless he sits through 2.8 s without a
 # switch, and the CowCrap collider (OnAdvanceFrame, cs:118-131) never enables.
 take ConstructionSet IT2_Fuel          # Zone01: fuel + match
-usewith FireChannel IT2_Fuel           # Zone04 (KeepAfterUse): ActivateItemTrick -> FireFakir
-prime Flowers IT2_Knife                # Zone04, same visit: the knife pick (Item.cs:1421-1426) — the held knife becomes IT2_Flowers and a fresh knife lands back
+prime Flowers IT2_Knife                # Zone04: the knife pick (Item.cs:1421-1426) — the held knife becomes IT2_Flowers and a fresh knife lands back
 prime Cow IT2_Flowers                  # Zone01: CowBehavior (Item.cs:1760-1780) — the cow primes at once; frame 27 of its primed pose enables the CowCrap collider (Level208Behaviors.OnAdvanceFrame)
 take CowCrap IT2_Crap                  # Zone01
-usewith Cow IT2_Knife                  # Zone01: the knife trick (KeepAfterUse; TrickItem.cs:319 wakes the crap's controller)
 take AsbestosNappies IT2_Pants         # Zone02 (RequirePrimingOnlyWhenTricked: primes on the TRICKED coal, PrimingItem Coal)
 take PairOfBellows IT2_Air_pump        # Zone02
-usewith IceCream IT2_Crap              # Zone02 (the Mother's sleep window)
-unlock Coal IT2_Air_pump               # Zone03: the dexterity trick item (unlocker the bellows, DexterityKeepItem) -> Coal tricked (hot)
+unlock Coal IT2_Air_pump               # Zone03: the dexterity trick item (unlocker the bellows, DexterityKeepItem) -> Coal tricked (hot) — after his lap-2 coal visit (148), before his lap-3 one (263)
 prime Coal IT2_Pants                   # Zone03, same visit -> IT2_Pants_coal
 usewith Trough IT2_Fuel                # Zone03 (LinkedItemTrick of the Coal)
 usewith Drain IT2_Match                # Zone05 (LinkedItemTrick of the HotShoe)
 usewith HotShoe IT2_Pants_coal         # Zone05: RottweilerUseTogglesPrime — after his prime visit (Item.cs:1520-1535 refuses before)
+usewith FireChannel IT2_Fuel           # Zone04 (KeepAfterUse): ActivateItemTrick -> FireFakir — after his lap-2 fakir visit (104): it pays at lap 3's (211)
+usewith IceCream IT2_Crap              # Zone02 (the Mother's sleep window) — after his lap-2 ice cream (169)
+usewith Cow IT2_Knife                  # Zone01: the knife trick (KeepAfterUse; TrickItem.cs:319 wakes the crap's controller) — after his second ride (189)
 await FireFakir 0
-await Cow 0
-await IceCream 0
-await Coal 0
-await Trough 0
 await HotShoe 0
 await Drain 0
+await Coal 0
+await Trough 0
+await IceCream 0
+await Cow 0                            # the overflow

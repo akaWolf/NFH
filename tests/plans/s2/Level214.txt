@@ -54,9 +54,10 @@ take BirdDead IT2_Key                  # Zone04
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
 usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
 usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the mug
-usewith Pistol IT2_Ammo        # after the raid: the same nap, and the trick has no deadline of its own
 await Shower 0
 await Bouquet 0
 # (no `await Glass`: Olga's glass never pays — OnTrickDone runs from the neighbour's angry alone (Rottweiler.cs:787); its trick is the bird's flight and the key. Six coins: the hatch twice, the bouquet, the shower, the wheel, the pistol.)
-await CaptainWheel 0
+await CaptainWheel 0                   # the wheel's 80 tops the meter: the one overflow (AngryCountTicks 1)
+wait 110                               # the meter decays 0.37/s from 100: the pistol's 40 must not top it again (GameInfo.cs:416 pays the 10 for exactly one)
+usewith Pistol IT2_Ammo        # after the raid, a lap later
 await Pistol 0

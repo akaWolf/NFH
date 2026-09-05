@@ -16,8 +16,6 @@ unlock WhipStonePlate IT2_Crowbar
 usewith AztecThrone2 IT2_Ruby
 prime ClosedMine1 IT2_Crowbar
 usewith CigarBox IT2_Tnt
-usewith BoatCoinSlot IT2_Coin
-usewith ParrotLedge IT2_Corn
 await MechanicalBull 0
 activated MechanicalBullCoins
 await SleepBench 0
@@ -26,6 +24,8 @@ await AztecThrone2 0
 activated RubyThrone
 take RubyThrone IT2_Ruby
 await Whip 0
-await CigarBox 0
+await CigarBox 0                       # the meter tops up here (20 + 10 + 30 + 20 + 40 + 20 bunched): the one overflow
+usewith BoatCoinSlot IT2_Coin          # the parrot pair a lap later — its 35 must not top the meter again (0.37/s decay, GameInfo.cs:416 pays the 10 for exactly one)
+usewith ParrotLedge IT2_Corn
 await ParrotLedge 0
 await BoatCoinSlot 0

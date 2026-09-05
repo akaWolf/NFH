@@ -17,11 +17,19 @@
 # crosses the hall (Z01) between almost every pair; the wardrobe there and
 # the bed (Z06) are the hides.
 
+# EXCELLENT (99 points of the 7 reachable + 7 x min(3, AngryCountTicks),
+# GameInfo.cs:394-405) needs three compound angries (Rottweiler.cs:598-611):
+# the valves go in on the first basement visit so that the radiator and
+# the sink, the chair and the grinder, the ladder and the drill all pay on
+# one lap, minutes apart at most while his meter is still up (the decay
+# pauses through his angry and his fix, cs:795/891/910).
 # -- he is on the balcony (AngleGrinder, t~15-30): the hall, kitchen, basement
 take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles
 take RubbishBinCable IT_Cable         # Z03
 usewith GroundMarbles@Zone03 IT_Marbles   # x=4.63 (score 8), on his door(4.09) -> Radiator(6.51) walk
 take BasementDrawer IT_Tongs          # Z09
+use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
+use ValveHot                          # Z09, bare: GetTrickedAtOnce -> the Radiator at [3], 15
 hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
 # -- he is in the basement / kitchen / bathroom: upstairs -----------------
 take BedDrawer IT_Painbook            # Z06
@@ -31,8 +39,6 @@ usewith ChairAssemblyBook IT_Painbook # Z02: GetTrickedAtOnce -> ChairAssembly [
 park Zone03                           # off his Z01 -> Z02 -> Z06 -> Z08 walk
 # -- he is in the study: the fuse box, then the valves ---------------------
 usewith FuseBox IT_Fuse               # Z01: after his [6] prime -> LadderDrill [8], 10
-use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
-use ValveHot                          # Z09, bare: GetTrickedAtOnce -> the Radiator at [3], 15
 park Zone04
 
 await GroundMarbles@Zone03 8
