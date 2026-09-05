@@ -1365,3 +1365,47 @@ Item.cs), so a tap cannot be sent early to hide its latency. The adb
 `input tap` itself is 0.12 s; the emulator console's raw events would
 take that to ~0.03 s and still leave the chain short by half a second.
 The sixth trick's replay stands where the section above leaves it.
+
+## Level214, the sixth trick: the whole plan on the original
+
+Two things closed it. The plan parks Woody in the hatch room (Zone02)
+after the glass trick: the room is free once the Mother has walked to
+her chair (361 s), and the raid then starts the moment the Rottweiler
+leaves Zone03 for the shower — the runner's gate log (NFH_GATE_LOG=1)
+showed the Handbag leg waiting from 345.5 s on one reason, a catcher's
+ETA short of the need: him at the pistol until 373.6, then his walk
+Zone03 → Zone04 → Zone01 with Woody parked in Zone04 and going round
+the ring the other way (Zone01 at 376, Zone02 at 381.5, the click at
+382.4). Parked in Zone02 he clicks the handbag at 378.4, the door trick
+lands at 392.2 and the mug at 398.1 — 3.7 s earlier, which on the
+original puts the mug's tap inside its visible window (24430 of the
+level) and the wheel's activation (its 11 s DelayActivateItem) at
+~25350, before his wheel action starts at 25717. And a landed click
+cancels its pending retry: the replay's earlier miss on the hidden mug
+had fired again as a bare-handed second click while Woody walked to it,
+and the use at his arrival failed (replay50).
+
+The replay of that click log (act29, tap mode, dexterity.js, the 0.05 s
+settle), frames from StartGame — the port's column is its own plan run:
+
+| trick | original | port | what |
+|---|---|---|---|
+| 1 | 5278 | 5292 | the carpet hatch |
+| 2 | 11325 | 11340 | the shards hatch, the fish |
+| 3 | 18648 | 18666 | the bouquet |
+| 4 | 24174 | 24198 | the shower |
+| 5 | 27950 | 27966 | the wheel (SteeringCrash) |
+| 6 | 29641 | 29658 | the pistol |
+| the level won (GameEnding) | 29642 | — | |
+
+The wheel tap resolved at 25351 (the wheel active since ~25340), the
+pistol tap at 25497, and his loop then ran as the port's: the wheel at
+his index 1 from 25243 (the steering from ~27100, the crash at 27950),
+the pistol at index 2 from 28282 (PistolFire, the Mother's crash,
+29641), the level over at 29642 — six tricks on the original within
+14–24 frames of the port's own six. The port-side replay of the same
+clicks (record_app on the original's frames) no longer runs the level
+out: since the tap's settle dropped to 0.05 s its Woody is caught at
+7738, in the deck chair leg after the shards round — an artifact of the
+replay's port half, not of the port (the plan run is 28/28), noted
+here and not chased.
