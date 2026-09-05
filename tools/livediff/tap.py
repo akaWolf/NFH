@@ -150,6 +150,131 @@ function cameraInterpolating() {
     const cam = gi.add(fieldOff(fCam)).readPointer(); if (cam.isNull()) return false;
     return cam.add(cmInterp).readU8() !== 0;
 }
+// a dexterity round in progress (Woody.InDexterity, the mini-game's own
+// gate in CanWoodyUse): a tap landing inside it is lost — the round's
+// done-pass click (Item.cs:1462-1473) only counts once DexterityDone is up,
+// so the tap waits for the round to end (dexterity.js may be playing it)
+const wInDex = WoodyK.isNull() ? -1 : offOf(WoodyK, 'InDexterity');
+function dexterityRunning() {
+    if (wInDex < 0) return false;
+    const fInst = fieldFrom(GameInfo, S('Instance')); if (fInst.isNull()) return false;
+    const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
+    const gi = out.readPointer(); if (gi.isNull()) return false;
+    const fW = fieldFrom(GameInfo, S('Woody')); if (fW.isNull()) return false;
+    const w = gi.add(fieldOff(fW)).readPointer(); if (w.isNull()) return false;
+    return w.add(wInDex).readU8() !== 0;
+}
+function woodyObj() {
+    const fInst = fieldFrom(GameInfo, S('Instance')); if (fInst.isNull()) return NULL;
+    const out = Memory.alloc(Process.pointerSize); staticGet(classVtable(dom, GameInfo), fInst, out);
+    const gi = out.readPointer(); if (gi.isNull()) return NULL;
+    const fW = fieldFrom(GameInfo, S('Woody')); if (fW.isNull()) return NULL;
+    return gi.add(fieldOff(fW)).readPointer();
+}
+// an item tap while Woody still walks to or uses the previous tap's item
+// waits for him to be free — the runner starts a leg only when the one
+// before it completed, and the replay's ~70 frames of tap latency put
+// Level214's Cloth click inside the bucket's use, undoing its trick on
+// both sides. Busy: Woody.InputLocked (a search item's take, Woody.cs:
+// 460-483 — a click then is stored and, the take not being a Blocking
+// animation, never replayed: the ammo tap vanished inside the carpet's
+// take on every replay), or a Blocking animation (the original's own gate,
+// Woody.cs:652-656), or a Single that has not reached its last frame (a
+// use, cancellable by a click: Refresh ends a single by StopSingleAnimation
+// or a hold, AnimationControllerBase.cs:102-142, ReachedEndFrame
+// AnimationInstance.cs:196-203) unless it is an InfiniteLoop pose;
+// Woody.Hiding is free. Not the AnimState name alone: a finished single
+// lingers as the state (FearRight held a tap 600 frames). The walk to an
+// item is busy too — MovePath's last step an item and Woody moving, or
+// climbing to it — so a parking click recorded after a leg
+// does not pull Woody off the leg's walk when the original's walk runs
+// longer (it did: lost in the hatch climb, Woody stood on the hatch when
+// the Rottweiler came). WAIT is the caller's: an item tap and a
+// parking walk wait, a dodge never does (the runner flees at once). The
+// wait is bounded (600 frames) under resolve()'s timeout, and the tap's
+// row reports the frames it waited and the state it waited on
+const PACK = classFrom(game, S(''), S('PawnAnimationController'));
+function methodUp(k0, name, argc) { let k = k0; while (!k.isNull()) { const mm = methodFrom(k, S(name), argc); if (!mm.isNull()) return mm; k = parentOf(k); } return NULL; }
+const getAnimState = PACK.isNull() ? NULL : methodUp(PACK, 'get_AnimState', 0);
+const wHiding = WoodyK.isNull() ? -1 : offOf(WoodyK, 'Hiding');
+const wCtrl = WoodyK.isNull() ? -1 : offOf(WoodyK, 'AnimController');
+const wLocked = WoodyK.isNull() ? -1 : offOf(WoodyK, 'InputLocked');
+const wItemMove = WoodyK.isNull() ? -1 : offOf(WoodyK, 'ItemMove');
+const wMovePath = WoodyK.isNull() ? -1 : offOf(WoodyK, 'MovePath');
+const wMovingUp = WoodyK.isNull() ? -1 : offOf(WoodyK, 'MovingUp');
+let PS = null;                        // Path.Steps, the List, Step.IsItem offsets
+// the walk to an item: MovePath's last step is an item and Woody moves —
+// the path outlives the walk and the use, so the flags on it (ItemMove,
+// MoveIndex) do not tell a finished walk from one in progress; his
+// position does, and the climb to a ShouldWalkUp item is MovingUp
+let lastWp = null, moved = false;
+function woodyMoved(w) {
+    const t = call(methodFrom(Component, S('get_transform'), 0), w, []);
+    const b = t.isNull() ? NULL : call(getPosition, t, []);
+    if (b.isNull()) return false;
+    const p = [b.add(BOX).readFloat(), b.add(BOX + 4).readFloat()];
+    const m = lastWp !== null && (Math.abs(p[0] - lastWp[0]) > 1e-4 || Math.abs(p[1] - lastWp[1]) > 1e-4);
+    lastWp = p;
+    return m;
+}
+function walkingToItem(w) {
+    if (wMovePath < 0) return false;
+    const m = woodyMoved(w);
+    if (!m && !(wMovingUp >= 0 && w.add(wMovingUp).readU8() !== 0)) return false;
+    const path = w.add(wMovePath).readPointer(); if (path.isNull()) return false;
+    if (PS === null) PS = { steps: offOf(classOfObj(path), 'Steps') };
+    if (PS.steps < 0) return false;
+    const list = path.add(PS.steps).readPointer(); if (list.isNull()) return false;
+    if (PS.items === undefined) { const lk = classOfObj(list); PS.items = offOf(lk, '_items'); PS.size = offOf(lk, '_size'); }
+    if (PS.items < 0 || PS.size < 0) return false;
+    const size = list.add(PS.size).readS32(); if (size <= 0) return false;
+    const arr = list.add(PS.items).readPointer(); if (arr.isNull()) return false;
+    const last = arr.add(4 * Process.pointerSize + (size - 1) * Process.pointerSize).readPointer(); if (last.isNull()) return false;
+    if (PS.isItem === undefined) PS.isItem = offOf(classOfObj(last), 'IsItem');
+    return PS.isItem >= 0 && last.add(PS.isItem).readU8() !== 0;
+}
+const cCur = PACK.isNull() ? -1 : offOf(PACK, 'CurrentAnimation');
+const classOfObj = f('mono_object_get_class', 'pointer', ['pointer']);
+let AI = null;                        // AnimationInstance<AnimationState> offsets
+let busyFrames = 0, lastAnim = null;
+function singlePlaying(cur) {
+    if (cur.isNull()) return false;
+    if (AI === null) {
+        const k = classOfObj(cur);
+        AI = {};
+        ['Type', 'InfiniteLoop', 'UsePattern', 'Pattern', 'CurrentFrameIndex', 'CurrentFrame', 'EndFrame', 'Blocking', 'HoldOnLastFrame'].forEach(n => { AI[n] = offOf(k, n); });
+        if (Object.keys(AI).some(n => AI[n] < 0)) { AI = { bad: true }; }
+    }
+    if (AI.bad) return false;
+    if (cur.add(AI.Blocking).readU8() !== 0) return true;
+    if (cur.add(AI.Type).readS32() !== 0) return false;            // AnimationType.Single
+    if (cur.add(AI.InfiniteLoop).readU8() !== 0) return false;
+    // a single plays through its last frame too (ReachedEndFrame is one
+    // step past it, AnimationInstance.cs:196-203, and Refresh then swaps
+    // the next animation in the same call): free only once it is held
+    // there (HoldOnLastFrame) — a tap sent on the last frame reached
+    // Woody in the laugh that follows a use (Woody.cs:418) and was lost
+    const hold = cur.add(AI.HoldOnLastFrame).readU8() !== 0;
+    if (cur.add(AI.UsePattern).readU8() !== 0) {
+        const pat = cur.add(AI.Pattern).readPointer();
+        const len = pat.isNull() ? 0 : pat.add(12).readU32();
+        const idx = cur.add(AI.CurrentFrameIndex).readS32();
+        return hold ? idx < len - 1 : idx < len;
+    }
+    const fr = cur.add(AI.CurrentFrame).readS32(), end = cur.add(AI.EndFrame).readS32();
+    return hold ? fr < end : fr <= end;
+}
+function woodyBusy() {
+    if (!WAIT) return false;
+    const w = woodyObj(); if (w.isNull()) return false;
+    if (wHiding >= 0 && w.add(wHiding).readU8() !== 0) return false;
+    if (wLocked >= 0 && w.add(wLocked).readU8() !== 0) return true;
+    const ctrl = wCtrl >= 0 ? w.add(wCtrl).readPointer() : NULL;
+    if (ctrl.isNull() || cCur < 0) return false;
+    if (!getAnimState.isNull()) { const st = call(getAnimState, ctrl, []); if (!st.isNull()) lastAnim = st.add(BOX).readS32(); }
+    if (walkingToItem(w)) return true;
+    return singlePlaying(ctrl.add(cCur).readPointer());
+}
 function camPos() {
     const arr = call(allCameras, NULL, []);
     const count = arr.isNull() ? 0 : arr.add(12).readU32();
@@ -171,6 +296,8 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             if (c !== null && lastCam !== null && Math.abs(c[0] - lastCam[0]) < 1e-4 && Math.abs(c[1] - lastCam[1]) < 1e-4) still++; else still = 0;
             lastCam = c;
             if (cameraInterpolating()) { still = 0; return; }
+            if (dexterityRunning()) { still = 0; return; }
+            if (busyFrames < 600 && woodyBusy()) { busyFrames++; still = 0; return; }
             if (still < 3) return;
         } catch (e) { send({ error: 'camera: ' + e }); return; }
         done = true;
@@ -202,7 +329,7 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
             if (STAGE === 3) { send({ world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()], x: sp.add(BOX).readFloat(), y: sp.add(BOX + 4).readFloat(), h: 0, stage: 3 }); return; }
             const hb = call(getHeight, NULL, []);
             const h = hb.isNull() ? 0 : hb.add(BOX).readS32();
-            send({ world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()],
+            send({ busy: busyFrames, anim: lastAnim, world: [pos.add(BOX).readFloat(), pos.add(BOX + 4).readFloat()],
                    x: sp.add(BOX).readFloat(), y: sp.add(BOX + 4).readFloat(), h: h, framed: framed });
         } catch (e) { send({ error: '' + e }); }
     }
@@ -211,13 +338,20 @@ Interceptor.attach(compile(methodFrom(GameInfo, S('Update'), 0)), {
 '''
 
 
-def resolve(session, name, wait=15.0, select=None, world=None):
+import re as _re
+_ANIMS = [l.strip().rstrip(',') for l in open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'src', 'Assembly-CSharp', 'AnimationState.cs'))
+          if _re.match(r'^\s*[A-Za-z0-9_]+,?\s*$', l) and l.strip() not in ('{', '}')]
+def resolve(session, name, wait=15.0, select=None, world=None, busy=None):
     """the item's tap point on the running game, through an existing
     frida session: (x, y, world) in adb's top-down screen space, or None;
     `select` puts an InventoryType id in Woody's hand first (-1 clears);
-    `world` = (x, y) taps that point instead of the item's transform"""
+    `world` = (x, y) taps that point instead of the item's transform;
+    `busy` — wait for Woody to be free first (default: an item tap does)"""
     got = {}
+    if busy is None:
+        busy = name is not None
     sc = session.create_script(JS.replace('NAME', 'null' if name is None else repr(name)).replace('STAGE', '9')
+                               .replace('WAIT', 'true' if busy else 'false')
                                .replace('SELECT', 'null' if select is None else str(int(select)))
                                .replace('WORLD', 'null' if world is None else '[%r, %r]' % (float(world[0]), float(world[1]))))
     def on_msg(m, d):
@@ -232,9 +366,15 @@ def resolve(session, name, wait=15.0, select=None, world=None):
         if got:
             break
         time.sleep(0.05)
-    time.sleep(1.0)                        # let the hooked frame finish
+    # let the hooked frame finish: the point was read after the framing
+    # inside GameInfo.Update; a full second here put every tap ~70 frames
+    # behind its schedule, and a chain the runner clicks back to back
+    # (Level214's bucket then cloth) breaks on that much
+    time.sleep(0.2)
     if 'error' in got or 'x' not in got:
         return None
+    if got.get('busy'):
+        print('busy: waited %d frames (anim %s)' % (got['busy'], _ANIMS[got['anim']] if got.get('anim') is not None and 0 <= got['anim'] < len(_ANIMS) else got.get('anim')))
     return int(round(got['x'])), int(round(got['h'] - got['y'])), got.get('world')
 
 
@@ -257,7 +397,7 @@ def main(argv):
     sess = dev.attach(app[0].pid)
     got = {}
     stage = int(opts.get('stage', 9))          # stop after engine call N (debugging)
-    sc = sess.create_script(JS.replace('NAME', repr(name)).replace('STAGE', str(stage)).replace('SELECT', 'null').replace('WORLD', 'null'))
+    sc = sess.create_script(JS.replace('NAME', repr(name)).replace('STAGE', str(stage)).replace('SELECT', 'null').replace('WAIT', 'true').replace('WORLD', 'null'))
     def on_msg(m, d):
         p = m.get('payload')
         if isinstance(p, dict) and 'step' in p:

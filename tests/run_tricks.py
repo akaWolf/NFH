@@ -1147,6 +1147,15 @@ class Driver(Recorder):
         return True
 
     def _dodge_tick(self):
+        # the dodge loop's clicks are the flee — a replay on the original
+        # sends those at once, where a leg's or a parking click waits for
+        # Woody to be free (tools/livediff/tap.py's busy rule)
+        self._click_kind = 'dodge'
+        try:
+            return self._dodge_tick_inner()
+        finally:
+            self._click_kind = 'leg'
+    def _dodge_tick_inner(self):
         """the by-hand loop of a human run: when a catcher will be in
         Woody's zone sooner than Woody can leave it, hide in the zone's
         wardrobe if there is one, else flee along a route that crosses no
@@ -1541,6 +1550,7 @@ class Driver(Recorder):
         self.clicks.append({'frame': int(round(self.t * 60)),
                             'item': getattr(self, '_click_item_name', None),
                             'type': cur['type'] if cur else None, 'result': r,
+                            'kind': getattr(self, '_click_kind', 'leg'),
                             'world': [round(wx, 4), round(wy, 4)]})
         return r
 

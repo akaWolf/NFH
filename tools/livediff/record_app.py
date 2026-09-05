@@ -111,6 +111,17 @@ def main(argv):
         return v.handle_click(sx, sy) or 'none'
 
     log = open(os.path.join(out, 'state.jsonl'), 'w')
+    # NFH_DEX_AUTOPLAY=1: every dexterity round is played to the win the
+    # way dexterity.js plays it on the original — the pick steered onto the
+    # field's centre each frame (run_tricks' _dex_tick), so a replay whose
+    # live side ran with that tracer keeps its rounds comparable
+    autoplay = os.environ.get('NFH_DEX_AUTOPLAY') == '1'
+    def dex_autoplay():
+        for ds in v.world.dex_states.values():
+            if ds.enabled:
+                ddx = (ds.bg[0] + ds.bg[2] / 2.0) - (ds.fg[0] + ds.fg[2] / 2.0)
+                ddy = (ds.bg[1] + ds.bg[3] / 2.0) - (ds.fg[1] + ds.fg[3] / 2.0)
+                ds.input = (ddx * 30.0, -ddy * 30.0)
     t, wait_until = 0.0, 0.0
     pending = list(steps)
     frame = 0
@@ -144,6 +155,8 @@ def main(argv):
                             if parts[0] == 'select' and e['type'] == parts[1]), -1)
                 inv.select(idx)
                 print('t=%6.2f f=%d %s %s -> %s' % (t, frame, parts[0], parts[1] if len(parts) > 1 else '', idx))
+        if autoplay:
+            dex_autoplay()
         app.tick(DT, events=(False, False, False, False))
         frame += 1
         log.write(json.dumps(state(app, t)) + '\n')

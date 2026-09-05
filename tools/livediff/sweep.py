@@ -251,10 +251,15 @@ def replay_port(level):
     script = os.path.join(out, 'script.txt')
     open(script, 'w').write('\n'.join(lines) + '\n')
     seconds = tap.get('level_frames', last + 1800) / 60.0
+    # a live side run with dexterity.js won its rounds by machine: the port
+    # plays its rounds the same way (record_app's NFH_DEX_AUTOPLAY)
+    xj = os.path.join(OUT, level, 'live', 'extra.jsonl')
+    dex = os.path.exists(xj) and any('"dexterity"' in l for l in open(xj))
     r = subprocess.run([sys.executable, os.path.join(HERE, 'record_app.py'), level, out,
                         '--script=' + script, '--cards', '--seconds=%s' % seconds],
                        capture_output=True, text=True, timeout=int(seconds) + 600,
-                       env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'))
+                       env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy',
+                                NFH_DEX_AUTOPLAY='1' if dex else '0'))
     open(os.path.join(out, 'run.log'), 'w').write(r.stdout + r.stderr)
     ok = os.path.exists(os.path.join(out, 'state.jsonl'))
     print('%-10s replay port %s, %d clicks' % (level, 'ok' if ok else 'FAILED', len(lines) // 3), flush=True)

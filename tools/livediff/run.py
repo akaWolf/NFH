@@ -55,10 +55,11 @@ def main(argv):
     # clock.js ...) in the same session — a second frida client on the
     # process has taken the game down; its own messages (no 'type') go to
     # extra.jsonl
-    if 'extra' in opts:
-        extra = open(os.path.join(HERE, opts['extra'])).read()
-        js += "\n;(function () { const ROLE = %s;\n%s\n})();\n" % (
-            json.dumps(opts.get('role', 'Rottweiler')), extra)
+    if 'extra' in opts:                # a comma-separated list: each tracer
+        for name in opts['extra'].split(','):   # in its own closure
+            extra = open(os.path.join(HERE, name.strip())).read()
+            js += "\n;(function () { const ROLE = %s;\n%s\n})();\n" % (
+                json.dumps(opts.get('role', 'Rottweiler')), extra)
     script = session.create_script(js)
 
     log = open(os.path.join(out_dir, 'state.jsonl'), 'w')
@@ -191,20 +192,8 @@ def main(argv):
             time.sleep(0.05)
         start = stats.get('start') or 0
         print('[taps] StartGame at level frame %d, %d clicks' % (start, len(rows)))
-        for row in rows:
-            want = start + int(row['frame'])
-            while stats['level_frames'] < want and time.time() < deadline:
-                time.sleep(0.02)
-            sel = types.get(row.get('type')) if row.get('type') else -1
-            try:
-                pt = tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'))
-            except Exception as e:          # the game died under the run: keep what landed
-                print('[taps] frame %d: %s — the rest of the clicks dropped' % (want, e))
-                break
-            if pt is None:
-                print('[taps] frame %d: could not resolve %s' % (want, row.get('item') or row.get('world')))
-                continue
-            print('[taps] frame %d (%d) %s with %s at %d %d' % (want, stats['level_frames'], row.get('item') or row.get('world'), row.get('type'), pt[0], pt[1]))
+        def send_tap(row, want, pt):
+            print('[taps] frame %d (%d) %s with %s at %d %d' % (want, stats['level_frames'], row.get('item') or row.get('world'), row.get('type'), pt[0], pt[1]), flush=True)
             stats.setdefault('planned', []).append({'want': want, 'at': stats['level_frames'],
                                                     'item': row.get('item'), 'type': row.get('type'),
                                                     'world': row.get('world')})
@@ -213,6 +202,69 @@ def main(argv):
                    else ['adb', 'shell', 'input', 'tap', str(pt[0]), str(pt[1])])
             import subprocess
             subprocess.run(cmd, check=False, timeout=60)
+        def resolve_row(row):
+            sel = types.get(row.get('type')) if row.get('type') else -1
+            # a dodge is sent at once; a leg's or a parking click waits for
+            # Woody to be free (tap.py's busy rule); a click log without
+            # kinds waits on item taps alone
+            busy = (row['kind'] != 'dodge') if row.get('kind') else None
+            return tapper.resolve(session, row.get('item'), select=sel, world=row.get('world'), busy=busy)
+        i = 0
+        pending = None                     # an item tap that found no item yet
+        while (i < len(rows) or pending is not None) and time.time() < deadline:
+            now = stats['level_frames']
+            if pending is not None and now >= pending['next']:
+                # the runner's poke: a click on an item that is not there
+                # yet is repeated every 3 s until it is (Level214's wheel
+                # comes 11 s after the mug, and the original's mug use ran
+                # later than the port's under the busy waits, so the five
+                # recorded clicks all came before the wheel) — the replay
+                # retries between the scheduled taps, never holding them
+                # (a retry loop that did held the dodges and Woody was
+                # caught), for 15 s past the last recorded click
+                row = pending['row']
+                try:
+                    pt = resolve_row(row)
+                except Exception as e:
+                    print('[taps] retry: %s — the rest of the clicks dropped' % e)
+                    break
+                if pt is not None:
+                    print('[taps] frame %d: %s resolved after retries at %d' % (pending['want'], row.get('item'), stats['level_frames']))
+                    send_tap(row, pending['want'], pt)
+                    # the recorded pokes on the same item that follow were
+                    # the runner's own retries: one landed click answers them
+                    while i < len(rows) and rows[i].get('item') == row.get('item'):
+                        i += 1
+                    pending = None
+                elif stats['level_frames'] >= pending['give_up']:
+                    print('[taps] frame %d: could not resolve %s (retried 15 s)' % (pending['want'], row.get('item')))
+                    pending = None
+                else:
+                    pending['next'] = stats['level_frames'] + 180
+                continue
+            if i >= len(rows):
+                time.sleep(0.02)
+                continue
+            row = rows[i]
+            want = start + int(row['frame'])
+            if now < want:
+                time.sleep(0.02)
+                continue
+            i += 1
+            try:
+                pt = resolve_row(row)
+            except Exception as e:          # the game died under the run: keep what landed
+                print('[taps] frame %d: %s — the rest of the clicks dropped' % (want, e))
+                break
+            if pt is None:
+                if row.get('item'):
+                    print('[taps] frame %d: %s not there yet, retrying' % (want, row.get('item')))
+                    pending = {'row': row, 'want': want, 'next': stats['level_frames'] + 180,
+                               'give_up': want + 900}
+                else:
+                    print('[taps] frame %d: could not resolve %s' % (want, row.get('world')))
+                continue
+            send_tap(row, want, pt)
         seconds = max(0.0, deadline - time.time())
     tap = opts.get('tap')                  # Item@seconds: click it mid-run,
     if tap:                                # through this same session
