@@ -830,8 +830,18 @@ def _season_installed(season):
     pngs = sum(1 for n in os.listdir(d) if n.endswith('.png'))
     if pngs <= 100:
         return False
-    return os.path.exists(os.path.join(levels_root(), 'levels', season,
-                                       'Entry.json'))
+    lv = os.path.join(levels_root(), 'levels', season)
+    if not os.path.exists(os.path.join(lv, 'Entry.json')):
+        return False
+    # an extraction killed before its end (the first run's minutes of CPU
+    # with no window yet were read as a hang once, and the process shot)
+    # leaves Entry.json and no levels: a working menu with a dead play
+    # button. A finished extraction leaves the COMPLETE marker; an older
+    # one, made whole by hand, counts by its level scenes
+    if os.path.exists(os.path.join(lv, 'COMPLETE')):
+        return True
+    return any(n.startswith('Level') and n.endswith('.json')
+               for n in os.listdir(lv))
 
 
 def have_assets():
@@ -886,9 +896,18 @@ def ensure_assets():
                 'Season 1 is required; Season 2 is optional.\n'
                 'Looked in: %s' % root))
         return False
-    for season in ('s1', 's2'):
-        if season not in sources or _season_installed(season):
-            continue
+    todo = [s for s in ('s1', 's2') if s in sources and not _season_installed(s)]
+    if todo:
+        # the double-click user sees no window for the minutes this takes:
+        # say so first (the box blocks until OK; with no display only the
+        # console line remains)
+        _message_box('Neighbours from Hell', (
+            'First run: the game data (Season %s) is extracted from your '
+            'apk/obb now. This takes a few minutes at full CPU and shows no '
+            'window until it is done — please wait, do not kill it. The '
+            'log goes to extract-<season>.log next to the executable.'
+            % ', '.join(s[1] for s in todo)))
+    for season in todo:
         print('== extracting %s (one-time, a few minutes) ==' % season)
         # the same log into a file next to the assets: a game started by a
         # double click or a launcher has no console to show it on
@@ -919,7 +938,12 @@ def ensure_assets():
                     return False
                 continue
             failed = extract_season(tmp, root, season, log=log)
-            if failed:
+            if not failed:
+                with open(os.path.join(root, 'levels', season, 'COMPLETE'),
+                          'w', encoding='utf-8') as f:
+                    f.write('extracted from %s\n' % os.path.basename(str(
+                        sources[season].get('xapk') or sources[season].get('apk'))))
+            else:
                 _message_box('Neighbours from Hell', (
                     'Season %s: %d scene(s) did not export (%s) — those '
                     'levels will not start. The reasons are in %s' % (
