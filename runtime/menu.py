@@ -626,6 +626,9 @@ class ControlButton(Control):
     def start_level(self):
         """StartLevel (cs:164-185)"""
         if not self.level_to_start:
+            if self.scene.go_name(self.go) in ('PlayEpisode', 'StartLevel'):
+                print('the play button has no level to start: no tile '
+                      'selection reached it', flush=True)
             return
         self.menu.prefs.save()
         if self.return_to_level_selection:

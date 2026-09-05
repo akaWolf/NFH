@@ -477,7 +477,20 @@ class App:
         title cards"""
         path, season = scene_path(name, self.level_season)
         if not os.path.exists(path):
-            print('no such scene: %s' % name)
+            # the tile's LevelToStart names a scene the extraction did not
+            # export: say which, and what the season's directory holds —
+            # the play button otherwise does nothing, silently
+            d = os.path.dirname(path)
+            have = sorted(f for f in os.listdir(d)) if os.path.isdir(d) else []
+            _message_box('Neighbours from Hell', (
+                'The level "%s" is not there: %s\n\n%s holds %d file(s): %s\n\n'
+                'The first run exports the levels from the game data; a '
+                'partial export means it stopped on one of them — start the '
+                'game from a terminal to see the extraction log, or delete '
+                'the levels/%s directory to have it exported again.'
+                % (name, path, d, len(have),
+                   ', '.join(have[:12]) + (' …' if len(have) > 12 else ''),
+                   season)))
             return
         self._draw_loading(name)
         self._bind_season(season)
@@ -892,6 +905,13 @@ def main(argv):
     # from the C signal handler, so it works inside a native call too
     import faulthandler, signal
     faulthandler.enable(all_threads=True)
+    # a bundle's console is a file or a pipe as often as a terminal: what
+    # the game says must arrive as it is said, not at exit
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(line_buffering=True)
+        except Exception:
+            pass
     if hasattr(signal, 'SIGUSR1'):
         faulthandler.register(signal.SIGUSR1, all_threads=True)
     if '--smoke' in argv:
