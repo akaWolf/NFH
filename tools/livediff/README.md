@@ -1485,3 +1485,88 @@ the port. The same null-manager path exists on the item controllers
 sequence's completion also comes a period late is not measured — the
 neighbours' sequences end in StopCurrentAction, which starts the next
 animation in the same frame, and their timings already matched.
+
+## The reverse plans: every level's tricks in another order
+
+A standard plan (tests/plans/<season>/<Level>.txt) tricks each item once,
+at one point of the neighbour's lap, with one history behind it — the
+order the plan was tuned in, often his first lap's. A player does not
+play like that, and the two bugs above (Level101's binoculars, found by
+a player who glued them first; the hatch's Woody offset) were invisible
+to the standard order. So every level now has a second plan,
+<Level>-rev.txt — the same tricks, reversed where the level's windows
+and dependencies allow it, another admissible order where they do not
+(tests/run_tricks.py: the part of the name before the dash is the level,
+the whole name keeps its own output directory; --all runs both). Level201
+(the tutorial script fixes the order) and Level214 (the cabin raid lives
+inside the Mother's nap) have no second order.
+
+What the 26 reverse plans found on the port, in the order found:
+
+- Level101: the glued binoculars, above.
+- Level205, the tennis tricked first: the neighbour played TennisEgg and
+  then stood in WaitInFear for the rest of the level, Olga in HitPawn.
+  Rottweiler.PlayAngryAnimation's affected-pawn branch (cs:737-753)
+  starts his WaitInFear urgent and Olga.RunToHitPawn — StartUrgentAction
+  → StartAction, which stops her active action first (ActionManager.cs:
+  157-160 → RoutineAction.StopAction(next), cs:116-120: Active = false,
+  OnActionStopped). Her active action was the table-tennis mutex park
+  (HideOwnerDuringUse), whose OnActionStopped unhides her (RoutineAction
+  Use.cs:481-484, outside the !MutexAction block that closes at cs:363);
+  a Hidden controller never refreshes (AnimationControllerBase.OnGUI), so
+  without that stop her HitPawnSequence never ran out. Routine.run_to_hit_
+  pawn now stops a use in progress before the hit.
+- Level205, the same order, one lap later: he parked on the mat's mutex
+  (WaitWatch) and Olga on the tennis mutex (EatChinese), each waiting
+  for the other. The bench (the port's click log replayed by taps,
+  dexterity.js for the duck cage, olga.js on the controllers and
+  managers): at 133.03, the WaitInFear's start, Olga is unhidden and her
+  parked mutex aborted — his tennis action's OnActionStopped runs THERE,
+  at the first StopAction(canPostponeStop: true), because the urgent's
+  StartAction stops the still-active use; at 141.18, the fix's end, the
+  second StopAction(false) only sets Finished and the next StartAction
+  finds the action inactive — no unhide. She reaches the mat at 139.38,
+  sits down hidden (her own mat action's HideOwnerDuringUse) and stays,
+  her sequence frozen, with ActiveActionIndex 0 through the end of the
+  recording (230 s, when Woody was caught); his mat visit is what drains
+  the mat's loop (ItemToStopInfiniteAnimation) and releases her. The
+  port ran OnActionStopped at 141.18: her unhide let her [HitPawn] run
+  out at 145.28, she left for the tennis park at 147.5, and at 231 the
+  two waited for each other for good. World._start_wait_in_fear now
+  runs the use's OnActionStopped, and _angry_done skips its own. After
+  both: the mini plan's trace matches the bench frame by frame (the
+  unhide and the hit at 133.05, the mat at 139.38, nothing for her at
+  141.18), Level205-rev 19/19, the standard Level205 19/19.
+
+The other failures were the plans', not the port's — the runner's gate
+(a leg starts when its zone is free of catchers and their ETA leaves
+room for the job and the way out) reads a lap the way a careful player
+would, and some orders have no window:
+
+- Level103: the picture (NoticeWhenWalkNearby 0.1) and the toilet pay
+  only on the first-aid rush the mousetrap starts, and his candle-and-
+  cakes stretch leaves the kitchen no other window — the letter box
+  goes before the kitchen; the kitchen's own order is the reversal.
+- Level106: the hair restorer and the towel go in between his [3] fill
+  and his [7]/[8] visits; the pudding (a kitchen walk) after them.
+- Level108: the balcony's first window closes at ~52 s; the lotion
+  (+10) fits only the window the coffee's bathroom rush opens, right
+  after the coffee; the kitchen's banana last.
+- Level109: the keys hang on the hook only from his [10] to his [4] —
+  through his sleep; the teeth (primed then) lead into that sleep.
+- Level110: the bedroom's one window opens as he comes down to the
+  chair with Woody at the wine; the balcony's order is the reversal.
+- Level111, 206, 211, 213: a park next door before the target (the
+  awaits leave Woody in a hiding spot too far for the gate's ETA
+  arithmetic — Level206's harpoon window is his own weights visit).
+- Level114: the bedroom (the dog) only while he is in the basement.
+- Level209: the trough must be armed before his coal visit (the linked
+  pair pays on one visit); the ice cream is the variation.
+
+The bench recipe for another order: the plan run's directory copied as
+NFH_PLANS/<season>_<Level> (the runner's click log), `em level`, then
+run.py --attach --load=<Level> --taps=<clicks> --extra=dexterity.js,...
+by hand — sweep.py's replay-live does not pass dexterity.js, and a
+plan whose first click opens a dexterity round lands one tap of 25
+without it. Walk taps whose world point is off the original's screen
+are dropped ('could not resolve'); the item taps still land.

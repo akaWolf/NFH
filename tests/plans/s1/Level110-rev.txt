@@ -1,0 +1,23 @@
+# Level110 in the only other order its windows allow: the steak room and
+# the extinguisher exactly as the standard plan — the banana's slip
+# included, its walk is what puts Woody at the wine as the bedroom's one
+# window opens (he comes down to the chair at ~50 s) — and the spray
+# before the beer on the balcony.
+take PinsBoard IT_Pins               # Z01
+take FirstAid IT_Fuel                # Z04: fuel + growth liquid
+take RubbishBinBanana2 IT_Banana     # Z03
+take Fridge IT_Vinegar               # Z03
+usewith Ground@Zone03 IT_Banana      # Z03, 10: his walk to the steak
+usewith SteakChair IT_Pins           # Z02, 10
+usewith SteakWine IT_Vinegar         # Z02, 15
+use FireExtinguisher                 # Z06: the BBQ's fixing tool
+hide Bed                             # he crosses to the balcony
+await SteakChair 10
+await SteakWine 15
+usewith CarnivorPlantSpray IT_Growthliquid   # Z07, 15
+usewith Beer IT_Fuel +8              # Z07: BBQ.Tricked
+hide Bed
+await Ground@Zone03 10
+await CarnivorPlantSpray 15
+await BBQ 20
+await FireExtinguisher 15

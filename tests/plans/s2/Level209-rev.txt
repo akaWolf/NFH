@@ -1,0 +1,25 @@
+# Level209 in another order: the fire channel and the knife chain stay first
+# (his first cow ride locks the cow's pose for good), the coal with its
+# trough (the linked pair armed for one visit), the drain, the shoe, the
+# ice cream last.
+take ConstructionSet IT2_Fuel
+usewith FireChannel IT2_Fuel
+prime Flowers IT2_Knife
+prime Cow IT2_Flowers
+take CowCrap IT2_Crap
+usewith Cow IT2_Knife
+take PairOfBellows IT2_Air_pump
+take AsbestosNappies IT2_Pants
+unlock Coal IT2_Air_pump
+prime Coal IT2_Pants
+usewith Trough IT2_Fuel
+usewith Drain IT2_Match
+usewith HotShoe IT2_Pants_coal
+usewith IceCream IT2_Crap
+await FireFakir 0
+await Cow 0
+await Coal 0
+await Trough 0
+await Drain 0
+await HotShoe 0
+await IceCream 0

@@ -1,0 +1,21 @@
+# Level205 in reverse: the table tennis, the sand sculpture, the skis, the
+# rockets and the chef last.
+unlock DuckCage
+take DuckCage IT2_Egg
+usewith TabbleTennis IT2_Egg
+await TabbleTennis 0
+take Banger IT2_Bangers
+usewith LionStatue IT2_Bangers
+take Glasses IT2_Glasses
+prime LionStatue IT2_Glasses
+usewith SandSculpture IT2_Lionhead
+await SandSculpture 0
+take HammerNails IT2_Tools
+usewith WaterSkiis IT2_Tools
+await WaterSkiis 0
+take Anchor IT2_Rope
+usewith Rockets IT2_Rope
+take BicycleTubeBox IT2_Tube
+usewith Eals IT2_Tube
+await Rockets 0
+await Chef 0

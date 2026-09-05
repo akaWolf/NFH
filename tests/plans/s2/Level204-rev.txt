@@ -1,0 +1,22 @@
+# Level204 in reverse: the hot dog, the necklace and the vase, the kart, the
+# gong, the karate last.
+unlock ToyDispenser
+take ToyDispenser IT2_Teddy
+prime OlgaKid IT2_Teddy
+usewith HotDog IT2_Confetti
+await HotDog 0
+take BonsaiScissors IT2_Scissors
+take RiceBowl IT2_Rice_empty
+prime GongGrease IT2_Rice_empty
+usewith Vase IT2_Rice_full
+usewith JadeNecklace IT2_Scissors
+await JadeNecklace 0
+await Vase 0
+usewith PullKart IT2_Rice_full
+await PullKart 0
+take UmbrellaStand IT2_Sunshade
+usewith GongDrumstick IT2_Sunshade
+await GongDrumstick 0
+take Bricks IT2_Brick
+usewith Karate IT2_Brick
+await Karate 0

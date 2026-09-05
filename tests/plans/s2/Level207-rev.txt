@@ -1,0 +1,29 @@
+# Level207 in reverse: the shell and the castle (the two crayfish rounds, the
+# towel armed with the castle), the elephant, the pool board and the awning
+# last.
+take BBQ IT2_Bbqtongs
+unlock CrayFish IT2_Bbqtongs
+take CrayFish IT2_Crayfish
+usewith Shell IT2_Crayfish
+await Shell 0
+take SeaUrchin IT2_Hedgehog
+usewith BeachTowel IT2_Hedgehog
+unlock CrayFish IT2_Bbqtongs
+take CrayFish IT2_Crayfish
+usewith SandCastle IT2_Crayfish
+await BeachTowel 0
+await SandCastle 0
+take Whisky IT2_Whiskey
+prime Bartender IT2_Whiskey
+take IceBucket IT2_Bucket_empty
+prime Tap IT2_Bucket_empty
+usewith Elephant IT2_Bucket
+await Elephant 0
+take Moped IT2_Spring
+usewith PoolBoard IT2_Spring
+await PoolBoard 0
+take Moped2 IT2_Pedal
+usewith PoolAwning IT2_Pedal
+take MopedPool IT2_Spring
+usewith PoolBoard IT2_Spring
+await PoolAwning 0

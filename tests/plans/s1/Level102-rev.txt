@@ -1,0 +1,18 @@
+# Level102 in reverse: the TV and the microwave first; the saw still needs the
+# long absence of the laxative's toilet trip, so the beer arms it last.
+use Television                    # 15
+await Television 15
+take Fridge IT_Egg
+usewith Microwave IT_Egg          # 10
+reclick Microwave
+await Microwave 10
+take Drawer IT_Saw
+take FirstAid IT_Laxative
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # 10
+usewith Beer IT_Laxative          # 18, drunk at the sofa
+await Beer 18
+park Zone03
+usewith Sofa IT_Saw               # 25, sawn during the toilet trip
+await Toilet 10
+await Sofa 25

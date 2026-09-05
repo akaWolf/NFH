@@ -1,0 +1,25 @@
+# Level107 in reverse: the balcony (Z07) and the bedroom (Z06) first — he
+# starts in Z06 — then the statue, then the generator room.
+take FirstAid IT_Scissors            # Z04: scissors + antispot
+hide Bed
+usewith Dove IT_Scissors             # Z07, 10
+usewith Drawing IT_Antispot          # Z07, 12 (after his first drawing)
+hide Bed
+await Dove 10
+await Drawing 12                     # KNOWN: Drawing tricks never go angry
+take MagnesiumBottle IT_Magnesium    # Z06
+usewith Camera IT_Magnesium          # Z06, 12
+hide Bed
+await Camera 12
+use MumStatueFootStool               # Z02, 15
+await MumStatueFootStool 15
+take PinsBoard IT_Pins               # Z01
+take Drawer IT_Wrench                # Z01
+take RubbishBinBanana IT_Banana      # Z03
+usewith Ground@Zone03 IT_Banana      # 8
+usewith DieselGenerator IT_Wrench    # 15
+usewith DieselChair IT_Pins          # 10
+reclick DieselChair
+await Ground@Zone03 8
+await DieselGenerator 15
+await DieselChair 10

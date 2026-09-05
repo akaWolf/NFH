@@ -1,0 +1,25 @@
+# Level109 in reverse: the kitchen during his first sleep, the bedroom on
+# his second — the teeth while primed lead (their wait lands in the sleep),
+# the keys hang on the hook only from his [10] to his [4], i.e. through
+# that sleep — the alarm clock, the bed once he is out of it, the pig last.
+take PinsBoard IT_Pins               # Z01
+take ChemicalSet IT_Nitro            # Z02
+take SpicyChips IT_Chips             # Z02
+take RubbishBinBanana2 IT_Banana     # Z03
+take Fridge IT_Tabasco               # Z03
+usewith Ground@Zone03 IT_Banana      # 7
+usewith PigMilk IT_Nitro             # 20 at the pig
+usewith CornChips IT_Chips           # 0, the dog
+take Cactus IT_Cactus                # Z07
+await Ground@Zone03 7
+await CornChips 0
+usewith Teeth IT_Tabasco             # Z06 while primed (his sleep), 15
+take PigKeys IT_Pigkey               # Z06, the same sleep: the hook holds them
+usewith AlarmClock IT_Cactus         # Z06, 13
+usewith Bed IT_Pins                  # Z06 with the bed empty, 8
+usewith Pig IT_Pigkey                # Z01, 20
+await Teeth 15
+await AlarmClock 13
+await Pig 20
+await PigMilk 20
+await Bed 8

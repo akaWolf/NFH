@@ -1,0 +1,20 @@
+# Level202 in reverse: the rake, the rail and the pond, the beer mat, the
+# submarine last.
+take Weed IT2_Weed
+use Rake
+usewith Rake IT2_Weed
+await Rake 0                      # KNOWN: Rake tricks never go angry
+take SawFish IT2_Sawfish
+take Sandbucket IT2_Sandbucket
+prime EelBox IT2_Sandbucket
+usewith Pond IT2_Sandbucketeel
+usewith BridgeRail IT2_Sawfish
+await BridgeRail 0
+take Reed IT2_Reed
+unlock CrayFish IT2_Reed
+take CrayFish IT2_Crayfish
+usewith BeerMat IT2_Crayfish
+await BeerMat 0
+take RubbishBin IT2_Fin
+usewith Submarine IT2_Fin
+await Swimming 0

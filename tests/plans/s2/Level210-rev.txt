@@ -1,0 +1,26 @@
+# Level210 in reverse: the diving board in the Mother's first sleep, the
+# deck chair pair, the elephant, the dog basket, and the turban shop through
+# its second required item — the octopus from the valve's puddle (the tool
+# belt's dexterity, the tongs at the valve).
+take SuntanOil IT2_Sunoil
+usewith DivingBoard IT2_Sunoil
+take CricketBat IT2_Bat
+take OlgaBra IT2_Bra
+prime WaterMelons IT2_Bra
+take SeaUrchin IT2_Hedgehog
+usewith Pylon IT2_Bra_sling
+usewith DeckChair IT2_Hedgehog
+usewith Elephant IT2_Bat
+take AlmsBowl IT2_Bone
+usewith DogBasket IT2_Bone
+take FishNet IT2_Brailer
+unlock ToolBelt IT2_Brailer
+prime Valve IT2_Tongs
+take ValveWaterPuddle IT2_Oktopus
+usewith TurbanShop IT2_Oktopus
+await DivingBoard 0
+await DeckChair 0
+await Pylon 0
+await Elephant 0
+await DogBasket 0
+await TurbanShop 0

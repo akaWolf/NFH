@@ -1,0 +1,20 @@
+# Level103 in another order: the picture and the toilet first (both pay on
+# the first-aid rush the mousetrap starts), the letter box, then the kitchen
+# in reverse — the microwave, the slip, the candle — during that rush (his
+# candle-and-cakes stretch leaves the kitchen no other window).
+take Drawer IT_Boom               # Boom + Marker + Mousetrap
+usewith MumPicture IT_Marker      # 10, on the rush (NoticeWhenWalkNearby 0.1)
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # 10, on the rush
+take SoapDish IT_Soap
+usewith LetterBox IT_Mousetrap    # 20 -> RushToToilet: the kitchen window
+take Fridge IT_Egg
+usewith Microwave IT_Egg          # 10
+usewith Ground@Zone03 IT_Soap     # 10
+usewith Candle IT_Boom            # 25 at the cake's visit
+await LetterBox 20
+await MumPicture 10
+await Toilet 10
+await Microwave 10
+await Ground@Zone03 10
+await Candle 25

@@ -1,0 +1,25 @@
+# Level105 in reverse: the football (rolled in by the piano's AlertNext) and
+# the piano first, then the phone, the kitchen, the plant's rush last.
+take BowlingBag IT_Bowling        # Z01
+take Drawer IT_Marker             # Z01, x9999
+take SoapDish IT_Soap             # Z04
+park Zone02
+usewith Football IT_Bowling       # 15
+await Football 15
+usewith Piano IT_Marker           # 13
+take Mobile IT_Handy              # Z02
+icon IT_Handy                     # the phone rings, 10
+await Piano 13
+await Phone 10
+take Fridge IT_Egg                # Z03: Egg + Cheese
+usewith Ground@Zone03 IT_Soap     # 7
+usewith Microwave IT_Egg          # 7
+await Ground@Zone03 7
+await Microwave 7
+usewith PlantStink IT_Cheese      # 13 -> RushToToilet
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # 7
+usewith MumPicture IT_Marker      # 7
+await PlantStink 13
+await Toilet 7
+await MumPicture 7

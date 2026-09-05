@@ -1,0 +1,34 @@
+# Level213 in another order: the statue hand and the flowers from the start
+# zone (Zone05 opens only between the Mother's waits there, and the walk
+# must be short), the jar before his cement-bath visit, the termites and
+# the bull controls on that visit, the boat, the tortilla and the plant
+# compounds, the live bull, the cement last; the wasp's pinata after the
+# bull's angry.
+take StatueHand IT2_Hand               # Zone05
+take Flowers IT2_Flowers               # Zone05
+take Jar IT2_Jar_empty                 # Zone04, before his cement bath
+prime Termite IT2_Jar_empty            # Zone01, while he is in the bath
+usewith MechanicalBullControls IT2_Hand # Zone01, the same visit
+usewith BoatPicnic IT2_Termites        # Zone02
+take Chili IT2_Chili
+take Skeleton IT2_Tequila
+take ChickenWings IT2_Chickenwing
+take Piranha IT2_Piranha
+park Zone04                            # out of Zone01 before his pinata visit; next door to the tortilla
+usewith Tortilla IT2_Chili
+usewith Tortilla IT2_Tequila
+usewith PlantCarnivore IT2_Chickenwing
+usewith PlantCarnivore IT2_Piranha
+usewith LiveBull IT2_Flowers
+take CementBag IT2_Cement
+usewith CementBath IT2_Cement
+await MechanicalBullControls 0
+await BoatPicnic 0
+await Tortilla 0
+await PlantCarnivore 0
+await LiveBull 0
+await CementBath 0
+take Wasp IT2_Beehive
+unlock Pinata IT2_Beehive
+await Pinata 0
+await 9

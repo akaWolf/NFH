@@ -1,0 +1,20 @@
+# Level104 in reverse: the kitchen stretch first, then the bathroom shelf.
+take SoapDish IT_Soap
+take FirstAid IT_Shavingfoam      # Shavingfoam + Hairrestorer
+take Fridge IT_Egg
+usewith Ground@Zone03 IT_Soap     # 8
+usewith WhippedCream IT_Shavingfoam   # 15 at the pie
+usewith Microwave IT_Egg          # 8
+await Ground@Zone03 8
+await WhippedCream 15
+await Microwave 8
+take Drawer IT_Superglue          # Superglue + Marker
+usewith MumPicture IT_Marker      # 8
+usewith AfterShave IT_Superglue   # 20 at the sink
+usewith Deodrant IT_Hairrestorer  # 15 at the sink
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # 8
+await MumPicture 8
+await AfterShave 20
+await Deodrant 15
+await Toilet 8

@@ -1,0 +1,16 @@
+# Level101, the tricks in reverse: the glued binoculars first (the neighbour's
+# window visits go on without them, Level101Behavior.cs:29-33 — a skipped
+# binoculars action parked him on the sofa for good), then the sofa, the TV,
+# the microwave.
+take FirstAid IT_Superglue
+usewith Binoculars IT_Superglue   # 30
+await Binoculars 30
+take Drawer IT_Fartbag
+usewith Sofa IT_Fartbag           # 25
+await Sofa 25
+use Television                    # 20
+await Television 20
+take Fridge IT_Egg
+usewith Microwave IT_Egg          # 16
+reclick Microwave
+await Microwave 16

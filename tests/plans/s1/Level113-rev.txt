@@ -1,0 +1,25 @@
+# Level113 in reverse: the basement valves first, the upstairs and the chair
+# book, the fuse box after his prime, the marbles last.
+take BasementDrawer IT_Tongs          # Z09
+use ValveMain                         # Z09, twice: closes, then arms
+use ValveHot                          # Z09
+park Zone04
+take Drawer IT_Fuse                   # Z01: fuse + marbles
+take BedDrawer IT_Painbook            # Z06
+usewith ChairAssemblyBook IT_Painbook # Z02
+use AngleGrinder                      # Z07
+usewith Ladder IT_Tongs               # Z08
+park Zone03
+usewith FuseBox IT_Fuse               # Z01 after his [6] prime
+take RubbishBinCable IT_Cable         # Z03
+usewith GroundMarbles@Zone03 IT_Marbles
+hide Wardrobe
+park Zone04
+await Sink 12
+await Radiator 15
+await ChairAssemblyBook 10
+await AngleGrinder 10
+await Ladder 15
+await FuseBox 10
+await GroundMarbles@Zone03 8
+prime ElectricTrapTatter              # the trap itself is unreachable (the standard plan's header)

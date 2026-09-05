@@ -1,0 +1,29 @@
+# Level106 in another order: the toilet and the picture first (walk-bys),
+# then the kitchen, the living room, then the bathroom (the tub still fills
+# the bottle only after his own [3] visit; the hair restorer and the towel
+# go in right after, before his bath and towel visits), the pudding last.
+take ToiletPaper IT_Wcpaper
+usewith Toilet IT_Wcpaper         # 7
+take Drawer IT_Glue               # Glue + Marker + Shoepolish
+usewith MumPicture IT_Marker      # 7
+take SoapDish IT_Soap
+take Fridge IT_Egg                # Z03
+usewith Ground@Zone03 IT_Soap     # 7
+usewith Microwave IT_Egg          # 7
+await Ground@Zone03 7
+await Microwave 7
+take FirstAid IT_Foamballs        # Foamballs + Hairrestorer
+usewith Candy IT_Foamballs        # 8 -> RushToToilet
+usewith PhotoAlbum IT_Glue        # 8
+await Candy 8
+await PhotoAlbum 8
+take RubbishBinBottle IT_Emptybottle
+prime BathTub IT_Emptybottle      # after his fill
+usewith BathTub IT_Hairrestorer   # 12, in the full tub
+usewith Towel IT_Shoepolish       # 12, before his [8]
+usewith Pudding IT_Fullbottle     # 8
+await BathTub 12
+await Towel 12
+await Pudding 8
+await Toilet 7
+await MumPicture 7

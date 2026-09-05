@@ -1,0 +1,26 @@
+# Level211 in reverse: the life boat (the rasp from the dog's handbag)
+# first, then the Zone04 stretch in one go — Olga's child, the phone (from
+# next door, not from the cabin: the Mother's naps are shorter than that
+# walk), the sign, the sweets — the jacket and the diving gear last.
+take Plate IT2_Sausage
+prime Dog IT2_Sausage
+take Handbag IT2_Rasp
+unlock LifeBoat IT2_Rasp
+take ChestDrawer IT2_Coin             # Zone05
+take CompressedAir IT2_Pressuretank   # Zone01
+take Urinal IT2_Pissballs             # Zone02
+usewith OlgaChild IT2_Pressuretank    # Zone04
+usewith PayPhone IT2_Coin             # Zone04
+usewith ToiletSign IT2_Rasp           # Zone04
+usewith Sweets IT2_Pissballs          # Zone04
+take CompressedAir IT2_Pressuretank
+usewith LifeJacket IT2_Pressuretank
+take FireExtinguisher IT2_Extinguisher
+usewith DivingGear IT2_Extinguisher
+await LifeBoat 0
+await OlgaChild 0
+await CabinPhone 0
+await Sweets 0
+await LifeJacket 0
+await DivingGear 0
+await 7

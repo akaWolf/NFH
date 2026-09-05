@@ -1,0 +1,27 @@
+# Level208 in reverse: the elephant and the snake (the second rat comes only
+# after the elephant round), the Fifi chain and the rake, the tap, the shoe
+# machine, the platform pair last (the level ends at the 7th coin).
+take Chalk IT2_Chalk_sponge
+take Mouse IT2_Rat
+prime AngryElephant IT2_Rat
+usewith SafetyLine IT2_Chalk_sponge
+await AngryElephant 0
+take Mouse IT2_Rat
+prime Snake IT2_Rat
+usewith ArmsBowl IT2_Snake
+await ArmsBowl 0
+use Rake
+use Fifi
+await Rake 0
+take Cable IT2_Cable
+usewith ElectricTap IT2_Cable
+await ElectricTap 0
+take BoardNail IT2_Blades
+usewith ShoeMachine IT2_Blades
+await ShoeMachine 0
+take Balloons IT2_Balloon
+take Spade IT2_Shovel
+usewith IndianMagician IT2_Balloon
+usewith SeeSaw IT2_Shovel
+await IndianPlatform 0
+await SeeSaw 0

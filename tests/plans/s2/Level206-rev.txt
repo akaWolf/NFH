@@ -1,0 +1,22 @@
+# Level206 with the free part in another order: the script's opening is
+# fixed (the toy box, the pillows race, the pipe hide), then the dynamite
+# before his first [14], the weights, and the harpoon and the pad right
+# after them, from next door (his lap has no later window the runner's
+# gate accepts from the pipe).
+take ToyBox IT2_Fartbag
+usewith! Pillows IT2_Fartbag
+take SportsBag IT2_Rubber
+hide Pipe
+await DeckChair 0
+unlock DentureAdhesive
+take DentureAdhesive IT2_Kukident
+usewith DynamiteBox IT2_Kukident
+take FleaBlanket IT2_Fleablanket
+usewith Weights IT2_Fleablanket
+usewith Harpoon IT2_Rubber
+usewith LaunchPad IT2_Rabbit
+await Weights 0
+await DynamiteBox 0
+await LaunchPad 0
+await Harpoon 0
+activated Rabbit

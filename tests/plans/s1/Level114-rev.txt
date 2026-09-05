@@ -1,0 +1,31 @@
+# Level114 in another order: the basement trap and the rat before his first
+# basement visit, the bedroom while he is down there, the horn, the shotgun
+# on his next balcony stretch, the kitchen and the hall last.
+take RubbishBinCable IT_Cable         # Z03: cable + cork
+take MouseHole IT_Rat                 # Z09
+usewith ElectricTrap IT_Cable         # Z09, 7
+take FirstAid IT_Superglue            # Z04
+park Zone04                           # he crosses the hall to the basement (~95)
+take ShotgunShells IT_Munition        # Z06 while he is in the basement
+take BedDrawer IT_Balloon             # Z06
+usewith Hat IT_Superglue              # Z06, 8
+usewith MedalBox IT_Rat               # Z06, 8
+hide Bed                              # he comes up for the Hat/MedalBox/Hat, then the Horn
+usewith Horn IT_Balloon               # Z07, 8
+hide Bed
+usewith Shotgun IT_Munition           # Z09 on his next balcony stretch
+usewith Shotgun IT_Cork               # the compound
+park Zone04
+take Drawer IT_Marbles                # Z01: marbles + shoepolish
+usewith Polish IT_Shoepolish          # Z03, 8 at the cup
+usewith GroundMarbles@Zone01 IT_Marbles   # 7
+park Zone04
+await ElectricTrap 7
+await Hat 8
+await MedalBox 8
+await Horn 8
+await Shotgun 13                      # KNOWN: the port pays 10
+await Polish 8
+await GroundMarbles@Zone01 7
+manual Gramaphone 10: primed only during his [4]..[8] Zone02 stretch, no window (see header)
+manual Pipe 10: primed only during his [3]..[7] Zone02 stretch, no window (see header)

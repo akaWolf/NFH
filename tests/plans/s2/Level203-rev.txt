@@ -1,0 +1,18 @@
+# Level203 in reverse: the bicycle and the melon, the toilets, the microphone
+# (through the generator) last.
+take ToolPelt IT2_Wrench
+usewith Bicycle IT2_Wrench
+take CannonBall IT2_Cannonball
+usewith Watermelon IT2_Cannonball
+await Watermelon 0
+await Bicycle 0
+take OilCan IT2_Oilcan
+usewith ToiletFlush IT2_Oilcan
+take ChiliSoup IT2_Piripiri
+usewith ToiletPaper IT2_Piripiri
+await ToiletPaper 0
+await ToiletFlush 0
+unlock OlgaBag
+take OlgaBag IT2_Tights
+usewith DieselGenerator IT2_Tights
+await Microphone 0

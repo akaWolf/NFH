@@ -1,7 +1,8 @@
 """The trick matrix (pass 3 of docs/FINAL_AUDIT_PROMPT.md): every trick of
 every level driven to the score, from the data.
 
-A plan file (tests/plans/<season>/<Level>.txt) lists the legs; this driver
+A plan file (tests/plans/<season>/<Level>.txt, or <Level>-<tag>.txt for
+another order of the same level's tricks) lists the legs; this driver
 executes them on the real 60 Hz viewer loop (over runtime/record.py's
 Recorder) with the safety loop a player performs by hand: a leg starts
 when its target zone is free of catchers, Woody flees to a parked zone
@@ -102,6 +103,40 @@ class Driver(Recorder):
         from invariants import Invariants
         self.inv = Invariants(self.v)
         self.frame_hooks.append(self.inv.frame)
+
+    def finish_level(self, secs=40.0):
+        """the level's own end after the plan, for the rating the player
+        sees (GameInfo.CalculateScore, cs:392-431): all tricks done ends
+        it by itself (WinGameOnCompleteAllTricks); a timed game short of
+        them runs out of clock — the driver lets the last seconds pass
+        instead of the minutes (the score does not read the clock, cs:
+        394-431) — and an untimed one (Season 2) never ends: its rating
+        is computed as the end would."""
+        w = self.world
+        g = w.game
+        rott = w.pawns.get('Rottweiler')
+        ticks = rott.angry_count_ticks if rott is not None else 0
+        nfh2 = bool(w.woody is not None and w.woody.nfh2)
+        end = 'all' if g.all_done() or g.ending else None
+        if end is None and g.timed and g.time_seconds > 0.0:
+            g.time_seconds = min(g.time_seconds, 4.0)
+            end = 'time'
+        if end is not None:
+            self.wait_until(lambda: g.ending and g.rating != '', secs)
+        if g.rating == '':
+            import copy
+            probe = copy.copy(g)
+            probe.log = list(g.log)
+            probe.calculate_score(ticks, nfh2=nfh2)
+            rating, won = probe.final_viewer_rating, probe.won
+            end = end or 'none'
+        else:
+            rating, won = g.final_viewer_rating, g.won
+        return {'completed': g.completed, 'total': g.total,
+                'score': g.final_trick_score, 'ticks': ticks,
+                'rating': rating, 'won': bool(won),
+                'perfect': bool(won and rating >= 100), 'end': end,
+                't': round(self.t, 1)}
 
     def _install_anim_probes(self):
         """count each pawn's AnimPlayer.tick calls per world tick: the port
@@ -2526,7 +2561,10 @@ def main(argv):
         plan = args[0]
         name = os.path.splitext(os.path.basename(plan))[0]
         season = os.path.basename(os.path.dirname(plan))
-        level = os.path.join(ROOT, 'levels', season, name + '.json')
+        # Level101-rev.txt is another plan of Level101 (the part before the
+        # dash names the level; the whole name keeps its own output dir)
+        level = os.path.join(ROOT, 'levels', season,
+                             name.split('-')[0] + '.json')
         outdir = os.path.join(outroot, '%s_%s' % (season, name))
         d = Driver(level, plan, outdir)
         d.apply_prelude()
@@ -2534,6 +2572,16 @@ def main(argv):
         results = d.run_plan()
         json.dump(results, open(os.path.join(outdir, 'results.json'), 'w'),
                   indent=1)
+        rating = d.finish_level()
+        json.dump(rating, open(os.path.join(outdir, 'rating.json'), 'w'),
+                  indent=1)
+        print('RATING %s: %d/%d tricks, %d points, %d angry ticks -> %d%% '
+              '%s (%s end, t=%.1f)'
+              % (name, rating['completed'], rating['total'], rating['score'],
+                 rating['ticks'], rating['rating'],
+                 'PERFECT' if rating['perfect'] else
+                 ('won' if rating['won'] else 'lost'), rating['end'],
+                 rating['t']))
         json.dump(d.clicks, open(os.path.join(outdir, 'clicks.json'), 'w'),
                   indent=1)
         vio = d.inv.finish()
@@ -2567,8 +2615,19 @@ def main(argv):
             ipath = os.path.join(outroot, '%s_%s' % (season, base),
                                  'invariants.json')
             vio = json.load(open(ipath)) if os.path.exists(ipath) else []
-            print('%-18s %d legs, %d failed, %d manual, %d invariant'
-                  % (name, len(data), len(bad), len(man), len(vio)))
+            rpath = os.path.join(outroot, '%s_%s' % (season, base),
+                                 'rating.json')
+            rt = json.load(open(rpath)) if os.path.exists(rpath) else None
+            rs = ''
+            if rt is not None:
+                rs = '  %d/%d %d%% %s' % (rt['completed'], rt['total'],
+                                          rt['rating'],
+                                          'PERFECT' if rt['perfect'] else
+                                          ('won' if rt['won'] else 'lost'))
+                if not rt['perfect']:
+                    total_bad += 1
+            print('%-18s %d legs, %d failed, %d manual, %d invariant%s'
+                  % (name, len(data), len(bad), len(man), len(vio), rs))
             for r in bad:
                 print('    FAIL %-36s %s' % (r['leg'], r.get('why') or ''))
             for x in vio:

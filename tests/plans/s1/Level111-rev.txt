@@ -1,0 +1,43 @@
+# Level111 in another order: the basement on lap 1 (while he irons upstairs),
+# the study, the vacuum and the fish tank on lap 2, the iron and the airer
+# after his primes, and the carpet trigger (the dog alarm, the vacuum's
+# fixing-tool run) last.
+take TableShovel IT_Shovel            # Z07 at once
+take Perch IT_Birdfood                # Z02 (auto-sneak: the dog)
+take Detergent IT_Detergent           # Z03 after his [0] use
+take RubbishBinCable IT_Cable         # Z03
+take Drawer IT_Marbles                # Z01
+park Zone04
+# -- lap 1, he is upstairs: the basement
+take BasementDrawer IT_Tongs
+usewith Drier IT_Tongs
+take WineCellar IT_Winebottle
+usewith WashingMachine IT_Winebottle
+usewith ElectricTrap IT_Cable         # 11
+usewith GroundMarbles@Zone09 IT_Marbles   # 7
+park Zone04
+# -- lap 2, he is in the kitchen/basement: the study, the vacuum, the tank
+take DeskDrawer IT_Paperknife         # Z08
+usewith Vacuum IT_Paperknife          # Z02, the tool that pays 15
+usewith FishTank IT_Detergent         # Z08, 10
+hide Bed
+# -- lap 2 upstairs: the primed iron and airer
+use Iron
+hide Bed
+usewith Airer IT_Birdfood
+hide Bed
+await Drier 10
+await WashingMachine 10
+await ElectricTrap 11
+await GroundMarbles@Zone09 7
+await FishTank 10
+await Iron 10
+await Airer 13
+# -- last: the carpet trigger -> the dog alarm -> the yell -> the vacuum
+prime PlantSoil IT_Shovel
+usewith DirtyCarpet IT_Soil
+sneak off
+park Zone02
+park Zone04
+sneak auto
+await Vacuum 15

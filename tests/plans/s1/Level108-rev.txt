@@ -1,0 +1,26 @@
+# Level108 in the only other order its windows allow: the balcony opening
+# as the standard plan (his first balcony window closes at ~52 s), the
+# coffee and — on its bathroom rush, the one balcony window long enough
+# for the lotion (+10) — the lotion and the poison right after; the banana
+# and its slip last.
+take PinsBoard IT_Pins               # Z01
+take BedDrawer IT_Key +12            # Z06
+take SoilBag IT_Soil_only            # Z07
+use SunShade                         # Z07: the lotion plays only under the tricked shade
+usewith Shezlong IT_Pins             # Z07, 10
+hide Bed                             # he comes through to the balcony
+await Shezlong 10
+take Fridge IT_Honey                 # Z03
+prime FirstAid IT_Key                # Z04 -> IT_Poison
+usewith CoffeeMaker IT_Soil_only     # Z03, 15
+reclick CoffeeMaker
+usewith SunLotion IT_Honey +10       # Z07, 20 at his Shezlong use — on the coffee's bathroom rush
+usewith WateringCan IT_Poison        # Z07: Plant 20 at his next watering
+hide Bed
+await CoffeeMaker 15
+await SunLotion 20
+await Plant 20
+take RubbishBinBanana2 IT_Banana     # Z03
+usewith Ground@Zone03 IT_Banana      # 8
+await Ground@Zone03 8
+manual ToothBrush 15: his FIRST use removes the action (RoutineActionUse.cs:424-427, ActionManager.RemoveActionByItem) and it is his first action; with the brush from the Drawer next to the start Woody reaches the bathroom door 0.1 s after the neighbour claims it (Pawn.cs:1359 door-pair wait) — see the report
