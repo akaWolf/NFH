@@ -7756,6 +7756,17 @@ class World:
             player.on_advance.append(
                 lambda idx, bl=tuple(blist):
                 [b.on_advance_frame(idx) for b in bl])
+            # the animation already running when the behaviour attaches:
+            # the original's ActorBehavior.PlayAnimation ran at that
+            # animation's InitializeCurrentAnimation (Actor.
+            # BehaviorPlayAnimation), the behaviour being enabled from its
+            # Start — MugBehavior tracks the captain's idle from the first
+            # cycle (the bench: the mug's collider off at 3.07 s from the
+            # load, then 4 s in 8), where a hook attached after the idle's
+            # start never learned its name and the mug stayed clickable
+            if player.anim is not None:
+                for b in blist:
+                    b.play_animation(player.anim.name)
         for role, spec in self.level.pawns.items():
             pawn = self.pawns.get(role)
             if pawn is None:

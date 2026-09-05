@@ -1220,11 +1220,27 @@ Woody went up, the wheel came, and the Rottweiler steered it for 13.4 s
 before the pistol: 28980 against 28688 is that visit, not a model
 difference). The same tap on the same screen point, sent in the level's
 end state, walks Woody through the DoorBack to the mug — so the point
-and the doors are right and the rejection is the moment's: the walk to
-the mug crosses the DoorBack pair, a ComplexMove door whose LinkNodes
-expansion reads Helpers' StepIndex / FirstStepIndex / DonePassingHelper
-statics from Woody's last walk (Helpers.cs:225-335 — the shape the
-runner's _click guard is about). Open: whether the port's find_path
-accepts that click where the original's LinkNodes does not, which would
-be a port difference in the pathing, or the original wants the walk's
-statics settled first.
+and the doors are right and the rejection is the moment's. calls.js on
+the click's raycast (Helpers.GetItemFromCollider) settled it: at 24727
+the ray met the Zone05 box, not the mug — the mug's collider was off.
+MugBehavior (MugBehavior.cs:16-33) hides the mug and drops its collider
+on frame 25 of the captain's idle (N2TrickItemIdleNormal: 64 pattern
+entries at 8 fps, an 8 s loop) and brings them back on frame 57: on the
+bench the collider goes off at level frame 184 and on at 424, then every
+480 frames (3.07 s from the load and 4 s in 8 — traced through
+Collider.set_enabled), and 24727 fell in the 24664-24904 window. With
+the pills in hand a click on the zone is abandoned (Woody.
+ShouldAbortMove: the used inventory drops), which is what the log showed.
+
+The port had the same MugBehavior and never hid the mug: World's
+behaviour wiring attaches the play/advance hooks after the captain's
+idle has started, so the behaviour never learned the idle's name and
+its frame checks never matched — the mug stayed clickable through the
+whole level, and the runner's click at 405.9 s landed where the
+original's could not. World.hook_player now replays the running
+animation's name to the behaviours it attaches (the original's
+ActorBehavior.PlayAnimation ran at that idle's InitializeCurrentAnimation,
+the behaviour being enabled from Start): the port's mug now goes off at
+3.00 s and on at 7.00 s from the load, then every 8 s. The tap rule
+treats a hidden item (Item.IsHidden) as not there and retries it like
+an absent one, each absent item on its own 3 s clock.
