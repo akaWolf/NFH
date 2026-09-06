@@ -237,7 +237,9 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   score screen lists the rows; the harness prints `PC N pts` and keeps
   `pc_points`/`pc_lines` in rating.json) — measured in §2.4 and
   docs/PC_VS_MOBILE.md; the HUD statue lights with the last coin, not at
-  the overflow; the Season 2 bonus for ANY overflow, three lives on Season 2
+  the overflow; the Season 2 HUD shows the PC's clock — the seconds
+  played, counting up, in the TimeRect the mobile data carries but its
+  DrawTime never uses on NFH2; the Season 2 bonus for ANY overflow, three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
   level entrance, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the

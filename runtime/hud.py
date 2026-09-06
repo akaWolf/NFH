@@ -1065,12 +1065,20 @@ class Hud:
                        self._statue_rect)
 
     def _draw_time(self):
-        """DrawTime: mm:ss when timed, --:-- otherwise (non-NFH2 only)"""
+        """DrawTime: mm:ss when timed, --:-- otherwise (non-NFH2 only).
+        The PC profile's Season 2 shows the PC's clock instead: the
+        seconds played, counting up (the NFH2 HUD's top-left "5:54" —
+        the level is untimed, the clock feeds the time bonus of the
+        COLLAPSE! board); the mobile HUD data carries the TimeRect and
+        style, its DrawTime just never draws them on NFH2"""
         woody = self.world.woody
-        if woody is not None and woody.nfh2:
-            return
         g = self.world.game
-        if g.timed:
+        if woody is not None and woody.nfh2:
+            if not pcprofile.is_pc():
+                return
+            n = max(0, int(self.world.time))
+            s = '%d:%02d' % (n // 60, n % 60)
+        elif g.timed:
             n = max(0, int(g.time_seconds))
             s = '%02d:%02d' % (n // 60, n % 60)
         else:
