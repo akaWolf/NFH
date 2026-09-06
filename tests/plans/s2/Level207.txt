@@ -1,43 +1,38 @@
 # Level207 — TotalTricksCount 7 (winning 5); every S2 TrickScore is 0.
 # Routine (Rottweiler2): PoolBoard (Zone04) -> Bartender, Elephant (Zone03)
-# -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); the Mother (a
-# catcher) on Zone04's DeckChair / PoolLadder (Level207MotherBehavior swaps
-# the pool board's sets while she is on the ladder); Olga on Zone02's shells.
-# Dead data (colliders off / no source): Fence1/2, PoolLadder, BeachLogo
-# (IT2_Knife), DeckChair (IT2_Fartbag), ShellLaydown, Pole, Tap and
-# Bartender as clicks (they are the IceBucket's / Whisky's PrimingItems),
-# ElephantBucket (Elephant's ActivateItemTrick). Seven coins = PoolBoard,
-# PoolAwning (linked, unlocked by the tricked board's use:
-# ItemsToUnlockWhenTricked + PoolJumpBehavior's collider enable), Elephant,
-# Shell, SandCastle + BeachTowel armed together (Item.OnTrickDone's fresh
-# pair, cs:2137-2142) and the castle's ExtraCoinLinkedTrick.
-# EXCELLENT is 90 + 10 for exactly one meter overflow (GameInfo.cs:413-416):
-# the board's first coin alone on lap 1; on lap 2 the board with its linked
-# awning (20 + 30), the elephant 20, the shell 20 and, last on his lap, the
-# castle with its linked towel (40 + 20) cross 100 once.
+# -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); Mother on Zone04,
+# Olga on Zone02's shells.
+# Dead data: Fence1/2, PoolLadder, BeachLogo, DeckChair, ShellLaydown,
+# Pole, Tap and Bartender as clicks (PrimingItems), ElephantBucket.
+# EXCELLENT is 90 + 10 for one meter overflow (GameInfo.cs:413-416). The
+# board's first tricked use unlocks the awning; then the board+awning
+# (20 + 30 linked), the elephant 20 and the shell 20 are armed to pay on
+# one lap, and the SandCastle with its linked BeachTowel and the extra coin
+# (40 + 20 + 10 on one visit), his last item, crosses 100 (single-lap peak
+# 133).
 take Moped IT2_Spring
-usewith PoolBoard IT2_Spring      # action [0]; PawnToAffectWhenTricked Mother
-await PoolBoard 0                 # the tricked use unlocks the awning (RoutineActionUse.cs:398-404)
+usewith PoolBoard IT2_Spring      # the first tricked use unlocks the awning (lap 1)
+await PoolBoard 0
 take Moped2 IT2_Pedal             # KeepFull
-usewith PoolAwning IT2_Pedal      # Locked until the board pays; collider enabled at PoolAwningFall frame 6
-take MopedPool IT2_Spring         # the second spring: the board has no UseOnce
-usewith PoolBoard IT2_Spring      # both tricked: the linked CrashMother set, the awning pays
-take Whisky IT2_Whiskey           # RequirePriming, PrimingItem Bartender, ObjectToPrimeWhenPrimed IceBucket
-prime Bartender IT2_Whiskey       # Item.cs:1537-1573 + the IceBucket name-hack (cs:1274-1281): the bucket unlocks and re-arms
-take IceBucket IT2_Bucket_empty   # RequirePriming (re-armed), PrimingItem Tap -> IT2_Bucket
+usewith PoolAwning IT2_Pedal      # Locked until the board pays
+take Whisky IT2_Whiskey
+prime Bartender IT2_Whiskey
+take IceBucket IT2_Bucket_empty
 prime Tap IT2_Bucket_empty
-usewith Elephant IT2_Bucket       # action [2]; ActivateItemTrick ElephantBucket
+usewith Elephant IT2_Bucket       # action [2]
 take BBQ IT2_Bbqtongs
-unlock CrayFish IT2_Bbqtongs      # Dexterity, DexterityUnlocker IT2_Bbqtongs, KeepFull
+unlock CrayFish IT2_Bbqtongs
 take CrayFish IT2_Crayfish
-usewith Shell IT2_Crayfish        # action [3]; PawnToAffectWhenTricked Olga
+usewith Shell IT2_Crayfish        # action [3]
 take SeaUrchin IT2_Hedgehog
 usewith BeachTowel IT2_Hedgehog   # action [5]
-unlock CrayFish IT2_Bbqtongs      # TakeItemCount 2: a second round
-take CrayFish IT2_Crayfish        # KeepFull: the second crayfish (SearchItem.cs:158-160)
-usewith SandCastle IT2_Crayfish   # action [4]; LinkedItemTrick BeachTowel: both pay on his visit
+unlock CrayFish IT2_Bbqtongs
+take CrayFish IT2_Crayfish
+usewith SandCastle IT2_Crayfish   # action [4]; LinkedItemTrick BeachTowel + ExtraCoin: three coins on his visit
+take MopedPool IT2_Spring         # the second spring, armed LAST: the board's linked awning pays with the set
+usewith PoolBoard IT2_Spring
 await PoolAwning 0
 await Elephant 0
 await Shell 0
-await SandCastle 0
 await BeachTowel 0
+await SandCastle 0

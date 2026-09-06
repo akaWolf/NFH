@@ -1,32 +1,32 @@
 # Level204 — TotalTricksCount 6 (winning 4); every S2 TrickScore is 0.
 # Routine (Rottweiler2): PullKart, Karate (Zone01) -> GongDrumstick (Zone04)
 # -> HotDog (Zone03) -> JadeNecklace (Zone02); Olga: PullKart.
-# Dead data: GongMan (IT2_Crayfish, no source, collider off), OlgaKid as a
-# trick (IT_Detergent) — it is the ToyDispenser's PrimingItem, GongGrease
-# as a trick (IT_Emptybottle) — it is the RiceBowl's PrimingItem.
+# Dead data: GongMan, OlgaKid / GongGrease as tricks (PrimingItems).
 # EXCELLENT is 90 + 10 for exactly one meter overflow (GameInfo.cs:413-416;
-# AngerAmount per trick, 0.37/s decay that pauses through his angries,
-# Rottweiler.cs:640-663, 795/891/910). The tricks are armed against his
-# lap — each right after his visit, the necklace first, the kart last — so
-# the whole set pays on the next lap: 25 + 20 + 30 + 20 stay under 100, the
-# necklace with its linked vase (20 + 25), his last visit, crosses it.
-unlock ToyDispenser               # Dexterity, DexterityUnlocker IT_NONE; RequirePriming, PrimingItem OlgaKid
-take ToyDispenser IT2_Teddy
-take BonsaiScissors IT2_Scissors
-take RiceBowl IT2_Rice_empty      # RequirePriming, x2 uses, PrimingItem GongGrease -> IT2_Rice_full
-prime GongGrease IT2_Rice_empty   # Item.cs:1537-1573: the held source primes on its PrimingItem
-usewith Vase IT2_Rice_full        # not in the routine: pays through JadeNecklace's LinkedItemTrick
-usewith JadeNecklace IT2_Scissors # action [4]; linked pair with the Vase: both pay (Item.OnTrickDone)
-prime OlgaKid IT2_Teddy           # the teddy primes on the kid -> IT2_Confetti
-usewith HotDog IT2_Confetti       # action [3]
-take UmbrellaStand IT2_Sunshade
-usewith GongDrumstick IT2_Sunshade   # action [2]
+# 0.37/s decay, no pause in Season 2). The meter overflows only if every
+# trick pays on ONE of his laps, and arming five tricks takes longer than
+# one lap — so the kart (his earliest visit, 6/82/168 s) is armed LAST,
+# after his lap-2 kart visit, so its payment falls on the same later lap
+# as the other four: 20 + 30 + 20 climb to 51 (Karate 97, Gong 118, HotDog
+# 149) and the JadeNecklace with its linked Vase (20 + 25) at 178 s crosses
+# 100 (peak 85 before the pair, 100 at it). Reached 100 (v4).
+take RiceBowl IT2_Rice_empty
+prime GongGrease IT2_Rice_empty
 take Bricks IT2_Brick
-usewith Karate IT2_Brick          # action [1]
-usewith PullKart IT2_Rice_full    # action [0], PawnToAffectWhenTricked Olga (Level204OlgaBehavior)
-await PullKart 0
+usewith Karate IT2_Brick
+take UmbrellaStand IT2_Sunshade
+usewith GongDrumstick IT2_Sunshade
+unlock ToyDispenser
+take ToyDispenser IT2_Teddy
+prime OlgaKid IT2_Teddy
+usewith HotDog IT2_Confetti
+take BonsaiScissors IT2_Scissors
+usewith Vase IT2_Rice_full
+usewith JadeNecklace IT2_Scissors
+usewith PullKart IT2_Rice_full    # LAST: after his lap-2 kart visit, so the kart pays with the rest
 await Karate 0
 await GongDrumstick 0
 await HotDog 0
 await JadeNecklace 0
 await Vase 0
+await PullKart 0
