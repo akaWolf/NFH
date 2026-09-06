@@ -1641,23 +1641,35 @@ Level214 (the wheel's 80 tops the meter at 466 s; the pistol waits 110 s
 so its 40 does not) and Level201 rate 100. The ones that cannot, by the
 shipped amounts against his lap:
 
+The Season 2 meter overflows only if every trick pays on ONE of the
+neighbour's laps, and arming five to seven tricks takes longer than one
+of his laps (85-130 s). The lever is to arm the trick he visits EARLIEST
+LAST — after its next visit — so its payment drops onto the same later
+lap as the rest: Level204 (the kart, 6/82/168 s) and Level207 (the
+second pool-board spring) reach 100 that way, joining Level201/203/209/
+212/213/214. The ones still at 90 are held there by a structural reason,
+not by the runner's pace:
+
 - Level211: 7 of 8 — the FishingRod's collider lies inside the door's
-  (x −5.27..−4.42, y 1.91..2.25 within −5.86..−4.06, 1.67..2.93, the
-  door's near face nearer to the camera); on the original the tap walked
-  Woody through the door and into a catch at 33 s. 78 + 10 at the most.
-- Level202, 204, 205, 206, 207, 208, 210: the single-lap peak, computed
-  from the neighbour's own visit times with every trick paid on one lap,
-  is over 100 for each (Level204 114 at the necklace+vase, Level207 133
-  at the castle's three coins, Level205 109 across the chef/rockets/
-  sculpture end-cluster). What the runner cannot do is ARM them fast
-  enough: his lap is 85-130 s and arming five to seven tricks takes more
-  than one lap, so the payments split across two or three of his laps and
-  the 0.37/s decay drains the meter between — the closest runs peak at
-  76-92. Whether a frame-perfect human could arm inside one lap is open;
-  the mobile release is reported not to allow the final level's maximum
-  either ("a bug prevents you from getting maximum score in the final
-  mission", App Store review). The reverse orders spread the same way.
-  These are the levels to revisit if the arming is ever made tighter.
+  (x −5.27..−4.42, y 1.91..2.25 within −5.86..−4.06, 1.67..2.93); on the
+  original the tap walked Woody through the door into a catch at 33 s.
+- Level202: the BeerMat is RottweilerUseTogglesPrime — it needs two of
+  his visits after arming (prime, then pay), so it cannot join the
+  rail+pond+rake cluster (peak ~79).
+- Level205: the SandSculpture's window (his 78-98 s end-cluster with the
+  chef and rockets) comes before its banger+statue+glasses chain can be
+  armed, and the lap-2 spread peaks at ~81.
+- Level206: the DeckChair (45) and the LaunchPad's linked triple (30+20+
+  15) are each big enough that any lap paying both overflows twice —
+  AngryCountTicks goes to 2 and the +10 (for exactly one) is lost.
+- Level208: the IndianPlatform+SeeSaw pair (50) is his earliest visit and
+  the Fifi chain re-orders his routine mid-lap; the cluster peaks ~86.
+- Level210: 6-7 of 8 — the empty-pool coins (DivingBoard/Pool linked) are
+  the reported final-level snag ("a bug prevents you from getting maximum
+  score in the final mission", App Store review); the two are not paid.
+
+The reverse orders of these sit at 90 the same way. They are the levels
+to revisit if the runner ever gains a per-frame arming lever.
 
 The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 
@@ -1666,10 +1678,10 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 101 | 100 | 100 | 201 | 100 | — |
 | 102 | 100 | 100 | 202 | 90 | 90 |
 | 103 | 100 | 100 | 203 | 100 | 90 |
-| 104 | 100 | 100 | 204 | 90* | 90* |
+| 104 | 100 | 100 | 204 | 100 | 90 |
 | 105 | 100 | 100 | 205 | 90* | 90* |
 | 106 | 100 | 100 | 206 | 90 | 90 |
-| 107 | 100 | 100 | 207 | 90* | 90* |
+| 107 | 100 | 100 | 207 | 100 | 90 |
 | 108 | 100 | 100 | 208 | 90 | 90 |
 | 109 | 100 | 100 | 209 | 100 | 90 |
 | 110 | 100 | 100 | 210 | 67 (6/8) | 78 (7/8) |
@@ -1678,6 +1690,6 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 113 | 100 (7/8) | 100 (7/8) | 213 | 100 | 90 |
 | 114 | 80 (7/9) | 80 (7/9) | 214 | 100 | — |
 
-(* the single-lap peak is >100 but the runner cannot arm inside one lap — see above.) Every plan passes its legs; a `manual` leg is a trick the data leaves
+Every plan passes its legs; a `manual` leg is a trick the data leaves
 unreachable (the plan headers say which). The runner's summary marks a
 plan short of PERFECT, and `--all` exits 1 while any is.
