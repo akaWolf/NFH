@@ -1664,9 +1664,11 @@ not by the runner's pace:
   AngryCountTicks goes to 2 and the +10 (for exactly one) is lost.
 - Level208: the IndianPlatform+SeeSaw pair (50) is his earliest visit and
   the Fifi chain re-orders his routine mid-lap; the cluster peaks ~86.
-- Level210: 6-7 of 8 — the empty-pool coins (DivingBoard/Pool linked) are
-  the reported final-level snag ("a bug prevents you from getting maximum
-  score in the final mission", App Store review); the two are not paid.
+- Level210: 8 of 8 at 90 — the pool coins (the valve's tongs from the
+  ToolBelt, the puddle's octopus for the shop's second coin, the DogBasket's
+  ExtraCoin210 with the pool drained) were missing from the plan, not from
+  the game (the PC guide has "use fishing net with tool belt, use tongs with
+  valve"); the eight payments spread over four laps, peak 68, no overflow.
 
 The reverse orders of these sit at 90 the same way. They are the levels
 to revisit if the runner ever gains a per-frame arming lever.
@@ -1684,7 +1686,7 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 107 | 100 | 100 | 207 | 100 | 90 |
 | 108 | 100 | 100 | 208 | 90 | 90 |
 | 109 | 100 | 100 | 209 | 100 | 90 |
-| 110 | 100 | 100 | 210 | 67 (6/8) | 78 (7/8) |
+| 110 | 100 | 100 | 210 | 90 (8/8) | 78 (7/8) |
 | 111 | 100 | 100 | 211 | 78 (7/8) | 78 (7/8) |
 | 112 | 100 | 100 | 212 | 100 | 90 |
 | 113 | 100 (7/8) | 100 (7/8) | 213 | 100 | 90 |
