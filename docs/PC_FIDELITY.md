@@ -81,11 +81,13 @@ Two ways, choose the overlay:
 
 Expected: 211 → 8 of 8, 90 (+10 with the overflow rule below).
 
-### 2.4 Season 2 rating — "fill the gauge" (confidence: medium)
+### 2.4 Season 2 rating — "fill the gauge" (confidence: high — measured)
 
-PC guide: "completely fill up the gauge on the left" plus every trick.
-Mobile: `+10 iff AngryCountTicks == 1` (GameInfo.cs:413-416). The PC text
-reads as "at least once"; the exact PC formula is not known.
+PC: points (coins + a COLLAPSE bonus + time; E10's end screen 8000 + 3000 +
+5000 + 1398, the map counting 8/8 coins), and the gauge may fill more than
+once — Badinfos' 100 % run fills it twice in 210 and 214. The gauge decays
+at ~0.4 %/s on PC as well (`tools/pcref/gauge.py`), so the mobile's 0.37/s
+is the PC's constant; only the "exactly one" is the remake's.
 
 Switch: `ticks >= 1`. Effect: Level206's two overflows stop costing the
 bonus (100), and the arm-the-earliest-last constraint relaxes to "overflow

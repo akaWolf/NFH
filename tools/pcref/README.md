@@ -20,3 +20,6 @@ tracking his sprite (the PC view pans and he is often off-screen).
 
 Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 `yt-dlp -4` from pcnew). Results: `docs/PC_LAPS.md`.
+- `gauge.py <video> <start> <dur>`: the PC NFH2 anger gauge (the bar at the
+  left of the 720p frame) as fill % per second — its jumps are the tricks'
+  amounts, its plateaus the decay (~0.4 %/s).

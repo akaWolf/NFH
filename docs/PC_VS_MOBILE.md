@@ -52,13 +52,15 @@ the fishing net + tongs + valve of 210, the bent nail on the child's rod of
 | | PC | mobile |
 |---|---|---|
 | Season 1 100 % | "pull off every trick; some scenes require chaining tricks in succession" (guide) | `GameInfo.CalculateScore` (cs:392-405): FinalTrickScore + CompletedTricksCount × min(CompoundTrickScore, AngryCountTicks), capped 100; a tick is an angry landing while the meter is still above zero (Rottweiler.cs:598-611; 4.23/s decay, 23.6 s window) |
-| Season 2 100 % | "completely fill up the gauge on the left" + every trick (guide) | int(completed × 90 / total) + 10 iff AngryCountTicks == 1 (cs:413-416): the meter must overflow EXACTLY once; 0.37/s decay, no pause (Rottweiler.cs:793-796) |
+| Season 2 100 % | points: coins + a "COLLAPSE!" bonus + time (E10's end screen: 8000 + 3000 + 5000 + 1398), the map counting coins 8/8; the gauge decays ~0.4 %/s (measured: E07 17→0 in 46 s, E04 62→51 in 26 s) and may fill ANY number of times — Badinfos' 100 % run fills it twice in 210 (299, 342 s) and 214 (396, 447 s) | int(completed × 90 / total) + 10 iff AngryCountTicks == 1 (cs:413-416): the meter must overflow EXACTLY once; 0.37/s decay (the PC's constant), no pause (Rottweiler.cs:793-796) |
 | Lives | 3 attempts (PC NFH2) | 1 (both mobile games; 4PDA thread, 2017) |
 
 The Season 1 rule is the same idea on both sides. The Season 2 rule is not: on
-PC the gauge only has to fill; on mobile a second overflow (AngryCountTicks 2)
-loses the +10 — Level206's DeckChair (45) and LaunchPad triple (30+20+15) are
-each big enough that any lap paying both overflows twice.
+PC the gauge only has to fill (once or more — the PC run fills it twice in
+210 and 214 and still scores the collapse); on mobile a second overflow
+(AngryCountTicks 2) loses the +10 — Level206's DeckChair (45) and LaunchPad
+triple (30+20+15) are each big enough that any lap paying both overflows
+twice, and 214 needs a deliberate wait before the pistol.
 
 ## Mechanics the mobile added or changed
 
@@ -143,6 +145,24 @@ the data. "Same set" means every PC step has a mobile item and vice versa.
 | 212 | crowbar→plate, crowbar→mine, explosive→cigars, paint→bench, resin→bull, corn→parrot, coin→slot, rubies→throne, dagger→disc, dagger→whip | 9: Bull 30, Throne hands/Cigars/Whip/Bench/... 20 | same set |
 | 213 | jar→termites, tequila+chili→nachos, chicken+teeth→plant, cement→bath salts, flower→trough, termites→basket, hand→lever, wasps→pinata | 9: all 20, controls 15 | same set |
 | 214 | carpet→hatch, glass→strap, fish→flowers, ammo→flare gun, fish→bucket, cloth→pane, key, pill→toddy, code→wheel | 6: Wheel 80, Door/Bucket/Glass/Shower/Bird/Pistol/Bouquet/Hatch 40 | same set; mobile wheel collider is touchy (review) |
+
+## Why the PC reaches 100 % everywhere and the mobile does not
+
+Measured, not inferred (`docs/PC_LAPS.md`, `tools/pcref/gauge.py`):
+
+1. Not the routines — the order is the PC's in all 28 episodes.
+2. Not the meter — the PC gauge decays at the same ~0.4 %/s and the trick
+   amounts are alike (PC 202: +18, +19, +37, +31; 205: +23, +35, +46, +30).
+3. Two tricks the remake made unreachable: 114 (the dog whistle became a
+   presence-only Alerter) and 211 (the rod under the door collider).
+4. A stricter bonus rule: the PC counts a collapse, the mobile counts EXACTLY
+   one overflow — 206 overflows twice by its data, 214 only with a wait.
+5. Slower actions: the mobile neighbour is 20-80 % slower on nine levels
+   (101, 105, 107, 110, 112, 114, 210, 211, 212), so on the levels that
+   need the whole set on one lap (202, 205, 208, 210) the payments spread
+   further apart and the decaying meter peaks at 79-97 where the PC fills
+   it inside 54-104 s of payments.
+6. One life against three — difficulty, not the maximum.
 
 ## What this means for "100 % on every level"
 
