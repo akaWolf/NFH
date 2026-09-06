@@ -1191,6 +1191,12 @@ class Level:
         self.dexterity = {}         # DexterityComponent pid -> spec
         self.mouse_cursor = None    # MouseCursor component spec
         self._zone_comp = {}        # Zone component pid -> Zone
+        try:
+            import pcprofile
+        except ImportError:                 # imported as runtime.scene
+            from runtime import pcprofile
+        if pcprofile.is_pc():
+            pcprofile.apply_overlay(self)   # levels/pc/<Level>.overlay.json
         self._build()
 
     def _level_location_index(self):

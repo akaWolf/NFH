@@ -1,0 +1,32 @@
+# Level211 under the PC profile: the standard plan plus the fishing rod —
+# the PC guide's 'use bent nail with child's fishing rod'. In the port the
+# rod is an item click (tools/livediff/README.md: no longer under the
+# moved stairs' collider); the nail comes from the cabin's picture (Zone05,
+# on nobody's route) and the rod goes in on the same Zone04 window as the
+# toilet sign. Expected 8/8, and 100 with the PC overflow rule.
+take FireExtinguisher IT2_Extinguisher # Zone03 in the Mother's first sleep, from the start zone next door
+take Urinal IT2_Pissballs              # Zone02
+take ChestDrawer IT2_Coin              # Zone05 (KeepFull)
+take MumPicture IT2_Bentnail          # Zone05: the nail is only for the rod
+take Plate IT2_Sausage                 # Zone05 (RequirePriming: primes at the Dog, PrimingItem; UnlockObjectToPrime -> Handbag)
+take CompressedAir IT2_Pressuretank    # Zone01 (KeepFull)
+usewith LifeJacket IT2_Pressuretank    # Zone02
+usewith DivingGear IT2_Extinguisher    # Zone02
+prime Dog IT2_Sausage                  # Zone03 (a Mother sleep): the held sausage's source primes on its PrimingItem (Item.cs:1548-1572, RemoveInventoryAfterRequirePriming) and unlocks + primes the Handbag (Item.WoodyPrime's ObjectToPrimeWhenPrimed / UnlockObjectToPrime)
+take Handbag IT2_Rasp                  # Zone03
+usewith ToiletSign IT2_Rasp            # Zone04 (KeepAfterUse: the rasp stays; DependsOn of ToiletMen/ToiletWomen)
+usewith FishingRod IT2_Bentnail       # Zone04, the same window: ActivateItemTrick -> OlgaStandStill
+usewith Sweets IT2_Pissballs           # Zone04: RushToToilet; with the sign tricked Toilet211Behavior (Item.cs:2373-2384) sends him to the women's toilet, sets Olga on him and pays an extra TrickDone
+take CompressedAir IT2_Pressuretank    # Zone01 again (KeepFull)
+usewith OlgaChild IT2_Pressuretank     # Zone04 (the Mother's action; LinkedItemTrick of the CabinPhone)
+usewith PayPhone IT2_Coin              # Zone04: ActivateItemTrick -> CabinPhone (Zone05) + AlarmItem/CauseAlarm: the phone rings and he runs to answer it (AnswerPhoneNFH2)
+unlock LifeBoat IT2_Rasp               # Zone01: the dexterity trick item (DexterityTrickItem, unlocker IT2_Rasp, DexterityKeepItem) — the done-pass falls out of CanWoodyUse's chain and the boat is tricked (Item.cs:1475-1507; RemoveFromRoutineAfterUseTricked)
+await LifeJacket 0
+await DivingGear 0
+await Sweets 0
+await CabinPhone 0
+await OlgaChild 0
+await LifeBoat 0
+await FishingRod 0
+await 8
+

@@ -1,0 +1,25 @@
+# Level202 under the PC profile: the rail, the submarine and the rake first;
+# the crab goes on the mat only after his lap-2 mat visit (whenusing
+# Swimming, ~92 s), so the mat's 30 lands on his lap-3 visit (153 s) right
+# after the rail with the pond (133 s, 20 + 30) — 78 -> 104, the one
+# overflow the PC scores (5/5, 100). The rake's own 35 lands before the
+# rail; no data overlay is needed on this level.
+take Sandbucket IT2_Sandbucket    # RequirePriming, PrimingItem EelBox, PrimedInventoryType IT2_Sandbucketeel
+prime EelBox IT2_Sandbucket       # Item.cs:1537-1573: the held source primes on its PrimingItem -> IT2_Sandbucketeel
+usewith Pond IT2_Sandbucketeel    # the eels go in (RequiredInventory)
+take RubbishBin IT2_Fin
+usewith Submarine IT2_Fin         # TrickItem.OnUseAnimationCompleted: ActivateItemTrick/SetTrickedOnItem -> Swimming
+take Weed IT2_Weed
+use Rake                          # bare-hand (RequiredInventory IT_NONE)
+usewith Rake IT2_Weed             # the compound lands only once tricked (TrickItem.cs:511)
+take SawFish IT2_Sawfish
+usewith BridgeRail IT2_Sawfish    # linked pair with Pond: the rail visit [4] pays both — the overflow
+whenusing Swimming                # his lap-2 swim: the mat visit (73-84) is over
+take Reed IT2_Reed
+unlock CrayFish IT2_Reed          # SearchItem Dexterity, DexterityUnlocker IT2_Reed
+take CrayFish IT2_Crayfish
+usewith BeerMat IT2_Crayfish      # RottweilerUseTogglesPrime, no RequirePriming: usable any time
+await Swimming 0
+await Rake 0
+await BridgeRail 0
+await BeerMat 0

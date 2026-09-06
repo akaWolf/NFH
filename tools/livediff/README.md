@@ -1692,6 +1692,10 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 113 | 100 (7/8) | 100 (7/8) | 213 | 100 | 90 |
 | 114 | 80 (7/9) | 80 (7/9) | 214 | 100 | — |
 
+The PC-experience profile (`NFH_PROFILE=pc`, docs/PC_FIDELITY.md §7) is a
+separate run: under it every level pays every trick and 26 of 28 rate 100
+(208 and 210 at 90 with all coins); none of the mobile numbers above move.
+
 Every plan passes its legs; a `manual` leg is a trick the data leaves
 unreachable (the plan headers say which). The runner's summary marks a
 plan short of PERFECT, and `--all` exits 1 while any is.

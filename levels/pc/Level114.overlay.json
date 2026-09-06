@@ -1,0 +1,7 @@
+{
+ "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter.",
+ "patches": [
+  {"object": "Drawer", "component": "SearchItem", "zone": "Zone01",
+   "append": {"InventoryItems": [{"Type": "IT_Whistle", "UseCount": 0, "NameString": "Dog whistle", "DescriptionString": "Only the dog hears it. The neighbour hears the dog.", "PrimedNameString": "", "PrimedDescriptionString": "", "WrongZoneTooltip": "", "LongDescription": false, "NFH2Inventory": false}]}}
+ ]
+}

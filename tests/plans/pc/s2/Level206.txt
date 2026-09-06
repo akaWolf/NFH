@@ -1,0 +1,22 @@
+# Level206 under the PC profile: the mobile lap (its three pad visits in a
+# row pay the pad, the harpoon and the extra coin at once) with the PC run's
+# payment ORDER (docs/PC_VS_MOBILE.md, the gauge: deck chair
+# 47 -> weights +35 -> dynamite +23 -> pad+harpoon +57 = full): the blanket on
+# the weights and the adhesive in the dynamite box go in first, the launch
+# pad with the harpoon last. The mobile plan's `activated Rabbit` marker is
+# dropped — the DentureAdhesive is a plain Zone04 dexterity search.
+take ToyBox IT2_Fartbag
+usewith! Pillows IT2_Fartbag           # the race for his one Pillows visit (~18 s)
+take SportsBag IT2_Rubber
+hide Pipe                              # the LevelScript's action 3: the Mother's pillow sequence unfreezes Woody
+take FleaBlanket IT2_Fleablanket       # Zone04 in a Mother sleep
+usewith Weights IT2_Fleablanket        # Zone02: 30 at his next weights
+take DentureAdhesive IT2_Kukident      # Zone04 (a Mother sleep; no minigame under the profile)
+usewith DynamiteBox IT2_Kukident       # Zone03: 20 at his next dynamite
+usewith Harpoon IT2_Rubber             # Zone01, last: the pair's 30 + 20 + 15 on his next pad
+usewith LaunchPad IT2_Rabbit
+await DeckChair 0
+await Weights 0
+await DynamiteBox 0
+await LaunchPad 0
+await Harpoon 0

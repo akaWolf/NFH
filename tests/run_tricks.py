@@ -2065,6 +2065,22 @@ class Driver(Recorder):
             self.step_world()
         return False, '%s never completed' % what
 
+    def leg_whistle(self, *args):
+        """PC profile: blow the dog whistle (World.blow_whistle)"""
+        ok = self.v.world.blow_whistle()
+        return (True, '') if ok else (False, 'no whistle in the inventory')
+
+    def leg_whenusing(self, name, *args):
+        """wait until the neighbour's routine is using the named item"""
+        def using():
+            for r in self.v.world.routines:
+                if r.pawn.role == 'Rottweiler':
+                    return r.state == r.USING and r.item is not None \
+                        and r.item.name == name
+            return False
+        ok = self.wait_until(using, 240.0)
+        return (True, '') if ok else (False, 'never used %s' % name)
+
     def leg_unlock(self, name, typ=None):
         """the dexterity gate: click with the unlocker held, then hold the
         pick center-ward each tick until DexterityDone passes the take;
@@ -2073,6 +2089,35 @@ class Driver(Recorder):
         DuckCage, 206's DentureAdhesive)"""
         if typ == 'IT_NONE':
             typ = None
+        if os.environ.get('NFH_PROFILE') == 'pc':
+            # the PC has no mini-games: the profile's gate passes the first
+            # click — a dexterity trick item is a plain use, a dexterity
+            # search item is taken by the take leg that follows
+            it = self.item(name)
+            if it.kind == 'SearchItem':
+                # a dexterity search: the unlocker held, one click, the item
+                # yields its first inventory type
+                if typ is not None and not self.select_type(typ):
+                    return False, '%s not in inventory' % typ
+                want = it.inventory_items[0].get('type') \
+                    if it.inventory_items else None
+                self._leg_zone = it.zone
+                self._leg_x = it.target_x
+                self._leg_item = it
+                if not self.wait_gate(it.zone, it.target_x, it):
+                    return False, 'zone never clear'
+                inv = self.world.inventory
+                def poke():
+                    if typ is not None:
+                        self.select_type(typ)
+                    self.click_item(it)
+                poke()
+                got = self.wait_until(
+                    lambda: want is None
+                    or any(e['type'] == want for e in inv.items),
+                    LEG_TIMEOUT, poke=poke)
+                return got, None if got else 'no %s after the unlock' % want
+            return self.leg_use(name, typ)
         it = self.item(name)
         self._leg_zone = it.zone
         self._leg_x = it.target_x
@@ -2508,6 +2553,8 @@ class Driver(Recorder):
                   'hide': self.leg_hide, 'icon': self.leg_icon,
                   'tutorial': self.leg_tutorial,
                   'walk': self.leg_walk,
+                  'whistle': self.leg_whistle,
+                  'whenusing': self.leg_whenusing,
                   'activated': self.leg_activated}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,
@@ -2550,6 +2597,8 @@ def main(argv):
     opts = {a.split('=')[0][2:]: (a.split('=', 1)[1] if '=' in a else '1')
             for a in argv[1:] if a.startswith('--')}
     outroot = opts.get('out', '/tmp/nfh-tricks')
+    if opts.get('profile'):
+        os.environ['NFH_PROFILE'] = opts['profile']   # pcprofile reads it live; children inherit
     if 'all' in opts:
         args = sorted(glob.glob(os.path.join(ROOT, 'tests', 'plans', 's*',
                                              'Level*.txt')))

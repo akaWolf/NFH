@@ -961,6 +961,11 @@ def ensure_assets():
 
 
 def main(argv):
+    # --profile=pc: the PC-experience profile (docs/PC_FIDELITY.md) — the
+    # overlays and rule switches hang off NFH_PROFILE, read live by pcprofile
+    for a in argv[1:]:
+        if a.startswith('--profile='):
+            os.environ['NFH_PROFILE'] = a.split('=', 1)[1]
     # a stuck or crashing bundle can say where it is: SIGUSR1 (or a fatal
     # signal) dumps every thread's Python stack to stderr — the dump runs
     # from the C signal handler, so it works inside a native call too

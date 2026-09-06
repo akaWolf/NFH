@@ -1,0 +1,9 @@
+{
+ "source": "PC Ping-Pong Fucius: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py): +23 tennis (124 s), +35 skis (154), +46 chef (192), +30 rockets (228, full). The mobile data has 25 / 30 / 40 / 30.",
+ "patches": [
+  {"object": "TabbleTennis", "component": "TrickItem", "set": {"AngerAmount": 23}},
+  {"object": "WaterSkiis", "component": "TrickItem", "set": {"AngerAmount": 35}},
+  {"object": "Chef", "component": "TrickItem", "set": {"AngerAmount": 46}},
+  {"object": "Eals", "component": "TrickItem", "set": {"AngerAmount": 46}}
+ ]
+}

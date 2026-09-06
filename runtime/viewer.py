@@ -479,6 +479,8 @@ class Viewer:
                         self.show_zones = not self.show_zones
                     elif k == sdl2.SDLK_SPACE:
                         self.paused = not self.paused
+                    elif k == sdl2.SDLK_w:
+                        self.world.blow_whistle()      # PC profile's dog whistle
                     elif k == sdl2.SDLK_s:
                         self.screenshot('/tmp/nfh-%s.png' % self.level.name)
                     elif k == sdl2.SDLK_f:

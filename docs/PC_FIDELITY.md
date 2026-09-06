@@ -194,3 +194,59 @@ The frame-sheet reading of A Sunny Morning that first stood here
 measurement that holds is the HUD bubble method of `tools/pcref/` and
 its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 95, the order identical, the toothbrush once at the start on both.
+
+## 7. Implemented (2026-09-06): `NFH_PROFILE=pc`
+
+- Switch: `python3 runtime/app.py --profile=pc …` for the game,
+  `tests/run_tricks.py … --profile=pc` for the harness (both set
+  `NFH_PROFILE`; `runtime/pcprofile.py` reads it live). Default `mobile`:
+  every mobile-profile number in `tools/livediff/README.md` is unchanged
+  (the full 54-plan regression re-run after the change).
+- Overlays: `levels/pc/<Level>.overlay.json`, applied to the raw objects
+  after the mobile load (`scene.Level.__init__`), each with a `source`.
+  Ops: `set` fields, `append` list fields, `anim`/`anim_set` on a
+  controller's animation, `actions` to rebuild an ActionManager's list by
+  item names (addressed by `owner`). Shipped: Level113 (the electric trap
+  lifted to the depth it has in L111/L114, so the click ray reaches it),
+  Level114 (the dog whistle in the hall's chest of drawers), Level205 (the
+  PC trick amounts off the gauge).
+- Rules (`world.py`, all behind `pcprofile.is_pc()`): the Season 2 bonus
+  for ANY overflow (`GameState.calculate_score`), three lives on Season 2
+  levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
+  level entrance, the neighbour resumes his routine), no dexterity
+  mini-games (`_dexterity_gate` runs WinDexterity's side effects on the
+  first click), `World.blow_whistle()` — the targetless inventory use
+  that wakes every alerter (the W key in the viewer, the `whistle` plan
+  leg; the icon is the PC's own, cropped from the video).
+- Harness: `whistle` and `whenusing <Item>` legs; `unlock` on a dexterity
+  search takes the item outright under the profile.
+- Plans: `tests/plans/pc/` holds the nine that differ (113, 114, 202, 205,
+  206, 208, 210, 211, 214); the other nineteen run the standard plans under
+  the profile.
+
+### Results under the profile (the final run, 2026-09-06)
+
+Every level pays every trick. Rating 100 on 26 of 28; Level208 and
+Level210 pay all their coins at 90 — the meter never crosses because the
+runner arms one item per lap through the Mother's windows, which is the
+harness's pace, not the game's (the PC player fills both gauges).
+
+| S1 | tricks | rating | S2 | tricks | rating |
+|---|---|---|---|---|---|
+| 101 | 4/4 | 100 | 201 | 4/4 | 100 |
+| 102 | 6/6 | 100 | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
+| 103 | 6/6 | 100 | 203 | 5/5 | 100 |
+| 104 | 7/7 | 100 | 204 | 6/6 | 100 |
+| 105 | 8/8 | 100 | 205 | 5/5 | 100 (the PC amounts, the sculpture before the rockets) |
+| 106 | 9/9 | 100 | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
+| 107 | 7/7 | 100 | 207 | 7/7 | 100 |
+| 108 | 6/6 | 100 | 208 | 7/7 | 90 |
+| 109 | 7/7 | 100 | 209 | 7/7 | 100 |
+| 110 | 6/6 | 100 | 210 | 8/8 | 90 |
+| 111 | 8/8 | 100 | 211 | 8/8 | 100 (the rod) |
+| 112 | 10/10 | 100 | 212 | 9/9 | 100 |
+| 113 | 8/8 | 100 (the electric trap's depth) | 213 | 9/9 | 100 |
+| 114 | 9/9 | 100 (the whistle) | 214 | 6/6 | 100 (no wait before the pistol) |
+
+The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
+failed — the same table as before it.

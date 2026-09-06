@@ -1,0 +1,6 @@
+{
+ "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth.",
+ "patches": [
+  {"object": "ElectricTrap", "component": "Transform", "set": {"localPosition": [2.06777024269104, -4.324999809265137, -0.219]}}
+ ]
+}

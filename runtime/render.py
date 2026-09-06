@@ -50,6 +50,16 @@ class TextureCache:
     def __init__(self, renderer, directories):
         self.r = renderer
         self.dirs = [d for d in directories if d and os.path.isdir(d)]
+        # the PC profile's own sheets (the dog whistle's icon) live in the
+        # repo, after the extraction's directories
+        try:
+            import pcprofile
+        except ImportError:
+            from runtime import pcprofile
+        if pcprofile.is_pc():
+            extra = os.path.join(pcprofile.ROOT, 'levels', 'pc', 'assets')
+            if os.path.isdir(extra):
+                self.dirs.append(extra)
         self._cache = {}
         self._missing = set()
         self._wrap = {}                  # resolved name -> 'repeat'|'clamp'

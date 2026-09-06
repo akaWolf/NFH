@@ -1,0 +1,37 @@
+# Level113 under the PC profile: the standard plan plus the electric trap —
+# the PC's 'cable with socket'. levels/pc/Level113.overlay.json lifts the
+# trap's transform to the depth it has in L111/L114, so the click ray
+# reaches it instead of the basement door. It must go in on the FIRST
+# basement visit: once ValveMain is tricked his ValveMain actions are
+# removed and he never enters the basement again — which also makes the
+# basement safe for the hot valve afterwards. So: cable, then tongs,
+# tatter, trap, main valve (out by ~40 s, the wardrobe by 45); the hall
+# drawer (fuse + marbles), the marbles and the hot valve after his pass. 8/8.
+
+take RubbishBinCable IT_Cable         # Z03
+take BasementDrawer IT_Tongs          # Z09
+prime ElectricTrapTatter              # Z09: the bare click primes the trap
+usewith ElectricTrap IT_Cable        # Z09: 8 on his [2] walk in (the overlay lifts it above the door)
+use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
+hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
+take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles
+usewith GroundMarbles@Zone03 IT_Marbles   # x=4.63 (score 8), on his door(4.09) -> Radiator(6.51) walk
+use ValveHot                          # Z09, now safe: GetTrickedAtOnce -> the Radiator at his next [3], 15
+take BedDrawer IT_Painbook            # Z06
+usewith Ladder IT_Tongs               # Z08, 15 at his [7]
+use AngleGrinder                      # Z07, bare, 10 at his [1]
+usewith ChairAssemblyBook IT_Painbook # Z02: GetTrickedAtOnce -> ChairAssembly [0], 10
+park Zone03                           # off his Z01 -> Z02 -> Z06 -> Z08 walk
+usewith FuseBox IT_Fuse               # Z01: after his [6] prime -> LadderDrill [8], 10
+park Zone04
+
+await GroundMarbles@Zone03 8
+await Ladder 15
+await FuseBox 10
+await ChairAssemblyBook 10
+await AngleGrinder 10
+await Radiator 15
+await Sink 12
+
+
+await ElectricTrap 8

@@ -1,0 +1,25 @@
+# Level205 under the PC profile: the PC's trick amounts (the gauge jumps
+# of Badinfos' run, levels/pc/Level205.overlay.json: tennis 23, skis 35,
+# chef 46, rockets 30) and the sand sculpture armed before his lap-2
+# sculpture visit (258 s): tennis 129, skis 155, chef 205, rockets 240,
+# sculpture 258 climb past 100 on one lap.
+unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
+take DuckCage IT2_Egg
+usewith TabbleTennis IT2_Egg      # action [1], PawnToAffectWhenTricked Olga
+take HammerNails IT2_Tools
+usewith WaterSkiis IT2_Tools      # Primed at load, RottweilerUseTogglesPrime, no RequirePriming
+take BicycleTubeBox IT2_Tube
+usewith Eals IT2_Tube             # SetTrickedOnItem -> Chef
+take Banger IT2_Bangers
+usewith LionStatue IT2_Bangers    # the statue must be tricked before it accepts the glasses (no coin of its own)
+take Glasses IT2_Glasses          # RequirePriming, PrimingItem LionStatue
+prime LionStatue IT2_Glasses
+usewith SandSculpture IT2_Lionhead   # action [6]: before his lap-2 sculpture (258 s)
+
+take Anchor IT2_Rope
+usewith Rockets IT2_Rope          # action [5]
+await TabbleTennis 0
+await WaterSkiis 0
+await Chef 0
+await Rockets 0
+await SandSculpture 0

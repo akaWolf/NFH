@@ -17,6 +17,7 @@ _RAT_ENTRY_208 = {'type': 'IT2_Rat', 'use_count': 0, 'name': 'MOUSE_NAME',
 
 
 import struct as _struct
+import pcprofile
 _f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
 
 
@@ -1939,6 +1940,7 @@ class GameState:
         self.ended = False               # GameInfo.GameEnded (FinishAnimationEnded)
         self.win_timer = None            # WinGameOnCompleteAllTricks' 2.5s wait
         self.win_immediate = False       # GameInfo.WinImmediate (ForceWinGame)
+        self.lives = 0                   # PC profile only: On Vacation's three attempts
         self.final_trick_score = 0       # GameInfo.FinalTrickScore
         # the clock: TimedGame counts down from TimeMinutes, else up
         # (GameInfo.Start 171-177, Update 239-254; PlayerPrefs default is on)
@@ -1972,7 +1974,11 @@ class GameState:
             final = int(self.completed * 90.0 / max(1, self.total))
             # the tick bonus honors IgnoreScore (GameInfo.cs:414-419);
             # no shipped level sets it (tests/run_csdiff.py caught the gap)
-            if angry_count_ticks == 1 and not self.ignore_score:
+            # the PC profile scores the collapse itself: the PC gauge may
+            # fill more than once (docs/PC_VS_MOBILE.md, the gauge measured)
+            one = angry_count_ticks == 1 or (pcprofile.is_pc()
+                                             and angry_count_ticks >= 1)
+            if one and not self.ignore_score:
                 final += 10
         self.final_viewer_rating = min(final, 100)
         self.trick_ratio = '%d / %d' % (self.completed, self.total)
@@ -4996,6 +5002,8 @@ class World:
         # that RoutineActionMove.Finished ends by distance
         self._hit_watches = []
         self.game = GameState(level.game_info)
+        if pcprofile.is_pc() and getattr(level, '_season2', False):
+            self.game.lives = 3           # the PC's three attempts (4PDA, 2017)
         self.inventory = InventoryState()
         # InventoryManager.InventoryItems is a serialized List<Inventory>
         # (InventoryManager.cs:5): Unity deserializes it before any Start,
@@ -7250,6 +7258,16 @@ class World:
         if not woody.in_dexterity:
             self._dex_inv_used = used              # InvUsed
             woody.in_dexterity = True
+        if pcprofile.is_pc() and not woody.dexterity_done:
+            # the PC has no mini-games: the first click wins the game
+            # outright, with WinDexterity's side effects (the search item's
+            # ActivateTrickIfSearch coin, the DexterityOtherAnimation)
+            ds = self.dex_states.get(item.dexterity_alert) \
+                if item.dexterity_alert else None
+            if ds is not None:
+                ds._win()
+            else:
+                woody.dexterity_done = True
         if not woody.dexterity_done:
             if search_branch and item.hide_in_dexterity:
                 self.set_object_hidden(item, True)
@@ -7984,8 +8002,16 @@ class World:
             self.game.got_caught = True
         self.game.caught_by = catcher.role if catcher is not None else 'Rottweiler'
         self.game.won = False             # GameInfo.cs:325/335
-        self._finish_game()               # FinishGame (cs:326/336)
-        self._play_jingle('caught')       # PlayCaughtMusic (cs:329/339)
+        self._respawning = False
+        if pcprofile.is_pc() and self.game.lives > 0:
+            # the PC profile's lives: the beating plays, then Woody is back
+            # at the entrance and the neighbour resumes (docs/PC_FIDELITY.md 2.5)
+            self.game.lives -= 1
+            self._respawning = True
+            self._last_catcher = catcher
+        else:
+            self._finish_game()               # FinishGame (cs:326/336)
+            self._play_jingle('caught')       # PlayCaughtMusic (cs:329/339)
         woody = self.woody
         # Woody.PlayFearAnimation(catcher): face whoever caught him
         fear = woody.fear_left if catcher.sprite.x < woody.sprite.x \
@@ -8042,9 +8068,9 @@ class World:
                 pick = 0 if num <= 25 else 1 if num <= 50 else \
                     2 if num <= 75 else 3
                 catcher.anim.play_sequence(seqs[min(pick, len(seqs) - 1)],
-                                           on_end=self._finish_animation_ended)
+                                           on_end=self._after_hit)
             else:
-                self._finish_animation_ended()
+                self._after_hit()
         # HitWoodyAction serializes Urgent=false — the catcher walks over
         catcher.in_urgent = False
         # StartAction (ActionManager.cs:146-155) walks only when the action
@@ -8086,6 +8112,68 @@ class World:
         if abs(dx) < catcher.min_door_distance:
             catcher.sprite.x += catcher.min_door_distance \
                 * (1.0 if dx >= 0 else -1.0)
+
+    def _after_hit(self):
+        """the beating's end: the ending in the mobile game, a respawn under
+        the PC profile's lives"""
+        if getattr(self, '_respawning', False):
+            self._respawn()
+        else:
+            self._finish_animation_ended()
+
+    def _respawn(self):
+        """PC profile only (docs/PC_FIDELITY.md 2.5): Woody reappears at the
+        level entrance, the catcher goes back to his routine, the clock and
+        the tricks stay as they are"""
+        self._respawning = False
+        w = self.woody
+        catcher = getattr(self, '_last_catcher', None)
+        if w is not None:
+            w.sprite.hidden = False
+            w.frozen = False
+            w.movement_paused = False
+            w.input_locked = False
+            w.steps = []
+            w.on_arrive = None
+            w.state = w.IDLE
+            w.hiding = False
+            loc = self.level.entrance_location
+            if loc:
+                w.sprite.x, w.sprite.y = loc
+                z = self.level.zone_at(loc[0], loc[1])
+                if z is not None:
+                    w.zone = z
+            for name in ('switch_to_stand', 'stand'):
+                if hasattr(w.anim, name):
+                    getattr(w.anim, name)()
+                    break
+        if catcher is not None:
+            catcher.movement_paused = False
+            catcher.state = catcher.IDLE
+            catcher.steps = []
+            catcher.on_arrive = None
+            for r in self.routines:
+                if r.pawn is catcher:
+                    r.unfreeze()
+        self.game.got_caught = False
+
+    def blow_whistle(self):
+        """PC profile only (docs/PC_FIDELITY.md 2.1): the dog whistle, an
+        inventory use with no target — every sleeping alerter wakes as if it
+        had heard Woody, and the neighbour's HearAlerter chain follows
+        (Alerter.WakeUp -> CoRoutineRottweilerHearAlerter)"""
+        if not pcprofile.is_pc() or self.woody is None:
+            return False
+        if not self.inventory.has('IT_Whistle'):
+            return False
+        n = 0
+        for fsm in self.alerters.values():
+            if not fsm.alert:
+                fsm.animation_type = 1
+                fsm.triggered_by_woody = False
+                fsm.wake_up()
+                n += 1
+        return n > 0
 
     def _finish_game(self):
         """GameInfo.FinishGame (GameInfo.cs:358-371), shared by every ending:
