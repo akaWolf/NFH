@@ -23,3 +23,6 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 - `gauge.py <video> <start> <dur>`: the PC NFH2 anger gauge (the bar at the
   left of the 720p frame) as fill % per second — its jumps are the tricks'
   amounts, its plateaus the decay (~0.4 %/s).
+- `lives2.py <video> <start> <dur> <x0> <y0> <w> <h> <prefix> [T] [white|red]`: the
+  PC NFH2 lives counter (top right) binarized and clustered per second — a
+  cluster change is a lost life; used to find the catches in a let's play.

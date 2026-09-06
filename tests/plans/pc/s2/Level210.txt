@@ -1,7 +1,12 @@
-# Level210 under the PC profile: the standard plan (all eight coins). The
-# deck-chair sit is 55 s against the PC's 15 s, but it is the Mother's
-# progress-bar call that ends it (code, not data), so no overlay; the
-# payments spread over four laps and the rating stays 90.
+# Level210 under the PC profile: the standard plan (all eight coins, 90).
+# The shop pays ONE coin per visit (the octopus is accepted only after the
+# urchin's coin has paid), so the best single lap is the chair with the
+# pylon (20), the basket with its board and the drained pool (50), the
+# shop (37) and the elephant (30): ~96 after the 0.37/s decay between his
+# visits — the second shop coin comes a lap later. Thirteen orderings
+# tried (docs/PC_FIDELITY.md §7); the overflow needs either the PC's
+# shorter deck-chair sit (code-driven, not data) or a second coin in the
+# lap.
 take SeaUrchin IT2_Hedgehog            # Zone02 (KeepFull: repeatable)
 usewith TurbanShop IT2_Hedgehog        # Zone02 (SecondRequiredInventory IT2_Oktopus is the alternative)
 take SeaUrchin IT2_Hedgehog            # a second urchin

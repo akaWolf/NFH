@@ -95,14 +95,16 @@ at all" — 202/205/208/210 still need the meter to cross once, which their
 spread does not give (peaks 68-97), so they stay at 90 unless the overlay
 also tightens the arming (it should not: that is the runner, not the game).
 
-### 2.5 Lives (confidence: medium)
+### 2.5 Lives (confidence: high — checked on video)
 
-PC "On Vacation" gives three attempts (4PDA, 2017: "на компьютере было 3
-попытки возрождения, здесь одна"); PC Season 1 has none, like the mobile.
-The mobile code has no lives at all — being caught ends the level. A PC
-profile would need a "caught → resume" path: what the PC resumes to (the
-same moment? the level start with the tricks kept?) has to be read off the
-PC video before it is worth writing. Score-neutral; leave for last.
+PC "On Vacation" gives three attempts (4PDA, 2017); PC Season 1 has none,
+like the mobile. What a catch does on PC, read off a let's play of the
+PC game (youtube awWiuFm9llc, 5:03-5:10 and 6:05, the counter x3 → x2 →
+x1 found with tools/pcref/lives2.py): the neighbour beats Woody for ~4 s,
+Woody reappears in the level's start area with his inventory, the anger
+gauge and the tricks stay as they were, the neighbour walks back into his
+routine and the clock never stops. The profile's `_respawn` does exactly
+that (the entrance location, the routine unfrozen, nothing reset).
 
 ### 2.6 Dexterity mini-games (confidence: high)
 
@@ -226,10 +228,17 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 ### Results under the profile (the final run, 2026-09-06)
 
-Every level pays every trick. Rating 100 on 26 of 28; Level208 and
-Level210 pay all their coins at 90 — the meter never crosses because the
-runner arms one item per lap through the Mother's windows, which is the
-harness's pace, not the game's (the PC player fills both gauges).
+Every level pays every trick. Rating 100 on 27 of 28. The lever on the
+levels that sat at 90 was the same every time: arm each coin right after
+the neighbour's previous visit to it — the `whenusing` leg — so the whole
+set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
+Fifi + rake) last. Level210 is the one that does not yield: its shop pays
+one coin per visit (the octopus only after the urchin's coin), so a lap
+holds at most chair+pylon 20, basket+board+pool 50, shop 37, elephant 30
+— about 96 after the decay between his visits; the second shop coin is a
+lap away. Thirteen orderings tried; the PC's 15 s deck-chair sit (against
+the mobile's 55 s, driven by the Mother's progress bar in code) is what
+closes the gap on PC.
 
 | S1 | tricks | rating | S2 | tricks | rating |
 |---|---|---|---|---|---|
@@ -240,9 +249,9 @@ harness's pace, not the game's (the PC player fills both gauges).
 | 105 | 8/8 | 100 | 205 | 5/5 | 100 (the PC amounts, the sculpture before the rockets) |
 | 106 | 9/9 | 100 | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
 | 107 | 7/7 | 100 | 207 | 7/7 | 100 |
-| 108 | 6/6 | 100 | 208 | 7/7 | 90 |
+| 108 | 6/6 | 100 | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |
 | 109 | 7/7 | 100 | 209 | 7/7 | 100 |
-| 110 | 6/6 | 100 | 210 | 8/8 | 90 |
+| 110 | 6/6 | 100 | 210 | 8/8 | 90 (one shop coin per visit; the lap-2 cluster peaks ~96) |
 | 111 | 8/8 | 100 | 211 | 8/8 | 100 (the rod) |
 | 112 | 10/10 | 100 | 212 | 9/9 | 100 |
 | 113 | 8/8 | 100 (the electric trap's depth) | 213 | 9/9 | 100 |
