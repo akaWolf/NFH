@@ -430,7 +430,17 @@ walk); the idle laps under the profile come to +11 % (101) and −6 %
 (−17 %) is a routine of three washer and three drier visits against the
 PC's one long visit each (47 s and 26 s), 213 (−17 %) a cement bath
 whose PC spell is twice the mobile's two animations, 210 (+16 %) a deck
-chair he leaves on the Mother's call — none is a loop count.
+chair he leaves on the Mother's call — none is a loop count. (Tried
+anyway on 2026-09-09: with her nap cut to one MotherSleepSingle his
+spell fell only from 54 to 45 s — his ChairAwake runs 27 s after her
+call, so the wait is not her nap alone — and both levels' plans, tuned
+to the mobile laps, lost; the overlays were withdrawn. The PC original's
+own data, `data/gamedata.bnd` — a plain ZIP of the levels' XML,
+tools/pcref/gamedata.py — is the way to settle these three and the tick
+window alike, once a copy is at hand.) A catch under the profile puts
+Woody back at the entrance in one frame; the respawn now marks that
+frame as a snap for the continuity invariant (`pos_snap`), which had
+flagged it as a teleport.
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)

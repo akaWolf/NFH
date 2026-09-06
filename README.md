@@ -29,7 +29,7 @@ decompile and one spec cover both. See `docs/BUILDS.md`.
 | `tools/` | the extraction pipeline — plain Python 3, numpy only for textures (`tools/README.md`) |
 | `tools/livediff/` | the bench: the original game in an Android-x86 VM / emulator, its state read out under Frida, plans replayed on both sides |
 | `tools/csdiff/` | the game's own bytecode run against the port one method at a time |
-| `tools/pcref/` | measurements off the PC original's videos: laps, amounts, the thermometer, the lives |
+| `tools/pcref/` | measurements off the PC original's videos (laps, amounts, the thermometer, the lives) and a reader for its data archive (`gamedata.py`) |
 | `src/` | the decompiled game assemblies — generated, not stored (`src/README.md`) |
 | `docs/GAMEPLAY.md` | the behavioural spec, cited to source lines |
 | `docs/PC_FIDELITY.md`, `docs/PC_VS_MOBILE.md`, `docs/PC_LAPS.md` | what the PC original does differently, what the profile carries, the numbers |

@@ -39,3 +39,7 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   full-to-empty durations. The mercury drains at 8.3–12.9 %/s per level (E01
   ≈ 6.1) — a drawing rate the PC overlays carry as PCThermometerDrain; the
   tick meter behind it is the data's 4.23 %/s (docs/PC_FIDELITY.md §7).
+- `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
+  (a plain ZIP of XML and TGA: the seasons' level folders with their level.xml,
+  the animations) — the PC side as data, once a copy of the game is at hand;
+  everything else here reads the PC off video.

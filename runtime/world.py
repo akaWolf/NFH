@@ -8245,6 +8245,7 @@ class World:
             loc = self.level.entrance_location
             if loc:
                 w.sprite.x, w.sprite.y = loc
+                w.pos_snap = True      # a legal snap for the continuity invariant
                 z = self.level.zone_at(loc[0], loc[1])
                 if z is not None:
                     w.zone = z
