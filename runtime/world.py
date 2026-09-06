@@ -4132,15 +4132,17 @@ class Routine:
             # a wiped drawing skips its own redo
             self._pending = 'skip'
         elif it is not None and it.got_tricked and not self.marbles_next and \
-                it.name not in ('WateringCan', 'ValveHot', 'ValveMain') \
-                and not pcprofile.is_pc():
+                it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
             # the skip goes straight to StartAction, without the
-            # StartNextAction extras (ActionManager.cs:614-619). The PC
-            # neighbour has no such skip: after the tool run a walk-by
-            # trick sends him on (the marbles, the trap), he goes back to
-            # the item he was walking to — Badinfos chains marbles, trap
-            # and shotgun on E14, marbles, expander, trap and weights on
-            # E12 (docs/PC_FIDELITY.md §7); the profile resumes it
+            # StartNextAction extras (ActionManager.cs:614-619). GotTricked
+            # is the sticky "its trick has fired on him" mark (Item.cs:836-
+            # 838), not the armed state: the expander and weights Badinfos
+            # chains after the marbles and the trap on E12, the shotgun on
+            # E14, are unfired at the walk-by (got_tricked False in the
+            # port's routine log), so the PC neighbour going back to them
+            # is this same rule, not an exception to it; the pudding of
+            # Level106, fired at [2], is skipped at [6] after the candy's
+            # toilet rush on both profiles (docs/PC_FIDELITY.md §7)
             self._pending = 'skip'
         elif it is not None and it.go_next_action and not self.marbles_next:
             # Item.GoNextAction (ActionManager.cs:620-626)
@@ -4787,7 +4789,7 @@ class DexterityState:
         self.percent = 20.0
         self.first_time = False
         self.wrong = False
-        self._rng = random.Random()
+        self._rng = random.Random(random.random())   # seeded from the run's random state (tests/run_tricks.py)
         if w.snap_camera is not None:
             w.snap_camera()              # SnapToWoodyImmediate (cs:149)
         W, H = w.screen_size

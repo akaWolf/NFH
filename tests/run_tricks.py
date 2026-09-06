@@ -56,6 +56,9 @@ Plan commands, one per line ('#' comments):
 
     python3 tests/run_tricks.py tests/plans/s1/Level101.txt
     python3 tests/run_tricks.py --all [--out=/tmp/nfh-tricks] [--jobs=4]
+    NFH_SEED=<n> seeds the world's random draws per level (default 0: a
+    run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
+    reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends.
 """
 import glob, json, os, sys
 
@@ -2438,7 +2441,13 @@ class Driver(Recorder):
     # -- the run ------------------------------------------------------------
     def _enter_level(self):
         """the App's load, the title cards skipped: the clock then runs
-        from play, as the original's StartGame"""
+        from play, as the original's StartGame. The world's few random
+        draws (Woody's idle animation, the catch sequence, the dexterity
+        sway) are seeded per level — NFH_SEED, default 0 — so a plan's
+        run reproduces to the frame; without it two runs of one plan
+        drifted by the idle animations' timing (a 63 s take became 78 s)"""
+        import random
+        random.seed(int(os.environ.get('NFH_SEED', '0')))
         self.app.load_level(self.level_name)
         self.app.tick(DT, events=(False, True, False, False))
         self.v = self.app.viewer

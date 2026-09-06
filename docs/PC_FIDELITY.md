@@ -239,11 +239,7 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   docs/PC_VS_MOBILE.md; the HUD statue lights with the last coin, not at
   the overflow; the Season 2 HUD shows the PC's clock — the seconds
   played, counting up, in the TimeRect the mobile data carries but its
-  DrawTime never uses on NFH2; after an urgent action the neighbour goes
-  back to the routine action it interrupted even when that item is
-  already tricked (ActionManager.cs:614-619 skips it on mobile — the PC
-  neighbour walks on to the expander after the marbles, to the shotgun
-  after the trap: E12 chains eight of ten, E14 seven of nine); the Season 2 bonus for ANY overflow, three lives on Season 2
+  DrawTime never uses on NFH2; the Season 2 bonus for ANY overflow, three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
   level entrance, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the
@@ -322,12 +318,20 @@ oven is not used a second time after the egg (ReuseAfterFix off), so the
 cream, the egg, the slip and the bathroom chain as on E04; 109 pays the
 PC's scores (the milk 10, the chips 15 — the mobile routes the chili's
 15 through a CornChips whose score is 0) and needs four ticks, not six.
-One rule of the mobile ActionManager was the next obstacle, off under
-the profile: after an urgent action it skips the interrupted routine
-action when that item is already tricked (ActionManager.cs:614-619 — the
-marbles' surprise cost the expander, the trap's the weights); the PC
-neighbour, on the videos, walks on to both (E12 chains eight of ten).
-Two port faults came out on the way and are fixed for both profiles:
+One rule of the mobile ActionManager looked like the next obstacle:
+after an urgent action it skips the interrupted routine action when that
+item's GotTricked is set (ActionManager.cs:614-619 — the marbles'
+surprise seemed to cost the expander, the trap's the weights, while the
+PC neighbour, on the videos, walks on to both: E12 chains eight of ten).
+It is not: GotTricked is the sticky "its trick has fired on him" mark of
+Item.Use (Item.cs:836-838), not the armed state, and the expander, the
+weights and E14's shotgun are unfired at those walk-bys (the port's
+routine log shows got_tricked False at both urgent ends of 112), so the
+rule never fires there — the profile ran without it for a while, which
+cost Level106 (the pudding, fired at [2], must be skipped at [6] after
+the candy's toilet rush or the chain runs past the six minutes), and it
+is back on both profiles. The two skips actually seen were port faults,
+fixed for both profiles:
 the roller-skater scene (Level112's skates) ended without closing its
 SurpriseNear urgent, so the next surprise inherited its OriginalAction —
 the mixer — and sent him back to it, past the expander (`abandon_urgent`
@@ -346,7 +350,19 @@ the shotgun — on his way up > hat > medals > horn, seven ticks. The
 bedroom door stands beside the Zone02 door (in his sight while he
 reads), so the bedroom and the balcony are armed while he is down there
 (`whenzone Zone09`: his routine's item reads `Shotgun` from the hall on)
-and Woody waits out his slip, hat, medals and horn in the bed. The PC
+and Woody waits out his slip, hat, medals and horn in the bed. (The
+routine's turns are visible with `NFH_ROUTINE_LOG=1`: the ActionManager
+prints its urgent starts and ends with the interrupted action, the
+surprise stashes and the inactive-item skips to stderr — the runner's
+single-plan runs pass it through.) The runner seeds the world's random
+draws per level (`NFH_SEED`, default 0; Woody's idle animations, the
+catch sequence, the dexterity sway) so a plan's result is repeatable: the
+seeded regression of 2026-09-09 rates all 54 mobile plans exactly as the
+unseeded reference (33 PERFECT, the same 21 non-perfect ratings, end
+times within half a second) and all 28 PC plans at 100 — under the
+cs:614-619 skip on both profiles; the profile's earlier exception to it
+had rated Level106 at 82 in the same seeded sweep (the pudding [6]
+played, the towel [8] past the six minutes). The PC
 thermometer (the S1 HUD's bottom-left tube, the mercury column
 measured per half-second and calibrated on the tube's 93 px, top 592
 to the bulb's neck 685 in the 720p frame) fills gradually after a trick
