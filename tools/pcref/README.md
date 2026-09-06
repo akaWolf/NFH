@@ -20,6 +20,10 @@ tracking his sprite (the PC view pans and he is often off-screen).
 
 Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 `yt-dlp -4` from pcnew). Results: `docs/PC_LAPS.md`.
+- `laps_natural.py [--plans <dir>] [--idle <dir>] [level ...]`: the neighbour's
+  natural lap (no trick fired) — writes 28 wait-only plans for the harness,
+  then pairs the idle recordings' actions with PC_LAPS_DETAIL's bubble spans
+  by name (docs/PC_LAPS.md, "Natural laps").
 - `gauge.py <video> <start> <dur>`: the PC NFH2 anger gauge (the bar at the
   left of the 720p frame) as fill % per second — its jumps are the tricks'
   amounts, its plateaus the decay (~0.4 %/s).

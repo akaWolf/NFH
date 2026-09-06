@@ -64,13 +64,58 @@ Confidence: ±2 s on PC boundaries, ±1 s on mobile.
   the ToothBrush and the CoffeeMaker's RushToToilet reproduce exactly that.
   `docs/PC_FIDELITY.md` §2.2 and the earlier "brushes every lap" reading
   were wrong and are corrected.
-- **Periods:** 17 of 27 comparable episodes are within ±15 %. The mobile
-  neighbour is slower where a single action is longer: 101 (the sofa),
-  105, 110 (eating), 107 (the pottery chain, +80 %), 112 (the weights and
-  rope), 114 (+20 %), 210 (a 55 s deck-chair sleep against the PC's 15 s),
-  211/212 (+20 %). 213 is the one level where the mobile is faster.
+- **Periods:** the table above compares the PC run with the port's PLAN
+  runs, and both carry the tricks' reactions — its "mobile slower by
+  20-80 %" on nine levels is that contamination (a 41 s Shotgun in 114 is
+  ElectricShock + AngryHard + FixMid, the aim itself 3 s). The natural
+  laps, measured on idle runs, are below: within ±15 % on 21 of 26
+  comparable levels; the exceptions are scenes, not speeds.
 - **114 on PC:** the Zone02 stretch (Pipe → Gram → CDs → Gram → Pipe →
   Gram) is 46 s (54-100 s of the lap); the mobile's is 37 s (63-100). The
   whistle window sits inside it on PC.
 - The per-activity durations for every episode are in
   `docs/PC_LAPS_DETAIL.md`.
+
+## Natural laps (idle runs, 2026-09-06)
+
+`tools/pcref/laps_natural.py`: the port driven by a wait-only plan (Woody
+dodging, nothing armed — no angry sequence stretches an action), one lap =
+the mobile routine list once, each action paired by name with the PC bubble
+span of the first PC lap (a mobile sub-step the bubble does not split is
+folded into its neighbour). PC / mobile seconds; the actions off by 5 s or
+more.
+
+| level | PC | mobile | Δ | where |
+|---|---|---|---|---|
+| 101 | 32 | 40 | +25 % | Sofa 15/21 |
+| 102 | 28 | 31 | +10 % | |
+| 103 | 42 | 39 | −8 % | Candle+Cake 10/17, LetterBox 23/14 |
+| 104 | 36-80 | 64 | ≈ | the PC's first lap is cut by the intro (Sink 2 s), its second carries tricks; the shaving chain 17/34 |
+| 105 | 40 | 39 | −2 % | |
+| 106 | 108 | 88 | −19 % | PhotoAlbum 19/12 |
+| 107 | 54 | 60 | +11 % | |
+| 108 | 94 | 104 | +11 % | Coffee+DeckChair 30/45 — the walks, the sunbath itself is 3 s |
+| 109 | 113 | 112 | 0 % | Bed 27/32 |
+| 110 | 59 | 59 | +1 % | |
+| 111 | 219 | 181 | −17 % | WashingMachine 47/19, Drier 26/7, Iron 30/20 |
+| 112 | 155 | 159 | +2 % | Mixer 14/20, Weights 14/20 |
+| 113 | 191 | 168 | −12 % | Ladder+Drill 47/26 |
+| 114 | 168 | 165 | −2 % | |
+| 201 | n/a | n/a | | the tutorial drives him |
+| 202 | 94 | 87 | −8 % | BridgeRail 27/21 |
+| 203 | 84 | 80 | −5 % | Microphone 18/24, Watermelon 22/14 |
+| 204 | 81 | 71 | −13 % | Gong 23/15, Necklace 24/16 |
+| 205 | 102 | 127 | +24 % | the Olga-mat scene (20 + 12 s, no PC counterpart); without it 88, −14 % |
+| 206 | n/a | n/a | | he waits for the Mother (WaitWatch) — event-driven on both |
+| 207 | 107 | 103 | −4 % | |
+| 208 | 71 | 65 | −8 % | IndianPlatform 9/18, ShoeMachine 35/28 |
+| 209 | 97 | 96 | −1 % | the order differs (PC Taj → Shoe, mobile Shoe → Taj → Shoe), the sum matches |
+| 210 | 102 | 118 | +16 % | DeckChair 25/54 — he sits until the Mother's call |
+| 211 | 68 | 72 | +6 % | |
+| 212 | 113 | 122 | +8 % | |
+| 213 | 136 | 114 | −17 % | CementBath 36/18 |
+| 214 | 75 | 81 | +7 % | Bouquet+CaptainDoor 22/38, Hatch 34/19 |
+
+Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
+the walks); faster: 106, 111, 113, 213 (−12..−19 %); the rest within ±10 %.
+The PC's own numbers are from one run's first lap (±2 s per activity).

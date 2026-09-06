@@ -14,7 +14,7 @@ carries a confidence.
 |---|---|---|
 | rules | S2 rating (+10 only for EXACTLY one overflow), no lives | yes — two switches |
 | reachability | 114 (no whistle), 211/214 (colliders), 108 (one-off brushing), 206 (double overflow) | yes — data overlays, one small hook |
-| routines / timing | laps re-authored by Nordi; PC laps unknown in numbers | only with PC data in hand |
+| routines / timing | laps re-authored by Nordi as ActionManager lists — the PC order everywhere, and without tricks the PC speed (±15 % on 21 of 26, §2.7) | no — measured equal |
 | content / UX | dexterity mini-games, IAP gates, tap controls | yes for dexterity (a bypass), no for the rest |
 | presentation | re-rendered sprites, cocos menus, HUD | no — assets, not behaviour |
 
@@ -116,13 +116,20 @@ become no-ops under the profile; the plans still run.
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
 Measured for all 28 episodes from the PC videos' HUD bubble: the ORDER of
-the neighbour's activities is the PC's in every episode; the periods are
-within ±15 % in 17 of 27, and the mobile is slower by 20-80 % in 101, 105,
-107, 110, 112, 114, 210, 211, 212 (single actions that last longer — the
-sofa, the pottery chain, the deck-chair sleep). A PC-timing profile would
-therefore not re-order anything; it would shorten specific action
-durations, and `docs/PC_LAPS_DETAIL.md` has the PC per-activity durations
-to set them from. Still not from PC data — from video, ±2 s.
+the neighbour's activities is the PC's in every episode. The periods were
+first compared against the port's plan runs, which read "mobile slower by
+20-80 % on nine levels" — wrong: those laps carried the tricks' angry
+sequences (a 41 s "shotgun aim" in 114 was ElectricShock + AngryHard +
+FixMid; the aim itself is 3 s of animation). Measured again on idle runs
+(`tools/pcref/laps_natural.py`: the harness with a wait-only plan, nothing
+armed) the natural laps are the PC's within ±15 % on 21 of 26 comparable
+levels (docs/PC_LAPS.md, "Natural laps"). What differs is not speed but
+single scripted scenes: 210's deck chair (54 s against 25 — he sits until
+the Mother's call, her cycle sets it), 101's sofa (+6 s), 108's walks
+between the coffee and the deck chair, 205's Olga-mat scene (the PC has no
+mat); and 106/111/113/213 run 12-19 % FASTER on mobile. No duration overlay
+is warranted; 210's chair is tied to the Mother's cycle that the profile's
+100 plan is timed against.
 
 ### 2.8 Not worth it
 
@@ -169,7 +176,7 @@ Art, menus, HUD, tap controls (the port is already mouse-driven), IAP gates
 | dexterity auto | fidelity | trivial | none | no |
 | 108 brushing flag | fidelity | trivial | none | no |
 | lives | fidelity | medium | low | video |
-| PC laps | fidelity | large | high if guessed | yes |
+| PC laps | none — measured equal without tricks (§2.7) | done | — | had |
 
 With the first three, every level the mobile machinery blocks reaches 100
 under the profile; the levels that then sat at 90 (202/205/208/210) were
