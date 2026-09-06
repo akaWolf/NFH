@@ -1,32 +1,32 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim \u2014 the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. Mobile 35 / 20 / 50 / 20 / 30 / 30.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim — the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. PC data (cn_b1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Rake 20 (rake_ground), Submarine 35 (shark), EelBox 30 (bridge_electrify); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
   {
    "object": "Rake",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 19
-   }
-  },
-  {
-   "object": "Swimming",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
+    "AngerAmount": 20
    }
   },
   {
    "object": "Submarine",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 45
+    "AngerAmount": 35
    }
   },
   {
-   "object": "BridgeRail",
+   "object": "EelBox",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 25
+    "AngerAmount": 30
+   }
+  },
+  {
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
+   "set": {
+    "AngryMeterMaximum": 80
    }
   }
  ]

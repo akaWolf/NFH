@@ -1,53 +1,11 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E11 Neighbour Over Board: +19 the rod (97 s), +25 the boat (123), +38 between the boat and the jacket \u2014 the cabin phone with Olga's child, split 11 + 27 (146), +25 the jacket (163), +25 the diving gear (175), +16 the sweets at the full bar (206). Mobile 20 / 20 / 10 + 25 / 20 / 20 / 15.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E11 Neighbour Over Board: +19 the rod (97 s), +25 the boat (123), +38 between the boat and the jacket — the cabin phone with Olga's child, split 11 + 27 (146), +25 the jacket (163), +25 the diving gear (175), +16 the sweets at the full bar (206). PC data (ship3/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
   {
-   "object": "FishingRod",
-   "component": "TrickItem",
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
    "set": {
-    "AngerAmount": 19
-   }
-  },
-  {
-   "object": "LifeBoat",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
-   }
-  },
-  {
-   "object": "CabinPhone",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 11
-   }
-  },
-  {
-   "object": "OlgaChild",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 27
-   }
-  },
-  {
-   "object": "LifeJacket",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
-   }
-  },
-  {
-   "object": "DivingGear",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
-   }
-  },
-  {
-   "object": "Sweets",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 16
+    "AngryMeterMaximum": 80
    }
   }
  ]

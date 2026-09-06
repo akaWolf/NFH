@@ -1,39 +1,11 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E12 Action!: +19 the throne pair, split 10 + 9 (143 s), +51 the whip (167), +25 the cigars (196), +25 the bench (212), +23 the bull at the full bar (239, the mobile 30 stays); the parrot and the boat pay on the full bar. Mobile 10 + 10 / 20 / 20 / 20 / 30.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E12 Action!: +19 the throne pair, split 10 + 9 (143 s), +51 the whip (167), +25 the cigars (196), +25 the bench (212), +23 the bull at the full bar (239, the mobile 30 stays); the parrot and the boat pay on the full bar. PC data (me_c1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
   {
-   "object": "AztecThrone",
-   "component": "TrickItem",
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
    "set": {
-    "AngerAmount": 10
-   }
-  },
-  {
-   "object": "AztecThrone2",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 9
-   }
-  },
-  {
-   "object": "Whip",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 51
-   }
-  },
-  {
-   "object": "CigarBox",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
-   }
-  },
-  {
-   "object": "SleepBench",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
+    "AngryMeterMaximum": 80
    }
   }
  ]

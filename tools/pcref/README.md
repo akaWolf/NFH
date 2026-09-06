@@ -40,6 +40,15 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   ≈ 6.1) — a drawing rate the PC overlays carry as PCThermometerDrain; the
   tick meter behind it is the data's 4.23 %/s (docs/PC_FIDELITY.md §7).
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
-  (a plain ZIP of XML and TGA: the seasons' level folders with their level.xml,
-  the animations) — the PC side as data, once a copy of the game is at hand;
-  everything else here reads the PC off video.
+  (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
+  `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —
+  the PC side as data. It settled what the videos could only estimate
+  (docs/PC_FIDELITY.md §7, "The PC's own data"): Season 1 `quota1` per trick
+  = the mobile TrickScore but on 109/111/112; `angrytime` per level = the
+  thermometer's drain in 1/20 s; Season 2 `rage` per trick = the mobile
+  AngerAmount but on eight items, and the gauge is 80 000 rage long. The
+  amounts.py readings (all 1.25× the data) are superseded by it.
+- `canon.py <level ...>`: the PC canon per level next to the mobile's data —
+  tricks and values, recipes, containers, walk-by triggers, rooms, the
+  neighbour's action lengths — with the multiset diffs (docs/PC_FIDELITY.md §7,
+  "The canon audit").

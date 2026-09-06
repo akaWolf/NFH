@@ -34,6 +34,7 @@ def apply_overlay(level):
     ov = json.load(open(p, encoding='utf-8'))
     n = 0
     for op in ov.get('patches', []):
+        hit = 0
         for pid, o in level.objs.items():
             if o.get('type') != op.get('component'):
                 continue
@@ -52,15 +53,15 @@ def apply_overlay(level):
             if op.get('zone') and (d.get('Zone') or {}).get('name') != op['zone']:
                 continue
             if 'set' in op:
-                d.update(op['set']); n += 1
+                d.update(op['set']); n += 1; hit += 1
             if 'append' in op:
                 for k, v in op['append'].items():
                     d.setdefault(k, []).extend(v)
-                n += 1
+                n += 1; hit += 1
             if 'anim' in op:
                 for a in d.get('Animations') or []:
                     if a.get('Name') == op['anim']:
-                        a.update(op.get('anim_set') or {}); n += 1
+                        a.update(op.get('anim_set') or {}); n += 1; hit += 1
             if 'actions_by_index' in op:
                 # rebuild an ActionManager's list from the mobile list's
                 # indices (duplicates allowed): the PC order of a lap where
@@ -69,7 +70,7 @@ def apply_overlay(level):
                 acts = d.get('Actions') or []
                 new = [acts[i] for i in op['actions_by_index'] if 0 <= i < len(acts)]
                 if new:
-                    d['Actions'] = new; n += 1
+                    d['Actions'] = new; n += 1; hit += 1
             if 'actions' in op:
                 # rebuild an ActionManager's list from item names, the
                 # entries reused (duplicates allowed): the PC order of a lap
@@ -83,7 +84,14 @@ def apply_overlay(level):
                     if nm in by_name:
                         new.append(by_name[nm])
                 if new:
-                    d['Actions'] = new; n += 1
+                    d['Actions'] = new; n += 1; hit += 1
+        if hit == 0:
+            import sys
+            # a patch that touched nothing is a wrong object/component name
+            # (the Season 2 neighbour's GameObject is "Rottweiler2", not
+            # "Rottweiler"): say so, per patch, instead of applying silently
+            print('pcprofile: overlay %s: patch %s matched nothing' % (
+                os.path.basename(p), json.dumps({k: op[k] for k in ('object', 'component', 'owner', 'zone') if k in op})), file=sys.stderr)
     if n == 0:
         import sys
         print('pcprofile: overlay %s matched nothing' % os.path.basename(p), file=sys.stderr)

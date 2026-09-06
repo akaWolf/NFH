@@ -1,25 +1,18 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E03 The Cabin Is Occupied: +32 the microphone (117 s), +38 and +38 the toilet \u2014 paper, flush (154, 160), +27 the melon at the full bar (194); the bicycle pays on the full bar. Mobile 30 / 20 / 30 / 30 / 30.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E03 The Cabin Is Occupied: +32 the microphone (117 s), +38 and +38 the toilet — paper, flush (154, 160), +27 the melon at the full bar (194); the bicycle pays on the full bar. PC data (cn_c2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on ToiletPaper 30 (piripiri); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
-  {
-   "object": "Microphone",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 32
-   }
-  },
   {
    "object": "ToiletPaper",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 38
+    "AngerAmount": 30
    }
   },
   {
-   "object": "ToiletFlush",
-   "component": "TrickItem",
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
    "set": {
-    "AngerAmount": 38
+    "AngryMeterMaximum": 80
    }
   }
  ]

@@ -1,11 +1,11 @@
 {
- "source": "PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 7.8 s in Badinfos' E06 — PCThermometerDrain 12.9 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7). PC lap (docs/PC_LAPS.md): his album spell is 19 s on E06 against the mobile's 12 — the read is five 0.54 s PhotoAlbumLoop entries (2.7 s) between Start and End; eighteen make the 9.7 s read that spans 19 with the walk.",
+ "source": "PC thermometer: the level's angrytime=156 in the PC data (level_bath/level.xml, 1/20 s ticks) is the 7.8 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 12.82 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC lap (docs/PC_LAPS.md): his album spell is 19 s on E06 against the mobile's 12 — the read is five 0.54 s PhotoAlbumLoop entries (2.7 s) between Start and End; eighteen make the 9.7 s read that spans 19 with the walk.",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 12.9
+    "PCThermometerDrain": 12.82
    }
   },
   {

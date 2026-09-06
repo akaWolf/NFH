@@ -1,11 +1,32 @@
 {
- "source": "PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 11.9 s in Badinfos' E11 — PCThermometerDrain 8.4 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 3.7 (docs/PC_FIDELITY.md §7).",
+ "source": "PC thermometer: the level's angrytime=240 in the PC data (level_laundry/level.xml, 1/20 s ticks) is the 12.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.33 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC data (level_laundry/tricks.xml): vacuum_hole 13, clothes_food 12, electrotrap 7 against the mobile's Vacuum 15, Airer 13, ElectricTrap 11 — 79 for the eight, so the PC's 100 takes all seven ticks (Badinfos' E11: 8/8, 7).  ",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 8.4
+    "PCThermometerDrain": 8.33
+   }
+  },
+  {
+   "object": "Vacuum",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 13
+   }
+  },
+  {
+   "object": "Airer",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 12
+   }
+  },
+  {
+   "object": "ElectricTrap",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 7
    }
   }
  ]

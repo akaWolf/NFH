@@ -1032,7 +1032,11 @@ class Hud:
                 shown = self._thermo
             if self._angry_rects is None or \
                     now - self._last_angry_update > 0.1:
-                pct = max(0.0, min(100.0, shown)) / 100.0
+                # the strip is the meter over 100 (HUD.cs:1244-1245 divides by
+                # 100f); the PC profile draws it over the meter's maximum — its
+                # Season 2 gauge is 80 000 rage long (docs/PC_FIDELITY.md §7)
+                mx = (rott.angry_max or 100.0) if pcprofile.is_pc() else 100.0
+                pct = max(0.0, min(mx, shown)) / mx
                 self._angry_rects = (
                     (int(full[0]), int(full[1] + full[3] * (1.0 - pct)),
                      int(full[2]), int(full[3] * pct)),

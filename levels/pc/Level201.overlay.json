@@ -1,25 +1,11 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E01 All Aboard: +45 the puddle (87 s), +51 the buffet (158), +57 the rail pair (202, full), the hat +19 at the full bar (258). Mobile 40 / 40 / 50 / 50.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E01 All Aboard: +45 the puddle (87 s), +51 the buffet (158), +57 the rail pair (202, full), the hat +19 at the full bar (258). PC data (ship1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
   {
-   "object": "WaterPuddle",
-   "component": "TrickItem",
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
    "set": {
-    "AngerAmount": 45
-   }
-  },
-  {
-   "object": "Buffet",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 51
-   }
-  },
-  {
-   "object": "DeckRail",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 57
+    "AngryMeterMaximum": 80
    }
   }
  ]

@@ -1,11 +1,18 @@
 {
- "source": "PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 11.9 s in Badinfos' E12 — PCThermometerDrain 8.4 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
+ "source": "PC thermometer: the level's angrytime=240 in the PC data (level_fitness/level.xml, 1/20 s ticks) is the 12.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.33 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC data (level_fitness/tricks.xml): skate 8 against the mobile's GroundSkates 14 — 76 for the ten, eight ticks for the 100 (Badinfos' E12: 10/10, 8).",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 8.4
+    "PCThermometerDrain": 8.33
+   }
+  },
+  {
+   "object": "GroundSkates",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 8
    }
   }
  ]

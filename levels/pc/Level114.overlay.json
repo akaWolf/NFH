@@ -1,5 +1,5 @@
 {
- "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 12.0 s in Badinfos' E14 — PCThermometerDrain 8.3 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
+ "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC thermometer: the level's angrytime=240 in the PC data (level_hunter/level.xml, 1/20 s ticks) is the 12.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.33 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7).",
  "patches": [
   {
    "object": "Drawer",
@@ -25,7 +25,7 @@
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 8.3
+    "PCThermometerDrain": 8.33
    }
   }
  ]

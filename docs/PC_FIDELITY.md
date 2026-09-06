@@ -442,6 +442,100 @@ Woody back at the entrance in one frame; the respawn now marks that
 frame as a snap for the continuity invariant (`pos_snap`), which had
 flagged it as a teleport.
 
+**The PC's own data (2026-09-10).** The user's Steam installs of both
+PC games are on the Windows partition; `data/gamedata.bnd` (a ZIP) holds
+per level `level.xml`, `objects.xml`, `tricks.xml`, `anims.xml`,
+`trigger.xml`, `combine.xml`, `strings.xml` — tools/pcref/gamedata.py
+reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
+
+- *Season 1 scores.* `tricks.xml`'s `quota1` per trick is the mobile
+  TrickScore on every level but three: 109 pays the nitro milk 20 and the
+  pig 10 (the video reading had them the other way round — the overlay
+  now sets Pig 10 and leaves PigMilk), 111 pays the vacuum 13, the airer
+  12 and the trap 7 (mobile 15/13/11 — 79 for the eight, so the PC's 100
+  takes all seven ticks — see below), 112 pays the skates 8 (mobile
+  14 — 76 for the ten, eight ticks). Every episode's
+  100 in Badinfos' runs is exactly Σ quota + 3 × ticks (E04 82 + 18, E07
+  82 + 18, E11 79 + 21, E12 76 + 24, E14 79 + 21), which is the rule.
+  The mobile's extra rated items (103's magnesium cake, the sink/shelf
+  pairs of 104, the valve/radiator pairs of 113) are not paid by the
+  plans and not counted by the HUD's total, so nothing to zero.
+- *The thermometer.* `level.xml`'s `angrytime` (1/20 s ticks: 156 on
+  the bath, 280 on the first trick, 240 on the laundry, fitness and
+  hunter) is exactly the drain the video gave — the fourteen
+  PCThermometerDrain values are now the data's, 100 / (angrytime / 20).
+  Some tricks carry their own `angrytime` (the foam pudding 240, the
+  dirty towel 216); what it changes is not settled: the drain after the
+  foam pudding on E06 was still the level's 7.8 s, and the tick still
+  landed 18 s into a decay whose trick had no own value. The tick window
+  stays the mobile's 23.6 s inside the 18-25 s bracket.
+- *Season 2 amounts.* `tricks.xml`'s `rage` per trick, in thousandths,
+  is the mobile AngerAmount on all but eight items (202: rake 20, shark
+  35, the electrified rail 30; 203: the chilli paper 30; 204: the jade
+  17; 206: the fleas 30; 208: the snake statue 15; 210: the hedgehog 27,
+  the octopus 27) — the amounts read off the gauge on 2026-09-08 were
+  all 1.25× the data and are withdrawn. That ratio is the gauge itself:
+  it is 80 000 rage long, a 40 000 trick fills half of it, and with the
+  data's amounts on the mobile's maximum of 100 the profile's 204, 205
+  and 210 no longer collapsed where Badinfos' did — AngryMeterMaximum
+  80 on the Season 2 levels, and the HUD draws the strip over the
+  maximum. (The Season 2 neighbour's GameObject is `Rottweiler2`; the
+  first overlay addressed `Rottweiler` and matched nothing, silently —
+  `pcprofile.apply_overlay` now reports every patch that touches no
+  component.) With the data's amounts and the 80 gauge the Season 2 set
+  is 14/14 at COLLAPSE!; the Season 1 set is 13/14 — 111 is 94 under the
+  PC scores (the mobile plan's eight tricks, five ticks).
+- *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
+  (156, 180, 196, 222, 249, 279, 301, 322 — the trap, three 10s, the
+  marbles, the vacuum, a 10, the airer; his popups), every gap under 31
+  s. Twelve plan trials on 2026-09-10 got the port to seven tricks and
+  five ticks at best (81 %). What stands in the way, in the data and the
+  port: the ironing board pays at his first ironing of the lap on PC (222,
+  26 s after the drier) — the mobile's hot iron starts cold and his first
+  ironing heats it, so the port can arm it only between his two ironings
+  and it pays at the second (a `Primed: true` overlay puts the toggle in
+  the PC's phase and the iron then pays at his first ironing, 30 s after
+  the drier); the soiled carpet sends him for the glued vacuum only on the
+  dog's yell (Rottweiler.cs:485-510; a plain pass through Z02 cleans it),
+  and in the port that run — the surprise at the dog, the walk to the
+  carpet, the grab, 18 s of vacuuming, the return — takes 33 s where the
+  PC's `vacuum` action is 35 frames, so the fish tank after it lands 48 s
+  after the vacuum; and the airer's prime toggles at his [8] and [10],
+  which the yell's detour shifts under the plan's gates. The overlay and
+  the plan are not shipped; 111 keeps the mobile plan (94). A shorter
+  vacuuming, if the PC's 1.75 s is taken as the constant, is the next
+  thing to try. `angrytime` is 0 on every Season 2 level; the gauge's slow
+  decay is the mobile's 0.37.
+- *Laps.* The neighbour's routine — the order of his actions — is not
+  in the data (the exe drives it); `objects.xml` gives each action's
+  `time` (the album read 113 ticks, the wash 59, the drier 29, the iron
+  71) and `anims.xml` the frame counts (the bath 133 frames), all near
+  the mobile's. 111's long washer and drier spells and 213's bath span
+  are walks and structure, 210's chair is the Mother's call: closed as
+  routine, not constants.
+- *Not in the data.* The tick rule, the hold, the neighbour's routine and
+  speeds beyond the door timings live in game.exe.
+
+**The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
+both games, the PC data next to the mobile's, category by category:
+
+| category | PC vs mobile |
+|---|---|
+| level time limits | equal: leveldata `time` is in 1/12 s — 300/360/420/600 s = the mobile's 5/6/7/10 minutes (E06's clock confirms 6:00); Season 2 has no limit on either |
+| pass thresholds | PC minquota 50-75 % per Season 1 level, mincoins 3-7 per Season 2 level; the mobile's are not level data (not compared) |
+| trick sets and values | equal but 109 (milk 20 / pig 10), 111 (13/12/7), 112 (skates 8) — overlays; the mobile's extra rated items (103's cake, 112's Yoga, the 104/113 pairs, Season 2's fence and hook items) are not on the PC and not on the PC routes |
+| recipes (combine.xml vs RequiredInventory) | equal on every trick the PC has; the mobile adds recipes of its own (108's balloon, the Season 2 knives) |
+| containers and their contents | equal (the PC marks unlimited stock with count 99, the mobile with UseCount 0) |
+| walk-by tricks (nearobj triggers vs NoticeWhenWalkNearby) | equal, 111's ironing board included |
+| rooms and doors | equal room graphs (the PC's extra "fro" is the entrance hall; the mobile numbers its zones) |
+| the neighbour's routine | not in the PC data (game.exe); the orders read off the videos stand (104's overlay) |
+| action lengths | the PC's `time`/frames at 20 per second are of the mobile's order (album 5.7 vs 3.3 s, pudding 4.8 vs 0.8, sofa 4.4 vs 11.8, microwave 9.4 vs 15) — the laps are walks and structure, see docs/PC_LAPS.md |
+| speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
+| doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |
+| Season 1 anger | thermometer drain = `angrytime` (exact, applied); the tick meter and the hold are game.exe's |
+| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 80 000 long (applied); decay is the mobile's 0.37 |
+| HUD | the PC's rating popups are yellow (240/240/0) for the score and orange (255/160/0) for the bonus, as drawn |
+
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)
 left a four-plan mobile subset (108/114/204/210) byte-identical.

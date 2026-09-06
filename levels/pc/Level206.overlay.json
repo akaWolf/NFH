@@ -1,25 +1,18 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E06 Every Shot A Hit: +51 as he leaves the pillows (67 s, the bubble already on the dog), +38 the weights (139), +25 the dynamite (190), +63 the pad with the harpoon at the full bar (236: the mobile pair's 30 + 20 + 15 stays); the chair pays on the full bar. Mobile 25 / 30 / 20 / 30 + 20 / 45.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E06 Every Shot A Hit: +51 as he leaves the pillows (67 s, the bubble already on the dog), +38 the weights (139), +25 the dynamite (190), +63 the pad with the harpoon at the full bar (236: the mobile pair's 30 + 20 + 15 stays); the chair pays on the full bar. PC data (ship2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Pillows 30 (fleas); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The PC gauge is 80 000 rage long: every jump read off Badinfos' bar (2026-09-08) was 1.25x the data's rage — a 40 000 trick fills half of it — and with the data's amounts on the mobile's 100 the gauge no longer overflows on 204/205/210 where his does; AngryMeterMaximum 80 (COLLAPSE! at the same tricks).",
  "patches": [
   {
    "object": "Pillows",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 51
+    "AngerAmount": 30
    }
   },
   {
-   "object": "Weights",
-   "component": "TrickItem",
+   "object": "Rottweiler2",
+   "component": "Rottweiler",
    "set": {
-    "AngerAmount": 38
-   }
-  },
-  {
-   "object": "DynamiteBox",
-   "component": "TrickItem",
-   "set": {
-    "AngerAmount": 25
+    "AngryMeterMaximum": 80
    }
   }
  ]
