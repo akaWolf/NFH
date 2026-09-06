@@ -31,6 +31,11 @@ FONT_CANDIDATES = (
 )
 
 # CalculateRating's message keys (GameInfo.cs:93-101)
+try:
+    import pcprofile
+except ImportError:                 # imported as runtime.hud
+    from runtime import pcprofile
+
 RATING_KEYS = {'EXCELLENT': 'EXCELLENTMSG', 'GOOD': 'GOODJOBMSG',
                'PASSED': 'PASSMSG', 'FAILED': 'FAIL2MSG',
                'TIME UP': 'TIMEUPMSG'}
@@ -1284,6 +1289,13 @@ class Hud:
         # Helpers.DrawLabel(AngryCountRect, ..., TimeStyle) — HUD.cs:669
         self._text('x%d' % rott.angry_count_ticks, self._angry_count_rect,
                    align=self._align('TimeStyle', 4), style_key='TimeStyle')
+        if pcprofile.is_pc() and self._angry_count_rect is not None:
+            # the PC HUD's live viewer rating beside the tick counter
+            # (GameState.calculate_score's PC branch)
+            r = self._angry_count_rect
+            live = min(100, g.final_trick_score + 3 * rott.angry_count_ticks)
+            self._text('%d%%' % live, (r[0] - r[2] * 1.6, r[1], r[2] * 1.5, r[3]),
+                       align=self._align('TimeStyle', 4), style_key='TimeStyle')
 
     def _draw_score(self):
         """DrawScore (game over, Classic): the board, the ratings, the
@@ -1297,16 +1309,29 @@ class Hud:
                    color=self._style_color('RatingStyle'),
                    align=self._align('RatingStyle', 4),
                    style_key='RatingStyle')
-        self._text(self.loc('GO_TRICKS') + '\n' + g.trick_ratio,
-                   self.rect('TrickRatioRect'),
-                   color=self._style_color('ScoreStyle'),
-                   align=self._align('ScoreStyle', 4),
-                   style_key='ScoreStyle')
-        self._text(self.loc('GO_VIEWER_RATING') + '\n' + g.viewer_rating,
-                   self.rect('ViewerRatingRect'),
-                   color=self._style_color('ScoreStyle'),
-                   align=self._align('ScoreStyle', 4),
-                   style_key='ScoreStyle')
+        if g.pc_points is not None:
+            # the PC profile's COLLAPSE! board: a row a bonus, then the sum
+            # (GameState.calculate_score)
+            rows = ['%d  %s' % g.pc_lines[0]] if g.pc_lines else []
+            rows += ['+ %d  %s' % (v, lab) for v, lab in g.pc_lines[1:]]
+            rows.append('= %d' % g.pc_points)
+            self._text('\n'.join(rows),
+                       self._adj({'x': 0.28, 'y': 0.36,
+                                  'width': 352.0, 'height': 150.0}),
+                       color=self._style_color('ScoreStyle'),
+                       align=self._align('ScoreStyle', 4),
+                       style_key='ScoreStyle')
+        else:
+            self._text(self.loc('GO_TRICKS') + '\n' + g.trick_ratio,
+                       self.rect('TrickRatioRect'),
+                       color=self._style_color('ScoreStyle'),
+                       align=self._align('ScoreStyle', 4),
+                       style_key='ScoreStyle')
+            self._text(self.loc('GO_VIEWER_RATING') + '\n' + g.viewer_rating,
+                       self.rect('ViewerRatingRect'),
+                       color=self._style_color('ScoreStyle'),
+                       align=self._align('ScoreStyle', 4),
+                       style_key='ScoreStyle')
         for rk, mk, key in (('RestartButtonRect', 'RestartMessageRect',
                              'RESTART_MESSAGE'),
                             ('OkButtonRect', 'OkMessageRect', 'OK_MESSAGE')):

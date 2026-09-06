@@ -83,8 +83,11 @@ Expected: 211 → 8 of 8, 90 (+10 with the overflow rule below).
 
 ### 2.4 Season 2 rating — "fill the gauge" (confidence: high — measured)
 
-PC: points (coins + a COLLAPSE bonus + time; E10's end screen 8000 + 3000 +
-5000 + 1398, the map counting 8/8 coins), and the gauge may fill more than
+PC: points — 1000 a coin, 3000 once for any collapse, 5000 for the trophy
+(every coin; the HUD statue lights with the last coin, not at the
+overflow) and ⌊500000 / seconds played⌋ for the clock, read off all
+thirteen end screens (docs/PC_VS_MOBILE.md, "The rating rules"; E10's
+8000 + 3000 + 5000 + 1398 = 17398) — and the gauge may fill more than
 once — Badinfos' 100 % run fills it twice in 210 and 214. The gauge decays
 at ~0.4 %/s on PC as well (`tools/pcref/gauge.py`), so the mobile's 0.37/s
 is the PC's constant; only the "exactly one" is the remake's.
@@ -219,8 +222,15 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   lifted to the depth it has in L111/L114, so the click ray reaches it),
   Level114 (the dog whistle in the hall's chest of drawers), Level205 and
   Level210 (the PC trick amounts off the gauge).
-- Rules (`world.py`, all behind `pcprofile.is_pc()`): the Season 2 bonus
-  for ANY overflow (`GameState.calculate_score`), three lives on Season 2
+- Rules (`world.py`, all behind `pcprofile.is_pc()`): the PC scores
+  themselves (`GameState.calculate_score`): Season 1's viewer rating =
+  the tricks' TrickScores + 3 per angry tick (the HUD shows it live
+  beside the tick counter), Season 2's COLLAPSE! board = 1000 a coin +
+  3000 for a collapse + 5000 for every coin + ⌊500000 / seconds⌋ (the
+  score screen lists the rows; the harness prints `PC N pts` and keeps
+  `pc_points`/`pc_lines` in rating.json) — measured in §2.4 and
+  docs/PC_VS_MOBILE.md; the HUD statue lights with the last coin, not at
+  the overflow; the Season 2 bonus for ANY overflow, three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
   level entrance, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the

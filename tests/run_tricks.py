@@ -133,16 +133,23 @@ class Driver(Recorder):
             import copy
             probe = copy.copy(g)
             probe.log = list(g.log)
-            probe.calculate_score(ticks, nfh2=nfh2)
+            probe.calculate_score(ticks, nfh2=nfh2, elapsed=self.t)
             rating, won = probe.final_viewer_rating, probe.won
             end = end or 'none'
+            src = probe
         else:
             rating, won = g.final_viewer_rating, g.won
-        return {'completed': g.completed, 'total': g.total,
-                'score': g.final_trick_score, 'ticks': ticks,
-                'rating': rating, 'won': bool(won),
-                'perfect': bool(won and rating >= 100), 'end': end,
-                't': round(self.t, 1)}
+            src = g
+        out = {'completed': g.completed, 'total': g.total,
+               'score': g.final_trick_score, 'ticks': ticks,
+               'rating': rating, 'won': bool(won),
+               'perfect': bool(won and rating >= 100), 'end': end,
+               't': round(self.t, 1)}
+        if getattr(src, 'pc_points', None) is not None:
+            # the PC profile's COLLAPSE! board (GameState.calculate_score)
+            out['pc_points'] = src.pc_points
+            out['pc_lines'] = list(src.pc_lines)
+        return out
 
     def _install_anim_probes(self):
         """count each pawn's AnimPlayer.tick calls per world tick: the port
@@ -2645,7 +2652,10 @@ def main(argv):
                  rating['ticks'], rating['rating'],
                  'PERFECT' if rating['perfect'] else
                  ('won' if rating['won'] else 'lost'), rating['end'],
-                 rating['t']))
+                 rating['t'])
+              + ((' PC %d pts = %s' % (rating['pc_points'], ' + '.join(
+                  '%d %s' % (v, lab) for v, lab in rating['pc_lines'])))
+                 if rating.get('pc_points') is not None else ''))
         json.dump(d.clicks, open(os.path.join(outdir, 'clicks.json'), 'w'),
                   indent=1)
         vio = d.inv.finish()
@@ -2688,6 +2698,8 @@ def main(argv):
                                           rt['rating'],
                                           'PERFECT' if rt['perfect'] else
                                           ('won' if rt['won'] else 'lost'))
+                if rt.get('pc_points') is not None:
+                    rs += ' PC %d' % rt['pc_points']
                 if not rt['perfect']:
                     total_bad += 1
             print('%-18s %d legs, %d failed, %d manual, %d invariant%s'

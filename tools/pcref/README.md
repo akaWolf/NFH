@@ -24,6 +24,10 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   natural lap (no trick fired) — writes 28 wait-only plans for the harness,
   then pairs the idle recordings' actions with PC_LAPS_DETAIL's bubble spans
   by name (docs/PC_LAPS.md, "Natural laps").
+- `amounts.py <video> [episode ...]`: the NFH2 trick amounts — the gauge's
+  jumps per second, each labelled with the bubble activity of that second
+  (PC_LAPS_DETAIL.md) and scaled to the full bar, beside the level's mobile
+  AngerAmounts (the overlays in levels/pc).
 - `gauge.py <video> <start> <dur>`: the PC NFH2 anger gauge (the bar at the
   left of the 720p frame) as fill % per second — its jumps are the tricks'
   amounts, its plateaus the decay (~0.4 %/s).

@@ -1956,16 +1956,30 @@ class GameState:
         self.trick_ratio = ''
         self.viewer_rating = ''
         self.final_viewer_rating = 0
+        self.pc_points = None            # PC profile: the COLLAPSE! board's sum
+        self.pc_lines = []               # its rows, (points, label)
         self.on_trick_done = None        # Woody.PlayTrickDone -> the HUD
         # GameInfo.ShowInteractionIcon: true while the HUD info button is
         # held; every item then draws its ItemTipIcon (HUD.cs:860-895)
         self.show_interaction_icon = False
 
-    def calculate_score(self, angry_count_ticks, nfh2=False):
+    def calculate_score(self, angry_count_ticks, nfh2=False, elapsed=0.0):
         """GameInfo.CalculateScore + CalculateRating (GameInfo.cs:392-465).
         The label lines ride localization files that are not extracted, so
-        only the value halves render."""
-        if not nfh2:
+        only the value halves render. `elapsed` (the seconds played) is the
+        PC profile's clock input; the mobile score never reads the clock."""
+        if not nfh2 and pcprofile.is_pc():
+            # the PC's viewer rating, read live off Badinfos' HUD (E01: 16 ->
+            # 49 -> 72 -> 100 for Microwave 16, Binoculars 30, TV 20, Sofa 25
+            # with the tick counter 0/1/2/3; E02: 18, 31, 44, 54, 72, 100 for
+            # Beer 18, three 10s, TV 15, Sofa 25 with 0/1/2/2/3/4): each
+            # trick pays its TrickScore — the mobile data's values ARE the
+            # PC's — plus 3 for every angry tick; the mobile's
+            # CompletedTricksCount x min(CompoundTrickScore, ticks) reaches
+            # the same 100 at the end of both runs but not the same value on
+            # the way (E02 after two tricks: 48 against the PC's 49)
+            final = self.final_trick_score + 3 * angry_count_ticks
+        elif not nfh2:
             compound = self.compound_trick_score
             if not self.is_tutorial and angry_count_ticks < compound:
                 compound = angry_count_ticks
@@ -1980,6 +1994,24 @@ class GameState:
                                              and angry_count_ticks >= 1)
             if one and not self.ignore_score:
                 final += 10
+            if pcprofile.is_pc():
+                # the PC's COLLAPSE! board, read off Badinfos' thirteen NFH2
+                # end screens (docs/PC_VS_MOBILE.md, "The rating rules"):
+                # 1000 a coin, 3000 once for any collapse (E10 and E14 fill
+                # the gauge twice and still get 3000), 5000 for the trophy —
+                # every coin: the HUD statue lights at 8/8, not at the
+                # overflow (E10: grey after the 299 s fill, gold after the
+                # eighth coin at 342) — and 500000 / the seconds played for
+                # the clock (498-500 k on all thirteen: 160 s -> 3123,
+                # 464 s -> 1077)
+                coins = self.completed * 1000
+                collapse = 3000 if angry_count_ticks >= 1 else 0
+                trophy = 5000 if self.total > 0 and \
+                    self.completed >= self.total else 0
+                clock = int(500000.0 / max(1.0, float(elapsed or 0.0)))
+                self.pc_points = coins + collapse + trophy + clock
+                self.pc_lines = [(coins, 'coins'), (collapse, 'collapse'),
+                                 (trophy, 'trophy'), (clock, 'time')]
         self.final_viewer_rating = min(final, 100)
         self.trick_ratio = '%d / %d' % (self.completed, self.total)
         self.viewer_rating = '%d%%' % self.final_viewer_rating
@@ -1991,6 +2023,8 @@ class GameState:
             self.rating = 'GOOD'
         else:
             self.rating = 'PASSED'
+        if nfh2 and pcprofile.is_pc() and self.won and angry_count_ticks >= 1:
+            self.rating = 'COLLAPSE!'    # the PC board's title
 
     def trick_done(self, score):
         """GameInfo.TrickDone (GameInfo.cs:467): Woody.PlayTrickDone leads"""
@@ -5341,7 +5375,10 @@ class World:
                     if pawn.anim.has('RottFreakoutHead') else []
                 self._hud_angry(3)
                 if self.hud is not None:
-                    self.hud.statue_anim.restart()     # PlayStatueAchieved
+                    if not pcprofile.is_pc():
+                        # PlayStatueAchieved; the PC lights the statue with
+                        # the last coin instead (_on_trick_done)
+                        self.hud.statue_anim.restart()
                     self.hud.play_whistle()
                 # GameInfo.OnStatueAchieved sets a flag nothing reads
         if item.object_to_show_before_angry_go is not None:
@@ -5566,6 +5603,11 @@ class World:
         elif not item.already_tricked:
             item.already_tricked = True
             self.game.trick_done(score)
+        if pcprofile.is_pc() and self.hud is not None \
+                and self.game.total > 0 \
+                and self.game.completed >= self.game.total:
+            # the PC's trophy: the statue lights with the last coin
+            self.hud.statue_anim.restart()
 
     def _tricked_item_to_fix(self, item):
         """TrickItem.GetTrickedItemToFix (TrickItem.cs:1136-1143)"""
@@ -8244,7 +8286,8 @@ class World:
         rott = self.pawns.get('Rottweiler')
         self.game.calculate_score(
             rott.angry_count_ticks if rott is not None else 0,
-            nfh2=self.woody.nfh2 if self.woody is not None else False)
+            nfh2=self.woody.nfh2 if self.woody is not None else False,
+            elapsed=self.time)
         if self.on_score_computed is not None:
             self.on_score_computed()      # Level.SaveScore (cs:409/429)
 
