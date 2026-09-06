@@ -63,11 +63,12 @@ each big enough that any lap paying both overflows twice.
 ## Mechanics the mobile added or changed
 
 - **RemoveFromRoutineAfterFirstUse** (RoutineActionUse.cs:424-427): Level108's
-  ToothBrush is used once and dropped from the routine. On PC the neighbour
-  brushes again every lap — the guide puts the shoe brush in "after he has
-  gone to the balcony". On mobile the same trick pays through the coffee's
-  RushToToilet: his ToiletAction's item is the ToothBrush, so the soil coffee
-  sends him back to the sink (Level108 both plans, 100 / 94).
+  ToothBrush is used once and dropped from the routine — and that IS the PC
+  behaviour (measured: he brushes at 5-23 s and never again; the toothbrush
+  returns only as the rinse after the soil coffee). The guide's "after he
+  has gone to the balcony" is simply the first safe moment to reach the
+  sink. The trick pays through the coffee's RushToToilet on both (Level108
+  both plans, 100 / 94).
 - **Alerters instead of the dog whistle.** PC Night of the Hunter: "wait for
   the neighbour to get vinyl, use dog whistle, use rusty nail with record
   player, use gunpowder with tobacco tin" — the whistle is an inventory item
@@ -116,7 +117,7 @@ the data. "Same set" means every PC step has a mobile item and vice versa.
 | 105 | bowling ball swap, piano sheet, egg, soap, prank call, portrait, cheese→plant | 8: Football 15, PlantStink 13, Piano 13, Phone 10, Toilet/Ground/Portrait/Microwave 7 | same set |
 | 106 | egg, milk↔bath water, portrait, soap, shoe polish→towel, hair restorer→tub, glue→album, bath pearls→sweets, loo | 9: Towel 12, BathTub 12, Pudding/Candy/PhotoAlbum 8, Ground/Toilet/Portrait/Microwave 7 | same set |
 | 107 | pigeon leash, stain remover→painting, magnesium→camera, footstool, banana, pins→stool, wrench→generator | 7: FootStool 15, Generator 15, Camera 12, DieselChair 10, Dove 10, Ground 8 | same set |
-| 108 | shoe brush (after his balcony visit), pins→chair, umbrella, honey→lotion, weedkiller→can, soil→coffee, banana | 6: SunLotion 20, Plant 20, ToothBrush 15, Coffee 15, Shezlong 10, Ground 8 | **routine differs**: PC brushes every lap; mobile once + the coffee rush |
+| 108 | shoe brush (after his balcony visit), pins→chair, umbrella, honey→lotion, weedkiller→can, soil→coffee, banana | 6: SunLotion 20, Plant 20, ToothBrush 15, Coffee 15, Shezlong 10, Ground 8 | same set; the one-off brushing + coffee rinse is the PC's too (docs/PC_LAPS.md) |
 | 109 | cactus→alarm clock, hot sauce→dentures, corn chips, nitro→milk, key→cage, pins→bed, banana | 7: PigMilk 20, Pig 20, Chili 15, Teeth 15, AlarmClock 13, Bed 8, Ground 7 | same set |
 | 110 | extinguisher, growth liquid→spray, alcohol→beer, vinegar→wine, pins→chair, banana | 6: BBQ 20, Beer 20, Spray 15, Extinguisher 15, Wine 15, Chair 10, Ground 10 | same set |
 | 111 | knife→vacuum, shovel→plant, wine→washer, cable→socket, pliers→drier, soil→carpet, marbles, soap flakes→fish food, iron, bird food→airer | 8: Carpet 15, Vacuum 15, Airer 13, ElectricTrap 11, Drier/FishTank/Washer/Iron 10, Marbles 7 | same set |
@@ -149,7 +150,10 @@ the data. "Same set" means every PC step has a mobile item and vice versa.
 - On mobile the trick sets are the same, but three levels lose a trick to the
   remake's own machinery — 114 (no whistle), 211 (the rod's collider) — or
   to its rating rule — 206 (two overflows). 108 looked like a fourth and was
-  not: the coffee rush is the mobile's replacement for the repeated brushing.
+  not: the one-off brushing and the coffee rinse are the PC's own routine.
+- The routines themselves are the PC's, order for order, in all 28
+  episodes; the mobile neighbour is 20-80 % slower on nine of them
+  (`docs/PC_LAPS.md`).
 - The Season 2 "+10 for exactly one overflow" turns arming ORDER into the
   whole game: the meter must climb on one of his laps, so the trick he
   visits earliest is armed last (204, 207, 209, 212-214 at 100). Where his

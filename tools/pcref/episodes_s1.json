@@ -1,0 +1,100 @@
+[
+ {
+  "name": "E01 The First Trick",
+  "card": 220.2,
+  "start": 229.9,
+  "end": 361.7,
+  "len": 131.8
+ },
+ {
+  "name": "E02 TV Time",
+  "card": 361.7,
+  "start": 369.6,
+  "end": 540.3,
+  "len": 170.7
+ },
+ {
+  "name": "E03 Birthday Surprises",
+  "card": 540.3,
+  "start": 546.5,
+  "end": 705.7,
+  "len": 159.1
+ },
+ {
+  "name": "E04 The Apple Pie",
+  "card": 705.7,
+  "start": 711.0,
+  "end": 948.8,
+  "len": 237.8
+ },
+ {
+  "name": "E05 The Old Spoilsport",
+  "card": 948.8,
+  "start": 959.7,
+  "end": 1143.7,
+  "len": 184.1
+ },
+ {
+  "name": "E06 Bath Time",
+  "card": 1143.7,
+  "start": 1149.4,
+  "end": 1484.2,
+  "len": 334.9
+ },
+ {
+  "name": "E07 A Work of Art",
+  "card": 1484.2,
+  "start": 1492.5,
+  "end": 1732.6,
+  "len": 240.1
+ },
+ {
+  "name": "E08 A Sunny Morning",
+  "card": 1732.6,
+  "start": 1739.4,
+  "end": 2019.0,
+  "len": 279.5
+ },
+ {
+  "name": "E09 This Little Piggy",
+  "card": 2019.0,
+  "start": 2027.4,
+  "end": 2364.1,
+  "len": 336.7
+ },
+ {
+  "name": "E10 Barbecue Time",
+  "card": 2364.1,
+  "start": 2370.9,
+  "end": 2640.2,
+  "len": 269.3
+ },
+ {
+  "name": "E11 Laundry Day",
+  "card": 2640.2,
+  "start": 2650.2,
+  "end": 2984.1,
+  "len": 333.9
+ },
+ {
+  "name": "E12 Fitness Frenzy",
+  "card": 2984.1,
+  "start": 2992.6,
+  "end": 3388.7,
+  "len": 396.1
+ },
+ {
+  "name": "E13 Home Improvement",
+  "card": 3388.7,
+  "start": 3396.6,
+  "end": 3778.9,
+  "len": 382.4
+ },
+ {
+  "name": "E14 Night of the Hunter",
+  "card": 3778.9,
+  "start": 3786.2,
+  "end": 4245.9,
+  "len": 459.7
+ }
+]

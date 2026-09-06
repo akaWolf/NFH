@@ -53,16 +53,15 @@ geometry) must cover the walk from the kitchen door to the Pipe (x −3.16)
 and the Gramaphone (x 0.86) and back — the PC video is the reference for
 how tight that was on PC.
 
-### 2.2 Level108 — repeated brushing (confidence: high)
+### 2.2 Level108 — brushing (confidence: high — MEASURED, see docs/PC_LAPS.md)
 
-PC: he brushes his teeth every lap (the guide puts the brush in after his
-balcony visit). Mobile: `RemoveFromRoutineAfterFirstUse` on the ToothBrush
-(RoutineActionUse.cs:424-427), and the coffee's RushToToilet as the
-replacement (his ToiletAction's item is the ToothBrush).
-
-Overlay: `RemoveFromRoutineAfterFirstUse = false`. Side effect: the rush
-still targets the ToothBrush, so a tricked brush pays at the first of the
-two — the rating is 100 either way; this one is fidelity, not score.
+Measured on the PC video: the neighbour brushes his teeth ONCE at the
+start (5-23 s) and never again in the routine; the toothbrush comes back
+only as the rinse after the soil coffee. That is exactly the mobile data
+(`RemoveFromRoutineAfterFirstUse` on the ToothBrush, the CoffeeMaker's
+RushToToilet with the ToothBrush as his ToiletAction). Nothing to change
+here; the earlier claim that "PC brushes every lap" was a misread of the
+frame sheets (Woody in the bathroom, not the neighbour).
 
 ### 2.3 Level211 rod, Level214 wheel — colliders (confidence: high)
 
@@ -110,17 +109,16 @@ the first pass and lets the second through. Profile switch: return the
 "done" branch on the first pass (auto-solve). The `unlock` legs in the plans
 become no-ops under the profile; the plans still run.
 
-### 2.7 Routines and timings (confidence: low without data)
+### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
-Everything above keeps the mobile laps. The PC laps are different (the PC
-108 brushes each lap; the PC 114 "gets vinyl" as a routine step; the PC
-guide's waits — "wait for him to go to the balcony" — imply room orders that
-sometimes differ from the mobile's ActionManager lists). Reproducing them
-needs either the PC data (the GOG/Steam "Neighbours from Hell Compilation";
-its level scripts would have to be unpacked — format not known here) or
-frame-timed references from the PC videos (per-episode room sequence with
-timestamps). Without one of those, re-authoring laps would be guesswork —
-exactly what CLAUDE.md forbids.
+Measured for all 28 episodes from the PC videos' HUD bubble: the ORDER of
+the neighbour's activities is the PC's in every episode; the periods are
+within ±15 % in 17 of 27, and the mobile is slower by 20-80 % in 101, 105,
+107, 110, 112, 114, 210, 211, 212 (single actions that last longer — the
+sofa, the pottery chain, the deck-chair sleep). A PC-timing profile would
+therefore not re-order anything; it would shorten specific action
+durations, and `docs/PC_LAPS_DETAIL.md` has the PC per-activity durations
+to set them from. Still not from PC data — from video, ±2 s.
 
 ### 2.8 Not worth it
 
@@ -189,11 +187,8 @@ tile=5x6" -frames:v 1 t.png` gives a minute per sheet; the PC HUD clock
 the episode title card marks the start (A Sunny Morning: 5:08 into
 pc_ep7-10_tm05.mp4).
 
-First measurement, A Sunny Morning (PC): hall → kitchen → bathroom →
-bedroom → balcony → down again, a lap of ~50-55 s with a bathroom visit
-every lap (level clock 6:36, ~5:37, ~4:47), the episode 7:00 long. The
-mobile 108 lap is ~77 s (Shezlong visits at 64, 141, 218 s in the port's
-trace) with ONE bathroom visit in the whole level plus the coffee rush.
-This is the kind of number §2.7 needs for every episode before any lap
-is touched: same method, one sheet per minute, the neighbour's room per
-frame.
+The frame-sheet reading of A Sunny Morning that first stood here
+("a bathroom visit every lap") was wrong — it counted Woody. The
+measurement that holds is the HUD bubble method of `tools/pcref/` and
+its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
+95, the order identical, the toothbrush once at the start on both.
