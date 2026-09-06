@@ -198,6 +198,11 @@ class Hud:
         # DrawAngryMeter's 0.1 s repaint throttle (HUD.cs:1242-1247)
         self._angry_rects = None          # AngryMeterFullRect + UV rect
         self._thermo = 0.0                # the PC profile's drawn meter
+        self._pc_last = None              # the PC rating count-up's state
+        self._pc_shown = 0.0
+        self._pc_t = 0.0
+        self._pc_popups = []
+        self._pc_gap = 0.0
         self._last_angry_update = 0.0     # LastUpdateAngryMeterTime
         self.desc_string = ''
         self.desc_pos = (0.0, 0.0)
@@ -1312,11 +1317,67 @@ class Hud:
                    align=self._align('TimeStyle', 4), style_key='TimeStyle')
         if pcprofile.is_pc() and self._angry_count_rect is not None:
             # the PC HUD's live viewer rating beside the tick counter
-            # (GameState.calculate_score's PC branch)
+            # (GameState.calculate_score's PC branch), counted up the way
+            # the PC counts it (docs/PC_FIDELITY.md §7): each increment is
+            # a popup — yellow for a trick's score, orange for a tick's 3 —
+            # that sits still for a second (1.0 s / 1.2 s on E06), then
+            # the figure climbs by the amount over 0.9 s while the popup
+            # shows what is left; popups queue, 0.2 s apart
             r = self._angry_count_rect
-            live = min(100, g.final_trick_score + 3 * rott.angry_count_ticks)
-            self._text('%d%%' % live, (r[0] - r[2] * 1.6, r[1], r[2] * 1.5, r[3]),
+            self._pc_rating_step(g.final_trick_score, rott.angry_count_ticks)
+            self._text('%d%%' % int(min(100.0, self._pc_shown + 1e-6)),
+                       (r[0] - r[2] * 1.6, r[1], r[2] * 1.5, r[3]),
                        align=self._align('TimeStyle', 4), style_key='TimeStyle')
+            if self._pc_popups:
+                amount, kind, age = self._pc_popups[0]
+                delay = 1.0 if kind == 'trick' else 1.2
+                left = amount if age < delay else \
+                    amount * (1.0 - min(1.0, (age - delay) / 0.9))
+                if left > 1e-6:
+                    color = (255, 232, 64) if kind == 'trick' else (255, 150, 40)
+                    self._text('+%d%%' % int(left + 0.999),
+                               (r[0] - r[2] * 1.6, r[1] - r[3] * 0.9, r[2] * 1.5, r[3]),
+                               small=True, color=color, align=self._align('TimeStyle', 4))
+
+    def _pc_rating_step(self, score, ticks):
+        """advance the PC rating's count-up: queue the new increments,
+        run the head popup's clock, move the shown figure"""
+        now = self.world.time
+        if self._pc_last is None:
+            self._pc_last = (score, ticks)
+            self._pc_shown = float(min(100, score + 3 * ticks))
+            self._pc_t = now
+            return
+        dt = max(0.0, now - self._pc_t)
+        self._pc_t = now
+        ls, lt = self._pc_last
+        if score > ls:
+            self._pc_popups.append([float(score - ls), 'trick', 0.0])
+        for _ in range(max(0, ticks - lt)):
+            self._pc_popups.append([3.0, 'tick', 0.0])
+        self._pc_last = (score, ticks)
+        if self._pc_gap > 0.0:
+            self._pc_gap = max(0.0, self._pc_gap - dt)
+            return
+        if not self._pc_popups:
+            return
+        head = self._pc_popups[0]
+        head[2] += dt
+        delay = 1.0 if head[1] == 'trick' else 1.2
+        if head[2] > delay:
+            step = head[0] * min(dt, head[2] - delay) / 0.9
+            self._pc_shown += step
+            if head[2] - delay >= 0.9:
+                self._pc_shown = float(min(100, self._pc_target()))
+                self._pc_popups.pop(0)
+                self._pc_gap = 0.2
+
+    def _pc_target(self):
+        """the figure the queue converges to: the paid score plus the ticks
+        already counted, less the popups still pending"""
+        s, t = self._pc_last
+        pending = sum(a for a, k, _ in self._pc_popups[1:])
+        return s + 3 * t - pending
 
     def _draw_score(self):
         """DrawScore (game over, Classic): the board, the ratings, the

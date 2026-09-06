@@ -388,7 +388,14 @@ PCThermometerDrain in the overlays and used only by the HUD: under the
 profile the drawn meter is full whenever the tick meter is, and drains
 at the level's rate while the tick meter behind it still decays at
 4.23. (An earlier reading of 3.7-4.6 %/s here came from an uncalibrated
-crop and is withdrawn.)
+crop and is withdrawn.) The percentage beside the tick counter is
+counted up the PC's way, too: a trick's score arrives as a yellow "+N %"
+popup above the figure, a tick's 3 as an orange one; the popup sits for
+a second (1.0 s for the score, 1.2 s for the tick, E06 304-318 at five
+frames a second), then the figure climbs by the amount over 0.9 s while
+the popup shows what is left, and the next popup follows 0.2 s later
+(HUD._pc_rating_step). The end-of-level score is the game's own value,
+untouched by the drawing.
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)

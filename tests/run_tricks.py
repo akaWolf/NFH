@@ -58,7 +58,8 @@ Plan commands, one per line ('#' comments):
     python3 tests/run_tricks.py --all [--out=/tmp/nfh-tricks] [--jobs=4]
     NFH_SEED=<n> seeds the world's random draws per level (default 0: a
     run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
-    reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends.
+    reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends;
+    NFH_SHOT_FPS=<n> saves n PNG frames a second into the run's dir.
 """
 import glob, json, os, sys
 
@@ -90,6 +91,11 @@ class Driver(Recorder):
     def __init__(self, level_path, plan_path, outdir):
         Recorder.__init__(self, level_path, outdir, script=None,
                           seconds=1e9, fps=0)
+        shot = float(os.environ.get('NFH_SHOT_FPS', '0') or 0)
+        if shot > 0:
+            self.frame_every = 1.0 / shot   # PNG frames into outdir
+        self._next_shot = 0.0
+        self._shot_i = 0
         self._tick_i = 0
         # the level runs in the App, not the bare Viewer: the App builds
         # and ticks the tutorial layer (LevelScript + the camera script,
@@ -2466,6 +2472,12 @@ class Driver(Recorder):
             self.app.tick(DT, events=(False, False, False, False))
         for hook in self.frame_hooks:
             hook(t, DT)
+        if self.frame_every is not None and t + 1e-9 >= self._next_shot:
+            # Recorder.tick's frame dump (NFH_SHOT_FPS)
+            v.screenshot(os.path.join(self.outdir, 'f%04d_t%05.2f.png'
+                                      % (self._shot_i, t)))
+            self._shot_i += 1
+            self._next_shot += self.frame_every
         # the state line every STATE_EVERY ticks: a plan run is minutes of
         # 60 Hz rows, and a stuck one grew a 190 MB log on /tmp
         self._tick_i += 1
