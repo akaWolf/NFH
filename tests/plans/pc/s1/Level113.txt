@@ -16,6 +16,7 @@ use ValveMain                         # Z09, bare, twice: closes, then arms -> t
 hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
 take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles
 usewith GroundMarbles@Zone03 IT_Marbles   # x=4.63 (score 8), on his door(4.09) -> Radiator(6.51) walk
+whenusing Sink                        # his [4] sink (17 s in Z04): the hall and the basement are clear — ungated, the leg met him crossing the hall once the PC's one-tantrum angry had moved his lap by 5 s
 use ValveHot                          # Z09, now safe: GetTrickedAtOnce -> the Radiator at his next [3], 15
 take BedDrawer IT_Painbook            # Z06
 usewith Ladder IT_Tongs               # Z08, 15 at his [7]

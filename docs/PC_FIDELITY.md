@@ -399,6 +399,39 @@ the popup shows what is left, and the next popup follows 0.2 s later
 (HUD._pc_rating_step). The end-of-level score is the game's own value,
 untouched by the drawing.
 
+The angry itself is the last piece of the tick window. The mobile plays
+its anger levels (Rottweiler.cs:597-607): AngryEasyUp alone, 2.5 s, on an
+empty meter, and AngryEasyDown before AngryHard, 2.5 + 6.7 s, on a full
+one — the meter holds full for the sequence plus the fix (10.7 s with
+FixMid), so the port's window after a first trick was 4 s + 23.6 and
+after a chained one 10.7 s + 23.6. The PC neighbour has one tantrum: on
+every angry of Badinfos' runs, first tricks included, the mercury holds
+7.0-7.5 s (E03, E06-E10) or 8.1-8.9 s (E01, E02, E11-E14) — AngryHard's
+6.7 s plus the item's fix. Under the profile the sequence is AngryHard
+alone for both cases (World.play_angry's Classic branch); the tick, the
+HUD face level and the audience laugh keep the mobile's rule; the
+port's meter now holds 6.7-8.2 s on the plain angries (the S1 set stays
+14/14 once 113's hot valve is gated on his sink visit — the 5 s the
+longer first angry moved his lap by had put the ungated leg in the hall
+with him). (The
+HUD arithmetic of the profile — the count-up queue and the drawn drain —
+has a window-less test: `python3 -m unittest tests.test_hud_pc` inside
+the project's nix-shell.)
+
+Two of the natural laps that sat outside ±15 % of the PC's
+(docs/PC_LAPS.md) are activity lengths the data can carry: E01's sofa
+spell is 15 s against the mobile's 21, E06's album 19 against 12, both
+plain sequences of loop entries in the item's RottweilerUseAnimation —
+the overlays give the sofa one SitRemote fewer and one SitLoop more
+(12.6 s of sitting, 15 with the walk) and the album eighteen 0.54 s
+PhotoAlbumLoop entries instead of five (a 9.7 s read, 19 with the
+walk); the idle laps under the profile come to +11 % (101) and −6 %
+(106), no activity off by five seconds. The other three stay open: 111
+(−17 %) is a routine of three washer and three drier visits against the
+PC's one long visit each (47 s and 26 s), 213 (−17 %) a cement bath
+whose PC spell is twice the mobile's two animations, 210 (+16 %) a deck
+chair he leaves on the Mother's call — none is a loop count.
+
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)
 left a four-plan mobile subset (108/114/204/210) byte-identical.

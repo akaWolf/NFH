@@ -5359,6 +5359,16 @@ class World:
                 self._hud_angry(3)                 # PlayRottweilerAngry(L3)
                 self._on_compound_trick_done(item)   # cs:608
                 self._audience_laugh(pawn, 'big')      # cs:609
+            if pcprofile.is_pc() and item.angry_hard:
+                # the PC neighbour has one tantrum, the same for a first
+                # trick and a chained one: his meter holds full for
+                # 7.0-8.9 s on every angry of Badinfos' runs, first ones
+                # included (tools/pcref/thermo.py) — AngryHard's 6.7 s plus
+                # the fix — where the mobile's anger levels (cs:597-607)
+                # play the 2.5 s AngryEasyUp alone on an empty meter and
+                # AngryEasyDown before AngryHard on a full one (10.7 s).
+                # The tick and the HUD face keep the mobile's rule
+                seq = [item.angry_hard]
             pawn.angry_meter = pawn.angry_max
         elif self.game is not None:
             # the NFH2/Modern anger ladder (Rottweiler.cs:613-693): the

@@ -9,7 +9,7 @@ look 20-80 % slower on nine levels (2026-09-06).
 usage:
   python3 tools/pcref/laps_natural.py --plans <dir>     # writes 28 idle plans
   python3 tests/run_tricks.py <dir>/s1/Level1*.txt <dir>/s2/Level2*.txt --profile=mobile --jobs=4 --out=$HOME/nfh-bench/runs/idle
-  python3 tools/pcref/laps_natural.py [--idle /tmp/nfh-idle] [level ...] [-v]
+  python3 tools/pcref/laps_natural.py [--idle ~/nfh-bench/runs/idle] [level ...] [-v]
 
 The table: one lap = the mobile routine list once (docs' "mobile routine"),
 each mobile action paired with the PC bubble span of the same name; a
@@ -21,7 +21,7 @@ import json, re, sys, glob
 import os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOC = os.path.join(ROOT, 'docs', 'PC_LAPS_DETAIL.md')
-IDLE = '/tmp/nfh-idle'
+IDLE = os.path.expanduser('~/nfh-bench/runs/idle')
 if '--idle' in sys.argv:
     k = sys.argv.index('--idle'); IDLE = sys.argv[k + 1]; del sys.argv[k:k + 2]
 if '--plans' in sys.argv:
