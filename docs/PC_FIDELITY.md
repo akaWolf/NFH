@@ -253,8 +253,12 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 ### Results under the profile (the final run, 2026-09-06)
 
-Every level pays every trick. Rating 100 on all 28. The lever on the
-levels that sat at 90 was the same every time: arm each coin right after
+Every level pays every trick. Under the PC's own scores (the COLLAPSE!
+board on Season 2, the viewer rating's 3 a tick on Season 1 — §2.4,
+docs/PC_VS_MOBILE.md) the fourteen Season 2 levels and ten of the
+fourteen Season 1 levels rate 100; 104 and 112 stop at 97, 109 at 98,
+114 at 88 — the mobile routine's ceilings, below. On Season 2 the lever
+on the levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
 Fifi + rake) last. Level210 was the last to yield (twenty-two orderings).
@@ -286,20 +290,41 @@ margin, so her room is entered by rushes timed to those windows.
 
 | S1 | tricks | rating | S2 | tricks | rating |
 |---|---|---|---|---|---|
-| 101 | 4/4 | 100 | 201 | 4/4 | 100 |
-| 102 | 6/6 | 100 | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
-| 103 | 6/6 | 100 | 203 | 5/5 | 100 |
-| 104 | 7/7 | 100 | 204 | 6/6 | 100 |
-| 105 | 8/8 | 100 | 205 | 5/5 | 100 (the PC amounts: tennis, skis, chef, rockets on one lap) |
-| 106 | 9/9 | 100 | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
-| 107 | 7/7 | 100 | 207 | 7/7 | 100 |
-| 108 | 6/6 | 100 | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |
-| 109 | 7/7 | 100 | 209 | 7/7 | 100 |
-| 110 | 6/6 | 100 | 210 | 8/8 | 100 (the PC amounts; basket triple, shop and elephant on his lap 2) |
-| 111 | 8/8 | 100 | 211 | 8/8 | 100 (the rod) |
-| 112 | 10/10 | 100 | 212 | 9/9 | 100 |
-| 113 | 8/8 | 100 (the electric trap's depth) | 213 | 9/9 | 100 |
-| 114 | 9/9 | 100 (the whistle) | 214 | 6/6 | 100 (no wait before the pistol) |
+| 101 | 4/4 | 100 (3 ticks) | 201 | 4/4 | 100 |
+| 102 | 6/6 | 100 (7) | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
+| 103 | 6/6 | 100 (5) | 203 | 5/5 | 100 |
+| 104 | 7/7 | 97 (5 of the 6 needed: the microwave's egg and the cream at the pie's end cannot chain) | 204 | 6/6 | 100 |
+| 105 | 8/8 | 100 (7) | 205 | 5/5 | 100 (the PC amounts: tennis, skis, chef, rockets on one lap) |
+| 106 | 9/9 | 100 (8: the whole set on [2]-[8] of one lap, Woody in the hall's wardrobe between the raids) | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
+| 107 | 7/7 | 100 (6: armed behind him, the lap pays all seven) | 207 | 7/7 | 100 |
+| 108 | 6/6 | 100 (5: the balcony raid first, the kitchen and the balcony armed behind him) | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |
+| 109 | 7/7 | 98 (5 of 6: the pig-to-chili stretch of his lap) | 209 | 7/7 | 100 |
+| 110 | 6/6 | 100 (5: the bed hide, the balcony and the bedroom rushed as he sits) | 210 | 8/8 | 100 (the PC amounts; basket triple, shop and elephant on his lap 2) |
+| 111 | 8/8 | 100 (5) | 211 | 8/8 | 100 (the rod) |
+| 112 | 10/10 | 97 (5 of 6: the yoga and the mixer cool him; the basement walk-bys skip his next item when hot) | 212 | 9/9 | 100 |
+| 113 | 8/8 | 100 (4, the electric trap's depth) | 213 | 9/9 | 100 |
+| 114 | 9/9 | 88 (3 of 7: the whistle, the walk-bys and a 175 s lap in a 10-minute level — see below) | 214 | 6/6 | 100 (no wait before the pistol) |
+
+Season 1 under the PC rule is a chaining problem: the tricks' scores
+sum to 76-91, so four to eight of a level's payments must land while he
+is still hot (23.6 s of decay from the last angry, the angries themselves
+not counting). The plans in tests/plans/pc/s1 arm everything for ONE lap,
+each item right after his previous visit, timed by `whenusing`/`whenzone`
+landmarks and rushes where the gate's escape margin would wait a window
+out (108, 110, 106). Two things of the mobile original set the ceilings:
+the routines' long single actions (104's pie eat and microwave, 109's
+milk-chips-chili stretch, 112's yoga and mixer) that open gaps over the
+window, and Item.RottweilerUse's FixingItem head (Item.cs:847-852): a
+walk-by trick — a slip, the electric trap, the marbles — on a hot meter
+plays the hard angry, and he runs for the fixing tool past the item he
+was walking to, which then never pays that lap (112's expander after the
+marbles, its weights after the trap; 114's shotgun after either). The PC
+neighbour has no such fetch — Badinfos chains 6 in E04, 6 in E09, 7 in
+E14 — so 104, 109, 112 and 114 keep their best mobile-routine plans.
+On 114 the dog whistle adds a third constraint: blown on a lap where the
+shotgun is armed, it puts the shotgun's payment off to the next lap, and
+with a 175 s lap in a 10-minute level the nine payments cannot all be
+timed into one chain; the committed plan pays 9/9 with three ticks.
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)

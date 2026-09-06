@@ -1,0 +1,32 @@
+# Level107 under the PC profile: the viewer rating pays each trick's score
+# plus 3 per angry tick, so these seven tricks' 82 need six ticks — every
+# trick but the first landing while he is still hot (the PC run: 10, 25,
+# 40, 51, 64, 82, 100 with the tick counter 0..6, the drawing ticking like
+# the rest). His lap (~65 s): drawing (balcony) > camera, magnesium
+# (bedroom) > chair, generator (kitchen) > statue (living room). Armed
+# behind him inside one lap — the kitchen and the statue while he is on
+# the balcony and in the bedroom, the bedroom and the balcony while he is
+# in the kitchen — the lap pays drawing > camera > the slip > chair >
+# generator > statue > the dove as he enters the balcony.
+take PinsBoard IT_Pins               # Zone01
+take Drawer IT_Wrench                # Zone01
+take RubbishBinBanana IT_Banana      # Zone03
+take FirstAid IT_Scissors            # Zone04: scissors + antispot together
+take MagnesiumBottle IT_Magnesium    # Zone06, once he has gone down to the kitchen
+whenusing MumStatueFootStool         # he is at the statue (~51-60): the kitchen is free until ~105
+usewith DieselChair IT_Pins          # Zone03, 10
+usewith DieselGenerator IT_Wrench    # Zone03, 15
+usewith Ground@Zone03 IT_Banana      # Zone03, 8, NoticeWhenWalkNearby: the slip on his way to the chair
+use MumStatueFootStool               # Zone02, bare hand, 15, once he has left for the balcony
+whenusing DieselChair                # he is in the kitchen (~105-116), then the statue: the bedroom and the balcony are free until ~135
+usewith Camera IT_Magnesium          # Zone06, 12 (RottweilerUseTogglesPrime)
+usewith Dove IT_Scissors             # Zone07, 10, NoticeWhenEnterZone
+usewith Drawing IT_Antispot          # Zone07, 12: the wall shows only after his first drawing
+hide Bed                             # the balcony is a dead end: let him pass
+await Drawing 12
+await Camera 12
+await Ground@Zone03 8
+await DieselChair 10
+await DieselGenerator 15
+await MumStatueFootStool 15
+await Dove 10

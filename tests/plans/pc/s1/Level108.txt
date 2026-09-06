@@ -1,0 +1,35 @@
+# Level108 under the PC profile: the viewer rating pays each trick's score
+# plus 3 per angry tick, so these six tricks' 88 need four ticks. His lap
+# (~87 s) alternates the kitchen (coffee) and the balcony (deck chair,
+# watering can, plant) through the bedroom, after one toothbrush at the
+# start. The balcony raid (the key, the soil, the folded shade) is the
+# mobile plan's opening, before he first comes through; then, while he is
+# on the balcony, the hall and the kitchen are collected and the kitchen
+# armed (the slip, the soil coffee), the toothbrush any time; the balcony
+# is armed while he drinks his second coffee. His second lap pays in a
+# row: the slip, the coffee, the toothbrush rinse, the pins and the honey
+# at the deck chair, the poisoned can at the plant — five ticks.
+take PinsBoard IT_Pins               # Zone01
+take BedDrawer IT_Key +12            # Zone06 (he never returns here after the start);
+                                     # +12: the balcony raid and the way back to the bed
+take SoilBag IT_Soil_only            # Zone07
+use SunShade                         # Zone07, bare hand: Neutral, folds the shade — the lotion plays only while SunShade.Tricked
+hide Bed                             # Zone06: he comes through to the balcony
+take Drawer IT_Brush                 # Zone01: the dirty shoe brush
+take RubbishBinBanana2 IT_Banana     # Zone03
+take Fridge IT_Honey                 # Zone03
+prime FirstAid IT_Key                # Zone04: the FirstAid+key hack turns the key into IT_Poison
+usewith ToothBrush IT_Brush          # Zone04, 15 on the coffee's rush
+usewith Ground@Zone03 IT_Banana      # Zone03, 8: he slips on his way to the coffee
+usewith CoffeeMaker IT_Soil_only     # Zone03, 15
+whenusing CoffeeMaker                # he is in the kitchen: the balcony is free until he comes through the bedroom
+usewith Shezlong IT_Pins             # Zone07, 10
+usewith SunLotion IT_Honey +10       # Zone07, 20: fires at his Shezlong use (DependsOn)
+usewith WateringCan IT_Poison        # Zone07: Plant 20 at his next watering
+hide Bed                             # Zone06: he comes through to the balcony
+await Ground@Zone03 8
+await CoffeeMaker 15
+await ToothBrush 15                  # the rush: ToiletAction = ToothBrush
+await Shezlong 10
+await SunLotion 20
+await Plant 20

@@ -1,0 +1,35 @@
+# Level109 under the PC profile: the viewer rating pays each trick's score
+# plus 3 per angry tick, so these seven tricks' 83 need six ticks — all
+# but the first landing while he is still hot. His lap (~114 s): teeth,
+# bed (a 31 s sleep), alarm, teeth, keys (bedroom) > milk, pig (kitchen,
+# the pig's room), milk, chips, chili > keys, teeth, bed. Everything is
+# armed for one round: the alarm as soon as he leaves the bedroom, the
+# kitchen and the pig after his kitchen round, the teeth's tabasco during
+# his sleep (the teeth are primed only then), the bed's pins once he is
+# up. The round pays alarm > teeth > the slip > the milk > the pig > the
+# chips the dog eats at the chili > the bed — six ticks, the gaps bridged
+# by his angries (the decay pauses through them).
+take PinsBoard IT_Pins               # Zone01
+take PigKeys IT_Pigkey               # Zone06, during the sleep: the hook holds them only while Primed
+take Cactus IT_Cactus                # Zone07
+usewith AlarmClock IT_Cactus         # Zone06 once he is out (45-111), 13 (BedAlarmCactus, AngryWithoutAnimations)
+take ChemicalSet IT_Nitro            # Zone02
+take SpicyChips IT_Chips             # Zone02, next to the dog
+take RubbishBinBanana2 IT_Banana     # Zone03, after his kitchen round (~100)
+take Fridge IT_Tabasco               # Zone03
+usewith Ground@Zone03 IT_Banana      # Zone03, 7: on his way to the milk
+usewith PigMilk IT_Nitro             # Zone03: explodes at the pig, paid through DependsOn = PigMilk (20)
+usewith CornChips IT_Chips           # Zone03: fed to the dog at Chili (the C# pays DependsOn = CornChips, 0)
+usewith Pig IT_Pigkey                # Zone01 once he has been to the pig, 20: the pig gets out (NoticeWhenWalkNearby)
+whenusing Bed                        # he sleeps (31 s): the teeth are primed
+usewith Teeth IT_Tabasco             # Zone06 while primed (his sleep), 15 at the RottweilerUseTogglesPrime use (SpitFire)
+whenusing PigKeys                    # he leaves the bedroom for the kitchen: the bed is empty
+usewith Bed IT_Pins                  # Zone06 with the bed empty (IsRottweilerSleeping refuses Woody), 8
+park Zone04
+await AlarmClock 13
+await Teeth 15
+await Ground@Zone03 7
+await PigMilk 20
+await Pig 20
+await CornChips 0
+await Bed 8

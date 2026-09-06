@@ -1,0 +1,35 @@
+# Level104 under the PC profile: the PC's viewer rating pays each trick's
+# score plus 3 per angry tick (docs/PC_VS_MOBILE.md), so the 82 of these
+# seven tricks needs six ticks — every trick after the first landing while
+# he is still hot (23.6 s of decay from the last angry, the angries
+# themselves not counting). His lap (~75 s): Pie > Microwave (20 s) >
+# Cream > Pie (the eat, 18 s) > Deodorant > AfterShave > Sink x2. The
+# microwave's egg and the slip behind it cannot chain into the cream — it
+# pays at the END of the pie's eat, 40 s later — so the chain starts at
+# the cream and closes at the microwave a lap later: cream at the pie's
+# eat > the picture on the hall transit > the aftershave and the deodorant
+# at the sink > the toilet walk-by > (his next kitchen visit) the microwave
+# > the soap slip. The cream is armed in his first bathroom stretch, the
+# hall and the bathroom while he is in the kitchen, the microwave and the
+# slip while he is at the sink.
+take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer
+take ToiletPaper IT_Wcpaper
+take SoapDish IT_Soap             # the one soap
+take Drawer IT_Superglue          # Zone01: Superglue + Marker
+take Fridge IT_Egg                # Zone03 once he has left for the bathroom (~35)
+usewith WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at [2], pays at the pie's eat, 15
+whenusing Microwave               # he is in the kitchen (~84-124): the hall and the bathroom are free
+usewith MumPicture IT_Marker      # Zone01, crossed on every hall transit, score 8
+usewith Deodrant IT_Hairrestorer  # on the shelf (Primed); pays at SinkDeodrant [7], score 15
+usewith AfterShave IT_Superglue   # on the shelf (Primed); pays at SinkAftershave [6], score 20
+usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by (0.1), score 8
+whenusing Deodrant                # (~124) he is in the bathroom: the kitchen is free until ~175
+usewith Microwave IT_Egg          # routine use [1] (ReuseAfterFix), score 8
+usewith Ground@Zone03 IT_Soap     # CauseSlip between microwave and pie, score 8
+await WhippedCream 15
+await MumPicture 8
+await AfterShave 20
+await Deodrant 15
+await Toilet 8
+await Microwave 8
+await Ground@Zone03 8

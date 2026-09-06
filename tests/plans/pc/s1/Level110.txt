@@ -1,0 +1,33 @@
+# Level110 under the PC profile: the viewer rating pays each trick's score
+# plus 3 per angry tick, so these six tricks' 85 need five ticks — every
+# trick but the first landing while he is still hot. His lap (~51 s) is
+# Meat (kitchen) > Beer/BBQ/Spray (the balcony, through the bedroom) >
+# Chair > Wine (the dining room), the banana slip on his walk back to the
+# meat. The bedroom is reached from the dining room or the hall, and the
+# hall is in view of the dining room, so Woody waits in the bed: he comes
+# out when the neighbour sits down, primes the extinguisher, fuels the
+# barbecue, doctors the spray and is back in the bed before he crosses to
+# the balcony (~74); once he is out there the dining room and the kitchen
+# are armed. The lap pays the barbecue fire, the spray, the extinguisher
+# he fetches, the chair, the wine and the slip — five ticks.
+take PinsBoard IT_Pins               # Zone01
+take FirstAid IT_Fuel                # Zone04: fuel + growth liquid together
+take RubbishBinBanana2 IT_Banana     # Zone03
+take Fridge IT_Vinegar               # Zone03
+hide! Bed                            # Zone06 while he is on the balcony (~31-39) — the gate never sees this room clear, he crosses it every ~25 s; he passes to the dining room at ~42-51
+whenusing SteakChair                 # (~51) he sits: the bedroom is free until ~74, the balcony until ~82
+use! FireExtinguisher                # Zone06, bare hand: the BBQ's fixing tool, 15 (RedoAction)
+usewith! Beer IT_Fuel                # Zone07: BBQ.Tricked via SetTrickedOnItem, 20 at his next BBQ
+usewith! CarnivorPlantSpray IT_Growthliquid   # Zone07, 15 (RemoveFromRoutineAfterUseTricked)
+hide! Bed                            # back before he crosses (~74); the fire at ~84, the extinguisher fetch through the bedroom
+whenusing Beer                       # (~82) he is on the balcony: the dining room is free until ~101, the kitchen until ~112
+usewith! SteakChair IT_Pins          # Zone02, 10
+usewith! SteakWine IT_Vinegar        # Zone02, 15
+usewith! Ground@Zone03 IT_Banana     # Zone03, 10: the slip on his walk to the meat
+park Zone04
+await BBQ 20                         # the fire; then the extinguisher fetch
+await CarnivorPlantSpray 15
+await FireExtinguisher 15            # the fetched tool's own trick (RedoAction)
+await SteakChair 10
+await SteakWine 15
+await Ground@Zone03 10
