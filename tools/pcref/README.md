@@ -34,3 +34,8 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 - `lives2.py <video> <start> <dur> <x0> <y0> <w> <h> <prefix> [T] [white|red]`: the
   PC NFH2 lives counter (top right) binarized and clustered per second — a
   cluster change is a lost life; used to find the catches in a let's play.
+- `thermo.py [video]`: the Season 1 thermometer (the neighbour's anger meter,
+  bottom-left): the mercury column at 10 Hz per episode, its full holds and
+  full-to-empty durations. The mercury drains at 8.3–12.9 %/s per level (E01
+  ≈ 6.1) — a drawing rate the PC overlays carry as PCThermometerDrain; the
+  tick meter behind it is the data's 4.23 %/s (docs/PC_FIDELITY.md §7).

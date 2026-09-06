@@ -363,13 +363,32 @@ times within half a second) and all 28 PC plans at 100 — under the
 cs:614-619 skip on both profiles; the profile's earlier exception to it
 had rated Level106 at 82 in the same seeded sweep (the pudding [6]
 played, the towel [8] past the six minutes). The PC
-thermometer (the S1 HUD's bottom-left tube, the mercury column
-measured per half-second and calibrated on the tube's 93 px, top 592
-to the bulb's neck 685 in the 720p frame) fills gradually after a trick
-— over ~10 s while his angry plays — and decays at 4.6 %/s in E14's
-clean stretch (370-378.5 s: 94 → 55 %), 4.6 in E02 (109-121 s), 3.7 in
-E01 (80-86 s): the mobile's 4.23 %/s within the reading. Nothing to
-apply; the PC run's 24 s gaps tick the same way the port's do.
+thermometer (the S1 HUD's bottom-left tube; tools/pcref/thermo.py reads
+the mercury column at 10 Hz, 93 px from y 592 to the bulb's neck, a full
+tube reading 89 on that scale) is two things at once. Its mercury jumps
+to full on every trick (Rottweiler.cs:611 on mobile — no gradual fill),
+stays full while the angry plays (7.0-7.5 s on E03/E06-E10, 8.1-8.9 s
+on E01/E02/E11-E14 for the plain angries, 11-24 s for the rushes; the
+port's plain hard angry holds 10.5 s, its easy one 2.3-3.8 s) and then
+drains to empty in a time that is a constant of the level: 7.8 s on
+E06, 8.9-9.6 s on E03/E07-E10, 10.1-10.3 s on E04/E05, 11.3-12.2 s on
+E02/E11-E14, ~16 s on E01 — 8.3-12.9 %/s, two to three times the mobile
+data's 4.23 %/s. But the tick counter beside it does not follow the
+mercury: the HUD digit read one second before and five after every
+trick of Badinfos' fourteen runs ticks for every gap whose decay (the
+gap less the previous hold) is 18 s or shorter — E06's 292 (25 s after
+267, hold 7), E11's 279 (17 s of decay), E12's 382 (17), E13's 256 (16)
+— with the tube empty for up to ten seconds, and never for 25 s or
+longer (E08 214, E09 242 and 319, E12 227, E13 212/325/374, E14 294).
+The data's 100/4.23 = 23.6 s sits inside that bracket, so the tick
+meter is the mobile's and the profile keeps it (a sweep with the mercury
+rates as AngryMeterDecay lost ticks on thirteen levels — 88-98 % — and
+113 outright); the mercury's rate is a drawing constant, carried as
+PCThermometerDrain in the overlays and used only by the HUD: under the
+profile the drawn meter is full whenever the tick meter is, and drains
+at the level's rate while the tick meter behind it still decays at
+4.23. (An earlier reading of 3.7-4.6 %/s here came from an uncalibrated
+crop and is withdrawn.)
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)

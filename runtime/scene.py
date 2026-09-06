@@ -2234,6 +2234,9 @@ class Level:
                 'portal_run_up': _anim_name(pd.get('PortalRunUpAnimation')),
                 'portal_run_down': _anim_name(pd.get('PortalRunDownAnimation')),
                 'angry_decay': pd.get('AngryMeterDecay') or 0.0,
+                # the PC HUD's thermometer drain, %/s (a drawing rate the PC
+                # overlays carry; the tick meter above is the data's)
+                'thermo_drain': pd.get('PCThermometerDrain') or 0.0,
                 'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')
                     if pd.get('NoticeWhenNearTrickedDistance') is not None
                     else 0.03,

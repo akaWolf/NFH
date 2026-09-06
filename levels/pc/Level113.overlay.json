@@ -1,6 +1,23 @@
 {
- "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth.",
+ "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth. PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 11.4 s in Badinfos' E13 — PCThermometerDrain 8.8 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
  "patches": [
-  {"object": "ElectricTrap", "component": "Transform", "set": {"localPosition": [2.06777024269104, -4.324999809265137, -0.219]}}
+  {
+   "object": "ElectricTrap",
+   "component": "Transform",
+   "set": {
+    "localPosition": [
+     2.06777024269104,
+     -4.324999809265137,
+     -0.219
+    ]
+   }
+  },
+  {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCThermometerDrain": 8.8
+   }
+  }
  ]
 }

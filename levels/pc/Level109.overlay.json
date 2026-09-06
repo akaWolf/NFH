@@ -1,5 +1,5 @@
 {
- "source": "PC This Little Piggy: the viewer rating's live increments in Badinfos' run (docs/PC_VS_MOBILE.md): 10, 20, 15, 7, 8, 13, 15 for the seven tricks against the mobile data's alarm 13, pig 20, slip 7, milk 20, chips 0 (the Chili's 15 is routed through DependsOn = CornChips, whose TrickScore is 0), teeth 15, bed 8 \u2014 the PC pays the milk 10 and the chips 15.",
+ "source": "PC This Little Piggy: the viewer rating's live increments in Badinfos' run (docs/PC_VS_MOBILE.md): 10, 20, 15, 7, 8, 13, 15 for the seven tricks against the mobile data's alarm 13, pig 20, slip 7, milk 20, chips 0 (the Chili's 15 is routed through DependsOn = CornChips, whose TrickScore is 0), teeth 15, bed 8 — the PC pays the milk 10 and the chips 15. PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 9.5 s in Badinfos' E09 — PCThermometerDrain 10.5 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
  "patches": [
   {
    "object": "PigMilk",
@@ -13,6 +13,13 @@
    "component": "TrickItem",
    "set": {
     "TrickScore": 15
+   }
+  },
+  {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCThermometerDrain": 10.5
    }
   }
  ]

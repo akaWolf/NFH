@@ -1,7 +1,32 @@
 {
- "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter.",
+ "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 12.0 s in Badinfos' E14 — PCThermometerDrain 8.3 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
  "patches": [
-  {"object": "Drawer", "component": "SearchItem", "zone": "Zone01",
-   "append": {"InventoryItems": [{"Type": "IT_Whistle", "UseCount": 0, "NameString": "Dog whistle", "DescriptionString": "Only the dog hears it. The neighbour hears the dog.", "PrimedNameString": "", "PrimedDescriptionString": "", "WrongZoneTooltip": "", "LongDescription": false, "NFH2Inventory": false}]}}
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "append": {
+    "InventoryItems": [
+     {
+      "Type": "IT_Whistle",
+      "UseCount": 0,
+      "NameString": "Dog whistle",
+      "DescriptionString": "Only the dog hears it. The neighbour hears the dog.",
+      "PrimedNameString": "",
+      "PrimedDescriptionString": "",
+      "WrongZoneTooltip": "",
+      "LongDescription": false,
+      "NFH2Inventory": false
+     }
+    ]
+   }
+  },
+  {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCThermometerDrain": 8.3
+   }
+  }
  ]
 }

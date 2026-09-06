@@ -421,6 +421,7 @@ class Pawn:
         # Rottweiler's anger meter (fields on the pawn, Rottweiler.cs:50-56)
         self.angry_meter = 0.0
         self.angry_decay = spec.get('angry_decay') or 0.0
+        self.thermo_drain = spec.get('thermo_drain') or 0.0   # HUD only
         self.angry_max = spec.get('angry_max') or 100.0
         self.can_decrease_angry = True
         self.angry_count_ticks = 0

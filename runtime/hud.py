@@ -197,6 +197,7 @@ class Hud:
         self._hover_zone = None
         # DrawAngryMeter's 0.1 s repaint throttle (HUD.cs:1242-1247)
         self._angry_rects = None          # AngryMeterFullRect + UV rect
+        self._thermo = 0.0                # the PC profile's drawn meter
         self._last_angry_update = 0.0     # LastUpdateAngryMeterTime
         self.desc_string = ''
         self.desc_pos = (0.0, 0.0)
@@ -1012,9 +1013,21 @@ class Hud:
             # between updates
             tex, tw, th = entry[0], entry[1], entry[2]
             now = self.world.time
+            shown = rott.angry_meter
+            if pcprofile.is_pc() and rott.thermo_drain > 0.0:
+                # the PC thermometer: full at every trick, full while the
+                # angry plays (the meter's own hold), then the mercury
+                # drains at the level's drawing rate (PCThermometerDrain,
+                # 8-13 %/s measured in tools/pcref/thermo.py) while the
+                # tick meter behind it still decays at the data's 4.23
+                if rott.angry_meter >= rott.angry_max - 1e-6:
+                    self._thermo = 100.0
+                else:
+                    self._thermo = max(0.0, self._thermo - rott.thermo_drain * dt)
+                shown = self._thermo
             if self._angry_rects is None or \
                     now - self._last_angry_update > 0.1:
-                pct = max(0.0, min(100.0, rott.angry_meter)) / 100.0
+                pct = max(0.0, min(100.0, shown)) / 100.0
                 self._angry_rects = (
                     (int(full[0]), int(full[1] + full[3] * (1.0 - pct)),
                      int(full[2]), int(full[3] * pct)),

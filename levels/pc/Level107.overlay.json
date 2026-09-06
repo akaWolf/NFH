@@ -1,0 +1,12 @@
+{
+ "source": "PC thermometer (tools/pcref/thermo.py): the mercury jumps to full on every trick, holds while the angry plays and drains to empty in 9.0 s in Badinfos' E07 — PCThermometerDrain 11.1 %/s, the HUD's drawing rate only; the tick meter keeps the data's AngryMeterDecay 4.23 (docs/PC_FIDELITY.md §7).",
+ "patches": [
+  {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCThermometerDrain": 11.1
+   }
+  }
+ ]
+}
