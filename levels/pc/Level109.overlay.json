@@ -1,0 +1,19 @@
+{
+ "source": "PC This Little Piggy: the viewer rating's live increments in Badinfos' run (docs/PC_VS_MOBILE.md): 10, 20, 15, 7, 8, 13, 15 for the seven tricks against the mobile data's alarm 13, pig 20, slip 7, milk 20, chips 0 (the Chili's 15 is routed through DependsOn = CornChips, whose TrickScore is 0), teeth 15, bed 8 \u2014 the PC pays the milk 10 and the chips 15.",
+ "patches": [
+  {
+   "object": "PigMilk",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 10
+   }
+  },
+  {
+   "object": "CornChips",
+   "component": "TrickItem",
+   "set": {
+    "TrickScore": 15
+   }
+  }
+ ]
+}

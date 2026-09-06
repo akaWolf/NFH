@@ -7,11 +7,9 @@
 # the arming follows him round the lap and his next lap pays them all:
 # the tank, the book at his yoga, the trampoline, the bicycle, the skates
 # on his walk to the mixer, the marbles, the expander, the trap, the
-# weights, the rope — the two basement walk-bys only on the lap after: a
-# slip or a shock on a hot meter plays the hard angry, after which his
-# routine skips the item it was walking to (the expander, the weights).
-# The long walks (yoga > trampoline, skates > expander) cool him; five
-# ticks on the lap, the trap's on the next — the six the 82 needs.
+# weights, the rope. The two long stretches (the yoga, the mixer) cool him
+# twice; the walk-bys send him for the fixing tool and, under the profile,
+# back to the item he was walking to — the PC run chains eight of ten.
 take Drawer IT_Marbles                # Z01
 take SportsBag IT_Skate               # Z01: IT_Skate + IT_Rubberrope
 take BasementSpring IT_Spring         # Z09
@@ -25,13 +23,11 @@ usewith YogaBook IT_Knotbook          # Z08: pays as the YogaBook at his Yoga [2
 usewith Trampoline IT_Spring          # Z06, 8 at his [4]
 usewith Bicycle IT_Tongs              # Z02, 8 at his [5]
 usewith GroundSkates IT_Skate         # Z03 x=4.12, on his Z02 -> Mixer walk (14 at the Shout)
+usewith GroundMarbles@Zone01 IT_Marbles   # x=3.30, on his Z03 -> Z09 walk, 7: the hot slip sends him for the fixing tool, and the profile brings him back to the expander (the PC neighbour's way)
 usewith ChestExpander IT_Rubberrope   # Z09, 8 at his [8], once he has left the basement
+usewith ElectricTrap IT_Cable         # Z09 x=2.06, crossed on the [8] -> [9] walk, 7 — likewise back to the weights after the shock
 usewith Weights IT_Metalsaw           # Z09, 8 at his [9]
 use Rope                              # Z01, bare hand: the knotted rope, 7 at his [10], once he has left it
-park Zone04
-whenusing Weights                     # his next basement visit: the walk-bys go down behind him, for the lap after
-usewith GroundMarbles@Zone01 IT_Marbles   # x=3.30, on his Z03 -> Z09 walk — on a cold meter: a hot slip plays the hard angry and his routine skips the expander
-usewith ElectricTrap IT_Cable         # Z09 x=2.06, crossed on the [8] -> [9] walk, 7 — the same lap as the marbles, after the expander has paid: a hot shock skips the weights
 park Zone04
 await FishTank 8
 await YogaBook 7

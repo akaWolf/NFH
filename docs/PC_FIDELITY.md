@@ -239,7 +239,14 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   docs/PC_VS_MOBILE.md; the HUD statue lights with the last coin, not at
   the overflow; the Season 2 HUD shows the PC's clock — the seconds
   played, counting up, in the TimeRect the mobile data carries but its
-  DrawTime never uses on NFH2; the Season 2 bonus for ANY overflow, three lives on Season 2
+  DrawTime never uses on NFH2; after an urgent action the neighbour goes
+  back to the routine action it interrupted even when that item is
+  already tricked (ActionManager.cs:614-619 skips it on mobile — the PC
+  neighbour walks on to the expander after the marbles, to the shotgun
+  after the trap: E12 chains eight of ten, E14 seven of nine), and a
+  nailed record player does not make him skip his next action
+  (ActionManager.cs:200-204, NextActionAfterGramaphoneTricked — the
+  mobile's way past Level114's shotgun); the Season 2 bonus for ANY overflow, three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
   level entrance, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the
@@ -257,9 +264,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 Every level pays every trick. Under the PC's own scores (the COLLAPSE!
 board on Season 2, the viewer rating's 3 a tick on Season 1 — §2.4,
-docs/PC_VS_MOBILE.md) the fourteen Season 2 levels and ten of the
-fourteen Season 1 levels rate 100; 104 and 112 stop at 97, 109 at 98,
-114 at 88 — the mobile routine's ceilings, below. On Season 2 the lever
+docs/PC_VS_MOBILE.md) the fourteen Season 2 levels and thirteen of the
+fourteen Season 1 levels rate 100 (114 below). On Season 2 the lever
 on the levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
@@ -295,17 +301,17 @@ margin, so her room is entered by rushes timed to those windows.
 | 101 | 4/4 | 100 (3 ticks) | 201 | 4/4 | 100 |
 | 102 | 6/6 | 100 (7) | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
 | 103 | 6/6 | 100 (5) | 203 | 5/5 | 100 |
-| 104 | 7/7 | 97 (5 of the 6 needed: the microwave's egg and the cream at the pie's end cannot chain) | 204 | 6/6 | 100 |
+| 104 | 7/7 | 100 (6: the PC lap order — the microwave after the pie — and no second use after the egg, levels/pc/Level104.overlay.json) | 204 | 6/6 | 100 |
 | 105 | 8/8 | 100 (7) | 205 | 5/5 | 100 (the PC amounts: tennis, skis, chef, rockets on one lap) |
 | 106 | 9/9 | 100 (8: the whole set on [2]-[8] of one lap, Woody in the hall's wardrobe between the raids) | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
 | 107 | 7/7 | 100 (6: armed behind him, the lap pays all seven) | 207 | 7/7 | 100 |
 | 108 | 6/6 | 100 (5: the balcony raid first, the kitchen and the balcony armed behind him) | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |
-| 109 | 7/7 | 98 (5 of 6: the pig-to-chili stretch of his lap) | 209 | 7/7 | 100 |
+| 109 | 7/7 | 100 (5: the PC's scores — the milk 10, the chips 15 — read off the live rating, levels/pc/Level109.overlay.json) | 209 | 7/7 | 100 |
 | 110 | 6/6 | 100 (5: the bed hide, the balcony and the bedroom rushed as he sits) | 210 | 8/8 | 100 (the PC amounts; basket triple, shop and elephant on his lap 2) |
 | 111 | 8/8 | 100 (5) | 211 | 8/8 | 100 (the rod) |
-| 112 | 10/10 | 97 (5 of 6: the yoga and the mixer cool him; the basement walk-bys skip his next item when hot) | 212 | 9/9 | 100 |
+| 112 | 10/10 | 100 (8, the PC run's eight: the walk-bys send him for the tool and back to the expander and the weights) | 212 | 9/9 | 100 |
 | 113 | 8/8 | 100 (4, the electric trap's depth) | 213 | 9/9 | 100 |
-| 114 | 9/9 | 88 (3 of 7: the whistle, the walk-bys and a 175 s lap in a 10-minute level — see below) | 214 | 6/6 | 100 (no wait before the pistol) |
+| 114 | 9/9 | 97 (6 of 7: gramophone > marbles > trap > shotgun chain, then ~26 s of decay on his walk from the basement up to the medals — the PC's shotgun and hat stand a second apart) | 214 | 6/6 | 100 (no wait before the pistol) |
 
 Season 1 under the PC rule is a chaining problem: the tricks' scores
 sum to 76-91, so four to eight of a level's payments must land while he
@@ -313,20 +319,36 @@ is still hot (23.6 s of decay from the last angry, the angries themselves
 not counting). The plans in tests/plans/pc/s1 arm everything for ONE lap,
 each item right after his previous visit, timed by `whenusing`/`whenzone`
 landmarks and rushes where the gate's escape margin would wait a window
-out (108, 110, 106). Two things of the mobile original set the ceilings:
-the routines' long single actions (104's pie eat and microwave, 109's
-milk-chips-chili stretch, 112's yoga and mixer) that open gaps over the
-window, and Item.RottweilerUse's FixingItem head (Item.cs:847-852): a
-walk-by trick — a slip, the electric trap, the marbles — on a hot meter
-plays the hard angry, and he runs for the fixing tool past the item he
-was walking to, which then never pays that lap (112's expander after the
-marbles, its weights after the trap; 114's shotgun after either). The PC
-neighbour has no such fetch — Badinfos chains 6 in E04, 6 in E09, 7 in
-E14 — so 104, 109, 112 and 114 keep their best mobile-routine plans.
-On 114 the dog whistle adds a third constraint: blown on a lap where the
-shotgun is armed, it puts the shotgun's payment off to the next lap, and
-with a 175 s lap in a 10-minute level the nine payments cannot all be
-timed into one chain; the committed plan pays 9/9 with three ticks.
+out (108, 110, 106). Where the mobile routine itself stood in the way, the profile copies
+the PC's (levels/pc, each overlay with its source): 104's lap is put in
+the PC order (the microwave after the pie, `actions_by_index`) and the
+oven is not used a second time after the egg (ReuseAfterFix off), so the
+cream, the egg, the slip and the bathroom chain as on E04; 109 pays the
+PC's scores (the milk 10, the chips 15 — the mobile routes the chili's
+15 through a CornChips whose score is 0) and needs four ticks, not six.
+Two rules of the mobile ActionManager were the last obstacles, both off
+under the profile: after an urgent action it skips the interrupted
+routine action when that item is already tricked (ActionManager.cs:
+614-619 — the marbles' surprise cost the expander, the trap's the
+weights), and a nailed record player makes it skip the next action
+(cs:200-204 — Level114's shotgun); the PC neighbour, on the videos, walks
+on to both (E12 chains eight of ten, E14 seven of nine). A port fault
+came out on the way and is fixed for both profiles: the roller-skater
+scene (Level112's skates) ended without closing its SurpriseNear urgent,
+so the next surprise inherited its OriginalAction — the mixer — and sent
+him back to it, past the expander (`abandon_urgent` at the scene's end;
+the mobile 112 run is unchanged, its skates never fire). Level114 is the
+one left at 97: its chain runs gramophone > marbles > trap > shotgun,
+but the cork's angry and the walk from the basement up through the hall
+to the bedroom put the medals ~26 s of decay after the shotgun — on the
+PC map the shotgun and the hat are a second apart. The bedroom door
+stands beside the Zone02 door (in his sight while he reads) and the
+routine's item reads `Shotgun` from the hall on (so `whenzone Zone09`,
+not `whenusing`, marks his basement visit); the plan arms the bedroom
+while he is down there and waits out his hat, medals and horn in the
+bed. The PC thermometer's decay, measured on the video, is not clearly
+slower than the mobile's 4.23 %/s (2.5-5 %/s in three stretches, the
+rise after a trick animated over ~10 s), so no decay overlay.
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)

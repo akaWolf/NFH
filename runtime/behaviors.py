@@ -599,6 +599,7 @@ class RollerSkaterBehavior(Behavior):
             rott.movement_paused = False
             rott.sprite.hidden = False
         if rt is not None:
+            rt.abandon_urgent()                       # the skates' SurpriseNear is over
             rt.frozen = False
             rt._pending = 'first'                     # Unfreeze -> StartNextAction
             rt.continue_alarm()                       # Rottweiler.ContinueAlarm

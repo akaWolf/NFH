@@ -61,6 +61,15 @@ def apply_overlay(level):
                 for a in d.get('Animations') or []:
                     if a.get('Name') == op['anim']:
                         a.update(op.get('anim_set') or {}); n += 1
+            if 'actions_by_index' in op:
+                # rebuild an ActionManager's list from the mobile list's
+                # indices (duplicates allowed): the PC order of a lap where
+                # the same item has several distinct actions (Level104's
+                # two ApplePie entries — the fridge and the eat)
+                acts = d.get('Actions') or []
+                new = [acts[i] for i in op['actions_by_index'] if 0 <= i < len(acts)]
+                if new:
+                    d['Actions'] = new; n += 1
             if 'actions' in op:
                 # rebuild an ActionManager's list from item names, the
                 # entries reused (duplicates allowed): the PC order of a lap

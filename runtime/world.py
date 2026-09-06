@@ -17,6 +17,7 @@ _RAT_ENTRY_208 = {'type': 'IT2_Rat', 'use_count': 0, 'name': 'MOUSE_NAME',
 
 
 import struct as _struct
+import os, sys
 import pcprofile
 _f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
 
@@ -2484,7 +2485,12 @@ class Routine:
                     else None
                 if p2 is not None and p2.next_action_after_gramaphone:
                     p2.next_action_after_gramaphone = False
-                    self.index = (self.index + 1) % len(self.actions)
+                    if not pcprofile.is_pc():
+                        # the mobile's Level114 neighbour skips the shotgun
+                        # after the nailed record player; the PC's goes on
+                        # to it (Badinfos: gramophone > marbles > trap >
+                        # shotgun chained, docs/PC_FIDELITY.md §7)
+                        self.index = (self.index + 1) % len(self.actions)
             if w is not None and prev is not None:
                 # the hide releases (ActionManager.cs:205-212)
                 if prev.hide_during_rott_animation:
@@ -2537,6 +2543,9 @@ class Routine:
                 it = self.item
                 a = self.action
         if it is not None and not it.active and not it.started:
+            if os.environ.get('NFH_ROUTINE_LOG'):
+                print('routine %s t=%.1f inactive item skipped: %s index=%s' % (
+                    self.role, getattr(self.pawn.world, 'time', 0.0), it.name, self.index), file=sys.stderr)
             # StartAction on an item whose object has never been active:
             # MoveToAction's Item.LoadRottweilerAnimations (ActionManager.
             # cs:119-127, Item.cs:785-811) dereferences the item's
@@ -3263,6 +3272,21 @@ class Routine:
                 return dep
         return None
 
+    def abandon_urgent(self):
+        """a running urgent template dropped by a script's restart of the
+        routine (ActionManager.StartAction stops the Active urgent for the
+        routine action it starts, cs:157-160; the SurpriseNear the skates
+        ride began never reaches its own StopUrgentAction): the urgent
+        fields clear so the next surprise stashes its own OriginalAction
+        — without this the marbles' surprise after the skates inherited
+        the mixer and sent him back to it, past the expander (Level112)"""
+        self._urgent_action = None
+        self.urgent_item = None
+        self._urgent_handler = None
+        self._original_action = None
+        self._urgent_stack = []
+        self.pawn.in_urgent = False
+
     def unfreeze(self, start_next=True, advance=False, idx_after=0):
         """ActionManager.Unfreeze (ActionManager.cs:797-812): drop the
         freeze, re-anchor at 0 when the caller says ...AfterForceAdvance
@@ -3746,6 +3770,12 @@ class Routine:
             self._stash_interrupted_urgent(name)
         if self._urgent_action is None:
             self._original_action = self.action   # cs:715-718
+        if os.environ.get('NFH_ROUTINE_LOG'):
+            oa = self._original_action or {}
+            oi = self.level.items.get(oa.get('item')) if oa.get('item') is not None else None
+            print('routine %s t=%.1f urgent start kind=%s item=%s index=%s original=%s' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), kind, getattr(item, 'name', None),
+                self.index, getattr(oi, 'name', None)), file=sys.stderr)
         self.urgent_item = item
         self._urgent_action = {
             'kind': kind, 'name': name, 'postpone_alarm': bool(postpone_alarm),
@@ -4083,6 +4113,11 @@ class Routine:
         # the branches read ActiveAction.OriginalAction.Item (cs:607-647):
         # the interrupted action's, wherever the routine's index went
         orig, self._original_action = self._original_action, None
+        if os.environ.get('NFH_ROUTINE_LOG'):
+            oi = self.level.items.get(orig.get('item')) if orig and orig.get('item') is not None else None
+            print('routine %s t=%.1f urgent end kind=%s finished=%s index=%s original=%s got_tricked=%s go_next=%s marbles_next=%s' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), kind, getattr(finished, 'name', None), self.index,
+                getattr(oi, 'name', None), getattr(oi, 'got_tricked', None), getattr(oi, 'go_next_action', None), self.marbles_next), file=sys.stderr)
         it = self.level.items.get(orig['item']) \
             if orig is not None and orig.get('item') else self.item
         linked = self.level.items.get(it.linked_item_trick) \
@@ -4093,9 +4128,15 @@ class Routine:
             # a wiped drawing skips its own redo
             self._pending = 'skip'
         elif it is not None and it.got_tricked and not self.marbles_next and \
-                it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
+                it.name not in ('WateringCan', 'ValveHot', 'ValveMain') \
+                and not pcprofile.is_pc():
             # the skip goes straight to StartAction, without the
-            # StartNextAction extras (ActionManager.cs:614-619)
+            # StartNextAction extras (ActionManager.cs:614-619). The PC
+            # neighbour has no such skip: after the tool run a walk-by
+            # trick sends him on (the marbles, the trap), he goes back to
+            # the item he was walking to — Badinfos chains marbles, trap
+            # and shotgun on E14, marbles, expander, trap and weights on
+            # E12 (docs/PC_FIDELITY.md §7); the profile resumes it
             self._pending = 'skip'
         elif it is not None and it.go_next_action and not self.marbles_next:
             # Item.GoNextAction (ActionManager.cs:620-626)
@@ -4382,6 +4423,11 @@ class Routine:
             self._stash_interrupted_urgent('surprise_near')
         if self._urgent_action is None:
             self._original_action = self.action   # cs:715-718
+        if os.environ.get('NFH_ROUTINE_LOG'):
+            nm = lambda e: self.level.items.get(e['item']).name if e and e.get('item') is not None and self.level.items.get(e['item']) else None
+            print('routine %s t=%.1f surprise_near item=%s index=%s action=%s active=%s override=%s original=%s running=%s' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), it.name, self.index, nm(self.action), nm(self._active),
+                nm(self._override), nm(self._original_action), (self._urgent_action or {}).get('kind')), file=sys.stderr)
         self.urgent_item = it
         self._urgent_handler = None
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first

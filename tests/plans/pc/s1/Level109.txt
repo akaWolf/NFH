@@ -29,7 +29,7 @@ park Zone04
 await AlarmClock 13
 await Teeth 15
 await Ground@Zone03 7
-await PigMilk 20
+await PigMilk 10                     # the PC pays the milk 10 (levels/pc/Level109.overlay.json)
 await Pig 20
-await CornChips 0
+await CornChips 15                   # and the chips 15
 await Bed 8
