@@ -347,13 +347,13 @@ bedroom door stands beside the Zone02 door (in his sight while he
 reads), so the bedroom and the balcony are armed while he is down there
 (`whenzone Zone09`: his routine's item reads `Shotgun` from the hall on)
 and Woody waits out his slip, hat, medals and horn in the bed. The PC
-thermometer (the S1 HUD's bottom-left tube, cropped per
-half-second) fills gradually after a trick — ~1.5 %/s over ~10 s while
-his angry plays — and then decays at ~3.4-3.7 %/s in E14's clean
-stretches (370-378 s: 82 → 53; 407-410: 99 → 88), 2.5-3.4 in E01/E02:
-a ~28 s window against the mobile's 23.6 s (4.23 %/s). Not applied —
-the tube's pixel scale is not the meter's and the stretches disagree —
-but it is why the PC run's 24-27 s gaps still tick.
+thermometer (the S1 HUD's bottom-left tube, the mercury column
+measured per half-second and calibrated on the tube's 93 px, top 592
+to the bulb's neck 685 in the 720p frame) fills gradually after a trick
+— over ~10 s while his angry plays — and decays at 4.6 %/s in E14's
+clean stretch (370-378.5 s: 94 → 55 %), 4.6 in E02 (109-121 s), 3.7 in
+E01 (80-86 s): the mobile's 4.23 %/s within the reading. Nothing to
+apply; the PC run's 24 s gaps tick the same way the port's do.
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
 failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)
