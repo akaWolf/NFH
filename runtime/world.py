@@ -2485,12 +2485,16 @@ class Routine:
                     else None
                 if p2 is not None and p2.next_action_after_gramaphone:
                     p2.next_action_after_gramaphone = False
-                    if not pcprofile.is_pc():
-                        # the mobile's Level114 neighbour skips the shotgun
-                        # after the nailed record player; the PC's goes on
-                        # to it (Badinfos: gramophone > marbles > trap >
-                        # shotgun chained, docs/PC_FIDELITY.md §7)
-                        self.index = (self.index + 1) % len(self.actions)
+                    self.index = (self.index + 1) % len(self.actions)
+                    # the skipped entry is the nailed record player's second
+                    # use ([8] of Level114, two after its fix at [6]): the
+                    # original's StartAction(Actions[ActiveActionIndex])
+                    # then starts the SHOTGUN — the port used to keep the
+                    # entry it had already fetched (`a`), played the broken
+                    # player and lost the shotgun instead (Badinfos' E14:
+                    # pipe 301-313 > shotgun 319, no second listen)
+                    it = self.item
+                    a = self.action
             if w is not None and prev is not None:
                 # the hide releases (ActionManager.cs:205-212)
                 if prev.hide_during_rott_animation:

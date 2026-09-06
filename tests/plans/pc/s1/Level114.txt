@@ -3,19 +3,20 @@
 # player and the pipe), re-timed for the PC's viewer rating — each trick's
 # score plus 3 per angry tick, so these nine tricks' 79 need seven ticks,
 # the PC run's very shape (8, 18, 31, 41, 57, 67, 78, 89, 100 with the
-# tick counter 0/0/1/2/3/4/5/6/7): two cold, seven chained — gramophone >
-# marbles > trap > shotgun > hat > medals > horn. The mobile neighbour
-# skips the action after a nailed record player (ActionManager.cs:200-204,
-# NextActionAfterGramaphoneTricked — the shotgun), the profile does not.
-# Everything pays on his second lap: the polish at the cup (cold), the
-# pipe (cold, 36 s on), then the chain. The bedroom door stands beside
-# the Zone02 door, in his sight while he reads, so the bedroom and the
-# balcony are armed while he is down at the shotgun — the marbles and the
-# trap on his way down and the cork make that visit long enough — and
-# Woody waits out his hat, medals and horn in the bed. Before that, as he
-# sits down to his lap-2 pipe: the marbles, the trap and the shotgun
-# (the hall's far end and the basement are out of Zone02's sight), the
-# whistle, the record player and the pipe while the dog keeps him.
+# tick counter 0/0/1/2/3/4/5/6/7): two cold, seven chained. Read off the
+# video frame by frame (220-460 s of E14): polish at the cup (cold),
+# gramophone (cold, 75 s on), pipe, the trap on his way down, the shotgun,
+# the MARBLES on his way up — laid in the hall while he is at the shotgun
+# — then the hat, the medals and the horn. The mobile neighbour skips the
+# action after a nailed record player (ActionManager.cs:200-204), the
+# profile does not. The bedroom door stands beside the Zone02 door, in
+# his sight while he reads, so the bedroom and the balcony are armed
+# while he is down at the shotgun — the trap and the cork make that visit
+# long enough — with the marbles dropped in the hall on the way, and
+# Woody waits out his slip, hat, medals and horn in the bed. Before that,
+# as he sits down to his lap-2 pipe: the trap and the shotgun (the hall's
+# far end and the basement are out of Zone02's sight), the whistle, the
+# record player and the pipe while the dog keeps him.
 take Drawer IT_Marbles                # Z01: IT_Marbles + IT_Shoepolish
 take Drawer IT_Whistle               # the overlay's whistle, PC-only
 take FirstAid IT_Superglue            # Z04
@@ -28,19 +29,19 @@ take MouseHole IT_Rat                 # Z09, once he has come up (~138)
 take BasementDrawer IT_Nail          # Z09: the rusty nail for the record player
 park Zone04                           # he is up for the hat, the medals and the horn (138-160), then the polish and the cup
 whenusing Pipe                        # his lap-2 [3] (~237): he stays in Zone02 until ~300 — the hall's far end and the basement are out of its sight
-usewith! GroundMarbles@Zone01 IT_Marbles   # x=-0.60, on his Z02-door(-1.92) -> Z09-door(2.18) walk, 7 — and his walk down takes 20 s longer for the two angries
-usewith! ElectricTrap IT_Cable        # Z09 x=2.06, on his door(2.21) -> Shotgun(0.66) walk, 7
+usewith! ElectricTrap IT_Cable        # Z09 x=2.06, on his door(2.21) -> Shotgun(0.66) walk, 7: the shock on his way down
 usewith! Shotgun IT_Munition          # Z09: Tricked
 usewith! Shotgun IT_Cork              # the compound: CompoundTricked (TrickItem.cs:509-529), 13 at his lap-2 shotgun
 whistle                              # the pair is primed by his [3] and [4]: the dog barks him out of Zone02 for ~20 s (his [5]-[6])
 usewith! Gramaphone IT_Nail          # Zone02 while he is away; 10 at his [8]
 usewith! Pipe IT_Gunpowder           # the far end of the room; 10 at his [7]
 park! Zone04
-whenzone Zone09                       # he is down in the basement (~330-360: the slip in the hall, the shock at the door and the cork cost him their angries) — his routine reads 'Shotgun' from the hall on, so the zone is the landmark, not the use; the bedroom door, beside the Zone02 door, is out of his sight only now
+whenzone Zone09                       # he is down in the basement (~330-375: the shock at the door and the cork cost him their angries) — his routine reads 'Shotgun' from the hall on, so the zone is the landmark, not the use
+usewith! GroundMarbles@Zone01 IT_Marbles   # x=-0.60 in the hall, on Woody's way to the bedroom — as Badinfos does on E14: the marbles go down while he is at the shotgun and he slips on his way UP (378 s of the video), 17 s after the shotgun: the slip bridges the walk to the bedroom, 7
 usewith! Hat IT_Superglue             # Z06: RottweilerUseTogglesPrime without RequirePriming — [10] primes (TryHatOn), [12] uses (TryHatGlue), 8 at his lap-2 hat
 usewith! MedalBox IT_Rat              # Z06, 8 at his lap-2 medals
 usewith! Horn IT_Balloon              # Z07, 8 at his lap-2 horn
-hide! Bed                             # Z06: he comes up for the hat, the medals and the horn; Woody stays in the bed through the payments
+hide! Bed                             # Z06: he comes up (the slip in the hall), then the hat, the medals and the horn; Woody stays in the bed through the payments
 await Polish 8
 await Pipe 10
 await Gramaphone 10
