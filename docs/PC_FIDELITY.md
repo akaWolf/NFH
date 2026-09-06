@@ -173,3 +173,27 @@ With the first three, every level the mobile machinery blocks reaches 100
 under the profile; the remaining 90s (202/205/208/210) are the runner's
 arming pace against the neighbour's lap, which is the same problem on PC and
 is not a fidelity question.
+
+## 6. PC references on disk
+
+`~/nfh-bench/pcref/` (outside /tmp, survives the nightly reboot; index in
+its README.txt): Badinfos' two full 100 % runs (PC episodes 1-14 and
+On Vacation 1-14, 360p) and TheMusician05's episodes 1-6 / 7-10 (the
+latter 720p). Fetched with `yt-dlp -4`: pcnew's IPv6 route exits through
+BlueVPS (Madrid) and gets YouTube's bot check, the IPv4 route does not —
+no cookies needed.
+
+Reading them: `ffmpeg -ss <s> -t 60 -i x.mp4 -vf "fps=1/2,scale=384:-1,
+tile=5x6" -frames:v 1 t.png` gives a minute per sheet; the PC HUD clock
+(top right, counting down from the episode's 7:00) is the time base, and
+the episode title card marks the start (A Sunny Morning: 5:08 into
+pc_ep7-10_tm05.mp4).
+
+First measurement, A Sunny Morning (PC): hall → kitchen → bathroom →
+bedroom → balcony → down again, a lap of ~50-55 s with a bathroom visit
+every lap (level clock 6:36, ~5:37, ~4:47), the episode 7:00 long. The
+mobile 108 lap is ~77 s (Shezlong visits at 64, 141, 218 s in the port's
+trace) with ONE bathroom visit in the whole level plus the coffee rush.
+This is the kind of number §2.7 needs for every episode before any lap
+is touched: same method, one sheet per minute, the neighbour's room per
+frame.
