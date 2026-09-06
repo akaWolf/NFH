@@ -232,13 +232,23 @@ Every level pays every trick. Rating 100 on 27 of 28. The lever on the
 levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
-Fifi + rake) last. Level210 is the one that does not yield: its shop pays
-one coin per visit (the octopus only after the urchin's coin), so a lap
-holds at most chair+pylon 20, basket+board+pool 50, shop 37, elephant 30
-— about 96 after the decay between his visits; the second shop coin is a
-lap away. Thirteen orderings tried; the PC's 15 s deck-chair sit (against
-the mobile's 55 s, driven by the Mother's progress bar in code) is what
-closes the gap on PC.
+Fifi + rake) last. Level210 is the one that does not yield in the
+runner. Compared with the PC run (Badinfos' E10, the gauge against the
+bubble): the PC player paid the shop +26 (170 s), the elephant +35 (191),
+the chair +11.5 and the pylon +11.2 (238-239), then the dog basket +23,
+the diving board +23 and the drained pool +15 (297-299 — the gauge full),
+the second shop coin capped (342). The mobile shop pays one coin per visit
+as well (the octopus is accepted only after the urchin's coin), so a
+mobile lap holds chair+pylon, the basket triple, the shop and the
+elephant; with the PC amounts (levels/pc/Level210.overlay.json: 24 + 62 +
+28 + 37) that is ~112 after the decay — enough — IF the four land on one
+lap. Sixteen orderings later the runner still cannot thread it: the bat
+and the oil come only in the 86-89 s window (Zone01 from next door, after
+his pass at 73-81 and before the Mother wakes at 85), Olga's bra in her
+shower windows, the chair before his return at ~129, and the arming for
+a lap-3 cluster after each lap-2 visit — each alone works, together the
+harness's dodging breaks one of them. A human does it by eye; the plan
+keeps the standard order (8/8, 90).
 
 | S1 | tricks | rating | S2 | tricks | rating |
 |---|---|---|---|---|---|

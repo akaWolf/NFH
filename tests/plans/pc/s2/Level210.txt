@@ -1,12 +1,15 @@
-# Level210 under the PC profile: the standard plan (all eight coins, 90).
-# The shop pays ONE coin per visit (the octopus is accepted only after the
-# urchin's coin has paid), so the best single lap is the chair with the
-# pylon (20), the basket with its board and the drained pool (50), the
-# shop (37) and the elephant (30): ~96 after the 0.37/s decay between his
-# visits — the second shop coin comes a lap later. Thirteen orderings
-# tried (docs/PC_FIDELITY.md §7); the overflow needs either the PC's
-# shorter deck-chair sit (code-driven, not data) or a second coin in the
-# lap.
+# Level210 under the PC profile: the standard order (all eight coins, 90)
+# with the PC's trick amounts (levels/pc/Level210.overlay.json, off the
+# gauge of Badinfos' run). Compared with that run: the PC player paid shop
+# 26 -> elephant 35 -> chair 11.5 + pylon 11.2 -> basket 23 + board 23 +
+# pool 15 (the gauge full there) -> the second shop coin; the mobile shop
+# pays one coin per visit too, so the same lap holds chair+pylon 24,
+# basket triple 62, shop 28, elephant 37 = 112 after the decay IF they
+# land on one lap. Sixteen orderings tried: the runner cannot thread the
+# lap-1 sources (the bat and the oil need the 86-89 s window, Zone01 from
+# next door, before the Mother wakes at 85 and after his pass at 73-81)
+# together with a lap-2/3 arming — a human does it by eye
+# (docs/PC_FIDELITY.md §7).
 take SeaUrchin IT2_Hedgehog            # Zone02 (KeepFull: repeatable)
 usewith TurbanShop IT2_Hedgehog        # Zone02 (SecondRequiredInventory IT2_Oktopus is the alternative)
 take SeaUrchin IT2_Hedgehog            # a second urchin

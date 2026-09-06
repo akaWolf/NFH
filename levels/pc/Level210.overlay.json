@@ -1,0 +1,11 @@
+{
+ "source": "PC The Enlightenment: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py, the bubble naming his activity): +26 at the shop (170 s), +34 at the elephant (191), +22 at the deck chair (239), +61 at the dog basket with the diving board and the drained pool (299, the gauge full), the second shop coin capped. Scaled to the 100 gauge (the video's full reads 92): shop 28, elephant 37, chair+pylon 24, basket+board 52 (+10 the code's extra coin). The mobile data has 37 / 30 / 10+10 / 20+20+10.",
+ "patches": [
+  {"object": "TurbanShop", "component": "TrickItem", "set": {"AngerAmount": 28}},
+  {"object": "Elephant", "component": "TrickItem", "set": {"AngerAmount": 37}},
+  {"object": "DeckChair", "component": "TrickItem", "set": {"AngerAmount": 14}},
+  {"object": "Pylon", "component": "TrickItem", "set": {"AngerAmount": 10}},
+  {"object": "DogBasket", "component": "TrickItem", "set": {"AngerAmount": 26}},
+  {"object": "DivingBoard", "component": "TrickItem", "set": {"AngerAmount": 26}}
+ ]
+}
