@@ -35,6 +35,12 @@ Plan commands, one per line ('#' comments):
     hide <HideItem>          climb into the bed/wardrobe and stay hidden
                              (the next leg's click brings Woody out)
     wait <seconds>           idle that long (still dodging)
+    whenusing <Item>         park safe until the neighbour's routine is
+                             using the item (a lap landmark)
+    whenzone <ZoneName>      park safe until the neighbour stands in the
+                             zone (his door pass is the landmark)
+    whistle                  PC profile: blow the dog whistle (needs
+                             IT_Whistle held) — every Alerter wakes
     sneak on|off|auto        the Tab toggle by hand; auto (the default)
                              sneaks in/into Alerter zones, runs elsewhere
     manual <text...>         a step the data cannot script — recorded as
@@ -2081,6 +2087,14 @@ class Driver(Recorder):
         ok = self.wait_until(using, 240.0)
         return (True, '') if ok else (False, 'never used %s' % name)
 
+    def leg_whenzone(self, name, *args):
+        """wait until the neighbour stands in the named zone"""
+        def there():
+            p = self.world.pawns.get('Rottweiler')
+            return p is not None and p.zone is not None and p.zone.name == name
+        ok = self.wait_until(there, 240.0)
+        return (True, '') if ok else (False, 'never in %s' % name)
+
     def leg_unlock(self, name, typ=None):
         """the dexterity gate: click with the unlocker held, then hold the
         pick center-ward each tick until DexterityDone passes the take;
@@ -2555,6 +2569,7 @@ class Driver(Recorder):
                   'walk': self.leg_walk,
                   'whistle': self.leg_whistle,
                   'whenusing': self.leg_whenusing,
+                  'whenzone': self.leg_whenzone,
                   'activated': self.leg_activated}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,

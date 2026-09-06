@@ -172,9 +172,9 @@ Art, menus, HUD, tap controls (the port is already mouse-driven), IAP gates
 | PC laps | fidelity | large | high if guessed | yes |
 
 With the first three, every level the mobile machinery blocks reaches 100
-under the profile; the remaining 90s (202/205/208/210) are the runner's
-arming pace against the neighbour's lap, which is the same problem on PC and
-is not a fidelity question.
+under the profile; the levels that then sat at 90 (202/205/208/210) were
+the runner's arming pace against the neighbour's lap — the same problem as
+on PC, not a fidelity question — and each yielded to an arming order (§7).
 
 ## 6. PC references on disk
 
@@ -210,8 +210,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   controller's animation, `actions` to rebuild an ActionManager's list by
   item names (addressed by `owner`). Shipped: Level113 (the electric trap
   lifted to the depth it has in L111/L114, so the click ray reaches it),
-  Level114 (the dog whistle in the hall's chest of drawers), Level205 (the
-  PC trick amounts off the gauge).
+  Level114 (the dog whistle in the hall's chest of drawers), Level205 and
+  Level210 (the PC trick amounts off the gauge).
 - Rules (`world.py`, all behind `pcprofile.is_pc()`): the Season 2 bonus
   for ANY overflow (`GameState.calculate_score`), three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
@@ -220,7 +220,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   first click), `World.blow_whistle()` — the targetless inventory use
   that wakes every alerter (the W key in the viewer, the `whistle` plan
   leg; the icon is the PC's own, cropped from the video).
-- Harness: `whistle` and `whenusing <Item>` legs; `unlock` on a dexterity
+- Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
+  neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
 - Plans: `tests/plans/pc/` holds the nine that differ (113, 114, 202, 205,
   206, 208, 210, 211, 214); the other nineteen run the standard plans under
@@ -228,27 +229,36 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 ### Results under the profile (the final run, 2026-09-06)
 
-Every level pays every trick. Rating 100 on 27 of 28. The lever on the
+Every level pays every trick. Rating 100 on all 28. The lever on the
 levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
-Fifi + rake) last. Level210 is the one that does not yield in the
-runner. Compared with the PC run (Badinfos' E10, the gauge against the
-bubble): the PC player paid the shop +26 (170 s), the elephant +35 (191),
-the chair +11.5 and the pylon +11.2 (238-239), then the dog basket +23,
-the diving board +23 and the drained pool +15 (297-299 — the gauge full),
-the second shop coin capped (342). The mobile shop pays one coin per visit
-as well (the octopus is accepted only after the urchin's coin), so a
-mobile lap holds chair+pylon, the basket triple, the shop and the
-elephant; with the PC amounts (levels/pc/Level210.overlay.json: 24 + 62 +
-28 + 37) that is ~112 after the decay — enough — IF the four land on one
-lap. Sixteen orderings later the runner still cannot thread it: the bat
-and the oil come only in the 86-89 s window (Zone01 from next door, after
-his pass at 73-81 and before the Mother wakes at 85), Olga's bra in her
-shower windows, the chair before his return at ~129, and the arming for
-a lap-3 cluster after each lap-2 visit — each alone works, together the
-harness's dodging breaks one of them. A human does it by eye; the plan
-keeps the standard order (8/8, 90).
+Fifi + rake) last. Level210 was the last to yield (twenty-two orderings).
+Compared with the PC run (Badinfos' E10, the gauge against the bubble):
+the PC player paid the shop +26 (170 s), the elephant +35 (191), the
+chair +11.5 and the pylon +11.2 (238-239), then the dog basket +23, the
+diving board +23 and the drained pool +15 (297-299 — the gauge full), the
+second shop coin capped (342). The mobile shop pays one coin per visit as
+well (the octopus is accepted only after the urchin's coin). With the PC
+amounts (levels/pc/Level210.overlay.json) the plan that works arms
+EVERYTHING on his lap 1 and lets his lap 2 pay three coins in a row:
+the basket with its board and the drained pool (62 at 162-178 s), the
+shop (28 at 214: meter 77), the elephant (37 at 245: 100, the overflow);
+the chair with its pylon pays on his lap-3 chair (290, a second
+overflow), the octopus coin a lap later (three ticks in all, no
+restart). The lap-1 arming is a timetable, not a gate question: Olga's
+bra in her first shower while he sleeps in the chair (5-16 s), the melons
+and the bowl, the net during his basket (the Mother asleep 66-86), then
+Zone01 from 80.5 — `whenzone! Zone02` (his door pass into the shop's
+zone, no dodging meanwhile: the runner's flight from the waking Mother
+went up to Zone03 in two runs out of three) — for the bat, the oil, the
+belt, the valve and the puddle by 97, the board and the basket in the
+Mother's second sleep (101-120, he is at the elephant) by 107, down
+before he comes up (116), the shop, the second urchin and the elephant
+by 126, the chair and pylon once he has left the chair for the Mother's
+call (`whenzone Zone04`, 156) by 165. The Mother sleeps 19 s at a time
+(66-86, 101-120, 164-184, 199-218, ...), shorter than the gate's escape
+margin, so her room is entered by rushes timed to those windows.
 
 | S1 | tricks | rating | S2 | tricks | rating |
 |---|---|---|---|---|---|
@@ -261,11 +271,12 @@ keeps the standard order (8/8, 90).
 | 107 | 7/7 | 100 | 207 | 7/7 | 100 |
 | 108 | 6/6 | 100 | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |
 | 109 | 7/7 | 100 | 209 | 7/7 | 100 |
-| 110 | 6/6 | 100 | 210 | 8/8 | 90 (one shop coin per visit; the lap-2 cluster peaks ~96) |
+| 110 | 6/6 | 100 | 210 | 8/8 | 100 (the PC amounts; basket triple, shop and elephant on his lap 2) |
 | 111 | 8/8 | 100 | 211 | 8/8 | 100 (the rod) |
 | 112 | 10/10 | 100 | 212 | 9/9 | 100 |
 | 113 | 8/8 | 100 (the electric trap's depth) | 213 | 9/9 | 100 |
 | 114 | 9/9 | 100 (the whistle) | 214 | 6/6 | 100 (no wait before the pistol) |
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0
-failed — the same table as before it.
+failed — the same table as before it. The `whenzone` leg that followed (the 210 plan)
+left a four-plan mobile subset (108/114/204/210) byte-identical.
