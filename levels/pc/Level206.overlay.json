@@ -1,0 +1,26 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E06 Every Shot A Hit: +51 as he leaves the pillows (67 s, the bubble already on the dog), +38 the weights (139), +25 the dynamite (190), +63 the pad with the harpoon at the full bar (236: the mobile pair's 30 + 20 + 15 stays); the chair pays on the full bar. Mobile 25 / 30 / 20 / 30 + 20 / 45.",
+ "patches": [
+  {
+   "object": "Pillows",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 51
+   }
+  },
+  {
+   "object": "Weights",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 38
+   }
+  },
+  {
+   "object": "DynamiteBox",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E08 Above The Clouds: +13 the shoe machine (127 s), +38 the elephant (143), +19 and +19 at the bowl \u2014 the bowl, the snake (163, 177), +25 with the Mother \u2014 Fifi (190), +25 the platform and +15 at the full bar its seesaw (246-248); the rake shows no jump. Mobile 15 / 30 / 20 / 27 / 20 / 20 + 30.",
+ "patches": [
+  {
+   "object": "ShoeMachine",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 13
+   }
+  },
+  {
+   "object": "AngryElephant",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 38
+   }
+  },
+  {
+   "object": "ArmsBowl",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 19
+   }
+  },
+  {
+   "object": "Snake",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 19
+   }
+  },
+  {
+   "object": "Fifi",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "IndianPlatform",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  }
+ ]
+}

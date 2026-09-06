@@ -1,0 +1,33 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E14 Don't Panic: +45 and +50 the hatch \u2014 his two falls (78, 178 s), +51 the pistol (255), +51 unlabelled (324) and +49, +21 at the full bar (396, 447) for the shower, the bouquet and the wheel; the wheel's 80 stays (its jump is on the full bar). Mobile 40 / 40 / 40 / 40 / 80.",
+ "patches": [
+  {
+   "object": "Hatch",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 48
+   }
+  },
+  {
+   "object": "Pistol",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 51
+   }
+  },
+  {
+   "object": "Shower",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 51
+   }
+  },
+  {
+   "object": "Bouquet",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 51
+   }
+  }
+ ]
+}

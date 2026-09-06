@@ -1,0 +1,47 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E09 Burning With Ambition: +19 the ice cream (67 s), +25 the cow (87), +25 the fakir (110), +25 and +25 the hot shoe with its drain (142, 144), +22 the coal at the full bar (160). Mobile 20 / 20 / 20 / 20 + 20 / 20.",
+ "patches": [
+  {
+   "object": "IceCream",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 19
+   }
+  },
+  {
+   "object": "Cow",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "FireFakir",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "HotShoe",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "Drain",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "Coal",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 22
+   }
+  }
+ ]
+}

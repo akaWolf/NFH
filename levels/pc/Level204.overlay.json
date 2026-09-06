@@ -1,0 +1,40 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E04 From Whom The Gong Sounds: +25 the kart (97 s), +25 karate (116), +38 the gong (144), +25 the hot dog (171), +22 the necklace and +10 at the full bar its vase (195-198). Mobile 25 / 20 / 30 / 20 / 20 / 25.",
+ "patches": [
+  {
+   "object": "PullKart",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "Karate",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "GongDrumstick",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 38
+   }
+  },
+  {
+   "object": "HotDog",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "JadeNecklace",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 22
+   }
+  }
+ ]
+}

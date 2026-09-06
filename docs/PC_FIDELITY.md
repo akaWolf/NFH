@@ -220,8 +220,15 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   controller's animation, `actions` to rebuild an ActionManager's list by
   item names (addressed by `owner`). Shipped: Level113 (the electric trap
   lifted to the depth it has in L111/L114, so the click ray reaches it),
-  Level114 (the dog whistle in the hall's chest of drawers), Level205 and
-  Level210 (the PC trick amounts off the gauge).
+  Level114 (the dog whistle in the hall's chest of drawers), and every
+  Season 2 level's PC trick amounts off the gauge of Badinfos' run
+  (`tools/pcref/amounts.py`: the jump per second labelled with the bubble's
+  activity, scaled to the full bar; a jump on the full bar keeps the
+  mobile value where that is higher, a shared jump is split in the mobile
+  proportions, an unmeasured coin keeps the mobile value). The amounts sit
+  near the mobile's — the common coin is 25 against the mobile's 20, the
+  big ones 38-51 against 30-45 — and all fourteen plans still rate 100
+  (205 re-timed: the chef is one 51, not the mobile's chef + eels).
 - Rules (`world.py`, all behind `pcprofile.is_pc()`): the PC scores
   themselves (`GameState.calculate_score`): Season 1's viewer rating =
   the tricks' TrickScores + 3 per angry tick (the HUD shows it live
@@ -283,7 +290,7 @@ margin, so her room is entered by rushes timed to those windows.
 | 102 | 6/6 | 100 | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
 | 103 | 6/6 | 100 | 203 | 5/5 | 100 |
 | 104 | 7/7 | 100 | 204 | 6/6 | 100 |
-| 105 | 8/8 | 100 | 205 | 5/5 | 100 (the PC amounts, the sculpture before the rockets) |
+| 105 | 8/8 | 100 | 205 | 5/5 | 100 (the PC amounts: tennis, skis, chef, rockets on one lap) |
 | 106 | 9/9 | 100 | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
 | 107 | 7/7 | 100 | 207 | 7/7 | 100 |
 | 108 | 6/6 | 100 | 208 | 7/7 | 100 (armed in his lap order after each lap-2 visit; Fifi and the rake last) |

@@ -1,9 +1,33 @@
 {
- "source": "PC Ping-Pong Fucius: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py): +23 tennis (124 s), +35 skis (154), +46 chef (192), +30 rockets (228, full). The mobile data has 25 / 30 / 40 / 30.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E05 Ping-Pong Fucius: +25 the tennis (124 s), +38 the skis (154), +51 the chef (192; the eels item carries no anger of its own \u2014 the port's meter rose by the Chef's amount alone), +33 the rockets at the full bar (228), the sculpture +2 on the full bar (245). Mobile 25 / 30 / 40 + 40 / 30 / 20.",
  "patches": [
-  {"object": "TabbleTennis", "component": "TrickItem", "set": {"AngerAmount": 23}},
-  {"object": "WaterSkiis", "component": "TrickItem", "set": {"AngerAmount": 35}},
-  {"object": "Chef", "component": "TrickItem", "set": {"AngerAmount": 46}},
-  {"object": "Eals", "component": "TrickItem", "set": {"AngerAmount": 46}}
+  {
+   "object": "TabbleTennis",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "WaterSkiis",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 38
+   }
+  },
+  {
+   "object": "Chef",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 51
+   }
+  },
+  {
+   "object": "Rockets",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 33
+   }
+  }
  ]
 }

@@ -1,0 +1,33 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim \u2014 the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. Mobile 35 / 20 / 50 / 20 / 30 / 30.",
+ "patches": [
+  {
+   "object": "Rake",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 19
+   }
+  },
+  {
+   "object": "Swimming",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "Submarine",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 45
+   }
+  },
+  {
+   "object": "BridgeRail",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  }
+ ]
+}

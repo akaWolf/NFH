@@ -1,0 +1,47 @@
+{
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) \u2014 a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E07 Mummy's Darling: +19 the board (123 s), +25 the elephant (170), +25 the shell (193), +25 and +25 the castle with its towel (221, 225), +32 at the full bar in his second elephant visit \u2014 the awning (239), +12 on the full bar (279). Mobile 20 / 20 / 20 / 40 + 20 / 30.",
+ "patches": [
+  {
+   "object": "PoolBoard",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 19
+   }
+  },
+  {
+   "object": "Elephant",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "Shell",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "SandCastle",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "BeachTowel",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 25
+   }
+  },
+  {
+   "object": "PoolAwning",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 32
+   }
+  }
+ ]
+}
