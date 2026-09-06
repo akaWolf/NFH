@@ -8,7 +8,7 @@ look 20-80 % slower on nine levels (2026-09-06).
 
 usage:
   python3 tools/pcref/laps_natural.py --plans <dir>     # writes 28 idle plans
-  python3 tests/run_tricks.py <dir>/s1/Level1*.txt <dir>/s2/Level2*.txt --jobs=10 --out=/tmp/nfh-idle
+  python3 tests/run_tricks.py <dir>/s1/Level1*.txt <dir>/s2/Level2*.txt --profile=mobile --jobs=4 --out=$HOME/nfh-bench/runs/idle
   python3 tools/pcref/laps_natural.py [--idle /tmp/nfh-idle] [level ...] [-v]
 
 The table: one lap = the mobile routine list once (docs' "mobile routine"),

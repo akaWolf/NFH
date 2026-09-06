@@ -60,6 +60,9 @@ Plan commands, one per line ('#' comments):
     run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
     reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends;
     NFH_SHOT_FPS=<n> saves n PNG frames a second into the run's dir.
+    --profile=mobile selects the mobile-parity runtime (the PC-experience
+    profile is the default: docs/PC_FIDELITY.md §7); the mobile regression
+    is --all --profile=mobile.
 """
 import glob, json, os, sys
 
@@ -2119,7 +2122,7 @@ class Driver(Recorder):
         DuckCage, 206's DentureAdhesive)"""
         if typ == 'IT_NONE':
             typ = None
-        if os.environ.get('NFH_PROFILE') == 'pc':
+        if os.environ.get('NFH_PROFILE', 'pc') != 'mobile':   # pcprofile.is_pc
             # the PC has no mini-games: the profile's gate passes the first
             # click — a dexterity trick item is a plain use, a dexterity
             # search item is taken by the take leg that follows

@@ -142,7 +142,8 @@ Art, menus, HUD, tap controls (the port is already mouse-driven), IAP gates
 
 ## 3. Shape of a PC profile in the port
 
-- `--profile pc` (default `mobile`, i.e. today's behaviour, untouched).
+- `--profile pc` (the default since 2026-09-09; `--profile mobile` is the
+  mobile-parity runtime, untouched).
 - `levels/pc/<Level>.overlay.json`: JSON merge patches applied after the
   mobile load — flags (108), collider rects (211/214), added objects (114's
   whistle). Each entry carries a `"source"` string (guide URL / video
@@ -207,13 +208,14 @@ measurement that holds is the HUD bubble method of `tools/pcref/` and
 its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 95, the order identical, the toothbrush once at the start on both.
 
-## 7. Implemented (2026-09-06): `NFH_PROFILE=pc`
+## 7. Implemented (2026-09-06): `NFH_PROFILE=pc`, the default since 2026-09-09
 
-- Switch: `python3 runtime/app.py --profile=pc …` for the game,
-  `tests/run_tricks.py … --profile=pc` for the harness (both set
-  `NFH_PROFILE`; `runtime/pcprofile.py` reads it live). Default `mobile`:
-  every mobile-profile number in `tools/livediff/README.md` is unchanged
-  (the full 54-plan regression re-run after the change).
+- Switch: the profile is the default — `runtime/pcprofile.is_pc()` is true
+  unless `NFH_PROFILE=mobile`; `python3 runtime/app.py --profile=mobile …`
+  for the game and `tests/run_tricks.py … --profile=mobile` for the harness
+  select the mobile-parity runtime (both set `NFH_PROFILE`; pcprofile reads
+  it live). Every mobile-profile number in `tools/livediff/README.md` is
+  unchanged under it (the full 54-plan regression, `--all --profile=mobile`).
 - Overlays: `levels/pc/<Level>.overlay.json`, applied to the raw objects
   after the mobile load (`scene.Level.__init__`), each with a `source`.
   Ops: `set` fields, `append` list fields, `anim`/`anim_set` on a

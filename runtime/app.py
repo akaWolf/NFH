@@ -961,8 +961,9 @@ def ensure_assets():
 
 
 def main(argv):
-    # --profile=pc: the PC-experience profile (docs/PC_FIDELITY.md) — the
-    # overlays and rule switches hang off NFH_PROFILE, read live by pcprofile
+    # --profile=mobile: the mobile-parity runtime; the PC-experience profile
+    # (docs/PC_FIDELITY.md) is the default — the overlays and rule switches
+    # hang off NFH_PROFILE, read live by pcprofile
     for a in argv[1:]:
         if a.startswith('--profile='):
             os.environ['NFH_PROFILE'] = a.split('=', 1)[1]

@@ -1,7 +1,7 @@
-"""The PC-experience profile (docs/PC_FIDELITY.md): NFH_PROFILE=pc.
-
-The mobile-parity runtime is the default and stays untouched; this module
-is the one switch the profile hangs off — a data overlay applied after the
+"""The PC-experience profile (docs/PC_FIDELITY.md): the default since
+2026-09-09; NFH_PROFILE=mobile (or --profile=mobile) selects the
+mobile-parity runtime, which stays untouched. This module is the one
+switch the profile hangs off — a data overlay applied after the
 mobile level loads (levels/pc/<Level>.overlay.json) and the rule switches
 the world reads through is_pc(). Every overlay entry carries a "source"
 (the PC guide / video the deviation comes from), the profile's counterpart
@@ -14,7 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def is_pc():
     """read live, not at import: the harness sets the env after its imports"""
-    return os.environ.get('NFH_PROFILE', 'mobile') == 'pc'
+    return os.environ.get('NFH_PROFILE', 'pc') != 'mobile'
 
 
 def overlay_path(level_path):
