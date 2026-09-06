@@ -1603,19 +1603,25 @@ the microwave on his kitchen walk, the binoculars, the TV as he comes
 back in; Level109-rev the bed's jump, the alarm clock and the teeth within
 seconds on one lap; Level113 the valves on the first basement visit so
 that the radiator and the sink, the chair and the grinder, the ladder and
-the drill pay on one lap. Every Season 1 plan rates 100 except:
+the drill pay on one lap. Level108's sixth trick was the plans', not
+the data's: the ToothBrush's routine action is removed at his first use
+(~14 s, RemoveFromRoutineAfterFirstUse), and the race for that use is
+lost on both sides (the port's Woody reaches the door 0.1 s after he
+claims it; on the original, the drawer tapped at frame 533 and the brush
+at 560 from StartGame, Woody is caught in the bathroom at 14.4 s) — but
+his ToiletAction's item is the ToothBrush and the CoffeeMaker carries
+RushToToilet: the soil coffee sends him back to the sink, a second
+toothbrush use, and the shoe brush put in after his first visit pays on
+it (6/6, 100 in both orders; the PC walkthroughs' "after he has been on
+the balcony" is the same trick). Every Season 1 plan rates 100 except:
 
-- Level108: 5 of 6 — the ToothBrush's action is removed at his first
-  use (~14 s), and the brush race is lost on the original as well: the
-  drawer at frame 533 and the brush at 560 from StartGame, Woody caught
-  in the bathroom at 14.4 s (CalculateScore at frame 1340, 0 tricks).
-  73 points + 5 × 3 = 88.
 - Level114: 7 of 9 — the Gramaphone (RequirePriming + RequireUnprime,
   primed from his [4] to his [8]) and the Pipe (ShowOnlyWhenPrimed, his
   [3] to [7]) are usable only during his Zone02 stretch, where
   CanRottweilerSeeWoody is zone-level and Zone02 has no hiding place;
-  taps on both at 100-108 s on the original ended with Woody caught.
-  57 points + 7 × 3 = 78.
+  Woody's use is refused unprimed (Item.cs:1520-1535), and taps on
+  both during his stretch on the original (85-108 s, two runs) ended
+  with Woody caught. 57 points + 7 × 3 = 78.
 - Level113 is EXCELLENT at 7 of 8 (the trap under the door's collider):
   99 points + 7 × 3.
 
@@ -1635,28 +1641,23 @@ Level214 (the wheel's 80 tops the meter at 466 s; the pistol waits 110 s
 so its 40 does not) and Level201 rate 100. The ones that cannot, by the
 shipped amounts against his lap:
 
-- Level204: 25 + 20 + 30 + 20 + 45 = 140 spread over his ~130 s lap
-  (the kart and the karate in Zone01, the gong, the hot dog, the
-  necklace) — 48 points of decay, a peak of 83-92.
-- Level205: 25 + 30 + 40 + 30 + 20 = 145, his tennis-to-sculpture stretch
-  113-127 s (the skis 45 s, the chef 44) — a peak of 83, 98 with all five.
-- Level207: 150 over a ~150 s lap — a peak of 32 in the runner's order,
-  95 at best.
 - Level211: 7 of 8 — the FishingRod's collider lies inside the door's
   (x −5.27..−4.42, y 1.91..2.25 within −5.86..−4.06, 1.67..2.93, the
-  door's near face nearer to the camera); on the original the tap
-  walked Woody through the door and into a catch at 33 s. 78 + 10 at
-  the most.
-- Level202, 206, 208, 210: arithmetically within reach (135-160 against
-  a 55-110 s lap) but the runner's arming — each leg waits for its zone's
-  window — spreads the payments over two laps; the closest runs peak at
-  78 (Level202: the rake pays ~30 s after the rail's slot, the rail a lap
-  later when the rake is armed first) and 77 (Level206: the harpoon and
-  the pad have to be armed before his [5] at 105 s, and the flea
-  blanket's take waits for the Mother until ~115 s). Level210 also pays
-  6 of 8 (the empty pool's coins are not in the plan yet).
-- The reverse plans of Season 2 are at 90 too: their arming order runs
-  against the lap the other way, and the payments spread the same.
+  door's near face nearer to the camera); on the original the tap walked
+  Woody through the door and into a catch at 33 s. 78 + 10 at the most.
+- Level202, 204, 205, 206, 207, 208, 210: the single-lap peak, computed
+  from the neighbour's own visit times with every trick paid on one lap,
+  is over 100 for each (Level204 114 at the necklace+vase, Level207 133
+  at the castle's three coins, Level205 109 across the chef/rockets/
+  sculpture end-cluster). What the runner cannot do is ARM them fast
+  enough: his lap is 85-130 s and arming five to seven tricks takes more
+  than one lap, so the payments split across two or three of his laps and
+  the 0.37/s decay drains the meter between — the closest runs peak at
+  76-92. Whether a frame-perfect human could arm inside one lap is open;
+  the mobile release is reported not to allow the final level's maximum
+  either ("a bug prevents you from getting maximum score in the final
+  mission", App Store review). The reverse orders spread the same way.
+  These are the levels to revisit if the arming is ever made tighter.
 
 The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 
@@ -1665,11 +1666,11 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 101 | 100 | 100 | 201 | 100 | — |
 | 102 | 100 | 100 | 202 | 90 | 90 |
 | 103 | 100 | 100 | 203 | 100 | 90 |
-| 104 | 100 | 100 | 204 | 90 | 90 |
-| 105 | 100 | 100 | 205 | 90 | 90 |
+| 104 | 100 | 100 | 204 | 90* | 90* |
+| 105 | 100 | 100 | 205 | 90* | 90* |
 | 106 | 100 | 100 | 206 | 90 | 90 |
-| 107 | 100 | 100 | 207 | 90 | 90 |
-| 108 | 78 (5/6) | 73 (5/6) | 208 | 90 | 90 |
+| 107 | 100 | 100 | 207 | 90* | 90* |
+| 108 | 100 | 100 | 208 | 90 | 90 |
 | 109 | 100 | 100 | 209 | 100 | 90 |
 | 110 | 100 | 100 | 210 | 67 (6/8) | 78 (7/8) |
 | 111 | 100 | 100 | 211 | 78 (7/8) | 78 (7/8) |
@@ -1677,6 +1678,6 @@ The table, all 54 plans (2026-09-06, /tmp/nfh-tricks-act35):
 | 113 | 100 (7/8) | 100 (7/8) | 213 | 100 | 90 |
 | 114 | 80 (7/9) | 80 (7/9) | 214 | 100 | — |
 
-Every plan passes its legs; a `manual` leg is a trick the data leaves
+(* the single-lap peak is >100 but the runner cannot arm inside one lap — see above.) Every plan passes its legs; a `manual` leg is a trick the data leaves
 unreachable (the plan headers say which). The runner's summary marks a
 plan short of PERFECT, and `--all` exits 1 while any is.

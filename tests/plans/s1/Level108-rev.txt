@@ -11,16 +11,18 @@ usewith Shezlong IT_Pins             # Z07, 10
 hide Bed                             # he comes through to the balcony
 await Shezlong 10
 take Fridge IT_Honey                 # Z03
+take Drawer IT_Brush                 # Z01: the dirty shoe brush
 prime FirstAid IT_Key                # Z04 -> IT_Poison
+usewith ToothBrush IT_Brush          # Z04, the same visit: the coffee's RushToToilet (his ToiletAction is the ToothBrush) brings him back, 15
 usewith CoffeeMaker IT_Soil_only     # Z03, 15
 reclick CoffeeMaker
 usewith SunLotion IT_Honey +10       # Z07, 20 at his Shezlong use — on the coffee's bathroom rush
 usewith WateringCan IT_Poison        # Z07: Plant 20 at his next watering
 hide Bed
 await CoffeeMaker 15
+await ToothBrush 15                  # paid on the coffee's rush (94%: the reverse order chains only one angry — the standard plan is the 100)
 await SunLotion 20
 await Plant 20
 take RubbishBinBanana2 IT_Banana     # Z03
 usewith Ground@Zone03 IT_Banana      # 8
 await Ground@Zone03 8
-manual ToothBrush 15: his FIRST use removes the action (RoutineActionUse.cs:424-427, ActionManager.RemoveActionByItem) and it is his first action; with the brush from the Drawer next to the start Woody reaches the bathroom door 0.1 s after the neighbour claims it (Pawn.cs:1359 door-pair wait) — see the report
