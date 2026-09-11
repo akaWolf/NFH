@@ -532,11 +532,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   PCAngryTime (levels/pc, from tricks.xml) and holds the meter at its
   maximum that long after the trick (World.play_angry's Classic branch),
   which is the tick window's other half.
-- *Not in the data.* The neighbour's routine lives in game.exe — the HUD
-  strings are pushed from seventeen places, one per level and tutorial
-  (radare2 on the copies in ~/nfh-bench/pcref/pc/*/bin), so each level
-  is a compiled class with its schedule; no object names reach the
-  string table. The lap orders read off the videos stand.
+- *In the binaries.* The neighbour's routine is a script in game.exe's
+  level classes — read out with radare2 into docs/PC_ROUTINES.md (the
+  object and action names are UTF-16 String globals the script code
+  loads; seventeen copies of the engine's string tables, one per
+  class); the anger timer and the bonus live in GFXEngine.dll with the
+  HUD (`rageometer`, `bonuscount`), fed by game.exe's trick parser
+  (quota1-4 and angrytime per trick) and level parser (angrytime at
+  +0xc); Loader.dll parses the XML. The exact indicator length is the
+  one number still to read, in GFXEngine.dll.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
@@ -550,7 +554,7 @@ both games, the PC data next to the mobile's, category by category:
 | containers and their contents | equal (the PC marks unlimited stock with count 99, the mobile with UseCount 0) |
 | walk-by tricks (nearobj triggers vs NoticeWhenWalkNearby) | equal, 111's ironing board included |
 | rooms and doors | equal room graphs (the PC's extra "fro" is the entrance hall; the mobile numbers its zones) |
-| the neighbour's routine | not in the PC data (game.exe); the orders read off the videos stand (104's overlay) |
+| the neighbour's routine | read out of game.exe (docs/PC_ROUTINES.md, tools/pcref/exe_scripts.py): one compiled class per level, its `run` a script of Icon / GoTo / Action / branch / SwitchObjects calls on the level's object names; the actions and repeats are there (the laundry's two wash and two dry cycles against the mobile's three), the lap order still from the video where the compiler laid branches out of line |
 | action lengths | the PC's `time`/frames at 20 per second are of the mobile's order (album 5.7 vs 3.3 s, pudding 4.8 vs 0.8, sofa 4.4 vs 11.8, microwave 9.4 vs 15) — the laps are walks and structure, see docs/PC_LAPS.md |
 | speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
 | doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |
