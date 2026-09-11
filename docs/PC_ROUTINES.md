@@ -32,7 +32,22 @@ GameOverAnimMsg, StartLevelMsg. The trick record AddTrick (0x444220) builds is 0
 +4 the name, +0x1c quota1, +8 quota2, +0xc quota3, +0x10 quota4, +0x14 angrytime, +0x18 a
 flag (0) — the level's trick list is what the bonus logic reads; its consumer was not found
 by static patterns yet (the searches land on the trick-preparation progress bar,
-cur × 100 / total at 0x47f5cc, and on container growth).
+cur × 100 / total at 0x47f5cc, and on container growth). The InGameGUI object game.exe
+creates through GFXEngine.dll's `createInGameGUI` (0x406ecc, in the init at 0x406970) is kept
+only in a local there and reached through the GUI engine afterwards, so the HUD's rage and
+bonus calls are virtual and do not show up as string references — tracing them needs the
+vtable of `gui::InGameGUI` (GFXEngine.dll) or a live run.
+
+Season 2 (GameLogic.dll, base 0x10000000) has the same constant pattern (`tools/pcref/exe/
+nfh2_gamelogic_globals.json`, 4373 names) but its scripts call a different engine: the
+cabin-boat level (cn_b1, Level202) at 0x100216xx reads `SetIcon(actor, icon)` = fcn.100422a5
+(`bridge`, `neighbor`), `DoAction(actor, anim)` = fcn.10002cd5 followed by the wait
+fcn.1000ae19 (`lookaround`, `crash`, `electrify`, `leave`), a variant test on a pair of
+objects = fcn.1000fb6e (`pond_bridge_damaged`, `pond_bridge`), a tricked test on one =
+fcn.1000ec67 (`pond_pond_eel`); the walks pass the object in a register the listing does not
+show. The ship1 code at 0x100269xx is the tutorial (`wait1`, `hurry`, `combo2`/`combo4`,
+room moves of `woody` and `neighbor` = fcn.1000fc33). Naming the walk and finishing the
+Season 2 scripts is the next step of this reading.
 
 ## level_peep (Level101)
 
