@@ -130,10 +130,11 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   54-plan regression under `--profile=mobile` is byte-identical.
 
 Open: three natural laps still differ from the PC's by more than 15 %
-(111, 213, 210 — routine structure, not constants), and the PC's tick
-window is bracketed at 18–25 s rather than measured (the data's 23.6 s
-sits inside). `docs/GAMEPLAY.md` §10–§11 list what resists a clean
-reimplementation.
+(111, 213, 210 — the neighbour's routine is compiled into game.exe, one
+class per level, not data), and the anger indicator's length on PC is
+bracketed at 18–25 s by the tick digits rather than measured (the data's
+23.6 s sits inside; the manual states the rule). `docs/GAMEPLAY.md`
+§10–§11 list what resists a clean reimplementation.
 
 ## What makes this tractable
 
