@@ -508,7 +508,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the basement three, the carpet on his living-room entry, the board on
   his approach, the marbles on the balcony for his walk to the airer,
   the tank, the airer — 97 with the marbles in the hall (v13); with the
-  marbles on the balcony 8/8, 79 points, seven ticks: 100 (v14).
+  marbles on the balcony 8/8, 79 points, seven ticks: 100 (v14). With
+  the routine read out of game.exe (docs/PC_ROUTINES.md) the lap also
+  keeps the PC's two wash and two dry cycles (actions_by_index — the
+  mobile lists three of each); the plan holds at 100, twelve seconds
+  sooner.
 - *The tick rule, in the canon's own words.* The Season 1 manual
   (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
   the victim of a trick, his anger indicator rises to the maximum value.

@@ -28,7 +28,11 @@ GFXEngine.dll are the next thing to read. The engine's messages (game.exe): Crea
 AddObjectMsg, AddActionMsg, AddHotSpotMsg, AddContentMsg, AddNoiseTriggerMsg,
 AddObjectTriggerMsg, CreateCombinationMsg, AddIngredientMsg, SetStdActionMsg, GoToPosMsg,
 UseObjectMsg, LookAtObjectMsg, SetAnimMsg, SetSpeedMsg, PauseActorMsg, StopJobMsg,
-GameOverAnimMsg, StartLevelMsg.
+GameOverAnimMsg, StartLevelMsg. The trick record AddTrick (0x444220) builds is 0x24 bytes:
++4 the name, +0x1c quota1, +8 quota2, +0xc quota3, +0x10 quota4, +0x14 angrytime, +0x18 a
+flag (0) — the level's trick list is what the bonus logic reads; its consumer was not found
+by static patterns yet (the searches land on the trick-preparation progress bar,
+cur × 100 / total at 0x47f5cc, and on container growth).
 
 ## level_peep (Level101)
 

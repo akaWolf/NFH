@@ -121,5 +121,9 @@ the walks); faster: 106, 111, 113, 213 (−12..−19 %); the rest within ±10 %.
 Under the PC profile (2026-09-09) the sofa and album overlays
 (levels/pc/Level101, Level106: RottweilerUseAnimation lists sized to the PC
 spells) bring 101 to +11 % and 106 to −6 %; 111, 213 and 210 are
-structural (docs/PC_FIDELITY.md §7).
+structural (docs/PC_FIDELITY.md §7). 111 under the profile now runs the
+washer and the drier twice a lap as game.exe's script does (2026-09-16);
+the lap stays −18 % because the PC's cycles are the long ones — its washer
+spells 24 and 47 s, its drier 6 and 26, against the port's 18/15 and 6/4 —
+the wash and dry waits, not the count.
 The PC's own numbers are from one run's first lap (±2 s per activity).
