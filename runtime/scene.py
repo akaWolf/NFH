@@ -236,7 +236,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'sprite',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -568,6 +568,10 @@ class Item:
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
         self.trick_score = d.get('TrickScore') or 0
+        # the PC data's per-trick angrytime, seconds: how long the PC
+        # neighbour's anger indicator stays at its maximum after this trick
+        # (levels/pc overlays, PCAngryTime; docs/PC_FIDELITY.md §7)
+        self.pc_angry_time = d.get('PCAngryTime') or 0.0
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))

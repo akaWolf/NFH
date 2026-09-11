@@ -424,6 +424,7 @@ class Pawn:
         self.thermo_drain = spec.get('thermo_drain') or 0.0   # HUD only
         self.angry_max = spec.get('angry_max') or 100.0
         self.can_decrease_angry = True
+        self.angry_hold_until = 0.0      # the PC profile's per-trick hold (world time)
         self.angry_count_ticks = 0
         self.tricked_aux = False         # Rottweiler.TrickedAux: set at cs:652,
                                          # cleared by every Item.Fix (Item.cs:2065)
@@ -1519,7 +1520,8 @@ class Pawn:
     def tick(self, dt):
         self.anim.tick(dt)
         # Rottweiler.Update: the meter decays while allowed
-        if self.can_decrease_angry and self.angry_meter > 0.0:
+        if self.can_decrease_angry and self.angry_meter > 0.0 and \
+                (self.world is None or self.world.time >= self.angry_hold_until):
             self.angry_meter = max(0.0, self.angry_meter - self.angry_decay * dt)
         self._zone_watch()
         if self.movement_paused:          # ProcessMovement's outer gate
@@ -1959,6 +1961,7 @@ class GameState:
         self.viewer_rating = ''
         self.final_viewer_rating = 0
         self.pc_points = None            # PC profile: the COLLAPSE! board's sum
+        self.pc_min_rating = None        # PC profile: the level's minquota (Season 1)
         self.pc_lines = []               # its rows, (points, label)
         self.on_trick_done = None        # Woody.PlayTrickDone -> the HUD
         # GameInfo.ShowInteractionIcon: true while the HUD info button is
@@ -1981,6 +1984,12 @@ class GameState:
             # the same 100 at the end of both runs but not the same value on
             # the way (E02 after two tricks: 48 against the PC's 49)
             final = self.final_trick_score + 3 * angry_count_ticks
+            if self.pc_min_rating is not None:
+                # the PC's SUCCESS: the minimum viewer rating reached
+                # (leveldata minquota; the manual's "Minimum viewer
+                # ratings") — the mobile's Won is its WinningTricksCount
+                # (GameInfo.cs) and the rating is graded after
+                self.won = min(100, final) >= self.pc_min_rating
         elif not nfh2:
             compound = self.compound_trick_score
             if not self.is_tutorial and angry_count_ticks < compound:
@@ -5524,6 +5533,14 @@ class World:
                 self.level_script.on_trick_done()  # cs:789-792
             if not nfh2:
                 pawn.can_decrease_angry = False    # cs:793-796
+                if pcprofile.is_pc() and item.pc_angry_time:
+                    # the PC's per-trick angrytime (tricks.xml): the anger
+                    # indicator stays at its maximum that long — E14's
+                    # marbles 360 = 18 s hold on the thermometer, E09's
+                    # nitro bottle 240 = 12 s, E05's bowling ball 288 =
+                    # 14.4 — where a plain trick holds for the angry
+                    # animation only (docs/PC_FIDELITY.md §7)
+                    pawn.angry_hold_until = self.time + item.pc_angry_time
             return
         # the extra-angry insert, gated for the sand castle (cs:754-766)
         if item.sand_castle_flag:
@@ -8353,6 +8370,8 @@ class World:
         original reads off other objects — Rottweiler.AngryCountTicks
         (cs:396-398, 416) and Woody.NFH2Path (cs:394)"""
         rott = self.pawns.get('Rottweiler')
+        if pcprofile.is_pc():
+            self.game.pc_min_rating = pcprofile.min_rating(self.level.name)
         self.game.calculate_score(
             rott.angry_count_ticks if rott is not None else 0,
             nfh2=self.woody.nfh2 if self.woody is not None else False,

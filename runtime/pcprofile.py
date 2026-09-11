@@ -96,3 +96,19 @@ def apply_overlay(level):
         import sys
         print('pcprofile: overlay %s matched nothing' % os.path.basename(p), file=sys.stderr)
     return n
+
+
+# The PC's pass rule (leveldata.xml of the Season 1 game, "minquota"; the
+# manual: an episode is a SUCCESS once the minimum viewer rating is reached):
+# the same numbers the mobile Entry scene carries as MinRatings, but the
+# mobile wins a level on its WinningTricksCount and grades the rating after.
+S1_MIN_RATING = {101: 50, 102: 55, 103: 60, 104: 65, 105: 70, 106: 75, 107: 60,
+                 108: 65, 109: 70, 110: 75, 111: 60, 112: 65, 113: 70, 114: 75}
+
+
+def min_rating(level_name):
+    """the PC minquota for a Season 1 level name ('Level106'), else None"""
+    try:
+        return S1_MIN_RATING.get(int(str(level_name)[-3:]))
+    except ValueError:
+        return None

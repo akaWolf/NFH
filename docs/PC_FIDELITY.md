@@ -509,8 +509,34 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   his approach, the marbles on the balcony for his walk to the airer,
   the tank, the airer — 97 with the marbles in the hall (v13); with the
   marbles on the balcony 8/8, 79 points, seven ticks: 100 (v14).
-- *Not in the data.* The tick rule, the hold, the neighbour's routine and
-  speeds beyond the door timings live in game.exe.
+- *The tick rule, in the canon's own words.* The Season 1 manual
+  (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
+  the victim of a trick, his anger indicator rises to the maximum value.
+  Then it slowly begins to sink again, until it finally gets back to
+  zero. If the neighbour gets mad again before his anger indicator is
+  back to zero, he starts fuming ... the viewer ratings rise by a few
+  additional points" — and under "Viewer ratings indicator": the trick's
+  points "are shown as small yellow numbers above the score display",
+  the bonus points "in bright red". That is Rottweiler.cs:597-611 (a tick
+  while AngryMeter > 0, +3 as the PC HUD shows) and the count-up the
+  profile draws. The indicator's length is not written down; the data's
+  23.6 s sits inside the 18-25 s the tick digits bracket, so it stands.
+- *The per-trick `angrytime`.* The manual adds that the indicator "will
+  sink again steadily after each trick — with varying speed", and the
+  thermometer says what varies: after a trick with its own `angrytime`
+  the mercury holds at the top for that long before it drains at the
+  level's rate — E14's marbles (360 = 18 s) hold 18.1 s, E09's nitro
+  bottle (240) 12.6, E05's bowling ball (288) 14.6, E04's picture (264)
+  12.8, E11's marbles and vacuum (300) 13.3 — where a plain trick holds
+  for the angry animation (7-8.5 s). The profile carries the values as
+  PCAngryTime (levels/pc, from tricks.xml) and holds the meter at its
+  maximum that long after the trick (World.play_angry's Classic branch),
+  which is the tick window's other half.
+- *Not in the data.* The neighbour's routine lives in game.exe — the HUD
+  strings are pushed from seventeen places, one per level and tutorial
+  (radare2 on the copies in ~/nfh-bench/pcref/pc/*/bin), so each level
+  is a compiled class with its schedule; no object names reach the
+  string table. The lap orders read off the videos stand.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
@@ -518,7 +544,7 @@ both games, the PC data next to the mobile's, category by category:
 | category | PC vs mobile |
 |---|---|
 | level time limits | equal: leveldata `time` is in 1/12 s — 300/360/420/600 s = the mobile's 5/6/7/10 minutes (E06's clock confirms 6:00); Season 2 has no limit on either |
-| pass thresholds | PC minquota 50-75 % per Season 1 level, mincoins 3-7 per Season 2 level; the mobile's are not level data (not compared) |
+| pass thresholds | equal tables: the mobile Entry scene's MinRatings (50-75 %) are the PC minquota, its WinningTricksCount the PC mincoins on every Season 2 level but 211 (6 against the PC's 5 — overlay); the rule differs on Season 1: the PC passes an episode on the minimum rating (the manual), the mobile on its trick count — the profile passes on the rating |
 | trick sets and values | equal but 109 (milk 20 / pig 10), 111 (13/12/7), 112 (skates 8) — overlays; the mobile's extra rated items (103's cake, 112's Yoga, the 104/113 pairs, Season 2's fence and hook items) are not on the PC and not on the PC routes |
 | recipes (combine.xml vs RequiredInventory) | equal on every trick the PC has; the mobile adds recipes of its own (108's balloon, the Season 2 knives) |
 | containers and their contents | equal (the PC marks unlimited stock with count 99, the mobile with UseCount 0) |

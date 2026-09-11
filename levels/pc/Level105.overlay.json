@@ -1,11 +1,33 @@
 {
- "source": "PC thermometer: the level's angrytime=204 in the PC data (level_piano/level.xml, 1/20 s ticks) is the 10.2 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 9.80 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7).",
+ "source": "PC thermometer: the level's angrytime=204 in the PC data (level_piano/level.xml, 1/20 s ticks) is the 10.2 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 9.80 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC per-trick angrytime (tricks.xml: kit/groundsoap 276, phone 276, bowlingball 288; 1/20 s): the anger indicator holds at its maximum that long after the trick — the thermometer's long holds on the video (E14's marbles 18.1 s, E09's 12.6, E05's 14.6) — carried as PCAngryTime for the profile's hold (docs/PC_FIDELITY.md §7).",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
     "PCThermometerDrain": 9.8
+   }
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 13.8
+   },
+   "zone": "Zone03"
+  },
+  {
+   "object": "Phone",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 13.8
+   }
+  },
+  {
+   "object": "Football",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 14.4
    }
   }
  ]

@@ -1,5 +1,5 @@
 {
- "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth. PC thermometer: the level's angrytime=228 in the PC data (level_DIY/level.xml, 1/20 s ticks) is the 11.4 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.77 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7).",
+ "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth. PC thermometer: the level's angrytime=228 in the PC data (level_DIY/level.xml, 1/20 s ticks) is the 11.4 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.77 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC per-trick angrytime (tricks.xml: marbles 264; 1/20 s): the anger indicator holds at its maximum that long after the trick — the thermometer's long holds on the video (E14's marbles 18.1 s, E09's 12.6, E05's 14.6) — carried as PCAngryTime for the profile's hold (docs/PC_FIDELITY.md §7).",
  "patches": [
   {
    "object": "ElectricTrap",
@@ -17,6 +17,13 @@
    "component": "Rottweiler",
    "set": {
     "PCThermometerDrain": 8.77
+   }
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 13.2
    }
   }
  ]

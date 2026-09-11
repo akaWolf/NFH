@@ -1,5 +1,5 @@
 {
- "source": "PC thermometer: the level's angrytime=240 in the PC data (level_fitness/level.xml, 1/20 s ticks) is the 12.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.33 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC data (level_fitness/tricks.xml): skate 8 against the mobile's GroundSkates 14 — 76 for the ten, eight ticks for the 100 (Badinfos' E12: 10/10, 8).",
+ "source": "PC thermometer: the level's angrytime=240 in the PC data (level_fitness/level.xml, 1/20 s ticks) is the 12.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 8.33 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC data (level_fitness/tricks.xml): skate 8 against the mobile's GroundSkates 14 — 76 for the ten, eight ticks for the 100 (Badinfos' E12: 10/10, 8). PC per-trick angrytime (tricks.xml: electrotrap 264, marbles 288, hometrainer_tonged 288, barbell_sawed 264, skate 300; 1/20 s): the anger indicator holds at its maximum that long after the trick — the thermometer's long holds on the video (E14's marbles 18.1 s, E09's 12.6, E05's 14.6) — carried as PCAngryTime for the profile's hold (docs/PC_FIDELITY.md §7).",
  "patches": [
   {
    "object": "Rottweiler",
@@ -13,6 +13,41 @@
    "component": "TrickItem",
    "set": {
     "TrickScore": 8
+   }
+  },
+  {
+   "object": "ElectricTrap",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 13.2
+   }
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 14.4
+   }
+  },
+  {
+   "object": "Bicycle",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 14.4
+   }
+  },
+  {
+   "object": "Weights",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 13.2
+   }
+  },
+  {
+   "object": "GroundSkates",
+   "component": "TrickItem",
+   "set": {
+    "PCAngryTime": 15.0
    }
   }
  ]
