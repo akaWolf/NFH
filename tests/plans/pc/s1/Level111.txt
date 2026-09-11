@@ -1,0 +1,65 @@
+# Level111 under the PC profile: the PC data (level_laundry/tricks.xml)
+# pays vacuum_hole 13, clothes_food 12 and electrotrap 7 where the mobile
+# pays 15, 13 and 11 — 79 for the eight, so the 100 takes every one of the
+# seven ticks: all eight tricks in one lap of his (Badinfos' E11: 156, 180,
+# 196, 222, 249, 279, 301, 322 — gaps of 16-30 s, each inside the 8 s hold
+# plus the 23.6 s meter). His lap (~120 s): Detergent (Z03, 11-16) ->
+# Z01 -> Z09 (26-42: WM x3, Drier x3) -> Z01 (47) -> Z02 (55) -> Iron (Z06,
+# 59-63) -> Airer (Z07, 68-71) -> FishTank (Z08, 83-88) -> Airer (99-102)
+# -> Iron (106-120) -> loop. The mobile plan's arming order is kept (its
+# comments explain the carpet and the vacuum); what moves is everything
+# that pays: on PC the dirty carpet is a room trigger (level_laundry/
+# trigger.xml: position="room" type="always") — the neighbour goes for the
+# vacuum the moment he enters the living room, where the mobile's
+# OnChangeZone skips the carpet and only the dog's yell sends him
+# (Rottweiler.cs:188, 485-510); the profile restores the room trigger. The
+# iron pays at his first ironing after Woody's use (the overlay starts it
+# hot, the PC's phase); the airer at his [10] once armed after his [8]. So
+# the whole lap 3 is: the basement three on his visit (268-303), the
+# carpet on his Z02 entry -> the glued vacuum (~335), the iron at his [7]
+# (~358), the marbles on the balcony as he goes to the airer [8] (~372),
+# the tank at his [9] (~398), the airer at his [10] (~421) — Badinfos'
+# order on E11 (trap 158, washer 180, drier 196, vacuum 222, marbles 249,
+# tank 279, board 302, airer 322), every gap inside the window.
+# -- lap 1: he walks Z06 -> Z02 -> Z03 (Detergent, t~15) -> Z01 -> Z09 ------
+take TableShovel IT_Shovel            # Z07 at once, behind him (Z01->Z02->Z06->Z07)
+take Detergent IT_Detergent           # Z03 after his [0] use
+take RubbishBinCable IT_Cable         # Z03
+wait 14                               # his Z01 -> Z02 -> Z06 pass: Woody stays out of Z02
+take Perch IT_Birdfood                # Z02 (auto-sneak: the dog)
+take Drawer IT_Marbles                # Z01
+park Zone04                           # the dead end he never visits
+# -- lap 2, he is in the kitchen/basement: the study (the knife) -----------
+take DeskDrawer IT_Paperknife         # Z08 (via Z02/Z06 while he is in Z03/Z01)
+park Zone02                           # wait for his climb here (Z04 -> Z09 crosses his Z06 -> Z07 walk)
+# -- lap 2, he is upstairs: the basement three (the marbles wait) ----------
+take BasementDrawer IT_Tongs
+usewith Drier IT_Tongs                # RequireUnprime trio: pays at his use visit
+take WineCellar IT_Winebottle
+usewith WashingMachine IT_Winebottle
+usewith ElectricTrap IT_Cable         # NoticeWhenWalkNearby, 7 on PC
+park Zone04
+# -- lap 3, he is in the basement (the three pay there): the tour ----------
+whenzone Zone09
+prime PlantSoil IT_Shovel             # Z07: the held type becomes IT_Soil
+usewith GroundMarbles@Zone07 IT_Marbles   # the balcony: his walk from the iron [7] to the airer [8]
+                                      # (Badinfos' marbles pay 27 s after his iron, on that walk;
+                                      # in the hall they paid on his way up and left the iron ->
+                                      # tank stretch 40 s wide — v13, 97)
+usewith DirtyCarpet IT_Soil           # Z02: the room trigger for his Z02 entry
+usewith Vacuum IT_Paperknife          # Z02: the tool that pays 13 on PC
+use Iron                              # Z06: hot since his [11] (the overlay's phase); pays at his [7]
+usewith FishTank IT_Detergent         # Z08, 10 at his [9]
+hide Bed                              # Z06: out of his way up; he vacuums, irons, goes to the balcony
+# -- the balcony after his [8] prime, armed while he is at the tank --------
+whenusing FishTank                    # his [9]: the airer is primed by his [8]
+usewith Airer IT_Birdfood             # Z07, 12 on PC; pays at his [10]
+hide Bed
+await ElectricTrap 7
+await WashingMachine 10
+await Drier 10
+await GroundMarbles@Zone07 7
+await Vacuum 13
+await Iron 10
+await FishTank 10
+await Airer 12

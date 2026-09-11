@@ -483,36 +483,32 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   first overlay addressed `Rottweiler` and matched nothing, silently —
   `pcprofile.apply_overlay` now reports every patch that touches no
   component.) With the data's amounts and the 80 gauge the Season 2 set
-  is 14/14 at COLLAPSE!; the Season 1 set is 13/14 — 111 is 94 under the
-  PC scores (the mobile plan's eight tricks, five ticks).
+  is 14/14 at COLLAPSE!, the Season 1 set 14/14 — 111 on its PC plan
+  (below).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
-  (156, 180, 196, 222, 249, 279, 301, 322 — the trap, three 10s, the
-  marbles, the vacuum, a 10, the airer; his popups), every gap under 31
-  s. Twelve plan trials on 2026-09-10 got the port to seven tricks and
-  five ticks at best (81 %). What stands in the way, in the data and the
-  port: the ironing board pays at his first ironing of the lap on PC (222,
-  26 s after the drier) — the mobile's hot iron starts cold and his first
-  ironing heats it, so the port can arm it only between his two ironings
-  and it pays at the second (a `Primed: true` overlay puts the toggle in
-  the PC's phase and the iron then pays at his first ironing, 30 s after
-  the drier); the soiled carpet sends him for the glued vacuum only on the
-  dog's yell (Rottweiler.cs:485-510; a plain pass through Z02 cleans it),
-  and in the port that run — the surprise at the dog, the walk to the
-  carpet, the grab, 18 s of vacuuming, the return — takes 33 s where the
-  PC's `vacuum` action is 35 frames, so the fish tank after it lands 48 s
-  after the vacuum; and the airer's prime toggles at his [8] and [10],
-  which the yell's detour shifts under the plan's gates. The overlay and
-  the plan are not shipped; 111 keeps the mobile plan (94). A shorter
-  vacuuming, if the PC's 1.75 s is taken as the constant, is the next
-  thing to try. `angrytime` is 0 on every Season 2 level; the gauge's slow
-  decay is the mobile's 0.37.
-- *Laps.* The neighbour's routine — the order of his actions — is not
-  in the data (the exe drives it); `objects.xml` gives each action's
-  `time` (the album read 113 ticks, the wash 59, the drier 29, the iron
-  71) and `anims.xml` the frame counts (the bath 133 frames), all near
-  the mobile's. 111's long washer and drier spells and 213's bath span
-  are walks and structure, 210's chair is the Mother's call: closed as
-  routine, not constants.
+  (his bubbles and popups: the trap on the basement walk-in 158, the
+  washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that
+  sends him to the dirty carpet and the glued vacuum 222, the marbles 249
+  on his walk from the bedroom to the balcony, the fish tank 279, the
+  ironing board 302 as he passes it between the tank and the balcony,
+  the airer 322), every gap 20-30 s. Twelve plan trials on 2026-09-10
+  stalled at seven tricks and five ticks (81 %) on two mobile rules the
+  PC data does not have: the dirty carpet is a room trigger on PC
+  (`level_laundry/trigger.xml`: `position="room" type="always"` — the
+  neighbour goes for the vacuum on entering the living room; the
+  mobile's OnChangeZone skips the carpet, Rottweiler.cs:188, and only
+  the dog's yell sends him, cs:485-510 — the profile notices the carpet
+  on entry like every other tricked item), and the ironing board is
+  armable on PC before his first ironing of the lap (Badinfos' board
+  pays at 302 with no ironing visit — the board is a walk-by trick on
+  both games, NoticeWhenWalkNearby — but the mobile's hot iron starts
+  cold and only his first ironing heats it, so the port could arm it
+  only between his two ironings; `Primed: true` at the start puts the
+  toggle in the PC's phase). With both, the PC plan follows his order —
+  the basement three, the carpet on his living-room entry, the board on
+  his approach, the marbles on the balcony for his walk to the airer,
+  the tank, the airer — 97 with the marbles in the hall (v13); with the
+  marbles on the balcony 8/8, 79 points, seven ticks: 100 (v14).
 - *Not in the data.* The tick rule, the hold, the neighbour's routine and
   speeds beyond the door timings live in game.exe.
 

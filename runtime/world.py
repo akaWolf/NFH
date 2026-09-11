@@ -4613,8 +4613,13 @@ class Routine:
         for it in w.notice_items.get(self.pawn.zone.pid, ()):
             # the DirtyCarpet is excluded from the generic run
             # (Rottweiler.cs:188) — its urgent rides the Dog/Chili yell
-            # choreography instead, which is not modelled
-            if it.name == 'DirtyCarpet':
+            # choreography instead (_yell_done). The PC data has the carpet
+            # as a room trigger (level_laundry/trigger.xml: object
+            # lir/dirtycarpet, position "room", type "always"): the
+            # neighbour goes for the vacuum on entering the room, which is
+            # how Badinfos' E11 pays the vacuum 30 s after the marbles and
+            # the ironing board 22 s later — the profile keeps the trigger
+            if it.name == 'DirtyCarpet' and not pcprofile.is_pc():
                 continue
             if it.tricked:
                 # RunToTrickedItem: PauseMovement + a startled look, then the
