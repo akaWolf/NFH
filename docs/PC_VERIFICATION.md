@@ -195,9 +195,13 @@ pets directly — `wakeup`, `pause`, `resume` and `whistle` events posted to
 say a walking Woody is noticed in the pet's room and sneaking is not
 (`level_laundry`, `tutorial_3`: the right mouse button sneaks; the
 `ChangeMoveTypeMsg` handler fcn.0044efc0 reads `sneaking="true"`); the
-emitter that turns a non-sneaking walk into a room noise was not located
-(the walk fiber and step helpers fcn.00475b30 / fcn.00444d30 / fcn.0047d030
-post nothing).
+emitter is the gait itself: Woody's walking `<speed>` records `mg0`–`mg3`
+carry `noise="1"` and his sneaking `sn0`–`sn3` `noise="0"` (generic/objects.xml;
+every other actor's records are 0), so a walking Woody is a noise of 1 in
+his room, a sneaking or standing one none — the pets' `wakeup` threshold
+exactly, below the neighbour's alarm at 2. The port's rule for a sleeping
+pet (moving and not sneaking, in its zone) is the same test; the reader of
+the record's noise field (+0x10 in SetSpeedMsg's record) is not traced.
 
 | rule | port (the mobile's, docs/GAMEPLAY.md §6) | binary / data | verdict |
 |---|---|---|---|
@@ -229,7 +233,7 @@ helpers.
 | the trick amounts | nine PC values in `levels/pc/*.overlay.json`, the rest the mobile's | tricks.xml `coins` / `rage` | agrees (data, the overlays' sources) |
 | the routines | the mobile ActionManager orders | `tools/pcref/routine_order_s2.py`: each level script is a chain of step functions handing over through `[obj+8]`; followed with no trick fired, the laps by code are 201 rail → water puddle → captain's cap → buffet → water puddle (mobile: CaptainHat, Buffet, WaterPuddle, DeckRail, WaterPuddle), 203 bike → stage → image → toilet → melons (Microphone, ToiletPaper, ToiletFlush, Watermelon, Bicycle), 205 sand lion → mat → ping-pong → water skis → chef → tyre → firework, rocket → sand lion (OlgaMatBeach, TableTennis, WaterSkiis, Chef, Rockets, SandSculpture), 206 Fifi → blanket → Fifi → ramp → harpoon → dumbbell → Fifi → dynamite bag (DogFifi, DeckChair, Pillows, LaunchPad, Harpoon, Weights, Fifi, Dynamite…), 208 statue → platform → shoe cleaner → elephant (IndianPlatform, ShoeMachine, AngryElephant, ArmsBowl), 211 diving → dish → rod → boat → life vest (Sweets, FishingRod, LifeBoat, LifeJacket, DivingGear), 209 cow → ride → fakir → shoe mat → coal → trough → fuel (FireFakir, HotShoe, TadjMahal, HotShoe, Coal, IceCream, Cow), 212 cliff → parrot → boat → hands → whip → cigars → bank → bull ride (PreAztecThrone, AztecThrone, Whip, CigarBox, SleepBench, MechanicalBull, PreParrotLedge, ParrotLedge), 213 limber wall → carnivore → tortilla → piñata → bull-ride controls → washing tub (LiveBull, PlantCarnivore, Tortilla, BoatPicnic, Pinata, MechanicalBullControls, CementBath) | agrees in order on the nine laps that close; 202, 204, 207 and 214 end at a step that polls an action (202's `waitsea` swim, 0x10022534: the step stores no next and is re-entered until the level's event moves it on) or an event callback, 210 re-arms its deck-chair step — the order past those steps is open |
 | the dexterity mini-games | `_dexterity_gate`: the first click wins outright with WinDexterity's side effects | no such code: the mobile's thirteen dexterity items (one per level 201–213, none on Season 1) are plain timed actions in the level `objects.xml` — `hairpin` time 270, `reed` 360, `brailer` 240, `crowbar` 360 (the action `time` unit, not a clock unit) — and GameLogic/GUIEngine carry no dexterity vocabulary beyond a `minigame_desc` string | agrees in kind (data) |
-| detection ("sees Woody") | the mobile's predicate | the level tick (fcn.10044234 at 0x100445f1) runs fcn.1003fc90 over a table of watch entries (an actor, a target, mode bits at +0x1c/+0x1d) and evaluates each with fcn.1003f573: the actor must carry flag 0x20, neither party flag 4 (the hideout flag — set on hiding, e.g. 0x100067e9, cleared by the `leave` action at 0x10006abc), the rooms compared through fcn.10040a7d (the record of the actor's +0x20 name), and in one mode a vertical distance below 15 (0x1003f7d0); a true entry fires an event object (fcn.1003f86d, fcn.1003f972, fcn.1003fa6b, fcn.1003fc6e — no strings); the table is filled from data and code: every action record carrying `behavior=`/`behavioractor=` (62 in the Season 2 objects.xml — the neighbour's `run` after a failed Woody action ×11, Olga's `kid_cry`, the mother's `crash`, …; parsed by fcn.1004fa5c/fcn.1004fbe7/fcn.10050c15 and flagged at +0x24, 0x1000a696), the engine's own per-action entries (fcn.1004008d from fcn.10001b2c at 0x10002478/0x100024af, mode 0) and the scripts' explicit ones (fcn.1004000a: the tutorials' and 201's `tutorial` entries, 213's `bull` and `boat`) | agrees in kind with the mobile's zone containment plus the hiding exemption. The mode bits are read (2026-09-17, fcn.1003f573 with the entry's +0x1c dword as its fourth argument): bit 1 — the two objects' rooms (fcn.10040a7d) are the same; bit 2 — the same room, the same floor record (fcn.1004c945 / fcn.10049006) and a vertical distance below 15 (0x1003f7d0); bit 4 — always true; no bit — never; and before any of them the second object must carry flag 0x20 and neither flag 4 (the hideout), with no sneaking, busy or animation term at all. The walker (fcn.1003fc90) tests an entry without a direct target against every other entry of the table whose ordinal (+0xc) reaches its threshold (+0x18), with the two modes ORed, and latches a hit in +0x1d bit 2. The engine's per-actor entries (fcn.1004008d from fcn.10001b2c) and the scripts' explicit ones (fcn.1004000a) are built with mode 0; the modes come from the parsed action records — `behavior=`/`behavioractor=` with `always="true"` (the 62 reactions: the neighbour's `run` after Woody's `failed`, `tongue`, `kid_cry`, `crash`, …) and the `room` keyword the level parsers compare (0x10070779 …). Still open: which entry fires the catch — the `fight` is issued by a per-level handler (fcn.10014980, fcn.10019352, … one per class) reached through the class's vtable, not from the text listing; until it is read, the profile's Season 2 keeps the mobile predicates |
+| detection ("sees Woody") | the mobile's predicate | the level tick (fcn.10044234 at 0x100445f1) runs fcn.1003fc90 over a table of watch entries (an actor, a target, mode bits at +0x1c/+0x1d) and evaluates each with fcn.1003f573: the actor must carry flag 0x20, neither party flag 4 (the hideout flag — set on hiding, e.g. 0x100067e9, cleared by the `leave` action at 0x10006abc), the rooms compared through fcn.10040a7d (the record of the actor's +0x20 name), and in one mode a vertical distance below 15 (0x1003f7d0); a true entry fires an event object (fcn.1003f86d, fcn.1003f972, fcn.1003fa6b, fcn.1003fc6e — no strings); the table is filled from data and code: every action record carrying `behavior=`/`behavioractor=` (62 in the Season 2 objects.xml — the neighbour's `run` after a failed Woody action ×11, Olga's `kid_cry`, the mother's `crash`, …; parsed by fcn.1004fa5c/fcn.1004fbe7/fcn.10050c15 and flagged at +0x24, 0x1000a696), the engine's own per-action entries (fcn.1004008d from fcn.10001b2c at 0x10002478/0x100024af, mode 0) and the scripts' explicit ones (fcn.1004000a: the tutorials' and 201's `tutorial` entries, 213's `bull` and `boat`) | agrees in kind with the mobile's zone containment plus the hiding exemption. The mode bits are read (2026-09-17, fcn.1003f573 with the entry's +0x1c dword as its fourth argument): bit 1 — the two objects' rooms (fcn.10040a7d) are the same; bit 2 — the same room, the same floor record (fcn.1004c945 / fcn.10049006) and a vertical distance below 15 (0x1003f7d0); bit 4 — always true; no bit — never; and before any of them the second object must carry flag 0x20 and neither flag 4 (the hideout), with no sneaking, busy or animation term at all. The walker (fcn.1003fc90) tests an entry without a direct target against every other entry of the table whose ordinal (+0xc) reaches its threshold (+0x18), with the two modes ORed, and latches a hit in +0x1d bit 2. The engine's per-actor entries (fcn.1004008d from fcn.10001b2c) and the scripts' explicit ones (fcn.1004000a) are built with mode 0; the modes come from the parsed action records — `behavior=`/`behavioractor=` with `always="true"` (the 62 reactions: the neighbour's `run` after Woody's `failed`, `tongue`, `kid_cry`, `crash`, …) and the `room` keyword the level parsers compare (0x10070779 …). The catch itself (2026-09-17, later): fcn.1000eb19 (13 call sites, one per level class) runs the catcher's approach step fcn.1000e601 — the two rooms compared through fcn.10040a7d, a point beside the target at the fixed offset [0x100cc814], a path check (fcn.100072b1) and the move (fcn.10007d78) — and starts the `fight` action (the string global 0x100e1b50, fcn.10002cd5) once no step is left; the level classes call it with `neighbor` and a continuation from handlers they subscribe to engine events through fcn.1000e7f2 (18 subscriptions, e.g. event 0xf0 on `pool_deckchair` in the 207 class), and the data's `behavior="run" behavioractor="neighbor"` on Woody's `failed` action is the reaction after it. The per-actor watch entries carry mode 0 (fcn.10001b2c) or 0x100 (fcn.10008b74 — the lookup selector byte), the room bits come from the outer, data-side entries ORed in by the walker. Which event the catch handlers answer — a watch entry's or a room hook's — is still unread, so the profile's Season 2 keeps the mobile predicates |
 
 ## Not verified
 
@@ -240,10 +244,22 @@ helpers.
   auto-repeat interval, its 1000 ms the hold timer, and fcn.100092a0's
   167 ms the caret blink — what makes the level tick 12 Hz is not
   located. The 12 Hz itself stands on the clock, the GUI's
-  divisions by 12 and the mercury (docs/PC_ROUTINES.md).
+  divisions by 12 and the mercury (docs/PC_ROUTINES.md). Read further on
+  2026-09-17: the app's timer is built for 60 (`push 0x3c` at 0x0040eed2
+  into fcn.00402cc0; fcn.00402da0 is QueryPerformanceCounter with a
+  timeGetTime fallback, in seconds since start), the level's update
+  fcn.0043ab40 drains its message queue and then, while `[+0x54]` is set,
+  runs the coroutines (fcn.00472390), the per-tick rules (fcn.00439cd0,
+  which holds the anger rule fcn.00436bb0) and the clock (fcn.00438a80);
+  the one fixed-step scheduler with a catch-up in game.exe — fcn.004237b0,
+  an interval of `1000 / rate` ms (0x00423ca6) and `n = elapsed /
+  interval` steps — belongs to the Video for Windows player (its
+  constructor fcn.00423860 asks MSVFW32 for its version; the rate is the
+  clip's), not to the level. The gate between the 60 Hz timer and the
+  update is what remains unread; the port keeps its own 12 Hz accumulator.
 - Season 1: whether the position object of the catch is the room or the
   floor strip.
-- Season 2: which watch entry (or room hook) reaches the level class's `fight` handler — the mode bits themselves are read
+- Season 2: which event reaches the level classes' catch handlers (fcn.1000eb19's 13 sites: the approach step fcn.1000e601, then `fight`) — the watch modes and the data-side `run` reactions (the failed minigame, Olga's shout) are read
   and what its reactions run; what the respawn
   timer gates.
 - The jingle table's index (0..3) is the dialog's outcome, not the level
@@ -261,7 +277,8 @@ helpers.
   90 mark under the profile.
 - `tests/test_hud_pc.py`: the captions and the threshold.
 - Documented, not carried: the walking speeds (the `<speed>` records and
-  the walk step, the row above) and the walk noise; the Season 2 lap tool
+  the walk step, the row above; carried later that day) and the walk noise
+  (the gait records' `noise` — the port's sleeping-pet test already matches); the Season 2 lap tool
   reads radare2's `fcn.` spelling of a next-step store too (nine laps
   close).
 - Documented, not carried: the neighbour's blind byte (never set on PC),
@@ -272,6 +289,13 @@ helpers.
   clips' pace (`clip_fps`) and the catch on sight without the busy
   windows (`sees_while_busy`); `NFH_PC_RULES=walk,doors,sight` keeps a
   subset of the three for bisecting a plan.
+- `tests/run_tricks.py` (2026-09-17, the chain pass): `Name@ZoneName:N`
+  names the N-th twin of one zone (113's two hall marbles spots); the
+  `await` timeout is 240 s under the profile (a PC lap runs to 180 s on
+  113, and a trick armed a lap ahead pays a lap later); an `await` parks
+  a hidden Woody where he is, so a plan whose neighbour makes an urgent
+  trip off his routine (113's hot-valve grab into the basement) ends in
+  the wardrobe.
 - `tests/run_tricks.py` (the same day): the harness dodges by the PC
   paces — a catcher's arrival is his climb to a back door plus the Enter
   clip, Woody's exit adds his own climb; the sleeper's and the ignorer's

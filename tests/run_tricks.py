@@ -9,7 +9,9 @@ when its target zone is free of catchers, Woody flees to a parked zone
 when one walks in, and the run restarts (score and all — GameInfo restart
 semantics) when he is caught anyway.
 
-Plan commands, one per line ('#' comments):
+Plan commands, one per line ('#' comments; an <Item> is its name, twins
+disambiguate as Name@ZoneName, twins in one zone as Name@ZoneName:N — the
+N-th in the level's order, from 1):
     take <Item> <Type>       click the search item until Type is held
     use <Item>               bare-hand click, success = item tricked
     usewith <Item> <Type>    select Type, click; success = tricked/armed
@@ -219,15 +221,21 @@ class Driver(Recorder):
         return self.v.world
 
     def item(self, name):
-        """an item by name; twins disambiguate as Name@ZoneName"""
-        zone = None
+        """an item by name; twins disambiguate as Name@ZoneName, twins in
+        one zone as Name@ZoneName:N (the N-th in the level's order, from 1)"""
+        zone, nth = None, 1
         if '@' in name:
             name, zone = name.split('@', 1)
+            if ':' in zone:
+                zone, nth = zone.split(':', 1)
+                nth = int(nth)
         for it in self.v.level.items.values():
             if it.name != name:
                 continue
             if zone is None or self.zone_name(it.zone) == zone:
-                return it
+                nth -= 1
+                if nth == 0:
+                    return it
         raise SystemExit('plan names no such item: %r' % name)
 
     def zone_name(self, pid):

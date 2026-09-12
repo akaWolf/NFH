@@ -4,29 +4,37 @@
 # reaches it instead of the basement door. It must go in on the FIRST
 # basement visit: once ValveMain is tricked his ValveMain actions are
 # removed and he never enters the basement again — which also makes the
-# basement safe for the hot valve afterwards. So: cable, then tongs,
-# tatter, trap, main valve (out by ~40 s, the wardrobe by 45); the hall
-# drawer (fuse + marbles), the marbles and the hot valve after his pass. 8/8.
+# basement safe afterwards. So: cable, then tongs, the hot valve on the way
+# (GetTrickedAtOnce: the radiator pays on its own a lap later — a slip on the
+# way to it drops that lap's radiator, ActionManager.cs:614-619), tatter,
+# trap, main valve (out by ~40 s, the wardrobe by 45); the hall drawer (fuse
+# + marbles) and the marbles on the hall spot behind the basement door while
+# he is down there (2026-09-17: the trap, the slip 19 s later, the sink 22 s
+# after that — two ticks; the ladder's tongs and the fuse at the drill a
+# third). 8/8, 96: the hall spot pays 7.
 
 take RubbishBinCable IT_Cable         # Z03
 take BasementDrawer IT_Tongs          # Z09
+use ValveHot                          # Z09, on the way from the drawer: GetTrickedAtOnce -> the Radiator at his lap-1 [3], 15 — the third link of the chain
 prime ElectricTrapTatter              # Z09: the bare click primes the trap
 usewith ElectricTrap IT_Cable        # Z09: 8 on his [2] walk in (the overlay lifts it above the door)
 use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
 hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
-take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles
-usewith GroundMarbles@Zone03 IT_Marbles   # x=4.63 (score 8), on his door(4.09) -> Radiator(6.51) walk
+take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles (he is in the basement, 55-75)
+usewith GroundMarbles@Zone01:2 IT_Marbles   # the hall spot x=3.02, between the basement door (2.55) and the kitchen door (4.63): he slips right after the trap (~18 s), the radiator ~18 s later
+hide Wardrobe                         # back in before he comes up (~75): the slip, the kitchen, the hall, the bathroom
 whenusing Sink                        # his [4] sink (17 s in Z04): the hall and the basement are clear — ungated, the leg met him crossing the hall once the PC's one-tantrum angry had moved his lap by 5 s
-use ValveHot                          # Z09, now safe: GetTrickedAtOnce -> the Radiator at his next [3], 15
-take BedDrawer IT_Painbook            # Z06
-usewith Ladder IT_Tongs               # Z08, 15 at his [7]
-use AngleGrinder                      # Z07, bare, 10 at his [1]
-usewith ChairAssemblyBook IT_Painbook # Z02: GetTrickedAtOnce -> ChairAssembly [0], 10
-park Zone03                           # off his Z01 -> Z02 -> Z06 -> Z08 walk
-usewith FuseBox IT_Fuse               # Z01: after his [6] prime -> LadderDrill [8], 10
-park Zone04
+take BedDrawer IT_Painbook            # Z06, while he is at the sink and in the basement (103-135)
+usewith Ladder IT_Tongs               # Z08, 15 at his lap-1 ladder [7] (~158): the drill [8] 5 s later carries the fuse — a tick
+use AngleGrinder                      # Z07, bare, 10 at his lap-2 [1] (~249)
+park Zone03                           # down through the living room before his hall pass (137-141): the kitchen is his only at the lap-2 radiator (~284)
+usewith FuseBox IT_Fuse               # Z01, after his prime (137.7) and before the drill (162.8): the hall is free once he climbs (141)
+park Zone03                           # back out of the hall while he is upstairs
+usewith ChairAssemblyBook IT_Painbook # Z02, after his descent (~178): GetTrickedAtOnce -> the chair [0] on lap 2 (~210), 10
+park Zone03                           # off his hall visit (~199) and the chair (~210)
+hide Wardrobe                         # Z01 while he is upstairs (~215-275): the awaits from inside — his hot-valve grab after the lap-2 radiator (an urgent, not the routine) crosses the hall into the basement, where a 'safest' park would sit
 
-await GroundMarbles@Zone03 8
+await GroundMarbles@Zone01:2 7
 await Ladder 15
 await FuseBox 10
 await ChairAssemblyBook 10

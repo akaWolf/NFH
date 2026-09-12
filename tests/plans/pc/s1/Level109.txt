@@ -13,22 +13,23 @@
 # cactus wait for his second sleep, entered from the living room the moment he
 # lies down, and the balcony (off his lap) is Woody's perch until he goes down;
 # the kitchen and the hall are armed on his first sleep instead. Seven tricks'
-# 88 need: the milk (56), the chips (91), the banana (~165), then the alarm
-# (~250), the teeth (~220), the bed (~225) and the pig (~285) — with the anger
-# of the first lap's three shifting the later laps.
+# 88 need four ticks; three are there (2026-09-17): the banana in the living
+# room (97) and the chili 15 s after it, the teeth 4 s after the cactus alarm on
+# his lap-3 waking (the tabasco goes in on his third sleep, after the pins) — the
+# milk's blast at the pig (69) is 28 s before the banana (its window 25), and
+# the bed's sleep (26.5 s) and the pig (a lap of its own) stay single.
+take! PinsBoard IT_Pins              # Zone01 first, on the way in from the entrance: the hall is his last room of the descent (59)
 take! ChemicalSet IT_Nitro           # Zone02 during his first sleep (4-31), tiptoe past the parrot
 take! SpicyChips IT_Chips            # Zone02
 take! RubbishBinBanana2 IT_Banana    # Zone03
 take! Fridge IT_Tabasco              # Zone03
 usewith! PigMilk IT_Nitro            # Zone03, 20: explodes at the pig (64), paid through DependsOn = PigMilk
 usewith! CornChips IT_Chips          # Zone03: fed to the dog at Chili (91; the C# pays DependsOn = CornChips, 0)
-take! PinsBoard IT_Pins              # Zone01, before he comes down (45)
-hide! Wardrobe                       # Zone01: wait out his first descent in the hall's wardrobe (the entrance zone is the exit door's, no park there)
-whenzone Zone06                      # (~98+) he is back upstairs, awake (keys, teeth)
-usewith! Ground@Zone03 IT_Banana     # Zone03, 7 (free while he is upstairs): he slips on his lap-2 walk to the milk (~165) — laid after the nitro has gone off (64)
-park! Zone02                         # up to the living room meanwhile (tiptoe: the parrot)
+walk -1.8 -3.45                      # the hall by the living-room door while he crosses the living room (45-51); the hall is his only at 59
+whenzone Zone03                      # (51.1) his first kitchen: into the living room behind him — the door clip (3.5 s) and the tiptoe past the dog fit before his hall at 59
+usewith! Ground@Zone02 IT_Banana     # Zone02, 7: x=-0.57 on his kitchen -> chili walk (84) — ~19 s after the milk's blast at the pig, the chili ~19 s after the slip: two ticks (the banana's 26 s)
+park! Zone07                         # up through the living room and the bedroom to the balcony (off his lap) before he comes up (98)
 whenusing Bed                        # (~111+) his second sleep: 26.5 s
-usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe: primed by his brushing before the sleep, un-primed by the one after — pays at that one
 take! PigKeys IT_Pigkey              # Zone06 -> the balcony door, tiptoe past the sleeper
 take! Cactus IT_Cactus               # Zone07: the balcony, off his lap
 park Zone07                          # the perch until he goes down (154)
@@ -39,9 +40,15 @@ park! Zone02                         # the living room while he is in the kitche
 whenusing Pig                        # (~195) his hall visit of the lap: the kitchen comes right after it
 whenzone Zone03                      # (~205) his second kitchen of the lap: the hall is his only at the next lap's pig (~300)
 usewith! Pig IT_Pigkey               # Zone01, 10: the pig gets out at his lap-4 visit
-hide! Wardrobe                       # Zone01: the awaits from inside
+hide! Wardrobe                       # Zone01: he crosses the living room (233-245) and climbs to the bedroom (251)
+whenusing Bed                        # (~253) his third bed: the pins jump him up, he lies down again ~32 s later
+park! Zone02                         # the living room meanwhile (the dog asleep again after his play at ~233)
+wait 30                              # (~286) his second lie-down of the night
+usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe past the sleeper: his brushing at the lap-3 waking (~316), 4 s after the cactus alarm (~313) — a tick
+park! Zone02                         # out of the bedroom before the alarm (~313)
+hide! Wardrobe                       # Zone01: the awaits from inside (his hall visit ~346 is the pig's)
 await PigMilk 20
-await Ground@Zone03 7
+await Ground@Zone02 7
 await CornChips 15
 await Teeth 15
 await Bed 8

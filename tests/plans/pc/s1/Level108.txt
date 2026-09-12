@@ -14,19 +14,17 @@
 # (105). The
 # can goes in during his second coffee (119-134) — up through the living room
 # as he enters the kitchen, down again before his bedroom at 138 — the deck
-# chair the same way during his third. Six tricks' 88 need four ticks: the
-# slip and the coffee at 119-122, the brush rush, the lotion at 146, the plant
-# at 150, the chair at 226.
+# chair the same way during his third. Six tricks' 88 need four ticks; three
+# are there (2026-09-17, the pay log): the pins, the lotion 10 s later at his
+# re-sit, the banana on the bedroom floor as he leaves the balcony (its 30 s
+# window carries the plant) — the coffee's brush rush is 24 s, past the 20.
 take! Fridge IT_Honey                # Zone03 by 7 through the hall's back door; he comes down into the hall at 11
 take! BedDrawer IT_Key               # Zone06 (~19): through the living room once he has left it (10) for the bathroom
 take! SoilBag IT_Soil_only           # Zone07
 use! SunShade                        # Zone07, bare hand: Neutral, folds the shade
-usewith! SunLotion IT_Honey          # Zone07, 20: with his lap-2 Shezlong use (DependsOn)
 hide! Bed                            # Zone06 by ~45: he climbs at 59, sunbathes 66-74, comes back through 74-81
 whenzone Zone07                      # (66) he is on the balcony: out of the bed and down to the kitchen
-take! RubbishBinBanana2 IT_Banana    # Zone03
-walk 3.0 -0.64                       # the middle of the kitchen: his coffee walk runs x 1.6-4.5, the bin stands past it
-usewith! Ground@Zone03 IT_Banana     # Zone03, 8: he slips on his way to the coffee (119)
+take! RubbishBinBanana2 IT_Banana    # Zone03: kept for the bedroom floor on his third balcony (the chain below)
 usewith! CoffeeMaker IT_Soil_only    # Zone03, 15: pays at his lap-2 coffee (122)
 whenzone Zone07                      # (105) his second balcony (the can): the hall and the bathroom until his coffee at 119
 take! Drawer IT_Brush                # Zone01: the dirty shoe brush
@@ -37,7 +35,11 @@ park Zone01                          # wait in the hall: he passes the living ro
 whenusing CoffeeMaker                # (122) his second coffee: up to the balcony
 usewith! WateringCan IT_Poison       # Zone07: Plant 20 at his watering (~228)
 usewith! Shezlong IT_Pins            # Zone07, 10: the same trip — fires at his lap-2 deck chair (~206)
+usewith! SunLotion IT_Honey          # Zone07, 20: the same trip — his re-sit after the pins (~216), 10 s later: a tick
 park! Zone02                         # straight down before his bedroom (~194)
+whenzone Zone07                      # (~203) his third balcony: the banana on the bedroom floor behind him
+usewith! Ground@Zone06 IT_Banana     # x=0.22, on his balcony -> living walk: he slips ~226 (inside the lotion's 20 s) and the plant at ~250 sits inside the banana's 30
+park! Zone03                         # the kitchen is his only after the plant: out of his way through the living room and the hall
 whenzone Zone01                      # (~184) he crosses the hall to the living room (~189): the kitchen is his only at the coffees
 park! Zone03                         # the kitchen until the tricks have paid (his next coffee ~280)
 await CoffeeMaker 15
@@ -45,4 +47,4 @@ await ToothBrush 15
 await SunLotion 20
 await Plant 20
 await Shezlong 10
-await Ground@Zone03 8               # the slip pays at the fall's end; its bookkeeping is the last to settle
+await Ground@Zone06 8               # the slip pays at the fall's end; its bookkeeping is the last to settle

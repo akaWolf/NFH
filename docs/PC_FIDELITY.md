@@ -324,8 +324,7 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   airer, primed by his own balcony use and un-primed by the next, is dropped
   and its errands split over his descents (70). Every other Season 1 level
   is re-timed to runs/idlepc4's laps and won: 101/102/107 100, 103/104/105
-  97, 112/114 94, 108/113 91, 109 88 (its first sleep is a second short for
-  the keys, which wait for the second). The 100 on a Season 1 level is the
+  97, 114 94 and, after the chain pass below, 113 96, 108/109/112 94. The 100 on a Season 1 level is the
   score plus 3 per trick that lands while he is still angry
   (World.calculate_score under the profile; the run's rating.json lists
   every payment with its hot/cold mark): a trick's window is the level's
@@ -337,7 +336,30 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   the cream at the eat, the phone answered 23 s after the loo); 114 chains
   six of its eight once the pipe and the gramophone are armed on his first
   basement trip (97 — the cup's tin 52 s after the horn and the pipe 43 s
-  after the tin stay cold); 112 spreads ten tricks over a lap of 143 s (94). Season 2 (the
+  after the tin stay cold); 112 spreads ten tricks over a lap of 143 s (94).
+  The chain pass of 2026-09-17 (runs/chain1, the pay logs; a window is the
+  60-tick hold plus the trick's own angrytime where tricks.xml gives one —
+  the marbles 27-29 s, the skates 30, a banana 26-30 — else the level's):
+  108 — the pins, the lotion at his re-sit 10 s later (a tick), the banana
+  on the bedroom floor as he leaves the balcony 20.0 s after the lotion (the
+  level's 20: cold by no margin at all), the plant 23 s after the slip
+  inside the banana's 30 (a tick); the coffee's brush rush is 24 s (94).
+  109 — the milk's blast at the pig, the banana in the living room 27.7 s
+  later (the milk's 25: cold), the chili's chips 14.6 s after the slip (a
+  tick), the tabasco brushing 1.3 s after the cactus alarm on his third
+  waking (a tick — the tabasco goes in on the third sleep, after the pins'
+  jump and his second lie-down); the bed's sleep is 37 s (94). 112 — the
+  fish to the yoga book 26.0 s (25: cold); the one marbles set bridges the
+  skates to the chest expander (27.6 s inside the skates' 30) and cannot
+  also bridge the yoga book to the trampoline (36 s): six ticks (94). 113 —
+  the trap, the hall marbles 19.4 s later (the spot between the basement
+  door and the kitchen door, `GroundMarbles@Zone01:2`; it pays 7 where the
+  kitchen's pays 8), the sink 21.5 s after the slip, the ladder's tongs and
+  the fuse at the drill 18.3 s later (three ticks); the hot valve is armed
+  before his first basement trip, and the marbles' surprise then drops his
+  tricked radiator (ActionManager.cs:614-619, the interrupted action of a
+  GotTricked item), so it pays alone a lap later (96). The 108 and 112
+  ceilings are a second of his lap each; 109's and 113's are the routine's. Season 2 (the
   mobile predicates): thirteen levels at 100 — 209 with its hot shoe used
   inside his Taj Mahal stay, where the mobile predicate is blind; 202 with
   the PC coins of cn_b1's tricks.xml (the mat 20, the shark 35 on the
