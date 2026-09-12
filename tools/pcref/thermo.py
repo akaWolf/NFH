@@ -10,10 +10,14 @@ are normalised by 89. The meter jumps to full on every trick (as the
 mobile's Rottweiler.cs:611 does), holds there while the angry plays, then
 falls linearly to empty: the durations are the level's constant, two to
 three times faster than the mobile data's AngryMeterDecay (4.23 %/s,
-23.6 s). The tick counter does not follow the mercury (ticks land with
-the tube empty for up to ten seconds; docs/PC_FIDELITY.md §7), so the
-rate is a drawing constant only — levels/pc/*.overlay.json carry it as
-PCThermometerDrain for the HUD, the tick meter keeps the data's value.
+23.6 s). Caveat: this reader counts red pixels only, and the column's
+top is white-hot when high, so its "full" outlives the true one by ~2 s
+and its drains cover the red part; thermo_rows.py reads the first
+non-blue row and gives the true hold (5 s, 60 ticks at 12 Hz) and fall.
+Per game.exe (docs/PC_ROUTINES.md) the mercury is the rage current over
+the level's angrytime in 1/12 s; levels/pc/*.overlay.json carry that
+angrytime in ticks as PCAngryTime and the profile runs the PC rule on it
+(docs/PC_FIDELITY.md §7).
 """
 import json, os, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

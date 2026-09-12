@@ -1,6 +1,7 @@
-"""The PC profile's HUD arithmetic, without a window: the viewer rating's
-count-up queue (HUD._pc_rating_step) and the thermometer's drawn drain —
-docs/PC_FIDELITY.md §7. Runs under the project's nix-shell (hud imports
+"""The PC profile's HUD and anger arithmetic, without a window: the viewer
+rating's count-up queue (HUD._pc_rating_step) and the Season 1 rage rule
+read from game.exe (pcprofile.s1_rage_*) — docs/PC_FIDELITY.md §7,
+docs/PC_ROUTINES.md. Runs under the project's nix-shell (hud imports
 sdl2): python3 -m unittest tests.test_hud_pc"""
 import os
 import sys
@@ -8,6 +9,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'runtime'))
 import hud  # noqa: E402
+import pcprofile  # noqa: E402
 
 
 class _World:
@@ -82,29 +84,38 @@ class CountUp(unittest.TestCase):
         self.assertEqual(h._pc_target(), 8)
 
 
-class Thermometer(unittest.TestCase):
-    """the drawn meter's rule as _draw_angry_meter applies it: full while
-    the tick meter is full, then the level's drain per second"""
-    def test_drain(self):
-        shown = 0.0
-        drain = 12.9
-        full = 100.0
-        def step(meter, dt):
-            nonlocal shown
-            if meter >= full - 1e-6:
-                shown = 100.0
-            else:
-                shown = max(0.0, shown - drain * dt)
-            return shown
-        self.assertEqual(step(100.0, 1 / 60.0), 100.0)      # the trick
-        self.assertEqual(step(100.0, 1 / 60.0), 100.0)      # the hold
-        for _ in range(60):
-            step(99.0, 1 / 60.0)                            # a second of drain
-        self.assertAlmostEqual(shown, 100.0 - drain, places=3)
-        for _ in range(60 * 8):
-            step(50.0, 1 / 60.0)
-        self.assertEqual(shown, 0.0)                        # empty in 7.8 s
-        self.assertEqual(step(100.0, 1 / 60.0), 100.0)      # the next trick
+class Rage(unittest.TestCase):
+    """game.exe's level state on the bath (level angrytime 156): the foam
+    pudding (240) pins the mercury 60 + 84 ticks (12 s at the 12 Hz tick),
+    drains it over 156 (13 s), and pays a bonus to any trick fired within
+    300 ticks (25 s)"""
+    def test_bath_foam(self):
+        cur, hold = pcprofile.s1_rage_fire(0, 240)
+        self.assertEqual((cur, hold), (240, 60))
+        self.assertEqual(pcprofile.s1_rage_percent(cur, 156), 100)
+        pinned = 0
+        ticks = 0
+        while cur > 0:
+            cur, hold = pcprofile.s1_rage_tick(cur, hold)
+            ticks += 1
+            if pcprofile.s1_rage_percent(cur, 156) == 100:
+                pinned += 1
+        self.assertEqual(ticks, 300)               # 60 + 240: 25 s above zero
+        self.assertEqual(pcprofile.S1_TICK_HZ, 12)
+        self.assertEqual(pinned, 60 + (240 - 156) - 1 + 1)   # 144 ticks full
+        self.assertEqual(pcprofile.s1_rage_percent(0, 156), 0)
+
+    def test_level_value_and_max(self):
+        # a trick without its own value takes the level's; a second trick
+        # never lowers the current, only restarts the hold
+        cur, hold = pcprofile.s1_rage_fire(0, 156)
+        for _ in range(100):
+            cur, hold = pcprofile.s1_rage_tick(cur, hold)
+        self.assertEqual((cur, hold), (116, 0))
+        self.assertEqual(pcprofile.s1_rage_percent(cur, 156), 74)   # 116*100//156
+        cur, hold = pcprofile.s1_rage_fire(cur, 100)
+        self.assertEqual((cur, hold), (116, 60))
+        self.assertTrue(cur > 0)                    # the bonus test
 
 
 if __name__ == '__main__':

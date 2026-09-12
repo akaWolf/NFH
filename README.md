@@ -121,22 +121,29 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   tricks in a second order): all won, 33 PERFECT; the rest are the
   remaster's own ceilings — one anger overflow per Season 2 level and no
   whistle on Level114 — measured in `docs/PC_VS_MOBILE.md`.
-- **The PC profile.** 28 of 28 levels at 100 %: the PC's scoring (the S1
-  viewer rating, the S2 COLLAPSE! board with the clock), its trick
-  amounts, lap orders and scores where they differ, the whistle, three
-  lives, no minigames, the thermometer's drain and the rating's count-up
-  — each deviation an overlay entry or an `is_pc()` branch with its
-  source (`docs/PC_FIDELITY.md` §7). The mobile numbers do not move: the
-  54-plan regression under `--profile=mobile` is byte-identical.
+- **The PC profile.** The PC's scoring (the S1 viewer rating, the S2
+  COLLAPSE! board with the clock), its trick amounts, lap orders and
+  scores where they differ, the whistle, three lives, no minigames, the
+  rating's count-up and — since 2026-09-16, read from game.exe — the
+  Season 1 anger itself (a trick sets the indicator to its `angrytime`,
+  60 ticks of hold, one per tick at 12 Hz, +3 while above zero) — each
+  deviation an overlay entry or an `is_pc()` branch with its source
+  (`docs/PC_FIDELITY.md` §7). 16 of 28 levels rate 100 at this commit:
+  all of Season 2 and 101/104; the other twelve Season 1 plans were
+  chained for the mobile's 23.6 s window and its angry latch and are
+  being re-chained to the PC's 18-35 s windows (`docs/PC_ROUTINES.md`).
+  The mobile numbers do not move: the 54-plan regression under
+  `--profile=mobile` is byte-identical.
 
 Open: three natural laps still differ from the PC's by more than 15 %
 (111, 213, 210 — the neighbour's routine is compiled into game.exe, one
-class per level, not data), and the PC's anger rule, now read from
-game.exe (a trick sets the indicator to its `angrytime`, 60 ticks of
-hold, then one per tick at 20 Hz; +3 while it is above zero —
-`docs/PC_ROUTINES.md`), is documented but not yet carried by the
-profile, whose tick meter is still the mobile's. `docs/GAMEPLAY.md`
-§10–§11 list what resists a clean reimplementation.
+class per level, not data); the PC's Season 1 anger rule is read from
+game.exe and carried (a trick sets the indicator to its `angrytime`, 60
+ticks of hold, then one per tick at 12 Hz; +3 while it is above zero —
+`docs/PC_ROUTINES.md`), the Season 2 one is not read yet (its trick
+accounting raises a flag at 100 000 rage, against the profile's 80-unit
+gauge from the video). `docs/GAMEPLAY.md` §10–§11 list what resists a
+clean reimplementation.
 
 ## What makes this tractable
 

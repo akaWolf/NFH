@@ -259,7 +259,14 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 Every level pays every trick. Under the PC's own scores (the COLLAPSE!
 board on Season 2, the viewer rating's 3 a tick on Season 1 — §2.4,
-docs/PC_VS_MOBILE.md) all twenty-eight levels rate 100. On Season 2 the lever
+docs/PC_VS_MOBILE.md) all twenty-eight levels rated 100 under the
+mobile's tick meter. Since the anger rule moved to game.exe's
+(2026-09-16: the 12 Hz tick, the 60-tick hold, the window 5 s + the
+trick's angrytime over 12, no pause for the tantrum) the same plans
+rate 100 on Season 2 and on 101 and 104, and 91-97 on the other twelve
+Season 1 levels — their chains leaned on the mobile's 23.6 s plus the
+angry latch (a gap of 24-33 s still paid); re-chaining them to the PC's
+18-35 s windows is the work in progress, level by level. On Season 2 the lever
 on the levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's
@@ -390,14 +397,25 @@ its foam pudding (240), 21 s after the hunter's marbles (360). The
 HUD digit read one second before and five after every trick of
 Badinfos' fourteen runs agrees with the bracket that reading gives
 (ticks for every gap whose decay is 18 s or shorter, never for 25 s or
-longer). The port's tick meter is still the mobile's (4.23 %/s, 23.6 s
-after any trick): a sweep with the mercury rates as AngryMeterDecay lost
-ticks on thirteen levels — 88-98 % — and 113 outright, so the drawn
-meter is a HUD-only constant (PCThermometerDrain) over the mobile
-meter; carrying the PC rule itself (hold, amount, level maximum,
-+3 while above zero) is the open change. (An earlier reading of 3.7-4.6
-%/s here came from an uncalibrated
-crop and is withdrawn.) The percentage beside the tick counter is
+longer). The tick is 12 Hz, not 20 (docs/PC_ROUTINES.md: the clock
+unit, the HUD's division by 12, the raw column), so the hold is 5 s
+and the window 5 s + the amount over 12 — 18 s on the bath, 20 s on
+the 180 levels, 25 s on the 240 ones, 35 s after the hunter's marbles
+— and the drains above are the red-only reader's artifact: the column's
+white-hot top is not red, and the tube shows the top ~70 % of the bar
+(tools/pcref/thermo_rows.py reads the first non-blue row: the fill
+holds 5.4-5.8 s and falls 0.7 × angrytime ticks over the tube, 10.6 s
+on E03, 11.7 on E04). The profile carries that rule since 2026-09-16
+(pcprofile.s1_rage_fire / s1_rage_tick / s1_rage_percent, run by
+Pawn.tick and World.play_angry's PC branch; the data as PCAngryTime in
+ticks — the level's on the neighbour, a trick's own on the item): the
+meter the HUD draws is the state's percentage and the +3 is paid off the
+current, so the mobile's tick meter (4.23 %/s, 23.6 s after any trick)
+is the mobile profile's alone — an earlier attempt to put the mercury
+rates into AngryMeterDecay under the mobile rule had lost ticks on
+thirteen levels, 88-98 %, and 113 outright, which is why the drawing
+and the rule had to move together. (An earlier reading of 3.7-4.6
+%/s here came from an uncalibrated crop and is withdrawn.) The percentage beside the tick counter is
 counted up the PC's way, too: a trick's score arrives as a yellow "+N %"
 popup above the figure, a tick's 3 as an orange one; the popup sits for
 a second (1.0 s for the score, 1.2 s for the tick, E06 304-318 at five
@@ -467,17 +485,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   The mobile's extra rated items (103's magnesium cake, the sink/shelf
   pairs of 104, the valve/radiator pairs of 113) are not paid by the
   plans and not counted by the HUD's total, so nothing to zero.
-- *The thermometer.* `level.xml`'s `angrytime` (1/20 s ticks: 156 on
+- *The thermometer.* `level.xml`'s `angrytime` (1/12 s ticks: 156 on
   the bath, 280 on the first trick, 240 on the laundry, fitness and
-  hunter) is exactly the drain the video gave — the fourteen
-  PCThermometerDrain values are now the data's, 100 / (angrytime / 20).
-  Some tricks carry their own `angrytime` (the foam pudding 240, the
-  dirty towel 216): per game.exe (docs/PC_ROUTINES.md) that is the
-  amount the rage current is set to, the level's value both the amount
-  of a trick without one and the mercury's full scale — which is why the
-  drain after the foam pudding on E06 was still the level's 7.8 s while
-  the mercury pinned 7.2 s first. The bonus window is 60 + amount ticks
-  at 20 Hz; the port's tick meter is still the mobile's 23.6 s.
+  hunter) is the mercury's full scale and its drain — the fourteen
+  values sit on the neighbour as PCAngryTime, in ticks. Some tricks
+  carry their own `angrytime` (the foam pudding 240, the dirty towel
+  216): per game.exe (docs/PC_ROUTINES.md) that is the amount the rage
+  current is set to, the level's value both the amount of a trick
+  without one and the mercury's full scale — the foam pudding pins the
+  column 60 + 84 ticks (12 s) before the level's 13 s drain. The bonus
+  window is 60 + amount ticks at 12 Hz, and the profile runs exactly
+  that (pcprofile.s1_rage_*).
 - *Season 2 amounts.* `tricks.xml`'s `rage` per trick, in thousandths,
   is the mobile AngerAmount on all but eight items (202: rake 20, shark
   35, the electrified rail 30; 203: the chilli paper 30; 204: the jade
@@ -541,10 +559,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   level's rate — E14's marbles (360 = 18 s) hold 18.1 s, E09's nitro
   bottle (240) 12.6, E05's bowling ball (288) 14.6, E04's picture (264)
   12.8, E11's marbles and vacuum (300) 13.3 — where a plain trick holds
-  for the angry animation (7-8.5 s). The profile carries the values as
-  PCAngryTime (levels/pc, from tricks.xml) and holds the meter at its
-  maximum that long after the trick (World.play_angry's Classic branch),
-  which is the tick window's other half.
+  for the angry animation (7-8.5 s). Read from game.exe (docs/
+  PC_ROUTINES.md), the hold is not the trick's value: the value is the
+  rage current the trick sets, the mercury pins while that current is at
+  or above the level's angrytime — 60 ticks of hold plus the excess, at
+  12 ticks a second (the marbles: 5 + 10 s) — and the profile carries
+  the values as PCAngryTime (levels/pc, from tricks.xml, in ticks) for
+  exactly that (pcprofile.s1_rage_fire).
 - *In the binaries.* The neighbour's routine is a script in game.exe's
   level classes — read out with radare2 into docs/PC_ROUTINES.md (the
   object and action names are UTF-16 String globals the script code

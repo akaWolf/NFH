@@ -1,5 +1,5 @@
 {
- "source": "PC The Apple Pie: the neighbour's lap on PC is Sink (the shaves) > Pie > Microwave > Deodorant (docs/PC_LAPS_DETAIL.md s1_E04: 36 s), the mobile's Pie > Microwave > Cream > Pie (the eat) > Deodorant > AfterShave > Sink x2 > AfterShave > Deodorant. The PC run chains six of the seven payments (15, 26, 37, 60, 78, 89, 100 with the tick counter 0..6): the cream at the pie's end is followed by the microwave at once. The mobile order puts the microwave's 20 s use and the 18 s eat between the two, 40 s no chain crosses; this list moves the microwave after the eat, as on PC: [Pie, Cream, Pie (eat), Microwave, Deodorant, AfterShave, SinkAftershave, SinkDeodorant, AfterShave, Deodorant]. The microwave's ReuseAfterFix (the mobile's fix-and-reuse, another 20 s at the oven after the egg) goes too: the PC visit is the one 20 s (84-104 s of the lap), the deodorant follows at once. PC thermometer: the level's angrytime=204 in the PC data (level_pie/level.xml, 1/20 s ticks) is the 10.2 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 9.80 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC per-trick angrytime (tricks.xml: mum_smeared 264, toiletstuffed 228; 1/20 s): the anger indicator holds at its maximum that long after the trick — the thermometer's long holds on the video (E14's marbles 18.1 s, E09's 12.6, E05's 14.6) — carried as PCAngryTime for the profile's hold (docs/PC_FIDELITY.md §7).",
+ "source": "PC The Apple Pie: the neighbour's lap on PC is Sink (the shaves) > Pie > Microwave > Deodorant (docs/PC_LAPS_DETAIL.md s1_E04: 36 s), the mobile's Pie > Microwave > Cream > Pie (the eat) > Deodorant > AfterShave > Sink x2 > AfterShave > Deodorant. The PC run chains six of the seven payments (15, 26, 37, 60, 78, 89, 100 with the tick counter 0..6): the cream at the pie's end is followed by the microwave at once. The mobile order puts the microwave's 20 s use and the 18 s eat between the two, 40 s no chain crosses; this list moves the microwave after the eat, as on PC: [Pie, Cream, Pie (eat), Microwave, Deodorant, AfterShave, SinkAftershave, SinkDeodorant, AfterShave, Deodorant]. The microwave's ReuseAfterFix (the mobile's fix-and-reuse, another 20 s at the oven after the egg) goes too: the PC visit is the one 20 s (84-104 s of the lap), the deodorant follows at once. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_pie/level.xml's angrytime=204 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (MumPicture 264, Toilet 228); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
  "patches": [
   {
    "owner": "Rottweiler",
@@ -28,21 +28,21 @@
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 9.8
+    "PCAngryTime": 204
    }
   },
   {
    "object": "MumPicture",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 13.2
+    "PCAngryTime": 264
    }
   },
   {
    "object": "Toilet",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 11.4
+    "PCAngryTime": 228
    }
   }
  ]

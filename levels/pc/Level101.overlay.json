@@ -1,11 +1,11 @@
 {
- "source": "PC thermometer: the level's angrytime=280 in the PC data (level_peep/level.xml, 1/20 s ticks) is the 14.0 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 7.14 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC lap (docs/PC_LAPS.md): his sofa spell is 15 s on E01 against the mobile's 21 (SitDown, three SitLoop of 2.2 s and two SitRemote of 4.4 s, SitUp, plus the 2.4 s walk) — one SitRemote fewer, one SitLoop more: 12.6 s of sitting, 15 with the walk.",
+ "source": "PC lap (docs/PC_LAPS.md): his sofa spell is 15 s on E01 against the mobile's 21 (SitDown, three SitLoop of 2.2 s and two SitRemote of 4.4 s, SitUp, plus the 2.4 s walk) — one SitRemote fewer, one SitLoop more: 12.6 s of sitting, 15 with the walk. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_peep/level.xml's angrytime=280 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 7.14
+    "PCAngryTime": 280
    }
   },
   {

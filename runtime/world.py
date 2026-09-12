@@ -421,11 +421,17 @@ class Pawn:
         # Rottweiler's anger meter (fields on the pawn, Rottweiler.cs:50-56)
         self.angry_meter = 0.0
         self.angry_decay = spec.get('angry_decay') or 0.0
-        self.thermo_drain = spec.get('thermo_drain') or 0.0   # HUD only
         self.angry_max = spec.get('angry_max') or 100.0
         self.can_decrease_angry = True
-        self.angry_hold_until = 0.0      # the PC profile's per-trick hold (world time)
         self.angry_count_ticks = 0
+        # the PC profile's Season 1 rage (game.exe's level state, +0x70
+        # current / +0x78 hold / +0x84 the level's angrytime, in 1/12 s
+        # ticks — pcprofile.s1_rage_*); rage_max 0 means the mobile meter
+        self.rage_max = spec.get('rage_max') or 0
+        self.rage_current = 0
+        self.rage_hold = 0
+        self.rage_bonus = False          # the flag of the last trick (+0x7c)
+        self.rage_acc = 0.0              # seconds toward the next 1/12 s tick
         self.tricked_aux = False         # Rottweiler.TrickedAux: set at cs:652,
                                          # cleared by every Item.Fix (Item.cs:2065)
         self.sneaking = False
@@ -1519,9 +1525,22 @@ class Pawn:
 
     def tick(self, dt):
         self.anim.tick(dt)
-        # Rottweiler.Update: the meter decays while allowed
-        if self.can_decrease_angry and self.angry_meter > 0.0 and \
-                (self.world is None or self.world.time >= self.angry_hold_until):
+        if pcprofile.is_pc() and self.rage_max > 0:
+            # the PC level state's tick (game.exe fcn.00438a80, 12 Hz): the
+            # hold counts down first, then the current; the mobile meter
+            # mirrors the mercury, current * 100 / the level's angrytime
+            self.rage_acc += dt
+            period = 1.0 / pcprofile.S1_TICK_HZ
+            while self.rage_acc >= period - 1e-9:
+                self.rage_acc -= period
+                self.rage_current, self.rage_hold = \
+                    pcprofile.s1_rage_tick(self.rage_current, self.rage_hold)
+                if self.rage_current == 0:
+                    self.rage_bonus = False
+            self.angry_meter = float(
+                pcprofile.s1_rage_percent(self.rage_current, self.rage_max))
+        elif self.can_decrease_angry and self.angry_meter > 0.0:
+            # Rottweiler.Update: the meter decays while allowed
             self.angry_meter = max(0.0, self.angry_meter - self.angry_decay * dt)
         self._zone_watch()
         if self.movement_paused:          # ProcessMovement's outer gate
@@ -5361,7 +5380,41 @@ class World:
                 p.play_directly(item.item_anim_when_angry)   # Item.cs:2654-2660
         seq = []
         nfh2 = self.woody is not None and self.woody.nfh2
-        if self.game is not None and not nfh2:     # Classic (cs:595-612)
+        if self.game is not None and not nfh2 and pcprofile.is_pc() \
+                and pawn.rage_max > 0:
+            # the PC's trick handler (game.exe fcn.0047bd00, docs/PC_ROUTINES.md
+            # "The anger and the bonus"): a trick that pays nothing changes
+            # nothing; otherwise the bonus is paid iff the rage current is
+            # above zero (fcn.004357e0), the current is raised to the trick's
+            # angrytime — the level's for a trick without one — and held 60
+            # ticks (fcn.00438b90), and the face bubble is 4 on a bonus, 3
+            # for more than 10 points, 2 otherwise (fcn.00438550) — the HUD's
+            # three angry faces in that order. The neighbour has one tantrum
+            # either way (his meter holds full 7.0-8.9 s on every angry of
+            # Badinfos' runs, first ones included — tools/pcref/thermo.py),
+            # where the mobile's levels (cs:597-607) play AngryEasyUp alone
+            # on an empty meter and AngryEasyDown before AngryHard on a hot one
+            points = self._would_pay(item)
+            bonus = points > 0 and pawn.rage_current > 0
+            if bonus:
+                pawn.angry_count_ticks += 1
+                self._on_compound_trick_done(item)   # the mobile's arm (cs:608)
+                self._audience_laugh(pawn, 'big')
+                seq = [a for a in (item.angry_easy_down, item.angry_hard) if a]
+            else:
+                self._audience_laugh(pawn, 'medium')
+                if item.angry_easy_up:
+                    seq = [item.angry_easy_up]
+            if points > 0:
+                self._hud_angry(3 if bonus else 2 if points > 10 else 1)
+                pawn.rage_current, pawn.rage_hold = pcprofile.s1_rage_fire(
+                    pawn.rage_current, item.pc_angry_time or pawn.rage_max)
+                pawn.rage_bonus = bonus
+                pawn.angry_meter = float(
+                    pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))
+            if item.angry_hard:
+                seq = [item.angry_hard]
+        elif self.game is not None and not nfh2:   # Classic (cs:595-612)
             if pawn.angry_meter <= 0.0:
                 if item.angry_easy_up:
                     seq = [item.angry_easy_up]
@@ -5374,14 +5427,8 @@ class World:
                 self._on_compound_trick_done(item)   # cs:608
                 self._audience_laugh(pawn, 'big')      # cs:609
             if pcprofile.is_pc() and item.angry_hard:
-                # the PC neighbour has one tantrum, the same for a first
-                # trick and a chained one: his meter holds full for
-                # 7.0-8.9 s on every angry of Badinfos' runs, first ones
-                # included (tools/pcref/thermo.py) — AngryHard's 6.7 s plus
-                # the fix — where the mobile's anger levels (cs:597-607)
-                # play the 2.5 s AngryEasyUp alone on an empty meter and
-                # AngryEasyDown before AngryHard on a full one (10.7 s).
-                # The tick and the HUD face keep the mobile's rule
+                # the PC neighbour's one tantrum for a level without the PC
+                # data (the tutorials): AngryHard alone
                 seq = [item.angry_hard]
             pawn.angry_meter = pawn.angry_max
         elif self.game is not None:
@@ -5533,14 +5580,6 @@ class World:
                 self.level_script.on_trick_done()  # cs:789-792
             if not nfh2:
                 pawn.can_decrease_angry = False    # cs:793-796
-                if pcprofile.is_pc() and item.pc_angry_time:
-                    # the PC's per-trick angrytime (tricks.xml): the anger
-                    # indicator stays at its maximum that long — E14's
-                    # marbles 360 = 18 s hold on the thermometer, E09's
-                    # nitro bottle 240 = 12 s, E05's bowling ball 288 =
-                    # 14.4 — where a plain trick holds for the angry
-                    # animation only (docs/PC_FIDELITY.md §7)
-                    pawn.angry_hold_until = self.time + item.pc_angry_time
             return
         # the extra-angry insert, gated for the sand castle (cs:754-766)
         if item.sand_castle_flag:
@@ -5658,6 +5697,21 @@ class World:
         if item.kind in TRICK_KINDS and item.compound and item.compound_tricked:
             return item.compound_trick_score_v
         return item.trick_score
+
+    def _would_pay(self, item):
+        """the score _on_trick_done is about to pay for this trick, 0 when
+        it pays nothing (Item.cs:2121-2154 without the side effects) — the
+        PC's `points`, whose zero skips the anger (game.exe fcn.0047bd00)"""
+        if self.game is None or item.dont_get_angry:
+            return 0
+        score = self.trick_score(item)
+        linked = self.level.items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        if linked is not None and linked.tricked and item.tricked:
+            if item.already_tricked and linked.already_tricked:
+                return 0
+            return score
+        return 0 if item.already_tricked else score
 
     def _on_trick_done(self, item):
         """Item.OnTrickDone (Item.cs:2121-2154): score once, linked pairs pay

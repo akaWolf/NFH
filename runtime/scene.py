@@ -568,10 +568,11 @@ class Item:
         self.delta_mother_x = (d.get('DeltaMotherLocation') or {}).get('x', 0.0)
         self.required_inventory = d.get('RequiredInventory')
         self.trick_score = d.get('TrickScore') or 0
-        # the PC data's per-trick angrytime, seconds: how long the PC
-        # neighbour's anger indicator stays at its maximum after this trick
-        # (levels/pc overlays, PCAngryTime; docs/PC_FIDELITY.md §7)
-        self.pc_angry_time = d.get('PCAngryTime') or 0.0
+        # the PC data's per-trick angrytime (tricks.xml, 1/12 s ticks): the
+        # rage current the trick sets — 0 for a trick without its own
+        # value, which takes the level's (levels/pc overlays, PCAngryTime;
+        # pcprofile.s1_rage_fire, docs/PC_ROUTINES.md)
+        self.pc_angry_time = int(d.get('PCAngryTime') or 0)
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))
@@ -2238,9 +2239,11 @@ class Level:
                 'portal_run_up': _anim_name(pd.get('PortalRunUpAnimation')),
                 'portal_run_down': _anim_name(pd.get('PortalRunDownAnimation')),
                 'angry_decay': pd.get('AngryMeterDecay') or 0.0,
-                # the PC HUD's thermometer drain, %/s (a drawing rate the PC
-                # overlays carry; the tick meter above is the data's)
-                'thermo_drain': pd.get('PCThermometerDrain') or 0.0,
+                # the PC level's angrytime (level.xml, 1/12 s ticks): the rage
+                # current's full scale and the amount of a trick without its
+                # own — the PC overlays carry it on the neighbour
+                # (pcprofile.s1_rage_percent, docs/PC_ROUTINES.md)
+                'rage_max': int(pd.get('PCAngryTime') or 0),
                 'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')
                     if pd.get('NoticeWhenNearTrickedDistance') is not None
                     else 0.03,

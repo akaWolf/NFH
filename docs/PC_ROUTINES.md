@@ -65,22 +65,33 @@ stays above zero for 60 + amount ticks, the mercury sits at full for 60 + (amoun
 angrytime) of them and drains over the level's angrytime ticks; the next trick's bonus is
 decided by that indicator alone — the scores and the neighbour's whereabouts play no part.
 
-The tick is 20 Hz. The engine's scheduler (fcn.00423b60) stores 1000 / rate milliseconds per
-tick and its driver (fcn.004237b0) runs the callback once per elapsed period; the rate reaches
-it as the third argument of the application's init (fcn.0041a910) rather than as a literal,
-but the video fixes it: the mercury drains over the level's angrytime ticks, and every
-measured drain (docs/PC_FIDELITY.md §7) is that value over 20 — the bath's 156 is the 7.8 s,
-the pie's and the piano's 204 the 10.2, the DIY's 228 the 11.4, the laundry's, fitness's and
-hunter's 240 the 12. The data, then (`tools/pcref/canon.py` reads the UTF-16 XML — grep does
-not), in ticks: peep 280, sofa 240, mail 180, pie 204 (mum_smeared 264, toiletstuffed 228),
-piano 204 (groundsoap 276, phone 276, bowlingball 288), bath 156 (foambottle 240, dirtytowel
-216), art 180 (potterswheel_fast 204, picture_smeared 204), suntan 180 (the six banana skins
-300), pig 192 (the four banana skins 252, babybottle_nitro 240), barbecue 180 (the four banana
-skins 252), laundry 240 (marbles 300, vacuum_hole 300, tumbledrier_smashed 270), fitness 240
-(electrotrap 264, marbles 288, hometrainer_tonged 288, barbell_sawed 264, skate 300), DIY 228
-(marbles 264), hunter 240 (electrotrap 272, marbles 360). The indicator's window after one
-trick is therefore 3 s plus the amount over 20: 10.8 s (bath, no own value) to 21 s (the
-hunter's marbles).
+The tick is 12 Hz — not the 20 an earlier reading of the mercury suggested. Three things
+say so. leveldata.xml gives the bath `time="4320"` and its HUD clock starts at 6:00 (Badinfos'
+video), so a time unit is 1/12 s; the GUI's clock handler (GFXEngine 0x10011310 → fcn.10014ba0)
+shows `(limit − elapsed) × 10 / 12` tenths of a second, and the clock keeps real time through a
+level's every tantrum (E06 6:00 → 1:02 over 297 s, E14 10:00 → 2:51 over 427 s) — that
+counter is the same `elapsed++` of fcn.00438a80 that decrements the rage. And the mercury
+itself, read as the first non-blue row of the tube (tools/pcref/thermo_rows.py; the old
+red-only reader missed the column's white-hot top and so held its "full" while the true fill
+fell to ~83 %): after a trick with no own value the column stays at the rim 5.4-5.8 s — the
+60-tick hold, 5.0 s, plus the top 3 % — and then falls at 0.7 × angrytime ticks per visible
+tube (E03 180: 10.6 s, E04 204: 11.7 s), the tube showing the top ~70 % of the bar, the rest
+sitting in the bulb. The engine's own frame pacing was not found in game.exe (the
+GetTickCount-driven scheduler at 0x423b60 is the AVI recorder's, `CAVIFile::addFrame`); the
+scripts pump frames from inside their waits (fcn.0044b540 → fcn.0044ade0 → fcn.00449f80 →
+fcn.0043ab40), one level tick per pump. The data, then (`tools/pcref/canon.py` reads the
+UTF-16 XML — grep does not), in 1/12 s ticks: peep 280, sofa 240, mail 180, pie 204
+(mum_smeared 264, toiletstuffed 228), piano 204 (groundsoap 276, phone 276, bowlingball 288),
+bath 156 (foambottle 240, dirtytowel 216), art 180 (potterswheel_fast 204, picture_smeared
+204), suntan 180 (the six banana skins 300), pig 192 (the four banana skins 252,
+babybottle_nitro 240), barbecue 180 (the four banana skins 252), laundry 240 (marbles 300,
+vacuum_hole 300, tumbledrier_smashed 270), fitness 240 (electrotrap 264, marbles 288,
+hometrainer_tonged 288, barbell_sawed 264, skate 300), DIY 228 (marbles 264), hunter 240
+(electrotrap 272, marbles 360). The indicator's window after one trick is therefore 5 s plus
+the amount over 12: 18 s (bath, no own value) to 35 s (the hunter's marbles) — 20 s on the
+180 levels, 25 s on the 240 ones, against the mobile's 23.6 s for every trick. The profile
+carries this rule since 2026-09-16 (pcprofile.s1_rage_fire / s1_rage_tick / s1_rage_percent,
+run by Pawn.tick and World.play_angry; the values as PCAngryTime in ticks in levels/pc).
 
 Season 2 (GameLogic.dll, base 0x10000000) has the same constant pattern (`tools/pcref/exe/
 nfh2_gamelogic_globals.json`, 4373 names) but its scripts call a different engine: the

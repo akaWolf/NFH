@@ -112,3 +112,43 @@ def min_rating(level_name):
         return S1_MIN_RATING.get(int(str(level_name)[-3:]))
     except ValueError:
         return None
+
+
+# The Season 1 anger rule, read from the PC game.exe (docs/PC_ROUTINES.md,
+# "The anger and the bonus"): the level state ticks 12 times a second —
+# the same tick counts the clock (leveldata's time=4320 is the 6:00 the HUD
+# shows, and the HUD divides the remaining ticks by 12), and the raw
+# mercury column holds 5.4-5.8 s after a trick (60 ticks plus the top 3 %)
+# and falls 0.7 of the level's angrytime in ticks over the visible tube.
+# A trick that pays raises the neighbour's rage current to max(current, its
+# angrytime — the level's when the trick has none) and starts a 60-tick
+# hold (fcn.00438b90); every tick the hold counts down first, then the
+# current, one per tick (fcn.00438a80); the HUD's mercury is current * 100
+# / the level's angrytime clipped at 100 (GFXEngine 0x10011460); the bonus,
+# +3 on the rating, is paid iff the current is above zero when the next
+# trick fires (fcn.0047bd00: fcn.004357e0 returns the current). The values
+# are the PC data's, in ticks: PCAngryTime on the Rottweiler is level.xml's
+# angrytime, PCAngryTime on an item its tricks.xml angrytime.
+S1_TICK_HZ = 12
+S1_RAGE_HOLD_TICKS = 60
+
+
+def s1_rage_fire(current, amount):
+    """the trick handler's rage part: the new (current, hold)"""
+    return max(current, amount), S1_RAGE_HOLD_TICKS
+
+
+def s1_rage_tick(current, hold):
+    """one 1/12 s tick of the level state: the new (current, hold)"""
+    if hold > 0:
+        return current, hold - 1
+    if current > 0:
+        return current - 1, hold
+    return current, hold
+
+
+def s1_rage_percent(current, level_angrytime):
+    """the mercury: integer percent of the level's angrytime, clipped"""
+    if level_angrytime <= 0:
+        return 0
+    return min(100, current * 100 // level_angrytime)

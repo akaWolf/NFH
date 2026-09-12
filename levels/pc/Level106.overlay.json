@@ -1,11 +1,11 @@
 {
- "source": "PC thermometer: the level's angrytime=156 in the PC data (level_bath/level.xml, 1/20 s ticks) is the 7.8 s the mercury takes to drain from full — tools/pcref/thermo.py measured the same off the video; PCThermometerDrain 12.82 %/s is the HUD's drawing rate only, the tick meter keeps the mobile data's AngryMeterDecay (docs/PC_FIDELITY.md §7). PC lap (docs/PC_LAPS.md): his album spell is 19 s on E06 against the mobile's 12 — the read is five 0.54 s PhotoAlbumLoop entries (2.7 s) between Start and End; eighteen make the 9.7 s read that spans 19 with the walk. PC per-trick angrytime (tricks.xml: foambottle 240, dirtytowel 216; 1/20 s): the anger indicator holds at its maximum that long after the trick — the thermometer's long holds on the video (E14's marbles 18.1 s, E09's 12.6, E05's 14.6) — carried as PCAngryTime for the profile's hold (docs/PC_FIDELITY.md §7).",
+ "source": "PC lap (docs/PC_LAPS.md): his album spell is 19 s on E06 against the mobile's 12 — the read is five 0.54 s PhotoAlbumLoop entries (2.7 s) between Start and End; eighteen make the 9.7 s read that spans 19 with the walk. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_bath/level.xml's angrytime=156 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (Pudding 240, Towel 216); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
  "patches": [
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
-    "PCThermometerDrain": 12.82
+    "PCAngryTime": 156
    }
   },
   {
@@ -40,14 +40,14 @@
    "object": "Pudding",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 12.0
+    "PCAngryTime": 240
    }
   },
   {
    "object": "Towel",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 10.8
+    "PCAngryTime": 216
    }
   }
  ]
