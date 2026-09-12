@@ -127,6 +127,47 @@ the other events; the port's whistle wakes the level's alerters
 (`World.blow_whistle`), which is the same effect on the one dog of 114 —
 the states' meaning is open.
 
+### The alerters
+
+The PC's pets are data plus one class. `generic/trigger.xml` gives every
+level's `dog` and `chili` a `wakeup` behaviour on a noise of 1 or more in
+their room and the neighbour an `alarm` on a noise of 2 anywhere in the
+house (the pig level adds a `wakeup` for the sleeping neighbour himself);
+the level files' `trigger.xml` hold the tricks' `nearobj` triggers (a
+behaviour such as `banana_on_floor` or `dirty_microwave` once the
+neighbour is near the tricked object). The noise sources in `objects.xml`
+are the pets' barks (`bark1`/`bark3`, noise 2), the dog whistle (noise 1,
+114) and the saw (noise 1, 102); every other action carries `noise="0"`
+and animations have no noise attribute. The registrations reach the game
+logic as `AddNoiseTriggerMsg` / `AddObjectTriggerMsg` (the loader at
+0x43d90a, the receiver fcn.004509e0 → fcn.00450410) and the pet's class
+(fcn.0045bcb0, shared by the dog and the parrot) is a five-state machine:
+0 init → 1 `fallasleep` → 2 `sleep`, the `wakeup` event (or the whistle)
+→ 3 `wakeup` with a 72-tick timer → 4 awake; every tick it compares the
+rooms of `woody`, `neighbor` and itself (fcn.00444b00) and Woody's hideout
+flag 4, and in state 4 barks (`bark1`/`bark3` by facing, then
+`startle_woody`) while Woody is in its room and unhidden; the sleeping
+state itself never looks. The neighbour's `alarm` is a switch case of the
+level class (peep case 22: the `noise` icon, `fast` gait, a walk to the
+noise, then the resume case 24) plus the engine's chain fcn.0047a690 (the
+`search` action, the `dog_shout` icon). The level scripts also drive the
+pets directly — `wakeup`, `pause`, `resume` and `whistle` events posted to
+`chili`/`dog` at fixed steps (fcn.00468840, fcn.00459220). The briefings
+say a walking Woody is noticed in the pet's room and sneaking is not
+(`level_laundry`, `tutorial_3`: the right mouse button sneaks; the
+`ChangeMoveTypeMsg` handler fcn.0044efc0 reads `sneaking="true"`); the
+emitter that turns a non-sneaking walk into a room noise was not located
+(the walk fiber and step helpers fcn.00475b30 / fcn.00444d30 / fcn.0047d030
+post nothing).
+
+| rule | port (the mobile's, docs/GAMEPLAY.md §6) | binary / data | verdict |
+|---|---|---|---|
+| the pet sleeps until Woody moves in its zone, sneaking excepted | `Alerter.CanSeeWoody` + moving, `IsSneaking` | `wakeup` on a room noise ≥ 1; the briefings' walking-vs-sneaking rule; the emitter open | agrees in kind; the PC pet also wakes on any noise-1 action in its room (the whistle, the saw) |
+| the awake pet barks at a visible Woody | the alert animations, `AlerterDelay` | state 4: bark while Woody is in the room and unhidden | agrees |
+| the bark brings the neighbour | `Rottweiler.HearAlerter` → `SurpriseFar` | the bark's noise 2 → the house-wide `alarm`: the `noise` icon, the fast walk, `search` | agrees in kind |
+| the whistle | `World.blow_whistle` wakes every alerter | the level script posts `whistle` to the dog: state 3 (from 2) or 4 | agrees for 114's one dog |
+| the pet calms when the neighbour arrives | `OnRottweilerEnter` → "poor" | the `poor1`/`poor3`, `whine1`/`whine3` animations exist; the transition was not read | open |
+
 ## Season 2
 
 Read earlier and carried (docs/PC_ROUTINES.md, the Season 2 sections): the
@@ -157,7 +198,9 @@ helpers.
   divisions by 12 and the mercury (docs/PC_ROUTINES.md).
 - Season 1: which neighbour actions clear or set the +0x78 byte (the
   script event's sender); whether the position object of the catch is
-  the room or the floor strip; door transit.
+  the room or the floor strip; door transit; the noise a walking Woody
+  makes for the pets' `wakeup` trigger (the briefings state the rule,
+  the emitter was not found).
 - Season 2: which watch entries the levels register with the trigger
   evaluator fcn.1003f573 and what its reactions run; what the respawn
   timer gates.
