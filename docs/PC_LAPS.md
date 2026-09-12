@@ -1,5 +1,10 @@
 # The neighbour's lap: PC original vs the mobile remake, all 28 episodes
 
+> The lap ORDER of every Season 1 level is read from game.exe itself since
+> 2026-09-16 (`tools/pcref/routine_order.py`, docs/PC_VERIFICATION.md "The
+> routines and the scripts") and equals the mobile routine on all fourteen
+> levels; this file remains the timing reference.
+
 Measured 2026-09-06. PC side: Badinfos' 100 % runs (720p), the HUD's
 neighbour-activity bubble sampled once a second and clustered
 (`tools/pcref/bubble.py`), icons labelled by eye from the cluster sheets.

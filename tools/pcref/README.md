@@ -57,3 +57,5 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   tricks and values, recipes, containers, walk-by triggers, rooms, the
   neighbour's action lengths — with the multiset diffs (docs/PC_FIDELITY.md §7,
   "The canon audit").
+
+- `routine_order.py` — the neighbour's lap of every Season 1 level read from game.exe's compiled level classes (the yield chain of each class's switch, simulated with no trick fired); prints the laps beside the mobile routines. Needs the radare2 listing of game.exe (`~/nfh-bench/pcref/r2/nfh1_game_text.txt`) and `exe/nfh1_globals.json`.

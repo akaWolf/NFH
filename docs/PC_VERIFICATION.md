@@ -118,16 +118,36 @@ is the beating). Each case yields through fcn.0045c600(next, current,
 resume-after-interruption) — the third argument is the case to redo when
 an urgent action interrupts a walk, not a catch hook. The order of the
 GoTo / DoAction calls is in `tools/pcref/exe/nfh1_scripts.json`
-(`tools/pcref/exe_scripts.py`). The stations the classes visit (their
-`ICON`/`GOTO` names — sofa, binoculars; beer, sofa, toilet; detergent,
-washing machine, drier, iron, rack, aquarium, vacuum; polish, cups, pipe,
-phonograph, records, gun, hat, horn; ...) are the mobile routines' items
-on all fourteen levels; the order of the switch cases is not the order of
-the walk (112 lists the trampoline last and 113 starts at the valve where
-the video and the mobile start at the chair), so the lap order stands on
-the video (docs/PC_LAPS.md, the same order everywhere) and the durations
-are the mobile data's (the open ceilings of 103–114 in
-docs/PC_FIDELITY.md §7). Two data facts with no rating effect: the level
+(`tools/pcref/exe_scripts.py`). The walk itself is read from the code by
+`tools/pcref/routine_order.py`: every case ends in a yield —
+fcn.0045c600 / fcn.004706a0 / fcn.0045e640 (next, current,
+resume-after-interruption) — so the lap is the chain of `next` values
+from case 0, simulated with no trick fired (IFVARIANT, OBJ3, string
+compares and the class's own helpers false, the engine's waits true, the
+class's byte fields at their current value, a case that returns without
+yielding treated as a poll that flips). The laps by code, against the
+mobile routines the port carries:
+
+| level | the lap by code (game.exe) | the mobile routine |
+|---|---|---|
+| 101 | sofa → binoculars → sofa | Sofa, Binoculars |
+| 102 | sofa → beer → sofa; the toilet (case 7) only with the laxative flag `[this+0x1c]` after the beer counter `[this+0x14]` | Sofa, Beer |
+| 103 | candle → cake → mailbox → candle; the first aid only after the mailbox trap (IFVARIANT anc/mailbox) | Candle, Cake, Cake, LetterBox |
+| 104 | apple pie → microwave → whipped cream → basin, aftershave → apple pie | ApplePie, Microwave, WhippedCream, ApplePie, Deodrant, AfterShave, Sink… |
+| 105 | piano (score) → football → flower → piano; the toilet only after the flower trick | Piano, Football, Window, PlantStink |
+| 106 | photo album → candy → milk bottle → bath tub → album; the toilet through a class helper, the towel off the lap | PhotoAlbum, Candy, Pudding, BathTub ×2, Towel |
+| 107 | painting → camera → magnesium → camera → potter's wheel → statue, footstool → painting | Drawing, Camera, Magnesium, Camera, DieselChair, Generator, FootStool |
+| 108 | toothbrush → coffee → folding chair → ewer → flower → ewer → coffee … | ToothBrush, CoffeeMaker, Shezlong, WateringCan, Plant, WateringCan |
+| 109 | teeth → bed, sleep → alarm clock → teeth → pig key → milk bottle → pig → milk bottle → cookies → parrot → pig key → teeth | Teeth, Bed, AlarmClock, Teeth, PigKeys, PigMilk, Pig, PigMilk, CornChips, Chili, PigKeys |
+| 110 | meat bowl → beer → bbq → plant, spray → bbq → table → wine → meat bowl | SteakMeat, Beer, BBQ, Spray, BBQ, SteakChair, SteakWine |
+| 111 | detergent → washing machine → tumble drier → ironing → laundry rack → aquarium → laundry rack → ironing → detergent | Detergent, WashingMachine ×3, Drier ×3, Iron, Airer, FishTank, Airer, Iron |
+| 112 | book → aquarium → yoga mat → book → trampoline → home trainer → mixer → expander → barbell → skipping rope → book | YogaBook, FishTank, Yoga, YogaBook, Trampoline, Bicycle, Mixer ×2, ChestExpander, Weights, Rope |
+| 113 | chair kit → power tool → valve → heater → basin → valve → fuse → ladder → fuse → chair kit | ChairAssembly, AngleGrinder, ValveMain, Radiator, Sink, ValveMain, FuseBox, Ladder, LadderDrill, FuseBox |
+| 114 | polish → cups → polish → smoke → phonograph → records → phonograph → smoke → gun → hat → horn → polish (the phono chain on the record playing, OBJ3 lir/phono_play) | Polish, GoldCup, Polish, Pipe, Gramaphone, CDs, Gramaphone, Pipe, Gramaphone, Shotgun, Hat, MedalBox, Hat, Horn |
+
+The same order on every level; the durations are the mobile data's (the
+open ceilings of 103–114 in docs/PC_FIDELITY.md §7), and the video laps
+of docs/PC_LAPS.md are now only the timing reference. Two data facts with no rating effect: the level
 `trigger.xml` marks four object triggers `always` (105 mum_smeared and
 phoneringing, 111 ironingboard_burn and dirtycarpet — the neighbour
 reacts every pass) where every other is `once`, and `objects.xml` flags
