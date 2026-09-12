@@ -369,13 +369,25 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   Swimming item, the rake 20 — two overlay patches had missed their
   items) and its four coins in one lap, armed from the ring's far side;
   205 with the tennis armed after his lap-2 tennis so it lands last; 207
-  with the awning on his lap-3 bar visit from the beach side. 210 is still
-  lost: the pool is the Mother's, who sleeps 19 s and looks around 15 s in
-  turn on her own clock, his own pool visits fall into the naps, and the
-  four rooms are a ring (beach - pool - elephant - shop - beach) whose
-  rooms he takes one after another every 90 s while each paid trick shifts
-  him ~10 s against her clock: the pool crossing Woody needs to change
-  sides has no window that survives the drift (v11-v13).
+  with the awning on his lap-3 bar visit from the beach side. 210 is won
+  (v18, 2026-09-17: 8/8, no restart, 90): the pool is the Mother's, who
+  sleeps 19 s and looks around 15 s in turn on her own clock — and keeps
+  doing so after her last call (v14 met her looking at 310; the idle
+  reading of one long sleep from 246 was wrong) — the four rooms are a
+  ring (beach - pool - elephant - shop - beach) he takes one after another
+  every 90 s, and each paid trick shifts him ~10 s against her clock, so
+  the crossings Woody needs go through the pool on her naps: the plan waits
+  for them with the harness's `whenanim Mother MotherSleepSingle` (after a
+  `MotherLookLoop`, so the nap is a fresh one) instead of his room entries
+  (v13's crossing on his shop entry met her looking; v17, with no early
+  coin and so no tantrum, met him at the elephant before her nap — the
+  crossing at 191 needs the ~10 s his basket and shop tantrums add). The
+  overflow does not come: the shop takes one trick at a time (the octopus
+  refused on the armed hedgehog), the basket pays 20 at his lap-2 call
+  and 30 at his lap-3 call where the PC's E10 lands the 70 at once, and
+  the coins fall 35-60 s apart on his tantrum-stretched laps (the gauge
+  peaks at 63 in runs/chain2/s2_Level210f), so the level rates 90. The
+  overlay's Elephant is 30 (dogattack_bat), not the octopus's 27.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

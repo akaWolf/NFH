@@ -1,5 +1,5 @@
 {
- "source": "PC The Enlightenment: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py, the bubble naming his activity): +26 at the shop (170 s), +34 at the elephant (191), +22 at the deck chair (239), +61 at the dog basket with the diving board and the drained pool (299, the gauge full), the second shop coin capped. Scaled to the 100 gauge (the video's full reads 92): shop 28, elephant 37, chair+pylon 24, basket+board 52 (+10 the code's extra coin). PC data (in_b2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on TurbanShop 27 (hedgehog), Elephant 27 (octopus); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37.",
+ "source": "PC The Enlightenment: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py, the bubble naming his activity): +26 at the shop (170 s), +34 at the elephant (191), +22 at the deck chair (239), +61 at the dog basket with the diving board and the drained pool (299, the gauge full), the second shop coin capped. Scaled to the 100 gauge (the video's full reads 92): shop 28, elephant 37, chair+pylon 24, basket+board 52 (+10 the code's extra coin). PC data (in_b2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on TurbanShop 27 (hedgehog and octopus, its two tricks) and Elephant 30 (dogattack_bat, the cricket bat — 2026-09-17: the earlier 27 took the octopus for the elephant); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -19,7 +19,7 @@
    "object": "Elephant",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 27
+    "AngerAmount": 30
    }
   }
  ]

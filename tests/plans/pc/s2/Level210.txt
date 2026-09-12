@@ -1,26 +1,33 @@
-# Level210 under the PC profile (v13, 2026-09-17: the profile's Season 2 paces).
+# Level210 under the PC profile (v18, 2026-09-17: the profile's Season 2 paces).
 # His lap (90 s, runs/idlepc2s2): Zone01 0-59 (the chair 3.5), the pool 59-71
 # (the Mother's call, the basket 64), Zone01 71-78, the shop (Zone02) 78-96
 # (81), the elephant (Zone03) 96-110 (96.5), the pool 110-118 (the basket
 # put 111), Zone01 118-149 (the chair 120), the pool 149-161 (the call, the
 # basket 154), Zone01 161-168, the shop 168-185 (171), the elephant 186-200,
 # the pool 200-208, Zone01 208-239 (210) ... The Mother sits in the pool
-# zone: asleep 6-25, 67-86, 101-121, 156-175, 191-210 (MotherSleepSingle,
+# zone: asleep 6-25, 67-86, 101-121, 156-175, 191-210, 280-299, ... (MotherSleepSingle,
 # 19.3 s), looking around between (MotherLookLoop, 15.3 s — a runner wakes
-# her), up for his calls 41-64, 136-154, 225-245. Olga showers in Zone01.
+# her), up for his calls 41-64, 136-154, 225-245; the naps go on after her
+# last call (v14 met her looking at 310), so every pool crossing waits for
+# `whenanim Mother MotherSleepSingle` after a look phase. Olga showers in Zone01.
 # The pool is Woody's only while she sleeps and he is away: the bone at 72-84
-# (he is in Zone01, then the shop), the board once her last call is over and
-# she sleeps on (246-420) — on his lap-3 shop visit (258-275), in and out
-# through the elephant's room; the beach, the shop and the elephant's room
-# are taken in turn as he leaves each — each wait is for his ENTRY into the
-# room Woody has just left, never into the one Woody stands in (v12).
+# (he is in Zone01, then the shop); the crossing from the elephant's room to
+# the beach on her third nap (`whenanim`, 191), which his tantrums after the
+# basket (154) and the shop (171) put before his elephant entry (~196; without
+# them he is there at 186 — v17); then the pylon, the chair and the board on
+# the same nap. The coins pile within one decay window — the basket triple
+# (154), the shop (171), the board (~212), the chair and the pylon (~222), the
+# shop again (~268) and the elephant (~286) — for the one overflow. The beach,
+# the shop and the elephant's room are taken in turn as he leaves each — each
+# wait is for his ENTRY into the room Woody has just left, never into the one
+# Woody stands in (v12).
 take SeaUrchin IT2_Hedgehog            # Zone02
 take! OlgaBra IT2_Bra                  # Zone01: Olga's first shower (3-25), he sleeps in the chair 4-16
 prime WaterMelons IT2_Bra              # Zone03 -> IT2_Bra_sling
 take AlmsBowl IT2_Bone                 # Zone03
 whenusing DogBasket                    # (64) his lap-1 basket: up once he has gone down (71.5)
 whenzone Zone01                        # (71.5) he crosses Zone01 to the shop; the Mother sleeps until 86
-usewith! DogBasket IT2_Bone            # Zone04 (~77): the basket triple at his lap-2 basket (154)
+usewith! DogBasket IT2_Bone            # Zone04 (~77): the basket triple at his lap-2 basket (154) — the first coins of the pile
 take! FishNet IT2_Brailer              # Zone04, the same trip
 whenzone! Zone02                       # (78) he is in the shop until 96, the elephant until 110: Zone01 is free until 118
 take! CricketBat IT2_Bat               # Zone01 down the stairs
@@ -32,25 +39,23 @@ whenzone Zone03                        # (96) he is at the elephant until 110: t
 park! Zone02                           # out of Zone01 before his return (118)
 usewith TurbanShop IT2_Hedgehog        # Zone02: pays at his lap-2 shop (171)
 take SeaUrchin IT2_Hedgehog            # Zone02: the second urchin, for the chair
-whenzone Zone01                        # (118) he is back on the beach until 149: the shop is Woody's until 168
+whenzone Zone01                        # (118, +drift) he is back on the beach until 149: the shop is Woody's until his shop (168)
 whenzone Zone04                        # (149) his second pool call: the elephant's room is free until 186
-park! Zone03
-whenzone Zone02                        # (168) he enters the shop: the beach is free until 208
-park! Zone01
-whenzone Zone04                        # (200) he goes up with the basket: the shop is free until 258
-park! Zone02
-whenzone Zone04                        # (239) her call: he leaves the pool at 251 for the beach and the shop (258) — the elephant's room is free until 276
-park! Zone03
-whenzone Zone02                        # (258) his lap-3 shop: the Mother sleeps from 246 on — the pool through the elephant's room
-usewith! DivingBoard IT2_Sunoil        # Zone04 (~265): with the basket, pays at his lap-4 pool visit (~290)
-park! Zone01                           # (~272) the beach: free until his lap-4 chair (~298)
+park! Zone03                           # shop -> elephant's room, not through the pool
+whenzone Zone02                        # (168; ~178 with the drift) he is in the shop until 185, at the elephant from 186
+whenanim Mother MotherLookLoop         # she is looking around (175-191): the next nap is a fresh 19 s
+whenanim Mother MotherSleepSingle      # (191) her third nap, on her own clock — v13 crossed on his shop entry and met her looking (175-191)
+park! Zone01                           # through the pool (she sleeps, he is in the shop) to the beach: free until his lap-3 chair (208, ~218)
 usewith! Pylon IT2_Bra_sling           # Zone01: the chair's linked coin, before the chair
-usewith! DeckChair IT2_Hedgehog        # Zone01: chair + pylon at his lap-4 chair
-whenzone Zone03                        # (276) he is at the elephant: the shop is free until ~348
-usewith TurbanShop IT2_Oktopus         # Zone02: the shop's second coin at his lap-4 shop
-whenzone Zone04                        # (290) he is in the pool: the elephant's room is free until ~366
-usewith Elephant IT2_Bat               # Zone03: pays at his lap-4 elephant
-park Zone02
+usewith! DeckChair IT2_Hedgehog        # Zone01: chair + pylon at his lap-3 chair (~220)
+usewith! DivingBoard IT2_Sunoil        # Zone04: beach -> pool while she still sleeps (to 210): pays at his lap-3 pool pass (~212)
+park! Zone01                           # back on the beach before she wakes (210); he is at the elephant until ~210
+park Zone02                            # (gated) the shop once he has left it (~195): free until his lap-3 shop (~268)
+usewith TurbanShop IT2_Oktopus         # Zone02: the shop's second coin at his lap-3 shop (~268)
+whenzone Zone04                        # (249) his third pool call: the elephant's room is free until ~286
+park! Zone03                           # shop -> elephant's room
+usewith Elephant IT2_Bat               # Zone03: pays at his lap-3 elephant (~286)
+park Zone02                            # (gated) the awaits from the shop
 await DogBasket 0
 await DivingBoard 0
 await TurbanShop 0

@@ -292,7 +292,9 @@ helpers.
 - `tests/run_tricks.py` (2026-09-17, the chain pass): `Name@ZoneName:N`
   names the N-th twin of one zone (113's two hall marbles spots); the
   `await` timeout is 240 s under the profile (a PC lap runs to 180 s on
-  113, and a trick armed a lap ahead pays a lap later); an `await` parks
+  113, and a trick armed a lap ahead pays a lap later); `whenanim <Role>
+  <Anim>` waits for a pawn's animation (210's Mother naps on her own
+  clock); an `await` parks
   a hidden Woody where he is, so a plan whose neighbour makes an urgent
   trip off his routine (113's hot-valve grab into the basement) ends in
   the wardrobe.

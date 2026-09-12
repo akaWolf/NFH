@@ -41,6 +41,8 @@ N-th in the level's order, from 1):
                              using the item (a lap landmark)
     whenzone <ZoneName>      park safe until the neighbour stands in the
                              zone (his door pass is the landmark)
+    whenanim <Role> <Anim>   park safe until that pawn plays the animation
+                             (a stationary catcher's phase on its own clock)
     whistle                  PC profile: blow the dog whistle (needs
                              IT_Whistle held) — every Alerter wakes
     sneak on|off|auto        the Tab toggle by hand; auto (the default)
@@ -2272,6 +2274,17 @@ class Driver(Recorder):
         ok = self.wait_until(there, 240.0)
         return (True, '') if ok else (False, 'never in %s' % name)
 
+    def leg_whenanim(self, role, anim, *args):
+        """wait until the named pawn plays the named animation (a stationary
+        catcher's phase on its own clock: Level210's Mother sleeps and looks
+        around in turn, MotherSleepSingle / MotherLookLoop)"""
+        def playing():
+            p = self.world.pawns.get(role)
+            return p is not None and p.anim is not None \
+                and p.anim.anim is not None and p.anim.anim.name == anim
+        ok = self.wait_until(playing, 240.0)
+        return (True, '') if ok else (False, '%s never plays %s' % (role, anim))
+
     def leg_unlock(self, name, typ=None):
         """the dexterity gate: click with the unlocker held, then hold the
         pick center-ward each tick until DexterityDone passes the take;
@@ -2771,6 +2784,7 @@ class Driver(Recorder):
                   'whistle': self.leg_whistle,
                   'whenusing': self.leg_whenusing,
                   'whenzone': self.leg_whenzone,
+                  'whenanim': self.leg_whenanim,
                   'activated': self.leg_activated}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,
