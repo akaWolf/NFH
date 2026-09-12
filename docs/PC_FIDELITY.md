@@ -523,16 +523,30 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   35, the electrified rail 30; 203: the chilli paper 30; 204: the jade
   17; 206: the fleas 30; 208: the snake statue 15; 210: the hedgehog 27,
   the octopus 27) — the amounts read off the gauge on 2026-09-08 were
-  all 1.25× the data and are withdrawn. That ratio is the gauge itself:
-  it is 80 000 rage long, a 40 000 trick fills half of it, and with the
-  data's amounts on the mobile's maximum of 100 the profile's 204, 205
-  and 210 no longer collapsed where Badinfos' did — AngryMeterMaximum
-  80 on the Season 2 levels, and the HUD draws the strip over the
-  maximum. (The Season 2 neighbour's GameObject is `Rottweiler2`; the
-  first overlay addressed `Rottweiler` and matched nothing, silently —
-  `pcprofile.apply_overlay` now reports every patch that touches no
-  component.) With the data's amounts and the 80 gauge the Season 2 set
-  is 14/14 at COLLAPSE!, the Season 1 set 14/14 — 111 on its PC plan
+  read 1.25× the data and are withdrawn. The gauge is 100 000 rage
+  long, the mobile's AngryMeterMaximum 100: the PC dialog gives the
+  `rageometer` a range of 0..100000 (nfh2 dialogs/*/menuleft_bar.xml),
+  GameLogic.dll's trick accounting flags 100000 (docs/PC_ROUTINES.md),
+  and the bar itself says so on E10 — the shop's 27 000 reads +26, and
+  the basket triple's 30 + 20 + 20 on top of 31 pins the bar for 21 s
+  before it falls again, which is 101 capped at 100 and 8 % of decay
+  spent invisibly (tools/pcref/gauge.py at 160 s for 190 s). The decay
+  is continuous and the mobile's 0.37 %/s within the reader's noise
+  (0.40-0.43 %/s on every trick-free plateau: 26 → 18 over 20 s, 52 →
+  33 over 46, 55 → 31 over 58 on E10; 41 → 11 over 70 on E01); where
+  GameLogic.dll applies it was not found — none of the four writers of
+  the status struct subtracts, so it lives outside them. A profile of
+  80 (2026-09-09 to 2026-09-16) was that video reading taken for the
+  bar; withdrawn with this. (The Season 2 neighbour's GameObject is
+  `Rottweiler2`; the first overlay addressed `Rottweiler` and matched
+  nothing, silently — `pcprofile.apply_overlay` now reports every patch
+  that touches no component.) With the data's amounts and the 100 gauge
+  the Season 2 set is 11/14 at COLLAPSE!: 204, 205 and 210 pay every
+  coin but never overflow (90 — the port's neighbour spreads their
+  chains 20-45 s apart while the PC's E10 lands 30 + 20 + 20 within two
+  seconds on a bar still at 31; re-chaining 210 to his lap-3 basket ran
+  into the board's and the basket's use predicates and is left as is).
+  Under the 80 gauge the Season 2 set had been 14/14, the Season 1 set 14/14 — 111 on its PC plan
   (below).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (his bubbles and popups: the trap on the basement walk-in 158, the
@@ -615,7 +629,7 @@ both games, the PC data next to the mobile's, category by category:
 | speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
 | doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |
 | Season 1 anger | thermometer drain = `angrytime` (exact, applied); the tick meter and the hold are game.exe's |
-| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 80 000 long (applied); decay is the mobile's 0.37 |
+| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 100 000 long — the dialog's range, the code's flag, the bar's cap on E10 (the mobile's 100, applied); decay is the mobile's 0.37 (the bar's plateaus, 0.40-0.43 read) |
 | HUD | the PC's rating popups are yellow (240/240/0) for the score and orange (255/160/0) for the bonus, as drawn |
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0

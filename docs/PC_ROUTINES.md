@@ -104,15 +104,23 @@ show. The ship1 code at 0x100269xx is the tutorial (`wait1`, `hurry`, `combo2`/`
 room moves of `woody` and `neighbor` = fcn.1000fc33). Its trick parser (fcn.10052a89)
 reads `name`, `coins` and `rage` into a 0x1c-byte record (+8 coins, +0xc rage, +0x10 a
 flag), and the trick accounting in fcn.1000140b works on a copy of the level state: coins +=
-the record's coins, rage += the record's rage, and a flag is raised when the rage total
-reaches 100000 (0x10001500) — the threshold the port's 80-unit gauge (AngryMeterMaximum 80,
-from the video's fill) has to be checked against; the decay per tick and the gauge event are
-not located yet (the state is not at a fixed offset — it is handed around through
-fcn.1005225b / fcn.10052272 / fcn.100523b0). Other candidates: a `current × 100 / maximum`
-clipped at 100 at 0x1000b3e4 and two `hold = 60` stores at 0x100238e1 / 0x10023a9e. Naming
-the walk, finishing the Season 2 scripts and reading that anger are the next steps; the
-Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application shell whose
-string table holds `rage`/`quota` once each.
+the record's coins, rage += the record's rage, and a byte of the copy is set when the rage
+total reaches 100000 (0x10001500) — the gauge's length: the HUD's `rageometer` progressbar
+(nfh2 dialogs/*/menuleft_bar.xml) runs 0..100000. The copy — eleven dwords: coins, the total,
+mincoins, the lives at +0x14, the rage at +0x1c — is written back and broadcast by fcn.10042358
+(the level state's status struct at +0x80, then a status event, vtable 0x100b1038, whose slot
+7 dispatches to the GUI listener's slot 50 = GUIEngine 0x100046ef → fcn.1000292c: the coins
+text, the `needmorecoins` mark when coins ≥ mincoins, the `rageometer` set to the raw rage,
+the `heart` and `rage` animations on the event's flag byte); the other three writers of that
+struct are the caught handler (fcn.10042471: lives − 1, then game over or a `woody` respawn)
+and the level start/end (fcn.10044234). None of them subtracts from the rage, so the 0.37 %/s
+decay the bar shows on the video (docs/PC_FIDELITY.md §7) lives outside those writers — not
+located. The Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application
+shell whose string table holds `rage`/`quota` once each. Naming the walk and finishing the
+Season 2 scripts are the remaining steps of this reading; the `time` attribute of
+objects.xml's actions is not a clock unit (the laundry's wash 59 with a 5-frame `wait` loop
+lasts ~24 s on the video, its iron 71 with an 18-frame loop ~14 s; the doors' 9-25 about a
+second) and is not needed by the port, which runs the mobile routines.
 
 ## level_peep (Level101)
 
