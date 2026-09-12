@@ -59,3 +59,4 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   "The canon audit").
 
 - `routine_order.py` — the neighbour's lap of every Season 1 level read from game.exe's compiled level classes (the yield chain of each class's switch, simulated with no trick fired); prints the laps beside the mobile routines. Needs the radare2 listing of game.exe (`~/nfh-bench/pcref/r2/nfh1_game_text.txt`) and `exe/nfh1_globals.json`.
+- `routine_order_s2.py` — the Season 2 counterpart: the chain of step functions of each GameLogic.dll level script followed with no trick fired; seven laps close, the event-driven ones stop (`TAILS=1` shows the branches). Needs `~/nfh-bench/pcref/r2/nfh2_gamelogic_text.txt`.

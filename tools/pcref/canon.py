@@ -8,7 +8,7 @@ Per level: the tricks (tricks.xml: quota / rage, angrytime), the recipes
 containers and what they hold (objects.xml <content>), the walk-by triggers
 (trigger.xml nearobj), the neighbour's actions per object with their length
 (objects.xml <action actor="neighbor"> time in 1/20 s, "auto" = the
-animation's frames at 20 fps from anims.xml), the rooms and doors (level.xml),
+animation's frames at the 12 Hz tick from anims.xml — one frame a tick, time="N" is N ticks), the rooms and doors (level.xml),
 the level's angrytime and time limit (leveldata.xml). The mobile side: the
 TrickItems (TrickScore / AngerAmount, the inventory they take), the search
 items (the IT_ types they hold), NoticeWhenWalkNearby, the items the neighbour's
@@ -80,9 +80,9 @@ def pc_level(n):
                 key = (gfx.group(1) if gfx else name, a.get('objanim', '')) if a.get('actoranim', 'inv') == 'inv' \
                     else (a.get('actor', ''), a.get('actoranim', ''))
                 n_frames = frames.get(key)
-                secs = n_frames / 20.0 if n_frames else None
+                secs = n_frames / 12.0 if n_frames else None
             else:
-                secs = int(t) / 20.0 if t.isdigit() else None
+                secs = int(t) / 12.0 if t.isdigit() else None
             o['actions'].append({'name': am.group(1), 'actor': a.get('actor'), 'anim': a.get('actoranim'),
                                  'objanim': a.get('objanim'), 'time': t, 'secs': secs, 'noise': a.get('noise')})
         out['objects'][name] = o

@@ -142,10 +142,14 @@ compares that sum with the leveldata record's `score` (+0x2c) and keeps the bett
 shell whose string table holds `rage`/`quota` once each. The walk is fcn.1000e3e0(level, actor, object), a bool that is false when the walk was
 interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — a random
 `shout<n>_*` / `freakout` animation — not a walk. The Season 2 scripts are extracted below
-(2026-09-16). The `time` attribute of objects.xml's actions is not a clock unit (the laundry's
-wash 59 with a 5-frame `wait` loop lasts ~24 s on the video, its iron 71 with an 18-frame
-loop ~14 s; the doors' 9-25 about a second) and is not needed by the port, which runs the
-mobile routines.
+(2026-09-16). The `time` attribute of objects.xml's actions is a tick count of the 12 Hz level tick: the
+fiber that runs a timed action counts `[obj+0x28]` down once a tick (fcn.00474a20,
+fcn.00475850, fcn.00478120), so a door's 9–25 is 0.75–2 s and the laundry's wash 59 is 4.9 s
+a visit (the video's ~24 s at the washer are its three visits, its iron 71 the two of 5.9 s);
+`time="auto"` runs the animation to its end at one frame a tick, and GFXEngine keeps no
+sprite timer of its own (its only 83 ms constant is a button's auto-repeat). The earlier
+"not a clock unit" here came from the 20 fps misreading of the tick; corrected 2026-09-16.
+The port runs the mobile routines.
 
 ## level_peep (Level101)
 
