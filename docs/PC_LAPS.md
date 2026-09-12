@@ -123,6 +123,19 @@ more.
 
 Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
 the walks); faster: 106, 111, 113, 213 (−12..−19 %); the rest within ±10 %.
+
+The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
+2026-09-17): the level class's lap as the walker reads it out of game.exe,
+walked at the neighbour's speed records (8 px a tick along the floor, 3 up
+and down, 12 a second) between the objects' hotspots through the doors
+(their standing points and `enter`/`leave` ticks), the actions at their
+`time` or animation frames — 101 34 s (video 32), 102 29 (28), 105 44 (40),
+108 90 (94), 109 104 (113), 110 60 (59), 112 143 (155), 113 172 (191),
+114 147 (168): nine within ±12 %. 103 (28/42), 106 (60/108), 107 (37/54)
+and 111 (108/219) come out short: the machine cycles the neighbour waits
+for and the bath are not in the tokens, and the video's lap may carry a
+trick. The model is the check of the walking rule read from the binary
+(docs/PC_VERIFICATION.md, "the walking speed" and "the lap's timing").
 Under the PC profile (2026-09-09) the sofa and album overlays
 (levels/pc/Level101, Level106: RottweilerUseAnimation lists sized to the PC
 spells) bring 101 to +11 % and 106 to −6 %; 111, 213 and 210 are

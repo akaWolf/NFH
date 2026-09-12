@@ -50,14 +50,26 @@ def at(a):
 def ins(k):
     t = L[k].strip(); m = re.match(r'(0x[0-9a-f]{8})\s+[0-9a-f.]+\s+(.*)', t)
     return (int(m.group(1), 16), m.group(2)) if m else (None, None)
-LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.00477f60': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2'}
+LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00444ad0': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2'}
 PRED = ('fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.0047c6c0', 'fcn.00413780')
 ALLPRED = os.environ.get('ALLPRED') == '1'
-NATFALSE_FN = {'fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.00413780', 'fcn.0047ac20', 'fcn.0047ad20'}
+NATFALSE_FN = {'fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.00413780', 'fcn.0047ac20', 'fcn.0047ad20', 'fcn.0047a0b0', 'fcn.00422c40'}
 NATTRUE = {'fcn.0047c640', 'fcn.0047c6c0', 'fcn.004766e0', 'fcn.00476770', 'fcn.00444d30', 'fcn.0044bb80', 'fcn.0047c320', 'fcn.0047ae70'}
 def strings_before(k, n=8):
     out = []
     for j in range(max(0, k - n), k):
+        for m in re.finditer(r'0x(5[01][0-9a-f]{4})', L[j]):
+            nm = G.get('0x' + m.group(1))
+            if nm: out.append(str(nm))
+    return out
+def strings_since_call(k, n=60):
+    """the string globals loaded since the previous labelled call — the arguments of the call at k"""
+    j0 = max(0, k - n)
+    for j in range(k - 1, j0, -1):
+        tt = ins(j)[1] or ''
+        if (mm := re.match(r'call (fcn\.[0-9a-f]+)', tt)) and (mm.group(1) in LABEL or re.search(r'fcn\.(0045c600|004706a0|0045e640)', tt)): j0 = j; break
+    out = []
+    for j in range(j0, k):
         for m in re.finditer(r'0x(5[01][0-9a-f]{4})', L[j]):
             nm = G.get('0x' + m.group(1))
             if nm: out.append(str(nm))
@@ -108,7 +120,7 @@ def run_level(sw):
             if tt and tt.startswith('push '): return resolve(tt[5:], regs)
         return '?'
     TRACE = os.environ.get('TRACE')
-    def simulate(start_a, objflags=None, flip=False):
+    def simulate(start_a, objflags=None, flip=False, depth=0):
         objflags = {} if objflags is None else objflags
         labels = []; k = at(start_a); seen = set(); pred = False; regs = {}; lastcall = None; flags = {}; inverted = False
         trace = TRACE and int(TRACE, 16) == start_a
@@ -125,7 +137,11 @@ def run_level(sw):
             m = re.match(r'call (fcn\.[0-9a-f]+)', t)
             if m:
                 fn = m.group(1)
-                if fn in LABEL: labels.append((LABEL[fn], strings_before(k, 14)[-2:]))
+                if fn in LABEL: labels.append((LABEL[fn], strings_since_call(k)[-4:]))
+                elif depth < 1 and lo - 0x2000 <= int(fn[4:], 16) < hi + 0x2000 and fn not in NATTRUE and fn not in NATFALSE_FN and not re.search(r'fcn\.(0045c600|004706a0|0045e640|0047f740)', fn):
+                    # a helper of the class (the sofa's sit/sit_remo picker, fcn.004707e0): its own
+                    # GoTo/DoAction calls belong to the case that calls it
+                    labels.extend(simulate(int(fn[4:], 16), objflags, False, depth + 1)[0])
                 pred = False; lastcall = fn; k += 1; continue
             if t == 'test al, al':
                 if lastcall is None: pred = 'false'
@@ -343,3 +359,11 @@ for lv in order:
         laps.append(st)
         for i, lp in enumerate(laps[:3]):
             print('   PC lap %d by code: %s' % (i + 1, ' > '.join(lp)))
+        if os.environ.get('LAPS'):
+            # the ordered ICON/GOTO/ACTION tokens of each lap, for tools/pcref/lap_model.py
+            toks = []; seen_c = set(); n = 0
+            for c, labels, nxt in seq:
+                if c in seen_c and toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks))); toks = []; seen_c = set()
+                seen_c.add(c)
+                toks += ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK')]
+            if toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks)))
