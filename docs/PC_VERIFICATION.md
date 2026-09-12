@@ -72,7 +72,10 @@ fcn.00448d70 — the walk step at 0x475ef1 compares the same field with the
 name-looked-up target to decide whether the actor is there yet), and the
 catch needs the two to be equal, the byte +0x78 of the actor looked up
 second to be zero (written only by the level's event handler at 0x440c87
-from an event's boolean — the sender was not traced), and flag 4 clear on
+from an event's boolean; the handler is slot 49 of the level state's
+vtables 0x4e07b8 / 0x4e1638, reached through the level's script
+interface — vtable 0x4e7650, slot 207, the stub at 0x405f10 — whose
+callers the dump does not show as direct calls), and flag 4 clear on
 both. Flag 4 is set by fcn.004737a0 (SetFlag 4 at 0x473965, then the
 actor's +0x30 hideout pointer and an action) and cleared by fcn.00473a60 —
 Woody in a hideout (the `hideout` flag of `objects.xml`). State 3 starts
@@ -143,7 +146,7 @@ helpers.
 | lives out | game over | fcn.10042471: lives − 1, below zero → the failed path (0x100424d8) | agrees |
 | the gauge, the decay, the board, the clock | `pcprofile.s2_rage_tick`, `calculate_score` | fcn.10044234, fcn.10040226 | agrees (docs/PC_ROUTINES.md) |
 | the trick amounts | nine PC values in `levels/pc/*.overlay.json`, the rest the mobile's | tricks.xml `coins` / `rage` | agrees (data, the overlays' sources) |
-| detection ("sees Woody") | the mobile's predicate | the catch is raised through a registered command handler (0x1003f08b: the catcher's flags 2 and 0x50 via fcn.100450dc) and a deferred event object (fcn.1003c543) | open: the predicate that raises them was not traced |
+| detection ("sees Woody") | the mobile's predicate | the level tick (fcn.10044234 at 0x100445f1) runs fcn.1003fc90 over a table of watch entries (an actor, a target, mode bits at +0x1c/+0x1d) and evaluates each with fcn.1003f573: the actor must carry flag 0x20, neither party flag 4 (the hideout flag — set on hiding, e.g. 0x100067e9, cleared by the `leave` action at 0x10006abc), the rooms compared through fcn.10040a7d (the record of the actor's +0x20 name), and in one mode a vertical distance below 15 (0x1003f7d0); a true entry fires an event object (fcn.1003f86d, fcn.1003f972, fcn.1003fa6b, fcn.1003fc6e — no strings) | agrees in kind with the mobile's zone containment plus the hiding exemption; open: which entries the levels register (scripts or engine) and what the reactions do — the catch itself is the catcher's `fight` action, issued by the level class's own method (the `fight` string sites, one per level, e.g. 0x100149dc) |
 
 ## Not verified
 
@@ -155,7 +158,9 @@ helpers.
 - Season 1: which neighbour actions clear or set the +0x78 byte (the
   script event's sender); whether the position object of the catch is
   the room or the floor strip; door transit.
-- Season 2: the detection predicate; what the respawn timer gates.
+- Season 2: which watch entries the levels register with the trigger
+  evaluator fcn.1003f573 and what its reactions run; what the respawn
+  timer gates.
 - The jingle table's index (0..3) is the dialog's outcome, not the level
   state; which outcome maps to which index was not traced beyond the
   table itself.
