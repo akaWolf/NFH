@@ -375,21 +375,28 @@ port's plain hard angry holds 10.5 s, its easy one 2.3-3.8 s) and then
 drains to empty in a time that is a constant of the level: 7.8 s on
 E06, 8.9-9.6 s on E03/E07-E10, 10.1-10.3 s on E04/E05, 11.3-12.2 s on
 E02/E11-E14, ~16 s on E01 — 8.3-12.9 %/s, two to three times the mobile
-data's 4.23 %/s. But the tick counter beside it does not follow the
-mercury: the HUD digit read one second before and five after every
-trick of Badinfos' fourteen runs ticks for every gap whose decay (the
-gap less the previous hold) is 18 s or shorter — E06's 292 (25 s after
-267, hold 7), E11's 279 (17 s of decay), E12's 382 (17), E13's 256 (16)
-— with the tube empty for up to ten seconds, and never for 25 s or
-longer (E08 214, E09 242 and 319, E12 227, E13 212/325/374, E14 294).
-The data's 100/4.23 = 23.6 s sits inside that bracket, so the tick
-meter is the mobile's and the profile keeps it (a sweep with the mercury
-rates as AngryMeterDecay lost ticks on thirteen levels — 88-98 % — and
-113 outright); the mercury's rate is a drawing constant, carried as
-PCThermometerDrain in the overlays and used only by the HUD: under the
-profile the drawn meter is full whenever the tick meter is, and drains
-at the level's rate while the tick meter behind it still decays at
-4.23. (An earlier reading of 3.7-4.6 %/s here came from an uncalibrated
+data's 4.23 %/s. The tick counter beside it follows a
+different clock, and game.exe says which (docs/PC_ROUTINES.md, "The
+anger and the bonus"): a trick sets the rage current to max(current,
+its angrytime — the level's when it has none), holds it for 60 ticks
+and then counts it down by one per tick at 20 Hz; the mercury is
+current × 100 / the level's angrytime clipped at 100, so it pins at full
+for 60 + (amount − level) ticks and drains over the level's value —
+the drains above are those values over 20 (bath 156 = 7.8 s, laundry
+240 = 12 s) — and the bonus of the next trick is paid iff the current
+is still above zero, +3 on the rating. The window is 3 s plus the
+amount over 20: 10.8 s after a bath trick with no own value, 15 s after
+its foam pudding (240), 21 s after the hunter's marbles (360). The
+HUD digit read one second before and five after every trick of
+Badinfos' fourteen runs agrees with the bracket that reading gives
+(ticks for every gap whose decay is 18 s or shorter, never for 25 s or
+longer). The port's tick meter is still the mobile's (4.23 %/s, 23.6 s
+after any trick): a sweep with the mercury rates as AngryMeterDecay lost
+ticks on thirteen levels — 88-98 % — and 113 outright, so the drawn
+meter is a HUD-only constant (PCThermometerDrain) over the mobile
+meter; carrying the PC rule itself (hold, amount, level maximum,
++3 while above zero) is the open change. (An earlier reading of 3.7-4.6
+%/s here came from an uncalibrated
 crop and is withdrawn.) The percentage beside the tick counter is
 counted up the PC's way, too: a trick's score arrives as a yellow "+N %"
 popup above the figure, a tick's 3 as an orange one; the popup sits for
@@ -465,10 +472,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   hunter) is exactly the drain the video gave — the fourteen
   PCThermometerDrain values are now the data's, 100 / (angrytime / 20).
   Some tricks carry their own `angrytime` (the foam pudding 240, the
-  dirty towel 216); what it changes is not settled: the drain after the
-  foam pudding on E06 was still the level's 7.8 s, and the tick still
-  landed 18 s into a decay whose trick had no own value. The tick window
-  stays the mobile's 23.6 s inside the 18-25 s bracket.
+  dirty towel 216): per game.exe (docs/PC_ROUTINES.md) that is the
+  amount the rage current is set to, the level's value both the amount
+  of a trick without one and the mercury's full scale — which is why the
+  drain after the foam pudding on E06 was still the level's 7.8 s while
+  the mercury pinned 7.2 s first. The bonus window is 60 + amount ticks
+  at 20 Hz; the port's tick meter is still the mobile's 23.6 s.
 - *Season 2 amounts.* `tricks.xml`'s `rage` per trick, in thousandths,
   is the mobile AngerAmount on all but eight items (202: rake 20, shark
   35, the electrified rail 30; 203: the chilli paper 30; 204: the jade

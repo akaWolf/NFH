@@ -37,8 +37,10 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 - `thermo.py [video]`: the Season 1 thermometer (the neighbour's anger meter,
   bottom-left): the mercury column at 10 Hz per episode, its full holds and
   full-to-empty durations. The mercury drains at 8.3–12.9 %/s per level (E01
-  ≈ 6.1) — a drawing rate the PC overlays carry as PCThermometerDrain; the
-  tick meter behind it is the data's 4.23 %/s (docs/PC_FIDELITY.md §7).
+  ≈ 6.1) — the level's `angrytime` in 1/20 s, per game.exe the full scale of
+  the rage current (docs/PC_ROUTINES.md); the PC overlays carry the rate as
+  PCThermometerDrain, the tick meter behind it is still the mobile's 4.23 %/s
+  (docs/PC_FIDELITY.md §7).
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —

@@ -18,25 +18,69 @@ wash cycles (give, wash, get_clothes twice) and the drier two dry cycles where t
 three of each; the bath's shower sequence (take_towel, dry) and the pudding's foam branch; the
 piano's kick of the football and the bowling ball's throw through the window.
 
-Where the rest lives: game.exe holds only the level classes (and their copies of the engine's
-string tables — angrytime, quota1-4, nearobj, the message names); Loader.dll parses the XML
-(`%s\level.xml`); GFXEngine.dll is the engine with the HUD (`rageometer`, `bonuscount`,
-`trickcount` are its dialog elements) and so the anger timer and the bonus — the trick parser
-in game.exe (0x444390) reads name, quota1-4 and angrytime into the trick record, the level
-parser (0x44f29a) the level's angrytime into the level object at +0xc; their consumers in
-GFXEngine.dll are the next thing to read. The engine's messages (game.exe): CreateRoomMsg,
-AddObjectMsg, AddActionMsg, AddHotSpotMsg, AddContentMsg, AddNoiseTriggerMsg,
-AddObjectTriggerMsg, CreateCombinationMsg, AddIngredientMsg, SetStdActionMsg, GoToPosMsg,
-UseObjectMsg, LookAtObjectMsg, SetAnimMsg, SetSpeedMsg, PauseActorMsg, StopJobMsg,
-GameOverAnimMsg, StartLevelMsg. The trick record AddTrick (0x444220) builds is 0x24 bytes:
-+4 the name, +0x1c quota1, +8 quota2, +0xc quota3, +0x10 quota4, +0x14 angrytime, +0x18 a
-flag (0) — the level's trick list is what the bonus logic reads; its consumer was not found
-by static patterns yet (the searches land on the trick-preparation progress bar,
-cur × 100 / total at 0x47f5cc, and on container growth). The InGameGUI object game.exe
-creates through GFXEngine.dll's `createInGameGUI` (0x406ecc, in the init at 0x406970) is kept
-only in a local there and reached through the GUI engine afterwards, so the HUD's rage and
-bonus calls are virtual and do not show up as string references — tracing them needs the
-vtable of `gui::InGameGUI` (GFXEngine.dll) or a live run.
+Where the rest lives: game.exe holds the level classes, the level state and the scoring;
+Loader.dll parses the XML (`%s\level.xml`); GFXEngine.dll is the engine with the HUD
+(`rageometer`, `bonuscount`, `trickcount`, `head_01`-`head_04` are its `ingame` dialog's
+elements). The engine's messages (game.exe): CreateRoomMsg, AddObjectMsg, AddActionMsg,
+AddHotSpotMsg, AddContentMsg, AddNoiseTriggerMsg, AddObjectTriggerMsg, CreateCombinationMsg,
+AddIngredientMsg, SetStdActionMsg, GoToPosMsg, UseObjectMsg, LookAtObjectMsg, SetAnimMsg,
+SetSpeedMsg, PauseActorMsg, StopJobMsg, GameOverAnimMsg, StartLevelMsg.
+
+**The anger and the bonus, read from the code (2026-09-16).** The trick parser (0x444390)
+reads `name`, `quota1`-`quota4` and `angrytime` (a missing quota is 0, a missing angrytime
+-1) and AddTrick (0x444220) builds the 0x24-byte record: +4 the name, +8/+0xc/+0x10/+0x14
+quota1-4, +0x18 the index of the quota that pays next, +0x1c angrytime, +0x20 0. The level
+parser (0x44f1d0, the attribute at 0x44f29a) puts the level's `angrytime` at +0xc of a
+0x14-byte level record. The level state object (its constructor fcn.0043b9b0) carries: +0x54
+the tick count, +0x58 the elapsed time and +0x5c the limit, +0x60 the score, +0x64 the bonus
+count, +0x6c the face-icon timer, +0x70 the rage current, +0x74 the rage maximum, +0x78 the
+hold, +0x7c the bonus flag, +0x84 the level's angrytime (120 from the constructor, overwritten
+from the level record's +0xc at 0x440a13), +0x88 running.
+
+The game tick fcn.0043ab40 calls fcn.00438a80 once per tick while the level runs (0x43b2fc):
+the icon timer counts down and resets the face (SetIcon fcn.00437f70, 0) when it reaches 0;
+then `if (current || hold) { if (hold) hold--; else { current--; if (current == 0) flag = 0; }
+send the rage event }`; then the clock: elapsed++ (clamped to the limit), a time event every
+12 ticks. The rage event (a 0x14-byte object, vtable 0x4e0a04, built by fcn.004381c0: +4
+maximum, +8 current, +0xc `hold > 0`, +0xd the flag) is dispatched through the 111-slot
+listener table of GFXEngine.dll (0x100a3740, default 0x1000ec10 = not handled): slot 46
+(0xb8, game.exe 0x435e90 → GFXEngine 0x10011460) draws it — the mercury is `current × 100 /
+maximum` clipped at 100 (fcn.1000ffc0 → fcn.10014a80 looks up `rageometer`, fcn.1000bd70 sets
+it), the face (fcn.1000ffb0 → `head_0N`) is 0 idle, 1 while current > 0, 2 during the hold,
+3 during the hold of a bonus trick. The `gui::InGameGUI` object itself is 0x6c bytes with the
+vtable 0x100a3908 (+0x28 the engine, +0x34 the dialog, +0x44 the dialog the elements are
+looked up in); its listener sub-object is what game.exe holds.
+
+A trick fires in fcn.0047bd00: return if the trick already fired (+0x1c of the trick); look
+the record up by name (fcn.00443920); points = the record's quota at its index, and
+fcn.004439d0 advances the index; no points, no scoring. Otherwise, in this order: bonus =
+(rage current > 0) (fcn.004357e0 returns +0x70 — the manual's "before the anger indicator is
+back to zero" is exactly that); fcn.00438070: score += points + (bonus ? 3 : 0), clamped to
+0..100, the bonus count += 1 on a bonus, a score event for the HUD; fcn.00438b90(amount,
+bonus) with amount = the record's angrytime, or the level's (+0x84) when it is -1: maximum
+= the level's angrytime, current = max(current, amount), hold = 60, flag = bonus; the face
+icon (fcn.00438550): 4 for a bonus, else 3 for more than 10 points, else 2; the jingle
+(`music/jingle_joke.mp3`); then the trick's animation. So after a trick the anger indicator
+stays above zero for 60 + amount ticks, the mercury sits at full for 60 + (amount − level
+angrytime) of them and drains over the level's angrytime ticks; the next trick's bonus is
+decided by that indicator alone — the scores and the neighbour's whereabouts play no part.
+
+The tick is 20 Hz. The engine's scheduler (fcn.00423b60) stores 1000 / rate milliseconds per
+tick and its driver (fcn.004237b0) runs the callback once per elapsed period; the rate reaches
+it as the third argument of the application's init (fcn.0041a910) rather than as a literal,
+but the video fixes it: the mercury drains over the level's angrytime ticks, and every
+measured drain (docs/PC_FIDELITY.md §7) is that value over 20 — the bath's 156 is the 7.8 s,
+the pie's and the piano's 204 the 10.2, the DIY's 228 the 11.4, the laundry's, fitness's and
+hunter's 240 the 12. The data, then (`tools/pcref/canon.py` reads the UTF-16 XML — grep does
+not), in ticks: peep 280, sofa 240, mail 180, pie 204 (mum_smeared 264, toiletstuffed 228),
+piano 204 (groundsoap 276, phone 276, bowlingball 288), bath 156 (foambottle 240, dirtytowel
+216), art 180 (potterswheel_fast 204, picture_smeared 204), suntan 180 (the six banana skins
+300), pig 192 (the four banana skins 252, babybottle_nitro 240), barbecue 180 (the four banana
+skins 252), laundry 240 (marbles 300, vacuum_hole 300, tumbledrier_smashed 270), fitness 240
+(electrotrap 264, marbles 288, hometrainer_tonged 288, barbell_sawed 264, skate 300), DIY 228
+(marbles 264), hunter 240 (electrotrap 272, marbles 360). The indicator's window after one
+trick is therefore 3 s plus the amount over 20: 10.8 s (bath, no own value) to 21 s (the
+hunter's marbles).
 
 Season 2 (GameLogic.dll, base 0x10000000) has the same constant pattern (`tools/pcref/exe/
 nfh2_gamelogic_globals.json`, 4373 names) but its scripts call a different engine: the
@@ -46,8 +90,10 @@ fcn.1000ae19 (`lookaround`, `crash`, `electrify`, `leave`), a variant test on a 
 objects = fcn.1000fb6e (`pond_bridge_damaged`, `pond_bridge`), a tricked test on one =
 fcn.1000ec67 (`pond_pond_eel`); the walks pass the object in a register the listing does not
 show. The ship1 code at 0x100269xx is the tutorial (`wait1`, `hurry`, `combo2`/`combo4`,
-room moves of `woody` and `neighbor` = fcn.1000fc33). Naming the walk and finishing the
-Season 2 scripts is the next step of this reading.
+room moves of `woody` and `neighbor` = fcn.1000fc33). Its anger is not read yet: the
+candidates are a `current × 100 / maximum` clipped at 100 at 0x1000b3e4 and two `hold = 60`
+stores at 0x100238e1 / 0x10023a9e. Naming the walk, finishing the Season 2 scripts and
+reading that anger are the next steps.
 
 ## level_peep (Level101)
 

@@ -131,9 +131,11 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 
 Open: three natural laps still differ from the PC's by more than 15 %
 (111, 213, 210 — the neighbour's routine is compiled into game.exe, one
-class per level, not data), and the anger indicator's length on PC is
-bracketed at 18–25 s by the tick digits rather than measured (the data's
-23.6 s sits inside; the manual states the rule). `docs/GAMEPLAY.md`
+class per level, not data), and the PC's anger rule, now read from
+game.exe (a trick sets the indicator to its `angrytime`, 60 ticks of
+hold, then one per tick at 20 Hz; +3 while it is above zero —
+`docs/PC_ROUTINES.md`), is documented but not yet carried by the
+profile, whose tick meter is still the mobile's. `docs/GAMEPLAY.md`
 §10–§11 list what resists a clean reimplementation.
 
 ## What makes this tractable
