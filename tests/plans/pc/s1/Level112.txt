@@ -33,7 +33,7 @@ await FishTank 8
 await YogaBook 7
 await Trampoline 8
 await Bicycle 8
-await GroundSkates 14
+await GroundSkates 8                 # the PC pays the skates 8 (levels/pc/Level112.overlay.json)
 await GroundMarbles@Zone01 7
 await ChestExpander 8
 await ElectricTrap 7
