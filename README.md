@@ -142,11 +142,11 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   level is won (101/102/107 100, 103/104/105/114 97, 113 96, 108/109/112
   94, 110 78, 106 77, 111 70 — the last three at ceilings the
   room-pointer catch sets, the 97s a second or two of his lap, the 94s
-  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), thirteen Season 2 levels rate 100 and 210 is
-  won at 90 (its coins never pile to the one overflow). The Season 2
-  compound coins pay the PC's per-record amounts under the profile
-  (`docs/PC_FIDELITY.md` "Season 2 compound coins"). The mobile numbers
-  do not move: the regression under
+  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 — 210 among
+  them since the PC's station stays, compound coins and coin ticks are
+  carried (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
+  coins"; 212 and 213 on PC plans of their own, in re-timing). The mobile
+  numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
 Open: the Season 2 catch on PC — the watch predicate's modes are read
@@ -158,9 +158,7 @@ neighbour scripts is the co-actor fight after a crash reaction), so the
 profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
-between them is not); 210's overflow (the basket's three coins now land
-at one call as on the PC, but his deck-chair scene holds him ~40 s and
-the pile peaks at 94); and the ceilings the room-pointer catch sets on
+between them is not); and the ceilings the room-pointer catch sets on
 106, 110 and 111. Three natural laps differ from the PC's by more than
 15 % (111, 213, 210 — the neighbour's routine is compiled into game.exe,
 one class per level, not data); the Season 2 gauge is 100 000 rage long

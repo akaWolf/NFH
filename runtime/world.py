@@ -3047,6 +3047,12 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         pc = self._pc_use_seconds(it)
+        w0 = self.pawn.world
+        if self.role == 'Rottweiler' and pcprofile.is_pc() and it.tricked \
+                and getattr(it, 'pc_coin_ticks', None) is not None \
+                and w0.woody is not None and w0.woody.nfh2 and seq:
+            # the PC credits the coin `time` ticks into the trick action
+            w0.pc_credits.append((w0.time + float(it.pc_coin_ticks) / 12.0, self.pawn, it))
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc), file=sys.stderr)
@@ -5274,6 +5280,7 @@ class World:
         self.sound_sink = sound_sink
         self._last_input_time = 0.0      # Woody.LastInputTime
         self.pay_log = []                # (t, item, points, hot) per paid trick under the profile
+        self.pc_credits = []             # (when, pawn, item): Season 2 coins due at the PC record's tick
         self._entrance_hello = False
         self._open_furniture = []        # SearchItem.CloseTime holders
         self.snap_request = None         # HUD face clicks -> CameraMover
@@ -5471,6 +5478,68 @@ class World:
         if self.hud is not None:
             self.hud.play_rottweiler_angry(level)
 
+    def _s2_credit(self, pawn, item):
+        """the NFH2 ladder's meter arithmetic (Rottweiler.cs:613-663): the
+        compounds' extras, the linked pair and the item's own AngerAmount;
+        returns whether the meter overflowed. Under the profile a Season 2
+        coin is credited at the PC record's tick into the tricked use
+        (World.pc_credits, PCCoinTicks) and play_angry finds it done."""
+        items = self.level.items
+        linked = items.get(item.linked_item_trick) \
+            if item.linked_item_trick else None
+        aux = item if item.kind in TRICK_KINDS else None
+        if item.extra_coin_toilet_211:         # cs:615-619
+            item.extra_coin_toilet_211 = False
+            pawn.angry_meter += 20.0
+        elif item.compound_extra_coin and aux is not None \
+                and aux.compound_tricked:      # cs:620-624
+            item.compound_extra_coin = False
+            # the PC pays the record the extra stands for (tricks.xml
+            # rage: 206's harpoon_fifi 30, 213's tortilla_tequila 20 —
+            # levels/pc overlays, PCExtraCoin); the accounting
+            # fcn.1000140b credits each named record of the action once
+            pawn.angry_meter += self._pc_extra(item, 20.0)
+        elif item.tricked and linked is not None and linked.tricked \
+                and item.extra_coin_206:       # cs:625-629
+            item.extra_coin_206 = False
+            # 206: the PC's three records (harpoon_fifi, harpoon_rubber,
+            # rubberrabbit) are the pad, the linked harpoon and one extra
+            # of 30 through whichever branch fires (PCExtraCoin206 30)
+            pawn.angry_meter += self._pc_extra(item, 15.0, 'pc_extra_coin_206')
+        elif item.plant_carnivore_extra and aux is not None \
+                and aux.compound_tricked:      # cs:630-634
+            item.plant_carnivore_extra = False
+            # 213: carnivore_bigmanip 20 in me_c2/tricks.xml
+            pawn.angry_meter += self._pc_extra(item, 10.0)
+        elif item.extra_coin_210 and item.tricked \
+                and linked is not None and linked.tricked:  # cs:635-639
+            basket = items.get(item.dog_basket_210) \
+                if item.dog_basket_210 else None
+            if basket is not None and basket.primed:
+                item.extra_coin_210 = False
+                # the PC pays the drained pool as its own trick record:
+                # in_b2/objects.xml `pool/divingboard_oil` lists
+                # fifi_bone, fall_water and fall_empty in one
+                # `fall_empty` action, fall_empty 20000 in tricks.xml
+                # (the mobile's 10 is that coin halved; PCExtraCoin 20)
+                pawn.angry_meter += self._pc_extra(item, 10.0)
+        if linked is not None and linked.tricked and item.tricked:
+            # the linked-pair arm (cs:640-654)
+            if not linked.already_tricked:
+                pawn.angry_meter += linked.anger_amount
+                if item.extra_coin_linked:
+                    pawn.angry_meter += item.extra_coin_anger
+            elif item.already_tricked and linked.already_tricked:
+                pawn.tricked_aux = True
+        if not item.dont_get_angry and not pawn.tricked_aux \
+                and not item.already_tricked:  # cs:655-658
+            pawn.angry_meter += item.anger_amount
+        overflow = False
+        if pawn.angry_meter > pawn.angry_max:  # cs:659-663
+            pawn.angry_meter = pawn.angry_max
+            overflow = True
+        return overflow
+
     def play_angry(self, pawn, item, on_done=None):
         """Rottweiler.PlayAngryAnimation (Rottweiler.cs:552-797), the
         GameMode.Classic branch, with the name-hack heads, the extra-angry
@@ -5575,59 +5644,11 @@ class World:
             # meter accumulates AngerAmount per trick, the extra-coin hacks
             # top it up, and only overflow costs a tick — with the freakout,
             # the statue strip and the whistle
-            linked = items.get(item.linked_item_trick) \
-                if item.linked_item_trick else None
-            aux = item if item.kind in TRICK_KINDS else None
-            if item.extra_coin_toilet_211:         # cs:615-619
-                item.extra_coin_toilet_211 = False
-                pawn.angry_meter += 20.0
-            elif item.compound_extra_coin and aux is not None \
-                    and aux.compound_tricked:      # cs:620-624
-                item.compound_extra_coin = False
-                # the PC pays the record the extra stands for (tricks.xml
-                # rage: 206's harpoon_fifi 30, 213's tortilla_tequila 20 —
-                # levels/pc overlays, PCExtraCoin); the accounting
-                # fcn.1000140b credits each named record of the action once
-                pawn.angry_meter += self._pc_extra(item, 20.0)
-            elif item.tricked and linked is not None and linked.tricked \
-                    and item.extra_coin_206:       # cs:625-629
-                item.extra_coin_206 = False
-                # 206: the PC's three records (harpoon_fifi, harpoon_rubber,
-                # rubberrabbit) are the pad, the linked harpoon and one extra
-                # of 30 through whichever branch fires (PCExtraCoin206 30)
-                pawn.angry_meter += self._pc_extra(item, 15.0, 'pc_extra_coin_206')
-            elif item.plant_carnivore_extra and aux is not None \
-                    and aux.compound_tricked:      # cs:630-634
-                item.plant_carnivore_extra = False
-                # 213: carnivore_bigmanip 20 in me_c2/tricks.xml
-                pawn.angry_meter += self._pc_extra(item, 10.0)
-            elif item.extra_coin_210 and item.tricked \
-                    and linked is not None and linked.tricked:  # cs:635-639
-                basket = items.get(item.dog_basket_210) \
-                    if item.dog_basket_210 else None
-                if basket is not None and basket.primed:
-                    item.extra_coin_210 = False
-                    # the PC pays the drained pool as its own trick record:
-                    # in_b2/objects.xml `pool/divingboard_oil` lists
-                    # fifi_bone, fall_water and fall_empty in one
-                    # `fall_empty` action, fall_empty 20000 in tricks.xml
-                    # (the mobile's 10 is that coin halved; PCExtraCoin 20)
-                    pawn.angry_meter += self._pc_extra(item, 10.0)
-            if linked is not None and linked.tricked and item.tricked:
-                # the linked-pair arm (cs:640-654)
-                if not linked.already_tricked:
-                    pawn.angry_meter += linked.anger_amount
-                    if item.extra_coin_linked:
-                        pawn.angry_meter += item.extra_coin_anger
-                elif item.already_tricked and linked.already_tricked:
-                    pawn.tricked_aux = True
-            if not item.dont_get_angry and not pawn.tricked_aux \
-                    and not item.already_tricked:  # cs:655-658
-                pawn.angry_meter += item.anger_amount
-            overflow = False
-            if pawn.angry_meter > pawn.angry_max:  # cs:659-663
-                pawn.angry_meter = pawn.angry_max
-                overflow = True
+            if item.pc_credited:
+                overflow = item.pc_overflow
+                item.pc_credited = False
+            else:
+                overflow = self._s2_credit(pawn, item)
             # cs:664 divides by Item.AngerAmount raw: a 0 gives Infinity/NaN
             # in C# float math (neither <= 1 nor <= 2), never the 20 default
             # (Item.cs:392); no shipped item serializes 0
@@ -5641,7 +5662,7 @@ class World:
             elif num <= 2.0:                       # cs:674-678
                 seq = [a for a in (item.angry_easy_up, item.angry_hard) if a]
                 self._hud_angry(2)
-            elif pawn.angry_meter < pawn.angry_max:    # cs:679-683
+            elif pawn.angry_meter < pawn.angry_max and not overflow:    # cs:679-683 (the PC credit's overflow may have decayed by the tantrum)
                 seq = [a for a in (item.angry_easy_up, item.angry_hard) if a]
                 self._hud_angry(3)
             else:                                  # cs:684-692
@@ -8759,6 +8780,14 @@ class World:
 
     def tick(self, dt):
         self.time += dt                  # Time.time
+        if self.pc_credits:
+            due = [c for c in self.pc_credits if c[0] <= self.time]
+            if due:
+                self.pc_credits = [c for c in self.pc_credits if c[0] > self.time]
+                for _when, pawn, item in due:
+                    if not item.pc_credited:
+                        item.pc_overflow = self._s2_credit(pawn, item)
+                        item.pc_credited = True
         # PlayLevelMusic's first-run delay (MusicPlayer.cs:88-98); the
         # track loops per the serialized LevelMusicSource flag
         if self._music_timer is not None:

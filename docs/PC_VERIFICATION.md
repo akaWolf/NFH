@@ -289,6 +289,15 @@ helpers.
   clips' pace (`clip_fps`) and the catch on sight without the busy
   windows (`sees_while_busy`); `NFH_PC_RULES=walk,doors,sight` keeps a
   subset of the three for bisecting a plan.
+- Carried on 2026-09-17 (the Season 2 stations): PCUseSeconds on the
+  routine items of 210-213 from the PC videos' bubble spans less the walk
+  (tools/pcref/pc_durations_s2.py; docs/PC_FIDELITY.md "Season 2 station
+  durations").
+- Carried on 2026-09-17 (the coin ticks): a Season 2 coin lands at its
+  record's `time` into the trick action (fcn.1000140b's `cmp eax,
+  [ecx+0x28]` per record) — PCCoinTicks on the items of 210-213, credited
+  through `World.pc_credits` at that tick into the neighbour's tricked use
+  (`_s2_credit`, the ladder's arithmetic split out of `play_angry`).
 - Carried on 2026-09-17 (the compound coins): the Season 2 ladder's
   hard-coded extras take the PC record's rage under the profile
   (`Item.pc_extra_coin` / `pc_extra_coin_206` from the overlays'

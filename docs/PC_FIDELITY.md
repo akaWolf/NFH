@@ -394,13 +394,13 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   fall_empty — 20 each in tricks.xml, the drained pool) and two in
   `fall_water`; GameLogic.dll's accounting (fcn.1000140b, the "Season 2
   compound coins" entry below) credits each named record once. The
-  profile now pays that: the basket's extra is 20 (PCExtraCoin, the
-  mobile's 10), and with the bone laid after the board's oil the ladder
-  pays bone, water and empty pool at one call (v20: +60 at 306 s). The
-  pile still peaks at 94: his deck-chair scene (the hedgehog and the
-  pylon's shock) holds him ~40 s, so the chair's 20 has decayed by the
-  time of the call, and the shop's 27 and the elephant's 30 after it fall
-  35 and 28 s apart — the level rates 90, won.
+  profile pays that (the basket's extra 20, PCExtraCoin), and with the PC
+  station stays and coin ticks (the entries below) his lap is the
+  Mother's call cycle of ~125 s: the plan (v21) lays the pylon and the
+  chair while he shops on lap 1, the oil and then the bone on her nap at
+  128 while he sits on the beach, so lap 2 piles the chair (20), the
+  basket's three (60), the shop's hedgehog (27) and the elephant (30) —
+  the overflow, 100.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
@@ -739,7 +739,34 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   pair already matched the PC's records (201's puddle 40 + rail 50 = auweh
   + owe, 204's jade 17 + vase 25, 208's platform 20 + seesaw 30, 209's
   coal 20 + trough 20 and shoe 20 + drain 20, 212's whip 20 + spikes 20,
-  hands 10 + 10, ledge 15 + boat 15, 214's hatch 40 + 40).
+  hands 10 + 10, ledge 15 + boat 15, 214's hatch 40 + 40). The record's
+  `time` is the tick into the action at which the coin lands (the boat 21,
+  the jacket 25, the gear 10, the rod 15, the phone 26 and 31, the fall's
+  bone 2 / water 20 / empty 25, the tortilla 20 and 30, the pinata 11 …),
+  where the mobile pays at a step of its own tricked sequence 6-10 s in;
+  under the profile a Season 2 coin is credited that many ticks into the
+  neighbour's tricked use (PCCoinTicks on the item, `World.pc_credits`,
+  `_s2_credit`) and the tantrum then finds it paid — carried on 210-213
+  with the stations (tools/pcref/coins.py --write-ticks).
+- *Season 2 station durations.* The PC videos' HUD bubble (docs/
+  PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
+  stay at each station once the walk to it is taken off (the icon shows
+  through the walk where the spans touch; an unlabelled gap before a span
+  is walk outside it — tools/pcref/pc_durations_s2.py), and the profile
+  plays the mobile use clips at the pace that lasts it (PCUseSeconds, the
+  Season 1 mechanism) on the four episodes whose natural laps sat more
+  than 15 % off the PC's: 210 (the deck chair 10.5 s for the mobile's
+  50-s sleep, the shop 11.7, the elephant 8.0, the basket put 13.7 — a lap
+  of ~90 s for the PC's 102-120), 211 (the boat 17.3, the jacket 10.2, the
+  rod 8.2, the gear 7.0, the sweets 0.5), 212 (the throne 2.9 + 7.0, the
+  whip 6.7, the cigars 14.0, the bull 19.0, the ledge 5.3 + 9.9) and 213
+  (the bull 3.5, the plant 12.8, the tortilla 4.0, the boat 21.5, the
+  pinata 12.5, the bull ride 0.9 + 8.2 + 1.1, the cement 28.5 — 135 s for
+  the PC's 136). The other episodes' laps were already within the
+  tolerance (docs/PC_LAPS.md) and keep the mobile clips' own lengths.
+  Under the stays and the coin ticks 210 and 211 rate 100 (211's boat
+  coin now lands 21 ticks into his boat and tops the bar at 241 s); 212
+  and 213 are re-timed on PC plans of their own.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (his bubbles and popups: the trap on the basement walk-in 158, the
   washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that

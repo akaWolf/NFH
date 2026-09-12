@@ -42,7 +42,12 @@ def pc_actions(n):
             inner = am.group(4) or ''
             names = re.findall(r'<trick\b[^>]*\bname="([^"]+)"', inner)
             own = bool(re.search(r'<trick\b(?![^>]*\bname=)[^>]*jingle="true"', inner))
-            lst.append((am.group(1), names, own))
+            ticks = {}
+            for tm in re.finditer(r'<trick\b([^>]*)/?>', inner):
+                a = dict(re.findall(r'(\w+)="([^"]*)"', tm.group(1)))
+                if a.get('name') and a.get('time', '').isdigit():
+                    ticks.setdefault(a['name'], int(a['time']))
+            lst.append((am.group(1), names, own, ticks))
         acts[name] = lst
     return rage, coins, combos, acts
 
@@ -94,17 +99,18 @@ def credits_for(inv, rage, combos, acts):
         if any(canon.norm(i) == inv for i in c['ingredients']):
             obj = cname
             recs = []
-            for act, names, own in acts.get(obj, []):
+            for act, names, own, ticks in acts.get(obj, []):
                 for t in names:
-                    recs.append((act, t, rage.get(t)))
+                    recs.append((act, t, rage.get(t), ticks.get(t)))
                 if own and act in rage:
-                    recs.append((act, act, rage[act]))
+                    recs.append((act, act, rage[act], ticks.get(act)))
             out.append((cname, c['trick'], recs))
     return out
 
 
-def show(n):
+def show(n, write_ticks=False):
     rage, coins, combos, acts = pc_actions(n)
+    found = {}
     print('=' * 100)
     print('LEVEL %d  PC %s  tricks: %s' % (n, canon.S2[n], ' '.join('%s=%d' % kv for kv in rage.items())))
     for it in mobile_items(n):
@@ -113,15 +119,37 @@ def show(n):
             it['name'], it['anger'], it['score'], ','.join(it['requires']) or '-', it['linked'] or '-', it['extras'] or '')
         print(line)
         for inv in it['requires']:
-            for cname, isTrick, recs in credits_for(inv, rage, combos, acts):
+            cands = credits_for(inv, rage, combos, acts)
+            own = [c for c in cands if it['name'].lower() in c[0].lower().replace('_', '')]
+            for cname, isTrick, recs in (own or cands):
                 uniq = {}
-                for act, t, r in recs:
-                    uniq.setdefault(t, (act, r))
+                for act, t, r, tk in recs:
+                    uniq.setdefault(t, (act, r, tk))
                 tot = sum(r or 0 for r in (v[1] for v in uniq.values()))
-                print('      %s <- %s (trick=%s): %s  = %d' % (cname, inv, isTrick, ' '.join('%s@%s=%s' % (t, a, r) for t, (a, r) in uniq.items()), tot))
+                print('      %s <- %s (trick=%s): %s  = %d' % (cname, inv, isTrick, ' '.join('%s@%s=%s/t%s' % (t, a, r, tk) for t, (a, r, tk) in uniq.items()), tot))
+                ticks = [tk for (_a, _r, tk) in uniq.values() if tk is not None]
+                if ticks:
+                    found.setdefault(it['name'], min(ticks))
+
+
+    if write_ticks and found:
+        p = '%s/levels/pc/Level%d.overlay.json' % (REPO, n)
+        ov = json.load(open(p))
+        ov['patches'] = [e for e in ov.get('patches', []) if 'PCCoinTicks' not in (e.get('set') or {})]
+        for item, tk in found.items():
+            for e in ov['patches']:
+                if e.get('object') == item and e.get('component') == 'TrickItem':
+                    e['set']['PCCoinTicks'] = tk; break
+            else:
+                ov['patches'].append({'object': item, 'component': 'TrickItem', 'set': {'PCCoinTicks': tk}})
+        note = ' Coin ticks (tools/pcref/coins.py --write-ticks): PCCoinTicks = the earliest `<trick time=>` of the records the item leads to, the tick into the action at which GameLogic credits the coin.'
+        if 'PCCoinTicks' not in ov['source']:
+            ov['source'] += note
+        json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
+        print('   written PCCoinTicks:', found)
 
 
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     for a in args:
-        show(int(a))
+        show(int(a), write_ticks='--write-ticks' in sys.argv)
