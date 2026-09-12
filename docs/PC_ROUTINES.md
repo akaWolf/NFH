@@ -90,10 +90,18 @@ fcn.1000ae19 (`lookaround`, `crash`, `electrify`, `leave`), a variant test on a 
 objects = fcn.1000fb6e (`pond_bridge_damaged`, `pond_bridge`), a tricked test on one =
 fcn.1000ec67 (`pond_pond_eel`); the walks pass the object in a register the listing does not
 show. The ship1 code at 0x100269xx is the tutorial (`wait1`, `hurry`, `combo2`/`combo4`,
-room moves of `woody` and `neighbor` = fcn.1000fc33). Its anger is not read yet: the
-candidates are a `current × 100 / maximum` clipped at 100 at 0x1000b3e4 and two `hold = 60`
-stores at 0x100238e1 / 0x10023a9e. Naming the walk, finishing the Season 2 scripts and
-reading that anger are the next steps.
+room moves of `woody` and `neighbor` = fcn.1000fc33). Its trick parser (fcn.10052a89)
+reads `name`, `coins` and `rage` into a 0x1c-byte record (+8 coins, +0xc rage, +0x10 a
+flag), and the trick accounting in fcn.1000140b works on a copy of the level state: coins +=
+the record's coins, rage += the record's rage, and a flag is raised when the rage total
+reaches 100000 (0x10001500) — the threshold the port's 80-unit gauge (AngryMeterMaximum 80,
+from the video's fill) has to be checked against; the decay per tick and the gauge event are
+not located yet (the state is not at a fixed offset — it is handed around through
+fcn.1005225b / fcn.10052272 / fcn.100523b0). Other candidates: a `current × 100 / maximum`
+clipped at 100 at 0x1000b3e4 and two `hold = 60` stores at 0x100238e1 / 0x10023a9e. Naming
+the walk, finishing the Season 2 scripts and reading that anger are the next steps; the
+Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application shell whose
+string table holds `rage`/`quota` once each.
 
 ## level_peep (Level101)
 
