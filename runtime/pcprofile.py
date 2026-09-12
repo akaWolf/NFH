@@ -260,19 +260,23 @@ def rule(name):
     return keep is None or name in keep.split(',')
 
 
-def walk_speed(role, sneaking, vx, vy, on_stairs=False):
-    """The multiplier of the pawn's Velocity that moves it at the PC's pace. The PC walks one
-    axis a tick, so a step the mobile takes diagonally lasts |dx| / h + |dy| / v there — the
-    harmonic mix of the two records along the direction, divided by the velocity's own length
-    (the mobile's force). None for a pawn without a record (the Kid keeps the mobile's)."""
+def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False):
+    """The multiplier of the pawn's Velocity that moves it at the PC's pace, divided by the
+    velocity's own length (the mobile's force). A plain walk moves at the floor record whatever
+    its direction: the PC walks along the room's path and steps a tick or two off it to a
+    hotspot, while the mobile scene's depth offsets to its items are the remaster's own (the
+    axis-by-axis mix over them made the Season 2 laps 20-30 % longer than the PC video's). A door
+    approach — the pawn's DOOR_CLIMB / DESCEND states, the PC's ~50 px up to a back door and down
+    from its twin — moves at the room's vertical record (`climbing`), or at Season 2's stair
+    record on its stairs (`stairs`); tools/pcref/lap_model.py checks those climbs against the
+    video. None for a pawn without a record (the Kid keeps the mobile's)."""
     rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
     n = math.hypot(vx, vy)
     if rec is None or n == 0.0 or not rule('walk'):
         return None
     h, v, st = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in rec)
-    vert = st if on_stairs else v
-    ux, uy = abs(vx) / n, abs(vy) / n
-    return 1.0 / (ux / h + uy / vert) / n
+    pace = (st if stairs else v) if climbing else h
+    return pace / n
 
 
 # -- the door transit (docs/PC_VERIFICATION.md "door transit") ----------------------------

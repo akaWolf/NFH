@@ -164,15 +164,13 @@ class Walk(unittest.TestCase):
         self.assertAlmostEqual(pcprofile.walk_speed('Woody', False, -1.0, 0.0), 17 * 12 / 96.0)
         self.assertAlmostEqual(pcprofile.walk_speed('Woody', True, 1.0, 0.0), 5 * 12 / 96.0)
 
-    def test_up_the_room_and_the_stairs(self):
-        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, 1.0), 3 * 12 / 96.0)
-        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, -1.0, on_stairs=True), 5 * 12 / 96.0)
-
-    def test_diagonal_is_the_sum_of_the_axes(self):
-        # a unit step at 45 degrees lasts |dx| / h + |dy| / v on the PC
-        h, v = 8 * 12 / 96.0, 3 * 12 / 96.0
-        s = pcprofile.walk_speed('Rottweiler', False, 0.6, 0.8)
-        self.assertAlmostEqual(1.0 / s, 0.6 / h + 0.8 / v)
+    def test_the_door_climb_and_the_stairs(self):
+        # a plain walk keeps the floor record whatever its direction; a door approach climbs
+        # at the room's vertical record, Season 2's stairs at the stair record
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, 1.0), 1.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, 1.0, climbing=True), 3 * 12 / 96.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, -1.0, climbing=True, stairs=True), 5 * 12 / 96.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Woody', True, 0.0, 1.0, climbing=True), 2 * 12 / 96.0)
 
     def test_velocity_length_and_unknown_pawn(self):
         # the multiplier divides by the velocity's length (the mobile's force)

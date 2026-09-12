@@ -1163,7 +1163,8 @@ class Pawn:
         if pcprofile.is_pc():
             vx, vy = self.velocity
             s = pcprofile.walk_speed(self.role, self.sneaking, vx, vy,
-                                     self.state in (self.DOOR_CLIMB, self.DESCEND))
+                                     climbing=self.state in (self.DOOR_CLIMB, self.DESCEND),
+                                     stairs=bool(self.nfh2))
             if s is not None:
                 return s
         return self.speed_sneaking if self.sneaking else self.speed

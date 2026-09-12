@@ -351,6 +351,19 @@ class Driver(Recorder):
                             # (MakeTrick+TrickLaugh ~1.5 s, a take ~1.3 s)
     MARGIN = 1.5
 
+    DOOR_CLIMB_U = 0.65     # the back doors sit ~0.65 u above the floor path (Level109's log)
+
+    def _door_climb(self, door, p=None, sneaking=False):
+        """seconds of the climb to a back door plus the descent on the far side under the
+        PC profile: one axis a tick there, up and down the room at the record's pace —
+        the neighbour 0.375 u/s, Woody 0.75 walking and 0.25 sneaking; a side door needs none"""
+        if not pcprofile.is_pc() or door is None or not str(getattr(door, 'door_type', '')).endswith('Back'):
+            return 0.0
+        role = getattr(p, 'role', 'Woody') if p is not None else 'Woody'
+        v = pcprofile.walk_speed(role, sneaking, 0.0, 1.0, climbing=True,
+                                 stairs=bool(getattr(self.v.woody, 'nfh2', False)))
+        return 2 * self.DOOR_CLIMB_U / v if v else 0.0
+
     def _speed(self, p):
         if pcprofile.is_pc():
             # the PC pace along the floor (pcprofile.walk_speed: the neighbour,
@@ -377,8 +390,17 @@ class Driver(Recorder):
             return 4.0 if door.nfh2_stairs else 1.6
         if pcprofile.is_pc():
             # the door clips run a frame a tick under the profile (pcprofile.clip_fps):
-            # 20 frames at 12 a second, the walk-up pair likewise
-            return 2.9 if door.should_walk_up else 20 / 12.0
+            # 20 frames at 12 a second, the walk-up pair one after the other — plus the
+            # climb to a back door and the descent from its twin, ~0.65 u each at the
+            # pawn's PC pace up and down the room (the neighbour 3 px a tick = 0.375 u/s)
+            # the arrival: the climb on the near side, then the Enter clip — the
+            # flat branch plays Leave and Enter at once and warps at the Enter's
+            # end (13 frames through a back door, 20 through a side door, 12 a
+            # second); the descent on the far side happens inside the new room,
+            # where he already catches; a walk-up door plays Leave first
+            back = str(getattr(door, 'door_type', '')).endswith('Back')
+            t = (13 if back else 20) / 12.0 + (20 / 12.0 if door.should_walk_up else 0.0)
+            return t + self._door_climb(door, p) / 2.0
         if door.should_walk_up:
             return 3.5
         return 2.0
@@ -406,7 +428,7 @@ class Driver(Recorder):
         (pcprofile.sees_while_busy); the auto-sneak tiptoes there"""
         if not p.is_sleeping:
             return False
-        if pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(p, 'nfh2', False)):
+        if pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(self.v.woody, 'nfh2', False)):
             r = next((r for r in self.world.routines if r.pawn is p), None)
             it = r.item if r is not None else None
             return it is not None and it.name == 'Bed'
@@ -415,7 +437,7 @@ class Driver(Recorder):
     def _ignoring_safe(self, p):
         """IgnoreWoodyWhenUse: a window on the mobile, none on the PC"""
         return p.ignore_woody and not (
-            pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(p, 'nfh2', False)))
+            pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(self.v.woody, 'nfh2', False)))
 
     def sleep_left(self, p):
         """seconds until a sleeping catcher wakes: the bar's sleep window
@@ -1157,6 +1179,7 @@ class Driver(Recorder):
                 else 3.0
             crawl = dist / (pcprofile.walk_speed('Woody', True, 1.0, 0.0) if pcprofile.is_pc()
                             else max(0.2, (w.force or 0.8) * (w.speed_sneaking or 0.65))) + 2.0
+            crawl += self._door_climb(first_door, w, True) / 2.0
             for p in self.catchers():
                 eta = self.eta_to_zone(p, w.zone.pid, horizon=20.0)
                 if eta is not None and eta < min(8.0, crawl):
@@ -1387,7 +1410,10 @@ class Driver(Recorder):
         if first_door is not None:
             exit_time += abs(first_door.x - w.sprite.x) \
                 / self.woody_speed(here) \
-                + (1.2 if first_door.should_walk_up else 0.0)
+                + (1.2 if first_door.should_walk_up else 0.0) \
+                + self._door_climb(first_door, w, self.woody_speed(here) < 1.0) / 2.0
+        if pcprofile.is_pc():
+            exit_time += 1.0        # the 12-fps door pairs are quicker than the model's rounding
         # a sleeper's wake time is a sequence-length estimate (sleep_left,
         # ~2 s off on Level207's Mother: read 2.8 s at the moment she got
         # up) — leave with the same margin the gate keeps
@@ -1405,7 +1431,7 @@ class Driver(Recorder):
         hide = next((i for i in self.v.level.items.values()
                      if i.kind == 'HideItem' and i.zone == here
                      and i.collider is not None
-                     and abs(i.target_x - w.sprite.x) / 2.0 + 1.0 < soonest),
+                     and abs(i.target_x - w.sprite.x) / self.woody_speed(here) + 1.0 < soonest),
                     None) if soonest is not None else None
         if hide is not None:
             if self.click_item(hide) == 'transit':
@@ -1443,12 +1469,16 @@ class Driver(Recorder):
                  else []) + list(getattr(w, 'steps', []))
         x = w.sprite.x
         t = 0.0
+        zone = w.zone.pid if w.zone is not None else None
+        sp = self.woody_speed(zone) if zone is not None else 2.0
+        sneak = sp < 1.0
         for s in steps:
             if s.get('kind') == 'door':
-                return t + abs(s['door'].x - x) / 2.0
+                # the climb to a back door at the PC pace (half of _door_climb: the way up)
+                return t + abs(s['door'].x - x) / sp + self._door_climb(s['door'], w, sneak) / 2.0
             if s.get('kind') in ('point', 'cpoint', 'item'):
                 tx = s.get('x', x)
-                t += abs(tx - x) / 2.0
+                t += abs(tx - x) / sp
                 x = tx
                 # Season 2: the zone flips at the walk-through transition's
                 # 'transfer' step (no door warp)

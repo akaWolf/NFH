@@ -1,42 +1,39 @@
-# Level109 under the PC profile: the viewer rating pays each trick's score
-# plus 3 per angry tick, so these seven tricks' 83 need six ticks — all
-# but the first landing while he is still hot. His lap (~114 s): teeth,
-# bed (a 31 s sleep), alarm, teeth, keys (bedroom) > milk, pig (kitchen,
-# the pig's room), milk, chips, chili > keys, teeth, bed. Everything is
-# armed for one round: the alarm as soon as he leaves the bedroom, the
-# kitchen and the pig after his kitchen round, the teeth's tabasco during
-# his sleep (the teeth are primed only then), the bed's pins once he is
-# up. The round pays alarm > teeth > the slip > the milk > the pig > the
-# chips the dog eats at the chili > the bed. Under the PC's anger
-# (game.exe, docs/PC_ROUTINES.md: 192 ticks here, the slip 252 and the
-# milk 240; 60 ticks of hold, one per tick at 12 Hz — 21, 26 and 25 s, no
-# pause for his tantrums) the 88 points need four ticks: the banana goes
-# on the kitchen floor only once he is down at the pig, so it pays on his
-# second kitchen round — the pig > slip > chips stretch pays two, with
-# the teeth's and the pig's; the bedroom -> kitchen walk (31 s+) and the
-# chili -> bed walk stay outside any window.
-take PinsBoard IT_Pins               # Zone01
-take PigKeys IT_Pigkey               # Zone06, during the sleep: the hook holds them only while Primed
-take Cactus IT_Cactus                # Zone07
-usewith AlarmClock IT_Cactus         # Zone06 once he is out (45-111), 13 (BedAlarmCactus, AngryWithoutAnimations)
-take ChemicalSet IT_Nitro            # Zone02
-take SpicyChips IT_Chips             # Zone02, next to the dog
-take RubbishBinBanana2 IT_Banana     # Zone03, after his kitchen round (~100)
-take Fridge IT_Tabasco               # Zone03
-usewith PigMilk IT_Nitro             # Zone03: explodes at the pig, paid through DependsOn = PigMilk (20)
-usewith CornChips IT_Chips           # Zone03: fed to the dog at Chili (the C# pays DependsOn = CornChips, 0)
-usewith Pig IT_Pigkey                # Zone01 once he has been to the pig, 20: the pig gets out (NoticeWhenWalkNearby)
-whenusing Bed                        # he sleeps (31 s): the teeth are primed
-usewith Teeth IT_Tabasco             # Zone06 while primed (his sleep), 15 at the RottweilerUseTogglesPrime use (SpitFire)
-whenusing PigKeys                    # he leaves the bedroom for the kitchen: the bed is empty
-usewith Bed IT_Pins                  # Zone06 with the bed empty (IsRottweilerSleeping refuses Woody), 8
-whenzone Zone01                      # he is down at the pig (~195-226): the kitchen is nobody's
-usewith Ground@Zone03 IT_Banana      # Zone03, 7: the slip on his second kitchen round (~233), between the pig and the chips
-park Zone04
+# Level109 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
+# Woody 2.1 running and 0.62 tiptoeing, the doors a frame a tick, the catch the
+# room alone — his hideout bed the one blind spot, and a walking Woody wakes him
+# there). His lap (~110 s, the idle run under the profile): the bedroom 0-56
+# (teeth 3, bed 5-37, alarm 37, teeth 41, keys 47) > living 56-59 > kitchen
+# 59-67 (milk) > hall 67-80 (the pig) > kitchen 80-88 (milk, chips) > living
+# 88-102 (the chili) > bedroom 102-166 (keys 108, teeth 113, bed 116-147, alarm
+# 147, teeth 151, keys 157) > ... > bedroom 212-276 (bed 226-258). The balcony
+# is off his lap: Woody's perch between the bedroom windows. The living room's
+# parrot is tiptoed past. Seven tricks' 88 need four ticks: the alarm (147), the
+# teeth (151), the milk (173), the pig (180), the chips (194) and the bed (226).
+take PigKeys IT_Pigkey               # Zone06 during his first sleep (5-37): straight up, out before he wakes
+take Cactus IT_Cactus                # Zone07: the balcony, off his lap
+whenzone Zone03                      # (59) he is down: the bedroom is free until 102
+usewith! AlarmClock IT_Cactus        # Zone06, 13 (BedAlarmCactus, AngryWithoutAnimations) at his next alarm (147)
+whenzone Zone01                      # (67) he feeds the pig in the hall: the living room is free until 88
+take! ChemicalSet IT_Nitro           # Zone02, tiptoe past the parrot
+take! SpicyChips IT_Chips            # Zone02
+park Zone01                          # (80) he has gone to the kitchen: the hall until 102
+whenzone Zone02                      # (88) he sits at the chili: the kitchen is free until 170
+take! RubbishBinBanana2 IT_Banana    # Zone03
+take! Fridge IT_Tabasco              # Zone03
+usewith! PigMilk IT_Nitro            # Zone03, 20: explodes at the pig, paid through DependsOn = PigMilk
+usewith! CornChips IT_Chips          # Zone03: fed to the dog at Chili (the C# pays DependsOn = CornChips, 0)
+usewith! Ground@Zone03 IT_Banana     # Zone03, 7: he slips on his way to the milk (173)
+whenzone Zone06                      # (102) he is in the bedroom until 166: the hall is free
+usewith! Pig IT_Pigkey               # Zone01, 10 under the profile: the pig gets out at his lap-2 visit (180)
+take! PinsBoard IT_Pins              # Zone01
+whenusing Bed                        # (116) his second sleep: the teeth are primed
+usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe; the balcony before he wakes (147)
+whenzone Zone02                      # (166) he is down again: the bedroom is free until 212
+usewith! Bed IT_Pins                 # Zone06, 10: pays at his third sleep (226)
 await AlarmClock 13
 await Teeth 15
-await Ground@Zone03 7
 await PigMilk 20
-await Pig 10                         # the PC pays the pig 10 (levels/pc/Level109.overlay.json)
-await CornChips 15                   # and the chips 15
-await Bed 8
+await Pig 10                         # the pig's 10 and the chips' 15 under the profile (the DependsOn pair)
+await CornChips 15
+await Bed 8                          # 8 under the profile
+await Ground@Zone03 7

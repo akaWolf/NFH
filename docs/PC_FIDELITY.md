@@ -272,17 +272,25 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   the data — docs/PC_VERIFICATION.md "the walking speed", "door
   transit", "a busy neighbour"): every pawn moves at its PC speed record
   (`pcprofile.walk_speed`: the neighbour, the Mother and Olga 8 px a tick
-  along the floor and 3 up or down the room, Woody 17/6, sneaking 5/2,
-  Season 2's stairs 5/6 — 12 ticks a second at the scene's 96 px a unit;
-  one axis a tick on PC, so a diagonal step lasts the sum of the axes'
-  times), the pawns' door clips run a frame a tick (`clip_fps`, 12 a
+  along the floor, Woody 17, sneaking 5 — 12 ticks a second at the
+  scene's 96 px a unit, whatever the direction of a walk to an item, the
+  mobile scene's depth offsets being the remaster's; a door approach —
+  the DOOR_CLIMB / DESCEND states, the PC's ~50 px up to a back door —
+  at the room's vertical record, 3/6/2, Season 2's stairs at 5/6), the
+  pawns' door clips run a frame a tick (`clip_fps`, 12 a
   second), and the neighbour sees Woody in his room whatever he is doing
   except from inside a `neighbor_hideout` (`sees_while_busy`: 109's bed,
   where a walking Woody's noise 1 wakes him and a sneaking one's 0 does
-  not) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows.
-  The harness's dodging reads the same paces (`_speed`, `woody_speed`,
-  `door_time`); `NFH_PC_RULES=walk,doors,sight` keeps a subset for
-  bisecting a plan.
+  not) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows
+  (Season 1; Season 2 keeps the mobile's windows until GameLogic's watch
+  mode bits are read). The harness's dodging reads the same paces (`_speed`, `woody_speed`,
+  `door_time`, and `_door_climb` — the ~0.65 u climb to a back door, one
+  axis a tick: 1.7 s for the neighbour, 0.9 for a walking Woody, 2.6
+  sneaking; a catcher is in the far room once the Leave/Enter pair has
+  played at once after his climb, the descent happens inside it) and the
+  same windows
+  (`_asleep_safe`, `_ignoring_safe`); `NFH_PC_RULES=walk,doors,sight`
+  keeps a subset for bisecting a plan.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

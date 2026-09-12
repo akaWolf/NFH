@@ -30,7 +30,9 @@ take Mobile IT_Handy              # Zone02
 take Fridge IT_Egg                # Zone03 by the side door, once he heads for the piano: Egg + Cheese
 usewith Microwave IT_Egg          # Zone03 walk-by, score 7
 usewith Ground@Zone03 IT_Soap     # slip on the football/window walk, score 7 (Ground@Zone04 is the alternative)
-usewith Football IT_Bowling       # usable only once the piano's AlertNext rolls it in (fire on enable), score 15
+usewith! Football IT_Bowling      # usable only once the piano's AlertNext rolls it in (fire on enable), score 15.
+                                  # Under the PC paces (2026-09-17) the piano play opens an 8 s window before he
+                                  # walks in to kick it: a judgement call, Woody is already in the kitchen
 usewith PlantStink IT_Cheese      # Zone01, pays at SniffBad, score 13 -> RushToToilet
 usewith Piano IT_Marker           # Zone02, pays at PlayPianoSmeared, score 13
 usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 7: armed after his first pass, pays on his walk to the plant (~118)
