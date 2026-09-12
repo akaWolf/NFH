@@ -26,8 +26,16 @@ compiler lays the tricked-variant branches out of line: the code order is
 not always the lap order — docs/PC_LAPS.md's orders (read off the video)
 stay the reference for the lap, this file for the actions and their
 repeats (the laundry's two wash and two dry cycles, the bath's towel
-sequence). GameLogic.dll (Season 2) has the same constant pattern
-(exe/nfh2_gamelogic_globals.json) but different helpers, not yet named.
+sequence). GameLogic.dll (Season 2, `--gl <GameLogic.dll> <dump>`) has the
+same constant pattern and its own helpers, named 2026-09-16:
+
+    fcn.100422a5  SetIcon(actor, icon)              the bubble
+    fcn.1000e3e0  GoTo(level, actor, object) -> bool the walk (false: interrupted)
+    fcn.1000aeb8 / 1000ae19                        the waits
+    fcn.10002cd5  DoAction(actor, anim)
+    fcn.1000f977  Shout(actor, n)                    a random shout<n>/freakout anim
+    fcn.1000fb6e  IsVariant(a, b)   fcn.1000ec67  IsTricked(object)   branches
+    fcn.1000fc33  RoomMove(actor, room)
 """
 import glob
 import json
@@ -99,6 +107,78 @@ def level_of_block(blocks, xml_root):
     return g2level
 
 
+GL_CALLS = {'fcn.1000e3e0': 'GOTO', 'fcn.10002cd5': 'ACTION', 'fcn.100422a5': 'ICON',
+            'fcn.1000f977': 'SHOUT', 'fcn.1000fb6e': 'IFVARIANT', 'fcn.1000ec67': 'IFTRICKED',
+            'fcn.1000fc33': 'ROOM', 'fcn.1000f5c9': 'SET'}
+
+
+def main_gl(dll, dump, xml_root=os.path.expanduser('~/nfh-bench/pcref/pc/nfh2/x'),
+            gmap=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'exe', 'nfh2_gamelogic_globals.json')):
+    """the Season 2 scripts out of GameLogic.dll (base 0x10000000): the
+    String globals come from exe/nfh2_gamelogic_globals.json (their init is
+    not the S1 push-push-call form), the level blocks are the copies of the
+    engine's string table in address order, split at each copy's 'trick',
+    and a block's level is the objects.xml whose room/object names
+    ('pond/bridge' -> 'pond_bridge') it shares most; the calls above"""
+    G = {int(k, 16): v for k, v in json.load(open(gmap)).items()}
+    sites = sorted((g, n) for g, n in G.items())
+    blocks, cur = [], []
+    for g, n in sites:
+        # the engine's table (194 names, 'sfx_illegal.wav' first) is copied
+        # once per level class; the level's own object table sits between
+        # two copies as a block of its own
+        if n == sites[0][1] and cur:
+            blocks.append(cur); cur = []
+        cur.append((g, n))
+    blocks.append(cur)
+    levels = {}
+    for d in sorted(glob.glob(os.path.join(xml_root, '*'))):
+        f = os.path.join(d, 'objects.xml')
+        if not os.path.exists(f):
+            continue
+        raw = open(f, 'rb').read()
+        text = raw.decode('utf-16') if raw[:2] in (b'\xff\xfe', b'\xfe\xff') else raw.decode('utf-8', 'replace')
+        levels[os.path.basename(d)] = set(x.replace('/', '_') for x in re.findall(r'<(?:object|door) name="([^"]+)"', text))
+    g2level = {}
+    for blk in blocks:
+        objs = set(n.replace('/', '_') for _, n in blk)
+        best = max(levels, key=lambda L: len(objs & levels[L])) if objs else None
+        ok = best if best and len(objs & levels[best]) >= 3 else None
+        for g, n in blk:
+            g2level[g] = (ok, n)
+    events, pending = [], []
+    for ln in open(dump):
+        m = re.search(r'(0x100[0-9a-f]{5})\s+[0-9a-f]{2,}\s+(.*)$', ln)
+        if not m:
+            continue
+        addr, ins = int(m.group(1), 16), m.group(2).strip()
+        gs = [int(x, 16) for x in re.findall(r'0x100[de][0-9a-f]{4}', ins)]
+        if gs and ins.startswith(('mov ecx', 'mov edx', 'mov eax', 'push 0x')):
+            pending.append((addr, gs[0])); pending = pending[-4:]
+        pm = re.match(r'push ([0-9]|0x[0-9a-f]+)$', ins)
+        if pm:
+            pending.append((addr, ('imm', int(pm.group(1), 0)))); pending = pending[-4:]
+        cm = re.match(r'call (fcn\.[0-9a-f]+)', ins)
+        if cm and cm.group(1) in GL_CALLS:
+            args = []
+            for a, g in pending:
+                if addr - a >= 0x100:
+                    continue
+                args.append(str(g[1]) if isinstance(g, tuple) else g2level.get(g, (None, hex(g)))[1])
+            lvl = next((g2level[g][0] for a, g in pending if not isinstance(g, tuple) and g in g2level and g2level[g][0]), None)
+            events.append((addr, GL_CALLS[cm.group(1)], args, lvl)); pending = []
+    # an event that names only engine globals (`DoAction(neighbor, leave)`)
+    # belongs to the level class whose code it sits in: the last level seen
+    # in address order
+    by, last = {}, None
+    for addr, kind, args, lvl in events:
+        if lvl is None:
+            lvl = last
+        last = lvl
+        by.setdefault(str(lvl), []).append((hex(addr), kind, args))
+    json.dump(by, sys.stdout, indent=0)
+
+
 def main(exe, dump, xml_root=os.path.expanduser('~/nfh-bench/pcref/pc/nfh1/x')):
     sites = globals_map(exe)
     blocks, cur = [], []
@@ -129,4 +209,7 @@ def main(exe, dump, xml_root=os.path.expanduser('~/nfh-bench/pcref/pc/nfh1/x')):
 
 
 if __name__ == '__main__':
-    main(*sys.argv[1:])
+    if sys.argv[1:2] == ['--gl']:
+        main_gl(*sys.argv[2:])
+    else:
+        main(*sys.argv[1:])

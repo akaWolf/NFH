@@ -128,11 +128,11 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   Season 1 anger itself (a trick sets the indicator to its `angrytime`,
   60 ticks of hold, one per tick at 12 Hz, +3 while above zero) — each
   deviation an overlay entry or an `is_pc()` branch with its source
-  (`docs/PC_FIDELITY.md` §7). 16 of 28 levels rate 100: eleven of
+  (`docs/PC_FIDELITY.md` §7). 17 of 28 levels rate 100: twelve of
   Season 2 and 101/102/104/109/110; the other nine Season 1 levels sit
   at 91-97 where one of the neighbour's walks outlasts the window the
-  trick before it carries, and 204/205/210 at 90 where his chain does
-  not fill the 100-unit gauge — timing differences between the port's
+  trick before it carries, and 205/210 at 90 where his chain does not
+  fill the 100-unit gauge — timing differences between the port's
   routine (the mobile data's) and the PC's, listed gap by gap in
   `docs/PC_FIDELITY.md` §7. The mobile numbers do not move: the 54-plan
   regression under `--profile=mobile` is byte-identical.
@@ -144,9 +144,10 @@ game.exe and carried (a trick sets the indicator to its `angrytime`, 60
 ticks of hold, then one per tick at 12 Hz; +3 while it is above zero —
 `docs/PC_ROUTINES.md`); the Season 2 gauge is 100 000 rage long by its
 dialog, its code and its bar (the 80 read off the video is withdrawn),
-so 204, 205 and 210 pay every coin but no longer overflow on the
-port's neighbour (90). `docs/GAMEPLAY.md` §10–§11 list what resists a
-clean reimplementation.
+so 205 and 210 pay every coin but no longer overflow on the port's
+neighbour (90; 204 re-chained). The Season 2 scripts are read too
+(`docs/PC_ROUTINES.md`). `docs/GAMEPLAY.md` §10–§11 list what resists
+a clean reimplementation.
 
 ## What makes this tractable
 

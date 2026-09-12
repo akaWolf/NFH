@@ -116,11 +116,13 @@ struct are the caught handler (fcn.10042471: lives − 1, then game over or a `w
 and the level start/end (fcn.10044234). None of them subtracts from the rage, so the 0.37 %/s
 decay the bar shows on the video (docs/PC_FIDELITY.md §7) lives outside those writers — not
 located. The Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application
-shell whose string table holds `rage`/`quota` once each. Naming the walk and finishing the
-Season 2 scripts are the remaining steps of this reading; the `time` attribute of
-objects.xml's actions is not a clock unit (the laundry's wash 59 with a 5-frame `wait` loop
-lasts ~24 s on the video, its iron 71 with an 18-frame loop ~14 s; the doors' 9-25 about a
-second) and is not needed by the port, which runs the mobile routines.
+shell whose string table holds `rage`/`quota` once each. The walk is fcn.1000e3e0(level, actor, object), a bool that is false when the walk was
+interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — a random
+`shout<n>_*` / `freakout` animation — not a walk. The Season 2 scripts are extracted below
+(2026-09-16). The `time` attribute of objects.xml's actions is not a clock unit (the laundry's
+wash 59 with a 5-frame `wait` loop lasts ~24 s on the video, its iron 71 with an 18-frame
+loop ~14 s; the doors' 9-25 about a second) and is not needed by the port, which runs the
+mobile routines.
 
 ## level_peep (Level101)
 
@@ -848,3 +850,1037 @@ second) and is not needed by the port, which runs the mobile routines.
 - `0x45afa4` Action neighbor.doubletake1
 - `0x45b0b3` OBJ2 lir/mum_smeared
 - `0x45b21e` Action neighbor.slip1
+
+# Season 2 (GameLogic.dll)
+
+The same reading for GameLogic.dll (`tools/pcref/exe_scripts.py --gl`, the globals from
+`tools/pcref/exe/nfh2_gamelogic_globals.json`, the calls in `tools/pcref/exe/nfh2_gamelogic_scripts.json`):
+`Icon` = SetIcon(actor, icon) fcn.100422a5, `GoTo` = fcn.1000e3e0(level, actor, object) — the walk,
+false when interrupted, its object often held in a local the listing does not name — `Action` =
+DoAction(actor, anim) fcn.10002cd5 with the wait fcn.1000ae19, `Shout n` = fcn.1000f977(actor, n), a
+random shout<n>/freakout animation, `If variant a of b` = fcn.1000fb6e, `If tricked` = fcn.1000ec67,
+`Room` = fcn.1000fc33, `Set n` = fcn.1000f5c9. The level of a block is the objects.xml whose
+room/object names it shares (cn_c1, Level204, matched none and its calls sit under its
+neighbours or none). Code order, as for Season 1.
+
+## ship1 (Level201)
+
+- `0x10026990` Room auweia auweia topleft woody
+- `0x10026a1a` Room wait1 wait1 bottomleft neighbor
+- `0x10026b8e` Room wait1 wait1 bottomleft neighbor
+- `0x10026c7e` Room hurry hurry bottomleft woody
+- `0x10026cae` Room bottomleft neighbor
+- `0x10026ce5` Room topleft woody
+- `0x10026f63` If tricked topright_reling_open
+- `0x10026ffc` If tricked topright_soappuddle
+- `0x10027151` If tricked topright_soappuddle
+- `0x100271b5` If tricked topright_reling_open
+- `0x100273c7` If tricked topleft_buffet_damaged
+- `0x10027a66` If tricked topright_waterpuddle
+- `0x10028371` Icon 32 neighbor
+- `0x100283a7` GoTo entry
+- `0x100283db` Shout 0
+- `0x100284ba` Icon 0 reling neighbor
+- `0x100284fd` If variant topright_soappuddle of topright_waterpuddle
+- `0x10028531` GoTo ?
+- `0x10028592` Action topright_waterpuddle.slip.1.topright_waterpuddle
+- `0x100285ff` Action topright_soappuddle.crash_short
+- `0x10028699` Shout 2
+- `0x100286de` Set 
+- `0x10028a9f` Icon olga_fight neighbor
+- `0x10028bdb` Icon neighbor_entry olga neighbor
+- `0x10028c0f` GoTo topleft_buffet
+- `0x10028c3c` Action topleft_buffet.flirt.0.0
+- `0x10028cba` Icon captncap neighbor
+- `0x10028cfd` If variant topleft_captncap_manip of topleft_captncap
+- `0x10028d31` GoTo ?
+- `0x10028edf` Icon topleft_captncap_manip 1 captncap neighbor
+- `0x10028f15` GoTo topright_waterpuddle
+- `0x10028f42` Action topright_waterpuddle.slipleft.0.0
+- `0x10028fbf` Icon reling neighbor
+- `0x10028ff3` GoTo topright_reling
+- `0x10029020` Action topright_reling.look.0.0
+- `0x1002909d` Icon reling neighbor
+- `0x100290d2` GoTo topright_reling_open
+- `0x10029111` Action topright_reling_open.repair
+- `0x10029209` Icon topright_reling topright_reling_open reling neighbor
+- `0x1002924c` If variant topright_soappuddle of topright_waterpuddle
+- `0x1002927f` GoTo ?
+- `0x100292e0` Action topright_waterpuddle.slip.1.topright_waterpuddle
+- `0x100293a2` Action topright_soappuddle.crash_long
+- `0x10029533` Icon neighbor tutorial neighbor
+- `0x1002956a` GoTo entry
+- `0x100295a9` Action neighbor.wheeze
+- `0x100295ec` Shout 2
+- `0x100296c2` Icon 1 neighbor
+- `0x100297ff` Icon neighbor_entry reling neighbor
+- `0x10029831` GoTo topright_soappuddle
+- `0x10029870` Action topright_soappuddle.crash_long
+- `0x10029969` Icon topright_waterpuddle topright_soappuddle 1 neighbor
+- `0x10029ab5` Icon wait neighbor o_hurt_n neighbor
+- `0x10029b02` Shout 0
+- `0x10029b84` Action topleft_buffet_damaged.repair
+- `0x10029c84` Icon topleft_buffet topleft_buffet_damaged olga neighbor
+- `0x10029cb6` GoTo topleft_buffet_damaged
+- `0x10029cf5` Action topleft_buffet_damaged.flirt
+- `0x10029d44` Action topleft_buffet_damaged.crash
+- `0x10029de6` Icon captncap neighbor
+- `0x10029e17` GoTo topleft_captncap
+- `0x10029edd` Icon topleft_captncap captncap neighbor
+- `0x10029f13` GoTo topright_waterpuddle
+- `0x10029f40` Action topright_waterpuddle.slipleft.0.0
+- `0x1002a011` GoTo topright_reling
+- `0x1002a033` Icon neighbor
+- `0x1002a0a6` Icon wait neighbor reling neighbor
+- `0x1002a0da` GoTo topright_reling
+- `0x1002a107` Action topright_reling.look.0.0
+- `0x1002a206` Icon tutorial reling neighbor
+- `0x1002a239` GoTo topright_soappuddle
+- `0x1002a278` Action topright_soappuddle.crash_short
+- `0x1002a312` Shout 2
+- `0x1002a406` Icon 0 wait neighbor neighbor
+- `0x1002a499` Icon 1 0 captncap neighbor
+- `0x1002a4ca` GoTo topleft_captncap
+- `0x1002a523` Icon captncap neighbor
+- `0x1002a55a` GoTo topright_waterpuddle_closed
+- `0x1002a5ee` Action topright_waterpuddle.slipleft.0.0
+- `0x1002a6c5` Icon 1 0 reling neighbor
+- `0x1002a6f9` GoTo topright_reling
+- `0x1002a726` Action topright_reling.look.0.0
+- `0x1002a7a3` Icon reling neighbor
+- `0x1002a7d5` GoTo topright_waterpuddle_closed
+- `0x1002a810` Action topright_waterpuddle_closed.slip.0.0
+- `0x1002a88f` Icon olga neighbor
+- `0x1002a8c3` GoTo topleft_buffet
+- `0x1002a8f0` Action topleft_buffet.flirt.0.0
+- `0x1002a96d` Icon captncap neighbor
+- `0x1002a99e` GoTo topleft_captncap
+- `0x1002ac57` If variant 36 of topleft_buffet_damaged
+- `0x1002ac88` GoTo ?
+- `0x1002acc6` Action 1
+- `0x1002aeb5` Action topleft_buffet_damaged.crash.0.0
+
+## cn_b1 (Level202)
+
+- `0x100216c8` Icon 16 bridge neighbor
+- `0x1002170b` If variant pond_bridge_damaged of pond_bridge
+- `0x1002173f` GoTo ?
+- `0x1002177e` Action neighbor.lookaround
+- `0x100217e9` If tricked pond_pond_eel
+- `0x10021817` Action crash
+- `0x10021863` Action electrify
+- `0x100218af` Action leave
+- `0x100218f5` Shout 2
+- `0x10021903` Action ?
+- `0x1002194f` Action leave
+- `0x10021995` Shout 1
+- `0x100219db` Set 6
+- `0x10021a1f` Action repair
+- `0x10021a9d` Action look.pond_bridge.2
+- `0x10021d9f` Icon 2 goswim neighbor
+- `0x10021e2e` Icon 97 beachright_theocean goswim neighbor
+- `0x10021ead` Shout 0
+- `0x10021ff0` Icon beachright_theocean beachright_theocean_shark goswim neighbor
+- `0x10022078` If tricked beachright_theocean_shark
+- `0x100220fc` Action dive
+- `0x100221a8` Action beachleft_sub.run_ashore.beachleft_sub
+- `0x1002221d` If tricked shark
+- `0x100222e7` Action shark.dive.beachright_theocean_shark
+- `0x10022393` Action beachleft_sub.run_ashore.shark.beachleft_sub
+- `0x10022449` Icon goswim neighbor
+- `0x1002247a` GoTo beachright_theocean
+- `0x100224a8` If tricked 4
+- `0x100224c9` If tricked shark
+- `0x100225c3` Icon 0 waitsea goswim neighbor
+- `0x100225de` If tricked pond_rake_ground_weed
+- `0x1002261a` GoTo pond_rake_ground_weed
+- `0x10022659` Action pond_rake_ground_weed.crash
+- `0x1002269e` Shout ?
+- `0x100226e4` Set 6
+- `0x1002272b` Action pond_rake_ground_weed.repair
+- `0x100227ed` If tricked pond_rake_ground
+- `0x10022827` GoTo pond_rake_ground
+- `0x10022866` Action pond_rake_ground
+- `0x100228b5` Action pond_rake_ground.repair
+- `0x10022952` Set 1 pond_rake pond_rake_ground 6
+- `0x100229da` Icon beer neighbor
+- `0x10022a1d` If variant beachright_mat_hn_guarded_manip of beachright_mat_hn_guarded
+- `0x10022a8f` Action 4
+- `0x10022b35` Shout beachright_mat_hn_guarded_manip
+- `0x10022b7b` Set 6
+- `0x10022bbf` Action repair
+- `0x10022cc7` Icon 2 beachright_mat_hn neighbor
+- `0x10022d10` If variant beachright_mat_hn_guarded_manip of beachright_mat_hn_manip
+- `0x10022d45` GoTo ?
+- `0x10022f93` If variant 20 of beachleft_mat_olga_guarded
+- `0x10022fc8` GoTo ?
+- `0x100230de` If variant beachleft_mat_olga_guarded of beachleft_mat_olga_guarded
+- `0x10023112` GoTo ?
+- `0x100231e7` Action take.beachleft.4
+- `0x10023460` Action beachleft_mat_olga_guarded.wakeup.2
+- `0x1002359a` Action beachleft_mat_olga_guarded
+
+## cn_c2 (Level203)
+
+- `0x10033754` If variant groundleft_bike_manip of groundleft_bike
+- `0x10033788` GoTo ?
+- `0x100337c4` Action ?
+- `0x1003382e` Shout groundleft_bike_manip
+- `0x10033874` Set 6
+- `0x100338b8` Action repair
+- `0x10033bf6` Icon 2 melons neighbor
+- `0x10033c39` If variant wallleft_melons_manip of wallleft_melons
+- `0x10033c6d` GoTo ?
+- `0x10033ca9` Action ?
+- `0x10033d14` Shout wallleft_melons_manip
+- `0x10033d5a` Set 6
+- `0x10033e5b` Icon 1 wallleft_melons ricetoilet neighbor
+- `0x10033e8e` GoTo groundleft_toilet
+- `0x10033ed7` If variant groundleft_chilipaper of groundleft_toiletpaper
+- `0x10033f1a` If variant groundleft_ricechute_manip of groundleft_ricechute
+- `0x10033fea` Action groundleft_toilet.shit.groundleft_ricechute_manip.groundleft_chilipaper
+- `0x1003400f` Action groundleft_toilet.shit_chili
+- `0x100340fb` Action groundleft_toilet.flush_rice.flush
+- `0x10034175` Action groundleft_toilet.flush.manip
+- `0x100341d6` Shout 2
+- `0x1003421c` Set 6
+- `0x10034263` Action groundleft_toilet.repair
+- `0x100343db` Icon 2 groundleft_ricechute neighbor
+- `0x1003440e` GoTo wallright_generator_manip
+- `0x1003444d` Action wallright_generator_manip.repair
+- `0x10034545` Icon wallright_generator wallright_generator_manip speech neighbor
+- `0x10034588` If variant wallright_stage_broken of wallright_stage
+- `0x100345bc` GoTo ?
+- `0x10034633` If tricked wallright_generator_manip
+- `0x100346d6` Action crash.wallright_image.crash.wallright_stage
+- `0x10034758` Shout 1
+- `0x1003479e` Set 6
+- `0x10034830` Action wallright_image
+- `0x10034b05` Action shout.0.0.2
+
+## cn_b2 (Level205)
+
+- `0x10023840` Action shop_glasses_guarded.0.0
+- `0x10023934` If tricked shop_glasses
+- `0x10023a13` Action shop_glasses_guarded.take.shop_glasses_guarded.shop
+- `0x10023b60` Action shop_chef_blind.search.shop_chef_blind.shop_chef_blind
+- `0x10023ddb` Icon 24 o_hurt_n neighbor
+- `0x10023e69` Action beachleft_sandlion.build.0.0
+- `0x10024141` Icon 2 sandlion
+- `0x10024192` If variant beachleft_sandlion_iron of beachleft_sandlion
+- `0x100241c3` GoTo ?
+- `0x10024202` Action neighbor.lookaround
+- `0x1002424e` Action kick
+- `0x100242f9` Shout beachleft_sandlion_iron
+- `0x1002433f` Set 6
+- `0x10024383` Action repair
+- `0x10024426` Action laugh.beachleft_sandlion.1
+- `0x1002448a` Action dirt
+- `0x10024558` Icon rockets
+- `0x100245a9` If variant beachleft_firework_rope of beachleft_firework
+- `0x100245da` GoTo ?
+- `0x10024674` Action beachleft_rocket.ignite.beachleft_rocket.beachleft
+- `0x10024775` Action beachleft_rocket_rope.ignite.neighbor
+- `0x10024812` Action crash.beachleft_rocket_rope
+- `0x10024868` Shout 1
+- `0x100248ad` Set 
+- `0x10024974` Icon 1
+- `0x100249c5` If variant shop_chef_blind of shop_chef
+- `0x100249f6` GoTo ?
+- `0x10024a3c` If tricked shop_tube
+- `0x10024aaa` Action cut_tyre.shop_tube.disappear
+- `0x10024b35` Action eat_tyre.shop_tube
+- `0x10024b78` Shout 2
+- `0x10024bbe` Set 6
+- `0x10024c1b` Action take_tyre.shop_tube.disappear
+- `0x10024ca6` Action cut_eel.shop_tube
+- `0x10024cf2` Action eat_eel
+- `0x10024d38` Set 6
+- `0x10024d71` Action cut_eel
+- `0x10024dbd` Action eat_eel
+- `0x10024e86` GoTo beachleft_waterski_guarded
+- `0x10024f01` Action beachleft_waterski_guarded.putski.neighbor.idle
+- `0x10025011` GoTo beachleft_waterski_nailed_guarded
+- `0x10025060` Action neighbor.pant.262144
+- `0x100250a3` Shout 1
+- `0x1002512d` Action beachleft_waterski_nailed_guarded.repair
+- `0x10025233` Icon 5 beachleft_waterski beachleft_waterski_nailed_guarded waterski
+- `0x10025284` If variant beachleft_waterski_nailed of beachleft_waterski
+- `0x100252b7` GoTo ?
+- `0x100253f6` Action beachleft_waterski_nailed_guarded.skiing.beachleft_waterski_nailed_guarded.beachleft
+- `0x1002545d` Action beachleft_waterski_guarded.skiing.beachleft_waterski_guarded
+- `0x1002551d` Icon pingpong
+- `0x10025576` If variant beachright_pingpong_egg of beachright_pingpong
+- `0x100255b3` GoTo ?
+- `0x1002561e` Action play.beachright_pingpong_guarded
+- `0x100256f3` Action play.6.beachright_pingpong_egg_guarded
+- `0x100257cd` Shout 0
+- `0x10025945` Icon olga_fight pingpong
+- `0x10025996` If variant beachright_mat_guarded of beachright_mat
+- `0x100259c9` GoTo ?
+- `0x10025a00` Action neighbor.talk
+- `0x10025bb1` Action beachright_mat_guarded.wakeup.beachright_mat_guarded.20
+- `0x10025cd1` If variant beachright_pingpong_egg_guarded of beachright_pingpong_guarded
+- `0x10025d02` GoTo ?
+- `0x10025f08` If variant beachright_pingpong_guarded of beachright_pingpong_egg_guarded
+- `0x10025f39` GoTo ?
+
+## ship2 (Level206)
+
+- `0x1002b4b0` If tricked topright_pillows_manip
+- `0x1002ba35` Icon topleft_deckchair 0 4 mother
+- `0x1002ba65` GoTo topleft_deckchair
+- `0x1002baf7` Icon 720 topleft_deckchair m_hurt_n mother
+- `0x1002bbfc` Icon tutorial m_hurt_n mother
+- `0x1002bc2a` GoTo bottomleft_ramp
+- `0x1002bd3b` Icon fifi_crash m_hurt_n mother
+- `0x1002bdad` Icon 268614457 neighbor mother
+- `0x1002bde2` Action topleft_deckchair.fart.0.0
+- `0x1002be5d` Icon neighbor mother
+- `0x1002beb8` Icon topleft_deckchair neighbor bring_pillow mother
+- `0x1002bee1` Action mother.order.0.0
+- `0x1002bfe5` Action topleft_deckchair.pillow_slip.topleft_deckchair.topleft_deckchair
+- `0x1002c034` Action mother.callneighbor
+- `0x1002c0e3` GoTo topleft_deckchair
+- `0x1002c1b2` Icon tutorial topleft_deckchair mother
+- `0x1002c211` Icon neighbor mother
+- `0x1002c26c` Icon topleft_deckchair neighbor bring_pillow mother
+- `0x1002c295` Action mother.order.0.0
+- `0x1002c30f` Icon neighbor mother
+- `0x1002c3f3` GoTo topleft_deckchair
+- `0x1002c58a` Icon 36 dynamitefish neighbor
+- `0x1002c5bf` GoTo topright_reling
+- `0x1002c6ae` Icon 1 2 dynamitefish neighbor
+- `0x1002c6e3` GoTo topright_reling
+- `0x1002cadc` Icon dynamitefish neighbor
+- `0x1002cb25` If variant topright_dynamitebag_manip of topright_dynamitebag
+- `0x1002cb58` GoTo ?
+- `0x1002cb94` Action take
+- `0x1002ccc9` Icon topright_dynamitebag topright_dynamitebag_manip fifi neighbor
+- `0x1002ccfc` GoTo topleft_fifi
+- `0x1002cd2f` If tricked topleft_fleablanket
+- `0x1002ce14` Action topleft_fifi.topleft_fifi.topleft
+- `0x1002ce63` Action topleft_usedblanket
+- `0x1002cee4` Action topleft_fifialone.topleft_fifialone.topleft
+- `0x1002cf89` Icon workout neighbor
+- `0x1002cfcc` If variant bottomright_dumbbell_manip of bottomright_dumbbell
+- `0x1002d007` GoTo ?
+- `0x1002d046` Action bottomright_fifi
+- `0x1002d095` Action olga.marvel
+- `0x1002d10c` Action bottomright_dumbbell.bottomright_dumbbell
+- `0x1002d15b` Action olga
+- `0x1002d1ae` Action bottomright_dumbbell_manip
+- `0x1002d1fd` Action olga.laugh
+- `0x1002d297` Shout 4
+- `0x1002d2dd` Set 2
+- `0x1002d33c` Action bottomright_fifi.take
+- `0x1002d3ef` Icon fifi neighbor
+- `0x1002d427` GoTo bottomleft_fifi
+- `0x1002d454` Action bottomleft_fifi.take.0.0
+- `0x1002d4d0` Icon fifi neighbor
+- `0x1002d508` GoTo bottomleft_fifi2
+- `0x1002d535` Action bottomleft_fifi2.take.0.0
+- `0x1002d5af` Icon neighbor
+- `0x1002d5f6` If variant bottomleft_harpoon_manip of bottomleft_harpoon
+- `0x1002d629` GoTo ?
+- `0x1002d6e9` Action bottomleft_harpoon.bottomleft_harpoon_manip.bottomleft_harpoon
+- `0x1002d797` Icon neighbor
+- `0x1002d7de` If variant bottomleft_harpoon_manip of bottomleft_harpoon
+- `0x1002d811` GoTo ?
+- `0x1002d8d1` Action bottomleft_harpoon.bottomleft_harpoon_manip.bottomleft_harpoon
+- `0x1002d981` Icon shoot_teddy neighbor
+- `0x1002d9b9` GoTo bottomleft_ramp
+- `0x1002d9e6` Action bottomleft_ramp.shootbear.0.0
+- `0x1002da64` Icon shoot_teddy neighbor
+- `0x1002da9a` GoTo bottomleft_ramp
+- `0x1002dad9` Action bottomleft_ramp.rubberbear
+- `0x1002db1c` Shout 1
+- `0x1002db62` Set 6
+- `0x1002dc0d` GoTo bottomleft_ramp
+- `0x1002dc4c` Action bottomleft_ramp.repair
+- `0x1002dd45` Icon bottomleft bottomleft_rabbit shoot_teddy neighbor
+- `0x1002dd8e` If variant bottomleft_harpoon_manip of bottomleft_harpoon
+- `0x1002ddc1` GoTo ?
+- `0x1002dde9` Action take
+- `0x1002deb2` Icon bottomleft_harpoon being_hit neighbor
+- `0x1002defb` Shout 0
+- `0x1002dfd3` Icon 0 shoot_teddy neighbor
+- `0x1002e00b` GoTo bottomleft_ramp_manip
+- `0x1002e135` Icon bottomleft_ramp bottomleft_ramp_manip shoot_teddy neighbor
+- `0x1002e16d` GoTo bottomleft_ramp_manip
+- `0x1002e2ba` Icon bottomleft_ramp bottomleft_ramp_manip shoot_teddy neighbor
+- `0x1002e303` If variant bottomleft_harpoon_manip of bottomleft_harpoon
+- `0x1002e336` GoTo ?
+- `0x1002e35e` Action take
+- `0x1002e41a` Icon bottomleft_harpoon shoot_teddy neighbor
+- `0x1002e467` If variant bottomleft_ramp_manip of bottomleft_ramp
+- `0x1002e49a` GoTo ?
+- `0x1002e4d9` Action bottomleft_fifi
+- `0x1002e525` Action load
+- `0x1002e598` Action bottomleft_fifi.bottomleft_ramp_manip
+- `0x1002e677` Icon bottomleft_ramp fifi neighbor
+- `0x1002e6c0` If variant topleft_fifialone of topleft_fifi
+- `0x1002e6f3` GoTo ?
+- `0x1002e75a` Action topleft_usedblanket.empty.topleft_fifi
+- `0x1002e7a9` Action topleft_fifi.take
+- `0x1002e870` Action topleft_fifialone.take.topleft_usedblanket.topleft_fleablanket
+- `0x1002e96f` Icon topleft_fifialone m_hurt_n neighbor
+- `0x1002e9ba` Shout 0
+- `0x1002ea90` Icon 0 bring_pillow neighbor
+- `0x1002eacb` GoTo topleft_deckchair
+- `0x1002eaf8` Action topleft_deckchair.give.0.0
+- `0x1002eb75` Icon get_pillow neighbor
+- `0x1002ebae` GoTo topright_pillows_manip
+- `0x1002ebef` Action topright_pillows_manip.take
+- `0x1002ecec` Icon topright_pillows topright_pillows_manip mother neighbor
+- `0x1002ed24` GoTo topleft_deckchair
+- `0x1002ed86` Icon neighbor
+- `0x1002edba` GoTo topleft_fifi
+- `0x1002ee88` Icon neighbor 1 bring_pillow neighbor
+- `0x1002eec4` GoTo topleft_deckchair
+- `0x1002ef03` Action topleft_deckchair.give
+- `0x1002efd7` Icon 1 get_pillow neighbor
+- `0x1002f012` GoTo topright_pillows
+- `0x1002f03f` Action topright_pillows.take.0.0
+- `0x1002f0b9` Icon mother neighbor
+- `0x1002f0f1` GoTo topleft_deckchair
+- `0x1002f359` If tricked fifi_manip
+
+## in_b1 (Level207)
+
+- `0x10013d8c` If tricked bar_bar_whiskey
+- `0x10013e07` Action bar_keeper.drink.0.0
+- `0x10013fe0` Action tongue.0.1.tongue
+- `0x100140f7` Icon 16 pool
+- `0x1001422e` Icon deckchair
+- `0x10014328` GoTo pool_deckchair
+- `0x100144c5` Icon awake pool_deckchair deckchair
+- `0x10014574` Icon 268517856 240 pool_deckchair m_hurt_n
+- `0x10014914` Icon 1 beachleft_mat beachleft_mat_guarded m_hurt_n
+- `0x10014968` Icon o_hurt_n neighbor
+- `0x10014d91` Icon 24 24
+- `0x10014de2` If variant beachleft_mat_hedgehog of beachleft_mat
+- `0x10014e13` GoTo ?
+- `0x10014e7a` Action beachleft_mat_hedgehog.laydown.beachleft_mat_hedgehog
+- `0x10014ec9` Action hurt_low
+- `0x10014f0c` Shout ?
+- `0x10014f43` Set 6
+- `0x10014f8a` Action beachleft_mat_hedgehog.repair
+- `0x1001518a` Icon 268519356 120 beachleft_mat_guarded o_hurt_n
+- `0x100152db` Shout n_lift
+- `0x1001542f` If variant 6 of beachleft_sandcastle_destroyed
+- `0x10015498` Icon beachleft_sandcastle_destroyed sandcastle
+- `0x100154d8` GoTo ?
+- `0x10015517` Action neighbor.lookaround
+- `0x1001558a` Action splash.beachleft_sandcastle
+- `0x10015601` If tricked beachleft_mat_hedgehog
+- `0x100156ba` Action splash_crayfish_hedgehog.6.262144
+- `0x100157b4` Action beachleft_sandcastle_destroyed.fall.beachleft_mat_hedgehog.beachleft_mat
+- `0x10015817` Action splash_crayfish
+- `0x100158a4` Shout 2
+- `0x100158ea` Set 6
+- `0x100159bd` Shout 0
+- `0x10015b01` Icon 20 shell
+- `0x10015b52` If variant beachright_mat_guarded of beachright_mat
+- `0x10015b85` GoTo ?
+- `0x10015bce` If variant beachright_shell_crayfish of beachright_shell
+- `0x10015ca8` Action shell.shell.beachright_shell
+- `0x10015d64` Action shell_crayfish.6.shell_crayfish.262144
+- `0x10016040` Icon elephant
+- `0x10016080` GoTo bar_elefant
+- `0x10016107` Action neighbor.lookaround.bar_elefant
+- `0x1001614a` If tricked bar_bucket_water
+- `0x1001617b` Action bar_elefant.spit_at_neighbor_1
+- `0x10016208` Action bar_elefant.spit_at_neighbor_2.bar_bucket_water.hide
+- `0x1001638a` Shout 269350356
+- `0x100163d0` Set 6
+- `0x10016479` Action bar_elefant.spit_at_elefant
+- `0x10016539` Icon ?
+- `0x10016577` GoTo bar_keeper
+- `0x100165a1` If tricked bar_bar_whiskey
+- `0x100165ce` Action bar_keeper.order_drink_drunken
+- `0x100165f9` Action bar_keeper.order_drink
+- `0x100166a2` Icon divingboard
+- `0x100166e2` GoTo pool_divingboard_spring
+- `0x10016728` Action pool_divingboard_spring.repair
+- `0x10016883` Icon 2 pool pool_spring divingboard
+- `0x100168c3` GoTo pool_divingboard_spring
+- `0x10016909` Action pool_divingboard_spring.repair
+- `0x10016a10` Icon 2 pool_divingboard pool_divingboard_spring divingboard
+- `0x10016a6c` If variant pool_divingboard_spring of pool_divingboard
+- `0x10016a9d` GoTo ?
+- `0x10016b8a` Action dive.pool_deckchair.mother
+- `0x10016bfb` If variant pool_divingboard_spring of pool_awning_pole
+- `0x10016e66` Action crash.nohandle.pool_awning_handle.fall
+- `0x10016fea` Shout 269350348
+- `0x10017030` Set 6
+- `0x10017237` Icon wait m_hurt_n
+- `0x10017281` Shout 0
+- `0x100174fc` If variant 20 of beachright_mat_guarded
+- `0x10017531` GoTo ?
+- `0x1001763d` GoTo beachleft_sandcastle_destroyed
+- `0x1001766e` Action beachleft_sandcastle_destroyed.n_lift.0.0
+- `0x10017a20` Action beachright_mat_guarded.wakeup.beachright_mat_guarded
+- `0x10017cb1` If tricked beachleft_poolvalve_help
+
+## in_c1 (Level208)
+
+- `0x1001c10b` If tricked elephant_elephant_gone
+- `0x1001c12c` If tricked elephant_line
+- `0x1001c162` If tricked elephant_elephant
+- `0x1001c183` If tricked elephant_line
+- `0x1001c23b` If variant elephant_line of elephant_elephant_gone
+- `0x1001c3d1` Action elephant_elephant.return.elephant_elephant.elephant
+- `0x1001c48d` Action elephant_elephant_line.return.elephant_elephant_line
+- `0x1001c567` If tricked bazar_rake_ground
+- `0x1001c588` If tricked bazar_fifi_primary
+- `0x1001c5f1` If tricked bazar_fifi_gone
+- `0x1001c612` If tricked bazar_rake_primary
+- `0x1001c798` If tricked bazar_fifi_gone
+- `0x1001c949` GoTo bazar_hideout
+- `0x1001cb12` GoTo bazar_shop
+- `0x1001ccc1` Icon 16 neighbor
+- `0x1001cd15` If variant bazar_fifi_gone of bazar_fifi_secondary
+- `0x1001cd47` GoTo ?
+- `0x1001cf0f` Icon neighbor
+- `0x1001cf4f` GoTo bazar_fifi_gone
+- `0x1001cfb5` Action mother.order_left.neighbor.bazar_blades
+- `0x1001d07b` Icon wait fifi
+- `0x1001d0ce` If variant bazar_fifi_gone of bazar_fifi_secondary
+- `0x1001d101` GoTo ?
+- `0x1001d154` Action mother.callneighbor.bazar_fifi_gone
+- `0x1001d1fa` Icon dressingroom
+- `0x1001d238` GoTo bazar_dressing_room
+- `0x1001d37f` Icon 16 stealmoney
+- `0x1001d3d0` If variant altar_statue_snake of altar_statue
+- `0x1001d403` GoTo ?
+- `0x1001d449` Action neighbor.lookaround
+- `0x1001d495` Action take
+- `0x1001d559` Shout altar_statue_snake
+- `0x1001d59f` Set 6
+- `0x1001d655` Action elephant_tap_electricity.electrify
+- `0x1001d69d` Shout ?
+- `0x1001d6e3` Set 6
+- `0x1001d76a` Action elephant_tap_electricity.repair.elephant_tap
+- `0x1001d873` Icon 1 elephant_tap elephant_tap_electricity mother
+- `0x1001d8a5` If tricked bazar_rake_ground
+- `0x1001d8dd` GoTo bazar_rake_ground
+- `0x1001d91c` Action bazar_rake_ground.crash
+- `0x1001d95e` Shout ?
+- `0x1001d9a4` Set 6
+- `0x1001d9eb` Action bazar_rake_ground.repair
+- `0x1001dab8` GoTo bazar_blades
+- `0x1001db19` Icon fifi
+- `0x1001db5e` GoTo bazar_fifi_gone
+- `0x1001dbf7` Action bazar_fifi_secondary.bazar_fifi_secondary
+- `0x1001dc85` Action bazar_fifi_secondary.repair.bazar_fifi_gone
+- `0x1001e048` Icon 2 elephant
+- `0x1001e09b` If variant elephant_elephant_line of elephant_elephant_gone
+- `0x1001e0ce` GoTo ?
+- `0x1001e13c` Action neighbor.lookaround.elephant_elephant_gone
+- `0x1001e188` Action fool
+- `0x1001e1f6` Shout elephant_elephant_line
+- `0x1001e23c` Set 6
+- `0x1001e280` Action repair
+- `0x1001e3e7` Icon 1 elephant elephant_line fifi
+- `0x1001e42a` GoTo bazar_hideout
+- `0x1001e469` Action fifi.take3
+- `0x1001e64f` Icon electrify call order shoecleaner
+- `0x1001e6a0` If variant tadj_mahal_shoe_cleaner_blades of tadj_mahal_shoe_cleaner
+- `0x1001e6d1` GoTo ?
+- `0x1001e70d` Action ?
+- `0x1001e777` Shout tadj_mahal_shoe_cleaner_blades
+- `0x1001e7bd` Set 6
+- `0x1001e804` Action tadj_mahal_shoe_cleaner_blades.repair
+- `0x1001e91d` Icon 1 tadj_mahal_shoe_cleaner tadj_mahal_shoe_cleaner_blades platform
+- `0x1001e94f` If tricked amusement_fakir_balloon
+- `0x1001ea07` Action amusement_fakir.stop.amusement_fakir.amusement_fakir
+- `0x1001eaa4` Icon platform
+- `0x1001eaf5` If variant amusement_fakir_balloon of amusement_fakir
+- `0x1001eb5a` Action amusement_platform.crash.amusement_fakir_balloon
+- `0x1001ebc3` If variant amusement_seesaw_shovel of amusement_seesaw
+- `0x1001ebee` Action crash
+- `0x1001ec55` Shout amusement_seesaw
+- `0x1001ec9b` Set 6
+- `0x1001eccb` Shout 3
+- `0x1001ed11` Set 6
+- `0x1001ed55` Action repair
+- `0x1001eec1` Icon 268560597 60 amusement_platform platform
+- `0x1001eeff` GoTo amusement_platform
+- `0x1001ef48` If variant amusement_fakir_balloon of amusement_fakir
+- `0x1001efac` Action play
+
+## in_c2 (Level209)
+
+- `0x1001f12a` If variant 20 of holy_cow_cow_open
+- `0x1001f19a` Action holy_cow_crap.crap
+- `0x1001f259` If variant holy_cow_cow_open of holy_cow_cow
+- `0x1001f2e9` Action standup.holy_cow_cow
+- `0x1001f5ac` Icon 16 dressingroom
+- `0x1001f5ea` GoTo bazar_dressing_room
+- `0x1001f771` Icon fakirshop
+- `0x1001f7af` GoTo bazar_shop
+- `0x1001f7dc` Action bazar_shop.0.1
+- `0x1001f910` Icon 16
+- `0x1001f961` If variant holy_cow_cow_open of holy_cow_cow
+- `0x1001f992` GoTo ?
+- `0x1001f9d1` Action neighbor.lookaround
+- `0x1001fa1d` Action ride
+- `0x1001fa88` Shout holy_cow_cow_open
+- `0x1001face` Set 6
+- `0x1001fb12` Action repair
+- `0x1001fea1` Icon 2
+- `0x1001fef2` If variant bazar_icecream_machine_dirt of bazar_icecream_machine
+- `0x1001ff23` GoTo ?
+- `0x1001ff5f` Action take
+- `0x1001ffc9` Shout bazar_icecream_machine_dirt
+- `0x1002000f` Set 2
+- `0x10020053` Action repair
+- `0x1002016f` Icon 1 bazar_icecream_machine bazar_icecream_machine_dirt coals
+- `0x100201c0` If variant coal_area_hot_coal of coal_area_coal
+- `0x10020203` If variant coal_area_trough_fuel of coal_area_trough
+- `0x10020234` GoTo ?
+- `0x10020313` Action walk_fuel.walk.walk_hot.coal_area_hot_coal
+- `0x10020463` Action walk.walk
+- `0x1002058b` Shout 2
+- `0x100205d1` Set 6
+- `0x1002066c` Action coal_area_trough_fuel.repair.coal_area_coal.1
+- `0x100206e7` Shout 1
+- `0x1002072d` Set 6
+- `0x10020851` Icon 1 coal_area_coal slippers
+- `0x100208cb` If tricked tadj_mahal_shoe_mat
+- `0x10020944` Action tadj_mahal_shoe_mat_empty.take.tadj_mahal_shoe_mat_empty.tadj_mahal
+- `0x1002099c` If variant tadj_mahal_gully_open of tadj_mahal_gully
+- `0x100209fc` Action tadj_mahal_shoe_mat_coal.burn.tadj_mahal_shoe_mat_empty.tadj_mahal
+- `0x10020a48` Action jump
+- `0x10020aee` Shout tadj_mahal_shoe_mat_coal
+- `0x10020b0e` Shout ?
+- `0x10020b54` Set 6
+- `0x10020c0e` Icon tadj_mahal
+- `0x10020cbd` Icon 268568582 120 tadj_mahal_curtain tadj_mahal
+- `0x10020cfb` GoTo tadj_mahal_shoe_mat_empty
+- `0x10020d8d` Action tadj_mahal_shoe_mat.tadj_mahal_shoe_mat.tadj_mahal
+- `0x10020e89` Icon tadj_mahal_curtain fakir
+- `0x10020eda` If variant fire_fakir_groove_fuel of fire_fakir_groove
+- `0x10020f0b` GoTo ?
+- `0x10020f3a` Action fire_fakir_fakir.spit
+- `0x10020ff8` Action fire_fakir_groove_fuel.burn.fire_fakir_groove_fuel.fire_fakir_fakir
+- `0x1002103a` Shout ?
+- `0x10021080` Set 6
+- `0x100210c7` Action fire_fakir_groove_fuel.repair
+- `0x1002116f` Action fire_fakir_groove.burn.fire_fakir_groove_fuel.fire_fakir_groove
+
+## in_b2 (Level210)
+
+- `0x10017ddf` Action beachleft_poolvalve_help.flush.pool_pool_empty.pool
+- `0x10017fbf` GoTo neighbor
+- `0x1001800a` If tricked help
+- `0x100182ce` GoTo bar_elefant
+- `0x10018301` If tricked bar_bat
+- `0x10018356` Action bar_elefant.dogattack_bat.bar_bat.disappear
+- `0x100183e4` Action fifi.fall.bar_bat
+- `0x1001843e` Action bar_elefant.dogattack
+- `0x100186cd` Icon pool_deckchair 0 4 neighbor
+- `0x1001870b` GoTo pool_deckchair
+- `0x10018783` Action order.neighbor.pool_deckchair
+- `0x1001881b` Icon ?
+- `0x100189cb` GoTo pool_deckchair
+- `0x10018aba` Icon neighbor beachleft_deckchair_guarded 4 neighbor
+- `0x10018b5f` Action callneighbor
+- `0x10018c56` Icon deckchair
+- `0x10018d21` Icon 268536195 240 pool_deckchair pool_deckchair
+- `0x10018dbe` Icon pool_deckchair 1 4 m_hurt_n
+- `0x10018fdf` Action wakeup.4.beachleft_deckchair_guarded
+- `0x100190ae` GoTo beachleft_deckchair_guarded
+- `0x10019169` Icon beachleft_deckchair_guarded mother
+- `0x1001921b` If tricked beachleft_deckchair_guarded
+- `0x1001929a` GoTo pool_deckchair
+- `0x100192ef` Icon m_hurt_n
+- `0x100195e7` Icon 2
+- `0x10019693` Icon 268537674 120 beachleft_deckchair_guarded deckchair
+- `0x100196e4` If variant beachleft_deckchair_hedgehog of beachleft_deckchair
+- `0x10019717` GoTo ?
+- `0x10019820` If tricked beachleft_pole_damaged
+- `0x1001984e` Action electrify
+- `0x100198d0` Set 6
+- `0x1001990e` Shout 1
+- `0x10019971` Set 6
+- `0x100199ae` Shout ?
+- `0x10019a5b` Action repair.beachleft_deckchair_hedgehog
+- `0x10019b6b` Icon 2 beachleft_deckchair fifi
+- `0x10019bbc` If variant pool_divingboard_oil of pool_divingboard
+- `0x10019bed` GoTo ?
+- `0x10019c85` Action pool_fifi_sleep.pool_fifi_sleep.pool_dogbasket
+- `0x10019cb9` If tricked pool_bone
+- `0x10019e29` Icon fifi
+- `0x10019e67` GoTo bar_elefant
+- `0x10019eec` If tricked help
+- `0x10019f48` Action fifi.take1
+- `0x1001a09d` Icon help elephant
+- `0x1001a0e2` GoTo bar_elefant
+- `0x1001a216` Action fifi.put1.fifi
+- `0x1001a259` If tricked bar_bat
+- `0x1001a2e5` Action neighbor.fifi_bat.4
+- `0x1001a3c2` Icon 1 262144 m_hurt_n
+- `0x1001a40c` Shout 0
+- `0x1001a50c` Icon 4 turban
+- `0x1001a55f` If variant beachright_turbanshop_hedgehog of beachright_turbanshop_octopus
+- `0x1001a5d1` GoTo ?
+- `0x1001a702` Action fifi.put3.fifi
+- `0x1001a74e` Action try_turban
+- `0x1001a7b9` Shout beachright_turbanshop_octopus
+- `0x1001a7ff` Set 6
+- `0x1001a843` Action repair
+- `0x1001a8e2` Shout 1
+- `0x1001a928` Set 6
+- `0x1001a9c3` Action fifi.take3.beachright_turbanshop.1
+- `0x1001ab13` Icon 20 fifi
+- `0x1001ab64` If variant pool_fifi_bone of pool_fifi_sleep
+- `0x1001ab95` GoTo ?
+- `0x1001aca1` Action take.269350848.pool_fifi_sleep.pool_bone
+- `0x1001ad8f` Icon fifi
+- `0x1001adcf` GoTo pool_fifi_bone
+- `0x1001ae0e` Action pool_fifi_bone.take_bone
+- `0x1001af1a` Icon 2 pool_fifi_sleep pool_fifi_bone fifi
+- `0x1001af6b` If variant pool_fifi_bone of pool_fifi_sleep
+- `0x1001af9c` GoTo ?
+- `0x1001afe2` Action tickle
+- `0x1001b073` If variant pool_fifi_bone of pool_divingboard_oil
+- `0x1001b0e2` If variant pool_divingboard_oil of pool_pool_empty
+- `0x1001b17a` Action fall_empty.pool_pool_empty.8.1
+- `0x1001b27c` Shout 8
+- `0x1001b2d2` Action fall_water
+- `0x1001b3d4` Shout 8
+- `0x1001b438` Action fall
+- `0x1001b47e` Set 6
+- `0x1001b613` If tricked beachleft_bra
+- `0x1001b69e` Action beachleft_shower_guarded.takebra.beachleft_bra_guarded.beachleft
+- `0x1001b943` Action beachleft_shower_guarded.putbra.beachleft_bra_guarded.beachleft
+- `0x1001ba8c` If variant 120 of beachleft_shower_guarded
+- `0x1001bac1` GoTo ?
+- `0x1001bc51` If tricked beachleft_mat_olga_guarded
+- `0x1001bd44` If variant beachleft_mat_olga of beachleft_mat_olga_guarded
+- `0x1001bd78` GoTo ?
+- `0x1001bf4e` If tricked bazar_snake
+
+## ship3 (Level211)
+
+- `0x1002f37a` If tricked topright_handbag
+- `0x1002f3e3` If tricked fifi
+- `0x1002f412` Room topright woody
+- `0x1002f5b6` GoTo 16
+- `0x1002f5e3` Action shout.0.0
+- `0x1002f884` GoTo topright_deckchair
+- `0x1002f9b4` Icon 16 diving neighbor
+- `0x1002f9fd` If variant bottomright_diving_manip of bottomright_diving
+- `0x1002fa2e` GoTo ?
+- `0x1002fa81` Action bottomright_diving.bottomright_diving
+- `0x1002fafc` Action bottomright_diving_manip
+- `0x1002fb3f` Shout 1
+- `0x1002fb85` Set 2
+- `0x1002fbd4` Action bottomright_diving_manip.repair
+- `0x1002fcf9` Icon bottomright_diving bottomright_diving_manip phone neighbor
+- `0x1002fd33` GoTo cabin_phone
+- `0x1002fd66` If tricked kid_manip
+- `0x1002fd93` Action cabin_phone.crash
+- `0x1002fdd6` Shout 1
+- `0x1002fdfe` Action cabin_phone
+- `0x1002fe40` Shout ?
+- `0x1002fee3` Set 3 topleft_phone topleft_phone_manip 2
+- `0x10030293` Icon ring cabin_phone lifevest neighbor
+- `0x100302dc` If variant bottomleft_lifevest_manip of bottomleft_lifevest
+- `0x1003030d` GoTo ?
+- `0x10030360` Action bottomleft_lifevest.bottomleft_lifevest
+- `0x100303db` Action bottomleft_lifevest_manip
+- `0x1003041e` Shout 1
+- `0x10030464` Set 2
+- `0x100304b3` Action bottomleft_lifevest_manip.repair
+- `0x1003071d` If tricked bottomleft_boat_gone
+- `0x10030752` Icon boat neighbor
+- `0x1003079b` If variant bottomleft_boat_manip of bottomleft_boat
+- `0x100307cc` GoTo ?
+- `0x100309cd` Icon bottomleft_boat_gone bottomleft_boat_manip fishing neighbor
+- `0x10030a16` If variant topleft_rod_manip of topleft_rod
+- `0x10030a47` GoTo ?
+- `0x10030a9a` Action topleft_rod.topleft_rod
+- `0x10030bd6` Icon 1 2 toilet neighbor
+- `0x10030c0a` GoTo topleft_wcsign_manip
+- `0x10030c4c` Action topleft_wcsign_manip.repair.0.0
+- `0x10030d49` Icon topleft_wcsign topleft_wcsign_manip o_hurt_n neighbor
+- `0x10030dfd` Icon 1 2 toilet neighbor
+- `0x10030e2b` If tricked topleft_wcsign_manip
+- `0x10030e70` GoTo 269353656
+- `0x10030ed7` Action topleft_wcleft.puke.topleft_wcleft
+- `0x10030f1a` Shout 1
+- `0x100310f3` Icon fear neighbor candy neighbor
+- `0x10031134` If variant topleft_dish_manip of topleft_dish
+- `0x10031165` GoTo ?
+- `0x100311b8` Action topleft_dish.topleft_dish
+- `0x1003127e` Action topleft_dish_manip.2
+- `0x100315d8` GoTo topleft_wcright
+- `0x1003161a` Action topleft_wcright.enter.0.0
+- `0x100316c5` GoTo ?
+- `0x100317b6` GoTo topleft_reling
+- `0x100317e3` Action topleft_reling.look.0.1
+- `0x10031919` Action topleft_wcright.puke.268637824
+- `0x10031a2f` Action topleft_wcright.leave.bonbons.goup
+- `0x10031b5d` Icon 16 o_hurt_n neighbor
+- `0x10031ba1` Icon gong neighbor
+- `0x10031e57` Icon 2 gong neighbor
+- `0x10031e9a` If variant wallleft_gong_manip of wallleft_gong
+- `0x10031fbe` Action 6.wallleft_gong_manip.wallleft_elvis
+- `0x10032084` Icon headbanding neighbor
+- `0x100320c7` If variant groundleft_headbanging_manip of groundleft_headbanging
+- `0x100320fb` GoTo ?
+- `0x10032137` Action ?
+- `0x100321a2` Shout groundleft_headbanging_manip
+- `0x100321e8` Set 6
+- `0x1003222c` Action repair
+- `0x10032334` Icon 1 groundleft_headbanging rickshaw neighbor
+- `0x10032377` If variant groundleft_rickshaw_manip of groundleft_rickshaw
+- `0x100323aa` GoTo ?
+- `0x100323d6` Action ?
+- `0x10032544` Icon 6 rickshaw neighbor
+- `0x10032579` GoTo groundleft_rickshaw_manip
+- `0x100325b8` Action groundleft_rickshaw_manip.repair
+- `0x100326b1` Icon groundleft_rickshaw groundleft_rickshaw_manip jade neighbor
+- `0x100326f4` If variant groundright_jade_manip of groundright_jade
+- `0x10032737` If variant groundright_vase_manip of groundright_vase
+- `0x1003276b` GoTo ?
+- `0x100327f3` Action groundright_jadedummy.look.look.groundright_jade
+- `0x100328b6` Action crash_long.crash_long.groundright_vase_manip
+- `0x100328f9` Shout 2
+- `0x10032940` Action crash.crash
+- `0x10032982` Shout ?
+- `0x100329c8` Set 6
+- `0x10032a0c` Action repair
+- `0x10032ba9` Icon 2 groundright_vase rickshaw neighbor
+- `0x10032be6` Shout 0
+- `0x10032cc1` Icon 6 hotdog neighbor
+- `0x10032d04` If variant wallright_hotdogshop_manip of wallright_hotdogshop
+- `0x10032d38` GoTo ?
+- `0x10032d77` Action neighbor.lookaround
+- `0x10032dc3` Action ?
+- `0x10032e2e` Shout wallright_hotdogshop_manip
+- `0x10032e74` Set 6
+- `0x10032f8c` Icon 1 wallright_hotdogshop gong neighbor
+- `0x10032fcf` If variant wallleft_gong_manip of wallleft_gong
+- `0x10033065` Shout wallleft_gong_manip
+- `0x100330ec` Action repair.6
+- `0x10033362` If variant 20 of groundleft_rickshaw_manip
+- `0x10033711` Icon 16 bike neighbor
+
+## me_c1 (Level212)
+
+- `0x10034c3b` If tricked topright_throne_half
+- `0x10034c60` If tricked topright_throne_half_2
+- `0x10034c85` If tricked topright_throne_full
+- `0x10034caa` If tricked topright_throne_half_right
+- `0x10034ccb` If tricked topright_wheel
+- `0x10034d2c` If tricked topright_wheel_turning
+- `0x10034e34` If tricked bottomright_parrot_manip
+- `0x10034e5b` If tricked bottomright_parrot_shit
+- `0x10034e9c` Action bottomright_parrot_manip
+- `0x10035081` Icon whip mother
+- `0x100350b2` GoTo midright_statue_hideout
+- `0x100350df` Action midright_statue_hideout.0.1
+- `0x10035241` Icon bull mother
+- `0x10035272` GoTo midleft_red_bull
+- `0x1003529f` Action midleft_red_bull.0.1
+- `0x100353c2` Icon 16 cliff neighbor
+- `0x100353f5` GoTo bottomright_cliff
+- `0x1003543e` If variant bottomright_parrot_manip of bottomright_parrot
+- `0x10035534` Action bottomright_cliff.enter.neighbor.5
+- `0x10035577` If tricked bottomright_parrot_shit
+- `0x10035597` If tricked bottomright_boat
+- `0x100355c8` Action bottomright_parrot_shit.crash
+- `0x100355ed` Action bottomright_cliff
+- `0x1003570d` Action bottomright_boat.crash.269354160.bottomright_parrot
+- `0x10035732` Action bottomright_water
+- `0x10035883` Shout 3
+- `0x100358c9` Set 2
+- `0x10035a4a` Shout 5
+- `0x10035cc7` Icon 2 bullride neighbor
+- `0x10035d0a` If variant bottomleft_bullride_manip of bottomleft_bullride
+- `0x10035d3e` GoTo ?
+- `0x10035d7a` Action ?
+- `0x10035de5` If tricked bottomleft_coins
+- `0x10035e87` Shout bottomleft
+- `0x10035ecd` Set 6
+- `0x10035f11` Action repair
+- `0x10036038` If variant bottomleft_bullride of midleft_bank_manip
+- `0x10036094` GoTo midleft_bank_manip
+- `0x10036170` Icon 1 midleft_bank neighbor
+- `0x1003619b` If tricked midleft_bank_manip
+- `0x10036277` Action midleft_red_bull.crash.midleft_red_bull.wakeup
+- `0x100362bd` Shout 1
+- `0x10036303` Set 6
+- `0x100364c0` If variant midleft_red_bull of midleft_bank_manip
+- `0x100364f4` GoTo ?
+- `0x10036515` Icon neighbor
+- `0x1003656f` Icon 268656954 60 bank neighbor
+- `0x100365d0` Icon cigars neighbor
+- `0x10036613` If variant midleft_cigars_manip of midleft_cigars
+- `0x10036647` GoTo ?
+- `0x10036683` Action ?
+- `0x100366ed` Shout midleft_cigars_manip
+- `0x10036733` Set 6
+- `0x10036834` Icon 1 midleft_cigars whip neighbor
+- `0x10036877` If variant midright_whip_manip of midright_whip
+- `0x100368ab` GoTo ?
+- `0x10036906` If tricked midright_spikes_open
+- `0x10036934` Action crash
+- `0x10036977` Shout 2
+- `0x100369bd` Set 6
+- `0x100369e8` Action ?
+- `0x10036a2a` Shout ?
+- `0x10036a70` Set 6
+- `0x10036ab7` Action midright_whip_manip.repair
+- `0x10036b38` Action midright_whip_manip.midright_whip.2
+- `0x10036bec` Icon throne neighbor
+- `0x10036c1f` GoTo topright_hands
+- `0x10036c42` If tricked topright_throne_half
+- `0x10036c62` If tricked topright_throne_half_2
+- `0x10036c82` If tricked topright_throne_half_right
+- `0x10036c9d` If tricked topright_throne_full
+- `0x10036cd8` Action neighbor.lookaround
+- `0x10036d42` Action topright_hands
+- `0x10036d87` Shout ?
+- `0x10036dcd` Set 6
+- `0x10036e14` Action topright_hands.repair
+- `0x10036ee8` Action topright_hands.topright_ruby.topright
+- `0x10036f18` Action topright_hands.miss
+- `0x10036f5d` Shout ?
+- `0x10036fa3` Set 6
+- `0x10036fea` Action topright_hands.repair
+- `0x1003732a` Icon 16 water mother
+
+## me_c2 (Level213)
+
+- `0x1003735b` GoTo bottomright_water
+- `0x100374e0` Icon throne mother
+- `0x10037511` GoTo topright_flowers
+- `0x10037656` Icon 16 washingtub neighbor
+- `0x10037687` GoTo midleft_washingtub_manip
+- `0x10037a6c` Icon washingtub neighbor
+- `0x10037aaf` If variant midleft_washingtub_manip of midleft_washingtub
+- `0x10037ae3` GoTo ?
+- `0x10037c0a` Icon 1 2 bullride_olga neighbor
+- `0x10037c6b` Icon bullride_olga neighbor
+- `0x10037c9c` GoTo bottomleft_bullride_controls_manip
+- `0x10037d72` Icon bottomleft_bullride_controls bottomleft_bullride_controls_manip o_hurt_n neighbor
+- `0x10037e20` Icon 0 2 bullride_olga neighbor
+- `0x10037e63` If variant bottomleft_bullride_controls_manip of bottomleft_bullride_controls
+- `0x10037e96` GoTo ?
+- `0x100380d5` Icon bull pinata neighbor
+- `0x1003812a` If variant bottomleft_pinata_manip of bottomleft_pinata
+- `0x1003815d` GoTo ?
+- `0x10038258` Icon 1 2 o_hurt_n neighbor
+- `0x1003831e` Icon 1 2 picnic neighbor
+- `0x10038339` If tricked bottomright_picnic
+- `0x1003835c` If tricked bottomright_picnic_manip
+- `0x100383af` If variant bottomright_picnic_manip of bottomright_picnic
+- `0x100383e3` GoTo ?
+- `0x100385de` Icon fear neighbor tortilla neighbor
+- `0x10038627` If variant bottomright_tortilla_sharp_tequila of bottomright_tortilla_tequila
+- `0x1003865c` GoTo ?
+- `0x1003887b` Icon bottomright_tortilla_tequila 2 carnivore neighbor
+- `0x100388bf` If variant topright_carnivore_bigmanip of topright_carnivore_big
+- `0x100388f4` GoTo ?
+- `0x10038a48` Icon 1 2 limberwall neighbor
+- `0x10038a7b` GoTo midleft_limberwall
+- `0x10038a9e` If tricked midleft_bull_manip
+- `0x10038e4d` GoTo bottomright_water
+- `0x100390bb` GoTo bottomleft_bullride_olga
+- `0x10039102` If tricked bottomleft_bullride_controls_manip
+- `0x10039221` If variant neighbor of 268669043
+- `0x10039348` If variant bottomright_water2 of bottomright_water2
+- `0x1003938a` GoTo ?
+
+## ship4 (Level214)
+
+- `0x100396aa` If variant neighbor of woody
+- `0x10039a08` If tricked bridge_steering_captain
+- `0x10039a56` If variant bridge_grog_guarded of bridge_grog_manip
+- `0x10039caa` If tricked bridge_steering_captain
+- `0x10039d56` If tricked bridge_steering_captain
+- `0x10039d85` Action bridge_steering_captain.sleep.0.1
+- `0x10039eb5` Icon 16 deckchair
+- `0x10039f7c` Icon 0 awake topright_deckchair water
+- `0x10039fba` GoTo bottomright_reling
+- `0x10039fe7` Action bottomright_reling.0.1
+- `0x1003a106` Icon deckchair
+- `0x1003a144` GoTo topright_deckchair
+- `0x1003a264` Icon 268672820 600 topright_deckchair m_hurt_n
+- `0x1003a452` Icon 16 o_hurt_n
+- `0x1003a4db` Icon m_hurt_n
+- `0x1003a55e` Icon fishbox
+- `0x1003a5b7` If variant bottomright_hatch_open_manip of bottomright_hatch_closed_manip
+- `0x1003a5e8` GoTo ?
+- `0x1003aade` Icon 2 pistol
+- `0x1003ab2f` If variant bottomleft_pistol_manip of bottomleft_pistol
+- `0x1003ab62` GoTo ?
+- `0x1003ae3b` Icon wait pistol
+- `0x1003ae79` GoTo bottomleft_pistol_manip
+- `0x1003af61` Icon 1 bottomleft_pistol bottomleft_pistol_manip steering
+- `0x1003afb5` If variant bridge_steering_captain of bridge_steering_manip
+- `0x1003afe7` GoTo ?
+- `0x1003b0fe` Icon bridge_steering_manip 2 6 pistol
+- `0x1003b13c` GoTo bottomleft_pistol_ground
+- `0x1003b204` Icon bottomleft_pistol_ground bottomleft_pistol_ground steering
+- `0x1003b255` If variant topright_bridge of topright_door_closed
+- `0x1003b288` GoTo ?
+- `0x1003b371` Icon topright_door_closed m_hurt_n
+- `0x1003b436` Icon 262144 0 4 bouquet
+- `0x1003b487` If variant topleft_bouquet_manip of topleft_bouquet
+- `0x1003b4cc` GoTo ?
+- `0x1003b6c0` Icon olga o_hurt_n
+- `0x1003b786` Icon 262144 1 6 shipshower
+- `0x1003b7d9` If variant bottomleft_shipshower_guarded of bottomleft_shipshower
+- `0x1003b80d` GoTo bottomleft_shipshower
+- `0x1003b890` If tricked bottomleft_washbucket_manip
+- `0x1003bad9` Icon bottomleft_washbucket o_hurt_n
+- `0x1003bd37` If variant 20 of bottomleft_shipshower_guarded
+- `0x1003bd68` GoTo ?
+- `0x1003c1f5` If variant flowers of 2
+- `0x1003c229` GoTo ?
+- `0x1003c2e7` GoTo topleft_pillar
+- `0x1003c323` Action wait.0.0
+- `0x1003c430` Action wait.0.0.flowers
+- `0x1003d1e1` Action 0.0.20
+- `0x1003d41e` Icon hit_woody
+- `0x1003df74` Icon sfx_verybig1.wav alarm
+- `0x1003e078` Action search.1
+
+## unattributed
+
+- `0x100032eb` Action leave
+- `0x10003754` Action enter
+- `0x100043f4` Action 8
+- `0x10004d51` Action failed
+- `0x1000594b` Action decline
+- `0x100063b8` Action respawn.0.0
+- `0x10006558` Action 0.0.269359840.fear3
+- `0x10006821` Action enter.4.1.320
+- `0x10006a77` Action leave.1.269136360
+- `0x1000711b` Action fight.fear3_loop.12.fear1_loop
+- `0x1000a93a` Action decline.0.1.woody
+- `0x1000b78b` Action open.8192
+- `0x1000c092` Action surprise.32
+- `0x1000c185` Action take.0.8.1
+- `0x1000c2d6` Action give.0.declinetext.alreadyininv
+- `0x1000c33b` Action surprise.0
+- `0x1000d7e3` Action 11
+- `0x1000e91c` Icon neighbor neighbor mother mother
+- `0x1000e9b3` GoTo 1
+- `0x1000ea71` GoTo ?
+- `0x1000eb7b` Action fight.0.0
+- `0x1000f001` Action 0
+- `0x1000fb9b` If tricked ?
+- `0x1000fbca` If tricked ?
+- `0x1000fbed` If tricked ?
+- `0x1000fc10` If tricked ?
+- `0x1000ff0c` Shout ?
+- `0x1000ff79` Set 
+- `0x1001378c` Action start
+

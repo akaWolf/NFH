@@ -1,0 +1,31 @@
+# Level204 under the PC profile: the COLLAPSE! board pays 1000 a coin, 3000
+# once for the gauge's overflow, 5000 for every coin and the clock. The
+# gauge is the data's 100 000 (docs/PC_FIDELITY.md §7) and decays 0.37 %/s,
+# so the six coins' 137 need a chain that peaks over 100: the mobile order
+# (karate first) peaked at 98 — the kart's 25 on 73 — and the karate
+# moved last at 99.7. Here the karate's bricks and the gong's sunshade are
+# laid only after his lap-2 visits, so both pay on lap 3 on top of the
+# rest: hot dog (150) > jade + vase (178) > kart (203) > karate (216) >
+# gong (~237, 30 on ~74) — the overflow.
+take RiceBowl IT2_Rice_empty
+prime GongGrease IT2_Rice_empty
+take Bricks IT2_Brick
+take UmbrellaStand IT2_Sunshade
+unlock ToyDispenser
+take ToyDispenser IT2_Teddy
+prime OlgaKid IT2_Teddy
+usewith HotDog IT2_Confetti
+take BonsaiScissors IT2_Scissors
+usewith Vase IT2_Rice_full
+usewith JadeNecklace IT2_Scissors
+whenusing GongDrumstick           # he has done his lap-2 karate (~98) and stands at the gong (111-127): Zone01 is nobody's until ~186
+usewith Karate IT2_Brick          # pays at his lap-3 karate (~216)
+whenusing HotDog                  # he has left the gong (127) for the hot dog (135-150): Zone04 is nobody's until his lap-3 gong (~237)
+usewith GongDrumstick IT2_Sunshade   # pays at his lap-3 gong (~237), last: 30 on top of the kart and the karate
+usewith PullKart IT2_Rice_full    # after his lap-2 kart visit, so the kart pays with the rest (~203)
+await GongDrumstick 0
+await HotDog 0
+await JadeNecklace 0
+await Vase 0
+await PullKart 0
+await Karate 0

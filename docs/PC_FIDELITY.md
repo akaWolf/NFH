@@ -541,11 +541,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `Rottweiler2`; the first overlay addressed `Rottweiler` and matched
   nothing, silently — `pcprofile.apply_overlay` now reports every patch
   that touches no component.) With the data's amounts and the 100 gauge
-  the Season 2 set is 11/14 at COLLAPSE!: 204, 205 and 210 pay every
-  coin but never overflow (90 — the port's neighbour spreads their
-  chains 20-45 s apart while the PC's E10 lands 30 + 20 + 20 within two
-  seconds on a bar still at 31; re-chaining 210 to his lap-3 basket ran
-  into the board's and the basket's use predicates and is left as is).
+  the Season 2 set is 12/14 at COLLAPSE!: 204 re-chained (the karate's
+  bricks and the gong's sunshade laid after his lap-2 visits, so both
+  pay on lap 3 on top of the kart — 30 on 72 at the gong, 101.7); 205
+  and 210 pay every coin but never overflow (90): 205's chain peaks at
+  96 (the sculpture's 20 on 76) and the table's egg cannot move last —
+  Olga sits on the rockets until it fires; 210's basket toggles its
+  prime at his every visit (RottweilerUseTogglesPrime), so the bone goes
+  in before his lap-2 basket only and the 70-point triple lands first
+  (peak 97 at the chair), while the PC's E10 lands it last on a bar
+  still at 31.
   Under the 80 gauge the Season 2 set had been 14/14, the Season 1 set 14/14 — 111 on its PC plan
   (below).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
