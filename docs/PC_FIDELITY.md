@@ -263,10 +263,32 @@ docs/PC_VS_MOBILE.md) all twenty-eight levels rated 100 under the
 mobile's tick meter. Since the anger rule moved to game.exe's
 (2026-09-16: the 12 Hz tick, the 60-tick hold, the window 5 s + the
 trick's angrytime over 12, no pause for the tantrum) the same plans
-rate 100 on Season 2 and on 101 and 104, and 91-97 on the other twelve
+rated 100 on Season 2 and on 101 and 104, and 91-97 on the other twelve
 Season 1 levels — their chains leaned on the mobile's 23.6 s plus the
-angry latch (a gap of 24-33 s still paid); re-chaining them to the PC's
-18-35 s windows is the work in progress, level by level. On Season 2 the lever
+angry latch (a gap of 24-33 s still paid). Re-chained to the PC's
+windows (the same day): 102 (the beer first, the microwave on his next
+beer run, the TV after the sofa), 109 (the banana on the kitchen floor
+only once he is down at the pig, so it pays on his second kitchen
+round) and 110 (the banana on the bedroom floor after the extinguisher
+fetch, on his walk to the chair) are back at 100 — 19 of 28. The rest
+sit where one of his walks outlasts the window the trick before it
+carries, measured on the run (the fire-to-fire gap against 5 s + the
+trick's angrytime over 12): 103 at 97 (the hall to the candle after the
+picture, 21.7 s against 20), 105 at 97 (the toilet to the phone, 22.3
+against 22), 107 at 97 (the statue to the balcony, 21.8 against 20; the
+kitchen banana moved to the living-room floor, where it no longer sends
+him out of the kitchen and back), 111 at 97 (the drier to the vacuum,
+32.7 against 27.5 — the marbles can bridge that walk or the iron-to-tank
+stretch, not both; the PC video pays both with a 26 s drier-to-vacuum),
+114 at 97 (the pipe to the trap down the stairs, 29.7 against 25 — the
+PC video's neighbour is quicker down), 112 at 94 (three walks of 29-34 s
+against 25-29), 106 at 94 (the bath's 18 s window against his 18.5 s
+picture-to-toilet and 21 s toilet-to-album walks), 108 at 94 (the
+toothbrush to the deck chair 31.6 s, the lotion to the plant 33, against
+20), 113 at 91 (the raid's long waits; one gap of 24.3 against 24).
+Every one of these is a routine-timing difference between the port's
+neighbour and the PC's, not a scoring one: the walks are the mobile
+data's, the windows game.exe's. On Season 2 the lever
 on the levels that sat at 90 was the same every time: arm each coin right after
 the neighbour's previous visit to it — the `whenusing` leg — so the whole
 set pays on ONE lap, and put the biggest coin (or the walk-by ones, 208's

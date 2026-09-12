@@ -1,0 +1,28 @@
+# Level102 under the PC profile: the viewer rating pays each trick's score
+# plus 3 per angry tick, so these six tricks' 88 need four ticks. The PC's
+# anger indicator (game.exe, docs/PC_ROUTINES.md): a trick sets it to the
+# level's angrytime (240 ticks here, no trick has its own), 60 ticks of
+# hold, then one per tick at 12 Hz — 25 s, no pause for his tantrum. His
+# lap: Sofa (Zone02, ~7 s sit) <-> Beer (Zone03) with the microwave on the
+# beer run; the toilet (Zone04) only on the laxative rush. The mobile
+# chain opened with the microwave on his first beer run and the beer at
+# the sofa 31 s later — a gap the PC does not pay — so here the beer is
+# the first fire: beer (~97) > the blocked toilet and the paper on the
+# rush (~104, ~118) > the sofa sawn during the trip (~140) > the microwave
+# armed after his first run and paid on the next (~163) > the TV, armed
+# after the sofa, on his return (~181): five ticks, 100.
+take Drawer IT_Saw
+take FirstAid IT_Laxative
+take ToiletPaper IT_Wcpaper       # TrickAfterWoodyUse + GetTrickedAtOnce: the holder is tricked
+usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
+take Fridge IT_Egg
+usewith Beer IT_Laxative          # UseAtOtherPlace: drunk at the sofa (Sofa.DependsOn -> Beer), score 18
+await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa (~97), the rush follows
+park Zone03                       # the kitchen is free while he rages and runs to the loo
+usewith Microwave IT_Egg          # NoticeWhenWalkNearby: pays on his NEXT beer run (~163), score 10
+usewith Sofa IT_Saw               # score 25 — sawn during the toilet trip
+await Toilet 10                   # the ToiletAction visit (ShitNormal, ShitNoPaper) — paid meanwhile
+await Sofa 25                     # the next sit (~140): SitDown, SitFall, SofaBlur
+use Television                    # bare-hand, NoticeWhenEnterZone, score 15: his return from the beer (~181)
+await Microwave 10
+await Television 15

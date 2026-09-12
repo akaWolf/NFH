@@ -7,8 +7,14 @@
 # kitchen and the pig after his kitchen round, the teeth's tabasco during
 # his sleep (the teeth are primed only then), the bed's pins once he is
 # up. The round pays alarm > teeth > the slip > the milk > the pig > the
-# chips the dog eats at the chili > the bed — six ticks, the gaps bridged
-# by his angries (the decay pauses through them).
+# chips the dog eats at the chili > the bed. Under the PC's anger
+# (game.exe, docs/PC_ROUTINES.md: 192 ticks here, the slip 252 and the
+# milk 240; 60 ticks of hold, one per tick at 12 Hz — 21, 26 and 25 s, no
+# pause for his tantrums) the 88 points need four ticks: the banana goes
+# on the kitchen floor only once he is down at the pig, so it pays on his
+# second kitchen round — the pig > slip > chips stretch pays two, with
+# the teeth's and the pig's; the bedroom -> kitchen walk (31 s+) and the
+# chili -> bed walk stay outside any window.
 take PinsBoard IT_Pins               # Zone01
 take PigKeys IT_Pigkey               # Zone06, during the sleep: the hook holds them only while Primed
 take Cactus IT_Cactus                # Zone07
@@ -17,7 +23,6 @@ take ChemicalSet IT_Nitro            # Zone02
 take SpicyChips IT_Chips             # Zone02, next to the dog
 take RubbishBinBanana2 IT_Banana     # Zone03, after his kitchen round (~100)
 take Fridge IT_Tabasco               # Zone03
-usewith Ground@Zone03 IT_Banana      # Zone03, 7: on his way to the milk
 usewith PigMilk IT_Nitro             # Zone03: explodes at the pig, paid through DependsOn = PigMilk (20)
 usewith CornChips IT_Chips           # Zone03: fed to the dog at Chili (the C# pays DependsOn = CornChips, 0)
 usewith Pig IT_Pigkey                # Zone01 once he has been to the pig, 20: the pig gets out (NoticeWhenWalkNearby)
@@ -25,11 +30,13 @@ whenusing Bed                        # he sleeps (31 s): the teeth are primed
 usewith Teeth IT_Tabasco             # Zone06 while primed (his sleep), 15 at the RottweilerUseTogglesPrime use (SpitFire)
 whenusing PigKeys                    # he leaves the bedroom for the kitchen: the bed is empty
 usewith Bed IT_Pins                  # Zone06 with the bed empty (IsRottweilerSleeping refuses Woody), 8
+whenzone Zone01                      # he is down at the pig (~195-226): the kitchen is nobody's
+usewith Ground@Zone03 IT_Banana      # Zone03, 7: the slip on his second kitchen round (~233), between the pig and the chips
 park Zone04
 await AlarmClock 13
 await Teeth 15
 await Ground@Zone03 7
-await PigMilk 10                     # the PC pays the milk 10 (levels/pc/Level109.overlay.json)
-await Pig 20
+await PigMilk 20
+await Pig 10                         # the PC pays the pig 10 (levels/pc/Level109.overlay.json)
 await CornChips 15                   # and the chips 15
 await Bed 8

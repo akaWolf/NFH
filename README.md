@@ -128,12 +128,13 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   Season 1 anger itself (a trick sets the indicator to its `angrytime`,
   60 ticks of hold, one per tick at 12 Hz, +3 while above zero) — each
   deviation an overlay entry or an `is_pc()` branch with its source
-  (`docs/PC_FIDELITY.md` §7). 16 of 28 levels rate 100 at this commit:
-  all of Season 2 and 101/104; the other twelve Season 1 plans were
-  chained for the mobile's 23.6 s window and its angry latch and are
-  being re-chained to the PC's 18-35 s windows (`docs/PC_ROUTINES.md`).
-  The mobile numbers do not move: the 54-plan regression under
-  `--profile=mobile` is byte-identical.
+  (`docs/PC_FIDELITY.md` §7). 19 of 28 levels rate 100: all of Season 2
+  and 101/102/104/109/110; the other nine Season 1 levels sit at 91-97
+  where one of the neighbour's walks outlasts the window the trick
+  before it carries — a timing difference between the port's routine
+  (the mobile data's) and the PC's, listed gap by gap in
+  `docs/PC_FIDELITY.md` §7. The mobile numbers do not move: the 54-plan
+  regression under `--profile=mobile` is byte-identical.
 
 Open: three natural laps still differ from the PC's by more than 15 %
 (111, 213, 210 — the neighbour's routine is compiled into game.exe, one
