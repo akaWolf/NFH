@@ -7,7 +7,9 @@ the world reads through is_pc(). Every overlay entry carries a "source"
 (the PC guide / video the deviation comes from), the profile's counterpart
 of the runtime's `cs:` citations."""
 import json
+import math
 import os
+import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -226,3 +228,79 @@ def s2_result(won, collapsed, completed, total):
         return S2_RESULT['perfect']
     return S2_RESULT['success']
 
+
+
+# -- the walk (docs/PC_VERIFICATION.md "the walking speed", "the lap's timing") -----------
+# generic/objects.xml <speed> records of each actor: px a tick along the floor (the facing 1/3
+# gaits) and up or down the room (facing 0/2), one axis a tick — fcn.0047c7f0 adds the record
+# of the facing animation to the coordinate on every tick of the walk fiber fcn.00475b30
+# (0x476148), 12 ticks a second. The mobile scene is 96 px a unit (the house of 101: the
+# living room's 586 px path against the 6.8 u zone less the collider's margin, the hall
+# 740/8.4, the kitchen 412/5.1; the neighbour's start 504 px against -1.75 u within 9 px;
+# Season 2's scenes 93-100 px a unit by the actors' starts of 208 and 201's bridge-to-rail
+# span) — one figure serves both seasons. Checked by tools/pcref/lap_model.py: nine Season 1
+# laps within 12 % of the PC video.
+PX_PER_UNIT = 96.0
+TICKS_PER_SECOND = 12.0
+WALK_PX_PER_TICK = {
+    # role: (along the floor, up or down the room, up or down the stairs — Season 2's stair
+    # gaits; Season 1 has no stairs to walk)
+    'Rottweiler': (8, 3, 5),       # neighbor mg1 8 / mg0 3, stair1 8 / stair0 5
+    'Mother': (8, 3, 5),           # the same records on mother and olga (Season 2)
+    'Olga': (8, 3, 5),
+    'Woody': (17, 6, 6),           # woody mg1 17 / mg0 6, stair1 17 / stair0 6
+    'Woody_sneak': (5, 2, 2),      # sn1 5 / sn0 2 (no stair record: the room's)
+}
+
+
+def rule(name):
+    """the diagnostics' switch: NFH_PC_RULES=walk,doors,sight names the PC rules to keep,
+    the others fall back to the mobile's (all on when unset) — for bisecting a plan"""
+    keep = os.environ.get('NFH_PC_RULES')
+    return keep is None or name in keep.split(',')
+
+
+def walk_speed(role, sneaking, vx, vy, on_stairs=False):
+    """The multiplier of the pawn's Velocity that moves it at the PC's pace. The PC walks one
+    axis a tick, so a step the mobile takes diagonally lasts |dx| / h + |dy| / v there — the
+    harmonic mix of the two records along the direction, divided by the velocity's own length
+    (the mobile's force). None for a pawn without a record (the Kid keeps the mobile's)."""
+    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
+    n = math.hypot(vx, vy)
+    if rec is None or n == 0.0 or not rule('walk'):
+        return None
+    h, v, st = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in rec)
+    vert = st if on_stairs else v
+    ux, uy = abs(vx) / n, abs(vy) / n
+    return 1.0 / (ux / h + uy / vert) / n
+
+
+# -- the door transit (docs/PC_VERIFICATION.md "door transit") ----------------------------
+# the pawns' door clips keep the PC's frame counts, but the mobile plays them at 10 a second;
+# on PC every `auto` action is one frame a tick, 12 a second (generic/anims.xml doorleft /
+# doorright / doorback: woody_enter 19/16/10 frames, woody_leave 25/24/26, neighbor_enter
+# 20/20/12, neighbor_leave 20/20/23)
+DOOR_CLIP_FPS = 12.0
+DOOR_CLIP = re.compile(r'^(Woody|Rottweiler|Mother|Olga|Kid)Door(Left|Right|Back)(Enter|Leave)$')
+
+
+def clip_fps(name, fps):
+    return DOOR_CLIP_FPS if (DOOR_CLIP.match(name or '') and rule('doors')) else fps
+
+
+# -- the catch on sight (docs/PC_VERIFICATION.md "caught on sight", "a busy neighbour") ----
+# game.exe: level state 3 when Woody and the neighbour hold the same room object
+# ([actor+0x1c], set at the placement and at the door warp through fcn.00448d70's room
+# lookup), neither carries flag 4 — inside an object with the hideout flags 0x140: Woody's
+# hideouts, the neighbour's `neighbor_hideout` bed of 109 (fcn.004737a0 at 0x473951) — and
+# the +0x78 byte is clear, which it always is. No busy, sleeping or blocking-animation window
+# (the mobile's IgnoreWoodyWhenUse, IsSleeping and Blocking clauses are the remaster's). The
+# neighbour asleep in his hideout is woken by noise 1 in his room: a walking Woody's speed
+# record carries noise 1, a sneaking one 0 (generic/objects.xml).
+SEES_WHILE_BUSY = True
+
+
+def sees_while_busy(nfh2=False):
+    """Season 1 only: GameLogic.dll's watch predicate (fcn.1003f573) reads mode bits whose meaning is
+    still open, so Season 2 keeps the mobile's busy windows until they are read"""
+    return SEES_WHILE_BUSY and not nfh2 and rule('sight')

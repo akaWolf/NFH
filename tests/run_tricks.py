@@ -70,6 +70,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'runtime'))
 
 from record import Recorder, DT, WIDTH, HEIGHT     # noqa: E402
+import pcprofile  # noqa: E402
 from app import App                                 # noqa: E402
 from prefs import MemoryPrefs                       # noqa: E402
 from menu import GameIntroAnimation                 # noqa: E402
@@ -351,6 +352,12 @@ class Driver(Recorder):
     MARGIN = 1.5
 
     def _speed(self, p):
+        if pcprofile.is_pc():
+            # the PC pace along the floor (pcprofile.walk_speed: the neighbour,
+            # the Mother and Olga 8 px a tick = 1.0 u/s), whatever he is doing now
+            pc = pcprofile.walk_speed(p.role, False, 1.0, 0.0)
+            if pc:
+                return pc
         force = p.run_force if p.in_urgent else p.force
         return max(0.2, (force or 1.0) * (p.walk_speed_scale() or 1.0))
 
@@ -368,6 +375,10 @@ class Driver(Recorder):
         # at DoorForceMagnitude that the traces put at ~4 s
         if door.is_transition and door.complex_move:
             return 4.0 if door.nfh2_stairs else 1.6
+        if pcprofile.is_pc():
+            # the door clips run a frame a tick under the profile (pcprofile.clip_fps):
+            # 20 frames at 12 a second, the walk-up pair likewise
+            return 2.9 if door.should_walk_up else 20 / 12.0
         if door.should_walk_up:
             return 3.5
         return 2.0
@@ -387,6 +398,24 @@ class Driver(Recorder):
         # the sheet times over the measured tick rate (anim_rate)
         role = getattr(player, '_probe_role', None)
         return left / float(max(1, self._anim_rate.get(role, 1)))
+
+    def _asleep_safe(self, p):
+        """the sleeper's window: on the mobile IsSleeping gates the catch; under
+        the PC profile (Season 1) only the neighbour asleep in his hideout —
+        the Bed of 109 — is blind, and only to a sneaking or standing Woody
+        (pcprofile.sees_while_busy); the auto-sneak tiptoes there"""
+        if not p.is_sleeping:
+            return False
+        if pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(p, 'nfh2', False)):
+            r = next((r for r in self.world.routines if r.pawn is p), None)
+            it = r.item if r is not None else None
+            return it is not None and it.name == 'Bed'
+        return True
+
+    def _ignoring_safe(self, p):
+        """IgnoreWoodyWhenUse: a window on the mobile, none on the PC"""
+        return p.ignore_woody and not (
+            pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(p, 'nfh2', False)))
 
     def sleep_left(self, p):
         """seconds until a sleeping catcher wakes: the bar's sleep window
@@ -455,9 +484,9 @@ class Driver(Recorder):
                 # a sleeping catcher (IsSleeping gates both catch
                 # predicates, GameInfo.cs:189/198) is harmless until his
                 # bar's window ends; an ignoring one until his use ends
-                if p.is_sleeping:
+                if self._asleep_safe(p):
                     return self.sleep_left(p)
-                if p.ignore_woody:
+                if self._ignoring_safe(p):
                     return self._anim_left(p.anim)
                 return 0.0
             # else: gone before `after` — fall through to his return
@@ -1008,7 +1037,7 @@ class Driver(Recorder):
                 # a catcher asleep for a while yet (the sleep bar's window,
                 # IsSleeping gates the catch) does not hold his room — a
                 # human walks past the sleeper
-                if not (p.is_sleeping and self.sleep_left(p) > 8.0):
+                if not (self._asleep_safe(p) and self.sleep_left(p) > 8.0):
                     occ.add(p.zone.pid)
             if warping_out:
                 # mid-pass he holds the far room, not the one he is
@@ -1126,8 +1155,8 @@ class Driver(Recorder):
             _tz, first_door, _slack = self._flee_target(w.zone.pid)
             dist = abs(first_door.x - w.sprite.x) if first_door is not None \
                 else 3.0
-            crawl = dist / max(0.2, (w.force or 0.8)
-                               * (w.speed_sneaking or 0.65)) + 2.0
+            crawl = dist / (pcprofile.walk_speed('Woody', True, 1.0, 0.0) if pcprofile.is_pc()
+                            else max(0.2, (w.force or 0.8) * (w.speed_sneaking or 0.65))) + 2.0
             for p in self.catchers():
                 eta = self.eta_to_zone(p, w.zone.pid, horizon=20.0)
                 if eta is not None and eta < min(8.0, crawl):
@@ -1263,7 +1292,7 @@ class Driver(Recorder):
             for p in self.catchers():
                 if p.zone is not None and p.zone.pid == nxt \
                         and not p.is_warping \
-                        and not (p.is_sleeping
+                        and not (self._asleep_safe(p)
                                  and self.sleep_left(p) > 8.0):
                     # (a catcher asleep for a while yet does not block
                     # the room — IsSleeping gates the catch)
@@ -1499,6 +1528,9 @@ class Driver(Recorder):
             if not sneak:
                 sneak = any(p.zone is not None and p.zone.pid == zone_pid
                             and not p.is_warping for p in self.catchers())
+        if pcprofile.is_pc():
+            # Woody's PC records: 17 px a tick running (2.125 u/s), 5 sneaking (0.625)
+            return pcprofile.walk_speed('Woody', bool(sneak and w is not None), 1.0, 0.0)
         if not sneak or w is None:
             return 2.0
         return max(0.2, (w.force or 0.8) * (w.speed_sneaking or 0.65))

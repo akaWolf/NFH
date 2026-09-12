@@ -154,3 +154,36 @@ class Result(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class Walk(unittest.TestCase):
+    """pcprofile.walk_speed: the PC's speed records at 12 ticks a second and 96 px a unit"""
+
+    def test_floor(self):
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 1.0, 0.0), 1.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Woody', False, -1.0, 0.0), 17 * 12 / 96.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Woody', True, 1.0, 0.0), 5 * 12 / 96.0)
+
+    def test_up_the_room_and_the_stairs(self):
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, 1.0), 3 * 12 / 96.0)
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 0.0, -1.0, on_stairs=True), 5 * 12 / 96.0)
+
+    def test_diagonal_is_the_sum_of_the_axes(self):
+        # a unit step at 45 degrees lasts |dx| / h + |dy| / v on the PC
+        h, v = 8 * 12 / 96.0, 3 * 12 / 96.0
+        s = pcprofile.walk_speed('Rottweiler', False, 0.6, 0.8)
+        self.assertAlmostEqual(1.0 / s, 0.6 / h + 0.8 / v)
+
+    def test_velocity_length_and_unknown_pawn(self):
+        # the multiplier divides by the velocity's length (the mobile's force)
+        self.assertAlmostEqual(pcprofile.walk_speed('Rottweiler', False, 2.0, 0.0), 0.5)
+        self.assertIsNone(pcprofile.walk_speed('Kid', False, 1.0, 0.0))
+        self.assertIsNone(pcprofile.walk_speed('Woody', False, 0.0, 0.0))
+
+
+class Doors(unittest.TestCase):
+    def test_door_clips_run_a_frame_a_tick(self):
+        self.assertEqual(pcprofile.clip_fps('WoodyDoorLeftEnter', 10.0), 12.0)
+        self.assertEqual(pcprofile.clip_fps('RottweilerDoorBackLeave', 10.0), 12.0)
+        self.assertEqual(pcprofile.clip_fps('SitLoop', 5.0), 5.0)
+        self.assertEqual(pcprofile.clip_fps(None, 10.0), 10.0)

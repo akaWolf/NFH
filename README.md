@@ -127,7 +127,9 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   scores where they differ, the whistle, three lives, no minigames, the
   rating's count-up and — since 2026-09-16, read from game.exe — the
   Season 1 anger itself (a trick sets the indicator to its `angrytime`,
-  60 ticks of hold, one per tick at 12 Hz, +3 while above zero) — each
+  60 ticks of hold, one per tick at 12 Hz, +3 while above zero), and
+  since 2026-09-17 the PC's walking speeds, door pace and catch on sight
+  (docs/PC_VERIFICATION.md) — each
   deviation an overlay entry or an `is_pc()` branch with its source
   (`docs/PC_FIDELITY.md` §7). 17 of 28 levels rate 100: twelve of
   Season 2 and 101/102/104/109/110; the other nine Season 1 levels sit

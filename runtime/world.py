@@ -382,6 +382,9 @@ class AnimPlayer:
                 else:
                     self._stop_single()
         fps = self.anim.fps or 10.0
+        if pcprofile.is_pc():
+            # the pawns' door clips at the PC's frame a tick (pcprofile.clip_fps)
+            fps = pcprofile.clip_fps(self.anim.name, fps)
         # ResetAnimationTime (cs:144-150): `1f / FrameRate` in single
         # precision, the slow factor likewise
         self.acc = _f32(self.acc + _f32(1.0 / _f32(fps)))
@@ -1152,7 +1155,17 @@ class Pawn:
 
     def walk_speed_scale(self):
         """Pawn.ProcessMovement (Pawn.cs:871-879): position += Velocity * dt
-        * Speed, or * SpeedSneaking while SneakFlag"""
+        * Speed, or * SpeedSneaking while SneakFlag. Under the PC profile the
+        pace is the PC's speed record along the current direction
+        (pcprofile.walk_speed: 8 px a tick along the floor for the neighbour,
+        17 for Woody, 5 sneaking, 3/6/2 up and down the room, 12 ticks a
+        second at 96 px a unit)."""
+        if pcprofile.is_pc():
+            vx, vy = self.velocity
+            s = pcprofile.walk_speed(self.role, self.sneaking, vx, vy,
+                                     self.state in (self.DOOR_CLIMB, self.DESCEND))
+            if s is not None:
+                return s
         return self.speed_sneaking if self.sneaking else self.speed
 
     # -- door transit -------------------------------------------------------
@@ -8131,17 +8144,23 @@ class World:
         IsMovingToAdjacentZone the TransitionMove flag, and the NFH2 terms
         are DonePassingToOtherZone and PassingComplexMove on both pawns"""
         woody = self.woody
-        return (woody.zone is not None and catcher.zone is not None
-                and woody.zone.pid == catcher.zone.pid
-                and not woody.is_warping and not catcher.is_warping
-                and not woody.moving_to_adjacent_zone()
-                and not catcher.moving_to_adjacent_zone()
-                and not catcher.ignore_woody and not woody.hiding
+        same_room = (woody.zone is not None and catcher.zone is not None
+                     and woody.zone.pid == catcher.zone.pid
+                     and not woody.is_warping and not catcher.is_warping
+                     and not woody.moving_to_adjacent_zone()
+                     and not catcher.moving_to_adjacent_zone()
+                     and not woody.hiding
+                     and not woody.done_passing and not catcher.done_passing
+                     and not woody.passing_complex
+                     and not catcher.passing_complex)
+        if pcprofile.is_pc() and pcprofile.sees_while_busy(woody.nfh2):
+            # the PC's catch is the room and the hideout flag alone
+            # (pcprofile.sees_while_busy()): no IgnoreWoodyWhenUse, no
+            # blocking-animation clause
+            return same_room
+        return (same_room and not catcher.ignore_woody
                 and (not catcher.anim.blocking or not woody.sneaking)
-                and not woody.anim.blocking
-                and not woody.done_passing and not catcher.done_passing
-                and not woody.passing_complex
-                and not catcher.passing_complex)
+                and not woody.anim.blocking)
 
     def can_rottweiler_see_woody(self):
         """GameInfo.CanRottweilerSeeWoody (GameInfo.cs:181-192), the Classic
@@ -8161,11 +8180,21 @@ class World:
             return False
         if not self._detect_common(rott):
             return False
+        it = routine.item if routine else None
+        if pcprofile.is_pc() and pcprofile.sees_while_busy(woody.nfh2):
+            # the PC neighbour sees Woody whatever he is doing, except from
+            # inside his hideout: 109's bed carries `neighbor_hideout`, and a
+            # walking Woody's noise 1 wakes him there while a sneaking one's 0
+            # does not (pcprofile.sees_while_busy())
+            if it is not None and it.name == 'Bed':
+                moving = woody.state in (woody.WALK, woody.DOOR_CLIMB,
+                                         woody.DESCEND, woody.ITEM_CLIMB)
+                return moving and not woody.sneaking
+            return True
         # Rottweiler.CanSeeWoody defers to the primary behavior
         # (Rottweiler.cs:1218-1221)
         if rott.behaviors and not rott.behaviors[0].can_see_woody():
             return False
-        it = routine.item if routine else None
         if it is not None and it.name == 'Bed':
             moving = woody.state in (woody.WALK, woody.DOOR_CLIMB,
                                      woody.DESCEND, woody.ITEM_CLIMB)
@@ -8183,6 +8212,8 @@ class World:
         routine = next((r for r in self.routines if r.pawn is mother), None)
         if routine is None or not routine.actions or not routine.started:
             return False
+        if pcprofile.is_pc() and pcprofile.sees_while_busy(self.woody.nfh2):
+            return self._detect_common(mother)
         # Mother.CanSeeWoody defers to the primary behavior (Mother.cs:103-106)
         if mother.behaviors and not mother.behaviors[0].can_see_woody():
             return False

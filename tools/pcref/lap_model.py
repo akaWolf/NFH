@@ -292,8 +292,21 @@ def model(L, toks, verbose=False):
     return legs
 
 
+def stations(legs):
+    """the lap by ICON: [(icon, action ticks, walk+door ticks)]"""
+    out = []; cur = None
+    for kind, text, t in legs:
+        if kind == 'icon':
+            cur = [text, 0, 0]; out.append(cur); continue
+        if cur is None: continue
+        if kind == 'action': cur[1] += t
+        elif kind in ('walk', 'door'): cur[2] += t
+    return out
+
+
 def main(argv):
     verbose = '-v' in argv
+    show_stations = '--stations' in argv
     args = [a for a in argv[1:] if not a.startswith('-')]
     levels = [int(a) for a in args] or list(range(101, 115))
     cache = os.environ.get('LAP_TOKENS')
@@ -317,6 +330,11 @@ def main(argv):
         if verbose:
             for kind, text, t in legs:
                 print('     %-6s %4d  %s' % (kind, t, text))
+        if show_stations:
+            mob = canon.mobile_level(n)['routine']
+            print('     mobile routine: %s' % ' > '.join(str(r[0]) for r in mob))
+            for icon, ta, tw in stations(legs):
+                print('     %-28s actions %5.1f s   walk+doors %5.1f s' % (icon, ta / TICK, tw / TICK))
     return 0
 
 

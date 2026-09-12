@@ -268,6 +268,21 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   menu's exit), the catch fiber with its respawn 900 px above the start
   spot, and the data (time limits, minquota, reachable/mincoins, trick
   values, angrytime) — the open items are listed there.
+- The walk, the doors and the sight (2026-09-17, from the binaries and
+  the data — docs/PC_VERIFICATION.md "the walking speed", "door
+  transit", "a busy neighbour"): every pawn moves at its PC speed record
+  (`pcprofile.walk_speed`: the neighbour, the Mother and Olga 8 px a tick
+  along the floor and 3 up or down the room, Woody 17/6, sneaking 5/2,
+  Season 2's stairs 5/6 — 12 ticks a second at the scene's 96 px a unit;
+  one axis a tick on PC, so a diagonal step lasts the sum of the axes'
+  times), the pawns' door clips run a frame a tick (`clip_fps`, 12 a
+  second), and the neighbour sees Woody in his room whatever he is doing
+  except from inside a `neighbor_hideout` (`sees_while_busy`: 109's bed,
+  where a walking Woody's noise 1 wakes him and a sneaking one's 0 does
+  not) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows.
+  The harness's dodging reads the same paces (`_speed`, `woody_speed`,
+  `door_time`); `NFH_PC_RULES=walk,doors,sight` keeps a subset for
+  bisecting a plan.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
