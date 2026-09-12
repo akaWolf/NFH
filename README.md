@@ -149,9 +149,10 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 Open: the Season 2 catch on PC — the watch predicate's modes are read
 (the same room, the same room and floor with a vertical distance below
 15, always; the hideout flag exempts; no sneaking or busy term) and the
-catch itself is a per-level handler (the catcher walks up to Woody, then
-`fight`), but the event that wakes those handlers is unread, so the
-profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
+catch itself is a step of each catcher's per-level script (the catcher
+walks up to Woody, then `fight`), but how a script decides to enter that
+step is unread, so the profile's Season 2 keeps the mobile predicates
+(`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
 between them is not); 210 under the profile (the pool is the Mother's, asleep 19 s and

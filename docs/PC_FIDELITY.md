@@ -343,7 +343,10 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   108 — the pins, the lotion at his re-sit 10 s later (a tick), the banana
   on the bedroom floor as he leaves the balcony 20.0 s after the lotion (the
   level's 20: cold by no margin at all), the plant 23 s after the slip
-  inside the banana's 30 (a tick); the coffee's brush rush is 24 s (94).
+  inside the banana's 30 (a tick); the coffee's brush rush is 24 s, and a
+  banana laid on the rush's hall path slips him 6 s after the coffee but
+  its tantrum pushes the brushing 32 s past the slip (runs/chain2), so
+  the rush stays cold either way (94).
   109 — the milk's blast at the pig, the banana in the living room 27.7 s
   later (the milk's 25: cold), the chili's chips 14.6 s after the slip (a
   tick), the tabasco brushing 1.3 s after the cactus alarm on his third
