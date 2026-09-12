@@ -131,14 +131,15 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   since 2026-09-17 the PC's walking speeds, door pace and catch on sight
   (docs/PC_VERIFICATION.md) — each
   deviation an overlay entry or an `is_pc()` branch with its source
-  (`docs/PC_FIDELITY.md` §7). 17 of 28 levels rate 100: twelve of
-  Season 2 and 101/102/104/109/110; the other nine Season 1 levels sit
-  at 91-97 where one of the neighbour's walks outlasts the window the
-  trick before it carries, and 205/210 at 90 where his chain does not
-  fill the 100-unit gauge — timing differences between the port's
-  routine (the mobile data's) and the PC's, listed gap by gap in
-  `docs/PC_FIDELITY.md` §7. The mobile numbers do not move: the 54-plan
-  regression under `--profile=mobile` is byte-identical.
+  (`docs/PC_FIDELITY.md` §7). Under the PC rules read from the binaries on
+  2026-09-17 — the walking speeds, the door pace, the catch on sight with
+  no busy window — the plans were re-timed to the profile's own idle
+  laps: 101/104/105/107 and nine Season 2 levels rate 100, 102/103/109/111
+  97, 112 94, 113 91, 202/205 90, and the crowded laps of 106/108/110
+  (78-81), 207/209 (64) and 210 are still being re-planned — the PC's
+  47-second lap of 110 leaves no window for one of its tricks. The
+  mobile numbers do not move: the regression under `--profile=mobile`
+  is byte-identical.
 
 Open: three natural laps still differ from the PC's by more than 15 %
 (111, 213, 210 — the neighbour's routine is compiled into game.exe, one

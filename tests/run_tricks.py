@@ -1412,8 +1412,11 @@ class Driver(Recorder):
                 / self.woody_speed(here) \
                 + (1.2 if first_door.should_walk_up else 0.0) \
                 + self._door_climb(first_door, w, self.woody_speed(here) < 1.0) / 2.0
-        if pcprofile.is_pc():
-            exit_time += 1.0        # the 12-fps door pairs are quicker than the model's rounding
+        if pcprofile.is_pc() and not getattr(w, 'nfh2', False):
+            # the 12-fps door pairs are quicker than the model's rounding; Season 1 only —
+            # on Season 2 the margin outran an ignoring catcher's window and Woody hid
+            # again the moment a leg unhid him (Level209's hot shoe)
+            exit_time += 1.0
         # a sleeper's wake time is a sequence-length estimate (sleep_left,
         # ~2 s off on Level207's Mother: read 2.8 s at the moment she got
         # up) — leave with the same margin the gate keeps
@@ -2500,6 +2503,10 @@ class Driver(Recorder):
         self._leg_x = it.target_x
         self._leg_item = it
         w = self.v.woody
+        if w.hiding and w.zone is not None and w.zone.pid == it.zone:
+            # the dodge already put him in there: a click now would un-hide him
+            # (Woody.Hide/Unhide toggle on the click) — Level110's bed
+            return True, None
         ok = self.wait_gate(it.zone, it.target_x, it)
         if not ok:
             return False, 'zone never clear'

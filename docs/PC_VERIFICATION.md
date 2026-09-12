@@ -272,6 +272,14 @@ helpers.
   clips' pace (`clip_fps`) and the catch on sight without the busy
   windows (`sees_while_busy`); `NFH_PC_RULES=walk,doors,sight` keeps a
   subset of the three for bisecting a plan.
+- `tests/run_tricks.py` (the same day): the harness dodges by the PC
+  paces — a catcher's arrival is his climb to a back door plus the Enter
+  clip, Woody's exit adds his own climb; the sleeper's and the ignorer's
+  windows read the season from Woody. The Season 1 plans that stood on
+  the mobile's busy windows or paces are re-timed from the idle runs under
+  the profile (`tests/plans/pc/s1`: 102, 105-110, 114); Level114's overlay
+  drops the remaster's priming from the pipe and the phonograph, as
+  level_hunter's objects.xml has them.
 - `runtime/pcprofile.py` / `runtime/world.py` (the same day, later): the
   Season 2 captions FAILURE / COLLAPSE! / GOOD JOB! / SUCCESS! from
   GUIEngine's fill (`s2_result`).

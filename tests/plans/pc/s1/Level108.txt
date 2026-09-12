@@ -40,9 +40,9 @@ park! Zone02                         # straight down before his bedroom at 138
 whenusing CoffeeMaker                # (201) his third coffee: up again
 usewith! Shezlong IT_Pins            # Zone07, 10: fires at his lap-3 deck chair (226)
 park! Zone02                         # down before 217
-await Ground@Zone03 8
 await CoffeeMaker 15
 await ToothBrush 15
 await SunLotion 20
 await Plant 20
 await Shezlong 10
+await Ground@Zone03 8               # the slip pays at the fall's end; its bookkeeping is the last to settle

@@ -227,7 +227,11 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   controller's animation, `actions` to rebuild an ActionManager's list by
   item names (addressed by `owner`). Shipped: Level113 (the electric trap
   lifted to the depth it has in L111/L114, so the click ray reaches it),
-  Level114 (the dog whistle in the hall's chest of drawers), and every
+  Level114 (the dog whistle in the hall's chest of drawers; since
+  2026-09-17 the pipe's tin without the remaster's priming and the
+  phonograph unlocked for good by the neighbour's first `open`, as
+  level_hunter's objects.xml has them — the catch-on-sight rule leaves no
+  window for a trick that needs him in the room), and every
   Season 2 level's PC trick amounts off the gauge of Badinfos' run
   (`tools/pcref/amounts.py`: the jump per second labelled with the bubble's
   activity, scaled to the full bar; a jump on the full bar keeps the
@@ -294,11 +298,23 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
-- Plans: `tests/plans/pc/` holds the nine that differ (113, 114, 202, 205,
-  206, 208, 210, 211, 214); the other nineteen run the standard plans under
-  the profile.
+- Plans: `tests/plans/pc/` holds the ones that differ — since 2026-09-17
+  the Season 1 plans re-timed to the PC paces and the catch on sight (102,
+  105, 106, 107, 108, 109, 110, 113, 114, from the idle runs under the
+  profile: `runs/idlepc`) and the Season 2 nine (202, 205, 206, 208, 210,
+  211, 214 and the amounts' re-chains); the rest run the standard plans
+  under the profile. A plan's `whenzone` fires on any visit of the zone,
+  so a landmark names the wanted moment (`whenusing <station>`).
 
 ### Results under the profile (the final run, 2026-09-06)
+
+The 2026-09-17 state, under the PC walk, doors and catch rules and the
+re-timed plans: Season 1 — 101, 104, 105, 107 at 100; 102, 103, 109, 111
+at 97; 112 at 94; 113 at 91; 106 at 80, 108 at 81, 110 at 78 (won, a
+trick or the anger chain short); 114 in work. Season 2 — 201, 203, 204,
+206, 208, 211, 212, 213, 214 at 100; 202, 205 at 90 (all coins, no
+overflow); 207, 209 at 64 (a trick each behind a window the PC rules
+close); 210 lost. The section below is the 2026-09-06 run.
 
 Every level pays every trick. Under the PC's own scores (the COLLAPSE!
 board on Season 2, the viewer rating's 3 a tick on Season 1 — §2.4,

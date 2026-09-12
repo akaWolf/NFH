@@ -12,28 +12,27 @@
 # the wine at 95-100 — all on his second lap.
 take PinsBoard IT_Pins               # Zone01 (3-7)
 take FirstAid IT_Fuel                # Zone04 (9-13): fuel + growth liquid together
-whenzone Zone02                      # (17) he leaves the kitchen for the living room (17-22) and the bedroom (22-29)
-park! Zone02                         # (~20, tiptoe past the parrot): wait there while he is in the bedroom (22-29)
+whenzone Zone06                      # (22) he climbs to the bedroom: up into the living room (tiptoe past the parrot)
+park! Zone02
 whenzone Zone07                      # (29) he barbecues: the bedroom is free until 39
-hide! Bed                            # Zone06 by ~34: he crosses the bedroom 39-47 to the steak (47-57)
+hide! Bed                            # Zone06 by ~35: he crosses the bedroom 39-47 to the steak (47-57)
 whenzone Zone02                      # (47) he sits at the steak: the balcony and the bedroom are free until 69
 use! FireExtinguisher                # Zone06, bare hand: the BBQ's fixing tool, 15 (RedoAction)
 usewith! Beer IT_Fuel                # Zone07: BBQ.Tricked via SetTrickedOnItem, 20 at his next BBQ (77)
 usewith! CarnivorPlantSpray IT_Growthliquid   # Zone07, 15 (RemoveFromRoutineAfterUseTricked)
 hide! Bed                            # by 68: he crosses 69-75, barbecues 75-86 (the fire, the extinguisher), crosses back 86-93
-whenzone Zone07                      # (75) he is on the balcony: the living room is free until 93
-usewith! SteakChair IT_Pins          # Zone02, 10
-park! Zone03                         # the kitchen (free until 104): the banana and the vinegar
-take! RubbishBinBanana2 IT_Banana    # Zone03
+whenzone Zone07                      # (75) he is on the balcony: the living room is free until 93, the kitchen until 104
+usewith! SteakChair IT_Pins          # Zone02, 10: at his next steak
+park! Zone03                         # the kitchen: the vinegar and the banana
 take! Fridge IT_Vinegar              # Zone03
+take! RubbishBinBanana2 IT_Banana    # Zone03
 park! Zone01                         # the hall before his meat (104): off his lap
-whenzone Zone06                      # (116) he goes up: the living room is free until 140, the bedroom while he barbecues (122-133)
-usewith! SteakWine IT_Vinegar        # Zone02, 15: at his lap-4 wine (194)
-usewith! Ground@Zone06 IT_Banana     # Zone06, 10, while he barbecues (122-133): on his way back
-hide! Bed                            # by 133: he crosses 133-140
+whenusing Beer                       # his next barbecue (~124): the living room is free until he comes down (~140)
+usewith! SteakWine IT_Vinegar        # Zone02, 15: at his next wine
+park! Zone03                         # out through the kitchen door before he comes down
+park! Zone01                         # the bedroom floor's banana has no window under the PC paces (2026-09-17): five tricks
 await BBQ 20
 await FireExtinguisher 15
 await CarnivorPlantSpray 15
 await SteakChair 10
 await SteakWine 15
-await Ground@Zone06 10

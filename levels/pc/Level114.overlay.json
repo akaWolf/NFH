@@ -41,6 +41,31 @@
    "set": {
     "PCAngryTime": 360
    }
+  },
+  {
+   "object": "Pipe",
+   "component": "TrickItem",
+   "set": {
+    "RequirePriming": false,
+    "RottweilerUseTogglesPrime": false
+   },
+   "source": "PC objects.xml (level_hunter): lir/tabacbox's `gunpowder` is Woody's plain action (time 23), no condition — the tin takes the gunpowder any time; the remaster's RequirePriming and the prime toggle on the neighbour's every pipe (Item.cs:1085/1331: an unprimed Pipe stops taking clicks) have no PC counterpart (2026-09-17)"
+  },
+  {
+   "object": "Gramaphone",
+   "component": "TrickItem",
+   "set": {
+    "RequirePriming": false
+   },
+   "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
+  },
+  {
+   "object": "Pipe",
+   "component": "BoxCollider",
+   "set": {
+    "enabled": true
+   },
+   "source": "PC objects.xml (level_hunter): lir/tabacbox is Woody's plain object — the remaster ships the Pipe's collider off until the neighbour's prime (Item.cs:1326-1333), which the PC catch rule never lets Woody wait for; the tin is clickable from the start (2026-09-17)"
   }
  ]
 }

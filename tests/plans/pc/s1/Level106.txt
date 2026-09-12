@@ -1,49 +1,47 @@
-# Level106 under the PC profile: the viewer rating pays each trick's score
-# plus 3 per angry tick, so these nine tricks' 76 need eight ticks — all
-# nine landing in one chain. His lap (~93 s): album [0] > candy [1] (its
-# spit sends him to the toilet) > pudding [2] > tub [3] (he fills it) >
-# album [4] > candy [5] > pudding [6] > tub [7] (the bath) > towel [8].
-# The kitchen walk-bys (the microwave, the soap) pay only on his [2]
-# visit — he comes to [6] from the bathroom, the other way — and the [5]
-# spit's rush to the toilet makes his routine skip [6] altogether, so the
-# chain is [2] to [8] of one lap: the kitchen at [2], the toilet walk-by
-# the picture on his way to the fill, the toilet at the fill [3], the
-# album [4], the candy [5], the hair at [7], the polish at [8]. The windows are
-# short and the gate would wait them out, so the arming is rushed by his
-# lap: the kitchen in the 28 s after his towel [8], the bathroom and
-# Zone02 after his [2] (the picture first — it pays on his kitchen ->
-# bathroom transit to the fill, the one hall crossing it sees), the hair
-# once he has left the full tub for [4]; between the raids Woody sits in the hall's
-# wardrobe — the hall is the hub every crossing of his goes through.
-take Drawer IT_Glue               # Zone01: Glue + Marker + Shoepolish
-take FirstAid IT_Foamballs        # Zone04: Foamballs + Hairrestorer
-take ToiletPaper IT_Wcpaper
-take SoapDish IT_Soap             # the one soap
-take Fridge IT_Egg                # Zone03
-take RubbishBinBottle IT_Emptybottle   # Zone03
-prime BathTub IT_Emptybottle      # the full tub fills the bottle: IT_Emptybottle -> IT_Fullbottle
-park Zone03                       # wait in the kitchen for his towel
-whenusing Towel                   # his towel [8]: the kitchen is free until his pudding [2] (~28 s)
-usewith! Microwave IT_Egg         # Zone03 walk-by, score 7
-usewith! Ground@Zone03 IT_Soap    # slip on the pudding walk, score 7
-usewith! Pudding IT_Fullbottle    # Zone03, pays at [2] PourMilk, score 8
-hide! Wardrobe                    # the hall's wardrobe: every one of his crossings goes through the hall (the hub)
-whenusing Pudding                 # his [2]: the bathroom (after the [1] rush) and Zone02 are free until his fill [3] and the album [4]
-usewith! MumPicture IT_Marker     # Zone01 walk-by (0.1), score 7 — right at the wardrobe; pays on his kitchen -> bathroom transit to the fill (~216), the only hall crossing the picture is on
-usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by, score 7 — pays at his fill [3]
-usewith! Towel IT_Shoepolish      # pays at [8] BathTowelPolish, score 12
-usewith! PhotoAlbum IT_Glue       # Zone02, pays at [4] PhotoAlbumSticky, score 8
-usewith! Candy IT_Foamballs       # Zone02, pays at [5] SpitRight, score 8 -> RushToToilet
+# Level106 under the PC profile (2026-09-17, the PC paces, the catch the room
+# alone). His lap (~50 s, the idle run under the profile): living (album,
+# candy) 0-21 > kitchen (pudding) 21-31 > hall 31-40 > bathroom (tub) 40-44 >
+# hall 44-47 > living 47-66 > kitchen 66-76 > hall 76-85 > bathroom (tub, the
+# towel) 85-97 > hall 97-101 > living 101-120 > ... The hall's wardrobe hides
+# Woody through his hall passes. Nine tricks: the bathroom first (3-22), the
+# hall (22-30), the kitchen while he sits in the living room (47-66), the towel
+# while he is in the kitchen (66-76), the living room while he is in the
+# kitchen and the hall (66-101), the tub and the pudding on his next lap.
+take! FirstAid IT_Foamballs          # Zone04 (6-10): Foamballs + Hairrestorer — straight in while he is in the living room
+take! ToiletPaper IT_Wcpaper         # Zone04
+usewith! Toilet IT_Wcpaper           # Zone04: Neutral, raw-Tricked walk-by, 7
+take! SoapDish IT_Soap               # Zone04: the one soap
+take! Drawer IT_Glue                 # Zone01 (~24): Glue + Marker + Shoepolish
+usewith! MumPicture IT_Marker        # Zone01 walk-by, 7
+hide! Wardrobe                       # Zone01 by 30: he crosses the hall 31-40 and 44-47
+whenzone Zone02                      # (47) he sits in the living room until 66: the kitchen
+take! Fridge IT_Egg                  # Zone03
+usewith! Microwave IT_Egg            # Zone03 walk-by, 7
+usewith! Ground@Zone03 IT_Soap       # Zone03: the slip on the pudding walk, 7
+take! RubbishBinBottle IT_Emptybottle   # Zone03
+park! Zone01                         # the hall before he comes to the kitchen (66)
+whenzone Zone03                      # (66) he makes the pudding until 76: the towel
+usewith! Towel IT_Shoepolish         # Zone04, 12: pays at [8] BathTowelPolish
+park! Zone01                         # out of the bathroom before he comes to the hall (76)
+hide! Wardrobe                       # he crosses the hall 76-85, bathes 85-97, crosses 97-101
+whenzone Zone04                      # (85) he bathes: the living room is free until 101
+usewith! PhotoAlbum IT_Glue          # Zone02, 8: pays at PhotoAlbumSticky
+usewith! Candy IT_Foamballs          # Zone02, 8: SpitRight -> RushToToilet
+park! Zone03                         # the kitchen: out of his way from the bathroom to the living room
+whenusing BathTub                    # his next BathTub station is the FILL (his lap runs fill, bath+towel, fill, ...): the tub is full after it
+whenzone Zone02                      # he is back in the living room: the bathroom is free for a lap
+prime! BathTub IT_Emptybottle        # Zone04: the full tub fills the bottle
+usewith! BathTub IT_Hairrestorer     # Zone04, 12: pays at his next bath
+hide! Wardrobe                       # he crosses the hall to the kitchen, bathes, and comes back
+whenzone Zone02                      # his next sit in the living room: the kitchen is free for ~19 s (his bath's 12 are too few for the trip)
+usewith! Pudding IT_Fullbottle       # Zone03, 8: pays at his next pudding
 hide! Wardrobe
-whenzone Zone02                   # he has left the full tub for the album [4]: the bathroom is free until the [5] rush (~20 s)
-usewith! BathTub IT_Hairrestorer  # in the full tub, pays at [7] BathHair, 12
-hide! Wardrobe                    # the rush passes; the spit's rush skips his pudding [6] — the bath and the towel follow at once
+await MumPicture 7
+await Toilet 7
 await Microwave 7
 await Ground@Zone03 7
-await Pudding 8
-await Toilet 7
+await Towel 12
 await PhotoAlbum 8
 await Candy 8
-await MumPicture 7
 await BathTub 12
-await Towel 12
+await Pudding 8
