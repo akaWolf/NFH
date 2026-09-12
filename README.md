@@ -135,7 +135,7 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   2026-09-17 — the walking speeds, the door pace, the catch on sight with
   no busy window — the plans were re-timed to the profile's own idle
   laps: 101/104/105/107 and nine Season 2 levels rate 100, 102/103/109/111
-  97, 112 94, 113 91, 202/205 90, and the crowded laps of 106/108/110
+  97, 112/114 94, 113 91, 202/205 90, and the crowded laps of 106/108/110
   (78-81), 207/209 (64) and 210 are still being re-planned — the PC's
   47-second lap of 110 leaves no window for one of its tricks. The
   mobile numbers do not move: the regression under `--profile=mobile`

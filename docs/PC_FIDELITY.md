@@ -310,8 +310,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 
 The 2026-09-17 state, under the PC walk, doors and catch rules and the
 re-timed plans: Season 1 — 101, 104, 105, 107 at 100; 102, 103, 109, 111
-at 97; 112 at 94; 113 at 91; 106 at 80, 108 at 81, 110 at 78 (won, a
-trick or the anger chain short); 114 in work. Season 2 — 201, 203, 204,
+at 97; 112 and 114 at 94; 113 at 91; 106 at 80, 108 at 81, 110 at 78
+(won, a trick or the anger chain short). Season 2 — 201, 203, 204,
 206, 208, 211, 212, 213, 214 at 100; 202, 205 at 90 (all coins, no
 overflow); 207, 209 at 64 (a trick each behind a window the PC rules
 close); 210 lost. The section below is the 2026-09-06 run.
