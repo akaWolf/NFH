@@ -33,6 +33,7 @@ decompile and one spec cover both. See `docs/BUILDS.md`.
 | `src/` | the decompiled game assemblies — generated, not stored (`src/README.md`) |
 | `docs/GAMEPLAY.md` | the behavioural spec, cited to source lines |
 | `docs/PC_FIDELITY.md`, `docs/PC_VS_MOBILE.md`, `docs/PC_LAPS.md` | what the PC original does differently, what the profile carries, the numbers |
+| `docs/PC_VERIFICATION.md` | the profile against the PC binaries, rule by rule: the function that decides each rule, the verdict, what is still open |
 | `docs/BUILDS.md`, `docs/BUNDLE.md` | which build is which; the desktop bundles |
 | `*.apk` `*.obb` `*.xapk` | the shipped artifacts (see `docs/BUILDS.md`) |
 
@@ -147,10 +148,15 @@ dialog, its code and its bar (the 80 read off the video is withdrawn)
 and falls by leveldata's `time` every 1/12 s (0.36 %/s), so 205 and
 210 pay every coin but no longer overflow on the port's neighbour (90;
 204 re-chained). The Season 2 scripts are read too
-(`docs/PC_ROUTINES.md`); the engine's frame pacer itself was not
-found in either game.exe — the 12 Hz stands on the clocks, the HUD's
-divisions by 12 and the mercury. `docs/GAMEPLAY.md` §10–§11 list what
-resists a clean reimplementation.
+(`docs/PC_ROUTINES.md`); the profile was then checked against the
+binaries rule by rule (`docs/PC_VERIFICATION.md`, 2026-09-16: the level's
+end, the catch, the Season 2 completion and respawn, the data) — the
+Season 1 result captions and the map's perfect mark (BRILLIANT! and
+perfect from a rating of 90, GFXEngine 0x1000e201) were the two rules
+found off and are carried since; still open there: the frame pacer, the
+Season 2 detection predicate, which Season 1 actions blind the
+neighbour. `docs/GAMEPLAY.md` §10–§11 list what resists a clean
+reimplementation.
 
 ## What makes this tractable
 

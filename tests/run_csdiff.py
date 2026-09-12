@@ -20,6 +20,10 @@ Covered so far:
 """
 import itertools, json, os, subprocess, sys, tempfile
 
+# the diff is against the MOBILE bytecode: the mobile-parity runtime, whatever
+# the process's default profile (runtime/pcprofile reads NFH_PROFILE live)
+os.environ['NFH_PROFILE'] = 'mobile'
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSDIFF = os.path.join(ROOT, 'tools', 'csdiff')
 sys.path.insert(0, os.path.join(ROOT, 'runtime'))

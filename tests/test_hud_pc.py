@@ -126,5 +126,25 @@ class Rage(unittest.TestCase):
         self.assertEqual(pcprofile.s2_rage_tick(0.01, 30), 0.0)
 
 
+
+class Result(unittest.TestCase):
+    """the Season 1 result captions of the PC game-over dialog
+    (pcprofile.s1_result): BRILLIANT! from 90, SUCCESS! below, TIME'S UP!
+    for a clock run out below the quota, FAILED! for a catch below it"""
+
+    def test_captions(self):
+        self.assertEqual(pcprofile.s1_result(True, False, 100), 'BRILLIANT!')
+        self.assertEqual(pcprofile.s1_result(True, False, 90), 'BRILLIANT!')
+        self.assertEqual(pcprofile.s1_result(True, False, 89), 'SUCCESS!')
+        self.assertEqual(pcprofile.s1_result(True, True, 55), 'SUCCESS!')
+        self.assertEqual(pcprofile.s1_result(False, True, 40), "TIME'S UP!")
+        self.assertEqual(pcprofile.s1_result(False, False, 40), 'FAILED!')
+
+    def test_perfect_threshold(self):
+        self.assertEqual(pcprofile.S1_PERFECT_RATING, 90)
+        self.assertTrue(pcprofile.s1_perfect(90))
+        self.assertFalse(pcprofile.s1_perfect(89))
+
+
 if __name__ == '__main__':
     unittest.main()

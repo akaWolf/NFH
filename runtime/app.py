@@ -32,6 +32,7 @@ from base import asset_root, data_root, levels_root, sdl_open
 from gui import Gfx, Text, adjust_rect, font_size
 from menu import (Menu, SceneData, ControlToggle, level_index,
                   load_strings)
+import pcprofile
 from prefs import Prefs
 from render import TextureCache
 from tutorial import build as build_tutorial
@@ -630,6 +631,10 @@ class App:
         g = w.game
         idx = level_index(self.level_season, self.igm.scene.scene)
         perfect = g.won and g.final_viewer_rating >= 100
+        if pcprofile.is_pc() and self.level_season == 1:
+            # the PC map's perfect episode: a viewer rating of 90 or more
+            # (game.exe fcn.00437de0, pcprofile.s1_perfect)
+            perfect = g.won and pcprofile.s1_perfect(g.final_viewer_rating)
         self.igm.progress.save_score(idx, g.completed,
                                      g.final_viewer_rating, g.won, perfect)
 

@@ -253,6 +253,18 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   first click), `World.blow_whistle()` — the targetless inventory use
   that wakes every alerter (the W key in the viewer, the `whistle` plan
   leg; the icon is the PC's own, cropped from the video).
+- Verified against the binaries (2026-09-16, `docs/PC_VERIFICATION.md`,
+  rule by rule with the addresses): the Season 1 level-end state machine
+  (fcn.00436bb0 — success at a rating of 100 or every trick, time's up
+  by minquota, a catch with the quota reached still a success), the
+  result captions of the game-over dialog (GFXEngine 0x1000e0f9: BRILLIANT!
+  from a rating of 90, SUCCESS!, TIME'S UP!, FAILED! — `pcprofile.s1_result`
+  under the profile, and the map's perfect episode at 90 — `s1_perfect`),
+  the catch's per-tick rule and cutscene, the Season 2 completion check
+  (fcn.10041086: every reachable trick, or coins ≥ mincoins on the
+  menu's exit), the catch fiber with its respawn 900 px above the start
+  spot, and the data (time limits, minquota, reachable/mincoins, trick
+  values, angrytime) — the open items are listed there.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

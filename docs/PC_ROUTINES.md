@@ -67,10 +67,14 @@ decided by that indicator alone — the scores and the neighbour's whereabouts p
 
 Two more facts of the same state: no Season 1 trick carries a `quota2`-`quota4` in
 tricks.xml (every trick pays once, as the mobile's OnTrickDone does), and the level's end is
-one code (0x440f2f: 0 = caught, `music/jingle_caught.mp3`; 1 = failed, `jingle_failed`; 2-3 =
-success) — Season 1 has no lives, a catch ends the level, where Season 2 starts every level
-with three (GameLogic.dll fcn.10044234, the status copy's +0x14 = 3) and takes one per catch
-(fcn.10042471).
+the state machine of fcn.00436bb0 (docs/PC_VERIFICATION.md, "The level's end"): 5 = success
+once the score reaches 100 or every reachable trick has fired, 4 = time's up below minquota
+(5 at or above it), 2 = caught after the beating unless the quota is already reached — then
+a 5 as well; the jingle table at 0x440f2f (0 and 2 `jingle_failed`, 1 `jingle_caught`,
+3 `jingle_success_normal`) is indexed by the dialog's outcome, and `jingle_success_perfect`
+is never played by the code. Season 1 has no lives, a catch ends the level, where Season 2
+starts every level with three (GameLogic.dll fcn.10044234, the status copy's +0x14 = 3) and
+takes one per catch (fcn.10042471).
 
 The tick is 12 Hz — not the 20 an earlier reading of the mercury suggested. Three things
 say so. leveldata.xml gives the bath `time="4320"` and its HUD clock starts at 6:00 (Badinfos'

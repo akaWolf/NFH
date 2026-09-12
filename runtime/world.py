@@ -2067,6 +2067,12 @@ class GameState:
             self.rating = 'PASSED'
         if nfh2 and pcprofile.is_pc() and self.won and angry_count_ticks >= 1:
             self.rating = 'COLLAPSE!'    # the PC board's title
+        if not nfh2 and pcprofile.is_pc():
+            # the PC's own captions (pcprofile.s1_result): BRILLIANT! from a
+            # viewer rating of 90, SUCCESS! below it, TIME'S UP! and FAILED!
+            # — the mobile's EXCELLENT/GOOD/PASSED bands are its own
+            self.rating = pcprofile.s1_result(self.won, self.time_up,
+                                              self.final_viewer_rating)
 
     def trick_done(self, score):
         """GameInfo.TrickDone (GameInfo.cs:467): Woody.PlayTrickDone leads"""

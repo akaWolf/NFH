@@ -167,3 +167,36 @@ S2_TICK_HZ = 12
 def s2_rage_tick(meter, decay_per_tick):
     """one 1/12 s tick of the Season 2 gauge: the meter less the decay, not below zero"""
     return max(0.0, meter - decay_per_tick / 1000.0)
+
+# The Season 1 result screen, read from the PC binaries (docs/PC_VERIFICATION.md
+# "The level's end"). The level state machine (game.exe fcn.00436bb0, run
+# every tick from fcn.00439cd0) ends a level with 5 = success once the score
+# reaches 100 or every reachable trick has fired (the check runs after each
+# trick's reaction, fcn.0045b470 -> fcn.0047bc90), with 4 = time's up when
+# the clock runs out below the level's minquota and 5 when at or above it,
+# and with 2 = caught after the beating (the level classes' last case sets
+# state 1) — unless the score already reaches minquota, which makes a catch
+# a 5 as well. The game-over dialog (GFXEngine.dll 0x1000e0f9-0x1000e2b1)
+# captions the success flag as `perfect` when the viewer rating is 90 or
+# more (0x1000e201: cmp [esp+0x70], 0x5a) and `success` below, the time-up
+# flag as `timeover` and everything else as `failed`; generic/strings.xml
+# spells them BRILLIANT!, SUCCESS!, TIME'S UP!, FAILED!. The same 90 marks
+# the episode `perfect` on the level map (fcn.00437de0 at 0x437ebe writes
+# the leveldata state 4 for a score of 90 or more, 3 for one at minquota).
+S1_PERFECT_RATING = 90
+S1_RESULT = {'brilliant': 'BRILLIANT!', 'success': 'SUCCESS!',
+             'timeover': "TIME'S UP!", 'failed': 'FAILED!'}
+
+
+def s1_perfect(rating):
+    """the PC's BRILLIANT / map-perfect threshold for a Season 1 rating"""
+    return int(rating) >= S1_PERFECT_RATING
+
+
+def s1_result(won, time_up, rating):
+    """the PC game-over caption for a Season 1 outcome (GFXEngine
+    0x1000e113-0x1000e2b1): the success flag first, then time's up, else
+    failed — a catch with the quota reached is a success (fcn.00436bb0)"""
+    if won:
+        return S1_RESULT['brilliant' if s1_perfect(rating) else 'success']
+    return S1_RESULT['timeover' if time_up else 'failed']
