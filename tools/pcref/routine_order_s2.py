@@ -16,9 +16,11 @@ Inputs: the radare2 listing of GameLogic.dll (default
 tools/pcref/exe/nfh2_gamelogic_globals.json, the level folders of
 canon.py. `TAILS=1` prints every branch of the step a chain stops at.
 
-Coverage (2026-09-16): the lap closes on 201, 203, 205, 206, 208, 211,
-213 (and 210 up to a self-arming step); 202, 204, 207, 209, 212, 214 stop
-at an event-driven step.
+Coverage (2026-09-16): the lap closes on 201, 203, 205, 206, 208, 209,
+211, 212, 213; 202, 204, 207 and 214 end at a step that polls an action
+(202: the neighbour's `waitsea` swim, 0x10022534) or an event callback
+and stores no next step; 210 re-arms its deck-chair step. radare2 prints
+known code addresses as `fcn.XXXXXXXX` — both spellings are read.
 """
 import re, json, bisect, collections, sys, os
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -45,9 +47,10 @@ def objname(k, n=40):
             nm = G2.get(m.group(0))
             if nm and str(nm) not in ACTORS and not str(nm).endswith('.wav') and not str(nm).endswith('.mp3'): return str(nm)
     return '?'
-def run_step(start, maxsteps=1500, flip=False):
+def run_step(start, maxsteps=1500, flip=False, objflags=None):
     """one step function from its body start: (labels, next step address or None)"""
-    k = at(start); seen = set(); seq = []; lastcall = None; pred = None; nxt = None; regs = {}; lastlocal = None
+    objflags = {} if objflags is None else objflags
+    k = at(start); seen = set(); seq = []; lastcall = None; pred = None; nxt = None; regs = {}; lastlocal = None; cont = None
     for _ in range(maxsteps):
         if k in seen: return seq, nxt
         seen.add(k); a, t = ins(k)
@@ -61,16 +64,25 @@ def run_step(start, maxsteps=1500, flip=False):
                     for kk in range(i0, i1):
                         mm = re.match(r'mov dword \[e[a-z]+ \+ 8\], (0x100[0-9a-f]{5})$', ins(kk)[1] or '')
                         if mm: nxt = int(mm.group(1), 16); break
+            if nxt is None and cont is not None: nxt = cont
             return seq, nxt
         m = re.match(r'mov dword \[e[a-z]+ \+ 8\], (0x100[0-9a-f]{5})$', t)
         if m: nxt = int(m.group(1), 16)
-        m = re.match(r'mov (e[a-z]x), (0x100[0-9a-f]{5})$', t)
+        m = re.match(r'mov (e[a-z]x), (?:0x|fcn\\.)(100[0-9a-f]{5})$', t)
         if m: regs[m.group(1)] = int(m.group(2), 16)
         m = re.match(r'mov dword \[e[a-z]+ \+ 8\], (e[a-z]x)$', t)
         if m and m.group(1) in regs: nxt = regs[m.group(1)]
-        if (m := re.match(r'cmp byte \[e[a-z]+ \+ 0x[0-9a-f]+\], (bl|0)$', t)): pred = 'true' if flip else 'false'; k += 1; continue
+        m = re.match(r'(?:mov dword \[e[a-z]+\]|push) (0x100[123][0-9a-f]{4})$', t)
+        if m and 0x10013000 <= int(m.group(1), 16) < 0x1003e000: cont = int(m.group(1), 16)
+        if (m := re.match(r'mov byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+)$', t)): objflags[m.group(1)] = int(m.group(2), 0)
+        if (m := re.match(r'inc byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\]$', t)): objflags[m.group(1)] = objflags.get(m.group(1), 0) + 1
+        if (m := re.match(r'cmp byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (bl|0)$', t)):
+            pred = 'true' if objflags.get(m.group(1), 0) else 'false'
+            if flip: pred = 'false' if pred == 'true' else 'true'
+            k += 1; continue
+        if (m := re.match(r'mov al, byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\]$', t)): lastcall = ('flag', 'true' if objflags.get(m.group(1), 0) else 'false')
         if 'call fcn.1000e7f2' in t:
-            pm = re.search(r'push (0x100[0-9a-f]{5})$', ins(k - 1)[1] or '')
+            pm = re.search(r'push (?:0x|fcn\\.)(100[0-9a-f]{5})$', ins(k - 1)[1] or '')
             if pm: nxt = int(pm.group(1), 16)
         m = re.match(r'call (fcn\.[0-9a-f]+)', t)
         if m:
@@ -82,7 +94,8 @@ def run_step(start, maxsteps=1500, flip=False):
             if 0x10013000 <= int(fn[4:], 16) < 0x1003d000: lastlocal = fn
             k += 1; continue
         if t == 'test al, al' or re.match(r'cmp al, (bl|0)$', t):
-            pred = 'false' if lastcall in NATFALSE else 'true'
+            if isinstance(lastcall, tuple): pred = lastcall[1]
+            else: pred = 'false' if lastcall in NATFALSE else 'true'
             if flip and lastcall not in NATFALSE: pred = 'false' if pred == 'true' else 'true'
             k += 1; continue
         m = re.match(r'jmp (0x[0-9a-f]+)', t)
@@ -105,7 +118,7 @@ def explore_step(start, forced, maxsteps=1500):
         if t.startswith('ret'): return seq, nxt, dec
         m = re.match(r'mov dword \[e[a-z]+ \+ 8\], (0x100[0-9a-f]{5})$', t)
         if m: nxt = int(m.group(1), 16)
-        m = re.match(r'mov (e[a-z]x), (0x100[0-9a-f]{5})$', t)
+        m = re.match(r'mov (e[a-z]x), (?:0x|fcn\\.)(100[0-9a-f]{5})$', t)
         if m: regs[m.group(1)] = int(m.group(2), 16)
         m = re.match(r'mov dword \[e[a-z]+ \+ 8\], (e[a-z]x)$', t)
         if m and m.group(1) in regs: nxt = regs[m.group(1)]
@@ -140,14 +153,19 @@ def all_nexts(start, maxpaths=40):
         for i2 in range(len(forced), len(dec)): frontier.append(forced + [False] * (i2 - len(forced)) + [True])
     return out
 def walk(start, maxsteps=200):
-    seq = []; steps = {}; cur = start; walk.visited = []
+    seq = []; steps = {}; cur = start; walk.visited = []; objflags = {}
     for _ in range(maxsteps):
-        if cur in steps: return seq, ('loop', steps[cur])
-        steps[cur] = len(seq); walk.visited.append(cur)
-        labels, nxt = run_step(cur)
-        if nxt == cur:
-            l2, n2 = run_step(cur, flip=True)
+        key = (cur, tuple(sorted(objflags.items())))
+        if key in steps: return seq, ('loop', steps[key])
+        steps[key] = len(seq); walk.visited.append(cur)
+        before = dict(objflags)
+        labels, nxt = run_step(cur, objflags=objflags)
+        if nxt == cur or nxt is None:
+            l2, n2 = run_step(cur, flip=True, objflags=dict(objflags))
             if n2 is not None and n2 != cur: labels, nxt = l2 + ['POLL'], n2
+        if nxt is None and objflags != before:
+            l2, n2 = run_step(cur, objflags=objflags)   # re-entry with the flags the step set
+            if n2 is not None: labels, nxt = labels + l2, n2
         seq += labels
         if nxt is None: return seq, ('end', None)
         cur = nxt
