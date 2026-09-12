@@ -144,8 +144,10 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   room-pointer catch sets, the 97s a second or two of his lap, the 94s
   and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 212 and
   213 at 90 — the PC's station stays, compound coins and coin ticks are
-  carried (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
-  coins"), and 210 overflows among the 100s; the coin ticks decay each
+  carried on every episode since 2026-09-18 (`docs/PC_FIDELITY.md`
+  "Season 2 station durations" / "compound coins"; 214's lap is a
+  neighbour-Mother handshake and keeps the mobile pace, its coin tick
+  carried), and 210 overflows among the 100s; the coin ticks decay each
   coin from partway into its action, leaving 212 and 213 one coin short
   of the overflow on the three-catcher floors. The mobile numbers do not
   move: the regression under

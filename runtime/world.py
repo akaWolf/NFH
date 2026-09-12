@@ -5648,6 +5648,13 @@ class World:
                 overflow = item.pc_overflow
                 item.pc_credited = False
             else:
+                # the tantrum before the record's tick (a use shorter than
+                # the PC action's — no PC stay written for the station):
+                # credit now and drop the pending credit, or the coin
+                # would pay twice
+                if self.pc_credits:
+                    self.pc_credits = [c for c in self.pc_credits
+                                       if c[2] is not item]
                 overflow = self._s2_credit(pawn, item)
             # cs:664 divides by Item.AngerAmount raw: a 0 gives Infinity/NaN
             # in C# float math (neither <= 1 nor <= 2), never the 20 default

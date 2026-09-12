@@ -293,6 +293,28 @@ helpers.
   routine items of 210-213 from the PC videos' bubble spans less the walk
   (tools/pcref/pc_durations_s2.py; docs/PC_FIDELITY.md "Season 2 station
   durations").
+- Carried on 2026-09-18: the Season 2 station stays and coin ticks on
+  every episode (PCUseSeconds/PCCoinTicks in levels/pc, tools/pcref/
+  pc_durations_s2.py and coins.py) except 214's, whose lap is a
+  neighbour-Mother handshake (mother_sleep from his pistol sequence,
+  mother_sit releasing his WaitWatch — the Level214 behaviour cs:62-65,
+  130-147): under the PC stays the two wait for each other for good, and
+  the PC's Mother script is unread, so its stations keep the mobile pace;
+  a coin credit due past the use's end is paid by the tantrum once
+  (World.play_angry drops the pending credit).
+- Read on 2026-09-18, the last candidate for the Season 2 catch trigger:
+  slot 4 of the level classes' vtables (0x100b1548 the base, written by
+  the constructor at 0x100430bf and used by the level constructors
+  fcn.10044bb5/fcn.10044ce6; 0x100b1628 the derived, at 0x10044e94) is
+  fcn.10043253(nameA, nameB, key): it resolves A and B in the level's
+  object table (+0x10, fcn.1004ba02/fcn.1004bb0d), requires A's +0x14
+  flags & 2 (fcn.100450dc is `flags & arg`), lists B's entries
+  (fcn.1004ccdb) and calls virtual slot 1 of the entry whose +0xc name
+  equals `key` (fcn.100585c0) — a by-name dispatch gated on the mode
+  bit, not the watch objects' creation (fcn.1003cc45 on the match is an
+  accessor). What sets flag 2 on an actor and what creates the watch
+  entries remain unread; the profile's Season 2 keeps the mobile
+  predicates.
 - `tests/run_tricks.py` (2026-09-18): `whenin <Role> <ZoneName>` waits
   for a pawn to stand in a zone (213's Mother in Zone02); the PC dodge
   trusts the gate on a walk into the leg's own zone (212's cigar box) —

@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim — the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. PC data (cn_b1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Rake 20 (rake_ground), Submarine 35 (shark), EelBox 30 (bridge_electrify); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim — the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. PC data (cn_b1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Rake 20 (rake_ground), Submarine 35 (shark), EelBox 30 (bridge_electrify); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit. Coin ticks (tools/pcref/coins.py --write-ticks): PCCoinTicks = the earliest `<trick time=>` of the records the item leads to, the tick into the action at which GameLogic credits the coin.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -35,9 +35,31 @@
    "object": "BeerMat",
    "component": "TrickItem",
    "set": {
-    "AngerAmount": 20
+    "AngerAmount": 20,
+    "PCCoinTicks": 21
    },
    "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
+  },
+  {
+   "object": "BeerMat",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 0.5
+   }
+  },
+  {
+   "object": "Swimming",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 10.2
+   }
+  },
+  {
+   "object": "BridgeRail",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 26.0
+   }
   }
  ]
 }

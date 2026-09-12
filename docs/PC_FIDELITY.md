@@ -754,16 +754,35 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   through the walk where the spans touch; an unlabelled gap before a span
   is walk outside it — tools/pcref/pc_durations_s2.py), and the profile
   plays the mobile use clips at the pace that lasts it (PCUseSeconds, the
-  Season 1 mechanism) on the four episodes whose natural laps sat more
-  than 15 % off the PC's: 210 (the deck chair 10.5 s for the mobile's
+  Season 1 mechanism) — first (2026-09-17) on the four episodes whose
+  natural laps sat more than 15 % off the PC's: 210 (the deck chair 10.5 s for the mobile's
   50-s sleep, the shop 11.7, the elephant 8.0, the basket put 13.7 — a lap
   of ~90 s for the PC's 102-120), 211 (the boat 17.3, the jacket 10.2, the
   rod 8.2, the gear 7.0, the sweets 0.5), 212 (the throne 2.9 + 7.0, the
   whip 6.7, the cigars 14.0, the bull 19.0, the ledge 5.3 + 9.9) and 213
   (the bull 3.5, the plant 12.8, the tortilla 4.0, the boat 21.5, the
   pinata 12.5, the bull ride 0.9 + 8.2 + 1.1, the cement 28.5 — 135 s for
-  the PC's 136). The other episodes' laps were already within the
-  tolerance (docs/PC_LAPS.md) and keep the mobile clips' own lengths.
+  the PC's 136), and since 2026-09-18 on every Season 2 episode (the
+  canon rule: the PC profile carries the PC's trick logic and timing
+  wherever the data gives it), 202-209 and 214 included — with the coin
+  ticks of their records (the "compound coins" entry). Three rules of the
+  pairing: a PC bubble the port has no station for is skipped (214's
+  CaptainWheel — the door's stay is the mobile's), a port visit the PC
+  never makes keeps the mobile length as a leading 0 in the per-visit
+  list (209's first shoe: the PC does the Taj before the shoes, so the
+  Taj span is the Taj's alone, 10 s, and the shoe span the second
+  visit's, 2 s), and a lap that is a two-actor handshake keeps the
+  mobile pace as a whole (214: his pistol sequence fires mother_sleep,
+  the Mother's sit fires mother_sit and releases his WaitWatch at the
+  second pistol — the Level214 behaviour, cs:62-65 and 130-147; with the
+  PC stays he reaches the pistol after her sit and the two wait for each
+  other for good, and the PC's Mother script is unread — so 214 carries
+  its coin tick only). A coin whose record tick
+  falls past the use's end (no PC stay for the station) is credited by
+  the tantrum and its pending credit dropped, or it would pay twice.
+  Under the carry 202-209 rate 100 as before (209 once the Taj/shoe
+  pairing was the PC's order; a Taj of 3.2 s had him turn on Woody at
+  the shoe).
   Under the stays and the coin ticks 210 and 211 rate 100 (211's boat
   coin now lands 21 ticks into his boat and tops the bar at 241 s). 212
   (the mobile plan under the profile) and 213 (a PC plan of its own,

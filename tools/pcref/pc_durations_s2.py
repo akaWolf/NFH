@@ -27,16 +27,27 @@ ALIAS = {
     'TableTennis': ['TabbleTennis'],
     'WaterSkis': ['WaterSkiis', 'WaterSkiis'],
     'DeckChair(mum)': ['DeckChair'],
-    'CaptainWheel': ['CaptainDoor'],
 }
 PER_LEVEL = {
     213: {'MechanicalBull': ['MechanicalBullControls', 'MechanicalBullControlsWait', 'MechanicalBullControls']},
     212: {'AztecThrone': ['PreAztecThrone', 'AztecThrone'], 'ParrotLedge': ['PreParrotLedge', 'ParrotLedge']},
-    209: {'TadjMahal': ['HotShoe', 'TadjMahal'], 'HotShoe': ['HotShoe']},
+    # the PC does the Taj before the shoes (no first shoe visit): the Taj span
+    # is the Taj's alone, the shoe span the second shoe visit's
+    209: {'TadjMahal': ['TadjMahal'], 'HotShoe': ['HotShoe']},
     210: {'DogBasket#2': ['DogBasketPut']},
 }
 SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake'}   # other actors' icons, a walk-by without a use
+# stations kept at the mobile pace per level: 214's lap is a neighbour-Mother
+# handshake timed as a whole (his pistol sequence fires mother_sleep, her sit
+# fires mother_sit and releases his WaitWatch at the second pistol,
+# Level214 behaviour cs:62-65/130-147): with the PC stays he reaches the pistol
+# after her sit and both wait for each other for good; the PC's Mother script
+# is unread, so the whole lap stays the mobile's
+SKIP_LEVEL = {214: {'Shower', 'Bouquet', 'CaptainWheel', 'Pistol', 'Hatch'}}
 MIN_STAY = 0.5
+# visits of the port's lap the PC never makes (209's first shoe: the PC does the
+# Taj before the shoes) keep the mobile length — written as a leading 0
+LEAD_MOBILE = {209: {'HotShoe': 1}}
 
 
 def pc_spans(n):
@@ -85,7 +96,7 @@ def pair(n):
     for name, a, b in spans:
         gap = (a - prev_end) if prev_end is not None else 0
         prev_end = b
-        if name in SKIP:
+        if name in SKIP or name in SKIP_LEVEL.get(n, ()):
             continue
         occ[name] = occ.get(name, 0) + 1
         group = alias.get('%s#%d' % (name, occ[name]), alias.get(name, [name]))
@@ -132,11 +143,12 @@ def main(argv):
         stays = sum(v for vals in per.values() for v in vals)
         lap = port_lap(n); walks = sum(v['walk'] for v in lap)
         print('   sum of stays %.1f + the port lap\'s walks %.1f = %.1f s' % (stays, walks, stays + walks))
-        if write and per:
+        if write:      # (a level with nothing to carry loses its stale patches too)
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
             ov['patches'] = [e for e in ov.get('patches', []) if 'PCUseSeconds' not in (e.get('set') or {})]
             for item, vals in per.items():
+                vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 ov['patches'].append({'object': item, 'component': 'TrickItem',
                                       'set': {'PCUseSeconds': vals if len(vals) > 1 else vals[0]}})
             note = ' Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit.'

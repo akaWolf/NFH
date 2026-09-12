@@ -1,11 +1,55 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E07 Mummy's Darling: +19 the board (123 s), +25 the elephant (170), +25 the shell (193), +25 and +25 the castle with its towel (221, 225), +32 at the full bar in his second elephant visit — the awning (239), +12 on the full bar (279). PC data (in_b1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E07 Mummy's Darling: +19 the board (123 s), +25 the elephant (170), +25 the shell (193), +25 and +25 the castle with its towel (221, 225), +32 at the full bar in his second elephant visit — the awning (239), +12 on the full bar (279). PC data (in_b1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit. Coin ticks (tools/pcref/coins.py --write-ticks): PCCoinTicks = the earliest `<trick time=>` of the records the item leads to, the tick into the action at which GameLogic credits the coin.",
  "patches": [
   {
    "object": "Rottweiler2",
    "component": "Rottweiler",
    "set": {
     "PCRageDecay": 30
+   }
+  },
+  {
+   "object": "PoolBoard",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 8.8,
+    "PCCoinTicks": 20
+   }
+  },
+  {
+   "object": "Bartender",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 12.5
+   }
+  },
+  {
+   "object": "Elephant",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 10.8
+   }
+  },
+  {
+   "object": "Shell",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 13.2
+   }
+  },
+  {
+   "object": "SandCastle",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 11.5
+   }
+  },
+  {
+   "object": "BeachTowel",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.2,
+    "PCCoinTicks": 5
    }
   }
  ]

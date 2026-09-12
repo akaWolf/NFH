@@ -53,7 +53,7 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   thermometer's drain in 1/20 s; Season 2 `rage` per trick = the mobile
   AngerAmount but on eight items, and the gauge is 80 000 rage long. The
   amounts.py readings (all 1.25× the data) are superseded by it.
-- `pc_durations_s2.py [--write] <level ...>`: the Season 2 neighbour's station stays from the PC videos' bubble spans (docs/PC_LAPS_DETAIL.md, the first lap) less the walk the profile's neighbour takes to each station (runs/idlepc2s2), into the overlays as PCUseSeconds per visit.
+- `pc_durations_s2.py [--write] <level ...>`: the Season 2 neighbour's station stays from the PC videos' bubble spans (docs/PC_LAPS_DETAIL.md, the first lap) less the walk the profile's neighbour takes to each station (runs/idlepc2s2), into the overlays as PCUseSeconds per visit. Written for every Season 2 level (2026-09-18); the aliases pair PC bubble names with the port's uses in order, a port visit the PC never makes (209's first shoe: the PC does the Taj before the shoes) keeps the mobile length as a leading 0, and a level whose lap is a two-actor handshake (214: the Mother's sit releases his pistol wait) is skipped whole.
 - `coins.py [--write-ticks] <level ...>`: the Season 2 coin tricks of the profile's plan against the PC records (`--write-ticks` writes PCCoinTicks, the record's tick into the action) — the mobile item's inventory → the PC combination → the variant object → the `<trick name=...>` records of its actions and their tricks.xml rage (GameLogic.dll credits each named record once, fcn.1000140b).
 - `canon.py <level ...>`: the PC canon per level next to the mobile's data —
   tricks and values, recipes, containers, walk-by triggers, rooms, the
