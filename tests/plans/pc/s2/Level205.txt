@@ -1,4 +1,4 @@
-# Level205 under the PC profile (v2, 2026-09-17: the profile's Season 2 paces).
+# Level205 under the PC profile (v3, 2026-09-17: the profile's Season 2 paces).
 # His lap (~96 s, runs/idlepc2s2): the mat and the table tennis (Zone02, 0-35:
 # tennis 22), the water skis (Zone01, 35-71: 38), the chef (Zone04, 71-83:
 # 73), the rockets and the sand sculpture (Zone01, 83-106: 86, 91.5), Zone02
@@ -6,9 +6,10 @@
 # (181.5), the sculpture (187.5), the tennis (212) ... The gauge is 100 000
 # rage and falls 0.36 % a second (pcprofile.s2_rage_tick); the five coins —
 # the tennis 25, the skis 30, the chef 40, the rockets 30, the sculpture 20 —
-# overflow only inside one lap: the tennis (117) -> the skis (133.5) -> the
-# chef (168) -> the rockets (181.5) reads 25, 49, 77, 102, the sculpture on
-# top. Each trick is armed after its lap-1 visit and before its lap-2 one:
+# overflow only inside one lap, and each coin's own anger stretches the lap:
+# with the tennis first (v2) the five read 25, 40, 65, 87 and 99.97 at the
+# sculpture — three hundredths short; so the tennis is armed after his lap-2
+# tennis and lands last, after the sculpture (~90 -> 108). Each trick is armed after its lap-1 visit and before its lap-2 one:
 # the tennis once he has left Zone02 (35), the skis, the rockets and the
 # sculpture during his lap-2 Zone02 stay (106-130), the eels once he is back
 # in Zone01 (131, before the chef at 168). The earlier version armed
@@ -22,12 +23,11 @@ usewith LionStatue IT2_Bangers    # Zone03: the statue must be tricked before it
 take Glasses IT2_Glasses          # RequirePriming, PrimingItem LionStatue
 prime LionStatue IT2_Glasses      # -> IT2_Lionhead
 take Anchor IT2_Rope
-usewith TabbleTennis IT2_Egg      # Zone02 (he is away 35-106): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-2 tennis (117)
 whenzone Zone02                   # (106) his lap-2 mat and tennis: Zone01's three
 usewith! WaterSkiis IT2_Tools     # Zone01: Primed at load, RottweilerUseTogglesPrime, no RequirePriming — 30 at 133.5
 usewith! Rockets IT2_Rope         # Zone01: action [5] — 30 at 181.5
 usewith! SandSculpture IT2_Lionhead   # Zone01: action [6] — 20 at 187.5
-whenzone Zone01                   # (131) he is back: the eels in Zone04
+usewith TabbleTennis IT2_Egg      # Zone02 once he has left it (130.7): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-3 tennis (~212), the coin AFTER the sculpture
 usewith Eals IT2_Tube             # Zone04: SetTrickedOnItem -> Chef — 40 at 168
 await TabbleTennis 0
 await WaterSkiis 0

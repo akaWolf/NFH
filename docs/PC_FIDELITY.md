@@ -323,19 +323,28 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   has none either (his 9 s barbecue is shorter than the climb, 78); 111's
   airer, primed by his own balcony use and un-primed by the next, is dropped
   and its errands split over his descents (70). Every other Season 1 level
-  is re-timed to runs/idlepc4's laps and won: 101/107 100, 102/105 97,
-  103/104/112/114 94, 108/113 91, 109 88 (its first sleep is a second
-  short for the keys, which wait for the second). The 100 on a Season 1
-  level is the score plus 3 per trick that lands while he is still angry
-  (World.calculate_score under the profile): the 91-97 are one to three
-  tricks landing on a cold meter. Season 2 (the mobile predicates): ten
-  levels at 100 — 209 among them, its hot shoe used inside his Taj Mahal
-  stay, where the mobile predicate is blind — 202 and 205 at 90 with their
-  coins re-armed into one lap (202: the rail from the ring's far side, the
-  mat and the rake from Zone01) but no overflow yet: each coin's own anger
-  stretches the lap, and 202's 30 + 20 + 20 + 50 read 95 at the rail;
-  207 64 (the awning behind the Mother's pool naps) and 210 (the pool legs
-  behind her looks and his 90 s lap) still open.
+  is re-timed to runs/idlepc4's laps and won: 101/102/107 100, 103/104/105
+  97, 112/114 94, 108/113 91, 109 88 (its first sleep is a second short for
+  the keys, which wait for the second). The 100 on a Season 1 level is the
+  score plus 3 per trick that lands while he is still angry
+  (World.calculate_score under the profile; the run's rating.json lists
+  every payment with its hot/cold mark): a trick's window is the level's
+  angrytime plus the 60 ticks of hold (18-28 s) and his own tantrum after
+  each trick stretches the lap by ~10 s, so the chains are set by the
+  stations' order — 102 chains its six once the television is armed on the
+  loo trip; 103, 104 and 105 keep one cold trick by a second or two (the
+  kitchen three a lap after the mailbox rush, the dirty microwave 26 s after
+  the cream at the eat, the phone answered 23 s after the loo); 112 and 114
+  spread ten and nine tricks over laps of 143 and 168 s. Season 2 (the
+  mobile predicates): thirteen levels at 100 — 209 with its hot shoe used
+  inside his Taj Mahal stay, where the mobile predicate is blind; 202 with
+  the PC coins of cn_b1's tricks.xml (the mat 20, the shark 35 on the
+  Swimming item, the rake 20 — two overlay patches had missed their
+  items) and its four coins in one lap, armed from the ring's far side;
+  205 with the tennis armed after his lap-2 tennis so it lands last; 207
+  with the awning on his lap-3 bar visit from the beach side. 210 is still
+  lost: the pool is the Mother's, who sleeps 19 s and looks around 15 s in
+  turn and wakes to a runner, and his own pool visits fall into the naps.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

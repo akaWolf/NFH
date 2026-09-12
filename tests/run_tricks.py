@@ -155,6 +155,7 @@ class Driver(Recorder):
             src = g
         out = {'completed': g.completed, 'total': g.total,
                'score': g.final_trick_score, 'ticks': ticks,
+               'pays': list(getattr(w, 'pay_log', [])),
                'rating': rating, 'won': bool(won),
                'perfect': bool(won and rating >= 100), 'end': end,
                't': round(self.t, 1)}

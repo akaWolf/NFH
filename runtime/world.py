@@ -2726,6 +2726,12 @@ class Routine:
     def _use(self):
         it = self.item
         a = self.action
+        if os.environ.get('NFH_ROUTINE_LOG'):
+            print('routine %s t=%.1f use start item=%s tricked=%s state=%s override=%s anim=%s' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), getattr(it, 'name', None),
+                it.is_tricked(self.level.items) if it is not None else None, self.state,
+                (self.level.items.get(self._override['item']).name if self._override and self._override.get('item') is not None and self.level.items.get(self._override['item']) else None),
+                self.pawn.anim.anim.name), file=sys.stderr)
         if it is None:
             self._pending = 'advance'; self.state = self.IDLE; return
         if self.routine_behavior is not None:
@@ -3041,6 +3047,9 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         pc = self._pc_use_seconds(it)
+        if os.environ.get('NFH_ROUTINE_LOG'):
+            print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc), file=sys.stderr)
         if seq:
             if pc:
                 # the PC station lasts its DoActions' ticks (levels/pc overlays,
@@ -5264,6 +5273,7 @@ class World:
         self.music_bank = music
         self.sound_sink = sound_sink
         self._last_input_time = 0.0      # Woody.LastInputTime
+        self.pay_log = []                # (t, item, points, hot) per paid trick under the profile
         self._entrance_hello = False
         self._open_furniture = []        # SearchItem.CloseTime holders
         self.snap_request = None         # HUD face clicks -> CameraMover
@@ -5522,6 +5532,9 @@ class World:
             # on an empty meter and AngryEasyDown before AngryHard on a hot one
             points = self._would_pay(item)
             bonus = points > 0 and pawn.rage_current > 0
+            if points > 0:
+                # the profile's payment record (the harness reads it for the chains)
+                self.pay_log.append((round(self.time, 2), item.name, points, bool(bonus)))
             if bonus:
                 pawn.angry_count_ticks += 1
                 self._on_compound_trick_done(item)   # the mobile's arm (cs:608)

@@ -17,11 +17,12 @@
    "note": "the rake's component is the Rake subclass (scene.py), not a plain TrickItem — the patch matched nothing until 2026-09-17"
   },
   {
-   "object": "Submarine",
+   "object": "Swimming",
    "component": "TrickItem",
    "set": {
     "AngerAmount": 35
-   }
+   },
+   "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"
   },
   {
    "object": "EelBox",
@@ -29,6 +30,14 @@
    "set": {
     "AngerAmount": 30
    }
+  },
+  {
+   "object": "BeerMat",
+   "component": "TrickItem",
+   "set": {
+    "AngerAmount": 20
+   },
+   "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
   }
  ]
 }

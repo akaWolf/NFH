@@ -1752,14 +1752,6 @@ the level selection menu, LevelLoader, not modelled).
   ~0.1 s window under perfect input), L206's Weights/DynamiteBox (Zone04
   sealed by the awake Mother's infinite poses); the level's TotalTricksCount
   counts them, the win comes at WinningTricksCount.
-- Open (2026-09-17, the PC profile's plans): a RoutineActionSurpriseNear that
-  lands on the doorstep of a still-tricked item — Level109's banana slip at
-  the nitro'd PigMilk's use spot, the walk ending and the slip starting on
-  the same frame — leaves the manager in USING with no sequence and no
-  timer once the slip's `urgent end` restarts the original action (three
-  runs, the stall at 54-60 s each time; without the trick on the milk the
-  same slip resumes normally). The plans lay that banana after the nitro
-  has gone off; the original's own handling of the collision is unread.
 
 ## The menus and the flow (runtime/app.py, runtime/menu.py)
 

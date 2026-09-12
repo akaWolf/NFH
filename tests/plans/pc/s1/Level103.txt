@@ -1,4 +1,4 @@
-# Level103 under the PC profile: the viewer rating pays each trick's score
+# Level103 under the PC profile (v3, 2026-09-17: the picture on the rush; the kitchen three pay a lap after the rush — its loo trip and the walk back are 43 s, past any window — so 97 is this lap's ceiling): the viewer rating pays each trick's score
 # plus 3 per angry tick, so these six tricks' 85 need five ticks — every
 # trick but the first landing while his anger indicator is up. The PC's
 # indicator (game.exe, docs/PC_ROUTINES.md): a trick sets it to the level's
@@ -15,9 +15,9 @@ take Drawer IT_Boom               # Boom + Marker + Mousetrap in one take
 take ToiletPaper IT_Wcpaper       # Zone04
 usewith Toilet IT_Wcpaper         # Neutral: pays only raw-Tricked, on the first-aid rush walk-by, score 10
 take SoapDish IT_Soap             # the one soap
+usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 10: armed before the rush, it pays on the rush itself, a second after the mailbox (v3; armed after it, it paid on the walk back, 21 s after the toilet — a second past the 20 s window)
 usewith LetterBox IT_Mousetrap    # Zone01, score 20 -> RushToToilet (the FirstAid)
 whenzone Zone04                   # the rush has reached the first-aid kit (~76): the hall is his again at ~91, the kitchen at ~102
-usewith! MumPicture IT_Marker     # Zone01, NoticeWhenWalkNearby (0.1), score 10: pays on his walk back (~95)
 take! Fridge IT_Egg               # Zone03: the kitchen is nobody's until ~102
 usewith! Candle IT_Boom           # Zone03, UseAtOtherPlace: explodes at the cake's use visit, score 25
 usewith! Ground@Zone03 IT_Soap    # Zone03, CauseSlip, score 10 (Ground@Zone04 is the alternative)

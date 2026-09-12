@@ -1,4 +1,4 @@
-# Level110 under the PC profile (v12: the bedroom banana on his lap-3 barbecue, from the hall into the bed)
+# Level110 under the PC profile (v13: the bedroom banana dropped — no window, see the last park)
 # Level110 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
 # Woody 2.1, the doors a frame a tick, the catch the room alone). His lap (47 s,
 # the idle run under the profile): living 6-10 > kitchen (meat) 10-17 > living
@@ -31,15 +31,9 @@ park! Zone01                         # the hall before his meat (104): off his l
 whenusing Beer                       # his next barbecue (~124): the living room is free until he comes down (~140)
 usewith! SteakWine IT_Vinegar        # Zone02, 15: at his next wine
 park! Zone03                         # out through the kitchen door before he comes down
-park! Zone01                         # the hall: off his lap while he eats and fetches the meat
-whenzone Zone06                      # his crossing to the barbecue (8 s): the living room, next to the back door
-park! Zone02
-whenzone Zone07                      # his barbecue (9-12 s): up the back door, the banana on the floor, into the bed
-usewith! Ground@Zone06 IT_Banana     # Zone06, 10: he slips crossing the bedroom on his way down
-hide! Bed                            # the awaits from inside it
+park! Zone01                         # the hall: off his lap. The bedroom floor's banana (10) has no window under the profile: his barbecue lasts 9 s once the spray has paid, the climb to the bedroom from the living room 8 — two tries (v11, v12) ended in the door as he came down
 await BBQ 20
 await FireExtinguisher 15
 await CarnivorPlantSpray 15
 await SteakChair 10
 await SteakWine 15
-await Ground@Zone06 10

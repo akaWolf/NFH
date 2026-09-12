@@ -139,31 +139,30 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   on sight with no busy window, the stations' durations — the profile's
   idle laps sit within 10 % of the lap model on every level it covers
   (docs/PC_LAPS.md) and the plans were re-timed to them: every Season 1
-  level is won (101/107 100, 102/105 97, 103/104/112/114 94, 108/113 91,
+  level is won (101/102/107 100, 103/104/105 97, 112/114 94, 108/113 91,
   109 88, 110 78, 106 77, 111 70 — the last three at ceilings the
-  room-pointer catch sets, `docs/PC_FIDELITY.md` §7) and ten Season 2
-  levels rate 100 (205 90, 207 64, 210 open). The mobile numbers do not
-  move: the regression under `--profile=mobile` is byte-identical.
+  room-pointer catch sets, the 97s a second or two of his lap,
+  `docs/PC_FIDELITY.md` §7) and thirteen Season 2 levels rate 100 (210
+  open). The mobile numbers do not move: the regression under
+  `--profile=mobile` is byte-identical.
 
-Open: three natural laps still differ from the PC's by more than 15 %
-(111, 213, 210 — the neighbour's routine is compiled into game.exe, one
-class per level, not data); the PC's Season 1 anger rule is read from
-game.exe and carried (a trick sets the indicator to its `angrytime`, 60
-ticks of hold, then one per tick at 12 Hz; +3 while it is above zero —
-`docs/PC_ROUTINES.md`); the Season 2 gauge is 100 000 rage long by its
-dialog, its code and its bar (the 80 read off the video is withdrawn)
-and falls by leveldata's `time` every 1/12 s (0.36 %/s), so 205 and
-210 pay every coin but no longer overflow on the port's neighbour (90;
-204 re-chained). The Season 2 scripts are read too
-(`docs/PC_ROUTINES.md`); the profile was then checked against the
-binaries rule by rule (`docs/PC_VERIFICATION.md`, 2026-09-16: the level's
-end, the catch, the Season 2 completion and respawn, the data) — the
-Season 1 result captions and the map's perfect mark (BRILLIANT! and
-perfect from a rating of 90, GFXEngine 0x1000e201) were the two rules
-found off and are carried since; still open there: the frame pacer, the
-Season 2 detection predicate, which Season 1 actions blind the
-neighbour. `docs/GAMEPLAY.md` §10–§11 list what resists a clean
-reimplementation.
+Open: the Season 2 catch on PC — the watch predicate's modes are read
+(the same room, the same room and floor with a vertical distance below
+15, always; the hideout flag exempts; no sneaking or busy term), but the
+entry that reaches each level class's `fight` handler sits behind the
+class's vtable and is unread, so the profile's Season 2 keeps the mobile
+predicates (`docs/PC_VERIFICATION.md`); the frame pacer of game.exe (the
+level tick at 12 Hz is measured off the HUD clock, its scheduler is not
+located); 210 under the profile (the pool is the Mother's, asleep 19 s and
+looking 15 s in turn); and the ceilings the room-pointer catch sets on
+106, 110 and 111. Three natural laps differ from the PC's by more than
+15 % (111, 213, 210 — the neighbour's routine is compiled into game.exe,
+one class per level, not data); the Season 2 gauge is 100 000 rage long
+and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the coins are
+the levels' tricks.xml rage values. The Season 1 anger rule, the result
+captions and the map's perfect mark are read from the binaries and
+carried (`docs/PC_ROUTINES.md`, `docs/PC_VERIFICATION.md`).
+`docs/GAMEPLAY.md` §10–§11 list what resists a clean reimplementation.
 
 ## What makes this tractable
 

@@ -25,7 +25,7 @@ usewith! CornChips IT_Chips          # Zone03: fed to the dog at Chili (91; the 
 take! PinsBoard IT_Pins              # Zone01, before he comes down (45)
 hide! Wardrobe                       # Zone01: wait out his first descent in the hall's wardrobe (the entrance zone is the exit door's, no park there)
 whenzone Zone06                      # (~98+) he is back upstairs, awake (keys, teeth)
-usewith! Ground@Zone03 IT_Banana     # Zone03, 7 (free while he is upstairs): he slips on his lap-2 walk to the milk (~165) — laid once the nitro has gone off (64): a slip on the doorstep of a still-tricked milk stalls the port's routine (open, runtime/README.md)
+usewith! Ground@Zone03 IT_Banana     # Zone03, 7 (free while he is upstairs): he slips on his lap-2 walk to the milk (~165) — laid after the nitro has gone off (64)
 park! Zone02                         # up to the living room meanwhile (tiptoe: the parrot)
 whenusing Bed                        # (~111+) his second sleep: 26.5 s
 usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe: primed by his brushing before the sleep, un-primed by the one after — pays at that one

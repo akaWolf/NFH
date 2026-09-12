@@ -18,29 +18,32 @@
 # stay after it (111-130, longer by the shelf's anger; his first bathroom stay
 # leaves 20 s for a 22 s trip), the soap on the bathroom stay after that —
 # every trip ends in the wardrobe before he crosses the hall.
+# v6 (2026-09-17, the chain): the seven pay in one chain when the soap goes on
+# the bathroom floor (Ground@Zone04, the shelf's own visit), the picture is
+# armed while he is in the bathroom and pays on his walk out to the kitchen,
+# and the kitchen pair follows — v5 read the shelf four hot, then the kitchen
+# 30 s later (cold) and the microwave 24 s after the kitchen slip (cold).
 take FirstAid IT_Shavingfoam      # Zone04 (13-18): Shavingfoam + Hairrestorer, while he eats in the kitchen (0-29)
 take ToiletPaper IT_Wcpaper
 take SoapDish IT_Soap             # the one soap
 take! Drawer IT_Superglue         # Zone01 (~24): Superglue + Marker, before he crosses the hall (29.6)
 hide! Wardrobe                    # Zone01 by ~28: he crosses the hall 30-40 and 60-70
-whenusing WhippedCream            # (~74) his first kitchen stay (70-100): the bathroom shelf, the toilet, the picture
+whenusing WhippedCream            # (~74) his first kitchen stay (70-100): the bathroom shelf, the toilet, the soap
 usewith! Deodrant IT_Hairrestorer # on the shelf (Primed); pays at SinkDeodrant, score 15
 usewith! AfterShave IT_Superglue  # on the shelf (Primed); pays at SinkAftershave, score 20
 usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by (0.1), score 8
-usewith! MumPicture IT_Marker     # Zone01, crossed on every hall transit, score 8
+usewith! Ground@Zone04 IT_Soap    # CauseSlip on his bathroom walk, 8 — with the shelf
 hide! Wardrobe                    # by ~95, before he comes down (100)
 whenzone Zone04                   # (~111) his bathroom stay, longer by the shelf's anger: the kitchen
 take! Fridge IT_Egg               # Zone03
 usewith! WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at the cream action, pays at the pie's eat, 15
 usewith! Microwave IT_Egg         # the microwave after the eat (the overlay), 8
-hide! Wardrobe                    # before he comes down the hall (~140)
-whenzone Zone04                   # his next bathroom stay: the soap
-usewith! Ground@Zone03 IT_Soap    # CauseSlip on his kitchen walk, 8
+usewith! MumPicture IT_Marker     # Zone01 on the way back: pays on his walk out of the bathroom to the kitchen, score 8
 hide! Wardrobe
+await Toilet 8
 await AfterShave 20
 await Deodrant 15
-await Toilet 8
+await Ground@Zone04 8
 await MumPicture 8
 await WhippedCream 15
 await Microwave 8
-await Ground@Zone03 8

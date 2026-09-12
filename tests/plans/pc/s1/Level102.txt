@@ -7,7 +7,7 @@
 # walk (45), the laxative at the sit after it (57 -> the loo run); the sofa is
 # sawn while he is on the loo, and the television switched once he sits on the
 # sawn sofa and goes for the next beer.
-# v3 (2026-09-17): the egg and the laxative on separate sits — the kitchen window
+# v4 (2026-09-17): the television armed on the loo trip with the saw (it paid 46 s after the sofa in v3, cold); v3: the egg and the laxative on separate sits — the kitchen window
 # (16 s) holds one trip from the hall, not the walk from the bathroom.
 take Drawer IT_Saw                # Zone01 (the hall) while he sits (0-13)
 take FirstAid IT_Laxative         # Zone04
@@ -25,8 +25,8 @@ park! Zone01                      # out before his beer walk
 await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa (~100)
 whenzone Zone04                   # he is on the loo (the PC neighbour sees Woody on his rush): the sofa
 usewith! Sofa IT_Saw              # score 25 — sawn during the toilet trip, out again before he comes back
+use! Television                   # bare-hand, NoticeWhenEnterZone, 15: the same trip — it pays as he walks back in, seconds before the sawn sofa (the chain's fifth tick)
 park! Zone03                      # the kitchen while he comes back through the hall to the sofa
 await Toilet 10                   # the ToiletAction visit (ShitNormal, ShitNoPaper) — paid meanwhile
 await Sofa 25                     # the next sit: SitDown, SitFall, SofaBlur
-use Television                    # bare-hand, NoticeWhenEnterZone, score 15
 await Television 15

@@ -14,11 +14,12 @@
 # the tiptoe past the dog makes that block ~58 s, past his first basement
 # window — the kitchen while he is down there (104-122), the basement traps and
 # the hall's marbles while he is upstairs (127-167), and the pipe and the
-# gramophone in the living room on his SECOND basement trip (270-280), the
-# wardrobe once he is back upstairs (~294). Nine tricks' 79 pay on laps 2-3:
-# the polish's tin at the cup (~200), the marbles (~262), the trap and the
-# shotgun (~270), the hat, the medals and the horn (~295-315), the pipe and the
-# gramophone (~395-410).
+# gramophone in the living room straight after the medals, while he is down
+# in the basement (104-114) — v12: the pipe and the gramophone then pay on his
+# lap-2 living-room stay (~233, ~238), 19 s after the cup's tin, and the trap
+# and the shotgun follow the marbles (~265-280): six of the eight ticks — the
+# tin's 52 s after the horn and the marbles' 27 s after the gramophone stay
+# cold, 97.
 take Drawer IT_Marbles                # Zone01 (3-8): IT_Marbles + IT_Shoepolish
 take Drawer IT_Whistle                # the overlay's whistle, PC-only
 take! FirstAid IT_Superglue           # Zone04 (10-16): the hall and the bathroom are his only from 96
@@ -31,9 +32,10 @@ take! BedDrawer IT_Balloon            # Zone06
 usewith! Horn IT_Balloon              # Zone07, 8: the balcony — its only visit is his 149-159
 take! DeskDrawer IT_Gunpowder         # Zone08: the gunpowder for the tobacco tin
 usewith! Hat IT_Superglue             # Zone06, 8
-usewith! MedalBox IT_Rat              # Zone06, 8
-whenzone Zone09                       # (~104) he is in the basement until 114, the hall until 122: down through the living room
-usewith! Polish IT_Shoepolish         # Zone03, 8: he carries the black tin to the cup on lap 2 (~200)
+usewith! MedalBox IT_Rat              # Zone06, 8 (~105; he is in the basement 104-114, the hall until 122)
+usewith! Pipe IT_Gunpowder            # Zone02 (~110), straight down the back door: the tin takes the gunpowder any time on PC, 10 — pays at his lap-2 pipe (~233), 19 s after the cup's tin
+usewith! Gramaphone IT_Nail           # Zone02 (~113): open since his first lap, 10 — the next use (~238)
+usewith! Polish IT_Shoepolish         # Zone03 (~117), 8: he carries the black tin to the cup on lap 2 (~214)
 take! RubbishBinCable IT_Cable        # Zone03: IT_Cable + IT_Cork
 park Zone03                           # the kitchen is off his way until 173: he crosses the living room (122-127)
 whenzone Zone06                       # (127.5) he is upstairs until 167: the basement and the hall
@@ -41,13 +43,7 @@ usewith! ElectricTrap IT_Cable        # Zone09 x=2.06, on his door(2.21) -> Shot
 usewith! Shotgun IT_Munition          # Zone09: Tricked, 13
 usewith! Shotgun IT_Cork              # Zone09: the cork
 usewith! GroundMarbles@Zone01 IT_Marbles   # Zone01, 7: he crosses the hall at ~262
-park! Zone04                          # the bathroom, off his lap, for his kitchen and living-room stays (173-262)
-whenzone Zone09                       # (~270) his second basement trip: the living room is free until ~288
-usewith! Pipe IT_Gunpowder            # Zone02: the tin takes the gunpowder any time on PC, 10
-usewith! Gramaphone IT_Nail           # Zone02: open since his first lap, 10
-park! Zone03                          # the kitchen while he passes the hall and the living room (280-293)
-whenzone Zone06                       # (~294) he is upstairs: the hall
-hide! Wardrobe                        # Zone01: his hall passes from ~430, the shock's run
+hide! Wardrobe                        # Zone01 (~160): his hall passes at ~262-270 and ~280-288, the shock's run
 await Polish 8
 await GroundMarbles@Zone01 7
 await ElectricTrap 7

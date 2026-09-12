@@ -1,0 +1,44 @@
+# Level207 under the PC profile (v4, 2026-09-17): the pool zone is the Mother's — she sleeps 19 s a lap (MotherSleepLoop 5-25, 59-79, 113-133, 167-187, 221-241) and swims between — and the neighbour's 101-123 and 202-231; the awning waits for his lap-3 bar visit (232-260), the tap and the elephant for his shell after it (260+).
+# Level207 — TotalTricksCount 7 (winning 5); every S2 TrickScore is 0.
+# Routine (Rottweiler2): PoolBoard (Zone04) -> Bartender, Elephant (Zone03)
+# -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); Mother on Zone04,
+# Olga on Zone02's shells.
+# Dead data: Fence1/2, PoolLadder, BeachLogo, DeckChair, ShellLaydown,
+# Pole, Tap and Bartender as clicks (PrimingItems), ElephantBucket.
+# EXCELLENT is 90 + 10 for one meter overflow (GameInfo.cs:413-416). The
+# board's first tricked use unlocks the awning; then the board+awning
+# (20 + 30 linked), the elephant 20 and the shell 20 are armed to pay on
+# one lap, and the SandCastle with its linked BeachTowel and the extra coin
+# (40 + 20 + 10 on one visit), his last item, crosses 100 (single-lap peak
+# 133).
+take Moped IT2_Spring
+usewith PoolBoard IT2_Spring      # the first tricked use unlocks the awning (lap 1)
+await PoolBoard 0
+take Moped2 IT2_Pedal             # KeepFull
+take Whisky IT2_Whiskey
+prime Bartender IT2_Whiskey
+take IceBucket IT2_Bucket_empty
+whenzone Zone04                   # (202) he goes up to the pool: his beach zone is free until ~271
+park Zone01                       # the beach, next to the pool's own stairs — gated: the rush park took the shell's short cut through the pool, into him (v3)
+whenzone Zone03                   # (232) his lap-3 bar visit: the Mother sleeps in the pool zone 221-241, the awning is unlocked since the board paid
+usewith! PoolAwning IT2_Pedal     # Zone04 (~236): before her look (241)
+park! Zone01                      # (~240) his beach zone is free until ~271
+whenzone Zone02                   # (260) he is at the shell: the bar is free until ~331
+prime Tap IT2_Bucket_empty        # Zone03
+usewith Elephant IT2_Bucket       # Zone03: action [2]
+take BBQ IT2_Bbqtongs
+unlock CrayFish IT2_Bbqtongs
+take CrayFish IT2_Crayfish
+usewith Shell IT2_Crayfish        # action [3]
+take SeaUrchin IT2_Hedgehog
+usewith BeachTowel IT2_Hedgehog   # action [5]
+unlock CrayFish IT2_Bbqtongs
+take CrayFish IT2_Crayfish
+usewith SandCastle IT2_Crayfish   # action [4]; LinkedItemTrick BeachTowel + ExtraCoin: three coins on his visit
+take MopedPool IT2_Spring         # the second spring, armed LAST: the board's linked awning pays with the set
+usewith PoolBoard IT2_Spring
+await PoolAwning 0
+await Elephant 0
+await Shell 0
+await BeachTowel 0
+await SandCastle 0
