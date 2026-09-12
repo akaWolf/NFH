@@ -118,9 +118,24 @@ is the beating). Each case yields through fcn.0045c600(next, current,
 resume-after-interruption) — the third argument is the case to redo when
 an urgent action interrupts a walk, not a catch hook. The order of the
 GoTo / DoAction calls is in `tools/pcref/exe/nfh1_scripts.json`
-(`tools/pcref/exe_scripts.py`); the lap orders were measured equal to the
-mobile's on video (docs/PC_LAPS.md), the durations are the mobile data's
-(the open ceilings of 103–114 in docs/PC_FIDELITY.md §7). The hunter
+(`tools/pcref/exe_scripts.py`). The stations the classes visit (their
+`ICON`/`GOTO` names — sofa, binoculars; beer, sofa, toilet; detergent,
+washing machine, drier, iron, rack, aquarium, vacuum; polish, cups, pipe,
+phonograph, records, gun, hat, horn; ...) are the mobile routines' items
+on all fourteen levels; the order of the switch cases is not the order of
+the walk (112 lists the trampoline last and 113 starts at the valve where
+the video and the mobile start at the chair), so the lap order stands on
+the video (docs/PC_LAPS.md, the same order everywhere) and the durations
+are the mobile data's (the open ceilings of 103–114 in
+docs/PC_FIDELITY.md §7). Two data facts with no rating effect: the level
+`trigger.xml` marks four object triggers `always` (105 mum_smeared and
+phoneringing, 111 ironingboard_burn and dirtycarpet — the neighbour
+reacts every pass) where every other is `once`, and `objects.xml` flags
+fourteen objects `singleuse`; the mobile's ReuseAfterFix (102 sofa, 104
+microwave, 105 piano, 108 sunbed and brush, 109 bed, 110 chair, 113
+ladder) is a different notion (re-tricking after the fix) and neither
+pays twice — both games' tricks pay once (fcn.0047bd00 skips a fired
+trick; the mobile's OnTrickDone counts it once). The hunter
 level's dog (fcn.0045bcb0) is an event-driven state machine: `whistle`
 moves it to state 3 (from state 2) or 4, `wakeup`, `pause`, `resume` are
 the other events; the port's whistle wakes the level's alerters
