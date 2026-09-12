@@ -289,6 +289,13 @@ helpers.
   clips' pace (`clip_fps`) and the catch on sight without the busy
   windows (`sees_while_busy`); `NFH_PC_RULES=walk,doors,sight` keeps a
   subset of the three for bisecting a plan.
+- Carried on 2026-09-17 (the compound coins): the Season 2 ladder's
+  hard-coded extras take the PC record's rage under the profile
+  (`Item.pc_extra_coin` / `pc_extra_coin_206` from the overlays'
+  PCExtraCoin / PCExtraCoin206, `World._pc_extra`), and the base amounts
+  of 213's Tortilla and PlantCarnivore and 211's OlgaChild are the PC's —
+  the accounting is fcn.1000140b per `<trick>` record, once per record
+  (docs/PC_FIDELITY.md "Season 2 compound coins"; tools/pcref/coins.py).
 - `tests/run_tricks.py` (2026-09-17, the chain pass): `Name@ZoneName:N`
   names the N-th twin of one zone (113's two hall marbles spots); the
   `await` timeout is 240 s under the profile (a PC lap runs to 180 s on

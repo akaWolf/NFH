@@ -53,6 +53,7 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   thermometer's drain in 1/20 s; Season 2 `rage` per trick = the mobile
   AngerAmount but on eight items, and the gauge is 80 000 rage long. The
   amounts.py readings (all 1.25× the data) are superseded by it.
+- `coins.py <level ...>`: the Season 2 coin tricks of the profile's plan against the PC records — the mobile item's inventory → the PC combination → the variant object → the `<trick name=...>` records of its actions and their tricks.xml rage (GameLogic.dll credits each named record once, fcn.1000140b).
 - `canon.py <level ...>`: the PC canon per level next to the mobile's data —
   tricks and values, recipes, containers, walk-by triggers, rooms, the
   neighbour's action lengths — with the multiset diffs (docs/PC_FIDELITY.md §7,

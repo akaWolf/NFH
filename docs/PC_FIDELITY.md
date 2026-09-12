@@ -390,12 +390,17 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   overlay's Elephant is 30 (dogattack_bat — in_b2/objects.xml the bat's
   attack is `bar/elefant`'s action, Fifi the actor), not the octopus's 27.
   The PC's own triple is the board's: `pool/divingboard_oil` fires three
-  tricks in one `fall_empty` action (fifi_bone, fall_water, fall_empty —
-  60 at once, the drained pool) and two in `fall_water` (40), where the
-  mobile's ladder (Rottweiler.cs:613-693, carried by the port) pays the
-  board 20 and the basket 20 + 10 at separate calls; the E10 bar's 70
-  landing last on 31 is that action. Carrying it would be a trick-logic
-  change, not a rule or a constant, and stays outside the profile.
+  trick records in one `fall_empty` action (fifi_bone, fall_water,
+  fall_empty — 20 each in tricks.xml, the drained pool) and two in
+  `fall_water`; GameLogic.dll's accounting (fcn.1000140b, the "Season 2
+  compound coins" entry below) credits each named record once. The
+  profile now pays that: the basket's extra is 20 (PCExtraCoin, the
+  mobile's 10), and with the bone laid after the board's oil the ladder
+  pays bone, water and empty pool at one call (v20: +60 at 306 s). The
+  pile still peaks at 94: his deck-chair scene (the hedgehog and the
+  pylon's shock) holds him ~40 s, so the chair's 20 has decayed by the
+  time of the call, and the shop's 27 and the elephant's 30 after it fall
+  35 and 28 s apart — the level rates 90, won.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
@@ -714,6 +719,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   still at 31.
   Under the 80 gauge the Season 2 set had been 14/14, the Season 1 set 14/14 — 111 on its PC plan
   (below).
+- *Season 2 compound coins.* GameLogic.dll pays coins per `<trick
+  name=...>` record of the action that plays (fcn.1000140b, from the
+  action-play code at 0x1000254d / 0x100025bf): each record is looked up
+  in the level's tricks.xml table by name (fcn.10052345), its use count at
+  +0x10 is raised (fcn.100522e6, capped at 3), and coins and rage are added
+  only on the first use — so a record credited by several actions pays
+  once, and an action listing three records pays three coins at one
+  moment. The mobile's ladder (Rottweiler.cs:613-693) pays its compounds
+  as one item plus hard-coded extras (+20, +15, +10) and linked items;
+  the profile keeps the ladder's events and takes the amounts from the PC
+  records (tools/pcref/coins.py lays the mobile items next to the PC
+  combinations, variant objects and their records): 210's basket extra 20
+  (fall_empty), 213's Tortilla 15 + 20 (tortilla_sharp, tortilla_tequila)
+  and PlantCarnivore 15 + 20 (carnivore_big, carnivore_bigmanip), 211's
+  OlgaChild 20 (phone_loud, with phone_normal 10), 206's pad 30 + harpoon
+  20 + one extra of 30 (rubberrabbit, harpoon_rubber, harpoon_fifi — the
+  mobile's 30 + 20 + 20 + 15 were 85 for the PC's 80). Every other linked
+  pair already matched the PC's records (201's puddle 40 + rail 50 = auweh
+  + owe, 204's jade 17 + vase 25, 208's platform 20 + seesaw 30, 209's
+  coal 20 + trough 20 and shoe 20 + drain 20, 212's whip 20 + spikes 20,
+  hands 10 + 10, ledge 15 + boat 15, 214's hatch 40 + 40).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (his bubbles and popups: the trap on the basement walk-in 158, the
   washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that

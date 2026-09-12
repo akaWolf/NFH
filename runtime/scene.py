@@ -305,6 +305,7 @@ class Item:
                  'compound_extra_coin', 'plant_carnivore_extra',
                  'extra_coin_206', 'extra_coin_210', 'dog_basket_210',
                  'anger_amount', 'extra_coin_anger', 'extra_coin_toilet_211',
+                 'pc_extra_coin', 'pc_extra_coin_206',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -766,6 +767,10 @@ class Item:
         # the NFH2 anger ladder (Rottweiler.cs:613-693)
         self.anger_amount = d.get('AngerAmount', 20) or 0
         self.extra_coin_anger = d.get('ExtraCoinAngerAmount') or 0.0
+        # the PC profile's amounts for the ladder's hard-coded extras (levels/pc
+        # overlays: tricks.xml's rage of the record the extra stands for)
+        self.pc_extra_coin = d.get('PCExtraCoin')
+        self.pc_extra_coin_206 = d.get('PCExtraCoin206')
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)

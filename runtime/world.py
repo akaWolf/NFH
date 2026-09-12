@@ -5584,22 +5584,35 @@ class World:
             elif item.compound_extra_coin and aux is not None \
                     and aux.compound_tricked:      # cs:620-624
                 item.compound_extra_coin = False
-                pawn.angry_meter += 20.0
+                # the PC pays the record the extra stands for (tricks.xml
+                # rage: 206's harpoon_fifi 30, 213's tortilla_tequila 20 —
+                # levels/pc overlays, PCExtraCoin); the accounting
+                # fcn.1000140b credits each named record of the action once
+                pawn.angry_meter += self._pc_extra(item, 20.0)
             elif item.tricked and linked is not None and linked.tricked \
                     and item.extra_coin_206:       # cs:625-629
                 item.extra_coin_206 = False
-                pawn.angry_meter += 15.0
+                # 206: the PC's three records (harpoon_fifi, harpoon_rubber,
+                # rubberrabbit) are the pad, the linked harpoon and one extra
+                # of 30 through whichever branch fires (PCExtraCoin206 30)
+                pawn.angry_meter += self._pc_extra(item, 15.0, 'pc_extra_coin_206')
             elif item.plant_carnivore_extra and aux is not None \
                     and aux.compound_tricked:      # cs:630-634
                 item.plant_carnivore_extra = False
-                pawn.angry_meter += 10.0
+                # 213: carnivore_bigmanip 20 in me_c2/tricks.xml
+                pawn.angry_meter += self._pc_extra(item, 10.0)
             elif item.extra_coin_210 and item.tricked \
                     and linked is not None and linked.tricked:  # cs:635-639
                 basket = items.get(item.dog_basket_210) \
                     if item.dog_basket_210 else None
                 if basket is not None and basket.primed:
                     item.extra_coin_210 = False
-                    pawn.angry_meter += 10.0
+                    # the PC pays the drained pool as its own trick record:
+                    # in_b2/objects.xml `pool/divingboard_oil` lists
+                    # fifi_bone, fall_water and fall_empty in one
+                    # `fall_empty` action, fall_empty 20000 in tricks.xml
+                    # (the mobile's 10 is that coin halved; PCExtraCoin 20)
+                    pawn.angry_meter += self._pc_extra(item, 10.0)
             if linked is not None and linked.tricked and item.tricked:
                 # the linked-pair arm (cs:640-654)
                 if not linked.already_tricked:
@@ -5836,6 +5849,17 @@ class World:
         if item.kind in TRICK_KINDS and item.compound and item.compound_tricked:
             return item.compound_trick_score_v
         return item.trick_score
+
+    @staticmethod
+    def _pc_extra(item, mobile, field='pc_extra_coin'):
+        """the NFH2 ladder's hard-coded extra coin: the mobile's amount, or
+        under the PC profile the tricks.xml rage of the record it stands
+        for (the overlays' PCExtraCoin / PCExtraCoin206 on the item)"""
+        if pcprofile.is_pc():
+            v = getattr(item, field, None)
+            if v is not None:
+                return float(v)
+        return mobile
 
     def _would_pay(self, item):
         """the score _on_trick_done is about to pay for this trick, 0 when
