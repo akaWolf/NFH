@@ -43,6 +43,7 @@ N-th in the level's order, from 1):
                              zone (his door pass is the landmark)
     whenanim <Role> <Anim>   park safe until that pawn plays the animation
                              (a stationary catcher's phase on its own clock)
+    whenin <Role> <ZoneName> park safe until that pawn stands in the zone
     whistle                  PC profile: blow the dog whistle (needs
                              IT_Whistle held) — every Alerter wakes
     sneak on|off|auto        the Tab toggle by hand; auto (the default)
@@ -1414,7 +1415,15 @@ class Driver(Recorder):
                 if s is not None and s.get('transfer') == nxt:
                     ahead = True
                     break
-            if not ahead:
+            pc_leg = os.environ.get('NFH_PROFILE', 'pc') != 'mobile' \
+                and nxt == getattr(self, '_leg_zone', None)
+            if not ahead and not pc_leg:
+                # (under the profile a walk into the leg's own zone was let
+                # through by the gate on his ETA against the leg's need — the
+                # dodge does not second-guess it on the hop time: the PC
+                # stays put his next station a hair inside the hop window on
+                # 212's cigar box; the mobile driver keeps its rule, so the
+                # mobile regression stays byte-identical)
                 for p in self.catchers():
                     if p.zone is not None and p.zone.pid == nxt \
                             and not p.is_warping:
@@ -2285,6 +2294,15 @@ class Driver(Recorder):
         ok = self.wait_until(playing, 240.0)
         return (True, '') if ok else (False, '%s never plays %s' % (role, anim))
 
+    def leg_whenin(self, role, zone, *args):
+        """wait until the named pawn stands in the named zone (a catcher's
+        room on its own clock: Level213's Mother in Zone02)"""
+        def there():
+            p = self.world.pawns.get(role)
+            return p is not None and p.zone is not None and p.zone.name == zone
+        ok = self.wait_until(there, 240.0)
+        return (True, '') if ok else (False, '%s never in %s' % (role, zone))
+
     def leg_unlock(self, name, typ=None):
         """the dexterity gate: click with the unlocker held, then hold the
         pick center-ward each tick until DexterityDone passes the take;
@@ -2785,6 +2803,7 @@ class Driver(Recorder):
                   'whenusing': self.leg_whenusing,
                   'whenzone': self.leg_whenzone,
                   'whenanim': self.leg_whenanim,
+                  'whenin': self.leg_whenin,
                   'activated': self.leg_activated}.get(op)
             if fn is None:
                 self.results.append({'leg': ' '.join(leg), 'ok': False,

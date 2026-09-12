@@ -142,11 +142,13 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   level is won (101/102/107 100, 103/104/105/114 97, 113 96, 108/109/112
   94, 110 78, 106 77, 111 70 — the last three at ceilings the
   room-pointer catch sets, the 97s a second or two of his lap, the 94s
-  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 — 210 among
-  them since the PC's station stays, compound coins and coin ticks are
+  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 212 and
+  213 at 90 — the PC's station stays, compound coins and coin ticks are
   carried (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
-  coins"; 212 and 213 on PC plans of their own, in re-timing). The mobile
-  numbers do not move: the regression under
+  coins"), and 210 overflows among the 100s; the coin ticks decay each
+  coin from partway into its action, leaving 212 and 213 one coin short
+  of the overflow on the three-catcher floors. The mobile numbers do not
+  move: the regression under
   `--profile=mobile` is byte-identical.
 
 Open: the Season 2 catch on PC — the watch predicate's modes are read

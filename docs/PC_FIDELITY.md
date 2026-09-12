@@ -765,8 +765,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the PC's 136). The other episodes' laps were already within the
   tolerance (docs/PC_LAPS.md) and keep the mobile clips' own lengths.
   Under the stays and the coin ticks 210 and 211 rate 100 (211's boat
-  coin now lands 21 ticks into his boat and tops the bar at 241 s); 212
-  and 213 are re-timed on PC plans of their own.
+  coin now lands 21 ticks into his boat and tops the bar at 241 s). 212
+  (the mobile plan under the profile) and 213 (a PC plan of its own,
+  around the Mother's Zone02 stands and Olga's bull, three catchers on
+  one floor) win 9/9 at 90: with the stations only they overflowed, but
+  the coin ticks credit each coin partway into its action, so it decays
+  from that moment and the pile falls one coin short (212 peaks at 77,
+  213 at 84 — the tortilla's compound and the boat lift it, the earlier
+  coins have bled off). The overflow is a tighter plan than the
+  three-catcher timing has yielded; the amounts, ticks and stays are the
+  PC's, so the ceiling is the plan's, not the model's.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (his bubbles and popups: the trap on the basement walk-in 158, the
   washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that

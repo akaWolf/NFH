@@ -293,6 +293,10 @@ helpers.
   routine items of 210-213 from the PC videos' bubble spans less the walk
   (tools/pcref/pc_durations_s2.py; docs/PC_FIDELITY.md "Season 2 station
   durations").
+- `tests/run_tricks.py` (2026-09-18): `whenin <Role> <ZoneName>` waits
+  for a pawn to stand in a zone (213's Mother in Zone02); the PC dodge
+  trusts the gate on a walk into the leg's own zone (212's cigar box) —
+  both mobile-guarded, the regression byte-identical.
 - Carried on 2026-09-17 (the coin ticks): a Season 2 coin lands at its
   record's `time` into the trick action (fcn.1000140b's `cmp eax,
   [ecx+0x28]` per record) — PCCoinTicks on the items of 210-213, credited

@@ -1,0 +1,39 @@
+# Level213 under the PC profile (2026-09-18: PC station stays + coin ticks).
+# His lap ~118 s (Zone04 bull 3-7 / cement 110-118, Zone03 plant 18-31 /
+# tortilla 31-35, Zone02 picnic 43-61, Zone01 pinata 71-83 / bull-ride
+# 85-103). Olga rides the bull in Zone01 41-102 and 200-233; the Mother
+# stands in Zone02 15 s at ~34/94/154/214 (walking Zone05->Zone03->Zone02
+# and back). Zone05 (hand, flowers) hangs off Zone03 — entered on her
+# Zone02 stand. Zone01 is clear 103-184 (he is upstairs, Olga off the
+# bull), so the bull controls go in then, with the hand grabbed on her
+# first stand at ~34.
+take CementBag IT2_Cement
+usewith CementBath IT2_Cement
+take ChickenWings IT2_Chickenwing
+take Skeleton IT2_Tequila
+take Piranha IT2_Piranha
+take Jar IT2_Jar_empty
+prime Termite IT2_Jar_empty
+whenin Mother Zone02                   # (~34) her first Zone02 stand (15 s): Zone05 hangs off Zone03, clear while she stands and he is at the cigars (Zone04, 36-47)
+take! StatueHand IT2_Hand
+take! Flowers IT2_Flowers
+park! Zone04                           # (~50) back down before she walks through Zone03 (~49)
+whenzone Zone03                        # (~135) his lap-2 plant: Zone01 is his only after the bull ride (103) until his lap-2 pinata (~184); Olga is off the bull 102-200
+usewith MechanicalBullControls IT2_Hand   # Zone01: the controls in the 108-184 clear window
+usewith LiveBull IT2_Flowers   # Zone04: flowers -> bull on his next Zone04 (the cement/bull ~110, or lap-2 ~228)
+take Chili IT2_Chili
+usewith PlantCarnivore IT2_Chickenwing
+usewith PlantCarnivore IT2_Piranha
+usewith Tortilla IT2_Chili
+usewith Tortilla IT2_Tequila
+usewith BoatPicnic IT2_Termites
+await CementBath 0
+await LiveBull 0
+take Wasp IT2_Beehive
+unlock Pinata IT2_Beehive
+await PlantCarnivore 0
+await Tortilla 0
+await BoatPicnic 0
+await Pinata 0
+await MechanicalBullControls 0
+await 9
