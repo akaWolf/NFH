@@ -65,6 +65,13 @@ stays above zero for 60 + amount ticks, the mercury sits at full for 60 + (amoun
 angrytime) of them and drains over the level's angrytime ticks; the next trick's bonus is
 decided by that indicator alone — the scores and the neighbour's whereabouts play no part.
 
+Two more facts of the same state: no Season 1 trick carries a `quota2`-`quota4` in
+tricks.xml (every trick pays once, as the mobile's OnTrickDone does), and the level's end is
+one code (0x440f2f: 0 = caught, `music/jingle_caught.mp3`; 1 = failed, `jingle_failed`; 2-3 =
+success) — Season 1 has no lives, a catch ends the level, where Season 2 starts every level
+with three (GameLogic.dll fcn.10044234, the status copy's +0x14 = 3) and takes one per catch
+(fcn.10042471).
+
 The tick is 12 Hz — not the 20 an earlier reading of the mercury suggested. Three things
 say so. leveldata.xml gives the bath `time="4320"` and its HUD clock starts at 6:00 (Badinfos'
 video), so a time unit is 1/12 s; the GUI's clock handler (GFXEngine 0x10011310 → fcn.10014ba0)
