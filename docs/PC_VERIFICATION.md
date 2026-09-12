@@ -198,7 +198,7 @@ helpers.
 | the level completes when every trick is done | `all_done` (completed == total) | fcn.10041086: status +0xc == +0x10 (done == `reachable`) → the actors are stopped (fcn.1004ba02 → fcn.100450bf), the board | agrees; `reachable` 4/5/5/6/5/6/7/7/7/8/8/9/9/6 is the port's `total` (data) |
 | the pass mark | `won` at WinningTricksCount | leveldata `mincoins`, checked when a flagged request comes in (byte +0x6f, set by the virtual at 0x1004717f — the menu's exit-level path, `mm_exitlevel`; coins ≥ mincoins passes) | agrees in effect: `mincoins` equals the mobile's WinningTricksCount on 13 levels and the 211 overlay carries the PC's 5 (data); the PC lets a player leave a level early through the menu, the port's menus do not model that |
 | the catch | `_catch`: fear, the beating, `_respawn` | the catch fiber (vtable 0x100ab258 slot 10, entry 0x100061dc): Woody's `fear1`/`fear3` facing the catcher (0x10006510), the catcher's `fight` action (objects.xml: `fight_woody` with `fly_away_neighbor` / `fly_away_mother` on Woody, who becomes invisible), then case 4 places Woody 900 px above the respawn spot (0x10006336: y = top − 900, x = the midpoint) and plays the `respawn` action (the fall), case 5 takes a life (fcn.10042471) | agrees: the spot is the level's start area on video (docs/PC_FIDELITY.md §2.5) and the port's entrance location |
-| the respawn timer | the beating's length | leveldata.xml `respawntime="60"` (5 s at 12 Hz) into status +0x18 | open: what the timer gates was not read |
+| the respawn timer | Woody is controllable as soon as he reappears | the catch (fcn.10042471 at 0x100424b6) copies leveldata's `respawntime="60"` into status +0x18, the tick counts it down (fcn.10044234 at 0x10044725), and while it runs the action runner fcn.1003cc45 drops the actions whose actor is `woody` (0x1003ce61, 0x1003ceae: the timer read fcn.10040123) | read: 5 s without Woody's actions after the respawn; open whether a walk command is among them, so not carried |
 | lives out | game over | fcn.10042471: lives − 1, below zero → the failed path (0x100424d8) | agrees |
 | the gauge, the decay, the board, the clock | `pcprofile.s2_rage_tick`, `calculate_score` | fcn.10044234, fcn.10040226 | agrees (docs/PC_ROUTINES.md) |
 | the trick amounts | nine PC values in `levels/pc/*.overlay.json`, the rest the mobile's | tricks.xml `coins` / `rage` | agrees (data, the overlays' sources) |
@@ -208,8 +208,11 @@ helpers.
 
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
-  screen's, no `SetTimer`/`timeSetEvent`; what makes the level tick 12 Hz
-  is not located. The 12 Hz itself stands on the clock, the GUI's
+  screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
+  binaries (GFXEngine fcn.10003420, `GetTickCount`) is a button widget's
+  auto-repeat interval, its 1000 ms the hold timer, and fcn.100092a0's
+  167 ms the caret blink — what makes the level tick 12 Hz is not
+  located. The 12 Hz itself stands on the clock, the GUI's
   divisions by 12 and the mercury (docs/PC_ROUTINES.md).
 - Season 1: which neighbour actions clear or set the +0x78 byte (the
   script event's sender); whether the position object of the catch is
