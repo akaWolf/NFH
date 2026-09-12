@@ -113,9 +113,21 @@ mincoins, the lives at +0x14, the rage at +0x1c — is written back and broadcas
 text, the `needmorecoins` mark when coins ≥ mincoins, the `rageometer` set to the raw rage,
 the `heart` and `rage` animations on the event's flag byte); the other three writers of that
 struct are the caught handler (fcn.10042471: lives − 1, then game over or a `woody` respawn)
-and the level start/end (fcn.10044234). None of them subtracts from the rage, so the 0.37 %/s
-decay the bar shows on the video (docs/PC_FIDELITY.md §7) lives outside those writers — not
-located. The Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application
+and the level's tick (fcn.10044234, second half, 0x10044712): it copies the status, counts a
+respawn timer down (+0x18), subtracts the level record's +0x28 from the rage (+0x1c, not below
+zero), counts the time (+0x24) up by one and calls fcn.10042358 — so the HUD gets the status
+every tick. The record is the leveldata.xml entry found by the level's name (the app's parser
+at game.exe 0x40d0c0 stores `reachable` at +0x1c, `mincoins` at +0x20, `coins` at +0x24,
+`time` at +0x28, `score` at +0x2c), and `time` is 30 on all fourteen levels: the gauge falls
+30 per tick. The tick is the same 12 Hz as Season 1's — the HUD clock (GUIEngine fcn.10007334)
+divides the count by 12 before its minutes and seconds — so the decay is 360 a second, 0.36 %
+of the gauge (the mobile's AngryMeterDecay 0.37 is that, rounded; the video's 0.40-0.43 read
+carries the reader's scale). The profile carries it as PCRageDecay 30 on the Season 2
+neighbour (pcprofile.s2_rage_tick, 12 ticks a second). The COLLAPSE! board is fcn.10040226:
+`(coins + lives) × 1000 + (collapsed ? 5000 : 0) + fcn.10040205`, where fcn.10040205 is
+6 000 000 / the status's tick count (+0x24) — 500 000 over the seconds — and the collapse byte
+(+0x28) is the accounting's flag at 100 000 rage; the level end (fcn.10042471, second half)
+compares that sum with the leveldata record's `score` (+0x2c) and keeps the better. The Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application
 shell whose string table holds `rage`/`quota` once each. The walk is fcn.1000e3e0(level, actor, object), a bool that is false when the walk was
 interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — a random
 `shout<n>_*` / `freakout` animation — not a walk. The Season 2 scripts are extracted below

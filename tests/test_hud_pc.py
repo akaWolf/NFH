@@ -117,6 +117,14 @@ class Rage(unittest.TestCase):
         self.assertEqual((cur, hold), (116, 60))
         self.assertTrue(cur > 0)                    # the bonus test
 
+    def test_s2_decay(self):
+        # the Season 2 gauge: leveldata's time (30) off the meter every 1/12 s
+        m = 50.0
+        for _ in range(12 * 10):
+            m = pcprofile.s2_rage_tick(m, 30)
+        self.assertAlmostEqual(m, 50.0 - 3.6, places=6)   # 0.36 %/s over 10 s
+        self.assertEqual(pcprofile.s2_rage_tick(0.01, 30), 0.0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -83,14 +83,19 @@ Expected: 211 → 8 of 8, 90 (+10 with the overflow rule below).
 
 ### 2.4 Season 2 rating — "fill the gauge" (confidence: high — measured)
 
-PC: points — 1000 a coin, 3000 once for any collapse, 5000 for the trophy
-(every coin; the HUD statue lights with the last coin, not at the
-overflow) and ⌊500000 / seconds played⌋ for the clock, read off all
-thirteen end screens (docs/PC_VS_MOBILE.md, "The rating rules"; E10's
-8000 + 3000 + 5000 + 1398 = 17398) — and the gauge may fill more than
-once — Badinfos' 100 % run fills it twice in 210 and 214. The gauge decays
-at ~0.4 %/s on PC as well (`tools/pcref/gauge.py`), so the mobile's 0.37/s
-is the PC's constant; only the "exactly one" is the remake's.
+PC: points — read off all thirteen end screens as 1000 a coin, 3000
+once for any collapse, 5000 for the trophy and ⌊500000 / seconds played⌋
+for the clock (docs/PC_VS_MOBILE.md, "The rating rules"; E10's 8000 +
+3000 + 5000 + 1398 = 17398); GameLogic.dll's own sum (fcn.10040226,
+docs/PC_ROUTINES.md) is 1000 × (coins + lives left) + 5000 when the
+gauge overflowed + 6 000 000 / the level's ticks (12 a second — the
+500 000 / seconds) — Badinfos' three untouched lives were the "3000 for
+a collapse", the overflow the "5000 trophy" (the HUD statue lights with
+the last coin, but the points follow the flag). The gauge may fill more
+than once — Badinfos' 100 % run fills it twice in 210 and 214 — and the
+5000 is paid once. It decays by leveldata's `time`, 30, every 1/12 s
+(0.36 %/s; the mobile's 0.37 rounds it); only the "exactly one" is the
+remake's.
 
 Switch: `ticks >= 1`. Effect: Level206's two overflows stop costing the
 bonus (100), and the arm-the-earliest-last constraint relaxes to "overflow
@@ -533,9 +538,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   spent invisibly (tools/pcref/gauge.py at 160 s for 190 s). The decay
   is continuous and the mobile's 0.37 %/s within the reader's noise
   (0.40-0.43 %/s on every trick-free plateau: 26 → 18 over 20 s, 52 →
-  33 over 46, 55 → 31 over 58 on E10; 41 → 11 over 70 on E01); where
-  GameLogic.dll applies it was not found — none of the four writers of
-  the status struct subtracts, so it lives outside them. A profile of
+  33 over 46, 55 → 31 over 58 on E10; 41 → 11 over 70 on E01), and
+  GameLogic.dll's level tick says exactly what it is: leveldata.xml's
+  `time` (30 on every level) off the rage every 1/12 s — 0.36 %/s,
+  carried as PCRageDecay (docs/PC_ROUTINES.md). A profile of
   80 (2026-09-09 to 2026-09-16) was that video reading taken for the
   bar; withdrawn with this. (The Season 2 neighbour's GameObject is
   `Rottweiler2`; the first overlay addressed `Rottweiler` and matched
@@ -634,7 +640,7 @@ both games, the PC data next to the mobile's, category by category:
 | speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
 | doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |
 | Season 1 anger | thermometer drain = `angrytime` (exact, applied); the tick meter and the hold are game.exe's |
-| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 100 000 long — the dialog's range, the code's flag, the bar's cap on E10 (the mobile's 100, applied); decay is the mobile's 0.37 (the bar's plateaus, 0.40-0.43 read) |
+| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 100 000 long — the dialog's range, the code's flag, the bar's cap on E10 (the mobile's 100, applied); the decay is leveldata's `time` (30) per 1/12 s tick = 0.36 %/s (GameLogic fcn.10044234; PCRageDecay, applied — the mobile's 0.37 rounded it) |
 | HUD | the PC's rating popups are yellow (240/240/0) for the score and orange (255/160/0) for the bonus, as drawn |
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0

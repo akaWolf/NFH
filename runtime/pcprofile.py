@@ -152,3 +152,18 @@ def s1_rage_percent(current, level_angrytime):
     if level_angrytime <= 0:
         return 0
     return min(100, current * 100 // level_angrytime)
+
+
+# The Season 2 gauge, read from GameLogic.dll (docs/PC_ROUTINES.md): the
+# level state ticks 12 times a second too (the HUD clock divides the tick
+# count by 12); every tick the rage falls by the level record's `time`
+# (leveldata.xml, 30 on every level) and the status goes to the HUD; a trick
+# adds tricks.xml's rage; the gauge is 100 000 long (the dialog's range, the
+# accounting's flag). In the port's units (1 = 1000 rage) the decay per tick
+# is PCRageDecay / 1000.
+S2_TICK_HZ = 12
+
+
+def s2_rage_tick(meter, decay_per_tick):
+    """one 1/12 s tick of the Season 2 gauge: the meter less the decay, not below zero"""
+    return max(0.0, meter - decay_per_tick / 1000.0)

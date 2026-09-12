@@ -2244,6 +2244,10 @@ class Level:
                 # own — the PC overlays carry it on the neighbour
                 # (pcprofile.s1_rage_percent, docs/PC_ROUTINES.md)
                 'rage_max': int(pd.get('PCAngryTime') or 0),
+                # the PC Season 2 gauge's decay per 1/12 s tick, in thousandths
+                # (leveldata.xml's `time`, GameLogic.dll fcn.10044234 — the PC
+                # overlays carry it on the neighbour; docs/PC_ROUTINES.md)
+                'rage_decay_tick': int(pd.get('PCRageDecay') or 0),
                 'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')
                     if pd.get('NoticeWhenNearTrickedDistance') is not None
                     else 0.03,

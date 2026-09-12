@@ -428,6 +428,7 @@ class Pawn:
         # current / +0x78 hold / +0x84 the level's angrytime, in 1/12 s
         # ticks — pcprofile.s1_rage_*); rage_max 0 means the mobile meter
         self.rage_max = spec.get('rage_max') or 0
+        self.rage_decay_tick = spec.get('rage_decay_tick') or 0   # the PC Season 2 decay per tick
         self.rage_current = 0
         self.rage_hold = 0
         self.rage_bonus = False          # the flag of the last trick (+0x7c)
@@ -1539,6 +1540,16 @@ class Pawn:
                     self.rage_bonus = False
             self.angry_meter = float(
                 pcprofile.s1_rage_percent(self.rage_current, self.rage_max))
+        elif pcprofile.is_pc() and self.rage_decay_tick > 0:
+            # the PC Season 2 gauge (GameLogic.dll fcn.10044234, 12 Hz): the
+            # rage falls by the level's `time` every tick, no latch
+            self.rage_acc += dt
+            period = 1.0 / pcprofile.S2_TICK_HZ
+            while self.rage_acc >= period - 1e-9:
+                self.rage_acc -= period
+                if self.angry_meter > 0.0:
+                    self.angry_meter = pcprofile.s2_rage_tick(
+                        self.angry_meter, self.rage_decay_tick)
         elif self.can_decrease_angry and self.angry_meter > 0.0:
             # Rottweiler.Update: the meter decays while allowed
             self.angry_meter = max(0.0, self.angry_meter - self.angry_decay * dt)
@@ -2025,23 +2036,24 @@ class GameState:
             if one and not self.ignore_score:
                 final += 10
             if pcprofile.is_pc():
-                # the PC's COLLAPSE! board, read off Badinfos' thirteen NFH2
-                # end screens (docs/PC_VS_MOBILE.md, "The rating rules"):
-                # 1000 a coin, 3000 once for any collapse (E10 and E14 fill
-                # the gauge twice and still get 3000), 5000 for the trophy —
-                # every coin: the HUD statue lights at 8/8, not at the
-                # overflow (E10: grey after the 299 s fill, gold after the
-                # eighth coin at 342) — and 500000 / the seconds played for
-                # the clock (498-500 k on all thirteen: 160 s -> 3123,
-                # 464 s -> 1077)
+                # the PC's COLLAPSE! board as GameLogic.dll sums it
+                # (fcn.10040226 / fcn.10040205, docs/PC_ROUTINES.md): 1000 a
+                # coin AND 1000 a life left (the status struct's +0 and
+                # +0x14 together), 5000 when the gauge overflowed (the
+                # accounting's flag at 100 000 rage, once), and 6 000 000
+                # over the level's ticks at 12 a second for the clock —
+                # 500 000 / the seconds played. Badinfos' thirteen end
+                # screens (docs/PC_VS_MOBILE.md) read the same sums: his
+                # three untouched lives were the "3000 for a collapse" and
+                # the overflow the "5000 trophy" of the earlier reading
                 coins = self.completed * 1000
-                collapse = 3000 if angry_count_ticks >= 1 else 0
-                trophy = 5000 if self.total > 0 and \
-                    self.completed >= self.total else 0
-                clock = int(500000.0 / max(1.0, float(elapsed or 0.0)))
-                self.pc_points = coins + collapse + trophy + clock
-                self.pc_lines = [(coins, 'coins'), (collapse, 'collapse'),
-                                 (trophy, 'trophy'), (clock, 'time')]
+                lives = self.lives * 1000
+                collapse = 5000 if angry_count_ticks >= 1 else 0
+                ticks = max(1, int(round(float(elapsed or 0.0) * pcprofile.S2_TICK_HZ)))
+                clock = 6000000 // ticks
+                self.pc_points = coins + lives + collapse + clock
+                self.pc_lines = [(coins, 'coins'), (lives, 'lives'),
+                                 (collapse, 'collapse'), (clock, 'time')]
         self.final_viewer_rating = min(final, 100)
         self.trick_ratio = '%d / %d' % (self.completed, self.total)
         self.viewer_rating = '%d%%' % self.final_viewer_rating

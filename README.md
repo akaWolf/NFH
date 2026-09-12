@@ -143,11 +143,14 @@ class per level, not data); the PC's Season 1 anger rule is read from
 game.exe and carried (a trick sets the indicator to its `angrytime`, 60
 ticks of hold, then one per tick at 12 Hz; +3 while it is above zero —
 `docs/PC_ROUTINES.md`); the Season 2 gauge is 100 000 rage long by its
-dialog, its code and its bar (the 80 read off the video is withdrawn),
-so 205 and 210 pay every coin but no longer overflow on the port's
-neighbour (90; 204 re-chained). The Season 2 scripts are read too
-(`docs/PC_ROUTINES.md`). `docs/GAMEPLAY.md` §10–§11 list what resists
-a clean reimplementation.
+dialog, its code and its bar (the 80 read off the video is withdrawn)
+and falls by leveldata's `time` every 1/12 s (0.36 %/s), so 205 and
+210 pay every coin but no longer overflow on the port's neighbour (90;
+204 re-chained). The Season 2 scripts are read too
+(`docs/PC_ROUTINES.md`); the engine's frame pacer itself was not
+found in either game.exe — the 12 Hz stands on the clocks, the HUD's
+divisions by 12 and the mercury. `docs/GAMEPLAY.md` §10–§11 list what
+resists a clean reimplementation.
 
 ## What makes this tractable
 
