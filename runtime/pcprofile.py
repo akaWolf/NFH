@@ -200,3 +200,29 @@ def s1_result(won, time_up, rating):
     if won:
         return S1_RESULT['brilliant' if s1_perfect(rating) else 'success']
     return S1_RESULT['timeover' if time_up else 'failed']
+
+
+# The Season 2 result screen (docs/PC_VERIFICATION.md "Season 2"): the
+# GameLogic level end hands GUIEngine the status struct (eleven dwords) and
+# a failed flag, and the dialog fill at GUIEngine 0x10001536-0x10001652
+# captions the `rating` text `failed` when the flag is set, `bonus` when
+# the status's collapse byte (+0x28, the gauge overflowed) is set,
+# `perfect` when the coins (+0) equal the level's total (+4), else
+# `success`; generic/strings.xml spells them FAILURE, COLLAPSE!, GOOD JOB!,
+# SUCCESS!. The rows below the caption are the board's coins, lives,
+# bonus and time (calculate_score's pc_lines).
+S2_RESULT = {'failed': 'FAILURE', 'bonus': 'COLLAPSE!', 'perfect': 'GOOD JOB!',
+             'success': 'SUCCESS!'}
+
+
+def s2_result(won, collapsed, completed, total):
+    """the PC game-over caption for a Season 2 outcome (GUIEngine
+    0x10001536): failed, then the overflow, then every coin, else success"""
+    if not won:
+        return S2_RESULT['failed']
+    if collapsed:
+        return S2_RESULT['bonus']
+    if total > 0 and completed >= total:
+        return S2_RESULT['perfect']
+    return S2_RESULT['success']
+

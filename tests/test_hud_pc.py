@@ -140,6 +140,12 @@ class Result(unittest.TestCase):
         self.assertEqual(pcprofile.s1_result(False, True, 40), "TIME'S UP!")
         self.assertEqual(pcprofile.s1_result(False, False, 40), 'FAILED!')
 
+    def test_s2_captions(self):
+        self.assertEqual(pcprofile.s2_result(False, True, 5, 5), 'FAILURE')
+        self.assertEqual(pcprofile.s2_result(True, True, 3, 5), 'COLLAPSE!')
+        self.assertEqual(pcprofile.s2_result(True, False, 5, 5), 'GOOD JOB!')
+        self.assertEqual(pcprofile.s2_result(True, False, 3, 5), 'SUCCESS!')
+
     def test_perfect_threshold(self):
         self.assertEqual(pcprofile.S1_PERFECT_RATING, 90)
         self.assertTrue(pcprofile.s1_perfect(90))

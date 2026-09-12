@@ -201,6 +201,7 @@ helpers.
 | the respawn timer | Woody is controllable as soon as he reappears | the catch (fcn.10042471 at 0x100424b6) copies leveldata's `respawntime="60"` into status +0x18, the tick counts it down (fcn.10044234 at 0x10044725), and while it runs the action runner fcn.1003cc45 drops the actions whose actor is `woody` (0x1003ce61, 0x1003ceae: the timer read fcn.10040123) | read: 5 s without Woody's actions after the respawn; open whether a walk command is among them, so not carried |
 | lives out | game over | fcn.10042471: lives − 1, below zero → the failed path (0x100424d8) | agrees |
 | the gauge, the decay, the board, the clock | `pcprofile.s2_rage_tick`, `calculate_score` | fcn.10044234, fcn.10040226 | agrees (docs/PC_ROUTINES.md) |
+| the result screen | `COLLAPSE!` on an overflow, else the mobile's EXCELLENT / GOOD / PASSED | GUIEngine 0x10001536–0x10001652 fills `dialogs/gameover.xml` (`rating`, `coinsscore`, `lifesscore`, `bonusscore`, `timescore`, `wholescore`) from the status struct (eleven dwords, `push 0xb` at 0x1000515f) and a failed flag: `failed` (FAILURE), else `bonus` (COLLAPSE!) on the collapse byte +0x28, else `perfect` (GOOD JOB!) when coins +0 equal the total +4, else `success` (SUCCESS!) — `generic/strings.xml` | **fixed 2026-09-16**: `pcprofile.s2_result` under the profile; the rows were already the board's |
 | the trick amounts | nine PC values in `levels/pc/*.overlay.json`, the rest the mobile's | tricks.xml `coins` / `rage` | agrees (data, the overlays' sources) |
 | detection ("sees Woody") | the mobile's predicate | the level tick (fcn.10044234 at 0x100445f1) runs fcn.1003fc90 over a table of watch entries (an actor, a target, mode bits at +0x1c/+0x1d) and evaluates each with fcn.1003f573: the actor must carry flag 0x20, neither party flag 4 (the hideout flag — set on hiding, e.g. 0x100067e9, cleared by the `leave` action at 0x10006abc), the rooms compared through fcn.10040a7d (the record of the actor's +0x20 name), and in one mode a vertical distance below 15 (0x1003f7d0); a true entry fires an event object (fcn.1003f86d, fcn.1003f972, fcn.1003fa6b, fcn.1003fc6e — no strings) | agrees in kind with the mobile's zone containment plus the hiding exemption; open: which entries the levels register (scripts or engine) and what the reactions do — the catch itself is the catcher's `fight` action, issued by the level class's own method (the `fight` string sites, one per level, e.g. 0x100149dc) |
 
@@ -236,6 +237,9 @@ helpers.
 - `runtime/app.py`: the saved `perfect` flag of a Season 1 level uses the
   90 mark under the profile.
 - `tests/test_hud_pc.py`: the captions and the threshold.
+- `runtime/pcprofile.py` / `runtime/world.py` (the same day, later): the
+  Season 2 captions FAILURE / COLLAPSE! / GOOD JOB! / SUCCESS! from
+  GUIEngine's fill (`s2_result`).
 - `docs/PC_ROUTINES.md`: the level-end paragraph rewritten to the state
   machine (the earlier "0 = caught, 1 = failed, 2–3 = success" was the
   jingle table read as the level state).

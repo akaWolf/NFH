@@ -259,7 +259,10 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   by minquota, a catch with the quota reached still a success), the
   result captions of the game-over dialog (GFXEngine 0x1000e0f9: BRILLIANT!
   from a rating of 90, SUCCESS!, TIME'S UP!, FAILED! — `pcprofile.s1_result`
-  under the profile, and the map's perfect episode at 90 — `s1_perfect`),
+  under the profile, and the map's perfect episode at 90 — `s1_perfect`;
+  the Season 2 board's caption from GUIEngine 0x10001536: FAILURE,
+  COLLAPSE! on an overflow, GOOD JOB! with every coin, SUCCESS! —
+  `s2_result`),
   the catch's per-tick rule and cutscene, the Season 2 completion check
   (fcn.10041086: every reachable trick, or coins ≥ mincoins on the
   menu's exit), the catch fiber with its respawn 900 px above the start

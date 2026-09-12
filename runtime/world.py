@@ -2065,8 +2065,12 @@ class GameState:
             self.rating = 'GOOD'
         else:
             self.rating = 'PASSED'
-        if nfh2 and pcprofile.is_pc() and self.won and angry_count_ticks >= 1:
-            self.rating = 'COLLAPSE!'    # the PC board's title
+        if nfh2 and pcprofile.is_pc():
+            # the PC board's caption (pcprofile.s2_result, GUIEngine
+            # 0x10001536): FAILURE, COLLAPSE! on an overflow, GOOD JOB! with
+            # every coin, else SUCCESS! — the mobile's bands are its own
+            self.rating = pcprofile.s2_result(self.won, angry_count_ticks >= 1,
+                                              self.completed, self.total)
         if not nfh2 and pcprofile.is_pc():
             # the PC's own captions (pcprofile.s1_result): BRILLIANT! from a
             # viewer rating of 90, SUCCESS! below it, TIME'S UP! and FAILED!
