@@ -387,7 +387,15 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   and 30 at his lap-3 call where the PC's E10 lands the 70 at once, and
   the coins fall 35-60 s apart on his tantrum-stretched laps (the gauge
   peaks at 63 in runs/chain2/s2_Level210f), so the level rates 90. The
-  overlay's Elephant is 30 (dogattack_bat), not the octopus's 27.
+  overlay's Elephant is 30 (dogattack_bat — in_b2/objects.xml the bat's
+  attack is `bar/elefant`'s action, Fifi the actor), not the octopus's 27.
+  The PC's own triple is the board's: `pool/divingboard_oil` fires three
+  tricks in one `fall_empty` action (fifi_bone, fall_water, fall_empty —
+  60 at once, the drained pool) and two in `fall_water` (40), where the
+  mobile's ladder (Rottweiler.cs:613-693, carried by the port) pays the
+  board 20 and the basket 20 + 10 at separate calls; the E10 bar's 70
+  landing last on 31 is that action. Carrying it would be a trick-logic
+  change, not a rule or a constant, and stays outside the profile.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
