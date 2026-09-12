@@ -139,7 +139,7 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   on sight with no busy window, the stations' durations — the profile's
   idle laps sit within 10 % of the lap model on every level it covers
   (docs/PC_LAPS.md) and the plans were re-timed to them: every Season 1
-  level is won (101/102/107 100, 103/104/105 97, 112/114 94, 108/113 91,
+  level is won (101/102/107 100, 103/104/105/114 97, 112 94, 108/113 91,
   109 88, 110 78, 106 77, 111 70 — the last three at ceilings the
   room-pointer catch sets, the 97s a second or two of his lap,
   `docs/PC_FIDELITY.md` §7) and thirteen Season 2 levels rate 100 (210

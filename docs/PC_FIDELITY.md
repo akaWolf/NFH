@@ -334,8 +334,10 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   stations' order — 102 chains its six once the television is armed on the
   loo trip; 103, 104 and 105 keep one cold trick by a second or two (the
   kitchen three a lap after the mailbox rush, the dirty microwave 26 s after
-  the cream at the eat, the phone answered 23 s after the loo); 112 and 114
-  spread ten and nine tricks over laps of 143 and 168 s. Season 2 (the
+  the cream at the eat, the phone answered 23 s after the loo); 114 chains
+  six of its eight once the pipe and the gramophone are armed on his first
+  basement trip (97 — the cup's tin 52 s after the horn and the pipe 43 s
+  after the tin stay cold); 112 spreads ten tricks over a lap of 143 s (94). Season 2 (the
   mobile predicates): thirteen levels at 100 — 209 with its hot shoe used
   inside his Taj Mahal stay, where the mobile predicate is blind; 202 with
   the PC coins of cn_b1's tricks.xml (the mat 20, the shark 35 on the
@@ -344,7 +346,11 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   205 with the tennis armed after his lap-2 tennis so it lands last; 207
   with the awning on his lap-3 bar visit from the beach side. 210 is still
   lost: the pool is the Mother's, who sleeps 19 s and looks around 15 s in
-  turn and wakes to a runner, and his own pool visits fall into the naps.
+  turn on her own clock, his own pool visits fall into the naps, and the
+  four rooms are a ring (beach - pool - elephant - shop - beach) whose
+  rooms he takes one after another every 90 s while each paid trick shifts
+  him ~10 s against her clock: the pool crossing Woody needs to change
+  sides has no window that survives the drift (v11-v13).
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

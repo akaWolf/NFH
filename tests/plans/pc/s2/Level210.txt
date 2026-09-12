@@ -1,4 +1,4 @@
-# Level210 under the PC profile (v12, 2026-09-17: the profile's Season 2 paces).
+# Level210 under the PC profile (v13, 2026-09-17: the profile's Season 2 paces).
 # His lap (90 s, runs/idlepc2s2): Zone01 0-59 (the chair 3.5), the pool 59-71
 # (the Mother's call, the basket 64), Zone01 71-78, the shop (Zone02) 78-96
 # (81), the elephant (Zone03) 96-110 (96.5), the pool 110-118 (the basket
@@ -12,7 +12,8 @@
 # (he is in Zone01, then the shop), the board once her last call is over and
 # she sleeps on (246-420) — on his lap-3 shop visit (258-275), in and out
 # through the elephant's room; the beach, the shop and the elephant's room
-# are taken in turn as he leaves each (v11 sent Woody into his beach zone).
+# are taken in turn as he leaves each — each wait is for his ENTRY into the
+# room Woody has just left, never into the one Woody stands in (v12).
 take SeaUrchin IT2_Hedgehog            # Zone02
 take! OlgaBra IT2_Bra                  # Zone01: Olga's first shower (3-25), he sleeps in the chair 4-16
 prime WaterMelons IT2_Bra              # Zone03 -> IT2_Bra_sling
@@ -34,9 +35,11 @@ take SeaUrchin IT2_Hedgehog            # Zone02: the second urchin, for the chai
 whenzone Zone01                        # (118) he is back on the beach until 149: the shop is Woody's until 168
 whenzone Zone04                        # (149) his second pool call: the elephant's room is free until 186
 park! Zone03
-whenzone Zone03                        # (186) he comes to the elephant: the shop is free until 258
+whenzone Zone02                        # (168) he enters the shop: the beach is free until 208
+park! Zone01
+whenzone Zone04                        # (200) he goes up with the basket: the shop is free until 258
 park! Zone02
-whenzone Zone01                        # (208) he sits on the beach (210): the elephant's room is free until 276
+whenzone Zone04                        # (239) her call: he leaves the pool at 251 for the beach and the shop (258) — the elephant's room is free until 276
 park! Zone03
 whenzone Zone02                        # (258) his lap-3 shop: the Mother sleeps from 246 on — the pool through the elephant's room
 usewith! DivingBoard IT2_Sunoil        # Zone04 (~265): with the basket, pays at his lap-4 pool visit (~290)
