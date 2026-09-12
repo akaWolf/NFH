@@ -29,6 +29,38 @@
    "set": {
     "PCAngryTime": 288
    }
+  },
+  {
+   "object": "Piano",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 7.5
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 7.5 s"
+  },
+  {
+   "object": "Football",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 1.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.3 s"
+  },
+  {
+   "object": "Window",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.08
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.1 s"
+  },
+  {
+   "object": "PlantStink",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.83
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PlantStink <- flower#0 3.8 s"
   }
  ]
 }

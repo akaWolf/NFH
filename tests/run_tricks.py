@@ -351,18 +351,32 @@ class Driver(Recorder):
                             # (MakeTrick+TrickLaugh ~1.5 s, a take ~1.3 s)
     MARGIN = 1.5
 
-    DOOR_CLIMB_U = 0.65     # the back doors sit ~0.65 u above the floor path (Level109's log)
+    # the neighbour's climb to a back door and his descent from its twin under the profile,
+    # measured on the idle runs of 109/110/112 (runs/idlepc3: ~0.33 u up in 1.0 s at the
+    # PC's 0.375 u/s, ~0.23 u down); the old 0.65 each way over-read both by 2x
+    DOOR_CLIMB_UP_U = 0.35
+    DOOR_CLIMB_DOWN_U = 0.23
 
-    def _door_climb(self, door, p=None, sneaking=False):
-        """seconds of the climb to a back door plus the descent on the far side under the
-        PC profile: one axis a tick there, up and down the room at the record's pace —
-        the neighbour 0.375 u/s, Woody 0.75 walking and 0.25 sneaking; a side door needs none"""
+    @staticmethod
+    def _door_side(door):
+        s = str(getattr(door, 'door_type', ''))
+        return 'Back' if s.endswith('Back') else ('Left' if s.endswith('Left') else 'Right')
+
+    def _door_climb(self, door, p=None, sneaking=False, part='both'):
+        """seconds of the climb to a back door ('up'), the descent on the far side
+        ('down') or both under the PC profile: one axis a tick there, up and down the
+        room at the record's pace — the neighbour 0.375 u/s, Woody 0.75 walking and
+        0.25 sneaking; a side door needs none"""
         if not pcprofile.is_pc() or door is None or not str(getattr(door, 'door_type', '')).endswith('Back'):
             return 0.0
         role = getattr(p, 'role', 'Woody') if p is not None else 'Woody'
         v = pcprofile.walk_speed(role, sneaking, 0.0, 1.0, climbing=True,
                                  stairs=bool(getattr(self.v.woody, 'nfh2', False)))
-        return 2 * self.DOOR_CLIMB_U / v if v else 0.0
+        if not v:
+            return 0.0
+        u = {'up': self.DOOR_CLIMB_UP_U, 'down': self.DOOR_CLIMB_DOWN_U}.get(
+            part, self.DOOR_CLIMB_UP_U + self.DOOR_CLIMB_DOWN_U)
+        return u / v
 
     def _speed(self, p):
         if pcprofile.is_pc():
@@ -399,13 +413,26 @@ class Driver(Recorder):
             # second); the descent on the far side happens inside the new room,
             # where he already catches; a walk-up door plays Leave first
             back = str(getattr(door, 'door_type', '')).endswith('Back')
+            ticks = pcprofile.door_ticks(
+                getattr(p, 'role', 'Rottweiler') if p is not None else 'Rottweiler',
+                self._door_side(door), nfh2=bool(getattr(self.v.woody, 'nfh2', False)))
+            if ticks is not None:
+                # Season 1: the near door's `enter` (11 ticks back, 19 side), then
+                # the placement at the far door — the room flips there, before the
+                # far clip (pcprofile.door_warp_early)
+                return ticks[0] / 12.0 + self._door_climb(door, p, part='up')
             t = (13 if back else 20) / 12.0 + (20 / 12.0 if door.should_walk_up else 0.0)
-            return t + self._door_climb(door, p) / 2.0
+            return t + self._door_climb(door, p, part='up')
         if door.should_walk_up:
             return 3.5
         return 2.0
 
     def _anim_left(self, player):
+        """seconds left in the current animation plus the pending sequence, at the
+        player's pace (the profile's station scale, AnimPlayer.time_scale)"""
+        return self._anim_left_raw(player) / (getattr(player, 'time_scale', 1.0) or 1.0)
+
+    def _anim_left_raw(self, player):
         """seconds left in the current animation plus the pending sequence"""
         def length(a):
             n = len(a.pattern) if a.pattern else (a.end - a.start + 1)
@@ -500,7 +527,12 @@ class Driver(Recorder):
             # cs:342-351): Level205's neighbour stands watching the mat —
             # a human reads that as "not coming until Olga is done"
             return 0.0 if p.zone.pid == zone_pid else None
-        if p.zone.pid == zone_pid and not p.is_warping:
+        # under the PC profile the zone field is the room pointer the catch
+        # reads, door clips included (pcprofile.door_warp_early): a catcher
+        # in his near clip is still here, one in his far clip already there
+        rooms = pcprofile.is_pc() and pcprofile.door_warp_early(
+            bool(getattr(self.v.woody, 'nfh2', False)))
+        if p.zone.pid == zone_pid and (rooms or not p.is_warping):
             dwell = self._dwell(p, zone_pid) if after > 0.0 else None
             if dwell is None or dwell >= after:
                 # a sleeping catcher (IsSleeping gates both catch
@@ -654,6 +686,7 @@ class Driver(Recorder):
                 t += self.use_len(p, toilet)
         # the actions ahead
         n = len(r.actions)
+        visits = {}
         for k in range(1, n + 1):
             a = r.actions[(r.index + k) % n]
             it = self.v.level.items.get(a['item'])
@@ -665,7 +698,8 @@ class Driver(Recorder):
                 return None
             if hit == 'hit':
                 return t
-            t += self.use_len(p, it)
+            t += self.use_len(p, it, visits.get(id(it), 0))
+            visits[id(it)] = visits.get(id(it), 0) + 1
             if t > horizon:
                 return None
             toilet = self._rush_target(p, it)
@@ -694,10 +728,13 @@ class Driver(Recorder):
         toilet = items.get(ta.get('item')) if ta.get('item') else None
         return toilet if toilet is not it else None
 
-    def use_len(self, p, it):
+    def use_len(self, p, it, ahead=0):
         """seconds the catcher spends at `it`: his use sequence for its
         current tricked state (Item.sequence_for) plus the angry/fix tail
-        when it will go angry; 8 s when nothing is known"""
+        when it will go angry; 8 s when nothing is known. Under the PC
+        profile a plain use lasts the station's PCUseSeconds (per visit:
+        `ahead` visits of this item come before the one estimated —
+        RoutineAction._pc_use_seconds advances the counter as a use starts)"""
         try:
             role = getattr(p, 'role', 'Rottweiler')
             tricked = it.is_tricked(self.v.level.items) \
@@ -705,6 +742,10 @@ class Driver(Recorder):
             seq = it.sequence_for(role, tricked, self.v.level.items) or []
         except Exception:
             return 8.0
+        secs = getattr(it, 'pc_use_secs', None)
+        if secs and not tricked and pcprofile.is_pc() \
+                and getattr(p, 'role', None) == 'Rottweiler':
+            return float(secs[(it.pc_use_visit + ahead) % len(secs)])
         def length(names):
             s = 0.0
             for name in names:
@@ -730,6 +771,18 @@ class Driver(Recorder):
             t += (angry or 2.4) + fix
         return t / self.anim_rate(p)
 
+    def _out_of_zone_delay(self, door):
+        """seconds after Woody reaches `door` until he is out of the zone he leaves:
+        the mobile's pass is IsPassingDoor-safe from its first frame (a walk-up door
+        climbs ~1.2 s first); under the PC profile his room changes at the far clip's
+        start — after the climb and the near door's `enter` (pcprofile.door_warp_early)"""
+        w = self.v.woody
+        ticks = pcprofile.door_ticks('Woody', self._door_side(door),
+                                     nfh2=bool(getattr(w, 'nfh2', False)))
+        if ticks is not None:
+            return ticks[0] / 12.0 + self._door_climb(door, w, getattr(w, 'sneaking', False), part='up')
+        return 1.2 if door.should_walk_up else 0.0
+
     def woody_door_time(self, door):
         """Woody's own pass: a walk-up door is climb + Leave (10 fr) +
         Enter (16 fr) + descend, ~4.4 s; a flat door plays both sheets at
@@ -739,6 +792,14 @@ class Driver(Recorder):
         run speed, the NFH2Stairs pair a ~1-unit diagonal climb"""
         if door.is_transition and door.complex_move:
             return 1.5 if door.nfh2_stairs else 1.0
+        ticks = pcprofile.door_ticks('Woody', self._door_side(door),
+                                     nfh2=bool(getattr(self.v.woody, 'nfh2', False)))
+        if ticks is not None:
+            # Season 1 under the profile: his `enter` and the far door's `leave`
+            # one after the other (15 + 23 right, 18 + 24 left, 9 + 25 back) plus
+            # the climb and the descent of a back door
+            w = self.v.woody
+            return (ticks[0] + ticks[1]) / 12.0 + self._door_climb(door, w, getattr(w, 'sneaking', False))
         return 4.4 if door.should_walk_up else 2.5
 
     def use_time(self, item):
@@ -861,7 +922,8 @@ class Driver(Recorder):
         if path:
             first = path[0][1]
             leave = abs(first.x - w.sprite.x) / 2.0 \
-                + (2.0 if w.hiding else 0.0) + self.MARGIN
+                + (2.0 if w.hiding else 0.0) + self.MARGIN \
+                + self._out_of_zone_delay(first)
             t = 2.0 if w.hiding else 0.0
             wx = w.sprite.x
             cur = w.zone.pid
@@ -963,7 +1025,16 @@ class Driver(Recorder):
                 self.click_zone(z)
                 return
         self._waypoint = None
-        click()
+        r = click()
+        if r == 'hide-in':
+            # a click during the literal Hide_In dive is dropped by the
+            # original (Woody.cs:642-651): a human clicks again once he is
+            # in — the leg's window (Level106's pudding, 19 s of kitchen)
+            # is shorter than the poke cadence
+            deadline = self.t + 3.0
+            while self.t < deadline and w.anim.anim.name == 'Hide_In':
+                self.step_world()
+            click()
 
     def _route_clear(self, path, arrive, zone_pid):
         """every zone Woody crosses on `path` is clear while he passes it
@@ -1003,8 +1074,9 @@ class Driver(Recorder):
             for zp, door in path:
                 t += abs(door.x - wx) / self.woody_speed(cur)
                 # out of the zone he leaves the moment the pass begins
-                # (IsPassingDoor; a walk-up door climbs ~1.2 s first)
-                safe_at.append(t + (1.2 if door.should_walk_up else 0.0))
+                # (IsPassingDoor; a walk-up door climbs ~1.2 s first) — under
+                # the PC profile at the far clip's start (_out_of_zone_delay)
+                safe_at.append(t + self._out_of_zone_delay(door))
                 t += self.woody_door_time(door)
                 other = self.v.level.door_by_pid(door.link_to)
                 nx = other.x if other is not None else door.x
@@ -1179,7 +1251,7 @@ class Driver(Recorder):
                 else 3.0
             crawl = dist / (pcprofile.walk_speed('Woody', True, 1.0, 0.0) if pcprofile.is_pc()
                             else max(0.2, (w.force or 0.8) * (w.speed_sneaking or 0.65))) + 2.0
-            crawl += self._door_climb(first_door, w, True) / 2.0
+            crawl += self._door_climb(first_door, w, True, part='up')
             for p in self.catchers():
                 eta = self.eta_to_zone(p, w.zone.pid, horizon=20.0)
                 if eta is not None and eta < min(8.0, crawl):
@@ -1343,6 +1415,11 @@ class Driver(Recorder):
             if ahead and (getattr(self, '_flee_at', None) is None
                           or self.t - self._flee_at >= 2.5):
                 self._flee_at = self.t
+                if os.environ.get('NFH_GATE_LOG'):
+                    print('dodge t=%.1f flee here=%s next=%s soonest=%s etas=%s' % (
+                        self.t, here, nxt, soonest,
+                        [(p.role, self.eta_to_zone(p, nxt, horizon=20.0), p.zone.pid if p.zone else None,
+                          (p._step or {}).get('kind') if p._step else None) for p in self.catchers()]), flush=True)
                 hide = next((i for i in self.v.level.items.values()
                              if i.kind == 'HideItem' and i.zone == here
                              and i.collider is not None), None)
@@ -1411,7 +1488,7 @@ class Driver(Recorder):
             exit_time += abs(first_door.x - w.sprite.x) \
                 / self.woody_speed(here) \
                 + (1.2 if first_door.should_walk_up else 0.0) \
-                + self._door_climb(first_door, w, self.woody_speed(here) < 1.0) / 2.0
+                + self._door_climb(first_door, w, self.woody_speed(here) < 1.0, part='up')
         if pcprofile.is_pc() and not getattr(w, 'nfh2', False):
             # the 12-fps door pairs are quicker than the model's rounding; Season 1 only —
             # on Season 2 the margin outran an ignoring catcher's window and Woody hid
@@ -1478,7 +1555,7 @@ class Driver(Recorder):
         for s in steps:
             if s.get('kind') == 'door':
                 # the climb to a back door at the PC pace (half of _door_climb: the way up)
-                return t + abs(s['door'].x - x) / sp + self._door_climb(s['door'], w, sneak) / 2.0
+                return t + abs(s['door'].x - x) / sp + self._door_climb(s['door'], w, sneak, part='up')
             if s.get('kind') in ('point', 'cpoint', 'item'):
                 tx = s.get('x', x)
                 t += abs(tx - x) / sp
@@ -1906,6 +1983,13 @@ class Driver(Recorder):
         last_why = None
         while self.t < deadline:
             if self.gate_open(zone_pid, x, item):
+                if os.environ.get('NFH_GATE_LOG'):
+                    w = self.v.woody
+                    print('gate t=%.1f zone=%s OPEN need=%.1f woody=%s etas=%s' % (
+                        self.t, zone_pid,
+                        self.woody_need(zone_pid, x, item) + self.MARGIN + getattr(self, '_extra_need', 0.0),
+                        (w.zone.pid if w is not None and w.zone is not None else None),
+                        [(p.role, self.eta_to_zone(p, zone_pid), p.zone.pid if p.zone else None) for p in self.catchers()]), flush=True)
                 return True
             if os.environ.get('NFH_GATE_LOG') and self._gate_why != last_why:
                 # the gate's reason, numbered by its `return False` in
@@ -2538,6 +2622,14 @@ class Driver(Recorder):
         if self.tour:
             self._tour_tick()
         self._mouse_tick()
+        # the exit door's confirmation (Woody.ShowExitConfirmation, raised by a
+        # walk into the entrance zone): a human answers No — a plan never means
+        # to leave, and the open dialog would freeze the level for good
+        em = getattr(getattr(self.app, 'igm', None), 'exit_message', None)
+        if em is not None and em.should_show:
+            if em.dismissed is not None:
+                em.dismissed(False)
+            em.hide()
         v._frame_dt = DT
         if not self.paused and not v.world.menu_open:
             v.t += DT

@@ -22,44 +22,57 @@
 # order on E11 (trap 158, washer 180, drier 196, vacuum 222, marbles 249,
 # tank 279, board 302, airer 322), every gap inside the window.
 # -- lap 1: he walks Z06 -> Z02 -> Z03 (Detergent, t~15) -> Z01 -> Z09 ------
-take TableShovel IT_Shovel            # Z07 at once, behind him (Z01->Z02->Z06->Z07)
-take Detergent IT_Detergent           # Z03 after his [0] use
-take RubbishBinCable IT_Cable         # Z03
-wait 14                               # his Z01 -> Z02 -> Z06 pass: Woody stays out of Z02
-take Perch IT_Birdfood                # Z02 (auto-sneak: the dog)
-take Drawer IT_Marbles                # Z01
-park Zone04                           # the dead end he never visits
 # -- lap 2, he is in the kitchen/basement: the study (the knife) -----------
-take DeskDrawer IT_Paperknife         # Z08 (via Z02/Z06 while he is in Z03/Z01)
-park Zone02                           # wait for his climb here (Z04 -> Z09 crosses his Z06 -> Z07 walk)
 # -- lap 2, he is upstairs: the basement three (the marbles wait) ----------
-take BasementDrawer IT_Tongs
-usewith Drier IT_Tongs                # RequireUnprime trio: pays at his use visit
-take WineCellar IT_Winebottle
-usewith WashingMachine IT_Winebottle
-usewith ElectricTrap IT_Cable         # NoticeWhenWalkNearby, 7 on PC
-park Zone04
 # -- lap 3, he is in the basement (the three pay there): the tour ----------
-whenzone Zone09
-prime PlantSoil IT_Shovel             # Z07: the held type becomes IT_Soil
-usewith GroundMarbles@Zone07 IT_Marbles   # the balcony: his walk from the iron [7] to the airer [8]
-                                      # (Badinfos' marbles pay 27 s after his iron, on that walk;
-                                      # in the hall they paid on his way up and left the iron ->
-                                      # tank stretch 40 s wide — v13, 97)
-usewith DirtyCarpet IT_Soil           # Z02: the room trigger for his Z02 entry
-usewith Vacuum IT_Paperknife          # Z02: the tool that pays 13 on PC
-use Iron                              # Z06: hot since his [11] (the overlay's phase); pays at his [7]
-usewith FishTank IT_Detergent         # Z08, 10 at his [9]
-hide Bed                              # Z06: out of his way up; he vacuums, irons, goes to the balcony
 # -- the balcony after his [8] prime, armed while he is at the tank --------
-whenusing FishTank                    # his [9]: the airer is primed by his [8]
-usewith Airer IT_Birdfood             # Z07, 12 on PC; pays at his [10]
-hide Bed
+# v14 (2026-09-17, the PC door pass and station durations): his lap is 117 s —
+# downstairs 0-58 (bedroom 0-5, living 5-10, kitchen 11-20, hall 20-26,
+# basement 26-44, hall 44-52, living 53-58) and upstairs 58-127 (bedroom,
+# balcony 77-84, bedroom, study 93-101, bedroom, balcony 110-117, bedroom) —
+# the washing machine's mobile cycles stretch lap 2 to ~200 s. Under the PC
+# catch a walk through his room is a catch and the study and the balcony are
+# reached only through the bedroom, so the upstairs is Woody's while he is
+# down (127-175) and never while he is up: the airer (12) has no window — its
+# prime is his own balcony use and the next one comes with him through the
+# bedroom — and is dropped; the marbles, the shovel and the fish tank go on his
+# second lap's descent, the carpet and the vacuum on his third. Seven tricks'
+# 67 of the PC's 79.
+take Drawer IT_Marbles               # Zone01 (~4): he is upstairs, then in the living room (5-10)
+whenzone Zone03                      # (10.7) he is in the kitchen: up through the living room (tiptoe: the dog) to the balcony
+take! TableShovel IT_Shovel          # Zone07 (~33)
+usewith! GroundMarbles@Zone07 IT_Marbles   # Zone07: his walk from the iron [7] to the airer [8] (77)
+prime! PlantSoil IT_Shovel           # Zone02 (~47): the held type becomes IT_Soil
+park! Zone03                         # (~50) the kitchen before he sits in the living room (52.6-57.8)
+take! Detergent IT_Detergent         # Zone03
+take! RubbishBinCable IT_Cable       # Zone03
+whenzone Zone06                      # (58) he is upstairs until 127: the hall and the basement
+take! BasementDrawer IT_Tongs        # Zone09
+usewith! Drier IT_Tongs              # RequireUnprime trio: pays at his use visit (~156)
+take! WineCellar IT_Winebottle
+usewith! WashingMachine IT_Winebottle
+usewith! ElectricTrap IT_Cable       # NoticeWhenWalkNearby, 7 on PC
+hide! Wardrobe                       # Zone01 by ~100: he crosses the hall 142-148 and 162-170
+whenzone Zone03                      # (~133) his second kitchen: the iron and the knife through the living room and the bedroom
+use! Iron                            # Zone06: hot since his [11] (the overlay's phase); pays at his next ironing
+take! DeskDrawer IT_Paperknife       # Zone08
+park! Zone03                         # (~167) the kitchen, off his way while he crosses the hall and sits (162-175)
+whenzone Zone06                      # (175.5) he is upstairs: the wardrobe
+hide! Wardrobe
+whenzone Zone03                      # (~250) his third kitchen: the fish tank
+usewith! FishTank IT_Detergent       # Zone08, 10 at his next look at the tank
+park! Zone03                         # (~282)
+whenzone Zone06                      # (~293) he is upstairs: the wardrobe
+hide! Wardrobe
+whenzone Zone03                      # (~370) his fourth kitchen: the living room from the hall
+usewith! DirtyCarpet IT_Soil         # Zone02: the room trigger for his Z02 entry
+usewith! Vacuum IT_Paperknife        # Zone02: the tool that pays 13 on PC
+whenzone Zone09                      # he is in the basement: back to the wardrobe
+hide! Wardrobe
+await GroundMarbles@Zone07 7
 await ElectricTrap 7
 await WashingMachine 10
 await Drier 10
-await GroundMarbles@Zone07 7
-await Vacuum 13
 await Iron 10
 await FishTank 10
-await Airer 12
+await Vacuum 13

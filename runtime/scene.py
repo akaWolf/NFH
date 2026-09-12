@@ -236,7 +236,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'pc_angry_time', 'sprite',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -573,6 +573,12 @@ class Item:
         # value, which takes the level's (levels/pc overlays, PCAngryTime;
         # pcprofile.s1_rage_fire, docs/PC_ROUTINES.md)
         self.pc_angry_time = int(d.get('PCAngryTime') or 0)
+        # the PC station's seconds per visit (levels/pc overlays, PCUseSeconds — the level
+        # class's DoActions at 12 ticks a second, tools/pcref/pc_durations.py); one value
+        # or one per visit, cycling — RoutineAction._pc_use_seconds
+        v = d.get('PCUseSeconds')
+        self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
+        self.pc_use_visit = 0
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))

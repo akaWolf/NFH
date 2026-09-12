@@ -10,10 +10,11 @@
   },
   {
    "object": "Rake",
-   "component": "TrickItem",
+   "component": "Rake",
    "set": {
     "AngerAmount": 20
-   }
+   },
+   "note": "the rake's component is the Rake subclass (scene.py), not a plain TrickItem — the patch matched nothing until 2026-09-17"
   },
   {
    "object": "Submarine",

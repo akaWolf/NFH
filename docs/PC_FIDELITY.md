@@ -295,6 +295,47 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   same windows
   (`_asleep_safe`, `_ignoring_safe`); `NFH_PC_RULES=walk,doors,sight`
   keeps a subset for bisecting a plan.
+- The door pass (2026-09-17, `pcprofile.door_ticks` / `doors_sequential` /
+  `door_warp_early`, docs/PC_VERIFICATION.md "door transit"): the PC runs
+  the near door's `enter` and the far door's `leave` one after the other
+  through every door (the mobile fires a flat door's two strips at once),
+  each `time` ticks long — the neighbour 19 + 19 by a side door and
+  11 + 22 by a back door, Woody 15 + 23 / 18 + 24 / 9 + 25 — so the mobile
+  strips play at the rate that lasts those ticks; and the far door places
+  the pawn, zone and all, at its clip's start, where the PC's room pointer
+  changes (the mobile warps at the clip's end). Season 2's doors are not
+  `<door>` objects and keep the mobile's pass at a frame a tick.
+- The stations' durations (2026-09-17, `tools/pcref/pc_durations.py`):
+  every Season 1 overlay carries `PCUseSeconds` per routine item — the
+  PC station's DoActions at 12 ticks a second, from the lap model's
+  tokens of the level class, one value per visit — and the neighbour's
+  use plays the mobile clips at the pace that lasts it
+  (`RoutineAction._pc_use_seconds`, `AnimPlayer.time_scale`), or holds a
+  walk-by stand for it where the remaster only passes (the shout at
+  105's window, 112's yoga). 111's machines, 106's bath and 104's shaving
+  chain keep the mobile's (the PC neighbour waits on the object there —
+  docs/PC_VERIFICATION.md).
+- The plans under the door rule (2026-09-17, tests/plans/pc): the catch
+  reads the room pointer, door clips included, so a Woody still in his near
+  clip is caught by a neighbour who is (or wakes) in that room, and a walk
+  THROUGH a room he sits in is a catch — 106's pudding, reached only through
+  his living room, has no window and is dropped (77); 110's bedroom banana
+  has none either (his 9 s barbecue is shorter than the climb, 78); 111's
+  airer, primed by his own balcony use and un-primed by the next, is dropped
+  and its errands split over his descents (70). Every other Season 1 level
+  is re-timed to runs/idlepc4's laps and won: 101/107 100, 102/105 97,
+  103/104/112/114 94, 108/113 91, 109 88 (its first sleep is a second
+  short for the keys, which wait for the second). The 100 on a Season 1
+  level is the score plus 3 per trick that lands while he is still angry
+  (World.calculate_score under the profile): the 91-97 are one to three
+  tricks landing on a cold meter. Season 2 (the mobile predicates): ten
+  levels at 100 — 209 among them, its hot shoe used inside his Taj Mahal
+  stay, where the mobile predicate is blind — 202 and 205 at 90 with their
+  coins re-armed into one lap (202: the rail from the ring's far side, the
+  mat and the rake from Zone01) but no overflow yet: each coin's own anger
+  stretches the lap, and 202's 30 + 20 + 20 + 50 read 95 at the rail;
+  207 64 (the awning behind the Mother's pool naps) and 210 (the pool legs
+  behind her looks and his 90 s lap) still open.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.

@@ -1,20 +1,31 @@
-# Level102 under the PC profile (2026-09-17): the mobile plan, the sofa sawn
-# once he is on the loo — the PC neighbour sees Woody in the living room on
-# his rush there, where the mobile's IgnoreWoody let the saw start earlier.
-take Drawer IT_Saw
-take FirstAid IT_Laxative
+# Level102 under the PC profile (2026-09-17, the PC paces, the doors' two clips
+# in turn, the catch the room alone). His lap (27 s, the idle run under the
+# profile, runs/idlepc4): the sofa 0-13 (sit 3.6) > the kitchen 13-24 (beer 18)
+# > the sofa 24-40 (sit 30.5) > the kitchen 40-51 > ... The kitchen is a dead
+# end off the living room, the bathroom one off the hall. The egg and the
+# laxative go in on his second sit (24-40): the microwave pays on his next beer
+# walk (45), the laxative at the sit after it (57 -> the loo run); the sofa is
+# sawn while he is on the loo, and the television switched once he sits on the
+# sawn sofa and goes for the next beer.
+# v3 (2026-09-17): the egg and the laxative on separate sits — the kitchen window
+# (16 s) holds one trip from the hall, not the walk from the bathroom.
+take Drawer IT_Saw                # Zone01 (the hall) while he sits (0-13)
+take FirstAid IT_Laxative         # Zone04
 take ToiletPaper IT_Wcpaper       # TrickAfterWoodyUse + GetTrickedAtOnce: the holder is tricked
 usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
-take Fridge IT_Egg
-usewith Beer IT_Laxative          # UseAtOtherPlace: drunk at the sofa (Sofa.DependsOn -> Beer), score 18
-usewith Microwave IT_Egg          # NoticeWhenWalkNearby (the beer run passes it), score 10
-reclick Microwave                 # UseOnce: a second click is WrongTrick/NoNo
-await Microwave 10                # the beer run: surprise near, angry, fix
-await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa
-park Zone03                       # the kitchen is free while he rages and runs to the loo
-whenzone Zone04                   # the PC neighbour sees Woody on his rush (2026-09-17): the sofa is sawn once he is on the loo
+park! Zone01                      # the hall, off his lap, next to the living room's door
+whenzone Zone02                   # (24.5) his second sit: the kitchen is free until 40
+take! Fridge IT_Egg               # Zone03
+usewith! Microwave IT_Egg         # Zone03: NoticeWhenWalkNearby, 10 — his beer walk (45) passes it
+park! Zone01                      # out through the living room before he comes for the beer (40)
+await Microwave 10                # the beer walk: surprise near, angry, fix
+whenzone Zone02                   # his next sit (~67 with the anger): the kitchen again
+usewith! Beer IT_Laxative         # Zone03: UseAtOtherPlace, drunk at the sofa (Sofa.DependsOn -> Beer), 18
+park! Zone01                      # out before his beer walk
+await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa (~100)
+whenzone Zone04                   # he is on the loo (the PC neighbour sees Woody on his rush): the sofa
 usewith! Sofa IT_Saw              # score 25 — sawn during the toilet trip, out again before he comes back
-park! Zone03
+park! Zone03                      # the kitchen while he comes back through the hall to the sofa
 await Toilet 10                   # the ToiletAction visit (ShitNormal, ShitNoPaper) — paid meanwhile
 await Sofa 25                     # the next sit: SitDown, SitFall, SofaBlur
 use Television                    # bare-hand, NoticeWhenEnterZone, score 15

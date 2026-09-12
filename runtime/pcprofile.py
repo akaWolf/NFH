@@ -30,6 +30,8 @@ def apply_overlay(level):
     zone (`zone`); `set` updates fields, `append` extends list fields, `anim`
     + `anim_set` retunes one animation of an ItemAnimationController by
     Name. Returns the number of components touched."""
+    global SEASON2
+    SEASON2 = os.path.basename(level.path or '').startswith('Level2')
     p = overlay_path(level.path)
     if not os.path.exists(p):
         return 0
@@ -254,7 +256,7 @@ WALK_PX_PER_TICK = {
 
 
 def rule(name):
-    """the diagnostics' switch: NFH_PC_RULES=walk,doors,sight names the PC rules to keep,
+    """the diagnostics' switch: NFH_PC_RULES=walk,doors,sight,durations names the PC rules to keep,
     the others fall back to the mobile's (all on when unset) — for bisecting a plan"""
     keep = os.environ.get('NFH_PC_RULES')
     return keep is None or name in keep.split(',')
@@ -280,16 +282,57 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False):
 
 
 # -- the door transit (docs/PC_VERIFICATION.md "door transit") ----------------------------
-# the pawns' door clips keep the PC's frame counts, but the mobile plays them at 10 a second;
-# on PC every `auto` action is one frame a tick, 12 a second (generic/anims.xml doorleft /
-# doorright / doorback: woody_enter 19/16/10 frames, woody_leave 25/24/26, neighbor_enter
-# 20/20/12, neighbor_leave 20/20/23)
+# Every door of Season 1 is a <door> of the level's objects.xml with two actions per actor:
+# `enter` on the near door, `leave` on the far one, each `time` ticks long, the same figures
+# on every door of a type across the 14 levels — the neighbour 19 + 19 through a side door
+# and 11 + 22 through a back door, Woody 15 + 23 (right), 18 + 24 (left), 9 + 25 (back).
+# game.exe composes the pair as one step list (fcn.00478030 over fcn.00477ed0: the near
+# door's `enter`, then the far door's `leave`), and the PC video of 110 measures the
+# bedroom-to-living-room back door at ~3 s from the neighbour's arrival at the door to his
+# step out below — the sum — so the two clips run one after the other through a flat door
+# too, where the mobile fires both at once (Door.cs, Pawn._begin_transit). The actor is
+# placed at the far door's hotspot for the `leave` and its room pointer follows the
+# placement (fcn.00448d70), so the room changes at the far clip's START; the mobile warps
+# at its end. The mobile strips keep their frames (the neighbour's far back-door strip has
+# 13 where the PC's has 23) and play at the rate that lasts the PC's ticks; in Season 2,
+# whose doors are not <door> objects, they run a frame a tick as before.
 DOOR_CLIP_FPS = 12.0
 DOOR_CLIP = re.compile(r'^(Woody|Rottweiler|Mother|Olga|Kid)Door(Left|Right|Back)(Enter|Leave)$')
+DOOR_TICKS = {                    # (the near door's `enter`, the far door's `leave`)
+    ('Rottweiler', 'Back'): (11, 22), ('Rottweiler', 'Left'): (19, 19), ('Rottweiler', 'Right'): (19, 19),
+    ('Woody', 'Back'): (9, 25), ('Woody', 'Left'): (18, 24), ('Woody', 'Right'): (15, 23),
+}
+SEASON2 = False                   # apply_overlay sets it from the level's name
 
 
-def clip_fps(name, fps):
-    return DOOR_CLIP_FPS if (DOOR_CLIP.match(name or '') and rule('doors')) else fps
+def door_ticks(role, side, nfh2=None):
+    """(near, far) ticks of a pawn's Season 1 door pass; None off the rule, in
+    Season 2, and for the pawns without <door> actions (the Mother, Olga)"""
+    if not is_pc() or not rule('doors') or (SEASON2 if nfh2 is None else nfh2):
+        return None
+    return DOOR_TICKS.get((role, side))
+
+
+def clip_fps(name, fps, frames=0):
+    """the rate a door strip plays at: the one that lasts its PC action's ticks
+    (Season 1, the neighbour and Woody), else a frame a tick"""
+    m = DOOR_CLIP.match(name or '')
+    if not m or not rule('doors'):
+        return fps
+    t = door_ticks(m.group(1), m.group(2))
+    if t is None or not frames:
+        return DOOR_CLIP_FPS
+    return frames * TICKS_PER_SECOND / t[0 if m.group(3) == 'Leave' else 1]
+
+
+def doors_sequential(nfh2=False):
+    """a flat door's Leave -> Enter run one after the other, as the walk-up's do"""
+    return rule('doors') and not nfh2
+
+
+def door_warp_early(nfh2=False):
+    """the far door places the pawn — and flips its zone — at its clip's start"""
+    return rule('doors') and not nfh2
 
 
 # -- the catch on sight (docs/PC_VERIFICATION.md "caught on sight", "a busy neighbour") ----

@@ -7,6 +7,22 @@
    "set": {
     "PCAngryTime": 240
    }
+  },
+  {
+   "object": "Sofa",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.67
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
+  },
+  {
+   "object": "Beer",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 1.83
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.8 s"
   }
  ]
 }

@@ -12,23 +12,35 @@
 # cream at the pie's end > the microwave > the soap slip on his way out >
 # the picture on the hall transit > the toilet walk-by > the aftershave
 # and the deodorant at the sink.
-take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer
+# v5 (2026-09-17): the hall's wardrobe is the perch — the entrance zone is the
+# exit door's, unreachable for a park. The bathroom shelf, the toilet and the
+# picture on his first kitchen stay (70-100), the kitchen trip on his bathroom
+# stay after it (111-130, longer by the shelf's anger; his first bathroom stay
+# leaves 20 s for a 22 s trip), the soap on the bathroom stay after that —
+# every trip ends in the wardrobe before he crosses the hall.
+take FirstAid IT_Shavingfoam      # Zone04 (13-18): Shavingfoam + Hairrestorer, while he eats in the kitchen (0-29)
 take ToiletPaper IT_Wcpaper
 take SoapDish IT_Soap             # the one soap
-take Drawer IT_Superglue          # Zone01: Superglue + Marker
-take Fridge IT_Egg                # Zone03 once he has left for the bathroom: the kitchen is free until his next pie
-usewith WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at the cream action, pays at the pie's eat, 15
-usewith Microwave IT_Egg          # the microwave after the eat (the overlay), 8
-usewith Ground@Zone03 IT_Soap     # CauseSlip on his kitchen walk, 8
-whenusing WhippedCream            # he is in the kitchen (cream, eat, microwave: ~45 s): the hall and the bathroom are free
-usewith MumPicture IT_Marker      # Zone01, crossed on every hall transit, score 8
-usewith Deodrant IT_Hairrestorer  # on the shelf (Primed); pays at SinkDeodrant, score 15
-usewith AfterShave IT_Superglue   # on the shelf (Primed); pays at SinkAftershave, score 20
-usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by (0.1), score 8
-await WhippedCream 15
-await Microwave 8
-await Ground@Zone03 8
-await MumPicture 8
+take! Drawer IT_Superglue         # Zone01 (~24): Superglue + Marker, before he crosses the hall (29.6)
+hide! Wardrobe                    # Zone01 by ~28: he crosses the hall 30-40 and 60-70
+whenusing WhippedCream            # (~74) his first kitchen stay (70-100): the bathroom shelf, the toilet, the picture
+usewith! Deodrant IT_Hairrestorer # on the shelf (Primed); pays at SinkDeodrant, score 15
+usewith! AfterShave IT_Superglue  # on the shelf (Primed); pays at SinkAftershave, score 20
+usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by (0.1), score 8
+usewith! MumPicture IT_Marker     # Zone01, crossed on every hall transit, score 8
+hide! Wardrobe                    # by ~95, before he comes down (100)
+whenzone Zone04                   # (~111) his bathroom stay, longer by the shelf's anger: the kitchen
+take! Fridge IT_Egg               # Zone03
+usewith! WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at the cream action, pays at the pie's eat, 15
+usewith! Microwave IT_Egg         # the microwave after the eat (the overlay), 8
+hide! Wardrobe                    # before he comes down the hall (~140)
+whenzone Zone04                   # his next bathroom stay: the soap
+usewith! Ground@Zone03 IT_Soap    # CauseSlip on his kitchen walk, 8
+hide! Wardrobe
 await AfterShave 20
 await Deodrant 15
 await Toilet 8
+await MumPicture 8
+await WhippedCream 15
+await Microwave 8
+await Ground@Zone03 8

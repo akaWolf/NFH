@@ -14,6 +14,49 @@
    "set": {
     "PCAngryTime": 300
    }
+  },
+  {
+   "object": "ToothBrush",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.83
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 3.8 s"
+  },
+  {
+   "object": "CoffeeMaker",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.25
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 2.2 s"
+  },
+  {
+   "object": "Shezlong",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.17
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.2 s"
+  },
+  {
+   "object": "WateringCan",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.67,
+     0.67
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.7 s; WateringCan <- ewer#2 0.7 s"
+  },
+  {
+   "object": "Plant",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.17
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.2 s"
   }
  ]
 }

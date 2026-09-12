@@ -44,6 +44,30 @@
    "set": {
     "PCAngryTime": 228
    }
+  },
+  {
+   "object": "ApplePie",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 0.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.3 s"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 16.08
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Microwave <- microwave#0 16.1 s"
+  },
+  {
+   "object": "WhippedCream",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.58
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WhippedCream <- whippedcream#0 2.6 s"
   }
  ]
 }

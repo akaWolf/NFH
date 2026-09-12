@@ -1,0 +1,40 @@
+# Level209 under the PC profile (2026-09-17): the hot shoe inside his Taj Mahal stay (the profile's S2 keeps the mobile catch predicates)
+# Level209 — GameInfo total=7 / winning=5 (S2: TrickScore 0 everywhere). Woody
+# starts WITH the pen knife (InventoryManager.InventoryItems = [IT2_Knife],
+# InventoryManager.cs:5 — the port loads it since the s2_plans fix).
+# Catchers: Rottweiler + Mother; the Mother lives in Zone02 (DressingRoom
+# sleep bar, as in Level208). Rottweiler: FireFakir (Zone04) -> HotShoe,
+# TadjMahal, HotShoe (Zone05) -> Coal (Zone03) -> IceCream (Zone02) -> Cow
+# (Zone01, ~79 s). Woody starts in Zone01.
+# Order: the pants must be primed on the STILL-TRICKED coal (Item.cs:1598-1613:
+# RequirePrimingOnlyWhenTricked && Tricked) — the Rottweiler's next lap fixes
+# the coal (CanFix), so the dexterity win and the pants click go back to back.
+# The knife chain goes FIRST, before the neighbour's first cow ride (~79 s):
+# Level208Behaviors' CowGetUpAux1 (Level208Behaviors.cs:71-80, 112-115) is set
+# by his CowRide and never cleared, so from then on every animation switch of
+# his (SetAnimation -> BehaviorPlayAnimation, AnimationControllerBase.cs:
+# 380-385) forces the cow back to IdleNormal (PlayAnimationDirectly) — the
+# primed pose is cut before frame 27 unless he sits through 2.8 s without a
+# switch, and the CowCrap collider (OnAdvanceFrame, cs:118-131) never enables.
+take ConstructionSet IT2_Fuel          # Zone01: fuel + match
+prime Flowers IT2_Knife                # Zone04: the knife pick (Item.cs:1421-1426) — the held knife becomes IT2_Flowers and a fresh knife lands back
+prime Cow IT2_Flowers                  # Zone01: CowBehavior (Item.cs:1760-1780) — the cow primes at once; frame 27 of its primed pose enables the CowCrap collider (Level208Behaviors.OnAdvanceFrame)
+take CowCrap IT2_Crap                  # Zone01
+take AsbestosNappies IT2_Pants         # Zone02 (RequirePrimingOnlyWhenTricked: primes on the TRICKED coal, PrimingItem Coal)
+take PairOfBellows IT2_Air_pump        # Zone02
+unlock Coal IT2_Air_pump               # Zone03: the dexterity trick item (unlocker the bellows, DexterityKeepItem) -> Coal tricked (hot) — after his lap-2 coal visit (148), before his lap-3 one (263)
+prime Coal IT2_Pants                   # Zone03, same visit -> IT2_Pants_coal
+usewith Trough IT2_Fuel                # Zone03 (LinkedItemTrick of the Coal)
+usewith Drain IT2_Match                # Zone05 (LinkedItemTrick of the HotShoe)
+whenusing TadjMahal                    # Zone05: his stay between the two shoe uses (the second un-primes it); the mobile-era runs used the shoe with him there
+usewith! HotShoe IT2_Pants_coal        # Zone05: RottweilerUseTogglesPrime — primed by the first shoe use of his visit
+usewith FireChannel IT2_Fuel           # Zone04 (KeepAfterUse): ActivateItemTrick -> FireFakir — after his lap-2 fakir visit (104): it pays at lap 3's (211)
+usewith IceCream IT2_Crap              # Zone02 (the Mother's sleep window) — after his lap-2 ice cream (169)
+usewith Cow IT2_Knife                  # Zone01: the knife trick (KeepAfterUse; TrickItem.cs:319 wakes the crap's controller) — after his second ride (189)
+await FireFakir 0
+await HotShoe 0
+await Drain 0
+await Coal 0
+await Trough 0
+await IceCream 0
+await Cow 0                            # the overflow

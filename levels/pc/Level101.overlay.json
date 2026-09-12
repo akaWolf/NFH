@@ -21,6 +21,22 @@
      "SitUp"
     ]
    }
+  },
+  {
+   "object": "Sofa",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.67
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
+  },
+  {
+   "object": "Binoculars",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 6.5
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.5 s"
   }
  ]
 }

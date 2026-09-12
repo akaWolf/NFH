@@ -1,25 +1,42 @@
-# Level202 under the PC profile: the rail, the submarine and the rake first;
-# the crab goes on the mat only after his lap-2 mat visit (whenusing
-# Swimming, ~92 s), so the mat's 30 lands on his lap-3 visit (153 s) right
-# after the rail with the pond (133 s, 20 + 30) — 78 -> 104, the one
-# overflow the PC scores (5/5, 100). The rake's own 35 lands before the
-# rail; no data overlay is needed on this level.
-take Sandbucket IT2_Sandbucket    # RequirePriming, PrimingItem EelBox, PrimedInventoryType IT2_Sandbucketeel
-prime EelBox IT2_Sandbucket       # Item.cs:1537-1573: the held source primes on its PrimingItem -> IT2_Sandbucketeel
-usewith Pond IT2_Sandbucketeel    # the eels go in (RequiredInventory)
-take RubbishBin IT2_Fin
-usewith Submarine IT2_Fin         # TrickItem.OnUseAnimationCompleted: ActivateItemTrick/SetTrickedOnItem -> Swimming
-take Weed IT2_Weed
-use Rake                          # bare-hand (RequiredInventory IT_NONE)
-usewith Rake IT2_Weed             # the compound lands only once tricked (TrickItem.cs:511)
-take SawFish IT2_Sawfish
-usewith BridgeRail IT2_Sawfish    # linked pair with Pond: the rail visit [4] pays both — the overflow
-whenusing Swimming                # his lap-2 swim: the mat visit (73-84) is over
-take Reed IT2_Reed
-unlock CrayFish IT2_Reed          # SearchItem Dexterity, DexterityUnlocker IT2_Reed
-take CrayFish IT2_Crayfish
-usewith BeerMat IT2_Crayfish      # RottweilerUseTogglesPrime, no RequirePriming: usable any time
+# Level202 under the PC profile (v4, 2026-09-17: the profile's Season 2 paces).
+# His lap (65 s, runs/idlepc2s2): the mat and the swim (Zone02, 0-49: mat 4,
+# swim 21), the rail (Zone03, 49-68: rail 50), the mat and the swim (68-114:
+# mat 69, swim 86), the rail (114-133: 115.5), the mat and the swim (133-179:
+# mat 134, swim 151.5), the rail (179-198: 180.7) ... The rake is a walk-by of
+# his Zone02 stay after the swim (~90 in lap 2). The zones are a ring
+# (01-02-03-04-01), so Zone04 is the far side of his two rooms: the rail is
+# armed from there while he sits in Zone02, the mat and the rake from Zone01
+# while he stands at the rail. The gauge is 100 000 rage and falls 0.36 % a
+# second (pcprofile.s2_rage_tick); the coins land in one lap — the mat's 30
+# (134) -> the swim's 35 (151.5) -> the rake's 20 (~155) -> the rail's 50 with
+# the pond (180.7) reads 30, 59, 77, 118 — the overflow the PC scores. The
+# earlier versions armed the rail and the rake a lap apart (70 at the rail),
+# walked into his rail room for the mat, or fired a lap early (v3: the takes
+# end inside his first stay, so the lap-1 rail and mat are consumed first).
+take Sandbucket IT2_Sandbucket    # Zone01: RequirePriming, PrimingItem EelBox, PrimedInventoryType IT2_Sandbucketeel
+prime EelBox IT2_Sandbucket       # Zone04: Item.cs:1537-1573: the held source primes on its PrimingItem -> IT2_Sandbucketeel
+usewith Pond IT2_Sandbucketeel    # Zone03 (while he is in Zone02): the eels go in (RequiredInventory)
+take RubbishBin IT2_Fin           # Zone04
+take Reed IT2_Reed                # Zone03
+park! Zone01                      # round to the far side before he comes to the rail (49)
+take Weed IT2_Weed                # Zone01
+take SawFish IT2_Sawfish          # Zone01
+unlock CrayFish IT2_Reed          # Zone01: SearchItem Dexterity, DexterityUnlocker IT2_Reed
+take CrayFish IT2_Crayfish        # Zone01
+whenzone Zone03                   # (49) his lap-1 rail passes — the takes are done within his first stay
+whenzone Zone02                   # (67.5) his lap-2 mat
+whenusing Swimming                # (86) his lap-2 swim
+usewith Submarine IT2_Fin         # Zone01: TrickItem.OnUseAnimationCompleted: ActivateItemTrick/SetTrickedOnItem -> Swimming — 35 at his lap-3 swim (151.5)
+whenzone Zone03                   # (114) his lap-2 rail: the mat and the rake in Zone02 from Zone01
+usewith! BeerMat IT2_Crayfish     # RottweilerUseTogglesPrime, no RequirePriming: usable any time — 30 at his lap-3 mat (134)
+use! Rake                         # bare-hand (RequiredInventory IT_NONE)
+usewith! Rake IT2_Weed            # the compound lands only once tricked (TrickItem.cs:511) — 20 on his walk after the lap-3 swim (~155)
+park! Zone01                      # out before he comes back to Zone02 (133)
+whenzone Zone02                   # (133) his lap-3 mat and swim: round through Zone04 to the rail
+park! Zone04
+usewith! BridgeRail IT2_Sawfish   # Zone03: linked pair with Pond — 50 at 180.7, the overflow
+park! Zone04                      # the far side for the awaits
+await BeerMat 0
 await Swimming 0
 await Rake 0
 await BridgeRail 0
-await BeerMat 0

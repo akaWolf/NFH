@@ -61,6 +61,7 @@ class AnimPlayer:
         self.pat_idx = 0
         self.frame = 0
         self.slow_factor = None          # Owner.ShouldSlowAnimations hook
+        self.time_scale = 1.0            # the PC profile's station pace (RoutineAction._pc_use_seconds)
         self.ignore_infinite = False     # SetIgnoreInfiniteLoop
         self.ignore_infinite_once = False
         self.sound_sink = sound_sink
@@ -173,6 +174,18 @@ class AnimPlayer:
         self.as_sequence = False
         self.on_end = None
         return self._set(name, 'looping')
+
+    def sequence_seconds(self, names):
+        """the seconds a sequence of this sprite's animations lasts at their own rates"""
+        t = 0.0
+        for nm in names:
+            i = self.by_name.get(nm)
+            if i is None:
+                continue
+            a = self.sprite.anims[i]
+            n = len(a.pattern) if a.pattern else (a.end - a.start + 1)
+            t += max(1, n) / float(a.fps or 10.0)
+        return t
 
     def play_sequence(self, names, on_end=None, as_sequence=True):
         """PlayAnimationSequence: each element via PlaySingleAnimation; the
@@ -350,6 +363,8 @@ class AnimPlayer:
         # the 30th tick, where the same sums in doubles leave +1e-17 and
         # cost a 31st — one frame per sheet frame, 61 ticks for a 60-tick
         # BedSleep, 49 for a 48-tick use element (tools/livediff/README.md)
+        if self.time_scale != 1.0:
+            dt = dt * self.time_scale     # the profile only; the mobile path keeps its floats
         self.acc = _f32(self.acc - _f32(dt))
         if self.acc > 0.0:
             return
@@ -383,8 +398,10 @@ class AnimPlayer:
                     self._stop_single()
         fps = self.anim.fps or 10.0
         if pcprofile.is_pc():
-            # the pawns' door clips at the PC's frame a tick (pcprofile.clip_fps)
-            fps = pcprofile.clip_fps(self.anim.name, fps)
+            # the pawns' door clips at the rate that lasts the PC door action's
+            # ticks (pcprofile.clip_fps: Season 1), a frame a tick otherwise
+            frames = len(a.pattern) if a.pattern else (a.end - a.start + 1)
+            fps = pcprofile.clip_fps(a.name, fps, frames)
         # ResetAnimationTime (cs:144-150): `1f / FrameRate` in single
         # precision, the slow factor likewise
         self.acc = _f32(self.acc + _f32(1.0 / _f32(fps)))
@@ -448,6 +465,9 @@ class Pawn:
         self.min_door_distance = spec.get('min_door_distance') or 0.0
         self.hiding_item = None
         self.is_warping = False          # Pawn.IsWarping, set by door transit
+        self._warped = False             # the far door's placement done (PC: at its clip's start)
+        self._warp_old = None
+        self._warp_hooked = False
         self.velocity = (0.0, 0.0)       # Pawn.Velocity — a field that
                                          # outlives the frame (cs:855-880)
         self._item_snap = None           # MoveToItem's head, deferred one
@@ -1236,7 +1256,11 @@ class Pawn:
             self.world.show_exit_confirmation(self)
             return
         self.use_door_at_once = False     # Pawn.cs:1393
-        self._transit_animations(door, other, sequential=False)
+        # the PC runs the near door's `enter` and the far door's `leave` one
+        # after the other through a flat door too (pcprofile.doors_sequential)
+        self._transit_animations(
+            door, other,
+            sequential=pcprofile.is_pc() and pcprofile.doors_sequential(self.nfh2))
 
     def continue_exit(self):
         """Pawn.ContinueExit (Pawn.cs:1510-1515): ContinueMovement, the
@@ -1290,6 +1314,14 @@ class Pawn:
                 self._door_idle(door)
                 if self.world:
                     self.world.zone_reaction(other.zone, 'enter')
+                if pcprofile.is_pc() and pcprofile.door_warp_early(self.nfh2):
+                    # the PC places the pawn at the far door for its `leave`
+                    # action and the room pointer follows the placement: the
+                    # zone flips at the far clip's start (pcprofile.door_warp_early)
+                    # — the catch predicates read it from here; the zone-change
+                    # hooks (the routine's notices, the alerters, the item
+                    # reactions) still run at the clip's end, in _enter_played
+                    self._warp_through(other)
                 self._play_enter(other, enter_anim)
             if door.sprite is not None and leave_anim:
                 # Door.PlayAnimation is a PlaySingleAnimation behind
@@ -1342,14 +1374,11 @@ class Pawn:
         door.passing = None
         self._door_idle(door)
 
-    def _enter_played(self):
-        """OnDoorEnterAnimationFinished: warp, unhide, loop ExitAnimation;
-        a walk-up far door means climbing back down to the floor."""
-        d = self._exit_door
-        if d is None:
-            return
-        d.passing = None
-        self._door_idle(d)
+    def _warp_through(self, d):
+        """WarpThroughDoor (Pawn.cs:1522-1528, 1560-1566): the placement at the
+        far door and the zone change — at the far clip's end on the mobile,
+        at its start under the PC profile (pcprofile.door_warp_early).
+        Returns the zone left."""
         old_zone = self.zone.pid if self.zone else None
         self.sprite.x = d.x + self.door_delta[0]
         self.sprite.y = d.y + self.door_delta[1]
@@ -1358,11 +1387,6 @@ class Pawn:
         if self.role == 'Woody':
             self.sprite.x = d.x + d.delta_exit[0]
             self.sprite.y = d.y + d.delta_exit[1]
-            # the transit lock lifts on arrival (Woody.cs:471-474, 481-483):
-            # a finished entrance unlocks outright, an unfinished one only
-            # through a non-exit door
-            if self.finished_entrance or not d.exit_door:
-                self.input_locked = False
         elif self.role == 'Mother':
             self.sprite.x = d.x + d.delta_mother_exit[0]
             self.sprite.y = d.y + d.delta_mother_exit[1]
@@ -1376,6 +1400,31 @@ class Pawn:
         # neighbour back onto the floor line (Rottweiler.cs:168-172)
         if self.role == 'Rottweiler' and not d.should_walk_up:
             self.sprite.y = self.floor_y()
+        self._warped = True
+        self._warp_old = old_zone
+        return old_zone
+
+    def _enter_played(self):
+        """OnDoorEnterAnimationFinished: warp, unhide, loop ExitAnimation;
+        a walk-up far door means climbing back down to the floor."""
+        d = self._exit_door
+        if d is None:
+            return
+        d.passing = None
+        self._door_idle(d)
+        if self._warped:
+            old_zone = self._warp_old      # placed at the far clip's start (PC)
+        else:
+            old_zone = self._warp_through(d)
+        hooked = self._warp_hooked
+        self._warped = False
+        self._warp_hooked = False
+        if self.role == 'Woody':
+            # the transit lock lifts on arrival (Woody.cs:471-474, 481-483):
+            # a finished entrance unlocks outright, an unfinished one only
+            # through a non-exit door
+            if self.finished_entrance or not d.exit_door:
+                self.input_locked = False
         self.hidden = False
         self.sprite.hidden = False        # SetHidden(false), Pawn.cs:1661
         self.is_warping = False           # OnDoorEnterAnimationFinished
@@ -1385,7 +1434,8 @@ class Pawn:
         self.last_exit_door = d
         if self.role == 'Rottweiler':
             self.rott_last_door = d       # Pawn.cs:1645-1648
-        if self.world is not None and old_zone != (self.zone.pid if self.zone else None):
+        if not hooked and self.world is not None \
+                and old_zone != (self.zone.pid if self.zone else None):
             if self.world.on_pawn_zone_changed(self, old_zone):
                 # OnChangeZone returned true: taken over — the catch check
                 # still closes OnDoorEnterAnimationFinished (Pawn.cs:1666)
@@ -2143,6 +2193,7 @@ class Routine:
         self.stop_dog_action = False     # ActionManager.StopDogAction
         self.state = self.IDLE
         self.timer = 0.0
+        self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
         self.started = False             # ActionManager.CurrentAction != null
         self.on_use = None
@@ -2989,8 +3040,22 @@ class Routine:
                 oseq = [x for x in oseq if olga.anim.has(x)]
                 if oseq:
                     olga.anim.play_sequence(oseq)
+        pc = self._pc_use_seconds(it)
         if seq:
+            if pc:
+                # the PC station lasts its DoActions' ticks (levels/pc overlays,
+                # PCUseSeconds): the mobile clips play at the pace that lasts them
+                mobile = self.pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0:
+                    self.pawn.anim.time_scale = mobile / pc
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
+        elif pc:
+            # a station the remaster only walks by is an action on the PC (the
+            # shout at the window, the yoga): the stand holds for its ticks,
+            # then the empty sequence's own end (_finish, with StopAction's
+            # side effects) runs from the tick — an urgent or a surprise
+            # meanwhile drops the hold
+            self.pc_hold = pc
         else:
             # an empty sequence completes at once, and the angry postpone
             # still rides StopAction (OnUseAnimationsCompleted ->
@@ -3528,11 +3593,24 @@ class Routine:
             if tgt is not None:
                 w.set_active_object_hidden(tgt, False)
 
+    def _pc_use_seconds(self, it):
+        """the PC station's seconds for this visit of the neighbour's routine under the
+        profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
+        if self.role != 'Rottweiler' or it is None or not pcprofile.is_pc() \
+                or not pcprofile.rule('durations') \
+                or not getattr(it, 'pc_use_secs', None):
+            return 0.0
+        v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]
+        it.pc_use_visit += 1
+        return float(v)
+
     def _finish(self):
         """RoutineActionUse.StopAction(canPostponeStop: true): the side
         effects run, then a tricked TrickItem does not finish the action —
         the owner plays the angry sequence first (RoutineActionUse.cs:
         541-553). The stop also removes spent actions (cs:415-427)."""
+        self.pawn.anim.time_scale = 1.0
+        self.pc_hold = 0.0
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
@@ -3655,6 +3733,8 @@ class Routine:
         target fires, HideOwnerDuringUse unhides (cs:481-484), and a
         non-mutex action releases PawnToAbortMutexOnFinish's parked mutex."""
         a = self.action
+        self.pawn.anim.time_scale = 1.0
+        self.pc_hold = 0.0
         if a is None or a.get('move_only'):
             return
         it = self.item
@@ -3810,6 +3890,8 @@ class Routine:
         Pawn.cs:444-448) — SurpriseActionFar and ToiletAction serialize it,
         the AlarmAction and the Return leg do not, Grab/UseFixingItem do on
         L110/L113 only."""
+        self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
+        self.pc_hold = 0.0
         self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
@@ -4501,6 +4583,8 @@ class Routine:
                 nm(self._override), nm(self._original_action), (self._urgent_action or {}).get('kind')), file=sys.stderr)
         self.urgent_item = it
         self._urgent_handler = None
+        self.pc_hold = 0.0                    # a held station yields to the surprise
+        self.pawn.anim.time_scale = 1.0
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
         # arm (Rottweiler.cs:1049-1052)
         self._urgent_action = {'kind': 'surprise_near'}
@@ -4800,6 +4884,12 @@ class Routine:
             # 'first' and 'advance' are StartNextAction; 'skip' and 'start'
             # go straight to StartAction (ActionManager.cs:608-648)
             self._start_action(start_next=what in ('first', 'advance'))
+            return
+        if self.state == self.USING and self.pc_hold > 0.0:
+            self.pc_hold -= dt
+            if self.pc_hold <= 0.0:
+                self.pc_hold = 0.0
+                self._finish()            # the held empty sequence completes
             return
         if self.state == self.USING and self.timer > 0.0:
             self.timer -= dt
@@ -8158,6 +8248,12 @@ class World:
             # the PC's catch is the room and the hideout flag alone
             # (pcprofile.sees_while_busy()): no IgnoreWoodyWhenUse, no
             # blocking-animation clause
+            if pcprofile.door_warp_early(woody.nfh2):
+                # and no door term: a pawn inside a door clip is in the room
+                # its placement put it in (pcprofile.door_warp_early)
+                return (woody.zone is not None and catcher.zone is not None
+                        and woody.zone.pid == catcher.zone.pid
+                        and not woody.hiding)
             return same_room
         return (same_room and not catcher.ignore_woody
                 and (not catcher.anim.blocking or not woody.sneaking)
@@ -8233,6 +8329,16 @@ class World:
         # false. caught_by is the port's own record of who did it (the
         # runner / the recorder read it; no game rule hangs off it)
         catcher = catcher or self.pawns.get('Rottweiler')
+        if os.environ.get('NFH_CATCH_TRACE'):
+            import traceback
+            w = self.woody
+            rt = next((r for r in self.routines if r.pawn is catcher), None)
+            print('CATCH t=%.2f by %s woody(zone=%s state=%s sneak=%s hiding=%s warp=%s anim=%s) catcher(zone=%s state=%s warp=%s item=%s rstate=%s anim=%s)' % (
+                self.time, getattr(catcher, 'role', None),
+                w.zone.pid if w and w.zone else None, getattr(w, 'state', None), getattr(w, 'sneaking', None), getattr(w, 'hiding', None), getattr(w, 'is_warping', None), w.anim.anim.name if w else None,
+                catcher.zone.pid if catcher and catcher.zone else None, getattr(catcher, 'state', None), getattr(catcher, 'is_warping', None),
+                rt.item.name if rt and rt.item else None, rt.state if rt else None, catcher.anim.anim.name if catcher else None), flush=True)
+            traceback.print_stack(limit=6)
         if catcher is None or catcher.role == 'Rottweiler':
             self.game.got_caught = True
         self.game.caught_by = catcher.role if catcher is not None else 'Rottweiler'

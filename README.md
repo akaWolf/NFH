@@ -73,7 +73,8 @@ dir holds the state log, the results per leg and the rating. `NFH_GATE_LOG`,
 other suites: `tests/run_moments.py` (scripted moments), `tests/run_menu.py`
 and `tests/run_tutorial.py` (the flow and the five tutorials),
 `tests/monkey.py` over `tests/invariants.py` (random input against states the
-original cannot produce), `tests/run_csdiff.py` (the bytecode diff) and
+original cannot produce; the moments are the mobile's and run under
+`NFH_PROFILE=mobile`), `tests/run_csdiff.py` (the bytecode diff) and
 `python3 -m unittest tests.test_hud_pc` (the profile's HUD arithmetic).
 The bench that replays a plan on the original itself is described in
 `tools/livediff/README.md`.
@@ -128,18 +129,21 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   rating's count-up and — since 2026-09-16, read from game.exe — the
   Season 1 anger itself (a trick sets the indicator to its `angrytime`,
   60 ticks of hold, one per tick at 12 Hz, +3 while above zero), and
-  since 2026-09-17 the PC's walking speeds, door pace and catch on sight
+  since 2026-09-17 the PC's walking speeds, door pass (both clips in
+  turn, at the PC's ticks, the room changing at the far clip's start),
+  catch on sight and the neighbour's station durations at the PC's ticks
   (docs/PC_VERIFICATION.md) — each
   deviation an overlay entry or an `is_pc()` branch with its source
-  (`docs/PC_FIDELITY.md` §7). Under the PC rules read from the binaries on
-  2026-09-17 — the walking speeds, the door pace, the catch on sight with
-  no busy window — the plans were re-timed to the profile's own idle
-  laps: 101/104/105/107 and nine Season 2 levels rate 100, 102/103/109/111
-  97, 112/114 94, 113 91, 202/205 90, and the crowded laps of 106/108/110
-  (78-81), 207/209 (64) and 210 are still being re-planned — the PC's
-  47-second lap of 110 leaves no window for one of its tricks. The
-  mobile numbers do not move: the regression under `--profile=mobile`
-  is byte-identical.
+  (`docs/PC_FIDELITY.md` §7). Under the four PC rules read from the
+  binaries on 2026-09-17 — the walking speeds, the door pass, the catch
+  on sight with no busy window, the stations' durations — the profile's
+  idle laps sit within 10 % of the lap model on every level it covers
+  (docs/PC_LAPS.md) and the plans were re-timed to them: every Season 1
+  level is won (101/107 100, 102/105 97, 103/104/112/114 94, 108/113 91,
+  109 88, 110 78, 106 77, 111 70 — the last three at ceilings the
+  room-pointer catch sets, `docs/PC_FIDELITY.md` §7) and ten Season 2
+  levels rate 100 (205 90, 207 64, 210 open). The mobile numbers do not
+  move: the regression under `--profile=mobile` is byte-identical.
 
 Open: three natural laps still differ from the PC's by more than 15 %
 (111, 213, 210 — the neighbour's routine is compiled into game.exe, one

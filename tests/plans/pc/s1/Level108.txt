@@ -35,11 +35,11 @@ prime! FirstAid IT_Key               # Zone04: the FirstAid+key hack turns the k
 usewith! ToothBrush IT_Brush         # Zone04, 15 on the coffee's rush; the bathroom is off his lap
 park Zone01                          # wait in the hall: he passes the living room into the kitchen (115-119)
 whenusing CoffeeMaker                # (122) his second coffee: up to the balcony
-usewith! WateringCan IT_Poison       # Zone07: Plant 20 at his watering (150)
-park! Zone02                         # straight down before his bedroom at 138
-whenusing CoffeeMaker                # (201) his third coffee: up again
-usewith! Shezlong IT_Pins            # Zone07, 10: fires at his lap-3 deck chair (226)
-park! Zone02                         # down before 217
+usewith! WateringCan IT_Poison       # Zone07: Plant 20 at his watering (~228)
+usewith! Shezlong IT_Pins            # Zone07, 10: the same trip — fires at his lap-2 deck chair (~206)
+park! Zone02                         # straight down before his bedroom (~194)
+whenzone Zone01                      # (~184) he crosses the hall to the living room (~189): the kitchen is his only at the coffees
+park! Zone03                         # the kitchen until the tricks have paid (his next coffee ~280)
 await CoffeeMaker 15
 await ToothBrush 15
 await SunLotion 20

@@ -49,6 +49,22 @@
    "set": {
     "PCAngryTime": 216
    }
+  },
+  {
+   "object": "PhotoAlbum",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 9.42
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PhotoAlbum <- photo_album#0 9.4 s"
+  },
+  {
+   "object": "Pudding",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 8.0
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pudding <- milk_bottle#0 8.0 s"
   }
  ]
 }

@@ -136,6 +136,19 @@ and 111 (108/219) come out short: the machine cycles the neighbour waits
 for and the bath are not in the tokens, and the video's lap may carry a
 trick. The model is the check of the walking rule read from the binary
 (docs/PC_VERIFICATION.md, "the walking speed" and "the lap's timing").
+
+The port's own idle laps under the profile's four rules read from the
+binary and the data — the walking speeds, the door pass (both clips in
+turn at their ticks), the catch on sight and the stations' durations
+(2026-09-17, `~/nfh-bench/runs/idlepc4`, the neighbour alone on every
+level): 101 34 s (model 34, video 32), 102 27 (29, 28), 103 25 (28), 104
+70 (70), 105 43 (44, 40), 106 120 (video 108), 107 62 (video 54), 109 108
+(104, 113), 110 55 (60, 59), 111 120 (108), 112 141 (143, 155), 113 180
+(172, 191), 114 168 (147, 168). Every level with a complete model is
+within 10 % of it, the rest within 15 % of the video; what 110 still lacks
+against the model is the PC's vertical legs to the hotspots (the meat bowl
+30 px above the floor line, the back doors' 50 — 3 px a tick each), which
+the mobile's item positions do not have.
 Under the PC profile (2026-09-09) the sofa and album overlays
 (levels/pc/Level101, Level106: RottweilerUseAnimation lists sized to the PC
 spells) bring 101 to +11 % and 106 to −6 %; 111, 213 and 210 are

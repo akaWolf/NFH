@@ -7,6 +7,33 @@
    "set": {
     "PCAngryTime": 180
    }
+  },
+  {
+   "object": "Candle",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 1.58
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.6 s"
+  },
+  {
+   "object": "BirthdayCake",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     2.88,
+     2.88
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BirthdayCake <- cake#0 5.8 s /2"
+  },
+  {
+   "object": "LetterBox",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 5.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 5.3 s"
   }
  ]
 }

@@ -1,39 +1,49 @@
 # Level109 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
-# Woody 2.1 running and 0.62 tiptoeing, the doors a frame a tick, the catch the
-# room alone — his hideout bed the one blind spot, and a walking Woody wakes him
-# there). His lap (~110 s, the idle run under the profile): the bedroom 0-56
-# (teeth 3, bed 5-37, alarm 37, teeth 41, keys 47) > living 56-59 > kitchen
-# 59-67 (milk) > hall 67-80 (the pig) > kitchen 80-88 (milk, chips) > living
-# 88-102 (the chili) > bedroom 102-166 (keys 108, teeth 113, bed 116-147, alarm
-# 147, teeth 151, keys 157) > ... > bedroom 212-276 (bed 226-258). The balcony
-# is off his lap: Woody's perch between the bedroom windows. The living room's
-# parrot is tiptoed past. Seven tricks' 88 need four ticks: the alarm (147), the
-# teeth (151), the milk (173), the pig (180), the chips (194) and the bed (226).
-take PigKeys IT_Pigkey               # Zone06 during his first sleep (5-37): straight up, out before he wakes
-take Cactus IT_Cactus                # Zone07: the balcony, off his lap
-whenzone Zone03                      # (59) he is down: the bedroom is free until 102
-usewith! AlarmClock IT_Cactus        # Zone06, 13 (BedAlarmCactus, AngryWithoutAnimations) at his next alarm (147)
-whenzone Zone01                      # (67) he feeds the pig in the hall: the living room is free until 88
-take! ChemicalSet IT_Nitro           # Zone02, tiptoe past the parrot
+# Woody 2.1 running and 0.62 tiptoeing, the doors' two clips in turn at the PC's
+# ticks, the catch the room alone — his hideout bed the one blind spot, and a
+# walking Woody wakes him there; the room changes at the far clip's start, so
+# a Woody still in the near door is caught by a neighbour who wakes). His lap
+# (~108 s, the idle run under the profile, runs/idlepc4): the bedroom 0-45
+# (teeth 2, bed 4-31, alarm 31, teeth 35, keys 38) > living 45-51 > kitchen
+# 51-59 (milk 56) > hall 59-74 (the pig 64) > kitchen 74-84 (milk 77, chips 80)
+# > living 84-98 (the chili 91) > bedroom 98-154 (keys 105, teeth 109, bed
+# 111-138, alarm 138, teeth 142, keys 147) > ... > bedroom 207-263 (bed 220-247).
+# The first sleep (26.5 s, the PC's) is a second too short for the tiptoe up to
+# the balcony door — he wakes with Woody in the doorway — so the keys and the
+# cactus wait for his second sleep, entered from the living room the moment he
+# lies down, and the balcony (off his lap) is Woody's perch until he goes down;
+# the kitchen and the hall are armed on his first sleep instead. Seven tricks'
+# 88 need: the milk (56), the chips (91), the banana (~165), then the alarm
+# (~250), the teeth (~220), the bed (~225) and the pig (~285) — with the anger
+# of the first lap's three shifting the later laps.
+take! ChemicalSet IT_Nitro           # Zone02 during his first sleep (4-31), tiptoe past the parrot
 take! SpicyChips IT_Chips            # Zone02
-park Zone01                          # (80) he has gone to the kitchen: the hall until 102
-whenzone Zone02                      # (88) he sits at the chili: the kitchen is free until 170
 take! RubbishBinBanana2 IT_Banana    # Zone03
 take! Fridge IT_Tabasco              # Zone03
-usewith! PigMilk IT_Nitro            # Zone03, 20: explodes at the pig, paid through DependsOn = PigMilk
-usewith! CornChips IT_Chips          # Zone03: fed to the dog at Chili (the C# pays DependsOn = CornChips, 0)
-usewith! Ground@Zone03 IT_Banana     # Zone03, 7: he slips on his way to the milk (173)
-whenzone Zone06                      # (102) he is in the bedroom until 166: the hall is free
-usewith! Pig IT_Pigkey               # Zone01, 10 under the profile: the pig gets out at his lap-2 visit (180)
-take! PinsBoard IT_Pins              # Zone01
-whenusing Bed                        # (116) his second sleep: the teeth are primed
-usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe; the balcony before he wakes (147)
-whenzone Zone02                      # (166) he is down again: the bedroom is free until 212
-usewith! Bed IT_Pins                 # Zone06, 10: pays at his third sleep (226)
-await AlarmClock 13
-await Teeth 15
+usewith! PigMilk IT_Nitro            # Zone03, 20: explodes at the pig (64), paid through DependsOn = PigMilk
+usewith! CornChips IT_Chips          # Zone03: fed to the dog at Chili (91; the C# pays DependsOn = CornChips, 0)
+take! PinsBoard IT_Pins              # Zone01, before he comes down (45)
+hide! Wardrobe                       # Zone01: wait out his first descent in the hall's wardrobe (the entrance zone is the exit door's, no park there)
+whenzone Zone06                      # (~98+) he is back upstairs, awake (keys, teeth)
+usewith! Ground@Zone03 IT_Banana     # Zone03, 7 (free while he is upstairs): he slips on his lap-2 walk to the milk (~165) — laid once the nitro has gone off (64): a slip on the doorstep of a still-tricked milk stalls the port's routine (open, runtime/README.md)
+park! Zone02                         # up to the living room meanwhile (tiptoe: the parrot)
+whenusing Bed                        # (~111+) his second sleep: 26.5 s
+usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe: primed by his brushing before the sleep, un-primed by the one after — pays at that one
+take! PigKeys IT_Pigkey              # Zone06 -> the balcony door, tiptoe past the sleeper
+take! Cactus IT_Cactus               # Zone07: the balcony, off his lap
+park Zone07                          # the perch until he goes down (154)
+whenzone Zone03                      # (~160) he is down in the kitchen: the bedroom is free until his return (~207)
+usewith! AlarmClock IT_Cactus        # Zone06, 13 (BedAlarmCactus, AngryWithoutAnimations) at his lap-3 alarm (~247)
+usewith! Bed IT_Pins                 # Zone06, 8: pays at his third sleep (~220)
+park! Zone02                         # the living room while he is in the kitchen and the hall (160-183): the way down
+whenusing Pig                        # (~195) his hall visit of the lap: the kitchen comes right after it
+whenzone Zone03                      # (~205) his second kitchen of the lap: the hall is his only at the next lap's pig (~300)
+usewith! Pig IT_Pigkey               # Zone01, 10: the pig gets out at his lap-4 visit
+hide! Wardrobe                       # Zone01: the awaits from inside
 await PigMilk 20
-await Pig 10                         # the pig's 10 and the chips' 15 under the profile (the DependsOn pair)
-await CornChips 15
-await Bed 8                          # 8 under the profile
 await Ground@Zone03 7
+await CornChips 15
+await Teeth 15
+await Bed 8
+await AlarmClock 13
+await Pig 10

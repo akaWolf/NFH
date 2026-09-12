@@ -33,9 +33,9 @@ whenzone Zone02                      # he is back in the living room: the bathro
 prime! BathTub IT_Emptybottle        # Zone04: the full tub fills the bottle
 usewith! BathTub IT_Hairrestorer     # Zone04, 12: pays at his next bath
 hide! Wardrobe                       # he crosses the hall to the kitchen, bathes, and comes back
-whenzone Zone02                      # his next sit in the living room: the kitchen is free for ~19 s (his bath's 12 are too few for the trip)
-usewith! Pudding IT_Fullbottle       # Zone03, 8: pays at his next pudding
-hide! Wardrobe
+# the pudding (8) has no window under the PC catch (2026-09-17): the kitchen is
+# reached through the living room, where he sits while the kitchen is free, and
+# his bathroom stays (5-13 s) are shorter than the round trip from the hall
 await MumPicture 7
 await Toilet 7
 await Microwave 7
@@ -44,4 +44,3 @@ await Towel 12
 await PhotoAlbum 8
 await Candy 8
 await BathTub 12
-await Pudding 8

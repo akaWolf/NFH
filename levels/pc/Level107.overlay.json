@@ -21,6 +21,41 @@
    "set": {
     "PCAngryTime": 204
    }
+  },
+  {
+   "object": "Camera",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     3.5,
+     0.33
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.5 s; Camera <- camera#1 0.3 s"
+  },
+  {
+   "object": "MagnesiumBottle",
+   "component": "SearchItem",
+   "set": {
+    "PCUseSeconds": 0.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MagnesiumBottle <- magnesium#0 0.3 s"
+  },
+  {
+   "object": "DieselGenerator",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 4.67
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 4.7 s"
+  },
+  {
+   "object": "MumStatueFootStool",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 5.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.3 s"
   }
  ]
 }

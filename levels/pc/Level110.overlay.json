@@ -14,6 +14,57 @@
    "set": {
     "PCAngryTime": 252
    }
+  },
+  {
+   "object": "SteakMeat",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 1.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakMeat <- meatbowl#0 1.3 s"
+  },
+  {
+   "object": "Beer",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 0.67
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 0.7 s"
+  },
+  {
+   "object": "BBQ",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     1.75,
+     0.67
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.8 s; BBQ <- bbq#1 0.7 s"
+  },
+  {
+   "object": "CarnivorPlantSpray",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.25
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CarnivorPlantSpray <- plant#0 3.2 s"
+  },
+  {
+   "object": "SteakChair",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 5.5
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 5.5 s"
+  },
+  {
+   "object": "SteakWine",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.17
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakWine <- wine#0 2.2 s"
   }
  ]
 }
