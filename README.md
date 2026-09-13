@@ -141,12 +141,14 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   (docs/PC_LAPS.md) and the plans were re-timed to them; since 2026-09-22
   the Season 1 reactions are the PC's too — the trick step's fire, its
   shout, its repair and the tricked stand, read off game.exe's level
-  classes (`docs/PC_FIDELITY.md` "Season 1 reactions") — and every Season
-  1 level is won: 101/102/104/105/106/107/108/109/110/112 100 in the PC's
-  own chain orders, 103 and 114 97 (a link his lap cannot close: 103's
-  kitchen three a walk behind the loo, 114's polish alone in the study),
-  113 96, 111 70 at a ceiling the room-pointer catch sets (`docs/
-  PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 213 at
+  classes (`docs/PC_FIDELITY.md` "Season 1 reactions") — and since
+  2026-09-23 every Season 1 level rates 100 in the PC's own chain orders
+  (Badinfos' runs read off the HUD and the thermometer): a station tricked
+  through its DependsOn plays the dependency's trick, a fixing tool its own
+  case, a visit's prime leg its stay, 109's pig visit catches the pig and
+  feeds it, 111's washer and drier are one station each and its ironing
+  board burns between the give and the ironing (`docs/PC_FIDELITY.md` "The
+  playing trick"); the Season 2 levels rate 100 with 213 at
   90 — the PC's station stays, compound coins and reaction clips are
   carried on every episode since 2026-09-18, and the Mother's PC stands on
   212 (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
@@ -166,8 +168,9 @@ neighbour scripts is the co-actor fight after a crash reaction), so the
 profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
-between them is not); and the ceilings the room-pointer catch sets on
-106, 110 and 111. Three natural laps differ from the PC's by more than
+between them is not); and the PC's machine waits of 111 (its washer
+stays 24 and 47 s in the video, the level class's `wait` steps). Three
+natural laps differ from the PC's by more than
 15 % (111, 213, 210 — the neighbour's routine is compiled into game.exe,
 one class per level, not data); the Season 2 gauge is 100 000 rage long
 and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the coins are

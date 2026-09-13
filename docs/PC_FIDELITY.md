@@ -853,12 +853,53 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   rings after the kick instead), 108 with the toothbrush firing 1.9 s into
   the coffee rush's use, 109 with the tabasco going in as the PC's 1.6-s
   pins jump lets him lie down again, 112 with the skates firing at the
-  fall. 103 and 114 stay 97 by their laps — 103's kitchen three would have
-  to be armed inside one of his 9-s mail visits (the back door alone is
-  8 s from the fridge) and 114's polish pays only at the study cup, 42 s
-  after the horn and 30 before the pipe — and 111 70 by the room-pointer
-  catch; the mobile profile keeps its own clips and order (the 54-plan
+  fall. 103 and 114 stayed 97 and 113 96 on those plans; re-planned on
+  2026-09-23 in Badinfos' own chains (his HUD and thermometer,
+  tools/pcref/thermo_jumps.py) they rate 100 — 103 with the microwave's
+  egg cold at the head of the candle, the letter box, the picture, the
+  soap and the loo; 113 with the sink first, the trap on his rush to the
+  main valve, the cut ladder, the fuse at his drill, the pain book, the
+  bedroom marbles, the grinder and the hot radiator (Woody leaves the
+  study through the living room's side door to the kitchen while he takes
+  the fuse); 114 with the polish and the phonograph cold, then the pipe,
+  the trap, the shotgun, the hall marbles, the medal box, the hat and the
+  horn, the whistle calling him down between the phonograph and the pipe
+  — and the mobile profile keeps its own clips and order (the 54-plan
   regression is byte-identical to regmob4).
+- *The playing trick (2026-09-23).* A station tricked through its
+  DependsOn plays the dependency's trick — its stand, its fire and its pay
+  — the item RoutineActionUse.GetTrickedItem hands the angry
+  (`World._pc_trick_item`). The carry had fired the host's own score at
+  the host's PCFireAt and let the angry pay the dependency after it: 113's
+  chair kit paid the mobile's honey 10 and then the pain book's 10 (the
+  PC's lir/stoolkit_pain pays once), 109's chili its mobile 15 and then
+  the chips' 15 (kit/cookiebox_hot once), 102's sofa its 25 at the beer
+  visit under the broken sofa's 7.1-s stand where the laxative beer's is
+  3.2 s — 109's 100 stood on the double pay (97 without it) and 113's
+  level ended on the pair before the radiator. The chips carry
+  cookiebox_hot's keys beside the chili (pc_reactions.py), and with the
+  playing trick's stand 104 rates 100 too (the whipped cream's 5.9 s at
+  the pie). A fixing tool plays its own case: 111's glued vacuum
+  (Level_Laundry's case 22) is the take (PCGrabSeconds 0.33), the stand at
+  the carpet with the fire before the explode clip (vacuum_hole 2.92, then
+  FIRE5's vacuum_explode 2.58: PCUseSecondsTricked 5.5, PCFireAt 2.92),
+  the repair, vacuum2 after it (PCFixUseSeconds 2.92) and the give on the
+  way back (PCReturnSeconds) — where the port paid after the mobile's
+  VacuumLoop and explosion clips, 12.9 s after his living-room entry
+  against the PC's 6.8 (Badinfos' vacuum icon at 215, the fire at 221.8)
+  — and the carpet's room trigger runs cases 20-22 at once, without the
+  startled look of the mobile's RunToTrickedItem (the SurpriseFar, 2.1
+  s). 109's pig visit is one station: Level_Pig's case 18 fires the
+  pigout, catches the pig and returns to case 17, which feeds it (case
+  20: shake_bottle, the nitro bottle's fire) — ReuseAfterFix on the Pig
+  restarts the station after the catch, and the PigMilk's trick plays in
+  the same visit (Badinfos' E09: the pig +10 cold at 192.8, the bottle +20
+  hot at 204.0). 111's washer and drier are one station each (give, wash,
+  get_clothes; give, dry, take — the two branches of the case, not two
+  cycles), the mobile's three phases kept and a tricked use ending the
+  station at the case's yield (0x455639; PCStationEndsOnTrick,
+  `Routine._end_pc_station`); the 2026-09-16 patch that kept two of the
+  three entries read the two branches as two cycles and is withdrawn.
 - *Season 2 station durations.* The PC videos' HUD bubble (docs/
   PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
   stay at each station once the walk to it is taken off (the icon shows
@@ -935,33 +976,38 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   nap and sea-view loops have no explicit time and keep the mobile clips;
   214's handshake keeps the mobile pace whole.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
-  (his bubbles and popups: the trap on the basement walk-in 158, the
-  washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that
-  sends him to the dirty carpet and the glued vacuum 222, the marbles 249
-  on his walk from the bedroom to the balcony, the fish tank 279, the
-  ironing board 302 as he passes it between the tank and the balcony,
-  the airer 322), every gap 20-30 s. Twelve plan trials on 2026-09-10
-  stalled at seven tricks and five ticks (81 %) on two mobile rules the
-  PC data does not have: the dirty carpet is a room trigger on PC
-  (`level_laundry/trigger.xml`: `position="room" type="always"` — the
-  neighbour goes for the vacuum on entering the living room; the
-  mobile's OnChangeZone skips the carpet, Rottweiler.cs:188, and only
-  the dog's yell sends him, cs:485-510 — the profile notices the carpet
-  on entry like every other tricked item), and the ironing board is
-  armable on PC before his first ironing of the lap (Badinfos' board
-  pays at 302 with no ironing visit — the board is a walk-by trick on
-  both games, NoticeWhenWalkNearby — but the mobile's hot iron starts
-  cold and only his first ironing heats it, so the port could arm it
-  only between his two ironings; `Primed: true` at the start puts the
-  toggle in the PC's phase). With both, the PC plan follows his order —
-  the basement three, the carpet on his living-room entry, the board on
-  his approach, the marbles on the balcony for his walk to the airer,
-  the tank, the airer — 97 with the marbles in the hall (v13); with the
-  marbles on the balcony 8/8, 79 points, seven ticks: 100 (v14). With
-  the routine read out of game.exe (docs/PC_ROUTINES.md) the lap also
-  keeps the PC's two wash and two dry cycles (actions_by_index — the
-  mobile lists three of each); the plan holds at 100, twelve seconds
-  sooner.
+  (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
+  the trap on the basement walk-in 155.8, the washer 179.5, the drier
+  195.5, the glued vacuum 221.8 — his vacuum icon from 215 — the marbles
+  249.4 on his walk from the bedroom to the balcony, the fish tank 278.8,
+  the ironing board 301.3 as he passes it between the tank and the
+  balcony, the airer 322.2), every gap 16-29 s, seven ticks: the PC data's
+  79 points make the 100. The PC rules the port had to take from game.exe
+  and the data: the dirty carpet is a room trigger
+  (`level_laundry/trigger.xml`: `position="room" type="always"`; the
+  mobile's OnChangeZone skips the carpet, Rottweiler.cs:188, and only the
+  dog's yell sends him, cs:485-510) that runs Level_Laundry's cases 20-22
+  at once, and the glued vacuum is that case's tool (the playing trick,
+  above); the board burns only between his give and his ironing (case 8's
+  give switches in bed/ironingboard_clothes, the one variant Woody's use
+  burns, and case 16 irons it, 71 ticks — the mobile's phase; the
+  `Primed: true` of 2026-09-11 put the port in the other half of the lap
+  and is withdrawn); the washer and the drier are one station each, a
+  tricked one ending it; and the stations last the PC's actions (the
+  detergent 1.33 s, the give 0.33 and the ironing 5.92, the rack's
+  putclothes 1.5 and take 0.33, the feed 1.92 — tools/pcref/
+  pc_durations.py; the machines' waits stay the mobile's). Under the
+  room-pointer catch the balcony and the study are reached only through
+  the bedroom, so the bed hides Woody: the board goes in while he is on
+  the balcony, the airer's bird food while he is at the tank. The plan
+  (v17) arms the rest over two laps — the shovel on his first kitchen,
+  the paperknife on his second, the machines and the trap while he is
+  upstairs, the carpet, the vacuum, the tank and the bedroom marbles on
+  his third descent — and plays his third lap: the trap 261.4, the washer
+  283.0, the drier 297.7, the vacuum 324.4, the marbles 349.5 (Badinfos'
+  are the bedroom's too, 2.4 s after he leaves the board — on the balcony
+  they came 30.2 s after the vacuum, its window 30), the board 375.7, the
+  tank 397.4, the airer 421.7: 8/8, 79 points, seven ticks, 100.
 - *The tick rule, in the canon's own words.* The Season 1 manual
   (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
   the victim of a trick, his anger indicator rises to the maximum value.
@@ -1010,7 +1056,7 @@ both games, the PC data next to the mobile's, category by category:
 | containers and their contents | equal (the PC marks unlimited stock with count 99, the mobile with UseCount 0) |
 | walk-by tricks (nearobj triggers vs NoticeWhenWalkNearby) | equal, 111's ironing board included |
 | rooms and doors | equal room graphs (the PC's extra "fro" is the entrance hall; the mobile numbers its zones) |
-| the neighbour's routine | read out of game.exe (docs/PC_ROUTINES.md, tools/pcref/exe_scripts.py): one compiled class per level, its `run` a script of Icon / GoTo / Action / branch / SwitchObjects calls on the level's object names; the actions and repeats are there (the laundry's two wash and two dry cycles against the mobile's three), the lap order still from the video where the compiler laid branches out of line |
+| the neighbour's routine | read out of game.exe (docs/PC_ROUTINES.md, tools/pcref/exe_scripts.py): one compiled class per level, its `run` a script of Icon / GoTo / Action / branch / SwitchObjects calls on the level's object names; the actions and repeats are there (the laundry's washer and drier one station each — give, wash, get_clothes; give, dry, take — the mobile's three-phase machine; their tricked branch ends the station), the lap order still from the video where the compiler laid branches out of line |
 | action lengths | the PC's `time`/frames at 20 per second are of the mobile's order (album 5.7 vs 3.3 s, pudding 4.8 vs 0.8, sofa 4.4 vs 11.8, microwave 9.4 vs 15) — the laps are walks and structure, see docs/PC_LAPS.md |
 | speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
 | doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |

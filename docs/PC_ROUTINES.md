@@ -13,10 +13,13 @@ Mind the layout: the compiler puts the tricked-variant branches out of line, so 
 is not always the lap order (the fitness level's expander, home trainer, mixer, rope, barbell,
 trampoline appear in that order in code where the lap goes trampoline, bike, mixer, expander,
 weights, rope) — docs/PC_LAPS.md's orders, read off the video, stay the reference for the lap;
-this file gives the actions, their repeats and the branches: the laundry's washer runs two
-wash cycles (give, wash, get_clothes twice) and the drier two dry cycles where the mobile lists
-three of each; the bath's shower sequence (take_towel, dry) and the pudding's foam branch; the
-piano's kick of the football and the bowling ball's throw through the window.
+this file gives the actions, their repeats and the branches: the laundry's washer and drier
+are one station each — the two runs of give/wash and give/dry below are the case's two branches,
+the tricked one (the fire and the repair after the wash or the dry, then a jump to the yield,
+0x455639) laid out before the normal one (get_clothes, take), not two cycles; the mobile's
+three-phase machine (prime, use, unprime) is that station; the bath's shower sequence
+(take_towel, dry) and the pudding's foam branch; the piano's kick of the football and the
+bowling ball's throw through the window.
 
 Where the rest lives: game.exe holds the level classes, the level state and the scoring;
 Loader.dll parses the XML (`%s\level.xml`); GFXEngine.dll is the engine with the HUD

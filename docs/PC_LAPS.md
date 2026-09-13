@@ -152,9 +152,12 @@ the mobile's item positions do not have.
 Under the PC profile (2026-09-09) the sofa and album overlays
 (levels/pc/Level101, Level106: RottweilerUseAnimation lists sized to the PC
 spells) bring 101 to +11 % and 106 to −6 %; 111, 213 and 210 are
-structural (docs/PC_FIDELITY.md §7). 111 under the profile now runs the
-washer and the drier twice a lap as game.exe's script does (2026-09-16);
-the lap stays −18 % because the PC's cycles are the long ones — its washer
-spells 24 and 47 s, its drier 6 and 26, against the port's 18/15 and 6/4 —
-the wash and dry waits, not the count.
+structural (docs/PC_FIDELITY.md §7). 111's washer and drier are one
+station each in game.exe (give, wash, get_clothes; give, dry, take — the
+2026-09-16 reading of two cycles was the case's two branches, the tricked
+and the normal one), the mobile's three-phase machine kept whole under the
+profile since 2026-09-23 (the tricked use ends the station); the PC's
+machine spells stay the long ones — its washer 24 and 47 s, its drier 6
+and 26 — the wash and dry waits the level class spends in its `wait`
+steps, open.
 The PC's own numbers are from one run's first lap (±2 s per activity).

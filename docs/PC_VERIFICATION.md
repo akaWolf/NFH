@@ -150,9 +150,12 @@ mobile routines the port carries:
 | 113 | chair kit → power tool → valve → heater → basin → valve → fuse → ladder → fuse → chair kit | ChairAssembly, AngleGrinder, ValveMain, Radiator, Sink, ValveMain, FuseBox, Ladder, LadderDrill, FuseBox |
 | 114 | polish → cups → polish → smoke → phonograph → records → phonograph → smoke → gun → hat → horn → polish (the phono chain on the record playing, OBJ3 lir/phono_play) | Polish, GoldCup, Polish, Pipe, Gramaphone, CDs, Gramaphone, Pipe, Gramaphone, Shotgun, Hat, MedalBox, Hat, Horn |
 
-The same order on every level; the durations are the mobile data's (the
-open ceilings of 103–114 in docs/PC_FIDELITY.md §7), and the video laps
-of docs/PC_LAPS.md are now only the timing reference. Two data facts with no rating effect: the level
+The same order on every level; the stations' durations are the PC data's
+since 2026-09-17 (tools/pcref/pc_durations.py: every visit, a toggling
+station's prime and unprime legs included; 111's machines keep the mobile's
+waits, 111's second ironing is case 16's `iron`, a branch the walker reads
+as false), and the video laps of docs/PC_LAPS.md are now only the timing
+reference. Two data facts with no rating effect: the level
 `trigger.xml` marks four object triggers `always` (105 mum_smeared and
 phoneringing, 111 ironingboard_burn and dirtycarpet — the neighbour
 reacts every pass) where every other is `once`, and `objects.xml` flags
