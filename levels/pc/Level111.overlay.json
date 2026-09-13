@@ -1,5 +1,5 @@
 {
- "source": "PC data (level_laundry/tricks.xml): vacuum_hole 13, clothes_food 12, electrotrap 7 against the mobile's Vacuum 15, Airer 13, ElectricTrap 11 — 79 for the eight, so the PC's 100 takes all seven ticks (Badinfos' E11: 8/8, 7).   Badinfos' E11 pays the ironing board 26 s after the drier, at the neighbour's FIRST ironing of the lap (his popups: 7, 10, 10, 10 at 222, 7, 13, 10, 12): on PC the board is armed between his second ironing and the next lap's first; the mobile's hot iron starts cold and his first ironing heats it, so the port could only arm it between his two ironings and pay at the second — Primed true at the start puts the toggle in the PC's phase. Level_Laundry::run in game.exe (docs/PC_ROUTINES.md): the washer runs two wash cycles (give, wash, get_clothes twice) and the drier two dry cycles where the mobile's ActionManager lists three WashingMachine and three Drier entries — the PC lap keeps two of each. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_laundry/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 300, Vacuum 300, Drier 270); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
+ "source": "PC data (level_laundry/tricks.xml): vacuum_hole 13, clothes_food 12, electrotrap 7 against the mobile's Vacuum 15, Airer 13, ElectricTrap 11 — 79 for the eight, so the PC's 100 takes all seven ticks (Badinfos' E11: 8/8, 7).   The ironing board keeps the mobile's phase (not primed at the start): Level_Laundry::run's case 8 has him give the clothes to the board at his first ironing of the lap (bed/ironingboard.give, then the switch to bed/ironingboard_clothes, the one variant Woody's use burns — objects.xml) and case 16, his second, irons them if they are still there (0x456280: DoAction iron, 71 ticks, the switch back); the burnt board fires by its nearobj trigger (trigger.xml) as he passes it — Badinfos' E11 board at 301, between the tank (279) and the airer (322). The mobile's iron heats at his first ironing and goes cold at his second: the same window. Level_Laundry::run in game.exe: the washer and the drier are one station each (cases 4 and 6: give, wash, get_clothes; give, dry, take), and a tricked machine takes the case's other branch — give, wash, get_clothes, the fire, the repair; give, dry, the fire, the repair — which jumps straight to the yield (0x455639 for the drier), where the mobile's three-phase machine (RequireUnprime: the prime, the use, the unprime — three ActionManager entries each) is the same station, so the profile keeps the three and ends the station at the tricked use (Routine._angry_done). PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_laundry/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 300, Vacuum 300, Drier 270); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "Rottweiler",
@@ -14,9 +14,12 @@
    "set": {
     "TrickScore": 13,
     "PCShoutIndex": 1,
+    "PCGrabSeconds": 0.333,
+    "PCUseSecondsTricked": 5.5,
+    "PCFireAt": 2.917,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 8.75,
-    "PCFireAt": 3.25
+    "PCFixUseSeconds": 2.917,
+    "PCReturnSeconds": 0.333
    }
   },
   {
@@ -38,15 +41,6 @@
     "PCFireBefore": true,
     "PCSurpriseSeconds": 5.083,
     "PCFixSeconds": 1.917
-   }
-  },
-  {
-   "object": "Iron",
-   "component": "TrickItem",
-   "set": {
-    "Primed": true,
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.333
    }
   },
   {
@@ -73,49 +67,59 @@
    "set": {
     "PCAngryTime": 270,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 3.667
+    "PCUseSecondsTricked": 3.667,
+    "PCStationEndsOnTrick": true
    }
   },
   {
-   "owner": "Rottweiler",
-   "component": "ActionManager",
-   "actions_by_index": [
-    0,
-    1,
-    2,
-    4,
-    5,
-    7,
-    8,
-    9,
-    10,
-    11
-   ]
+   "object": "Detergent",
+   "component": "SearchItem",
+   "set": {
+    "PCUseSeconds": 1.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Detergent <- detergent#0 1.3 s"
+  },
+  {
+   "object": "Iron",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.33,
+     5.92
+    ],
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 4.333
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.3 s; Iron <- ironing#1 5.9 s"
+  },
+  {
+   "object": "Airer",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     1.5,
+     0.33
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Airer <- laundry_rack#0 1.5 s; Airer <- laundry_rack#1 0.3 s"
   },
   {
    "object": "FishTank",
    "component": "TrickItem",
    "set": {
+    "PCUseSeconds": 1.92,
     "PCFixSeconds": 0.917,
     "PCUseSecondsTricked": 3.25
-   }
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 1.9 s"
   },
   {
    "object": "WashingMachine",
    "component": "TrickItem",
    "set": {
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 9.833
-   }
-  },
-  {
-   "object": "DirtyCarpet",
-   "component": "TrickItem",
-   "set": {
-    "PCShoutIndex": 1,
-    "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 8.75,
-    "PCFireAt": 3.25
+    "PCUseSecondsTricked": 9.833,
+    "PCStationEndsOnTrick": true
    }
   }
  ]

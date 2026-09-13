@@ -5,7 +5,10 @@
    "object": "CornChips",
    "component": "TrickItem",
    "set": {
-    "TrickScore": 15
+    "TrickScore": 15,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 7.167,
+    "PCFireAt": 4.667
    }
   },
   {
@@ -20,8 +23,10 @@
    "component": "TrickItem",
    "set": {
     "TrickScore": 10,
+    "ReuseAfterFix": true,
     "PCFixSeconds": 0.917
-   }
+   },
+   "source": "Level_Pig::run (game.exe class 468c8c): case 17 finds the pig out (anc/pigout), case 18 fires the pigout, plays catch_pig and switches the pig back, and returns to case 17, which goes on to 19-20 (shake_bottle, feed; the nitro bottle's fire at 0x46a907) — the catch and the feeding are one visit. ReuseAfterFix restarts the station after the pigout's repair (Rottweiler.cs:707-714): the feeding plays in the same visit, the PigMilk's trick through DependsOn when the bottle holds the nitro."
   },
   {
    "object": "Ground",
