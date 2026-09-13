@@ -65,6 +65,26 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   radare2's analysis of the level fiber (the prologue constant of the class's
   `run`): the shout choice and the pay-before-clip sites of docs/PC_ROUTINES.md
   "The fire's tail".
+- `trick_branches.py [--json out] [--cases N | --chain N | --dump lo hi] [101 …]`:
+  the tricked STAND around every fire site — the level class's case chain
+  (routine_order.py's walker: a switch of cases ending in yields) simulated
+  with the trick in place (its variant test true, the objects a Switch or the
+  repair helper takes out of the world tracked, a test kept in a class byte
+  followed, the level's own helpers entered one level deep), cut at the walks
+  and the bubbles: the DoActions before the fire, the five-argument step's own
+  clip, the actions after it, the repair or clean (fcn.0047ae70 or the
+  script's own `repair`), in objects.xml seconds — the neighbour's own actions
+  (smokepipe_explosive, riphat, spit …) looked up on the `<actor>` blocks.
+  `--cases`/`--chain` print a level's cases and chain, `--dump` a code range
+  with its strings. The walk-trigger handlers (the doubletakes, the slips,
+  the trap) are no cases: their straight branch is read instead.
+- `pc_reactions.py [--write] [106 …]`: the keys per mobile item out of the
+  stands — PCShoutIndex/PCShoutSkip (the step's index and flag 2, the
+  register-valued ones from `fire_sites.py --fibers`), PCUseSecondsTricked,
+  PCFireAt, PCFixSeconds, and the walk-bys', slips' and trap's
+  PCSurpriseSeconds/PCSlipSeconds/PCFireBefore — into levels/pc's overlays;
+  the item -> PC object pairing is its TABLE (docs/PC_FIDELITY.md, "Season 1
+  reactions").
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —

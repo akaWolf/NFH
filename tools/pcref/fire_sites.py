@@ -54,7 +54,7 @@ def decode(i):
         m = re.match(r'mov (eax|ecx|edx), esp$', ins)
         if m: ptr[m.group(1)] = len(stack) - 1; continue
         m = re.match(r'mov dword \[(eax|ecx|edx)\], (.+)$', ins)
-        if m and m.group(1) in ptr:
+        if m and m.group(1) in ptr and 0 <= ptr[m.group(1)] < len(stack):
             v = m.group(2); stack[ptr[m.group(1)]] = regs.get(v, sym(v)) if v in regs or v in ('eax','ecx','edx','ebx','esi','edi','ebp') else sym(v); continue
         m = re.match(r'mov (eax|ecx|edx|ebx|esi|edi|ebp), (.+)$', ins)
         if m:
@@ -73,25 +73,40 @@ def lastassign(i, reg):
             if p.match(ins): return '0x%x %s' % (a, ins)
     return '?'
 REGS = ('ebx', 'edi', 'ebp', 'esi')
-rows = []
-reg_sites = []
-for i, ln in enumerate(L):
-    m = re.search(r'call (fcn\.0047c290|fcn\.0047c320|fcn\.0047c3b0)$', ln)
-    if not m: continue
-    a, _ = parse(ln)
-    st = decode(i)
-    st = st[:-1] if st and st[-1] == 'addr' else st     # the result pointer on top
-    kind = {'fcn.0047c290': 'OBJ2', 'fcn.0047c320': 'FIRE5', 'fcn.0047c3b0': 'FIRE4'}[m.group(1)]
-    n = {'OBJ2': 3, 'FIRE5': 5, 'FIRE4': 4}[kind]
-    args = st[-n:] if len(st) >= n else st
-    top_first = list(reversed(args))      # p1 = top (last pushed)
-    notes = []
-    for k, v in enumerate(top_first):
-        if v in ('ebx', 'edi', 'ebp', 'esi'):
-            notes.append('p%d=%s: %s' % (k + 1, v, lastassign(i, v)))
-    for k, v in enumerate(top_first[:3]):
-        if v in REGS: reg_sites.append((a, v, top_first[0] if isinstance(top_first[0], str) else '?', k + 1))
-    print('%08x %-5s %s %s' % (a, kind, top_first, '; '.join(notes)))
+KIND = {'fcn.0047c290': 'OBJ2', 'fcn.0047c320': 'FIRE5', 'fcn.0047c3b0': 'FIRE4'}
+NARGS = {'OBJ2': 3, 'FIRE5': 5, 'FIRE4': 4}
+
+
+def sites():
+    """every fire site: (line, address, kind, args top-first, notes, reg_sites)"""
+    rows = []
+    for i, ln in enumerate(L):
+        m = re.search(r'call (fcn\.0047c290|fcn\.0047c320|fcn\.0047c3b0)$', ln)
+        if not m: continue
+        a, _ = parse(ln)
+        st = decode(i)
+        st = st[:-1] if st and st[-1] == 'addr' else st     # the result pointer on top
+        kind = KIND[m.group(1)]
+        n = NARGS[kind]
+        args = st[-n:] if len(st) >= n else st
+        top_first = list(reversed(args))      # p1 = top (last pushed)
+        notes = []; regs = []
+        for k, v in enumerate(top_first):
+            if v in REGS:
+                notes.append('p%d=%s: %s' % (k + 1, v, lastassign(i, v)))
+        for k, v in enumerate(top_first[:3]):
+            if v in REGS: regs.append((a, v, top_first[0] if isinstance(top_first[0], str) else '?', k + 1))
+        rows.append((i, a, kind, top_first, notes, regs))
+    return rows
+
+
+def main(argv):
+    reg_sites = []
+    for i, a, kind, top_first, notes, regs in sites():
+        reg_sites.extend(regs)
+        print('%08x %-5s %s %s' % (a, kind, top_first, '; '.join(notes)))
+    if '--fibers' in argv:
+        fibers(reg_sites)
 
 
 def fibers(reg_sites):
@@ -127,5 +142,5 @@ def fibers(reg_sites):
                 else: last_write = ins
         print('%08x %-24s p%d=%s fiber 0x%x %s | prologue: %s | in-case: %s' % (site, name, k, reg, p, last_case, const, last_write))
 
-if '--fibers' in sys.argv:
-    fibers(reg_sites)
+if __name__ == '__main__':
+    main(sys.argv[1:])
