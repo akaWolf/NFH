@@ -44,6 +44,20 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   ticks over the visible tube (docs/PC_ROUTINES.md); the PC overlays carry
   the angrytime in ticks as PCAngryTime, and the profile runs the PC rule on
   it (docs/PC_FIDELITY.md §7).
+- `thermo_jumps.py <episode>…`: the thermometer's jumps per episode — the second
+  of every trick of Badinfos' run (game.exe fires the trick before its
+  animation), the fill just before each jump and the gap to the previous one:
+  the PC's own chain of a level (E06 in docs/PC_LAPS_DETAIL.md — nine tricks,
+  eight bonuses). A jump within ~4 s of the tube's emptying can still be a
+  bonus (the bulb holds the bar's bottom ~30 %); the HUD's bonus counter in
+  a frame settles it, and in the frames Woody is the blond in blue, the
+  neighbour the man in the vest.
+- `pc_tricked_actions.py`: the Season 1 TRICKED objects' neighbour actions in
+  seconds next to the normal object's, paired by the scripts' `If <tricked>
+  of <normal>` steps (docs/PC_ROUTINES.md) — the PC plays the tricked
+  object's own action (106's make_foampudding 3.17 s, not make_pudding's
+  8.00) where the port stretches the tricked clip to the normal stay
+  (docs/PC_FIDELITY.md, the 106 paragraph).
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —

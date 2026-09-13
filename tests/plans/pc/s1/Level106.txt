@@ -1,46 +1,67 @@
-# Level106 under the PC profile (2026-09-17, the PC paces, the catch the room
-# alone). His lap (~50 s, the idle run under the profile): living (album,
-# candy) 0-21 > kitchen (pudding) 21-31 > hall 31-40 > bathroom (tub) 40-44 >
-# hall 44-47 > living 47-66 > kitchen 66-76 > hall 76-85 > bathroom (tub, the
-# towel) 85-97 > hall 97-101 > living 101-120 > ... The hall's wardrobe hides
-# Woody through his hall passes. Nine tricks: the bathroom first (3-22), the
-# hall (22-30), the kitchen while he sits in the living room (47-66), the towel
-# while he is in the kitchen (66-76), the living room while he is in the
-# kitchen and the hall (66-101), the tub and the pudding on his next lap.
-take! FirstAid IT_Foamballs          # Zone04 (6-10): Foamballs + Hairrestorer — straight in while he is in the living room
+# Level106 under the PC profile — the PC chain of Badinfos' E06 (the
+# thermometer of pc_s1_all_720.mp4, 1149.4 s on; the pays in level seconds):
+# Microwave 197.5 > Pudding 212.5 (+15.0) > MumPicture 234.5 (+22.0, the
+# pudding's 25 s window) > Ground@Zone04 252.0 (+17.5: the soap at the
+# bathroom door) > BathTub 267.5 (+15.5) > Towel 274.5 (+7.0) > PhotoAlbum
+# 292.5 (+18.0, the towel's 23 s window) > Candy 304.5 (+12.0) > Toilet 313.0
+# (+8.5, on the candy rush) — nine tricks, eight bonuses, 100.
+# His idle lap under the profile (runs/idlepc4): living 0-14 (album 3-12.5,
+# candy 13-14) > kitchen 19.5-34 (pudding 24-32) > hall 35-45.5 > bathroom
+# 45.6-49.6 (the fill 48.3) > hall 51-55.5 > living 55.6-73.7 > kitchen
+# 75.3-90.5 > hall 90.7-101.5 > bathroom 101.7-115 (bath 104-108, towel
+# 108.5-112) > hall 115-119 > living 119.3-137 > kitchen 138.8-154 > hall
+# 154-165 > bathroom 165-169 (the fill) > hall 171-175 > living 175-193 >
+# kitchen 194.9 (the chain lap: his second bath lap). The tub is full from
+# his fill to his next bath: the bottle fills after the first fill (48.3),
+# the hair restorer goes in after the third (168). The kitchen is armed
+# after his lap-3 pudding (154) from the living room, the bathroom and the
+# living room while he cooks the lap-4 pudding, the toilet paper after his
+# lap-4 bath — it pays on the candy rush, the last trick.
+take! FirstAid IT_Foamballs          # Zone04 while he sits in the living room (0-19) and the kitchen (19-35)
+take! FirstAid IT_Hairrestorer       # Zone04
 take! ToiletPaper IT_Wcpaper         # Zone04
-usewith! Toilet IT_Wcpaper           # Zone04: Neutral, raw-Tricked walk-by, 7
 take! SoapDish IT_Soap               # Zone04: the one soap
-take! Drawer IT_Glue                 # Zone01 (~24): Glue + Marker + Shoepolish
-usewith! MumPicture IT_Marker        # Zone01 walk-by, 7
-hide! Wardrobe                       # Zone01 by 30: he crosses the hall 31-40 and 44-47
-whenzone Zone02                      # (47) he sits in the living room until 66: the kitchen
+take! Drawer IT_Glue                 # Zone01 (~24): Glue + Marker + Shoepolish — the rest on his next living-room stay
+hide! Wardrobe                       # Zone01 by 30: he crosses the hall 35-45, fills the tub 48, crosses 51-55
+whenzone Zone02                      # (56) his lap-1 living-room stay until 75; the kitchen 75-90
+take! Drawer IT_Marker               # Zone01
+take! Drawer IT_Shoepolish           # Zone01
+take! RubbishBinBottle IT_Emptybottle   # Zone03 (~65): out before he comes at 75 through the back door
 take! Fridge IT_Egg                  # Zone03
-usewith! Microwave IT_Egg            # Zone03 walk-by, 7
-usewith! Ground@Zone03 IT_Soap       # Zone03: the slip on the pudding walk, 7
-take! RubbishBinBottle IT_Emptybottle   # Zone03
-park! Zone01                         # the hall before he comes to the kitchen (66)
-whenzone Zone03                      # (66) he makes the pudding until 76: the towel
-usewith! Towel IT_Shoepolish         # Zone04, 12: pays at [8] BathTowelPolish
-park! Zone01                         # out of the bathroom before he comes to the hall (76)
-hide! Wardrobe                       # he crosses the hall 76-85, bathes 85-97, crosses 97-101
-whenzone Zone04                      # (85) he bathes: the living room is free until 101
-usewith! PhotoAlbum IT_Glue          # Zone02, 8: pays at PhotoAlbumSticky
-usewith! Candy IT_Foamballs          # Zone02, 8: SpitRight -> RushToToilet
-park! Zone03                         # the kitchen: out of his way from the bathroom to the living room
-whenusing BathTub                    # his next BathTub station is the FILL (his lap runs fill, bath+towel, fill, ...): the tub is full after it
-whenzone Zone02                      # he is back in the living room: the bathroom is free for a lap
-prime! BathTub IT_Emptybottle        # Zone04: the full tub fills the bottle
-usewith! BathTub IT_Hairrestorer     # Zone04, 12: pays at his next bath
-hide! Wardrobe                       # he crosses the hall to the kitchen, bathes, and comes back
-# the pudding (8) has no window under the PC catch (2026-09-17): the kitchen is
-# reached through the living room, where he sits while the kitchen is free, and
-# his bathroom stays (5-13 s) are shorter than the round trip from the hall
-await MumPicture 7
-await Toilet 7
+park! Zone01                         # (~74) the kitchen's hall door; he walks living > kitchen
+prime! BathTub IT_Emptybottle        # Zone04 (~79): the tub is full since 48 — IT_Fullbottle
+park! Zone01
+hide! Wardrobe                       # by 88: he crosses 91-101, bathes 102-115 (the tub empties), crosses 115-119, sits 119-139
+whenzone Zone04                      # (102) his lap-2 bath — the landmarks below pin lap 3
+whenzone Zone02                      # (119) his lap-2 living-room stay until 139
+whenzone Zone03                      # (139) his lap-3 pudding until 154: the living room is free until 175
+park! Zone02                         # the living room (~145)
+whenzone Zone01                      # (154) he crosses to the bathroom (165-169, the fill) and back (171-175)
+usewith! Microwave IT_Egg            # Zone03 (~158) through the back door: pays at his lap-4 kitchen entry (195), the chain's first
+usewith! Pudding IT_Fullbottle       # Zone03: the foam pudding, pays after the pour
+whenzone Zone02                      # (175) he sits in the living room until 193: the hall and the bathroom are free
+park! Zone01
+usewith! MumPicture IT_Marker        # Zone01 (~180): pays on his lap-4 hall pass to the bathroom (~234)
+usewith! BathTub IT_Hairrestorer     # Zone04 (~182): the tub is full since his lap-3 fill (168)
+usewith! Towel IT_Shoepolish         # Zone04
+usewith! Ground@Zone04 IT_Soap       # Zone04: the slip at the bathroom door
+park! Zone01
+hide! Wardrobe                       # by 194: he enters the kitchen at 195 and stays through the egg, the pour and two tantrums (~226)
+whenzone Zone03                      # (195) the chain lap: the living room is free until his lap-4 album (~290)
+usewith! PhotoAlbum IT_Glue          # Zone02 (~201)
+usewith! Candy IT_Foamballs          # Zone02
+park! Zone01
+hide! Wardrobe                       # by 211: he crosses the hall ~228-240 (the picture), slips, bathes, crosses back ~283-290
+whenzone Zone02                      # (~290) his lap-4 album: the bathroom is free until the candy rush (~313)
+usewith! Toilet IT_Wcpaper           # Zone04 (~296): pays on the candy rush, the ninth trick
+park! Zone01
+hide! Wardrobe                       # the rush crosses the hall
 await Microwave 7
-await Ground@Zone03 7
+await Pudding 8
+await MumPicture 7
+await Ground@Zone04 7
+await BathTub 12
 await Towel 12
 await PhotoAlbum 8
 await Candy 8
-await BathTub 12
+await Toilet 7

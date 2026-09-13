@@ -232,6 +232,8 @@ PC (bubble, s from the level start): PhotoAlbum 5-15 > Candy 16-17 > Pudding 18-
 
 PC lap by PhotoAlbum: [48, 60, 57, 108] → median 58.5 s
 
+PC tricks (the thermometer's jumps, s from the level start, tools/pcref/thermo_jumps.py; the HUD counters give the points): Microwave 197.5 (7) > Pudding 212.5 (8, +15.0) > MumPicture 234.5 (7, +22.0 — the pudding's 25 s) > Ground@bathroom door 252.0 (7, +17.5) > BathTub hair 267.5 (12, +15.5) > Towel 274.5 (12, +7.0) > PhotoAlbum 292.5 (8, +18.0 — the towel's 23 s) > Candy 304.5 (8, +12.0) > Toilet on the sweets rush 313.0 (7, +8.5): nine tricks, eight bonuses, 100. Woody arms everything in the first 190 s (the frames show him in the bathroom at 189-195); the neighbour's tricked pour is make_foampudding (38 frames, 3.2 s), his tricked read read_stickybook (47, 3.9 s).
+
 mobile routine: PhotoAlbum > Candy > Pudding > BathTub > PhotoAlbum > Candy > Pudding > BathTub > Towel
 
 mobile uses: PhotoAlbum@3 > Candy@8 > Pudding@19 > BathTub@29 > BathTub@44 > PhotoAlbum@53 > Candy@58 > Pudding@69 > BathTub@86 > BathTub@92 > Towel@97 > PhotoAlbum@111 > Candy@116 > Pudding@123 > Pudding@137 > Pudding@153

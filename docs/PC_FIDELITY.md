@@ -450,8 +450,18 @@ him out of the kitchen and back), 111 at 97 (the drier to the vacuum,
 stretch, not both; the PC video pays both with a 26 s drier-to-vacuum),
 114 at 97 (the pipe to the trap down the stairs, 29.7 against 25 — the
 PC video's neighbour is quicker down), 112 at 94 (three walks of 29-34 s
-against 25-29), 106 at 94 (the bath's 18 s window against his 18.5 s
-picture-to-toilet and 21 s toilet-to-album walks), 108 at 94 (the
+against 25-29), 106 at 94 in the PC's own order (Badinfos' E06 chain read
+off the thermometer, tools/pcref/thermo_jumps.py: microwave > pudding >
+picture > the bathroom-door soap > hair > towel > album > sweets > the loo on
+the sweets rush, nine tricks and eight bonuses at 15.0, 22.0, 17.5, 15.5,
+7.0, 18.0, 12.0 and 8.5 s; the port's plan pays the same nine with two
+cold links — microwave to pudding 18.7 s against the PC's 15.0, the port
+stretching the tricked pour to the NORMAL station's 8.0 s where the PC's
+make_foampudding is 38 frames = 3.17 s, and picture to soap 21.0 against
+17.5, the port paying a walk-by after its surprise clip (SlipRight 3.3 s,
+FindRight 1.5 s) where game.exe fires the trick before the animation, and
+cleaning the picture in the mobile's 3.4 s against the PC's 2.0 —
+tools/pcref/pc_tricked_actions.py tabulates the tricked actions), 108 at 94 (the
 toothbrush to the deck chair 31.6 s, the lotion to the plant 33, against
 20), 113 at 91 (the raid's long waits; one gap of 24.3 against 24).
 Every one of these is a routine-timing difference between the port's
