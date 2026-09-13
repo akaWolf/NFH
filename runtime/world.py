@@ -2844,6 +2844,18 @@ class Routine:
                 seq = [x for x in leg if self.pawn.anim.has(x)]
                 self.state = self.USING
                 self.timer = a['duration']
+                # the prime and unprime legs are visits of the PC station too
+                # (111's board: the give at his first ironing; the rack's
+                # putclothes; 113's fuse take): they take this visit's
+                # PCUseSeconds and play at its pace, keeping the per-visit
+                # values in the PC's order (tools/pcref/pc_durations.py)
+                if self.role == 'Rottweiler' and seq and pcprofile.is_pc() \
+                        and pcprofile.rule('durations'):
+                    pc = self._pc_visit_seconds(it)
+                    if pc:
+                        mobile = self.pawn.anim.sequence_seconds(seq)
+                        if mobile > 0.0:
+                            self.pawn.anim.time_scale = mobile / pc
                 if a.get('hide_owner'):
                     self.pawn.set_hidden(True)   # cs:213-216
                 self._after_use_side_effects(a, it)
@@ -3050,18 +3062,20 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         pc = self._pc_use_seconds(it)
+        ft = self._pc_trick_item(it)
         if pcprofile.is_pc() and self.role == 'Rottweiler' and it is not None \
-                and getattr(it, 'pc_fire_at', None) is not None \
-                and it.is_tricked(self.level.items) and not it.pc_fired:
+                and getattr(ft, 'pc_fire_at', None) is not None \
+                and it.is_tricked(self.level.items) and not ft.pc_fired:
             # the PC step fires this far into the tricked stand when its own
             # clip or more actions follow the fire (PCFireAt: the tub's hair
             # after the shower clip, the dirty microwave on arrival at 0 and
-            # the cooking after it — docs/PC_ROUTINES.md "The fire's tail")
-            if float(it.pc_fire_at) > 0.0:
-                self.pc_fire_at = float(it.pc_fire_at)
-                self.pc_fire_item = it
+            # the cooking after it — docs/PC_ROUTINES.md "The fire's tail");
+            # the playing trick fires, the one the angry pays (_pc_trick_item)
+            if float(ft.pc_fire_at) > 0.0:
+                self.pc_fire_at = float(ft.pc_fire_at)
+                self.pc_fire_item = ft
             elif w is not None:
-                w.s1_fire(self.pawn, it)
+                w.s1_fire(self.pawn, ft)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -3618,6 +3632,19 @@ class Routine:
             if tgt is not None:
                 w.set_active_object_hidden(tgt, False)
 
+    def _pc_trick_item(self, it):
+        """the item whose PC trick a tricked station plays: the one its angry
+        pays, RoutineActionUse.GetTrickedItem (_tricked_item). A station
+        tricked through its DependsOn plays the dependency's trick — 113's
+        chair kit the pain book's (lir/stoolkit_pain), 109's chili the chips'
+        (kit/cookiebox_hot), 102's sofa the laxative beer's — with that
+        trick's stand, fire and pay, as game.exe's level class runs that
+        trick's own case (tools/pcref/pc_reactions.py maps every PC trick
+        onto the item that pays it); the host's values are its own trick's"""
+        if it is None or not it.is_tricked(self.level.items):
+            return it
+        return self._tricked_item(it) or it
+
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
@@ -3631,15 +3658,22 @@ class Routine:
             k = it.pc_use_visit_role.get(self.role, 0)
             it.pc_use_visit_role[self.role] = k + 1
             return float(vals[k % len(vals)])
-        if getattr(it, 'pc_use_secs_tricked', None) is not None \
+        t = self._pc_trick_item(it)
+        if getattr(t, 'pc_use_secs_tricked', None) is not None \
                 and it.is_tricked(self.level.items):
             # the tricked stand's own seconds (PCUseSecondsTricked: game.exe
             # runs kit/foambottle's make_foampudding, 38 frames, not
             # kit/milkbottle's make_pudding — docs/PC_ROUTINES.md "The
             # stands"); 0 = the PC plays nothing before the fire (104's dirty
             # microwave fires on arrival and cooks after the clean): the
-            # mobile's tricked clip runs at its own pace, not the normal stay's
-            return float(it.pc_use_secs_tricked)
+            # mobile's tricked clip runs at its own pace, not the normal stay's.
+            # The stand is the playing trick's (_pc_trick_item)
+            return float(t.pc_use_secs_tricked)
+        return self._pc_visit_seconds(it)
+
+    def _pc_visit_seconds(self, it):
+        """the item's PCUseSeconds for this visit: one value, or one per
+        visit in the PC station order, cycling; 0 = none"""
         if not getattr(it, 'pc_use_secs', None):
             return 0.0
         v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]
@@ -3714,7 +3748,30 @@ class Routine:
             self._pending = 'start'
         else:
             self._pending = 'advance'
+            if pcprofile.is_pc() and target is not None and target is it \
+                    and target.pc_station_ends_on_trick:
+                self._end_pc_station(target)
         self._check_parked_runs()
+
+    def _end_pc_station(self, it):
+        """the PC's three-phase machine (111's washer and drier, the
+        overlay's PCStationEndsOnTrick: the mobile's RequireUnprime prime, use
+        and unprime are one station of Level_Laundry::run, give, wash or dry,
+        get_clothes or take): a tricked machine takes the case's other branch
+        — the fire and the repair after the wash or the dry — which jumps to
+        the case's yield (game.exe 0x455639), so the unprime visit that would
+        follow is passed over and the machine is left unprimed for the next
+        lap's give"""
+        w = self.pawn.world
+        if w is not None:
+            w.set_primed(it, False)
+        it.is_using = False
+        if not self.actions:
+            return
+        nxt = self._next_index(self.index)
+        if self.actions[nxt].get('item') == it.pid:
+            # the queued advance then lands past the unprime
+            self._advance()
 
     def _check_parked_runs(self):
         """the Rottweiler tail of RoutineActionUse.OnActionStopped
@@ -4076,14 +4133,15 @@ class Routine:
             # Tricked, PCFireAt — docs/PC_ROUTINES.md "The stands")
             pc = self._pc_use_seconds(it) if pcprofile.is_pc() else 0.0
             w = self.pawn.world
+            ft = self._pc_trick_item(it)
             if pcprofile.is_pc() and self.role == 'Rottweiler' \
-                    and getattr(it, 'pc_fire_at', None) is not None \
-                    and it.is_tricked(self.level.items) and not it.pc_fired:
-                if float(it.pc_fire_at) > 0.0:
-                    self.pc_fire_at = float(it.pc_fire_at)
-                    self.pc_fire_item = it
+                    and getattr(ft, 'pc_fire_at', None) is not None \
+                    and it.is_tricked(self.level.items) and not ft.pc_fired:
+                if float(ft.pc_fire_at) > 0.0:
+                    self.pc_fire_at = float(ft.pc_fire_at)
+                    self.pc_fire_item = ft
                 elif w is not None:
-                    w.s1_fire(self.pawn, it)
+                    w.s1_fire(self.pawn, ft)
             if os.environ.get('NFH_ROUTINE_LOG'):
                 print('routine %s t=%.1f use sequence (rush) item=%s seq=%s pc=%s mobile=%.2f' % (
                     self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -4468,6 +4526,19 @@ class Routine:
         self.run_to_fixing_item(tool, w._tricked_item_to_fix(it))
         return True
 
+    def _pc_tool_pace(self, seq, secs):
+        """under the profile a fixing tool's step lasts its PC action's
+        seconds — the tool's PCGrabSeconds, PCUseSecondsTricked,
+        PCFixUseSeconds or PCReturnSeconds (tools/pcref/pc_reactions.py's
+        `tool`: the take, the stand at the target, the use after the repair,
+        the give) — the mobile clips at that pace (AnimPlayer.time_scale,
+        reset by the step's end)"""
+        self.pawn.anim.time_scale = 1.0
+        if secs and seq and pcprofile.is_pc() and pcprofile.rule('durations'):
+            mobile = self.pawn.anim.sequence_seconds(seq)
+            if mobile > 0.0:
+                self.pawn.anim.time_scale = mobile / float(secs)
+
     def run_to_fixing_item(self, tool, tricked):
         """Rottweiler.RunToFixingItem (Rottweiler.cs:1077-1082): shift the
         tricked item's stand spot by DeltaFixLocation, wire the chain, and
@@ -4487,8 +4558,10 @@ class Routine:
         seq = [x for x in self.pawn.grab_action.get('sequence', [])
                if self.pawn.anim.has(x)]
         self.state = self.USING
+        self._pc_tool_pace(seq, getattr(self._fix_tool, 'pc_grab_secs', None))
 
         def grabbed():
+            self.pawn.anim.time_scale = 1.0
             tool = self._fix_tool
             if tool is not None and tool.sprite is not None:
                 tool.sprite.hidden = True    # SetActiveObjectHidden(true)
@@ -4525,8 +4598,22 @@ class Routine:
                    if self.pawn.anim.has(x)]
 
             def angry():
+                self.pawn.anim.time_scale = 1.0
                 w.play_angry(self.pawn, tool, on_done=self._use_fixing_arrived)
             self.state = self.USING
+            # the PC case's stand at the target (111's vacuum_hole and its
+            # explode clip) and the fire before that clip (FIRE5, PCFireAt) —
+            # a tool pc_reactions.py maps as one (PCGrabSeconds); another
+            # tool's PCUseSecondsTricked is its own station's stand
+            pc_tool = tool.pc_grab_secs is not None
+            self._pc_tool_pace(seq, tool.pc_use_secs_tricked if pc_tool else None)
+            if pcprofile.is_pc() and pc_tool and tool.pc_fire_at is not None \
+                    and not tool.pc_fired:
+                if float(tool.pc_fire_at) > 0.0:
+                    self.pc_fire_at = float(tool.pc_fire_at)
+                    self.pc_fire_item = tool
+                else:
+                    w.s1_fire(self.pawn, tool)
             if seq:
                 self.pawn.anim.play_sequence(seq, on_end=angry)
             else:
@@ -4538,10 +4625,17 @@ class Routine:
         seq = [x for x in self.pawn.use_fixing_action.get('sequence', [])
                if self.pawn.anim.has(x)]
         self.state = self.USING
-        if seq:
-            self.pawn.anim.play_sequence(seq, on_end=self._fixing_done)
-        else:
+        # the PC's use at the target after the repair (vacuum2) or of a
+        # sound tool (vacuum): both the same clip on PC
+        self._pc_tool_pace(seq, getattr(tool, 'pc_fix_use_secs', None))
+
+        def used():
+            self.pawn.anim.time_scale = 1.0
             self._fixing_done()
+        if seq:
+            self.pawn.anim.play_sequence(seq, on_end=used)
+        else:
+            used()
 
     def _fixing_done(self):
         """RoutineActionUseFixingItem.StopAction clears Rottweiler.FixingItem;
@@ -4564,8 +4658,10 @@ class Routine:
         seq = [x for x in self.pawn.use_fixing_action.get('return_sequence', [])
                if self.pawn.anim.has(x)]
         self.state = self.USING
+        self._pc_tool_pace(seq, getattr(self._fix_tool, 'pc_return_secs', None))
 
         def returned():
+            self.pawn.anim.time_scale = 1.0
             tool = self._fix_tool
             if tool is not None and tool.sprite is not None:
                 tool.sprite.hidden = False
@@ -4856,6 +4952,12 @@ class Routine:
                 # urgent run (consumed in OnSingleAnimationEnded)
                 self.pawn.steps = []
                 self.pawn.state = self.pawn.IDLE
+                if it.name == 'DirtyCarpet' and pcprofile.is_pc():
+                    # the PC's room trigger runs Level_Laundry's cases 20-22
+                    # at once: the variant test, the vacuum icon and the walk
+                    # to the vacuum (game.exe 0x45647f-0x456561) — no look
+                    self.start_urgent(it)
+                    return True
                 startle = it.surprise_far_left if self.pawn.facing == 'Right' \
                     else it.surprise_far_right
                 if startle and self.pawn.anim.has(startle):

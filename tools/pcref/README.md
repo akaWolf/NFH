@@ -84,7 +84,11 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   PCFireAt, PCFixSeconds, and the walk-bys', slips' and trap's
   PCSurpriseSeconds/PCSlipSeconds/PCFireBefore — into levels/pc's overlays;
   the item -> PC object pairing is its TABLE (docs/PC_FIDELITY.md, "Season 1
-  reactions").
+  reactions"), each PC trick on the item that pays it — a station tricked
+  through its DependsOn plays the dependency's stand, fire and pay
+  (World._pc_trick_item), so 113's pain book and 109's chips carry the keys
+  beside their hosts; an item the TABLE names is written whatever its mobile
+  score (109's CornChips pays 0 on the mobile).
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —
@@ -106,4 +110,5 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
 - `routine_order_s2.py` — the Season 2 counterpart: the chain of step functions of each GameLogic.dll level script followed with no trick fired; nine laps close (201, 203, 205, 206, 208, 209, 211, 212, 213), the polling steps of 202/204/207/214 and 210's deck chair stop the rest (`TAILS=1` shows the branches). Needs `~/nfh-bench/pcref/r2/nfh2_gamelogic_text.txt`.
 
 - `lap_model.py` — the Season 1 lap by code and data: `LAPS=1 routine_order.py`'s ICON / GOTO / ENTER / LEAVE / ACTION tokens of each level class, walked at the neighbour's `<speed>` records between the objects' hotspots through the doors (standing points, `enter`/`leave` ticks), the actions at their `time` or frames; against the PC video's natural laps (docs/PC_LAPS.md). The door sum (the near `enter` plus the far `leave`) is the engine's: game.exe composes the pair as one step list (fcn.00478030) and the 110 video measures a back door at ~3 s. `-v` lists the legs; `LAP_TOKENS=<file>` caches the walker's output.
+- `pc_durations.py [--show]` — the Season 1 station stays: each PC station of `lap_model.py`'s lap paired with the mobile routine item that visits it (PAIRS), into the overlays as PCUseSeconds per visit, written in place beside the trick step's keys pc_reactions.py merges into the same entries. NATURAL adds an action the walker's lap misses because it takes a test as false: 111's second ironing (case 16, 0x456280) tests the board for the clothes case 8's `give` put there and irons them, 71 ticks. Left to the mobile: 111's machines, 106's bath, 104's shaving chain.
 - `routine_order.py` `LAPS=1` — prints each level's lap as tokens (`LAP <level> <n>: ICON x | GOTO obj | ACTION act + obj …`), the helpers of the class (the sofa's sit picker) descended into, the compound GoTo/DoAction helpers labelled (fcn.00479f10 GoTo+enter, fcn.0044ac80 GoTo with leave, fcn.00473e20/ea0 enter/leave, fcn.00479c70 DoAction+wait).

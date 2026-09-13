@@ -8,10 +8,14 @@ Each PC station of the level class's lap (tools/pcref/lap_model.py: the ICON gro
 of the walker's tokens, the DoActions' ticks summed at 12 a second) is paired with the
 mobile routine's item that visits it — PAIRS: (mobile item, PC icon, k-th visit of that
 icon, and how many consecutive mobile visits share one PC station). The overlay entry
-PCUseSeconds carries one value per visit, cycling; RoutineAction._pc_use_seconds plays
+PCUseSeconds carries one value per visit, cycling — every visit counts, the prime and
+unprime legs of a toggling station included (Routine._pc_visit_seconds: 111's first
+ironing is the give, its second the ironing); RoutineAction._pc_use_seconds plays
 the mobile use clips at the pace that lasts it (AnimPlayer.time_scale), or holds a
 walk-by stand for it. Left to the mobile: 111's machines (the PC neighbour waits on the
 machine's cycle — open in docs/PC_VERIFICATION.md), 106's bath, 104's shaving chain.
+NATURAL: a station whose natural-lap action sits behind a test the walker takes as false
+(routine_order.py: OBJ3 is 'no trick has fired') while the lap itself made it true.
 """
 import json
 import os
@@ -39,7 +43,8 @@ PAIRS = {
           ('CornChips', 'cookies', 0), ('Chili', 'parrot', 1), ('PigKeys', 'pig_key', 1)],
     110: [('SteakMeat', 'meatbowl', 0), ('Beer', 'beer', 0), ('BBQ', 'bbq', 0), ('CarnivorPlantSpray', 'plant', 0),
           ('BBQ', 'bbq', 1), ('SteakChair', 'table', 0), ('SteakWine', 'wine', 0)],
-    111: [],
+    111: [('Detergent', 'detergent', 0), ('Iron', 'ironing', 0), ('Airer', 'laundry_rack', 0),
+          ('FishTank', 'aquarium', 0), ('Airer', 'laundry_rack', 1), ('Iron', 'ironing', 1)],
     112: [('YogaBook', 'book', 0), ('FishTank', 'aquarium', 0), ('Yoga', 'yoga_mat', 0), ('YogaBook', 'book', 1),
           ('Trampoline', 'trampoline', 0), ('Bicycle', 'home_trainer', 0), ('Mixer', 'mixer', 0, 2),
           ('ChestExpander', 'expander', 0), ('Weights', 'barbell', 0), ('Rope', 'skipping_rope', 0)],
@@ -50,6 +55,10 @@ PAIRS = {
           ('Gramaphone', 'phonograph', 0), ('CDs', 'records', 0), ('Gramaphone', 'phonograph', 1), ('Pipe', 'smoke', 1),
           ('Shotgun', 'gun', 0), ('Hat', 'hat', 0), ('Horn', 'horn', 0)],
 }
+# (level, PC icon, k-th visit) -> ticks: Level_Laundry's case 16 (game.exe 0x456280)
+# tests the board for bed/ironingboard_clothes, which case 8's switch (the `give`)
+# put there on the same lap, and irons it: DoAction iron, objects.xml time 71
+NATURAL = {(111, 'ironing', 1): 71}
 
 
 def pc_stations(n, toks):
@@ -61,6 +70,9 @@ def pc_stations(n, toks):
     by = {}
     for icon, ta, tw in st:
         by.setdefault(icon.split()[-1], []).append(ta / lap_model.TICK)
+    for (lv, icon, k), ticks in NATURAL.items():
+        if lv == n and k < len(by.get(icon, [])):
+            by[icon][k] += ticks / lap_model.TICK
     return by
 
 
@@ -97,18 +109,33 @@ def main(argv):
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
         ov = json.load(open(p)) if os.path.exists(p) else {'source': 'the PC data (tools/pcref)', 'patches': []}
-        ov['patches'] = [e for e in ov.get('patches', []) if 'PCUseSeconds' not in (e.get('set') or {})]
+        # in place: an entry keeps its other keys (tools/pcref/pc_reactions.py merges the
+        # trick step's into the same object's entry) and its place in the file
+        patches = []
+        for e in ov.get('patches', []):
+            st = e.get('set') or {}
+            if 'PCUseSeconds' in st and e.get('object') not in secs:
+                st = {k: v for k, v in st.items() if k != 'PCUseSeconds'}
+                if not st:
+                    continue
+                e = dict(e, set=st)
+            patches.append(e)
+        ov['patches'] = patches
         for item, vals in secs.items():
             kind = item_kind(n, item)
             if kind is None:
                 print('%d: no item %s' % (n, item)); continue
-            ov['patches'].append({
-                'object': item, 'component': kind,
-                'set': {'PCUseSeconds': vals if len(vals) > 1 else vals[0]},
-                'source': "the PC station's DoActions at 12 ticks a second (level_%s's objects.xml and anims.xml through "
-                          "tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): %s"
-                          % (canon.pc_level(n)['folder'][6:], '; '.join(x for x in notes if x.startswith(item + ' <-'))),
-            })
+            src = ("the PC station's DoActions at 12 ticks a second (level_%s's objects.xml and anims.xml through "
+                   "tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): %s"
+                   % (canon.pc_level(n)['folder'][6:], '; '.join(x for x in notes if x.startswith(item + ' <-'))))
+            v = vals if len(vals) > 1 else vals[0]
+            e = next((e for e in ov['patches'] if e.get('object') == item and e.get('component') == kind
+                      and 'PCUseSeconds' in (e.get('set') or {})), None)
+            if e is not None:
+                e['set']['PCUseSeconds'] = v
+                e['source'] = src
+            else:
+                ov['patches'].append({'object': item, 'component': kind, 'set': {'PCUseSeconds': v}, 'source': src})
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     return 0
 

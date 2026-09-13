@@ -18,6 +18,10 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       electric shock
   PCFireBefore        the fire before that clip (the slips, the trap)
   PCSlipSeconds       a slip's fall, slip1/slip3 (31 frames)
+  PCGrabSeconds       a fixing tool's take (the mobile's grab), and at the
+  PCFixUseSeconds     target the use after the repair (the mobile's redo of
+  PCReturnSeconds     the fixing use) and the give on the way back: the
+                      tool's tricked use at the target is PCUseSecondsTricked
 
 The seconds are objects.xml's `time` ticks or the clip's frames at 12 a
 second. The pairing mobile item -> PC object is the TABLE below, by hand
@@ -60,6 +64,14 @@ def wb(pc, site=None, fix=None):
     return dict(pc=pc, kind='wb', site=site, fix=fix)
 
 
+def tool(pc, back, site=None):
+    """a fixing tool's case (the mobile's RoutineActionUseFixingItem chain): the
+    take at the tool is the grab, the rest of the stand before the fire with the
+    step's own clip the tricked use at the target, the actions after the repair
+    the redo's normal use, `back`'s give after the walk back the return"""
+    return dict(pc=pc, kind='tool', site=site, back=back)
+
+
 TABLE = {
     101: {'Microwave': wb('kit/microwavedirty'), 'Television': use('lir/twistedantenna'),
           'Binoculars': use('kit/binoculars_glue'), 'Sofa': use('lir/sofa_fartbag')},
@@ -88,12 +100,18 @@ TABLE = {
     108: {'Shezlong': use('bal/foldingchair_pins'), 'ToothBrush': use('toi/shoebrushset'), 'CoffeeMaker': use('kit/coffeebox_soil'),
           'SunLotion': use('bal/suncream_sweet'), 'Plant': use('anc/deadflower')},
     109: {'AlarmClock': use('bed/cactusclock'), 'PigMilk': use('kit/babybottle_nitro'), 'Bed': use('bed/bed_pins'),
-          'Chili': use('kit/cookiebox_hot'), 'Teeth': use('bed/teeth_tabasco'), 'Pig': wb('anc/pigout')},
+          # the chili's stand plays the chips' trick: CornChips pays it
+          # (RoutineActionUse.GetTrickedItem, World._pc_trick_item)
+          'Chili': use('kit/cookiebox_hot'), 'CornChips': use('kit/cookiebox_hot'),
+          'Teeth': use('bed/teeth_tabasco'), 'Pig': wb('anc/pigout')},
     110: {'BBQ': use('bal/fuelbeer'), 'FireExtinguisher': use('bed/extinguisher_knotted'), 'CarnivorPlantSpray': use('bal/growspray'),
           'SteakChair': use('lir/chair_pins'), 'SteakWine': use('lir/vinegar')},
     111: {'Drier': use('bas/tumbledrier_smashed'), 'FishTank': use('wor/fishfood_soap'), 'WashingMachine': use('bas/washingmachine_wine'),
           'Airer': use('bal/clothes_food'), 'Iron': wb('bed/ironingboard_burn'),
-          'Vacuum': use('lir/vacuum_hole'), 'DirtyCarpet': use('lir/vacuum_hole')},
+          # case 22: take the vacuum, go to the carpet, vacuum_hole, the fire before
+          # vacuum_explode, repair, vacuum2, back to lir/vacuum and give — the carpet
+          # (Neutral) only sends him, the glued vacuum is the tool that pays
+          'Vacuum': tool('lir/vacuum_hole', back='lir/vacuum')},
     112: {'Weights': use('bas/barbell_sawed'), 'GroundSkates': wb('kit/skate'), 'FishTank': use('wor/fishfood_steroid'),
           'Yoga': use('wor/book_replaced'), 'YogaBook': use('wor/book_replaced'), 'Trampoline': use('bed/trampoline_elastic'),
           'Rope': use('anc/skippingrope_knotted'), 'Bicycle': use('lir/hometrainer_tonged'), 'ChestExpander': use('bas/expander_elastic')},
@@ -115,7 +133,7 @@ SLIP_NAMES = ('Ground', 'GroundMarbles')
 TRAP_NAMES = ('ElectricTrap',)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
-        'PCSlipSeconds', 'PCSurpriseSeconds')
+        'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCReturnSeconds')
 
 _ROWS = None
 _LEVELS = None
@@ -152,11 +170,14 @@ def trick_items(n):
     """the level's trick items, and the ones the mobile uses again after the
     fix (ReuseAfterFix: Rottweiler.cs:707-714 — the PC's actions after the
     fire at those stands are that normal use, which the mobile's redo plays
-    at the pace of PCUseSeconds, so they stay out of PCUseSecondsTricked)"""
+    at the pace of PCUseSeconds, so they stay out of PCUseSecondsTricked).
+    An item the TABLE names is one too whatever its mobile score: 109's
+    CornChips pays 0 on the mobile and the chips' 15 under the profile"""
     d = json.load(open(os.path.join(ROOT, 'levels/s1/Level%d.json' % n)))
     out = []; reuse = set()
     for o in d['objects'].values():
-        if o.get('type') != 'TrickItem' or not o['data'].get('TrickScore'):
+        if o.get('type') != 'TrickItem' or not (o['data'].get('TrickScore')
+                                                 or o['data']['m_GameObject']['name'] in TABLE.get(n, {})):
             continue
         out.append(o['data']['m_GameObject']['name'])
         if o['data'].get('ReuseAfterFix'):
@@ -232,6 +253,14 @@ def specs(n):
                 else:
                     keys['PCSurpriseSeconds'] = round(DOUBLETAKE, 3)
                     keys['PCFixSeconds'] = round(fix + own + after, 3)
+            elif spec['kind'] == 'tool':
+                grab = sum(v for a, v in sm['before'] if a.startswith(spec['pc'] + '.'))
+                keys['PCGrabSeconds'] = round(grab, 3)
+                keys['PCUseSecondsTricked'] = round(before - grab + own, 3)
+                keys['PCFireAt'] = round(before - grab, 3)
+                keys['PCFixSeconds'] = round(fix, 3)
+                keys['PCFixUseSeconds'] = round(after, 3)
+                keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3)
             else:
                 total = before + own + after
                 keys['PCFixSeconds'] = round(fix, 3)
