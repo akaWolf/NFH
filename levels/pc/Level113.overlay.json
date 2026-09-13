@@ -1,5 +1,5 @@
 {
- "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_DIY/level.xml's angrytime=228 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 264); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
+ "source": "PC Do It Yourself: 'use cut-off electric cable with socket' is one of the eight (Steam guide 2584421942). The mobile L113 ElectricTrap sits at transform z -0.001, its box inside the basement back door's, so the click ray hits the door; the same trap in L111/L114 sits at z -0.219 and wins the ray — the profile gives L113's the same depth. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_DIY/level.xml's angrytime=228 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 264); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "ElectricTrap",
@@ -23,14 +23,21 @@
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 264
+    "PCAngryTime": 264,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCSlipSeconds": 2.583
    }
   },
   {
    "object": "ChairAssembly",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.33
+    "PCUseSeconds": 6.33,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 7.25,
+    "PCFireAt": 4.583
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.3 s"
   },
@@ -38,7 +45,10 @@
    "object": "AngleGrinder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.5
+    "PCUseSeconds": 6.5,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 7.333,
+    "PCFireAt": 6.667
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.5 s"
   },
@@ -49,7 +59,10 @@
     "PCUseSeconds": [
      2.0,
      2.0
-    ]
+    ],
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 5.083
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 2.0 s; ValveMain <- valve#1 2.0 s"
   },
@@ -65,7 +78,10 @@
    "object": "Sink",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.42
+    "PCUseSeconds": 3.42,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 5.083
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.4 s"
   },
@@ -76,7 +92,10 @@
     "PCUseSeconds": [
      2.0,
      0.33
-    ]
+    ],
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 8.167
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 2.0 s; FuseBox <- fuse#1 0.3 s"
   },
@@ -84,9 +103,39 @@
    "object": "Ladder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.0
+    "PCUseSeconds": 5.0,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 1.417
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 5.0 s"
+  },
+  {
+   "object": "ValveHot",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 3.167
+   }
+  },
+  {
+   "object": "ElectricTrap",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutIndex": 1,
+    "PCFireBefore": true,
+    "PCSurpriseSeconds": 5.0,
+    "PCFixSeconds": 1.917
+   }
+  },
+  {
+   "object": "ChairAssemblyBook",
+   "component": "TrickItem",
+   "set": {
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 7.25,
+    "PCFireAt": 4.583
+   }
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_hunter/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (ElectricTrap 272, GroundMarbles 360); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
+ "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_hunter/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (ElectricTrap 272, GroundMarbles 360); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "Drawer",
@@ -32,14 +32,22 @@
    "object": "ElectricTrap",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 272
+    "PCAngryTime": 272,
+    "PCShoutIndex": 1,
+    "PCFireBefore": true,
+    "PCSurpriseSeconds": 5.083,
+    "PCFixSeconds": 1.917
    }
   },
   {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 360
+    "PCAngryTime": 360,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCSlipSeconds": 2.583
    }
   },
   {
@@ -47,7 +55,9 @@
    "component": "TrickItem",
    "set": {
     "RequirePriming": false,
-    "RottweilerUseTogglesPrime": false
+    "RottweilerUseTogglesPrime": false,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 5.5
    },
    "source": "PC objects.xml (level_hunter): lir/tabacbox's `gunpowder` is Woody's plain action (time 23), no condition — the tin takes the gunpowder any time; the remaster's RequirePriming and the prime toggle on the neighbour's every pipe (Item.cs:1085/1331: an unprimed Pipe stops taking clicks) have no PC counterpart (2026-09-17)"
   },
@@ -55,7 +65,10 @@
    "object": "Gramaphone",
    "component": "TrickItem",
    "set": {
-    "RequirePriming": false
+    "RequirePriming": false,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 0.917,
+    "PCFireAt": 0.583
    },
    "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
   },
@@ -74,7 +87,9 @@
     "PCUseSeconds": [
      1.33,
      1.33
-    ]
+    ],
+    "PCFixSeconds": 2.0,
+    "PCUseSecondsTricked": 2.0
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.3 s; Polish <- polish#1 1.3 s"
   },
@@ -120,7 +135,10 @@
    "object": "Shotgun",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.67
+    "PCUseSeconds": 1.67,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 5.333,
+    "PCFireAt": 5.0
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 1.7 s"
   },
@@ -128,7 +146,11 @@
    "object": "Hat",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.58
+    "PCUseSeconds": 1.58,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 8.25,
+    "PCFireAt": 7.917
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 1.6 s"
   },
@@ -136,9 +158,22 @@
    "object": "Horn",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.75
+    "PCUseSeconds": 5.75,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 4.667,
+    "PCFireAt": 4.333
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 5.8 s"
+  },
+  {
+   "object": "MedalBox",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 5.75,
+    "PCFireAt": 4.5
+   }
   }
  ]
 }

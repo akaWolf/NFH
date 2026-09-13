@@ -1,5 +1,5 @@
 {
- "source": "PC data (level_laundry/tricks.xml): vacuum_hole 13, clothes_food 12, electrotrap 7 against the mobile's Vacuum 15, Airer 13, ElectricTrap 11 — 79 for the eight, so the PC's 100 takes all seven ticks (Badinfos' E11: 8/8, 7).   Badinfos' E11 pays the ironing board 26 s after the drier, at the neighbour's FIRST ironing of the lap (his popups: 7, 10, 10, 10 at 222, 7, 13, 10, 12): on PC the board is armed between his second ironing and the next lap's first; the mobile's hot iron starts cold and his first ironing heats it, so the port could only arm it between his two ironings and pay at the second — Primed true at the start puts the toggle in the PC's phase. Level_Laundry::run in game.exe (docs/PC_ROUTINES.md): the washer runs two wash cycles (give, wash, get_clothes twice) and the drier two dry cycles where the mobile's ActionManager lists three WashingMachine and three Drier entries — the PC lap keeps two of each. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_laundry/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 300, Vacuum 300, Drier 270); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
+ "source": "PC data (level_laundry/tricks.xml): vacuum_hole 13, clothes_food 12, electrotrap 7 against the mobile's Vacuum 15, Airer 13, ElectricTrap 11 — 79 for the eight, so the PC's 100 takes all seven ticks (Badinfos' E11: 8/8, 7).   Badinfos' E11 pays the ironing board 26 s after the drier, at the neighbour's FIRST ironing of the lap (his popups: 7, 10, 10, 10 at 222, 7, 13, 10, 12): on PC the board is armed between his second ironing and the next lap's first; the mobile's hot iron starts cold and his first ironing heats it, so the port could only arm it between his two ironings and pay at the second — Primed true at the start puts the toggle in the PC's phase. Level_Laundry::run in game.exe (docs/PC_ROUTINES.md): the washer runs two wash cycles (give, wash, get_clothes twice) and the drier two dry cycles where the mobile's ActionManager lists three WashingMachine and three Drier entries — the PC lap keeps two of each. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_laundry/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (GroundMarbles 300, Vacuum 300, Drier 270); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "Rottweiler",
@@ -12,35 +12,52 @@
    "object": "Vacuum",
    "component": "TrickItem",
    "set": {
-    "TrickScore": 13
+    "TrickScore": 13,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 8.75,
+    "PCFireAt": 3.25
    }
   },
   {
    "object": "Airer",
    "component": "TrickItem",
    "set": {
-    "TrickScore": 12
+    "TrickScore": 12,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 0.333,
+    "PCFireAt": 0
    }
   },
   {
    "object": "ElectricTrap",
    "component": "TrickItem",
    "set": {
-    "TrickScore": 7
+    "TrickScore": 7,
+    "PCShoutIndex": 1,
+    "PCFireBefore": true,
+    "PCSurpriseSeconds": 5.083,
+    "PCFixSeconds": 1.917
    }
   },
   {
    "object": "Iron",
    "component": "TrickItem",
    "set": {
-    "Primed": true
+    "Primed": true,
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 4.333
    }
   },
   {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 300
+    "PCAngryTime": 300,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCSlipSeconds": 2.583
    }
   },
   {
@@ -54,7 +71,9 @@
    "object": "Drier",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 270
+    "PCAngryTime": 270,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 3.667
    }
   },
   {
@@ -72,6 +91,32 @@
     10,
     11
    ]
+  },
+  {
+   "object": "FishTank",
+   "component": "TrickItem",
+   "set": {
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 3.25
+   }
+  },
+  {
+   "object": "WashingMachine",
+   "component": "TrickItem",
+   "set": {
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 9.833
+   }
+  },
+  {
+   "object": "DirtyCarpet",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 8.75,
+    "PCFireAt": 3.25
+   }
   }
  ]
 }

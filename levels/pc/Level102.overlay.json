@@ -1,5 +1,5 @@
 {
- "source": "PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_sofa/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
+ "source": "PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_sofa/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "Rottweiler",
@@ -12,7 +12,11 @@
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.67
+    "PCUseSeconds": 3.67,
+    "PCShoutSkip": true,
+    "PCFixSeconds": 3.917,
+    "PCUseSecondsTricked": 7.083,
+    "PCFireAt": 0.5
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
   },
@@ -20,9 +24,37 @@
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.83
+    "PCUseSeconds": 1.83,
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 3.167
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.8 s"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 1.917
+   }
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 3.917
+   }
+  },
+  {
+   "object": "Television",
+   "component": "TrickItem",
+   "set": {
+    "PCFixSeconds": 1.917,
+    "PCUseSecondsTricked": 0.0,
+    "PCFireAt": 0
+   }
   }
  ]
 }

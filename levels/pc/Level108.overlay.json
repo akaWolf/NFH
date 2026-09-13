@@ -1,5 +1,5 @@
 {
- "source": "PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_suntan/level.xml's angrytime=180 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (Ground 300); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*).",
+ "source": "PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_suntan/level.xml's angrytime=180 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (Ground 300); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py, game.exe's fire step, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCFixSeconds the repair or clean action, PCUseSecondsTricked the tricked object's own action, PCFireAt the second of the use at which a five-argument step fires, PCFireBefore/PCSlipSeconds/PCSurpriseSeconds the slips' and walk-bys' fire and clip. The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
   {
    "object": "Rottweiler",
@@ -12,14 +12,22 @@
    "object": "Ground",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 300
+    "PCAngryTime": 300,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCSlipSeconds": 2.583
    }
   },
   {
    "object": "ToothBrush",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.83
+    "PCUseSeconds": 3.83,
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 6.583,
+    "PCFireAt": 1.917
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 3.8 s"
   },
@@ -27,7 +35,11 @@
    "object": "CoffeeMaker",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.25
+    "PCUseSeconds": 2.25,
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 7.75,
+    "PCFireAt": 6.167
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 2.2 s"
   },
@@ -35,7 +47,9 @@
    "object": "Shezlong",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.17
+    "PCUseSeconds": 2.17,
+    "PCFixSeconds": 0.917,
+    "PCUseSecondsTricked": 1.5
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.2 s"
   },
@@ -54,9 +68,20 @@
    "object": "Plant",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.17
+    "PCUseSeconds": 2.17,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 2.167
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.2 s"
+  },
+  {
+   "object": "SunLotion",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 7.583
+   }
   }
  ]
 }
