@@ -302,6 +302,45 @@ helpers.
   the PC's Mother script is unread, so its stations keep the mobile pace;
   a coin credit due past the use's end is paid by the tantrum once
   (World.play_angry drops the pending credit).
+- Read on 2026-09-18, the catch trigger's plumbing (GameLogic.dll):
+  every GL object (actors and items alike) keeps a flag word at +0x14,
+  read by fcn.100450dc (`flags & mask`) and written only by
+  fcn.100450bf (`set(mask, bool)`); the immediates set through it are
+  4, 8, 0x20, 0x10000, 0x40000, 0x80000, 0x100000 (states of the scenes'
+  fibers), never 2 — bit 2 arrives as data: the message registry
+  fcn.100500e6 (CreateGLObjMsg, AddObjectMsg, CreateRoomMsg, BeginRoomMsg,
+  EndRoomMsg, SetPosMsg, AddNeighborMsg, AddHotSpotMsg, EndGLObjMsg,
+  SetSpeedMsg, AddActionMsg, AddContentMsg, SetFlagMsg, CreateInvObjMsg,
+  EndInvObjMsg, AddInvObjImgMsg, CreateCombinationMsg, AddIngredientMsg,
+  EndCombinationMsg, CombineMsg, AddObjectTriggerMsg, AddNoiseTriggerMsg,
+  SetStdActionMsg, SetLevelSizeMsg, SetAnimMsg, StopJobMsg, PauseActorMsg,
+  AddIconMsg, StartLevelMsg, ActivateAnimMsg, GoToPosMsg, UseObjectMsg)
+  binds SetFlagMsg to fcn.1004e78c, which parses the message's `mask`
+  as a number and its `value` against "true" into a record the step
+  class applies to the named object (vtable slot +0x7c, fcn.1004670e,
+  through the visitor fcn.1004d0c9). The data's flag names (`<flag
+  name=…>`: container, remove, doorleft/right/up/down, hideout,
+  neighbor_hideout, autotake, game, singleuse, bad) exist as static
+  string globals in GameLogic, Loader.dll and game.exe but no code maps
+  them to bits by name — the mask is numbered upstream (the level
+  compiler or game.exe's message builder, `createMsgList`), so which
+  name is bit 2 stays unread. What bit 2 does is read: the actor tick
+  fcn.10004f3d (from fcn.10005370) tests 0x40, 0x10 and 2 on the actor;
+  under 2 it resolves a name (fcn.1003cc45 → fcn.10040a7d), finds the
+  entry of that name in a list (fcn.1004ca80, strcmp) and starts a
+  behaviour object of class 0x100ab1a0 (fcn.10003d50 → fcn.10003d01 →
+  new(0x30) + fcn.1000340b) — the on-sight reaction, keyed by the
+  actor's current room or target. The watch predicate fcn.1003f573 tests
+  the entry's own mode bits 1/2/4 (same room / same room and floor /
+  always) and two object flags, 0x20 and 4 (the hideout pair by their
+  use in the data: Woody's hideout, the neighbour's neighbor_hideout
+  station); the watch entries themselves are created by the use_object
+  step (fcn.1003f431 keys them "use_object") and their class chain is
+  fcn.1003f322 (vtable 0x100b0ff8) → fcn.1003f390 (0x100b100c) →
+  fcn.1003f3df. The step kinds are goto_pos, combine, stop, crash,
+  olga_fight, mother_fight and use_object (the static-init pool at
+  0x1008ca42; run, won and mg0 beside them are states); the level
+  scripts build them in code (fcn.10040f38 from the level classes).
 - Read on 2026-09-18, the last candidate for the Season 2 catch trigger:
   slot 4 of the level classes' vtables (0x100b1548 the base, written by
   the constructor at 0x100430bf and used by the level constructors
