@@ -459,6 +459,7 @@ class Pawn:
         self.sneaking = False
         self.sneak_toggle = False        # Woody.MbSneakToggle
         self.in_urgent = False           # Pawn.InUrgentMove
+        self.pc_run = False              # the PC case's run gait (Routine._pc_runs)
         self.movement_paused = False     # Pawn.MovementPaused
         self.exit_confirmation_shown = False   # Pawn.ExitConfirmationShown
         self.waiting_for_exit_confirmation = False  # WaitingforExitConfirmation
@@ -674,7 +675,7 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWC' + direction
-            if self.in_urgent:
+            if self.in_urgent and not self._pc_walking_urgent():
                 return 'Run_' + direction
             if self.holding_cake:
                 return 'WalkPie_' + direction
@@ -691,6 +692,26 @@ class Pawn:
             return 'Run_' + direction
         return 'Walk_' + direction
 
+    def _pc_gait(self):
+        """the Season 1 neighbour's gait under the profile (pcprofile.
+        GAIT_PX_PER_TICK): the run on an urgent the PC case runs
+        (Routine._pc_runs), the bowling ball's carry (105's case 11 sets
+        gait 4 before the GoTo to the window, game.exe 0x46e4d3; the
+        mobile's HasBowling), else the walk"""
+        if self.role != 'Rottweiler' or not pcprofile.is_pc() or pcprofile.SEASON2:
+            return 'walk'
+        if self.in_urgent and self.pc_run:
+            return 'run'
+        if self.has_bowling:
+            return 'bowling'
+        return 'walk'
+
+    def _pc_walking_urgent(self):
+        """an urgent the PC case walks (its gait left at mg: 110's
+        extinguisher, 111's vacuum and carpet) shows the walk set under the
+        Season 1 profile, as it moves at the walk records (Routine._pc_runs)"""
+        return pcprofile.is_pc() and not pcprofile.SEASON2 and not self.pc_run
+
     def _portal_up_anim(self):
         """Rottweiler.GetPortalUpAnimation (Rottweiler.cs:398-413); Woody
         climbs with PortalSneakUpAnimation while sneaking (Woody.cs:961-968)
@@ -698,7 +719,7 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWCUp'
-            if self.in_urgent:
+            if self.in_urgent and not self._pc_walking_urgent():
                 return self.portal_run_up or 'Run_Up'
             if self.has_fifi:
                 return 'FifiWalkUp'
@@ -714,7 +735,7 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWCDown'
-            if self.in_urgent:
+            if self.in_urgent and not self._pc_walking_urgent():
                 return self.portal_run_down or 'Run_Down'
             if self.has_fifi:
                 return 'FifiWalkDown'
@@ -1180,12 +1201,13 @@ class Pawn:
         pace is the PC's speed record along the current direction
         (pcprofile.walk_speed: 8 px a tick along the floor for the neighbour,
         17 for Woody, 5 sneaking, 3/6/2 up and down the room, 12 ticks a
-        second at 96 px a unit)."""
+        second at 96 px a unit; the neighbour's other gaits of the PC case,
+        _pc_gait)."""
         if pcprofile.is_pc():
             vx, vy = self.velocity
             s = pcprofile.walk_speed(self.role, self.sneaking, vx, vy,
                                      climbing=self.state in (self.DOOR_CLIMB, self.DESCEND),
-                                     stairs=bool(self.nfh2))
+                                     stairs=bool(self.nfh2), gait=self._pc_gait())
             if s is not None:
                 return s
         return self.speed_sneaking if self.sneaking else self.speed
@@ -2720,8 +2742,9 @@ class Routine:
                 self.routine_behavior.on_move_to_routine_action(it, a)
             self.state = self.MOVING
             # an Urgent action is approached at a run (MoveToGoalUrgent,
-            # RoutineActionMove.cs:68-75)
+            # RoutineActionMove.cs:68-75); a station of the PC lap is walked to
             self.pawn.in_urgent = bool(a.get('urgent'))
+            self.pawn.pc_run = False
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
@@ -3667,7 +3690,10 @@ class Routine:
             # stands"); 0 = the PC plays nothing before the fire (104's dirty
             # microwave fires on arrival and cooks after the clean): the
             # mobile's tricked clip runs at its own pace, not the normal stay's.
-            # The stand is the playing trick's (_pc_trick_item)
+            # The stand is the playing trick's (_pc_trick_item). It is this
+            # visit of the PC station order all the same — the case's other
+            # branch, then the chain's next case — so its slot passes
+            self._pc_visit_seconds(it)
             return float(t.pc_use_secs_tricked)
         return self._pc_visit_seconds(it)
 
@@ -3770,7 +3796,10 @@ class Routine:
             return
         nxt = self._next_index(self.index)
         if self.actions[nxt].get('item') == it.pid:
-            # the queued advance then lands past the unprime
+            # the queued advance then lands past the unprime, and its visit's
+            # PCUseSeconds (get_clothes, take: played by the tricked branch
+            # or not at all) passes with it
+            self._pc_visit_seconds(it)
             self._advance()
 
     def _check_parked_runs(self):
@@ -4038,6 +4067,7 @@ class Routine:
         self._alarm_use = alarm_use
         self.pawn.steps = []
         self.pawn.in_urgent = bool(urgent)
+        self.pawn.pc_run = self._pc_runs(item, kind, name)
         self.state = self.MOVING
         # a new MoveAction target: RoutineActionMove.SameZone() is asked on
         # every ActionManager.Update while the urgent move toward a Dog/Chili
@@ -4056,6 +4086,30 @@ class Routine:
             self._urgent_arrived()
         elif not self.pawn.goto_item(item, on_arrive=self._urgent_arrived):
             self._urgent_finished()
+
+    def _pc_runs(self, item, kind, name):
+        """whether game.exe's level class runs this urgent's walk (Season 1,
+        the neighbour: the case sets the gait to mr or mrwc before its GoTo,
+        pcprofile.GAIT_PX_PER_TICK) — the pets' alarm (the `noise` case),
+        the toilet and first-aid rushes (the mobile's ToiletAction) and the
+        runs the overlay marks on their object (PCRunTo): the antenna's
+        shout (101/102's Television, the notice run), the fetch of a fixing
+        tool and the way back to the target (110's extinguisher, 113's
+        valves); the other urgents the PC walks (111's vacuum and carpet
+        cases leave the gait at 0)"""
+        if self.role != 'Rottweiler' or not pcprofile.is_pc() or pcprofile.SEASON2 \
+                or item is None:
+            return False
+        w = self.pawn.world
+        if kind == 'surprise_far' and w is not None and item.pid in w.alerters:
+            return True
+        if name == 'toilet':
+            return True
+        if kind in ('surprise_far', 'grab'):
+            return bool(getattr(item, 'pc_run_to', False))
+        if name == 'use_fixing':
+            return bool(getattr(self._fix_tool, 'pc_run_to', False))
+        return False
 
     def _stash_interrupted_urgent(self, new_name):
         """StartUrgentAction's OriginalAction wiring when an urgent lands on
@@ -4547,6 +4601,7 @@ class Routine:
         tricked.dy += tricked.delta_fix_y
         self._fix_tool = tool
         self._fix_target = tricked
+        self._fix_redo = False
         g = self.pawn.grab_action            # the RoutineActionGrab template
         self.start_urgent(tool, arrived=self._grab_arrived, kind='grab',
                           urgent=g.get('urgent'),
@@ -4599,6 +4654,7 @@ class Routine:
 
             def angry():
                 self.pawn.anim.time_scale = 1.0
+                self._fix_redo = True      # RedoAction re-enters after the angry
                 w.play_angry(self.pawn, tool, on_done=self._use_fixing_arrived)
             self.state = self.USING
             # the PC case's stand at the target (111's vacuum_hole and its
@@ -4625,9 +4681,19 @@ class Routine:
         seq = [x for x in self.pawn.use_fixing_action.get('sequence', [])
                if self.pawn.anim.has(x)]
         self.state = self.USING
-        # the PC's use at the target after the repair (vacuum2) or of a
-        # sound tool (vacuum): both the same clip on PC
-        self._pc_tool_pace(seq, getattr(tool, 'pc_fix_use_secs', None))
+        # the PC case's use at the target: after the tricked branch's repair
+        # the actions that follow it (111's vacuum2; 110's case has none —
+        # PCFixUseSeconds 0 drops the clip), of a sound tool the normal
+        # branch's action (the vacuum, the extinguish; 113's valves have
+        # none past the switch — PCToolUseSeconds 0)
+        redo = getattr(self, '_fix_redo', False)
+        self._fix_redo = False
+        secs = None
+        if tool is not None and tool.pc_grab_secs is not None and pcprofile.is_pc():
+            secs = tool.pc_fix_use_secs if redo else tool.pc_tool_use_secs
+            if secs is not None and float(secs) == 0.0:
+                seq = []
+        self._pc_tool_pace(seq, secs)
 
         def used():
             self.pawn.anim.time_scale = 1.0
@@ -4642,6 +4708,14 @@ class Routine:
         OnActionStopped starts the Return urgent when ShouldReturnFixingItem
         (its Item is pre-serialized to the tool)."""
         self.pawn.fixing_item = None
+        tool = self._fix_tool
+        if pcprofile.is_pc() and tool is not None and tool.pc_grab_secs is not None \
+                and tool.pc_return_secs is not None and float(tool.pc_return_secs) == 0.0:
+            # the PC case keeps the tool (110's case 9 takes the extinguisher
+            # and gives nothing back): no walk back, the tool stays taken
+            self._fix_tool = self._fix_target = None
+            self._urgent_finished()
+            return
         if self.pawn.use_fixing_action.get('should_return') \
                 and self._fix_tool is not None:
             # RoutineActionReturn: its Urgent is never serialized — a walk
@@ -4845,6 +4919,7 @@ class Routine:
         # HitPawnAction.Urgent picks the run (RoutineActionMove.cs:72-75):
         # Olga's is serialized true, the Mother's only on Level210
         self.pawn.in_urgent = bool(self.pawn.hit_pawn_action.get('urgent'))
+        self.pawn.pc_run = False
         self.state = self.MOVING
         maxd = self.pawn.hit_pawn_action.get('max_distance') or 0.03
         if self.pawn.zone is target_pawn.zone and \

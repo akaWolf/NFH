@@ -520,8 +520,16 @@ class RollerSkaterBehavior(Behavior):
             if self._at(self.window_x):
                 self._fall()
             else:
-                rott.sprite.x += self.velocity[0] * dt
-                rott.sprite.y += self.velocity[1] * dt
+                vx, vy = self.velocity
+                sk = pcprofile.gait_speed('Rottweiler', 'skate') \
+                    if pcprofile.is_pc() and not pcprofile.SEASON2 else None
+                if sk and (vx or vy):
+                    # game.exe's skate: gait 5 before the slide to the window
+                    # (0x46312f), skate1 18 px a tick (level_fitness)
+                    n = (vx * vx + vy * vy) ** 0.5
+                    vx, vy = vx / n * sk, vy / n * sk
+                rott.sprite.x += vx * dt
+                rott.sprite.y += vy * dt
         elif self.state == self.FALL and self._fall_left > 0.0:   # cs:119-128
             self._fall_left -= dt
             if self._fall_left <= 0.0:
@@ -583,6 +591,9 @@ class RollerSkaterBehavior(Behavior):
             rott.zone = self.entrance_zone
         if self.breath_zone is not None:
             rott.in_urgent = True                     # MoveToGoalUrgent
+            # game.exe runs him back in: gait 2 before the GoTo anc/inside
+            # (0x463335), 0 after it (0x463401) — Pawn._pc_gait
+            rott.pc_run = pcprofile.is_pc() and not pcprofile.SEASON2
             rott.goto_zone(self.breath_zone, self.breath_location[0])
 
     def _breath(self):

@@ -309,6 +309,25 @@ WALK_PX_PER_TICK = {
     'Woody': (17, 6, 6),           # woody mg1 17 / mg0 6, stair1 17 / stair0 6
     'Woody_sneak': (5, 2, 2),      # sn1 5 / sn0 2 (no stair record: the room's)
 }
+# The neighbour's gaits, Season 1: the actor's +0x38 indexes the facing tables 0x51b5f0 /
+# 0x51b648 (0 mg, 1 sn, 2 mr, 3 mrwc, 4 mgbowling1 in both, 5 skate1 in both, 6 piewalk) and
+# fcn.0047c7f0 moves him by that record. The level class sets it before a GoTo and back to 0
+# at the next case — directly (+0x38) or by a step (fcn.0045f6b0, the value at +4, run by
+# 0x479660): the run (2, and 3 on the toilet runs — ebx = 3 from the classes' prologues) on
+# every level's `noise` case (the pets' alarm, 107-114: 0x458e6b, 0x45e43f, 0x46b50e, 0x4615a4,
+# 0x4563d3, 0x46508c, 0x454262, 0x46834a), the toilet and first-aid rushes (102 0x470034, 103
+# 0x45f3e7, 105 0x46ea8a, 106 0x46d0f5, 108's rinse 0x45d729), the antenna's shout (101
+# 0x4710e3, 102 0x46fe74), the extinguisher's fetch and the way back to the burning barbecue
+# (110 0x45fffe, reset 0x460339), 113's main valve after the flood and heat valve after the hot
+# heater (0x452a1c, 0x452497) and 112's way back in after the skate (0x463335); the skate's
+# slide to the window (112 0x46312f, 5) and the bowling ball's carry to the window (105
+# 0x46e4d3, 4). generic/objects.xml's mr1 18 / mr0 9 (the mrwc records of level_sofa, bath,
+# piano and suntan the same), level_fitness's skate1 18, level_piano's mgbowling1 9.
+GAIT_PX_PER_TICK = {
+    ('Rottweiler', 'run'): (18, 9),       # (along the floor, up or down the room)
+    ('Rottweiler', 'bowling'): (9, 9),    # mgbowling1 in both tables
+    ('Rottweiler', 'skate'): (18, 18),    # skate1 in both tables
+}
 
 
 def rule(name):
@@ -318,7 +337,7 @@ def rule(name):
     return keep is None or name in keep.split(',')
 
 
-def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False):
+def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False, gait='walk'):
     """The multiplier of the pawn's Velocity that moves it at the PC's pace, divided by the
     velocity's own length (the mobile's force). A plain walk moves at the floor record whatever
     its direction: the PC walks along the room's path and steps a tick or two off it to a
@@ -327,12 +346,16 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False):
     approach — the pawn's DOOR_CLIMB / DESCEND states, the PC's ~50 px up to a back door and down
     from its twin — moves at the room's vertical record (`climbing`), or at Season 2's stair
     record on its stairs (`stairs`); tools/pcref/lap_model.py checks those climbs against the
-    video. None for a pawn without a record (the Kid keeps the mobile's)."""
+    video. Another gait of the PC case (`gait`: GAIT_PX_PER_TICK, Season 1 — the run, the
+    bowling ball's carry) takes its own records. None for a pawn without a record (the Kid
+    keeps the mobile's)."""
     rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
     n = math.hypot(vx, vy)
     if rec is None or n == 0.0 or not rule('walk'):
         return None
     h, v, st = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in rec)
+    if (role, gait) in GAIT_PX_PER_TICK and not stairs:
+        h, v = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in GAIT_PX_PER_TICK[(role, gait)])
     pace = (st if stairs else v) if climbing else h
     return pace / n
 
@@ -407,3 +430,11 @@ def sees_while_busy(nfh2=False):
     """Season 1 only: GameLogic.dll's watch predicate (fcn.1003f573) reads mode bits whose meaning is
     still open, so Season 2 keeps the mobile's busy windows until they are read"""
     return SEES_WHILE_BUSY and not nfh2 and rule('sight')
+
+
+def gait_speed(role, gait):
+    """u/s along the floor of a Season 1 gait record (the skate's slide), None without one"""
+    rec = GAIT_PX_PER_TICK.get((role, gait))
+    if rec is None or not rule('walk'):
+        return None
+    return rec[0] * TICKS_PER_SECOND / PX_PER_UNIT

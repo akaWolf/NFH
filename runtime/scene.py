@@ -238,8 +238,9 @@ class Item:
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_fire_at', 'pc_fire_before',
-                 'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_return_secs',
-                 'pc_station_ends_on_trick',
+                 'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
+                 'pc_return_secs',
+                 'pc_station_ends_on_trick', 'pc_run_to',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -611,14 +612,19 @@ class Item:
         self.pc_fire_before = bool(d.get('PCFireBefore'))
         self.pc_slip_secs = _f('PCSlipSeconds')
         self.pc_surprise_secs = _f('PCSurpriseSeconds')
-        # a fixing tool's PC case (111's vacuum, case 22): the take at the
-        # tool, the use after the repair, the give on the way back
+        # a fixing tool's PC case (111's vacuum, case 22; 110's extinguisher,
+        # case 9): the take at the tool, the use after the repair (0: none),
+        # a sound tool's use, the give on the way back (0: the tool is kept)
         self.pc_grab_secs = _f('PCGrabSeconds')
         self.pc_fix_use_secs = _f('PCFixUseSeconds')
+        self.pc_tool_use_secs = _f('PCToolUseSeconds')
         self.pc_return_secs = _f('PCReturnSeconds')
         # the PC case's tricked branch ends the station (111's machines: the
         # mobile's three phases are one station, World._end_pc_station)
         self.pc_station_ends_on_trick = bool(d.get('PCStationEndsOnTrick'))
+        # the PC case runs to this fixing tool (113's valves: the gait's run
+        # before the GoTo, Routine._pc_runs)
+        self.pc_run_to = bool(d.get('PCRunTo'))
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')
