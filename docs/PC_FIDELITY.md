@@ -947,7 +947,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   room from 102 to 200 s; the flowers-and-hand trip into Zone05 (19 s,
   two door climbs) runs half a second past the Mother's 19-s absence
   from Zone03, and the room's hideout is in Zone03 on the mobile. Twelve
-  plans were tried on 2026-09-18; 213's pile peaks at 90. On 212 the one-lap
+  plans were tried on 2026-09-18; 213's pile peaked at 90. The picnic's
+  window is before Olga comes back, not after (2026-09-23, v7): the living
+  room is empty from his lap-1 picnic to her return (70-104 s — the Mother
+  in Zone05, Olga on the bull, he at the pinata and the controls), and her
+  own lap-2 picnic only seats her in the boat (OlgaUseTrickedAnimation
+  PicnicEnter/PicnicWait; the crash is his use, PawnToAffectWhenTricked
+  Olga); with the bull and the cement armed right after the flowers-and-hand
+  trip, the plant and the tortilla while the Mother stands in Zone02 and
+  he is at the cement (Woody in the statue in between), and the wasp, the
+  pinata and the controls once he has left the plant, the pile is
+  Badinfos' own: the cement 140.5, the bull 149.5, the plant 163.7/176.3,
+  the tortilla 180.7/184.7 (89 %), the picnic 216.0 (92.8), the pinata
+  245.2 — the collapse — 100. On 212 the one-lap
   pile was tried seven ways (2026-09-18): the throne room is entered only
   through his whip room, the Mother sits in the cigar room and steps out
   for 12 s every ~45 s — on his lap-2 cigars — and the pair's second ruby

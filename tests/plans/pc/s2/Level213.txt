@@ -1,42 +1,45 @@
-# Level213 under the PC profile (2026-09-18 v5: PC station stays + coin ticks).
-# His lap ~118 s (Zone04 bull 3-7 / cement 110-118, Zone03 plant 18-31 /
-# tortilla 31-35, Zone02 picnic 43-61, Zone01 pinata 71-83 / bull-ride
-# 85-103). Olga rides the bull in Zone01 41-102 and 200-233; the Mother
-# stands in Zone02 15 s at ~34/94/154/214 (Zone05 -> Zone03 -> Zone02 and
-# back). Zone05 (hand, flowers) hangs off Zone03 — entered on her first
-# Zone02 stand (~34). Zone01 is clear 103-184 for the bull controls. The
-# bath goes in late so that its coin joins the lap-3 pile with the controls,
-# the bull, the plant, the tortilla, the picnic and the pinata (v4 paid it
-# on lap 1 and peaked at 84).
-# v6: the pinata's coin lands right after the picnic's (his pinata is 28 s past the picnic) — the wasp and the
-# pinata go in as soon as the bull pays, and the bath's await comes after them (v5 waited for the bath, 377 s).
+# Level213 under the PC profile (v7, 2026-09-23): Badinfos' pile — the cement at the
+# end of his lap 1, then lap 2 in station order: the bull, the plant, the tortilla,
+# the picnic, the pinata, and the gauge tops at the bull ride. Everything is armed
+# before his lap-2 bull: the bull and the cement right after the flowers-and-hand
+# trip, the chili and the picnic while Zone02 is empty (70-104: the Mother in
+# Zone05, Olga on the bull, he at the pinata and the controls), the plant and the
+# tortilla while the Mother stands in Zone02 and he is in Zone04 (105-127), Woody in
+# the statue in between; the wasp, the pinata and the controls once he has left
+# the plant for the picnic. Run 2026-09-23: the cement 140.5 (its scene from 112),
+# the bull 149.5, the plant 163.7/176.3, the tortilla 180.7/184.7 (89 %), the
+# picnic 216.0 (92.8), the pinata 245.2 — the collapse — the controls after it.
 take CementBag IT2_Cement
 take ChickenWings IT2_Chickenwing
 take Skeleton IT2_Tequila
 take Piranha IT2_Piranha
 take Jar IT2_Jar_empty
 prime Termite IT2_Jar_empty
-whenin Mother Zone02                   # (~34) her first Zone02 stand (15 s): Zone05 hangs off Zone03, clear while she stands and he is at the cigars (Zone04, 36-47)
+whenin Mother Zone02                   # (~34) her first Zone02 stand: Zone05 hangs off Zone03
 take! StatueHand IT2_Hand
 take! Flowers IT2_Flowers
-park! Zone04                           # (~50) back down before she walks through Zone03 (~49)
-whenzone Zone03                        # (~135) his lap-2 plant: Zone01 is his only after the bull ride (103) until his lap-2 pinata (~184); Olga is off the bull 102-200
-usewith MechanicalBullControls IT2_Hand   # Zone01: the controls in the 108-184 clear window
-usewith LiveBull IT2_Flowers   # Zone04: flowers -> bull on his next Zone04 (the cement/bull ~110, or lap-2 ~228)
-take Chili IT2_Chili
-usewith PlantCarnivore IT2_Chickenwing
-usewith PlantCarnivore IT2_Piranha
-usewith Tortilla IT2_Chili
-usewith Tortilla IT2_Tequila
-usewith BoatPicnic IT2_Termites
-await LiveBull 0   # (~239) the bull's coin frees the wasp nest
-take Wasp IT2_Beehive
-usewith CementBath IT2_Cement   # Zone04 after the wasp: free 262-340 — his lap-3 bath (~377) into the pile's tail
-unlock Pinata IT2_Beehive   # Zone01 before his lap-3 pinata (~307): the coin that tops the pile (84 at the picnic + 20)
+park! Zone04                           # (~68) back down before she walks through Zone03 (~67)
+usewith! LiveBull IT2_Flowers          # Z04: the bull's coin at his lap-2 bull (~143)
+usewith! CementBath IT2_Cement         # Z04: his lap-1 cement (~112), the pile's first coin
+park! Zone03                           # to Zone02 by the kitchen stairs: Zone01 is his (70-110)
+take! Chili IT2_Chili                  # Z02, empty 70-104
+usewith! BoatPicnic IT2_Termites       # Z02: his lap-2 picnic (~182); Olga sits in the boat at ~175
+hide! StatueHidden                     # Z03 before the Mother crosses it (~98-105)
+whenin Mother Zone02                   # (~105) her second Zone02 stand; he is in Zone04 110-152
+usewith! PlantCarnivore IT2_Chickenwing
+usewith! PlantCarnivore IT2_Piranha
+usewith! Tortilla IT2_Tequila
+usewith! Tortilla IT2_Chili
+hide! StatueHidden                     # she crosses back (~127), he plays the plant and the tortilla (153-181)
+whenzone Zone02                        # (~181) his lap-2 picnic
+take! Wasp IT2_Beehive                 # Z04: freed by the bull's coin
+unlock! Pinata IT2_Beehive             # Z01: his lap-2 pinata (~213)
+usewith! MechanicalBullControls IT2_Hand   # Z01: his lap-2 bull ride (~227), the pile's top
+hide! Lorry                            # Z01
 await CementBath 0
+await LiveBull 0
 await PlantCarnivore 0
 await Tortilla 0
 await BoatPicnic 0
 await Pinata 0
 await MechanicalBullControls 0
-await 9

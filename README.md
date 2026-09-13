@@ -148,15 +148,16 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   case, a visit's prime leg its stay, 109's pig visit catches the pig and
   feeds it, 111's washer and drier are one station each and its ironing
   board burns between the give and the ironing (`docs/PC_FIDELITY.md` "The
-  playing trick"); the Season 2 levels rate 100 with 213 at
-  90 — the PC's station stays, compound coins and reaction clips are
-  carried on every episode since 2026-09-18, and the Mother's PC stands on
-  212 (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
-  coins" / "Season 2 reactions" / "The other actors' stands"; 214's lap is
-  a neighbour-Mother handshake and keeps the mobile pace); a coin is
-  credited as its trick action completes, where the PC's bar jumps; 213's
-  pile of the PC amounts peaks at 90 (the PC's coin order needs the picnic
-  on a lap Olga sits through). The mobile numbers do not move: the regression under
+  playing trick"); every Season 2 level rates 100 as well — the PC's
+  station stays, compound coins and reaction clips are carried on every
+  episode since 2026-09-18, and the Mother's PC stands on 212
+  (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound coins"
+  / "Season 2 reactions" / "The other actors' stands"; 214's lap is a
+  neighbour-Mother handshake and keeps the mobile pace); a coin is
+  credited as its trick action completes, where the PC's bar jumps; 213
+  collapses on Badinfos' own pile (the cement, the bull, the plant, the
+  tortilla, the picnic armed while the living room is empty, the pinata).
+  The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
 Open: the Season 2 catch on PC — the watch predicate's modes are read
