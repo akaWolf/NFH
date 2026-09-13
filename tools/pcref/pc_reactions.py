@@ -20,8 +20,14 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
   PCSlipSeconds       a slip's fall, slip1/slip3 (31 frames)
   PCGrabSeconds       a fixing tool's take (the mobile's grab), and at the
   PCFixUseSeconds     target the use after the repair (the mobile's redo of
-  PCReturnSeconds     the fixing use) and the give on the way back: the
-                      tool's tricked use at the target is PCUseSecondsTricked
+  PCReturnSeconds     the fixing use; 0 = the case plays none) and the give on
+                      the way back (0 = the case keeps the tool: no walk back);
+  PCToolUseSeconds    a sound tool's use at the target; the tool's tricked
+                      use there is PCUseSecondsTricked
+  PCRunTo             the case runs to the object (the gait's run, RUNTO):
+                      101/102's antenna shout, 110's extinguisher fetch and
+                      113's valves — whose station is the switch alone
+                      (FIXRUN: PCGrabSeconds; the use and the return none)
 
 The seconds are objects.xml's `time` ticks or the clip's frames at 12 a
 second. The pairing mobile item -> PC object is the TABLE below, by hand
@@ -64,12 +70,15 @@ def wb(pc, site=None, fix=None):
     return dict(pc=pc, kind='wb', site=site, fix=fix)
 
 
-def tool(pc, back, site=None):
+def tool(pc, back=None, use=None, site=None):
     """a fixing tool's case (the mobile's RoutineActionUseFixingItem chain): the
-    take at the tool is the grab, the rest of the stand before the fire with the
-    step's own clip the tricked use at the target, the actions after the repair
-    the redo's normal use, `back`'s give after the walk back the return"""
-    return dict(pc=pc, kind='tool', site=site, back=back)
+    take at the tool is the grab (inside the stand's cut or just before the walk
+    to the target), the rest of the stand before the fire with the step's own clip
+    the tricked use at the target, the actions after the repair the redo's use (0:
+    the case has none), `use` = (object, action) the sound tool's action at the
+    target, `back`'s give after the walk back the return (none: the case keeps
+    the tool, no walk back)"""
+    return dict(pc=pc, kind='tool', site=site, back=back, use=use)
 
 
 TABLE = {
@@ -104,14 +113,23 @@ TABLE = {
           # (RoutineActionUse.GetTrickedItem, World._pc_trick_item)
           'Chili': use('kit/cookiebox_hot'), 'CornChips': use('kit/cookiebox_hot'),
           'Teeth': use('bed/teeth_tabasco'), 'Pig': wb('anc/pigout')},
-    110: {'BBQ': use('bal/fuelbeer'), 'FireExtinguisher': use('bed/extinguisher_knotted'), 'CarnivorPlantSpray': use('bal/growspray'),
+    110: {'BBQ': use('bal/fuelbeer'),
+          # case 9: take the extinguisher, go to the burning barbecue, extinguish_explo,
+          # repair_extinguisher, extinguish, the fire, the barbecue's repair — the
+          # extinguisher is not taken back
+          'FireExtinguisher': tool('bed/extinguisher_knotted', use=('bal/barbecue_burn', 'extinguish')),
+          'CarnivorPlantSpray': use('bal/growspray'),
           'SteakChair': use('lir/chair_pins'), 'SteakWine': use('lir/vinegar')},
-    111: {'Drier': use('bas/tumbledrier_smashed'), 'FishTank': use('wor/fishfood_soap'), 'WashingMachine': use('bas/washingmachine_wine'),
-          'Airer': use('bal/clothes_food'), 'Iron': wb('bed/ironingboard_burn'),
+    111: {# the machines' give is the mobile's prime leg (PCUseSeconds' first
+          # visit, tools/pcref/pc_durations.py): the tricked use is the rest
+          'Drier': use('bas/tumbledrier_smashed', before=[('bas/tumbledrier_smashed', 'dry')]),
+          'WashingMachine': use('bas/washingmachine_wine', before=[('bas/washingmachine_wine', 'wash'),
+                                                                   ('bas/washingmachine_wine', 'get_clothes')]),
+          'FishTank': use('wor/fishfood_soap'), 'Airer': use('bal/clothes_food'), 'Iron': wb('bed/ironingboard_burn'),
           # case 22: take the vacuum, go to the carpet, vacuum_hole, the fire before
           # vacuum_explode, repair, vacuum2, back to lir/vacuum and give — the carpet
           # (Neutral) only sends him, the glued vacuum is the tool that pays
-          'Vacuum': tool('lir/vacuum_hole', back='lir/vacuum')},
+          'Vacuum': tool('lir/vacuum_hole', back='lir/vacuum', use=('lir/dirtycarpet', 'vacuum'))},
     112: {'Weights': use('bas/barbell_sawed'), 'GroundSkates': wb('kit/skate'), 'FishTank': use('wor/fishfood_steroid'),
           'Yoga': use('wor/book_replaced'), 'YogaBook': use('wor/book_replaced'), 'Trampoline': use('bed/trampoline_elastic'),
           'Rope': use('anc/skippingrope_knotted'), 'Bicycle': use('lir/hometrainer_tonged'), 'ChestExpander': use('bas/expander_elastic')},
@@ -126,6 +144,20 @@ TABLE = {
           'Gramaphone': use('lir/phono_nail'), 'Polish': use('kit/blackpolish'), 'Horn': use('bal/balloonhorn'),
           'Pipe': use('lir/tabacbox_explosive'), 'Shotgun': use('bas/gun_loaded')},
 }
+# the fixing runs whose tool is the valve itself: Level_DIY's case 5 sets the run
+# gait when the basin flooded (game.exe 0x452a1c) and case 6 switches the main
+# valve off (bas/valve_on.switch_off, 0x452afe; the valve Woody opened); case 9
+# runs to the heat valve after the hot heater's vent (0x452497) and case 10
+# switches it off (bas/heatvalve_on.switch_off, 0x45256a) — then the lap goes on
+FIXRUN = {113: {'ValveMain': ('bas/valve_on', 'switch_off'), 'ValveHot': ('bas/heatvalve_on', 'switch_off')}}
+# the objects the level class runs to — the gait set to 2 before the GoTo
+# (runtime/pcprofile.py GAIT_PX_PER_TICK): the twisted antenna's shout (101
+# 0x4710e3, 102 0x46fe74 — the mobile's Television notice run), the
+# extinguisher's fetch after the fuel beer and the way back to the burning
+# barbecue (110 case 8 0x45fffe, reset in case 9 0x460339 — the mobile's
+# fixing chain), the valves of FIXRUN
+RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
+         113: ('ValveMain', 'ValveHot')}
 # the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
 # fire first, one fall clip, no clean, index 1) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)
@@ -133,7 +165,8 @@ SLIP_NAMES = ('Ground', 'GroundMarbles')
 TRAP_NAMES = ('ElectricTrap',)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
-        'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCReturnSeconds')
+        'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
+        'PCReturnSeconds', 'PCRunTo')
 
 _ROWS = None
 _LEVELS = None
@@ -254,13 +287,17 @@ def specs(n):
                     keys['PCSurpriseSeconds'] = round(DOUBLETAKE, 3)
                     keys['PCFixSeconds'] = round(fix + own + after, 3)
             elif spec['kind'] == 'tool':
-                grab = sum(v for a, v in sm['before'] if a.startswith(spec['pc'] + '.'))
+                inside = sum(v for a, v in sm['before'] if a.startswith(spec['pc'] + '.'))
+                grab = inside or _sum(lv, [(spec['pc'], 'take')])
                 keys['PCGrabSeconds'] = round(grab, 3)
-                keys['PCUseSecondsTricked'] = round(before - grab + own, 3)
-                keys['PCFireAt'] = round(before - grab, 3)
+                keys['PCUseSecondsTricked'] = round(before - inside + own, 3)
+                keys['PCFireAt'] = round(before - inside, 3)
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCFixUseSeconds'] = round(after, 3)
-                keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3)
+                if spec.get('use'):
+                    keys['PCToolUseSeconds'] = round(_sum(lv, [spec['use']]), 3)
+                keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3) \
+                    if spec.get('back') else 0.0
             else:
                 total = before + own + after
                 keys['PCFixSeconds'] = round(fix, 3)
@@ -269,6 +306,13 @@ def specs(n):
                     # the fire before the step's own clip or more actions,
                     # or on arrival when the stand plays nothing before it
                     keys['PCFireAt'] = round(before, 3)
+        if base in RUNTO.get(n, ()):
+            keys['PCRunTo'] = True
+        run = FIXRUN.get(n, {}).get(base)
+        if run is not None:
+            keys['PCGrabSeconds'] = round(_sum(lv, [run]), 3)
+            keys['PCToolUseSeconds'] = 0.0
+            keys['PCReturnSeconds'] = 0.0
         out[name] = keys
     return out
 

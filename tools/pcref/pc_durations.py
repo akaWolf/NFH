@@ -7,15 +7,19 @@
 Each PC station of the level class's lap (tools/pcref/lap_model.py: the ICON groups
 of the walker's tokens, the DoActions' ticks summed at 12 a second) is paired with the
 mobile routine's item that visits it — PAIRS: (mobile item, PC icon, k-th visit of that
-icon, and how many consecutive mobile visits share one PC station). The overlay entry
+icon, and how many consecutive mobile visits share one PC station — or, a tuple of the
+station's action names, the consecutive mobile visits that split it: 111's machines, the
+mobile's prime, use and unprime legs, are the case's give, wash, get_clothes and give,
+dry, take). The overlay entry
 PCUseSeconds carries one value per visit, cycling — every visit counts, the prime and
 unprime legs of a toggling station included (Routine._pc_visit_seconds: 111's first
 ironing is the give, its second the ironing); RoutineAction._pc_use_seconds plays
 the mobile use clips at the pace that lasts it (AnimPlayer.time_scale), or holds a
-walk-by stand for it. Left to the mobile: 111's machines (the PC neighbour waits on the
-machine's cycle — open in docs/PC_VERIFICATION.md), 106's bath, 104's shaving chain.
-NATURAL: a station whose natural-lap action sits behind a test the walker takes as false
-(routine_order.py: OBJ3 is 'no trick has fired') while the lap itself made it true.
+walk-by stand for it. Left to the mobile: 106's bath, 104's shaving chain.
+The walker (tools/pcref/routine_order.py) follows the objects' presence along the lap
+(isObjectPresent over level.xml and the switches): 111's second ironing irons the clothes
+case 8 gave the board, 113's valve is switched off and on, 114's third phonograph visit
+plays the record.
 """
 import json
 import os
@@ -43,7 +47,8 @@ PAIRS = {
           ('CornChips', 'cookies', 0), ('Chili', 'parrot', 1), ('PigKeys', 'pig_key', 1)],
     110: [('SteakMeat', 'meatbowl', 0), ('Beer', 'beer', 0), ('BBQ', 'bbq', 0), ('CarnivorPlantSpray', 'plant', 0),
           ('BBQ', 'bbq', 1), ('SteakChair', 'table', 0), ('SteakWine', 'wine', 0)],
-    111: [('Detergent', 'detergent', 0), ('Iron', 'ironing', 0), ('Airer', 'laundry_rack', 0),
+    111: [('Detergent', 'detergent', 0), ('WashingMachine', 'washing_machine', 0, ('give', 'wash', 'get_clothes')),
+          ('Drier', 'tumble_drier', 0, ('give', 'dry', 'take')), ('Iron', 'ironing', 0), ('Airer', 'laundry_rack', 0),
           ('FishTank', 'aquarium', 0), ('Airer', 'laundry_rack', 1), ('Iron', 'ironing', 1)],
     112: [('YogaBook', 'book', 0), ('FishTank', 'aquarium', 0), ('Yoga', 'yoga_mat', 0), ('YogaBook', 'book', 1),
           ('Trampoline', 'trampoline', 0), ('Bicycle', 'home_trainer', 0), ('Mixer', 'mixer', 0, 2),
@@ -53,27 +58,29 @@ PAIRS = {
           ('Ladder', 'ladder', 0), ('FuseBox', 'fuse', 1)],
     114: [('Polish', 'polish', 0), ('GoldCup', 'cups', 0), ('Polish', 'polish', 1), ('Pipe', 'smoke', 0),
           ('Gramaphone', 'phonograph', 0), ('CDs', 'records', 0), ('Gramaphone', 'phonograph', 1), ('Pipe', 'smoke', 1),
-          ('Shotgun', 'gun', 0), ('Hat', 'hat', 0), ('Horn', 'horn', 0)],
+          ('Gramaphone', 'phonograph', 2), ('Shotgun', 'gun', 0), ('Hat', 'hat', 0), ('Horn', 'horn', 0)],
 }
-# (level, PC icon, k-th visit) -> ticks: Level_Laundry's case 16 (game.exe 0x456280)
-# tests the board for bed/ironingboard_clothes, which case 8's switch (the `give`)
-# put there on the same lap, and irons it: DoAction iron, objects.xml time 71
-NATURAL = {(111, 'ironing', 1): 71}
 
 
 def pc_stations(n, toks):
+    """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]"""
     L = lap_model.Level(n)
     legs = lap_model.model(L, toks[n])
     st = lap_model.stations(legs)
+    acts = []
+    for kind, text, t in legs:
+        if kind == 'icon':
+            acts.append([])
+        elif kind == 'action' and acts:
+            acts[-1].append((text.split()[-1], t / lap_model.TICK))
     if len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
         st[0][1] += st[-1][1]; st = st[:-1]
-    by = {}
-    for icon, ta, tw in st:
+        acts[0] += acts[-1]; acts = acts[:-1]
+    by = {}; parts = {}
+    for (icon, ta, tw), aa in zip(st, acts):
         by.setdefault(icon.split()[-1], []).append(ta / lap_model.TICK)
-    for (lv, icon, k), ticks in NATURAL.items():
-        if lv == n and k < len(by.get(icon, [])):
-            by[icon][k] += ticks / lap_model.TICK
-    return by
+        parts.setdefault(icon.split()[-1], []).append(aa)
+    return by, parts
 
 
 def item_kind(n, name):
@@ -91,7 +98,7 @@ def main(argv):
     for n, pairs in sorted(PAIRS.items()):
         if not pairs:
             continue
-        by = pc_stations(n, toks)
+        by, parts = pc_stations(n, toks)
         secs = {}
         notes = []
         for pr in pairs:
@@ -100,6 +107,20 @@ def main(argv):
             vals = by.get(icon, [])
             if k >= len(vals):
                 print('%d: no PC station %s #%d for %s' % (n, icon, k, item)); continue
+            if isinstance(share, tuple):
+                # the station split by its actions, one mobile visit each
+                aa = parts[icon][k]
+                got = []
+                for name in share:
+                    v = [s for a, s in aa if a == name]
+                    if not v:
+                        print('%d: no action %s at %s#%d for %s' % (n, name, icon, k, item)); break
+                    got.append(v[0])
+                else:
+                    secs.setdefault(item, []).extend(round(v, 2) for v in got)
+                    notes.append('%s <- %s#%d %s' % (item, icon, k, ', '.join(
+                        '%s %.2f s' % (a, v) for a, v in zip(share, got))))
+                continue
             v = round(vals[k] / share, 2)
             for _ in range(share):
                 secs.setdefault(item, []).append(v)

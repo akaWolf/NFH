@@ -118,10 +118,11 @@
    "set": {
     "PCUseSeconds": [
      0.33,
-     0.5
+     0.5,
+     0.33
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.3 s; Gramaphone <- phonograph#1 0.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.3 s; Gramaphone <- phonograph#1 0.5 s; Gramaphone <- phonograph#2 0.3 s"
   },
   {
    "object": "CDs",

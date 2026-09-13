@@ -85,8 +85,14 @@
    "object": "FireExtinguisher",
    "component": "TrickItem",
    "set": {
+    "PCGrabSeconds": 0.333,
+    "PCUseSecondsTricked": 7.667,
+    "PCFireAt": 7.667,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 7.667
+    "PCFixUseSeconds": 0,
+    "PCToolUseSeconds": 3.25,
+    "PCReturnSeconds": 0.0,
+    "PCRunTo": true
    }
   }
  ]

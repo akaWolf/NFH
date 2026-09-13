@@ -6,11 +6,16 @@ index ([this+0xc]); every case ends in a yield, fcn.0045c600 /
 fcn.004706a0 / fcn.0045e640 (next, current, resume-after-interruption),
 so the walk is the chain of `next` values from case 0. The chain is
 simulated over the radare2 listing of game.exe: string-compare, IFVARIANT
-(fcn.0047a130), OBJ3 (fcn.00479ff0) and class-local helpers are taken as
-false (no trick has fired), the engine's waits as true, class byte fields
-as their current value (0 after the constructor, set along the walk), and
-a case that returns without yielding is a poll whose condition is assumed
-to flip. The stations are the ICON names of the cases, else the object
+(fcn.0047a130) and class-local helpers are taken as false (no trick has
+fired), the engine's waits as true, class byte fields as their current
+value (0 after the constructor, set along the walk), OBJ3 — isObjectPresent
+(fcn.00479ff0: the object looked up and its flag 0x20 tested, "isObjectPresent
+: Object not found") — as the object's presence along the lap: the level's
+level.xml places the objects, each SWITCH (fcn.00451de0, the new object and
+the old) swaps one for the other (113's valve: bas/valve_on placed, case 2
+switches it off, case 6 on again; 111's board: case 8 puts the clothes on
+it, case 16 irons them) — and a case that returns without yielding is a
+poll whose condition is assumed to flip. The stations are the ICON names of the cases, else the object
 walked to or acted on. The switch tables are read from the binary, the
 class is matched to a level by the object names it uses.
 
@@ -120,7 +125,7 @@ def run_level(sw):
             if tt and tt.startswith('push '): return resolve(tt[5:], regs)
         return '?'
     TRACE = os.environ.get('TRACE')
-    def simulate(start_a, objflags=None, flip=False, depth=0):
+    def simulate(start_a, objflags=None, flip=False, depth=0, present=None):
         objflags = {} if objflags is None else objflags
         labels = []; k = at(start_a); seen = set(); pred = False; regs = {}; lastcall = None; flags = {}; inverted = False
         trace = TRACE and int(TRACE, 16) == start_a
@@ -141,8 +146,15 @@ def run_level(sw):
                 elif depth < 1 and lo - 0x2000 <= int(fn[4:], 16) < hi + 0x2000 and fn not in NATTRUE and fn not in NATFALSE_FN and not re.search(r'fcn\.(0045c600|004706a0|0045e640|0047f740)', fn):
                     # a helper of the class (the sofa's sit/sit_remo picker, fcn.004707e0): its own
                     # GoTo/DoAction calls belong to the case that calls it
-                    labels.extend(simulate(int(fn[4:], 16), objflags, False, depth + 1)[0])
-                pred = False; lastcall = fn; k += 1; continue
+                    labels.extend(simulate(int(fn[4:], 16), objflags, False, depth + 1, present)[0])
+                pred = False; lastcall = fn
+                if present is not None and fn in ('fcn.00479ff0', 'fcn.00451de0'):
+                    ss = [x for x in strings_since_call(k) if '/' in x]
+                    if fn == 'fcn.00479ff0' and ss:
+                        lastcall = ('flag', 'true' if ss[-1] in present else 'false')
+                    elif fn == 'fcn.00451de0' and len(ss) >= 2:
+                        present.discard(ss[-1]); present.add(ss[-2])
+                k += 1; continue
             if t == 'test al, al':
                 if lastcall is None: pred = 'false'
                 elif isinstance(lastcall, tuple): pred = lastcall[1]
@@ -284,15 +296,19 @@ def run_level(sw):
         best = max(KW, key=lambda lv: len(icons & KW[lv]))
         if icons & KW[best]: level, score = best, len(icons & KW[best])
     seq = []; c = 0; visited = []; objflags = {}; states = set()
+    lx = os.path.join(X, level, 'level.xml')
+    present = set(re.findall(r'<object name="([^"]+)"', canon.read(lx))) if os.path.exists(lx) else None
     for _ in range(120):
-        key = (c, tuple(sorted(objflags.items())))
+        key = (c, tuple(sorted(objflags.items())), tuple(sorted(present or ())))
         if key in states: break
         states.add(key); visited.append(c)
         if c not in case_of.values() and c not in [ci for cs in case_of.values() for ci in cs]: break
         start = starts[c]
-        labels, nxt = simulate(start, objflags)
+        before = set(present) if present is not None else None
+        labels, nxt = simulate(start, objflags, present=present)
         if nxt == 'ret':
-            labels2, nxt2 = simulate(start, objflags, flip=True)
+            present = before
+            labels2, nxt2 = simulate(start, objflags, flip=True, present=present)
             if isinstance(nxt2, int): labels, nxt = labels2 + [('POLL', [])], nxt2
         seq.append((c, labels, nxt))
         if isinstance(nxt, int): c = nxt

@@ -19,6 +19,7 @@
     "PCFireAt": 2.917,
     "PCFixSeconds": 0.917,
     "PCFixUseSeconds": 2.917,
+    "PCToolUseSeconds": 2.917,
     "PCReturnSeconds": 0.333
    }
   },
@@ -66,9 +67,9 @@
    "component": "TrickItem",
    "set": {
     "PCAngryTime": 270,
+    "PCStationEndsOnTrick": true,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 3.667,
-    "PCStationEndsOnTrick": true
+    "PCUseSecondsTricked": 3.333
    }
   },
   {
@@ -117,10 +118,34 @@
    "object": "WashingMachine",
    "component": "TrickItem",
    "set": {
+    "PCStationEndsOnTrick": true,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 9.833,
-    "PCStationEndsOnTrick": true
+    "PCUseSecondsTricked": 9.5
    }
+  },
+  {
+   "object": "WashingMachine",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.33,
+     4.92,
+     2.0
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WashingMachine <- washing_machine#0 give 0.33 s, wash 4.92 s, get_clothes 2.00 s"
+  },
+  {
+   "object": "Drier",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.33,
+     2.42,
+     0.33
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.33 s, dry 2.42 s, take 0.33 s"
   }
  ]
 }

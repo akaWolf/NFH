@@ -53,7 +53,8 @@
    "set": {
     "PCFixSeconds": 1.917,
     "PCUseSecondsTricked": 0.0,
-    "PCFireAt": 0
+    "PCFireAt": 0,
+    "PCRunTo": true
    }
   }
  ]
