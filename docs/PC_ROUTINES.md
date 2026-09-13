@@ -79,36 +79,48 @@ a bonus, else by the points: ≤ 5 shout0_light (25 frames, 2.08 s) or shout2 (2
 ≤ 10 shout0_medium (45, 3.75 s) or shout2, > 10 shout0 (26, 2.17 s) or shout2 — the second
 of each pair at index 1 (the tables 0x51b584, 0x51b590, 0x51b598, 0x51b5a0) — unless flag 2
 is set; then a sync step (fcn.0047bc90 sets +0x8a) unless flag 1, fcn.00444d30 on the object,
-the fired flag +0x1c. The repair is not in the step: the walk-trigger handlers call
-fcn.0047ae70(normal, tricked, …, 1) after it, which plays the tricked object's `repair` or
-`clean` action (objects.xml: anc/mum_smeared clean 24 frames = 2.0 s, kit/microwavedirty and
+the fired flag +0x1c. The script functions only queue: DoAction appends the action to the
+actor's list and fcn.004766e0 appends a step to the script's own list, run in order by the
+fiber, and `push N; jmp` yields to the next case of the class's `run`; a step's run(a1, a2)
+gets the level state (the fire reads its angrytime at +0x84 and asks it for the rage through
+fcn.004357e0) and the list owner whose +0x18 list takes posted steps (fcn.00444d30). The
+bonus flag is `bl = (fcn.004357e0(level) != 0)`, the rage current above zero, and it also
+picks the face (4) and the +3. The repair is not in the step: the walk-trigger handlers call
+fcn.0047ae70(normal, tricked, …, 1) after it, which plays the tricked object's `repair`
+action if it has one, else its `clean`, else nothing (fcn.00445d30 asks the object; objects.xml: anc/mum_smeared clean 24 frames = 2.0 s, kit/microwavedirty and
 toi/groundsoap clean 23 ticks = 1.9 s, toi/toiletstuffed clean 47 = 3.9 s) and switches the
 objects, and the station branches play theirs themselves (kit/foambottle: `make_foampudding`
 38 frames = 3.17 s, the OBJ2 step, then `repair` 23 ticks). So the order per trick kind: a
 station — the tricked object's own action, the fire, the shout, the repair; a doubletake
 (mum_smeared, microwavedirty, toiletstuffed, twistedantenna: fcn.0047d9e0 and its siblings) —
-doubletake1 and doubletake3 (15 frames each) as two DoActions with one wait (whether both
-play, 2.5 s, or the second replaces the first, 1.25 s, is unread: DoAction's step start,
-fcn.00477e00), the fire, the shout, the repair; a slip (toi/groundsoap, the marbles:
-fcn.0047ddc0) — the fire FIRST, slip1 (31 frames, 2.58 s) inside the step, the shout, then a
-second step with slip3 that pays nothing (the record's next quota is 0: the no-points branch;
-whether its clip still plays is unread — E06's 15.5 s from the soap to the hair fits without
-it), the repair; and the other five-argument sites pay before their own clip too: the tub's hair
+doubletake1 and doubletake3 (15 frames each, and both play: DoAction — fcn.00477f60 →
+fcn.00477e00 — appends the action to the actor's list as a node of fcn.00476b20, and the
+script's own list, fcn.004766e0, takes the second's step, which completes after both, 2.5 s),
+the fire, the shout, the repair; a slip (toi/groundsoap, the marbles: fcn.0047ddc0) — the fire
+FIRST, slip1 (31 frames, 2.58 s) inside the step, the shout, then a second step with slip3 that
+pays nothing (the record's next quota is 0: the no-points branch, which only posts the step's
+animation to the runner's list — fcn.00444d30 with its run-now flag clear, fcn.00478f90's
+append — so slip3 plays alongside the steps that follow, not before them), the repair; and the
+other five-argument sites pay before their own clip too: the tub's hair
 (`show_hair` on toi/shower after the 2.83 s `shower` clip), the dirty towel (`show_black`),
 the electrotrap, the mailbox trap, the vacuum, the sofa, the tabasco teeth, the coffee soil,
-the shoebrush, the ironing board, the plant fight, the rat. Index 1 (shout2 when cold) at the
-OBJ2 sites of kit/foambottle, lir/stickybook, kit/foamcream, kit/bowlingball,
-toi/aftershave_glue, toi/grease_exchanged, kit/candlebox_boom, bal/suncream_sweet,
-bed/bed_pins, kit/babybottle_nitro, kit/stool_pins, kit/potterswheel_fast, bed/camera_flashy,
+the shoebrush, the ironing board, the plant fight, the rat. The sites' index and flags (tools/pcref/fire_sites.py: the
+pushes and slot stores before each call through a stack emulation; a register-valued int
+through radare2's analysis of the level fiber — the level classes' `run` is a switch on the
+resume index, and every such site sits in a case that never reloads the register, so the
+prologue's `mov ebx, 3` / `xor ebp, ebp` / `xor edi, edi` stands): index 1 (shout2 when cold)
+at kit/foambottle, lir/stickybook, kit/foamcream, kit/bowlingball, toi/aftershave_glue,
+toi/grease_exchanged, kit/candlebox_boom, bal/suncream_sweet, bed/bed_pins, bed/stickyhat,
+kit/babybottle_nitro, kit/stool_pins, kit/potterswheel_fast, bed/camera_flashy,
 kit/heater_hot, toi/basin_flooded, anc/fuse, bas/expander_elastic, anc/skippingrope_knotted,
-kit/binoculars_glue (kit/skate carries flags 3: no shout, no sync) — read off the two
-immediates pushed before the object; where a register or a placeholder push stands for an
-argument (lir/bathcandy, anc/stinkflower, bed/stickyhat, bal/dove_free, anc/deadflower,
-wor/book_replaced and every five-argument site) the index and the flags are NOT read: the
-no-shout of the tub's hair, the dirty towel and the bath candy rests on E06's timings alone
-(7.0 s hair to towel, 18.0 towel to album with dry and leave, 8.5 candy to the rush's loo),
-and the four-argument step fcn.0047c3b0 (the marbles, bal/fuelbeer, kit/laxativebeer,
-lir/sofa_fartbag, bed/cactusclock) is unread past its constructor call. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
+kit/binoculars_glue and at the five-argument lir/vacuum_hole, toi/shoebrushset,
+anc/mailbox_trap, bal/growspray, bed/teeth_tabasco, bas/electrotrap, toiletpaper and every
+soap and marbles slip; flags 3 (no shout, no sync) at toi/tub_hair, toi/dirtytowel,
+lir/bathcandy, anc/stinkflower, bed/medalbox_rat, bal/fuelbeer, kit/laxativebeer and
+kit/skate; flags 2 (no shout) at kit/coffeebox_soil, lir/sofa_broken, toiletpaper and
+bed/cactusclock; the rest flags 0. The four-argument step fcn.0047c3b0 (fcn.0047bc00: name,
+index, flags and a ready step at +0x18 the fire waits on before the shout) serves the marbles,
+bal/fuelbeer, kit/laxativebeer, bed/cactusclock and lir/sofa_fartbag. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
 and the towel 18.0 s before the album (no shout at either), the cold microwave (7 points:
 shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
 and every bonus trick is followed by the 7.67 s shout2_extra.

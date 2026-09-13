@@ -806,7 +806,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   hair after the 2.83 s shower clip, the dirty towel), then plays a shout
   whose length hangs on the bonus — shout2_extra 7.67 s after a bonus
   trick, 2.08–3.75 s after a cold one (shout2 2.17 at the index-1 sites)
-  and none where the step's flag 2 is set (the hair, the towel) — where
+  and none where the step carries flag 2 (the tub's hair, the dirty towel and
+  the bath candy at flags 3, 110's fuel beer, the laxative beer, the coffee
+  soil, the broken sofa, the cactus clock) — where
   the profile plays AngryHard, 6.8 s, after every trick; and the repair is
   the tricked object's `repair`/`clean` action (the picture 2.0 s, the
   microwave and the soap 1.9, the loo 3.9, the foam pudding 1.9) where the
@@ -815,12 +817,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   to pudding 18.7 s (the PC 15.0 — a 3.75 s shout and a 3.17 s pour against
   6.8 and 8.0), picture to soap 21.0 (17.5 — the 3.4 s clean and the pay
   after SlipRight's 3.3 s against 2.0 and the pay before slip1), fire to
-  extinguisher 23.2 (14.9 — the 20-point fire's shout0 2.17 against 6.8,
-  plus the two door passes). Carrying them — the shout paced to the PC clip
+  extinguisher 23.2 (14.9 — the fuel beer's step carries flags 3, no shout
+  at all, against the port's 6.8 s AngryHard, plus the two door passes). Carrying them — the shout paced to the PC clip
   by bonus, points and index, the fix to the PC action, the tricked clip to
   the tricked action, the five-argument pay before the clip — puts 106 and
   110 at 100 by the port's walks on paper; the mobile profile keeps its own.
-  Proposed, unconfirmed.
+  Read in the code site by site (tools/pcref/fire_sites.py); the carry is
+  proposed, unconfirmed.
 - *Season 2 station durations.* The PC videos' HUD bubble (docs/
   PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
   stay at each station once the walk to it is taken off (the icon shows

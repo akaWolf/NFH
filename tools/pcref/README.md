@@ -58,6 +58,13 @@ Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
   object's own action (106's make_foampudding 3.17 s, not make_pudding's
   8.00) where the port stretches the tricked clip to the normal stay
   (docs/PC_FIDELITY.md, the 106 paragraph).
+- `fire_sites.py [--fibers]`: every trick-fire step site of game.exe (the
+  three-, four- and five-argument steps whose run is fcn.0047bd00) decoded off
+  the listing by a stack emulation — name, index, flags, animation, actor —
+  and, with `--fibers`, a register-valued index or flags resolved through
+  radare2's analysis of the level fiber (the prologue constant of the class's
+  `run`): the shout choice and the pay-before-clip sites of docs/PC_ROUTINES.md
+  "The fire's tail".
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —
