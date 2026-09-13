@@ -1,14 +1,16 @@
-# Level213 under the PC profile (2026-09-18: PC station stays + coin ticks).
+# Level213 under the PC profile (2026-09-18 v5: PC station stays + coin ticks).
 # His lap ~118 s (Zone04 bull 3-7 / cement 110-118, Zone03 plant 18-31 /
 # tortilla 31-35, Zone02 picnic 43-61, Zone01 pinata 71-83 / bull-ride
 # 85-103). Olga rides the bull in Zone01 41-102 and 200-233; the Mother
-# stands in Zone02 15 s at ~34/94/154/214 (walking Zone05->Zone03->Zone02
-# and back). Zone05 (hand, flowers) hangs off Zone03 — entered on her
-# Zone02 stand. Zone01 is clear 103-184 (he is upstairs, Olga off the
-# bull), so the bull controls go in then, with the hand grabbed on her
-# first stand at ~34.
+# stands in Zone02 15 s at ~34/94/154/214 (Zone05 -> Zone03 -> Zone02 and
+# back). Zone05 (hand, flowers) hangs off Zone03 — entered on her first
+# Zone02 stand (~34). Zone01 is clear 103-184 for the bull controls. The
+# bath goes in late so that its coin joins the lap-3 pile with the controls,
+# the bull, the plant, the tortilla, the picnic and the pinata (v4 paid it
+# on lap 1 and peaked at 84).
+# v6: the pinata's coin lands right after the picnic's (his pinata is 28 s past the picnic) — the wasp and the
+# pinata go in as soon as the bull pays, and the bath's await comes after them (v5 waited for the bath, 377 s).
 take CementBag IT2_Cement
-usewith CementBath IT2_Cement
 take ChickenWings IT2_Chickenwing
 take Skeleton IT2_Tequila
 take Piranha IT2_Piranha
@@ -27,10 +29,11 @@ usewith PlantCarnivore IT2_Piranha
 usewith Tortilla IT2_Chili
 usewith Tortilla IT2_Tequila
 usewith BoatPicnic IT2_Termites
-await CementBath 0
-await LiveBull 0
+await LiveBull 0   # (~239) the bull's coin frees the wasp nest
 take Wasp IT2_Beehive
-unlock Pinata IT2_Beehive
+usewith CementBath IT2_Cement   # Zone04 after the wasp: free 262-340 — his lap-3 bath (~377) into the pile's tail
+unlock Pinata IT2_Beehive   # Zone01 before his lap-3 pinata (~307): the coin that tops the pile (84 at the picnic + 20)
+await CementBath 0
 await PlantCarnivore 0
 await Tortilla 0
 await BoatPicnic 0

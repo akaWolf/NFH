@@ -3054,8 +3054,9 @@ class Routine:
             # the PC credits the coin `time` ticks into the trick action
             w0.pc_credits.append((w0.time + float(it.pc_coin_ticks) / 12.0, self.pawn, it))
         if os.environ.get('NFH_ROUTINE_LOG'):
-            print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s' % (
-                self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc), file=sys.stderr)
+            print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
+                self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
+                self.pawn.anim.sequence_seconds(seq) if seq else 0.0), file=sys.stderr)
         if seq:
             if pc:
                 # the PC station lasts its DoActions' ticks (levels/pc overlays,
@@ -3611,9 +3612,17 @@ class Routine:
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
-        if self.role != 'Rottweiler' or it is None or not pcprofile.is_pc() \
-                or not pcprofile.rule('durations') \
-                or not getattr(it, 'pc_use_secs', None):
+        if it is None or not pcprofile.is_pc() or not pcprofile.rule('durations'):
+            return 0.0
+        if self.role != 'Rottweiler':
+            # another actor's stand at the PC data's `time` (PCUseSecondsRole)
+            vals = (getattr(it, 'pc_use_secs_role', None) or {}).get(self.role)
+            if not vals:
+                return 0.0
+            k = it.pc_use_visit_role.get(self.role, 0)
+            it.pc_use_visit_role[self.role] = k + 1
+            return float(vals[k % len(vals)])
+        if not getattr(it, 'pc_use_secs', None):
             return 0.0
         v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]
         it.pc_use_visit += 1

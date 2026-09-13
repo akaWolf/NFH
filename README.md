@@ -142,14 +142,14 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   level is won (101/102/107 100, 103/104/105/114 97, 113 96, 108/109/112
   94, 110 78, 106 77, 111 70 — the last three at ceilings the
   room-pointer catch sets, the 97s a second or two of his lap, the 94s
-  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 212 and
-  213 at 90 — the PC's station stays, compound coins and coin ticks are
-  carried on every episode since 2026-09-18 (`docs/PC_FIDELITY.md`
-  "Season 2 station durations" / "compound coins"; 214's lap is a
-  neighbour-Mother handshake and keeps the mobile pace, its coin tick
-  carried), and 210 overflows among the 100s; the coin ticks decay each
-  coin from partway into its action, leaving 212 and 213 one coin short
-  of the overflow on the three-catcher floors. The mobile numbers do not
+  and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 213 at
+  90 — the PC's station stays, compound coins and coin ticks are carried
+  on every episode since 2026-09-18, and the Mother's PC stands on 212
+  (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound coins"
+  / "The other actors' stands"; 214's lap is a neighbour-Mother handshake
+  and keeps the mobile pace, its coin tick carried); the coin ticks decay
+  each coin from partway into its action, and 213's pile of the PC amounts
+  over his tantrum-stretched lap peaks at 90. The mobile numbers do not
   move: the regression under
   `--profile=mobile` is byte-identical.
 

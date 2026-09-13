@@ -688,7 +688,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   35, the electrified rail 30; 203: the chilli paper 30; 204: the jade
   17; 206: the fleas 30; 208: the snake statue 15; 210: the hedgehog 27,
   the octopus 27) — the amounts read off the gauge on 2026-09-08 were
-  read 1.25× the data and are withdrawn. The gauge is 100 000 rage
+  read 1.25× the data and are withdrawn — the reader (tools/pcref/
+  gauge.py) counts the bar's orange and yellow rows and the bar's top is
+  red, so it saturates at ~74 % of the gauge: a jump reads 1/0.74 of its
+  size, a trick-free plateau falls 0.42-0.46 %/s for the true 0.36, and a
+  "capped" plateau (213's tortilla at 186 s, E10's triple) is a fill in
+  the red zone, not the collapse (2026-09-18). The gauge is 100 000 rage
   long, the mobile's AngryMeterMaximum 100: the PC dialog gives the
   `rageometer` a range of 0..100000 (nfh2 dialogs/*/menuleft_bar.xml),
   GameLogic.dll's trick accounting flags 100000 (docs/PC_ROUTINES.md),
@@ -793,7 +798,34 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   213 at 84 — the tortilla's compound and the boat lift it, the earlier
   coins have bled off). The overflow is a tighter plan than the
   three-catcher timing has yielded; the amounts, ticks and stays are the
-  PC's, so the ceiling is the plan's, not the model's.
+  PC's, so the ceiling is the plan's, not the model's. On 212 the one-lap
+  pile was tried seven ways (2026-09-18): the throne room is entered only
+  through his whip room, the Mother sits in the cigar room and steps out
+  for 12 s every ~45 s — on his lap-2 cigars — and the pair's second ruby
+  must follow the plate before one sit, so the six coins cannot all be
+  armed between two of his throne sits. What lifts 212 to 100 is the
+  Mother's PC stands (the entry below): with her 8.3 s at the statue
+  hideout for the mobile's 19.9 the cigar room opens more often, and the
+  mobile plan under the profile overflows at 279 s.
+- *The other actors' stands.* The PC level data times an actor's action in
+  ticks (`<action actor="mother" … time="120">` in objects.xml, 12 per
+  second) or `auto` (its clip: the enter/leave stretches of a stand, a
+  second or two — a loop's length is not in the data), so the explicit
+  waits are the stands the profile can carry for the Mother, Olga and the
+  rest: 212's Mother waits 11.7 s at the red bull and 8.3 s at the statue
+  hideout (the mobile's MumWaitZone3/Zone4 stand 13.2 and 19.9 s) — her
+  cycle becomes ~33 s and the cigar room opens more often, which is what
+  takes 212 to 100 on the mobile plan. PCUseSecondsRole carries them per
+  role (tools/pcref/pc_durations_others.py pairs the PC actions with the
+  idle runs' stands per level by hand; RoutineAction._pc_use_seconds
+  cycles per role and visit). 213's Mother keeps the mobile stands: the
+  PC's 12.5 s at the water and 5.0 + 16.7 s at the statue and the flowers
+  are within 3 s of the mobile's 15.6 and 18.8 (the port's one Zone05
+  stand covers both PC stations), and a paced stand that Woody's trip
+  interrupts restarts whole — under the carry her Zone02 visit ran 26 s
+  and caught the hand trip. 208/209's dressing room, 207/210/211's pool,
+  nap and sea-view loops have no explicit time and keep the mobile clips;
+  214's handshake keeps the mobile pace whole.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (his bubbles and popups: the trap on the basement walk-in 158, the
   washer 180, the drier 196, a "?!" alert at 206 — Woody's noise — that

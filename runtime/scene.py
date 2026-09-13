@@ -236,7 +236,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'sprite',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -580,6 +580,13 @@ class Item:
         v = d.get('PCUseSeconds')
         self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         self.pc_use_visit = 0
+        # the other actors' stays under the profile (PCUseSecondsRole: role ->
+        # seconds or one per visit, the PC data's `time` ticks / 12 — the
+        # Mother's stands of 212 and 213)
+        vr = d.get('PCUseSecondsRole') or {}
+        self.pc_use_secs_role = {r: [float(x) for x in (w if isinstance(w, list) else [w])]
+                                 for r, w in vr.items() if w}
+        self.pc_use_visit_role = {}
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))

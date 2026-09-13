@@ -293,6 +293,11 @@ helpers.
   routine items of 210-213 from the PC videos' bubble spans less the walk
   (tools/pcref/pc_durations_s2.py; docs/PC_FIDELITY.md "Season 2 station
   durations").
+- Carried on 2026-09-18 (the other actors): the PC data's explicit
+  action times (ticks / 12) as the stands of 212's Mother
+  (PCUseSecondsRole, tools/pcref/pc_durations_others.py — 212 rates 100
+  under them); 213's are within 3 s of the mobile's and stay; the loops
+  without a time in the data keep the mobile clips.
 - Carried on 2026-09-18: the Season 2 station stays and coin ticks on
   every episode (PCUseSeconds/PCCoinTicks in levels/pc, tools/pcref/
   pc_durations_s2.py and coins.py) except 214's, whose lap is a
