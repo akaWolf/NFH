@@ -102,7 +102,7 @@ more.
 | 108 | 94 | 104 | +11 % | Coffee+DeckChair 30/45 — the walks, the sunbath itself is 3 s |
 | 109 | 113 | 112 | 0 % | Bed 27/32 |
 | 110 | 59 | 59 | +1 % | |
-| 111 | 219 | 181 | −17 % | WashingMachine 47/19, Drier 26/7, Iron 30/20 |
+| 111 | 122 | 118 | −3 % | the first lap (PC_LAPS_DETAIL: Detergent 5 to 127); the pairing had summed the second, tricked lap's washer 47 and drier 26 into a 219 |
 | 112 | 155 | 159 | +2 % | Mixer 14/20, Weights 14/20 |
 | 113 | 191 | 168 | −12 % | Ladder+Drill 47/26 |
 | 114 | 168 | 165 | −2 % | |
@@ -122,7 +122,7 @@ more.
 | 214 | 75 | 81 | +7 % | Bouquet+CaptainDoor 22/38, Hatch 34/19 |
 
 Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
-the walks); faster: 106, 111, 113, 213 (−12..−19 %); the rest within ±10 %.
+the walks); faster: 106, 113, 213 (−12..−19 %); the rest within ±10 %.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,
@@ -131,10 +131,15 @@ and down, 12 a second) between the objects' hotspots through the doors
 (their standing points and `enter`/`leave` ticks), the actions at their
 `time` or animation frames — 101 34 s (video 32), 102 29 (28), 105 44 (40),
 108 90 (94), 109 104 (113), 110 60 (59), 112 143 (155), 113 172 (191),
-114 147 (168): nine within ±12 %. 103 (28/42), 106 (60/108), 107 (37/54)
-and 111 (108/219) come out short: the machine cycles the neighbour waits
-for and the bath are not in the tokens, and the video's lap may carry a
-trick. The model is the check of the walking rule read from the binary
+114 147 (168): nine within ±12 %. 103 (28/42), 106 (60/108) and 107
+(37/54) come out short: the bath is not in the tokens, and the video's lap
+may carry a trick. 111 is 114 s against its first lap's 122 (2026-09-23:
+the 219 was a pairing of the second, tricked lap; the walker reads the
+board's clothes and irons them, below), 113 167 and 114 153 since the
+walker follows the objects' presence (tools/pcref/routine_order.py:
+isObjectPresent over level.xml and the switches — 113's valve switched off
+and on at 0.33 s where the false branch had two 2-s surprises, 114's third
+phonograph visit). The model is the check of the walking rule read from the binary
 (docs/PC_VERIFICATION.md, "the walking speed" and "the lap's timing").
 
 The port's own idle laps under the profile's four rules read from the
@@ -156,8 +161,13 @@ structural (docs/PC_FIDELITY.md §7). 111's washer and drier are one
 station each in game.exe (give, wash, get_clothes; give, dry, take — the
 2026-09-16 reading of two cycles was the case's two branches, the tricked
 and the normal one), the mobile's three-phase machine kept whole under the
-profile since 2026-09-23 (the tricked use ends the station); the PC's
-machine spells stay the long ones — its washer 24 and 47 s, its drier 6
-and 26 — the wash and dry waits the level class spends in its `wait`
-steps, open.
+profile since 2026-09-23 (the tricked use ends the station) and its three
+legs at the case's three DoActions (the washer's give 0.33 s, wash 4.92 —
+objects.xml `time="59"`, the neighbour's `wait` clip over the machine's
+loop — and get_clothes 2.0; the drier's give 0.33, dry 2.42 and take 0.33);
+there is no wait step beside them (the `wait` helper fcn.0047c640 of the
+switch steps runs a held object's method and completes at once), and the
+first lap's bubble — the washer 24 s, the drier 6 — is the walk to each
+and those actions (the model's 18.8 and 4.1 s); the 47 and 26 s were the
+second lap's, the wine and the tongs tricked.
 The PC's own numbers are from one run's first lap (±2 s per activity).

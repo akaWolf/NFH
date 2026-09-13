@@ -1007,8 +1007,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and is withdrawn); the washer and the drier are one station each, a
   tricked one ending it; and the stations last the PC's actions (the
   detergent 1.33 s, the give 0.33 and the ironing 5.92, the rack's
-  putclothes 1.5 and take 0.33, the feed 1.92 — tools/pcref/
-  pc_durations.py; the machines' waits stay the mobile's). Under the
+  putclothes 1.5 and take 0.33, the feed 1.92, and since the same evening
+  the machines' legs — tools/pcref/pc_durations.py). Under the
   room-pointer catch the balcony and the study are reached only through
   the bedroom, so the bed hides Woody: the board goes in while he is on
   the balcony, the airer's bird food while he is at the tank. The plan
@@ -1020,6 +1020,48 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   are the bedroom's too, 2.4 s after he leaves the board — on the balcony
   they came 30.2 s after the vacuum, its window 30), the board 375.7, the
   tank 397.4, the airer 421.7: 8/8, 79 points, seven ticks, 100.
+- *The neighbour's gaits (2026-09-23).* game.exe moves an actor by the
+  speed record of his gait (+0x38: mg, sn, mr, mrwc, mgbowling1, skate1,
+  piewalk — the facing tables 0x51b5f0 / 0x51b648), and the level classes
+  set it before a GoTo — directly or by a step (fcn.0045f6b0) — and back
+  to mg at the next case. The Season 1 neighbour runs (mr/mrwc 18 px a
+  tick along the floor, 9 up and down, against his walk's 8/3) on every
+  `noise` case (the pets' bark, 107-114), the toilet and first-aid rushes
+  (102, 103, 105, 106, 108's rinse), the twisted antenna's shout (101,
+  102), the extinguisher's fetch and the way back to the burning barbecue
+  (110), 113's main valve after the flood and heat valve after the hot
+  heater, and 112's way back in after the skate; the skate slides at
+  skate1's 18 and the bowling ball goes to the window at mgbowling1's 9.
+  The profile had walked every urgent at the floor record; it now runs
+  those (`Routine._pc_runs`, the overlays' PCRunTo, `Pawn._pc_gait`,
+  `pcprofile.GAIT_PX_PER_TICK`) and shows the walk set on the urgents the
+  PC walks (111's vacuum and carpet). 113's valve station after the flood
+  and the hot heater is the switch alone (bas/valve_on.switch_off, 0.33 s,
+  for the mobile's grab and FixMid), and the lap's own valve and fuse
+  visits are the switches and the take (0.33 s each, where the walker's
+  false branch had put 2-s surprises): the run and the stations bring
+  him to the fuse box ~11 s earlier than the plan of the day before, and
+  Woody can no longer put the fuse back between his lap-1 take and his
+  drill — the plan (v9) cuts the ladder and puts the fuse on his second
+  lap, after the chair, the bedroom marbles and the grinder.
+- *The walker's object presence and the machines (2026-09-23).* The
+  lap walker (tools/pcref/routine_order.py) took isObjectPresent
+  (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it
+  now follows the objects' presence along the lap — level.xml places
+  them, each switch (fcn.00451de0, the new object and the old) swaps one
+  for the other — so 111's second ironing irons the clothes case 8 gave
+  the board (the hand-written NATURAL entry of pc_durations.py is gone),
+  113's valve is switched off and on and its fuse taken (0.33 s each for
+  the 2-s surprises) and 114 goes back to the phonograph a third time to
+  close it (the mobile's third Gramaphone visit, its own PCUseSeconds).
+  111's washer and drier legs last the case's DoActions (give 0.33, wash
+  4.92, get_clothes 2.0; give 0.33, dry 2.42, take 0.33 — pc_durations.py
+  splits the station by action), the tricked use the rest of the tricked
+  branch (the wine's wash and red get_clothes 9.5 s, the smashed drier's
+  dry 3.33), and every visit takes its slot of the per-visit list even
+  tricked, the skipped unprime included (`Routine._pc_use_seconds`,
+  `_end_pc_station`: a tricked Teeth, Airer, Polish or phonograph visit no
+  longer shifts the next visit's stay onto the wrong PC station).
 - *The tick rule, in the canon's own words.* The Season 1 manual
   (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
   the victim of a trick, his anger indicator rises to the maximum value.
