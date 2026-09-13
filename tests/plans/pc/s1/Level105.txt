@@ -16,10 +16,12 @@
 # once the postpone lifts. The mobile chain opened with the picture on his
 # first walk to the plant and the football 33 s later; here the picture is
 # armed while he is at the football and pays on his second walk to the
-# plant (~118), and the phone rings only once the toilet has paid, so he
-# answers it on his way back and its 28 s reach the piano: football (69)
-# > microwave (82) > slip (96) > picture (110) > plant (119) > toilet
-# (138) > phone (~155) > piano (~165) — seven ticks.
+# plant (~118). v4 (2026-09-22, the PC stands carried): the piano opens the
+# chain on his lap-3 play (~93), the microwave on the kitchen entry after it,
+# then the slip, the kick, the picture on the walk to the plant, the phone
+# rung right after it (he answers in the hall), the plant, the loo on the
+# rush — seven ticks; a phone rung after the loo answered 26 s after it under
+# the PC's loo stand, past the 22-s window.
 take Drawer IT_Marker             # Zone01, x9999
 take BowlingBag IT_Bowling        # Zone01
 take ToiletPaper IT_Wcpaper       # Zone04
@@ -27,6 +29,7 @@ usewith Toilet IT_Wcpaper         # pays on the cheese rush (Puke x3, angry) or 
 take SoapDish IT_Soap
 park Zone02                       # up the hall stairs while he is in the kitchen
 take Mobile IT_Handy              # Zone02
+usewith Piano IT_Marker           # Zone02 (~69, v4): pays at PlayPianoSmeared on his lap-3 piano (~93), score 13 — the chain's first trick; the off-key play, the shout, the repair and the normal play keep him until ~104
 take Fridge IT_Egg                # Zone03 by the side door, once he heads for the piano: Egg + Cheese
 usewith Microwave IT_Egg          # Zone03 walk-by, score 7
 usewith Ground@Zone03 IT_Soap     # slip on the football/window walk, score 7 (Ground@Zone04 is the alternative)
@@ -34,14 +37,13 @@ usewith! Football IT_Bowling      # usable only once the piano's AlertNext rolls
                                   # Under the PC paces (2026-09-17) the piano play opens an 8 s window before he
                                   # walks in to kick it: a judgement call, Woody is already in the kitchen
 usewith PlantStink IT_Cheese      # Zone01, pays at SniffBad, score 13 -> RushToToilet
-usewith Piano IT_Marker           # Zone02, pays at PlayPianoSmeared, score 13
 usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 7: armed after his first pass, pays on his walk to the plant (~118)
-await Football 15
-await Microwave 7
+await Piano 13                    # (~93) the chain's first trick
+await Microwave 7                 # his kitchen entry (~108)
 await Ground@Zone03 7
-await MumPicture 7
-await PlantStink 13
-await Toilet 7                    # the rush (~138)
-icon IT_Handy                     # (v3) the ring once the loo has paid (~171): he answers on his way out (~187), 16 s into the loo's 22-s window, and the piano follows within the phone's 28 (rung before the loo he answered at 194, one second cold)
+await Football 15
+icon IT_Handy                     # (v4) the ring once the kick has paid: he answers in the hall on his way to the plant (~150), the picture, the plant and the loo follow — rung after the picture he answered only after the rush (47 s), rung after the loo (v3) 26 s after it under the PC's loo stand (the 7.67 s shout, the 3.9 s clean, the puke), four past the 22-s window
 await Phone 10
-await Piano 13
+await MumPicture 7                # his walk to the plant
+await PlantStink 13
+await Toilet 7                    # the rush

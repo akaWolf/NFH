@@ -12,6 +12,13 @@
 # he is down there (2026-09-17: the trap, the slip 19 s later, the sink 22 s
 # after that — two ticks; the ladder's tongs and the fuse at the drill a
 # third). 8/8, 96: the hall spot pays 7.
+# 2026-09-22 (the PC stands carried): the marbles go in at once (`usewith!`) — under
+# the PC's shorter valve stand (the shock 5.1 s, the shout 2.2) he is up the stairs by
+# ~78 and the gate held them past his crossing (the radiator then paid on lap 1, cold,
+# 29 s after the trap). Still 96: eight tricks' 87 need five ticks, and a radiator-
+# first chain (the hot valve's radiator ~77 > the sink > the marbles on his way down
+# > the trap on his second basement walk, tried as v5) breaks on the rush the hot
+# radiator starts — the sink paid 42 s after it and the basement walk came a lap later.
 
 take RubbishBinCable IT_Cable         # Z03
 take BasementDrawer IT_Tongs          # Z09
@@ -21,7 +28,7 @@ usewith ElectricTrap IT_Cable        # Z09: 8 on his [2] walk in (the overlay li
 use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
 hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
 take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles (he is in the basement, 55-75)
-usewith GroundMarbles@Zone01:2 IT_Marbles   # the hall spot x=3.02, between the basement door (2.55) and the kitchen door (4.63): he slips right after the trap (~18 s), the radiator ~18 s later
+usewith! GroundMarbles@Zone01:2 IT_Marbles  # the hall spot x=3.02, between the basement door (2.55) and the kitchen door (4.63), at once: under the PC's shorter valve stand (the shock 5.1 s, the shout 2.2) he is up the stairs by ~78 and the gate would hold the marbles past his crossing — he slips on his way to the kitchen (~80), the radiator drops off that lap
 hide Wardrobe                         # back in before he comes up (~75): the slip, the kitchen, the hall, the bathroom
 whenusing Sink                        # his [4] sink (17 s in Z04): the hall and the basement are clear — ungated, the leg met him crossing the hall once the PC's one-tantrum angry had moved his lap by 5 s
 take BedDrawer IT_Painbook            # Z06, while he is at the sink and in the basement (103-135)

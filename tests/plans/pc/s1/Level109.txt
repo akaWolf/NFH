@@ -43,8 +43,8 @@ usewith! Pig IT_Pigkey               # Zone01, 10: the pig gets out at his lap-4
 hide! Wardrobe                       # Zone01: he crosses the living room (233-245) and climbs to the bedroom (251)
 whenusing Bed                        # (~253) his third bed: the pins jump him up, he lies down again ~32 s later
 park! Zone02                         # the living room meanwhile (the dog asleep again after his play at ~233)
-wait 30                              # (~286) his second lie-down of the night
-usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe past the sleeper: his brushing at the lap-3 waking (~316), 4 s after the cactus alarm (~313) — a tick
+whenanim Rottweiler BedSleep         # (~250) his second lie-down of the night: the PC's pins jump him up 1.6 s into the bed and he lies down again 4 s later, for 25 s
+usewith! Teeth IT_Tabasco            # Zone06, 15, tiptoe past the sleeper: his brushing at the lap-3 waking (~280), a second after the cactus alarm — a tick
 park! Zone02                         # out of the bedroom before the alarm (~313)
 hide! Wardrobe                       # Zone01: the awaits from inside (his hall visit ~346 is the pig's)
 await PigMilk 20

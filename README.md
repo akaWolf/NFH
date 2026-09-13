@@ -138,13 +138,15 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   binaries on 2026-09-17 — the walking speeds, the door pass, the catch
   on sight with no busy window, the stations' durations — the profile's
   idle laps sit within 10 % of the lap model on every level it covers
-  (docs/PC_LAPS.md) and the plans were re-timed to them: every Season 1
-  level is won (101/102/107 100, 103/104/105/114 97, 113 96, 108/109/112
-  94, 106 94, 110 97, 111 70 — 111 at a ceiling the room-pointer catch
-  sets, 106 and 110 in the PC's own chain order with links behind the
-  port's pacing of a tricked clip and its door passes, the 97s a second or
-  two of his lap, the 94s and the 96 at the edges of his anger windows,
-  `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 213 at
+  (docs/PC_LAPS.md) and the plans were re-timed to them; since 2026-09-22
+  the Season 1 reactions are the PC's too — the trick step's fire, its
+  shout, its repair and the tricked stand, read off game.exe's level
+  classes (`docs/PC_FIDELITY.md` "Season 1 reactions") — and every Season
+  1 level is won: 101/102/104/105/106/107/108/109/110/112 100 in the PC's
+  own chain orders, 103 and 114 97 (a link his lap cannot close: 103's
+  kitchen three a walk behind the loo, 114's polish alone in the study),
+  113 96, 111 70 at a ceiling the room-pointer catch sets (`docs/
+  PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 213 at
   90 — the PC's station stays, compound coins and reaction clips are
   carried on every episode since 2026-09-18, and the Mother's PC stands on
   212 (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound
