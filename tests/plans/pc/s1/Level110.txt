@@ -30,7 +30,7 @@ park! Zone03                         # the kitchen through the living room (~96)
 take! RubbishBinBanana2 IT_Banana    # Zone03
 take! Fridge IT_Vinegar              # Zone03
 park! Zone02                         # the living room (~104): he fetches the extinguisher through the bedroom 99-111
-whenanim Rottweiler FireExtinguisherStart   # (111) he is back on the balcony until ~140
+whenzone Zone07                      # he is back on the balcony with the extinguisher until ~140 (the PC's case 9 keeps it: no walk back)
 usewith! Ground@Zone06 IT_Banana     # Zone06 (~122): the slip on his way back (~147)
 park! Zone02                         # down to the living room
 usewith! SteakChair IT_Pins          # Zone02, 10: at his steak (~163)

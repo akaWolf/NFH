@@ -1,49 +1,51 @@
-# Level113 under the PC profile (v8, 2026-09-23). level_DIY's tricks.xml pays the
+# Level113 under the PC profile (v9, 2026-09-23). level_DIY's tricks.xml pays the
 # marbles 8 (the mobile data pays 8 only on the kitchen and bedroom spots, 7 on the
 # rest) and the chair once (lir/stoolkit_pain: the pain book's trick, played at the
 # chair kit — World._pc_trick_item), so the PC's eight make 88 and four bonuses give
 # the 100 — Badinfos' E13 (the HUD of pc_s1_all_720.mp4: 100 %, 8/8, four bonuses:
 # the fuse after the cut ladder, the bedroom marbles after the chair, the grinder in
-# the marbles' 27-s window, the trap on his rush). The port's lap leaves ~12 s between
-# his hall pass and the hot radiator's rush — Woody's two basement door passes take
-# ~9 s of it — so the same four links are made in another order of his lap: the
-# flooded sink first (cold) > the trap on his rush to the main valve > the cut ladder
-# (cold) > the fuse at the drill > the chair on lap 2 (cold) > the bedroom marbles >
-# the grinder > the hot radiator (cold); run 2026-09-23: 100.9, 117.3, 164.4, 180.4,
-# 221.4, 236.6, 259.9, 296.2. The main valve goes in before his first basement visit
-# (tricked there, it leaves his routine), the cable while he cooks at the radiator,
-# Woody waiting in the basement until he is at the sink; after the cut ladder the
-# pain book and the chair on the way down, then the kitchen through the living room's
-# side door — off his way basement > fuse box > study — and the fuse once he climbs
-# with his: the drill is 20 s off. The marbles and the grinder while he is in the
-# study (~40 s: the cut ladder, the drill).
+# the marbles' 27-s window, the trap on his rush). Since the PC's gaits and stations
+# (the run to the main valve after the flood, its switch 0.33 s, the lap's valve and
+# fuse switches 0.33 s) he takes the fuse and climbs to the study ~11 s earlier than
+# v8 had him, and Woody cannot put it back between that take and his lap-1 drill; the
+# four links are made over two laps: the flooded sink (cold) > the trap on his run to
+# the main valve > the chair on lap 2 (cold) > the bedroom marbles on his way to the
+# grinder > the grinder > the hot radiator (cold) > the cut ladder on lap 2 (cold) >
+# the fuse at his drill; run 2026-09-23: 99.3, 110.8, 216.0, 231.1, 254.5, 290.8,
+# 351.9, 367.9. The main valve goes in before his first basement visit, the fuse and
+# the marbles from the hall drawer before he comes down, the cable while he cooks at
+# the radiator, the heat valve on his way to the sink; while he is at the sink Woody
+# goes up (the pain book, the marbles, the grinder, the chair) and lies in the bed
+# through his lap-1 study trip and his lap-2 chair, marbles and grinder; the ladder
+# while he is on the balcony, the wardrobe before he leaves it, the fuse once he has
+# taken his.
 take RubbishBinCable IT_Cable         # Z03 (he is upstairs 0-41)
 take BasementDrawer IT_Tongs          # Z09
 prime ElectricTrapTatter              # Z09: the tatter's water; the trap waits for the cable
-use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at his lap-1 sink (~99), 12 — the chain's first
-hide Wardrobe                         # Z01 before he comes down (46.5)
-whenzone Zone09                       # (55) his first basement: the valve, tricked, leaves his routine
-take! Drawer IT_Fuse                  # Z01: IT_Fuse + IT_Marbles
-hide! Wardrobe                        # before he crosses the hall (62.8)
-whenzone Zone03                       # (69) the kitchen
-usewith! ElectricTrap IT_Cable        # Z09 x 2.07, 8: the shock on his rush from the sink; Woody stays in the basement
-whenzone Zone01                       # (81) his lap-1 radiator is done
-use! ValveHot                         # Z09: the radiator hot for his lap-2 kitchen, 15 — the chain's last
-whenzone Zone04                       # (92) he is at the sink: up through the hall and the living room
-usewith! Ladder IT_Tongs              # Z08, 15: the cut ladder (~119)
-take! BedDrawer IT_Painbook           # Z06 on the way back
-usewith! ChairAssemblyBook IT_Painbook # Z02, 10: armed for his lap-2 chair (his way to the study passes x -1.7 > -0.49 only)
-park! Zone03                          # through the living room's side door: the kitchen is off his way basement > fuse box > study
-whenzone Zone02                       # (~147) he takes the fuse and climbs to the study
-usewith! FuseBox IT_Fuse              # Z01 by the kitchen stairs, 10: the shock at his drill
-usewith! GroundMarbles@Zone06 IT_Marbles   # Z06 x 2.41, 8: his study trips never cross it, his lap-2 way to the grinder does
-use! AngleGrinder                     # Z07, bare, 10: he stays in the study ~40 s (the cut ladder, the drill)
-hide! Bed                             # Z06 x 2.74
+use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at his lap-1 sink (~96), 12 — cold
+take! Drawer IT_Fuse                  # Z01: IT_Fuse + IT_Marbles, before he comes down (46.5)
+hide! Wardrobe                        # Z01: he passes it down to the basement (55) and back up (61)
+whenzone Zone03                       # (68) the kitchen
+usewith! ElectricTrap IT_Cable        # Z09 x 2.07, 8: the shock on his run from the sink (~111) — hot
+whenzone Zone01                       # (80) his lap-1 radiator is done
+use! ValveHot                         # Z09: the radiator hot for his lap-2 kitchen, 15 — cold
+whenzone Zone04                       # (91) he is at the sink: up through the hall before his run down it (~102)
+take! BedDrawer IT_Painbook           # Z06
+usewith! GroundMarbles@Zone06 IT_Marbles   # Z06 x 2.41, 8: his study trips never cross it, his lap-2 way to the grinder does — hot
+use! AngleGrinder                     # Z07, bare, 10: his lap-2 grinder, in the marbles' window — hot
+usewith! ChairAssemblyBook IT_Painbook # Z02, 10: his lap-2 chair (~190) — cold
+hide! Bed                             # Z06: his lap-1 study trip passes it twice (~143, ~165), his lap-2 grinder trip twice
+whenzone Zone07                       # (~235) his lap-2 grinder, the balcony
+usewith! Ladder IT_Tongs              # Z08, 15: the cut ladder for his lap-2 study (~350) — cold
+hide! Wardrobe                        # Z01, down before he leaves the balcony (~267): he passes the hall to the kitchen, the heat valve, the toilet and the fuse box
+whenusing FuseBox                     # (~331) his lap-2 fuse box: he takes the fuse
+usewith FuseBox IT_Fuse               # Z01 by the kitchen stairs, 10: the shock at his lap-2 drill (~360) — hot
+hide Wardrobe                         # Z01
 await Sink 12
 await ElectricTrap 8
-await Ladder 15
-await FuseBox 10
 await ChairAssemblyBook 10
 await GroundMarbles@Zone06 8
 await AngleGrinder 10
 await Radiator 15
+await Ladder 15
+await FuseBox 10
