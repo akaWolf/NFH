@@ -282,6 +282,8 @@ PC (bubble, s from the level start): SteakMeat 4-16 > Beer 17-35 > BBQ 36-37 > B
 
 PC lap by SteakMeat: [63, 64] → median 63.5 s
 
+PC tricks (the thermometer's jumps, s from the level start, tools/pcref/thermo_jumps.py; the HUD counters give the points): BBQ fire 158.4 (20) > FireExtinguisher 173.3 (15, +14.9) > CarnivorPlantSpray 188.8 (15, +15.5) > the bedroom banana 205.4 (10, +16.6) > SteakChair 229.9 (10, +24.5 — the banana's 26 s) > SteakWine 248.6 (15, +18.7): six tricks, five bonuses, 100 (the level's window is 20 s: angrytime 180).
+
 mobile routine: SteakMeat > Beer > BBQ > CarnivorPlantSpray > BBQ > SteakChair > SteakWine
 
 mobile uses: SteakMeat@13 > Beer@33 > BBQ@34 > CarnivorPlantSpray@34 > BBQ@37 > SteakChair@51 > SteakChair@57 > SteakChair@63 > SteakWine@75 > SteakMeat@93 > SteakMeat@108 > Beer@127 > BBQ@128 > BBQ@142 > BBQ@147 > CarnivorPlantSpray@165

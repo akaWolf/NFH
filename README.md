@@ -140,11 +140,11 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   idle laps sit within 10 % of the lap model on every level it covers
   (docs/PC_LAPS.md) and the plans were re-timed to them: every Season 1
   level is won (101/102/107 100, 103/104/105/114 97, 113 96, 108/109/112
-  94, 106 94, 110 78, 111 70 — 110 and 111 at ceilings the room-pointer
-  catch sets, 106 in the PC's own chain order with two links behind the
-  port's pacing of a tricked clip, the 97s a second or two of his lap, the
-  94s and the 96 at the edges of his anger windows, `docs/PC_FIDELITY.md`
-  §7), and the Season 2 levels rate 100 with 213 at
+  94, 106 94, 110 97, 111 70 — 111 at a ceiling the room-pointer catch
+  sets, 106 and 110 in the PC's own chain order with links behind the
+  port's pacing of a tricked clip and its door passes, the 97s a second or
+  two of his lap, the 94s and the 96 at the edges of his anger windows,
+  `docs/PC_FIDELITY.md` §7), and the Season 2 levels rate 100 with 213 at
   90 — the PC's station stays, compound coins and reaction clips are
   carried on every episode since 2026-09-18, and the Mother's PC stands on
   212 (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound

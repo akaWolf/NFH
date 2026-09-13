@@ -318,11 +318,12 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
 - The plans under the door rule (2026-09-17, tests/plans/pc): the catch
   reads the room pointer, door clips included, so a Woody still in his near
   clip is caught by a neighbour who is (or wakes) in that room, and a walk
-  THROUGH a room he sits in is a catch — 106's pudding, reached only through
-  his living room, has no window and is dropped (77); 110's bedroom banana
-  has none either (his 9 s barbecue is shorter than the climb, 78); 111's
-  airer, primed by his own balcony use and un-primed by the next, is dropped
-  and its errands split over his descents (70). Every other Season 1 level
+  THROUGH a room he sits in is a catch — 106's pudding is armed from the
+  living room once his lap-3 pour is over (2026-09-22: the PC's own order,
+  94); 110's bedroom banana is dropped from the bed hideout while he fights
+  the fire (the same day, 97); 111's airer, primed by his own balcony use
+  and un-primed by the next, is dropped and its errands split over his
+  descents (70). Every other Season 1 level
   is re-timed to runs/idlepc4's laps and won: 101/102/107 100, 103/104/105
   97, 114 94 and, after the chain pass below, 113 96, 108/109/112 94. The 100 on a Season 1 level is the
   score plus 3 per trick that lands while he is still angry
@@ -461,7 +462,15 @@ make_foampudding is 38 frames = 3.17 s, and picture to soap 21.0 against
 17.5, the port paying a walk-by after its surprise clip (SlipRight 3.3 s,
 FindRight 1.5 s) where game.exe fires the trick before the animation, and
 cleaning the picture in the mobile's 3.4 s against the PC's 2.0 —
-tools/pcref/pc_tricked_actions.py tabulates the tricked actions), 108 at 94 (the
+tools/pcref/pc_tricked_actions.py tabulates the tricked actions), 110 at 97
+in the PC's own order too (Badinfos' E10: fire > extinguisher > spray > the
+bedroom banana > chair > wine at 14.9, 15.5, 16.6, 24.5 and 18.7 s; the
+port's banana lies on the bedroom floor again, dropped from the bed hideout
+while he fights the fire, and pays the slip, the chair and the wine hot —
+the fire to the extinguisher stays cold at 23.2 s against the PC's 14.9
+and the 20 s window: his fetch through the bedroom costs two door passes
+of 2.7 s each, and the port pays the extinguisher after its 3.8 s clip
+where game.exe fires it first), 108 at 94 (the
 toothbrush to the deck chair 31.6 s, the lotion to the plant 33, against
 20), 113 at 91 (the raid's long waits; one gap of 24.3 against 24).
 Every one of these is a routine-timing difference between the port's

@@ -1,39 +1,44 @@
-# Level110 under the PC profile (v13: the bedroom banana dropped — no window, see the last park)
-# Level110 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
-# Woody 2.1, the doors a frame a tick, the catch the room alone). His lap (47 s,
-# the idle run under the profile): living 6-10 > kitchen (meat) 10-17 > living
-# 17-22 > bedroom 22-29 > balcony (beer, barbecue, spray) 29-39 > bedroom 39-47
-# > living (chair, wine) 47-57 > kitchen 57-64 > living 64-69 > bedroom 69-75 >
-# balcony 75-86 > bedroom 86-93 > living 93-104 > kitchen 104-111 > ... The hall
-# and the bathroom are off his lap. Woody climbs through the living room while
-# he barbecues (29-39), hides in the bed for his crossings, arms the balcony and
-# the bedroom floor while he sits at the steak (47-57), the living room while he
-# barbecues again (75-86). Six tricks' 88 need four ticks: the fire and the
-# spray at 77-78, the extinguisher at the fire, the slip at 86, the chair and
-# the wine at 95-100 — all on his second lap.
-take PinsBoard IT_Pins               # Zone01 (3-7)
-take FirstAid IT_Fuel                # Zone04 (9-13): fuel + growth liquid together
-whenzone Zone06                      # (22) he climbs to the bedroom: up into the living room (tiptoe past the parrot)
+# Level110 under the PC profile — the PC chain of Badinfos' E10 (the thermometer
+# of pc_s1_all_720.mp4, tools/pcref/thermo_jumps.py; the pays in level seconds):
+# BBQ 158.4 (20) > FireExtinguisher 173.3 (15, +14.9) > CarnivorPlantSpray
+# 188.8 (15, +15.5) > the bedroom banana 205.4 (10, +16.6) > SteakChair 229.9
+# (10, +24.5: the banana's 26 s window) > SteakWine 248.6 (15, +18.7) — six
+# tricks, five bonuses, 100. His lap under the profile (runs/chainS1): living
+# 5-11 > kitchen (meat) 11-17 > living 19-24 > bedroom 24-33 > balcony (beer,
+# barbecue, spray) 33-45 > bedroom 45-53 > living (chair, wine) 53-66 > kitchen
+# 66-71 > living 74-79 > bedroom 79-87 > balcony 87-... The hall and the
+# bathroom are off his lap. With the fuel in the beer his second barbecue burns
+# (92): he fetches the extinguisher through the bedroom (99-111), puts the fire
+# out (115), sprays the plant (130) and comes back through the bedroom (~143),
+# where the banana lies since Woody's raid from the living room during the
+# fire; the pins and the vinegar wait at the steak (~163) and the wine.
+# Under the profile the fetch costs two door passes of 2.7 s each: the
+# extinguisher pays 23 s after the fire against the PC's 15 (the 20 s window).
+take PinsBoard IT_Pins               # Zone01 (3-9)
+take FirstAid IT_Fuel                # Zone04 (9-16): fuel + growth liquid together
+whenzone Zone06                      # (24) he climbs to the bedroom: up into the living room (tiptoe past the parrot)
 park! Zone02
-whenzone Zone07                      # (29) he barbecues: the bedroom is free until 39
-hide! Bed                            # Zone06 by ~35: he crosses the bedroom 39-47 to the steak (47-57)
-whenzone Zone02                      # (47) he sits at the steak: the balcony and the bedroom are free until 69
+whenzone Zone07                      # (33) he barbecues: the bedroom is free until 45
+hide! Bed                            # Zone06 by ~42: he crosses the bedroom 45-53 to the steak (53-66)
+whenzone Zone02                      # (53) he sits at the steak: the balcony and the bedroom are free until 79
 use! FireExtinguisher                # Zone06, bare hand: the BBQ's fixing tool, 15 (RedoAction)
-usewith! Beer IT_Fuel                # Zone07: BBQ.Tricked via SetTrickedOnItem, 20 at his next BBQ (77)
+usewith! Beer IT_Fuel                # Zone07: BBQ.Tricked via SetTrickedOnItem, 20 at his next barbecue (92)
 usewith! CarnivorPlantSpray IT_Growthliquid   # Zone07, 15 (RemoveFromRoutineAfterUseTricked)
-hide! Bed                            # by 68: he crosses 69-75, barbecues 75-86 (the fire, the extinguisher), crosses back 86-93
-whenzone Zone07                      # (75) he is on the balcony: the living room is free until 93, the kitchen until 104
-usewith! SteakChair IT_Pins          # Zone02, 10: at his next steak
-park! Zone03                         # the kitchen: the vinegar and the banana
-take! Fridge IT_Vinegar              # Zone03
+hide! Bed                            # by 79: he crosses 79-87, barbecues from 87 — the fire, the fetch, the extinguisher, the spray keep him until ~140
+whenzone Zone07                      # (87) he is on the balcony: the living room and the kitchen are free until ~150
+park! Zone03                         # the kitchen through the living room (~96)
 take! RubbishBinBanana2 IT_Banana    # Zone03
-park! Zone01                         # the hall before his meat (104): off his lap
-whenusing Beer                       # his next barbecue (~124): the living room is free until he comes down (~140)
-usewith! SteakWine IT_Vinegar        # Zone02, 15: at his next wine
-park! Zone03                         # out through the kitchen door before he comes down
-park! Zone01                         # the hall: off his lap. The bedroom floor's banana (10) has no window under the profile: his barbecue lasts 9 s once the spray has paid, the climb to the bedroom from the living room 8 — two tries (v11, v12) ended in the door as he came down
+take! Fridge IT_Vinegar              # Zone03
+park! Zone02                         # the living room (~104): he fetches the extinguisher through the bedroom 99-111
+whenanim Rottweiler FireExtinguisherStart   # (111) he is back on the balcony until ~140
+usewith! Ground@Zone06 IT_Banana     # Zone06 (~122): the slip on his way back (~147)
+park! Zone02                         # down to the living room
+usewith! SteakChair IT_Pins          # Zone02, 10: at his steak (~163)
+usewith! SteakWine IT_Vinegar        # Zone02, 15: at his wine after the pins
+park! Zone01                         # the hall: off his lap
 await BBQ 20
 await FireExtinguisher 15
 await CarnivorPlantSpray 15
+await Ground@Zone06 10
 await SteakChair 10
 await SteakWine 15
