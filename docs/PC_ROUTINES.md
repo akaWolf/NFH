@@ -65,6 +65,46 @@ stays above zero for 60 + amount ticks, the mercury sits at full for 60 + (amoun
 angrytime) of them and drains over the level's angrytime ticks; the next trick's bonus is
 decided by that indicator alone — the scores and the neighbour's whereabouts play no part.
 
+**The fire's tail and the trick steps, read from the code (2026-09-22).** fcn.0047bd00 is slot 2
+of the vtable 0x4e5944 — the trick STEP the level scripts and the walk-trigger handlers push
+through the script fiber (fcn.004766e0 runs one step and waits for it): `OBJ2 <object>` in
+tools/pcref/exe_scripts.py's listings is fcn.0047c290(object, index, flags) (the constructor
+fcn.0047ba80: +0xc the name, +0x10 = index ≠ 0, +0x14 the flags), and the five-argument
+fcn.0047c320(object, animation, actor, index, flags) (fcn.0047bca0 / fcn.0047baf0) is the same
+step carrying a DoAction of that animation at +0x18. When the step runs: the record lookup; no
+points → nothing but the fired flag; else the bonus test, the score, the rage (fcn.00438b90),
+the face, the jingle (music/jingle_joke.mp3), THEN the +0x18 animation if any (waited on), THEN
+the shout as a DoAction on `neighbor` — `shout2_extra` (92 frames, 7.67 s) when the trick was
+a bonus, else by the points: ≤ 5 shout0_light (25 frames, 2.08 s) or shout2 (26, 2.17 s),
+≤ 10 shout0_medium (45, 3.75 s) or shout2, > 10 shout0 (26, 2.17 s) or shout2 — the second
+of each pair at index 1 (the tables 0x51b584, 0x51b590, 0x51b598, 0x51b5a0) — unless flag 2
+is set; then a sync step (fcn.0047bc90 sets +0x8a) unless flag 1, fcn.00444d30 on the object,
+the fired flag +0x1c. The repair is not in the step: the walk-trigger handlers call
+fcn.0047ae70(normal, tricked, …, 1) after it, which plays the tricked object's `repair` or
+`clean` action (objects.xml: anc/mum_smeared clean 24 frames = 2.0 s, kit/microwavedirty and
+toi/groundsoap clean 23 ticks = 1.9 s, toi/toiletstuffed clean 47 = 3.9 s) and switches the
+objects, and the station branches play theirs themselves (kit/foambottle: `make_foampudding`
+38 frames = 3.17 s, the OBJ2 step, then `repair` 23 ticks). So the order per trick kind: a
+station — the tricked object's own action, the fire, the shout, the repair; a doubletake
+(mum_smeared, microwavedirty, toiletstuffed, twistedantenna: fcn.0047d9e0 and its siblings) —
+doubletake1 and doubletake3 (15 frames each) as two DoActions with one wait, the fire, the
+shout, the repair; a slip (toi/groundsoap, the marbles: fcn.0047ddc0) — the fire FIRST, slip1
+(31 frames, 2.58 s) inside the step, the shout, then a second step with slip3 that pays nothing,
+the repair; and the other five-argument sites pay before their own clip too: the tub's hair
+(`show_hair` on toi/shower after the 2.83 s `shower` clip), the dirty towel (`show_black`),
+the electrotrap, the mailbox trap, the vacuum, the sofa, the tabasco teeth, the coffee soil,
+the shoebrush, the ironing board, the plant fight, the rat. Index 1 (shout2 when cold) at the
+OBJ2 sites of kit/foambottle, lir/stickybook, kit/foamcream, kit/bowlingball,
+toi/aftershave_glue, toi/grease_exchanged, kit/candlebox_boom, bal/suncream_sweet,
+bed/bed_pins, kit/babybottle_nitro, kit/stool_pins, kit/potterswheel_fast, bed/camera_flashy,
+kit/heater_hot, toi/basin_flooded, anc/fuse, bas/expander_elastic, anc/skippingrope_knotted,
+kit/binoculars_glue (kit/skate carries flags 3: no shout, no sync); the rest index 0; the
+five-argument sites' index and flags want a per-site read (some arguments travel in
+registers). Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
+and the towel 18.0 s before the album (no shout at either), the cold microwave (7 points:
+shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
+and every bonus trick is followed by the 7.67 s shout2_extra.
+
 Two more facts of the same state: no Season 1 trick carries a `quota2`-`quota4` in
 tricks.xml (every trick pays once, as the mobile's OnTrickDone does), and the level's end is
 the state machine of fcn.00436bb0 (docs/PC_VERIFICATION.md, "The level's end"): 5 = success

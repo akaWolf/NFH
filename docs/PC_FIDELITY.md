@@ -796,6 +796,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   overflows rest on: with the same coins, decay and lap the port's 7.6-s
   tantrums spread six coins ~25 s further apart than the PC's reactions,
   a tenth of the gauge in decay — 204, 211 and 213 sat at 90 for it.
+- *Season 1 reactions (read 2026-09-22, not carried).* game.exe's trick
+  step (docs/PC_ROUTINES.md, "The fire's tail") pays after the tricked
+  object's OWN action (kit/foambottle's make_foampudding 3.17 s,
+  lir/stickybook's read_stickybook 3.92 — where the profile stretches the
+  mobile's tricked clip to the NORMAL station's stay, 8.0 and 9.42 s), or
+  after the doubletake for a walk-by, or BEFORE its own clip at the
+  five-argument sites (the soap slip: the fire, then slip1 2.58 s; the tub's
+  hair after the 2.83 s shower clip, the dirty towel), then plays a shout
+  whose length hangs on the bonus — shout2_extra 7.67 s after a bonus
+  trick, 2.08–3.75 s after a cold one (shout2 2.17 at the index-1 sites)
+  and none where the step's flag 2 is set (the hair, the towel) — where
+  the profile plays AngryHard, 6.8 s, after every trick; and the repair is
+  the tricked object's `repair`/`clean` action (the picture 2.0 s, the
+  microwave and the soap 1.9, the loo 3.9, the foam pudding 1.9) where the
+  profile plays the mobile's fix clips (MumPictureClean ×3 3.4 s, FixMid
+  1.4). The port's cold links on 106 and 110 are these numbers: microwave
+  to pudding 18.7 s (the PC 15.0 — a 3.75 s shout and a 3.17 s pour against
+  6.8 and 8.0), picture to soap 21.0 (17.5 — the 3.4 s clean and the pay
+  after SlipRight's 3.3 s against 2.0 and the pay before slip1), fire to
+  extinguisher 23.2 (14.9 — the 20-point fire's shout0 2.17 against 6.8,
+  plus the two door passes). Carrying them — the shout paced to the PC clip
+  by bonus, points and index, the fix to the PC action, the tricked clip to
+  the tricked action, the five-argument pay before the clip — puts 106 and
+  110 at 100 by the port's walks on paper; the mobile profile keeps its own.
+  Proposed, unconfirmed.
 - *Season 2 station durations.* The PC videos' HUD bubble (docs/
   PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
   stay at each station once the walk to it is taken off (the icon shows
