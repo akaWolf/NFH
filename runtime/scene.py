@@ -305,7 +305,7 @@ class Item:
                  'compound_extra_coin', 'plant_carnivore_extra',
                  'extra_coin_206', 'extra_coin_210', 'dog_basket_210',
                  'anger_amount', 'extra_coin_anger', 'extra_coin_toilet_211',
-                 'pc_extra_coin', 'pc_extra_coin_206', 'pc_coin_ticks', 'pc_credited', 'pc_overflow',
+                 'pc_extra_coin', 'pc_extra_coin_206', 'pc_laugh',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -778,12 +778,9 @@ class Item:
         # overlays: tricks.xml's rage of the record the extra stands for)
         self.pc_extra_coin = d.get('PCExtraCoin')
         self.pc_extra_coin_206 = d.get('PCExtraCoin206')
-        # the PC coin's tick within the trick action (the `<trick time=>`
-        # record, GameLogic fcn.1000140b credits it then): the profile pays
-        # the ladder that far into the neighbour's tricked use
-        self.pc_coin_ticks = d.get('PCCoinTicks')
-        self.pc_credited = False         # World.pc_credits paid this trick's coins already
-        self.pc_overflow = False
+        # the PC record's laugh level: the neighbour's reaction clip set after
+        # this trick (pcprofile.S2_REACTION_CLIPS; tools/pcref/coins.py --write-laugh)
+        self.pc_laugh = d.get('PCLaugh')
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)

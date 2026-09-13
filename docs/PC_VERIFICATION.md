@@ -257,8 +257,18 @@ helpers.
   constructor fcn.00423860 asks MSVFW32 for its version; the rate is the
   clip's), not to the level. The gate between the 60 Hz timer and the
   update is what remains unread; the port keeps its own 12 Hz accumulator. GFXEngine.dll (radare2, the same day) calls `Sleep` once — a 200 ms / 250 ms throttle of its present loop behind a flag (0x1002c1dd–0x1002c20c, the inactive-window pace) — and its GetTickCount/QueryPerformanceCounter pair is the CRT's cookie seed; the renderer has no frame limiter of its own. The frame function fcn.00410070 (called from fcn.00411d40's pump) runs one `[vtable+0x3c]` (slot 15) on the object at app+0x20 per frame, between two fps-timer updates and the render slot `+0x60`; the level's update fcn.0043ab40 counts its calls at +0x54 and runs the tick body — the coroutines, the rules, the clock — on every call while the byte at +0x88 is set (no divider there), and reaches it through fcn.00449f80 from the unheadered fcn.0044ae60 (slot 14 of the classes at vtables 0x4e19d0/0x4e19e8, radare2 `av` + the PE's own tables); which class sits at app+0x20 and how its slot 15 spaces the calls to 12 Hz is the one link still unread.
-- Season 1: whether the position object of the catch is the room or the
-  floor strip.
+- Season 1, settled on 2026-09-18: the catch's busy byte (+0x78) is
+  toggled by one message only — the level's slot 49 (fcn.00440c10,
+  `sete` on the byte of the actor named in the event, reached through
+  the event class 0x4e7984 built by the script command `pause_neighbor`
+  (fcn.00408210) and by PauseActorMsg (fcn.004509e0)) — and no Season 1
+  level file uses either, so the neighbour is never busy during play: no
+  busy window, as carried. The position object is the room for every
+  room but the hall: the level files give each room one walkable
+  `<floor>` (the rest are `wall="true"` strips) except `anc`, which has
+  two or three side by side — where the port's one zone may be coarser
+  than the PC's strips (open, and not where 106, 110 and 111 lose
+  their tricks: those rooms have one floor).
 - Season 2: where the PC tests a Woody merely walking into the catcher's room — the watch table (steps × data behaviours), its walker, equality, fire path, predicate branches and the reaction fiber are read end to end, and none of them names a walk — the watch modes, the scripted co-actor fights (fcn.1000eb19 after `crash`) and the data-side `run` reactions (the failed minigame, Olga's shout) are read
   and what its reactions run; what the respawn
   timer gates.
@@ -298,15 +308,27 @@ helpers.
   (PCUseSecondsRole, tools/pcref/pc_durations_others.py — 212 rates 100
   under them); 213's are within 3 s of the mobile's and stay; the loops
   without a time in the data keep the mobile clips.
-- Carried on 2026-09-18: the Season 2 station stays and coin ticks on
-  every episode (PCUseSeconds/PCCoinTicks in levels/pc, tools/pcref/
-  pc_durations_s2.py and coins.py) except 214's, whose lap is a
+- Carried on 2026-09-18: the Season 2 station stays on every episode
+  (PCUseSeconds in levels/pc, tools/pcref/pc_durations_s2.py) except 214's, whose lap is a
   neighbour-Mother handshake (mother_sleep from his pistol sequence,
   mother_sit releasing his WaitWatch — the Level214 behaviour cs:62-65,
   130-147): under the PC stays the two wait for each other for good, and
   the PC's Mother script is unread, so its stations keep the mobile pace;
   a coin credit due past the use's end is paid by the tantrum once
   (World.play_angry drops the pending credit).
+- Read on 2026-09-18 (Loader.dll, fcn.10008b6f): the `<flag name=…>`
+  table — container 0x10, hideout 0x40, singleuse 0x80, neighbor_hideout
+  0x100, doorup 0x200, doordown 0x400, doorleft 0x800, doorright 0x1000,
+  then 0x2000, autotake 0x4000, 0x8000 and game 0x20000 — the mask the
+  loader sends as SetFlagMsg for each flag of an object. No data flag
+  is 1, 2, 4 or 8, and no code in the three binaries stores those into a
+  message or record with an immediate: the actor's bit 2 that the tick
+  and the watch handler test, and the object bits 4 and 0x20 the watch
+  predicate tests, are runtime states — set through the generic setter
+  with a register or record mask by a sender this reading has not
+  reached (game.exe builds messages too: its `createMsgList` and a
+  "mask" field of its own). The predicate's hideout tests are therefore
+  states (4, 0x20), not the data's hideout flags (0x40, 0x100).
 - Read on 2026-09-18, the catch trigger's plumbing (GameLogic.dll):
   every GL object (actors and items alike) keeps a flag word at +0x14,
   read by fcn.100450dc (`flags & mask`) and written only by
@@ -363,11 +385,19 @@ helpers.
   for a pawn to stand in a zone (213's Mother in Zone02); the PC dodge
   trusts the gate on a walk into the leg's own zone (212's cigar box) —
   both mobile-guarded, the regression byte-identical.
-- Carried on 2026-09-17 (the coin ticks): a Season 2 coin lands at its
-  record's `time` into the trick action (fcn.1000140b's `cmp eax,
-  [ecx+0x28]` per record) — PCCoinTicks on the items of 210-213, credited
-  through `World.pc_credits` at that tick into the neighbour's tricked use
-  (`_s2_credit`, the ladder's arithmetic split out of `play_angry`).
+- Carried on 2026-09-18 (the reactions): the PC neighbour's reaction to
+  a trick is one clip picked by the record's laugh level and a seeded
+  random (GameLogic.dll 0x1000f9b5: the four clip tables), 2-7 s for the
+  mobile's ~7.6-s angry set — PCLaugh per item (tools/pcref/coins.py
+  --write-laugh), pcprofile.s2_reaction_seconds, the angry sequence
+  paced in World.play_angry and the pace restored at its end.
+- Withdrawn on 2026-09-18 (the coin ticks of 2026-09-17): a record's
+  `time` is a frame of its own action, not the credit's moment — the PC's
+  bar jumps 4-12 s before the neighbour leaves a tricked station, at the
+  reaction's start (amounts.py against the bubble spans), which is the
+  mobile's moment too; the coin is credited as the action completes
+  (`_s2_credit` from `play_angry`), PCCoinTicks and `World.pc_credits`
+  are gone.
 - Carried on 2026-09-17 (the compound coins): the Season 2 ladder's
   hard-coded extras take the PC record's rage under the profile
   (`Item.pc_extra_coin` / `pc_extra_coin_206` from the overlays'

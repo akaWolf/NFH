@@ -395,12 +395,15 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   `fall_water`; GameLogic.dll's accounting (fcn.1000140b, the "Season 2
   compound coins" entry below) credits each named record once. The
   profile pays that (the basket's extra 20, PCExtraCoin), and with the PC
-  station stays and coin ticks (the entries below) his lap is the
-  Mother's call cycle of ~125 s: the plan (v21) lays the pylon and the
+  station stays (the entry below) his lap is the
+  Mother's call cycle of ~125 s: the plan (v23) lays the pylon and the
   chair while he shops on lap 1, the oil and then the bone on her nap at
   128 while he sits on the beach, so lap 2 piles the chair (20), the
   basket's three (60), the shop's hedgehog (27) and the elephant (30) —
-  the overflow, 100.
+  the overflow at 234, 100; under the PC reactions the lap-1 arming
+  alone tops the gauge, so v21's lap-2 crossings of the pool room on her
+  naps (his beach stay shrank to 2 s and they met in the shop) are gone
+  and the octopus goes in gated once the hedgehog has paid.
 - Harness: `whistle`, `whenusing <Item>` and `whenzone <Zone>` legs (the
   neighbour's lap landmarks a plan can wait for); `unlock` on a dexterity
   search takes the item outright under the profile.
@@ -748,11 +751,32 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `time` is the tick into the action at which the coin lands (the boat 21,
   the jacket 25, the gear 10, the rod 15, the phone 26 and 31, the fall's
   bone 2 / water 20 / empty 25, the tortilla 20 and 30, the pinata 11 …),
-  where the mobile pays at a step of its own tricked sequence 6-10 s in;
-  under the profile a Season 2 coin is credited that many ticks into the
-  neighbour's tricked use (PCCoinTicks on the item, `World.pc_credits`,
-  `_s2_credit`) and the tantrum then finds it paid — carried on 210-213
-  with the stations (tools/pcref/coins.py --write-ticks).
+  — a frame of the record's own action, not a credit tick: the PC's bar
+  jumps 4-12 s BEFORE the neighbour leaves a tricked station, at the
+  reaction's start (tools/pcref/amounts.py's jump times against the
+  bubble spans of docs/PC_LAPS_DETAIL.md — 213's plant at 22 s of its 26,
+  the tortilla at 6 of 11, the picnic at 21 of 28, the pinata at 18 of
+  25; 212's throne at 30 of 38, the whip at 15 of 25), which is where the
+  mobile pays too. A carry that credited the coin `time` ticks into the
+  use (PCCoinTicks, 2026-09-17) is withdrawn on 2026-09-18: it decayed
+  every coin from too early a moment.
+- *Season 2 reactions.* After a trick the PC neighbour plays one short
+  clip picked by the trick record's `laugh` level (GameLogic.dll
+  0x1000f9b5-0x1000fa9b: the level chooses a table, a seeded random the
+  entry — 0: shout2_light; 1: shout2 or shout2_hard; 2: shout2_hard and
+  two of the shout2 set; 3 and above: freakout1, freakout2 or
+  freakout3, the tables at 0x100df45c/0x100df434/0x100df450/0x100df43c),
+  2.2 s for the shouts, 7.1 for shout2_hard, 3.1/3.2/5.2 s for the
+  freakouts (generic/anims.xml's frames at 12 a second) — where the
+  mobile plays AngryEasyUp and AngryHard, ~7.6 s, after every trick. The
+  tricked bubble spans agree (213's tortilla is 11 s for a 4-s stay and a
+  3.5-s trick action). The profile paces the mobile's angry set to the PC
+  clip (PCLaugh on the item from tools/pcref/coins.py --write-laugh, the
+  level's commonest level where the pairing does not reach a record;
+  pcprofile.S2_REACTION_CLIPS, World.play_angry). This is what the PC's
+  overflows rest on: with the same coins, decay and lap the port's 7.6-s
+  tantrums spread six coins ~25 s further apart than the PC's reactions,
+  a tenth of the gauge in decay — 204, 211 and 213 sat at 90 for it.
 - *Season 2 station durations.* The PC videos' HUD bubble (docs/
   PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
   stay at each station once the walk to it is taken off (the icon shows
@@ -782,23 +806,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   second pistol — the Level214 behaviour, cs:62-65 and 130-147; with the
   PC stays he reaches the pistol after her sit and the two wait for each
   other for good, and the PC's Mother script is unread — so 214 carries
-  its coin tick only). A coin whose record tick
-  falls past the use's end (no PC stay for the station) is credited by
-  the tantrum and its pending credit dropped, or it would pay twice.
-  Under the carry 202-209 rate 100 as before (209 once the Taj/shoe
-  pairing was the PC's order; a Taj of 3.2 s had him turn on Woody at
-  the shoe).
-  Under the stays and the coin ticks 210 and 211 rate 100 (211's boat
-  coin now lands 21 ticks into his boat and tops the bar at 241 s). 212
-  (the mobile plan under the profile) and 213 (a PC plan of its own,
-  around the Mother's Zone02 stands and Olga's bull, three catchers on
-  one floor) win 9/9 at 90: with the stations only they overflowed, but
-  the coin ticks credit each coin partway into its action, so it decays
-  from that moment and the pile falls one coin short (212 peaks at 77,
-  213 at 84 — the tortilla's compound and the boat lift it, the earlier
-  coins have bled off). The overflow is a tighter plan than the
-  three-catcher timing has yielded; the amounts, ticks and stays are the
-  PC's, so the ceiling is the plan's, not the model's. On 212 the one-lap
+  the mobile pace whole). Under the carry 202-209 rate 100 as before
+  (209 once the Taj/shoe pairing was the PC's order; a Taj of 3.2 s had
+  him turn on Woody at the shoe).
+  The overlay writers (tools/pcref/pc_durations_s2.py, coins.py,
+  pc_durations_others.py) used to drop a whole patch to replace one key
+  in it, so a stay sharing a patch with a coin tick or an amount went
+  with it: the committed 212 lacked the whip, cigars and bull stays and
+  213 the boat, controls and cement ones until 2026-09-18, when the
+  writers became key-precise and the overlays were rebuilt from the
+  tools — the numbers above are the files' now. Under the stays, the PC
+  reactions and the Mother's stands 212 rates 100 and 213 stays at 90
+  with every trick: the PC's own order of coins — Badinfos pays the
+  cement at the end of lap 1 and then lap 2 in station order, bull,
+  plant, tortilla, picnic, pinata, and the gauge tops at the bull ride —
+  needs the picnic armed before his lap-2 picnic, and Olga sits in that
+  room from 102 to 200 s; the flowers-and-hand trip into Zone05 (19 s,
+  two door climbs) runs half a second past the Mother's 19-s absence
+  from Zone03, and the room's hideout is in Zone03 on the mobile. Twelve
+  plans were tried on 2026-09-18; 213's pile peaks at 90. On 212 the one-lap
   pile was tried seven ways (2026-09-18): the throne room is entered only
   through his whip room, the Mother sits in the cigar room and steps out
   for 12 s every ~45 s — on his lap-2 cigars — and the pair's second ruby

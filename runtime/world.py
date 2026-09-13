@@ -18,6 +18,7 @@ _RAT_ENTRY_208 = {'type': 'IT2_Rat', 'use_count': 0, 'name': 'MOUSE_NAME',
 
 import struct as _struct
 import os, sys
+import random
 import pcprofile
 _f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
 
@@ -3047,12 +3048,6 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         pc = self._pc_use_seconds(it)
-        w0 = self.pawn.world
-        if self.role == 'Rottweiler' and pcprofile.is_pc() and it.tricked \
-                and getattr(it, 'pc_coin_ticks', None) is not None \
-                and w0.woody is not None and w0.woody.nfh2 and seq:
-            # the PC credits the coin `time` ticks into the trick action
-            w0.pc_credits.append((w0.time + float(it.pc_coin_ticks) / 12.0, self.pawn, it))
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -5289,7 +5284,6 @@ class World:
         self.sound_sink = sound_sink
         self._last_input_time = 0.0      # Woody.LastInputTime
         self.pay_log = []                # (t, item, points, hot) per paid trick under the profile
-        self.pc_credits = []             # (when, pawn, item): Season 2 coins due at the PC record's tick
         self._entrance_hello = False
         self._open_furniture = []        # SearchItem.CloseTime holders
         self.snap_request = None         # HUD face clicks -> CameraMover
@@ -5490,9 +5484,7 @@ class World:
     def _s2_credit(self, pawn, item):
         """the NFH2 ladder's meter arithmetic (Rottweiler.cs:613-663): the
         compounds' extras, the linked pair and the item's own AngerAmount;
-        returns whether the meter overflowed. Under the profile a Season 2
-        coin is credited at the PC record's tick into the tricked use
-        (World.pc_credits, PCCoinTicks) and play_angry finds it done."""
+        returns whether the meter overflowed."""
         items = self.level.items
         linked = items.get(item.linked_item_trick) \
             if item.linked_item_trick else None
@@ -5653,18 +5645,12 @@ class World:
             # meter accumulates AngerAmount per trick, the extra-coin hacks
             # top it up, and only overflow costs a tick — with the freakout,
             # the statue strip and the whistle
-            if item.pc_credited:
-                overflow = item.pc_overflow
-                item.pc_credited = False
-            else:
-                # the tantrum before the record's tick (a use shorter than
-                # the PC action's — no PC stay written for the station):
-                # credit now and drop the pending credit, or the coin
-                # would pay twice
-                if self.pc_credits:
-                    self.pc_credits = [c for c in self.pc_credits
-                                       if c[2] is not item]
-                overflow = self._s2_credit(pawn, item)
+            # the coin is credited as the trick action completes — the PC's
+            # bar jumps 4-12 s before he leaves a tricked station, at the
+            # reaction's start (tools/pcref/amounts.py against the bubble
+            # spans of docs/PC_LAPS_DETAIL.md, 2026-09-18); tricks.xml's
+            # `time` is a frame of the record's own action, not a credit tick
+            overflow = self._s2_credit(pawn, item)
             # cs:664 divides by Item.AngerAmount raw: a 0 gives Infinity/NaN
             # in C# float math (neither <= 1 nor <= 2), never the 20 default
             # (Item.cs:392); no shipped item serializes 0
@@ -5713,6 +5699,7 @@ class World:
             484, 544) — the animated angry never rushes to the toilet; only
             the AngryWithoutAnimations branch below does (cs:721). A started
             fetch owns the resume"""
+            pawn.anim.time_scale = 1.0             # (the profile's reaction pace, below)
             fetch = self._try_fix(item, pawn)
             pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
             if on_done and not fetch:
@@ -5794,6 +5781,15 @@ class World:
             pawn.can_decrease_angry = False
         seq = [a for a in seq if pawn.anim.has(a)]
         if seq:
+            if nfh2 and pcprofile.is_pc() and getattr(item, 'pc_laugh', None) is not None:
+                # the PC neighbour's reaction to a trick is one short clip
+                # picked by the record's laugh level (pcprofile.S2_REACTION_CLIPS,
+                # GameLogic 0x1000f9b5): the mobile's angry set plays at the
+                # pace that lasts it — after_run restores the pace
+                pc = pcprofile.s2_reaction_seconds(item.pc_laugh, random)   # the run's seeded module state
+                mobile = pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0 and pc > 0.0:
+                    pawn.anim.time_scale = mobile / pc
             pawn.anim.play_sequence(seq, on_end=after_run)
         else:
             after_run(False)
@@ -8796,14 +8792,6 @@ class World:
 
     def tick(self, dt):
         self.time += dt                  # Time.time
-        if self.pc_credits:
-            due = [c for c in self.pc_credits if c[0] <= self.time]
-            if due:
-                self.pc_credits = [c for c in self.pc_credits if c[0] > self.time]
-                for _when, pawn, item in due:
-                    if not item.pc_credited:
-                        item.pc_overflow = self._s2_credit(pawn, item)
-                        item.pc_credited = True
         # PlayLevelMusic's first-run delay (MusicPlayer.cs:88-98); the
         # track loops per the serialized LevelMusicSource flag
         if self._music_timer is not None:

@@ -3,6 +3,7 @@
 # times the gauge fills (docs/PC_VS_MOBILE.md). Expected 6/6, 100.
 take Carpet IT2_Carpet                 # Zone01
 take Ammo IT2_Ammo                     # Zone01
+usewith Pistol IT2_Ammo                # Zone03, before the raid: armed for his second pistol; under the PC reactions his lap-3 pistol wait (for the Mother's sit) starts after her sit and he waits for good (2026-09-18)
 usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his 71 s Hatch visit
 await Hatch 0                          # his first fall: ShowObjects runs at every angry (Rottweiler.cs:593) but the Hatch's arm needs Dexterity (Item.cs:2668-2672), which his first Fix sets (HatchFixBehavior, cs:2550-2570: the hatch turns into its dexterity round)
 take Shards IT2_Shards                 # Zone03: the hatch's DexterityUnlocker
@@ -27,6 +28,5 @@ usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the 
 await Shower 0
 await Bouquet 0
 await CaptainWheel 0                   # the wheel's 80 tops the meter: the one overflow (AngryCountTicks 1)
-usewith Pistol IT2_Ammo        # after the raid, a lap later
 await Pistol 0
 

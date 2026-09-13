@@ -30,6 +30,28 @@ ALIAS = {
 }
 
 
+def _strip_key(patches, key):
+    """drop `key` from every patch's set; a patch left empty goes"""
+    out = []
+    for e in patches:
+        st = e.get('set')
+        if isinstance(st, dict) and key in st:
+            st = dict(st); del st[key]
+            if not st:
+                continue
+            e = dict(e); e['set'] = st
+        out.append(e)
+    return out
+
+
+def _set_key(patches, item, key, value):
+    """set `key` on the item's TrickItem patch, or add one"""
+    for e in patches:
+        if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
+            e['set'][key] = value; return
+    patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
+
+
 def pc_actions(d):
     """(actor, object, action name, actoranim, seconds|'auto') of the level's objects.xml"""
     p = os.path.join(PCX, d, 'objects.xml')
@@ -68,9 +90,9 @@ def main(argv):
         if write:
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
-            ov['patches'] = [e for e in ov.get('patches', []) if 'PCUseSecondsRole' not in (e.get('set') or {})]
+            ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
             for item, roles in per.items():
-                ov['patches'].append({'object': item, 'component': 'TrickItem', 'set': {'PCUseSecondsRole': roles}})
+                _set_key(ov['patches'], item, 'PCUseSecondsRole', roles)
             note = " The other actors' stands (tools/pcref/pc_durations_others.py): the PC data's `time` ticks / 12 of the actions paired in ALIAS, as PCUseSecondsRole."
             if 'pc_durations_others' not in ov['source']:
                 ov['source'] += note

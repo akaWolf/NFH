@@ -1,60 +1,11 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E12 Action!: +19 the throne pair, split 10 + 9 (143 s), +51 the whip (167), +25 the cigars (196), +25 the bench (212), +23 the bull at the full bar (239, the mobile 30 stays); the parrot and the boat pay on the full bar. PC data (me_c1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit. Coin ticks (tools/pcref/coins.py --write-ticks): PCCoinTicks = the earliest `<trick time=>` of the records the item leads to, the tick into the action at which GameLogic credits the coin. The other actors' stands (tools/pcref/pc_durations_others.py): the PC data's `time` ticks / 12 of the actions paired in ALIAS, as PCUseSecondsRole.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E12 Action!: +19 the throne pair, split 10 + 9 (143 s), +51 the whip (167), +25 the cigars (196), +25 the bench (212), +23 the bull at the full bar (239, the mobile 30 stays); the parrot and the boat pay on the full bar. PC data (me_c1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS).",
  "patches": [
   {
    "object": "Rottweiler2",
    "component": "Rottweiler",
    "set": {
     "PCRageDecay": 30
-   }
-  },
-  {
-   "object": "PreAztecThrone",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 2.9
-   }
-  },
-  {
-   "object": "AztecThrone",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 7.0
-   }
-  },
-  {
-   "object": "PreParrotLedge",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 5.3
-   }
-  },
-  {
-   "object": "ParrotLedge",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 9.9
-   }
-  },
-  {
-   "object": "MechanicalBull",
-   "component": "TrickItem",
-   "set": {
-    "PCCoinTicks": 44
-   }
-  },
-  {
-   "object": "CigarBox",
-   "component": "TrickItem",
-   "set": {
-    "PCCoinTicks": 43
-   }
-  },
-  {
-   "object": "Whip",
-   "component": "TrickItem",
-   "set": {
-    "PCCoinTicks": 47
    }
   },
   {
@@ -73,6 +24,81 @@
     "PCUseSecondsRole": {
      "Mother": 8.3
     }
+   }
+  },
+  {
+   "object": "PreAztecThrone",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.9
+   }
+  },
+  {
+   "object": "AztecThrone",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 7.0,
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "Whip",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 6.7,
+    "PCLaugh": 4
+   }
+  },
+  {
+   "object": "CigarBox",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 14.0,
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "MechanicalBull",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 19.0,
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "PreParrotLedge",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 5.3
+   }
+  },
+  {
+   "object": "ParrotLedge",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 9.9,
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "BoatCoinSlot",
+   "component": "TrickItem",
+   "set": {
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "AztecThrone2",
+   "component": "TrickItem",
+   "set": {
+    "PCLaugh": 3
+   }
+  },
+  {
+   "object": "SleepBench",
+   "component": "TrickItem",
+   "set": {
+    "PCLaugh": 3
    }
   }
  ]

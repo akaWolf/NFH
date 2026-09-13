@@ -21,6 +21,9 @@
 # (~268) and the elephant (~286) — for the one overflow. Each later wait is
 # for his ENTRY into the room Woody has just left, never into the one Woody
 # stands in (v12); every pool crossing after 191 waits for a fresh nap.
+# v22 (2026-09-18, the PC reactions): the lap-1 arming alone tops the gauge on lap 2 — the chair at 139,
+# the basket's three at 185, the hedgehog at 217 and the elephant at 234 (113, the collapse) — so the
+# lap-2 crossings of the pool room on her naps are gone: the octopus goes in gated after his lap-2 shop.
 take SeaUrchin IT2_Hedgehog            # Zone02: the first urchin, for the deck chair
 take! OlgaBra IT2_Bra                  # Zone01: Olga's first shower (3-25); he sleeps in the chair 4-14 (the PC's 10.5 s)
 prime WaterMelons IT2_Bra              # Zone03 -> IT2_Bra_sling
@@ -47,22 +50,11 @@ whenanim Mother MotherLookLoop         # (113-128) her look
 whenanim Mother MotherSleepSingle      # (128) her nap while he sits on the beach (126-171): the pool from the elephant's room
 usewith! DivingBoard IT2_Sunoil        # Zone04: the oil first
 usewith! DogBasket IT2_Bone            # Zone04: the bone after it — his lap-2 call (~181) pays bone, water and empty pool at once (60)
-park! Zone03                           # back out before she wakes (148)
-whenzone Zone04                        # (176) his lap-2 call: the shop is free until 193
-park! Zone02                           # elephant's room -> shop
-whenzone Zone01                        # (186) he is back on the beach until 193, then in the shop: she naps 184-203
-whenanim Mother MotherSleepSingle      # (already asleep: at once)
-park! Zone04                           # shop -> elephant's room (free until 213) -> pool, on her nap
-whenzone Zone02                        # (193) he enters the shop: the beach is free until 246
-park! Zone01                           # pool -> beach before her look (203)
-whenzone Zone04                        # (227) his pool put: the shop is free until ~318
-park! Zone02                           # beach -> shop
-usewith TurbanShop IT2_Oktopus         # Zone02: the last coin, at his lap-3 shop (~325)
-whenzone Zone01                        # (246) he is on the beach until 291: the elephant's room is free until ~333
-park! Zone03                           # shop -> elephant's room: the awaits from there (the octopus ends the level)
+park Zone03                            # (gated) the elephant's room while he shops (203-220): out of the pool room before her look
 await DogBasket 0
 await DivingBoard 0
 await TurbanShop 0
+usewith TurbanShop IT2_Oktopus         # (gated) once the hedgehog has paid (~217; the shop takes one trick at a time): the last coin, at his lap-3 shop (~330)
 await DeckChair 0
 await Pylon 0
 await Elephant 0

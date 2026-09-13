@@ -168,6 +168,25 @@ def s1_rage_percent(current, level_angrytime):
 S2_TICK_HZ = 12
 
 
+# The Season 2 neighbour's reaction to a trick, read from GameLogic.dll
+# (0x1000f9b5-0x1000fa9b): the record's `laugh` level picks a clip table and
+# a seeded random picks the clip — 0: shout2_light; 1: shout2 or shout2_hard;
+# 2: shout2_hard and two more of the shout2 set; 3 and above: freakout1,
+# freakout2 or freakout3 — the tables at 0x100df45c, 0x100df434, 0x100df450
+# and 0x100df43c. The clips' lengths are generic/anims.xml's frames at 12 a
+# second (shout2 26 = 2.2 s, shout2_hard 85 = 7.1, freakout1 37 = 3.1,
+# freakout2 38 = 3.2, freakout3 63 = 5.2); the mobile's tantrum is its own
+# AngryEasyUp + AngryHard clips (~7.6 s), paced to the PC clip under the
+# profile (World.play_angry).
+S2_REACTION_CLIPS = {0: [2.2], 1: [2.2, 7.1], 2: [7.1, 2.2, 2.2], 3: [3.1, 3.2, 5.2]}
+
+
+def s2_reaction_seconds(laugh, rng):
+    """the seconds of the PC neighbour's reaction clip for a trick of this laugh level"""
+    table = S2_REACTION_CLIPS[min(max(int(laugh), 0), 3)]
+    return table[rng.randrange(len(table))] if len(table) > 1 else table[0]
+
+
 def s2_rage_tick(meter, decay_per_tick):
     """one 1/12 s tick of the Season 2 gauge: the meter less the decay, not below zero"""
     return max(0.0, meter - decay_per_tick / 1000.0)

@@ -41,7 +41,7 @@ await Microwave 7
 await Ground@Zone03 7
 await MumPicture 7
 await PlantStink 13
-icon IT_Handy                     # MobileCall as soon as the cheese has paid: the ring waits out his loo (v2 — placed after the toilet it was answered 23 s after it, one second past the 22 s window)
 await Toilet 7                    # the rush (~138)
+icon IT_Handy                     # (v3) the ring once the loo has paid (~171): he answers on his way out (~187), 16 s into the loo's 22-s window, and the piano follows within the phone's 28 (rung before the loo he answered at 194, one second cold)
 await Phone 10
 await Piano 13

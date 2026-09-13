@@ -18,7 +18,9 @@ import re
 import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-VISITS = os.path.join(os.environ.get('NFH_SCRATCH', '/tmp/claude-1000/-home-akawolf-projects-own-NFH/ac3a80a3-83a6-48a6-96d4-81dc371f54eb/scratchpad'), 's2_idle_visits.json')
+SCRATCH = os.environ.get('NFH_SCRATCH', '/tmp/claude-1000/-home-akawolf-projects-own-NFH/ac3a80a3-83a6-48a6-96d4-81dc371f54eb/scratchpad')
+VISITS = os.path.join(SCRATCH, 's2_idle_visits.json')
+VISITS_S1 = os.path.join(SCRATCH, 's1_idle_visits.json')   # runs/idlepc4, the Season 1 idle laps
 # a PC bubble name -> the mobile uses it covers, in order
 ALIAS = {
     'Puddle/Rail': ['WaterPuddle', 'DeckRail'],
@@ -28,7 +30,17 @@ ALIAS = {
     'WaterSkis': ['WaterSkiis', 'WaterSkiis'],
     'DeckChair(mum)': ['DeckChair'],
 }
+# Season 1: the PC bubble names against the mobile's stations (the toilet, the
+# phone and the vacuum are PC stations the mobile's routine has not)
+ALIAS_S1 = {
+    'Sofa/TV': ['Sofa'], 'Cake+Candle': ['Candle', 'BirthdayCake', 'BirthdayCake'],
+    'Sink(shave)': ['SinkAftershave', 'SinkDeodrant'], 'Deodorant': ['Deodrant'],
+    'Coffee': ['CoffeeMaker'], 'DeckChair': ['Shezlong'], 'Pottery(Diesel)': ['DieselChair', 'DieselGenerator'],
+    'MumStatue': ['MumStatueFootStool'], 'Wine': ['SteakWine'],
+}
 PER_LEVEL = {
+    105: {'Plant': ['PlantStink']},
+    108: {'Plant': ['Plant']},
     213: {'MechanicalBull': ['MechanicalBullControls', 'MechanicalBullControlsWait', 'MechanicalBullControls']},
     212: {'AztecThrone': ['PreAztecThrone', 'AztecThrone'], 'ParrotLedge': ['PreParrotLedge', 'ParrotLedge']},
     # the PC does the Taj before the shoes (no first shoe visit): the Taj span
@@ -36,7 +48,8 @@ PER_LEVEL = {
     209: {'TadjMahal': ['TadjMahal'], 'HotShoe': ['HotShoe']},
     210: {'DogBasket#2': ['DogBasketPut']},
 }
-SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake'}   # other actors' icons, a walk-by without a use
+SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake',
+        'Toilet', 'Phone', 'Vacuum', 'Towel', 'Candy', 'MagnesiumBottle'}   # other actors' icons, a walk-by without a use; Season 1 stations the mobile routine has not or takes in a second
 # stations kept at the mobile pace per level: 214's lap is a neighbour-Mother
 # handshake timed as a whole (his pistol sequence fires mother_sleep, her sit
 # fires mother_sit and releases his WaitWatch at the second pistol,
@@ -45,6 +58,28 @@ SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake'}   # other actors' icons, a walk-b
 # is unread, so the whole lap stays the mobile's
 SKIP_LEVEL = {214: {'Shower', 'Bouquet', 'CaptainWheel', 'Pistol', 'Hatch'}}
 MIN_STAY = 0.5
+
+
+def _strip_key(patches, key):
+    """drop `key` from every patch's set; a patch left empty goes"""
+    out = []
+    for e in patches:
+        st = e.get('set')
+        if isinstance(st, dict) and key in st:
+            st = dict(st); del st[key]
+            if not st:
+                continue
+            e = dict(e); e['set'] = st
+        out.append(e)
+    return out
+
+
+def _set_key(patches, item, key, value):
+    """set `key` on the item's TrickItem patch, or add one"""
+    for e in patches:
+        if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
+            e['set'][key] = value; return
+    patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
 # visits of the port's lap the PC never makes (209's first shoe: the PC does the
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
@@ -54,8 +89,8 @@ def pc_spans(n):
     """the first PC lap's spans (name, start, end); a station whose first span is
     degenerate (the level's opening frame) takes its next occurrence"""
     doc = open(os.path.join(ROOT, 'docs', 'PC_LAPS_DETAIL.md')).read()
-    m = re.search(r'### n2_E%02d[^\n]*\n\nPC \(bubble[^\n]*: ([^\n]*)' % (n - 200), doc)
-    allspans = [(a, int(b), int(c)) for a, b, c in re.findall(r'([\w/()]+) (\d+)-(\d+)', m.group(1))] if m else []
+    m = re.search(r'### [^\n]*\(mobile Level%d\)[^\n]*\n\nPC \(bubble[^\n]*: ([^\n]*)' % n, doc)
+    allspans = [(a, int(b), int(c)) for a, b, c in re.findall(r'([\w/()+]+) (\d+)-(\d+)', m.group(1))] if m else []
     if not allspans:
         return []
     first = allspans[0][0]
@@ -74,7 +109,7 @@ def pc_spans(n):
 
 def port_lap(n):
     """one lap of the port's idle visits: from the first visit to the next of its item"""
-    vis = json.load(open(VISITS)).get(str(n), [])
+    vis = json.load(open(VISITS_S1 if n < 200 else VISITS)).get(str(n), [])
     if not vis:
         return []
     first = vis[0]['item']
@@ -87,7 +122,7 @@ def port_lap(n):
 def pair(n):
     spans = pc_spans(n)
     lap = port_lap(n)
-    alias = dict(ALIAS); alias.update(PER_LEVEL.get(n, {}))
+    alias = dict(ALIAS if n >= 200 else ALIAS_S1); alias.update(PER_LEVEL.get(n, {}))
     out = []      # (mobile item, visit index within the lap, stay, pc name, span, walk)
     li = 0
     seen = {}
@@ -130,7 +165,7 @@ def pair(n):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or list(range(202, 215))
+    levels = [int(a) for a in argv if a.isdigit()] or list(range(202, 215))   # or 101-114 with the Season 1 idle visits
     for n in levels:
         rows = pair(n)
         print('== %d' % n)
@@ -146,11 +181,11 @@ def main(argv):
         if write:      # (a level with nothing to carry loses its stale patches too)
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
-            ov['patches'] = [e for e in ov.get('patches', []) if 'PCUseSeconds' not in (e.get('set') or {})]
+            if n >= 200:
+                ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSeconds')
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
-                ov['patches'].append({'object': item, 'component': 'TrickItem',
-                                      'set': {'PCUseSeconds': vals if len(vals) > 1 else vals[0]}})
+                _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
             note = ' Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit.'
             if 'pc_durations_s2' not in ov['source']:
                 ov['source'] += note
