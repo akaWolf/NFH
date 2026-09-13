@@ -135,7 +135,25 @@ it; 0x45a1cf fires after a level event step), kit/laxativebeer (the fire after t
 `spit`), bal/fuelbeer (the fire after `pour_fuel` on the barbecue, 29 frames = 2.42 s, with the
 Switch to bal/barbecue_burn inside it and flags 3: no shout, no sync), bed/cactusclock (flags
 2, a bed/bed_sleep event step inside) and lir/sofa_fartbag (the index from a level helper):
-at these the pay follows the clip, unlike the soap slip. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
+at these the pay follows the clip, unlike the soap slip. The three engine-side steps of
+these sequences are read through GFXEngine.dll (its text listing
+~/nfh-bench/pcref/r2/nfh1_gfxengine_text.txt, made like the game.exe one; the events are
+0xc-byte objects whose slot 2 calls one slot of every registered listener's 111-slot table,
+default 0x1000ec10 = not handled; game.exe's own level listener, tables 0x4e07b8 / 0x4e1638,
+handles neither): the stop message fcn.0047b350 (vtable 0x4e5798, listener slot 26, payload
+0) reaches the GUI table 0x100a3740 as fcn.10011a10 → fcn.1000ffd0 → fcn.10014770 — the
+in-game GUI's byte +0x30 set, GetTickCount stored at +0x2c and the four face elements
+head_01..head_04 (globals 0x100cd704..0x100cd710) set to state 1 through fcn.100091f0 — while
+the scene and actor tables' slot-26 handlers (0x10022f90, 0x10005240, 0x10022370, 0x1001a0b0,
+0x10020470) act only on a payload of 1 with a subfield 0x1b and ignore this one; the soap
+slip's follow-up (vtable 0x4e1bdc → fcn.00438c80: the object looked up by name, its flag
+word +0x14 given bit 0x20 through fcn.0043c280, the 0xc-byte event 0x4e095c dispatched, and
+the object deleted when its bit 1 is set) reaches listener slot 65: table 0x100a2b90's
+fcn.1001bc00 → fcn.100207b0 plays sfx_na_slip_up1.wav, table 0x100a2b48's fcn.100054d0 only
+fills the event's out-slot with two fields; and the cactus clock's ready step (fcn.00468700,
+vtable 0x4e1bd0, run fcn.004792c0 — the string "SwitchObjectsJobCallback::Do: Old object not
+in world") is a SwitchObjects job on bed/bed_sleep. None of the three plays an animation on
+the neighbour or takes time: the face icons, a sound, an object swap. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
 and the towel 18.0 s before the album (no shout at either), the cold microwave (7 points:
 shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
 and every bonus trick is followed by the 7.67 s shout2_extra.

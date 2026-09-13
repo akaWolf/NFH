@@ -18,7 +18,7 @@ tracking his sprite (the PC view pans and he is often off-screen).
   port's recordings (`tests/run_tricks.py` state.jsonl: the neighbour's
   `using` items) — writes the detail file behind `docs/PC_LAPS_DETAIL.md`.
 
-Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
+The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, nfh2_gamelogic_text.txt and, since 2026-09-22, nfh1_gfxengine_text.txt: `r2 -q -e scr.color=0 -e asm.lines=false -e asm.comments=false -c 'aaa; pD 0x9dd3a @ 0x10001000' GFXEngine.dll`). Videos live outside the repo in `~/nfh-bench/pcref` (see its README.txt;
 `yt-dlp -4` from pcnew). Results: `docs/PC_LAPS.md`.
 - `laps_natural.py [--plans <dir>] [--idle <dir>] [level ...]`: the neighbour's
   natural lap (no trick fired) — writes 28 wait-only plans for the harness,
