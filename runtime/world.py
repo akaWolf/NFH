@@ -2195,6 +2195,8 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
+        self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
+        self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
         self.started = False             # ActionManager.CurrentAction != null
         self.on_use = None
@@ -3048,6 +3050,18 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         pc = self._pc_use_seconds(it)
+        if pcprofile.is_pc() and self.role == 'Rottweiler' and it is not None \
+                and getattr(it, 'pc_fire_at', None) is not None \
+                and it.is_tricked(self.level.items) and not it.pc_fired:
+            # the PC step fires this far into the tricked stand when its own
+            # clip or more actions follow the fire (PCFireAt: the tub's hair
+            # after the shower clip, the dirty microwave on arrival at 0 and
+            # the cooking after it — docs/PC_ROUTINES.md "The fire's tail")
+            if float(it.pc_fire_at) > 0.0:
+                self.pc_fire_at = float(it.pc_fire_at)
+                self.pc_fire_item = it
+            elif w is not None:
+                w.s1_fire(self.pawn, it)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -3617,6 +3631,15 @@ class Routine:
             k = it.pc_use_visit_role.get(self.role, 0)
             it.pc_use_visit_role[self.role] = k + 1
             return float(vals[k % len(vals)])
+        if getattr(it, 'pc_use_secs_tricked', None) is not None \
+                and it.is_tricked(self.level.items):
+            # the tricked stand's own seconds (PCUseSecondsTricked: game.exe
+            # runs kit/foambottle's make_foampudding, 38 frames, not
+            # kit/milkbottle's make_pudding — docs/PC_ROUTINES.md "The
+            # stands"); 0 = the PC plays nothing before the fire (104's dirty
+            # microwave fires on arrival and cooks after the clean): the
+            # mobile's tricked clip runs at its own pace, not the normal stay's
+            return float(it.pc_use_secs_tricked)
         if not getattr(it, 'pc_use_secs', None):
             return 0.0
         v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]
@@ -3630,6 +3653,7 @@ class Routine:
         541-553). The stop also removes spent actions (cs:415-427)."""
         self.pawn.anim.time_scale = 1.0
         self.pc_hold = 0.0
+        self.pc_fire_at = 0.0; self.pc_fire_item = None
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
@@ -3754,6 +3778,7 @@ class Routine:
         a = self.action
         self.pawn.anim.time_scale = 1.0
         self.pc_hold = 0.0
+        self.pc_fire_at = 0.0; self.pc_fire_item = None
         if a is None or a.get('move_only'):
             return
         it = self.item
@@ -3911,6 +3936,7 @@ class Routine:
         L110/L113 only."""
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
+        self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
@@ -4045,7 +4071,28 @@ class Routine:
                                               self.level.items)
                    if self.pawn.anim.has(x)]
             self.state = self.USING
+            # the PC stand of a rush's use (108's toothbrush on the coffee
+            # rush): the same pace and fire as a routine use (PCUseSeconds
+            # Tricked, PCFireAt — docs/PC_ROUTINES.md "The stands")
+            pc = self._pc_use_seconds(it) if pcprofile.is_pc() else 0.0
+            w = self.pawn.world
+            if pcprofile.is_pc() and self.role == 'Rottweiler' \
+                    and getattr(it, 'pc_fire_at', None) is not None \
+                    and it.is_tricked(self.level.items) and not it.pc_fired:
+                if float(it.pc_fire_at) > 0.0:
+                    self.pc_fire_at = float(it.pc_fire_at)
+                    self.pc_fire_item = it
+                elif w is not None:
+                    w.s1_fire(self.pawn, it)
+            if os.environ.get('NFH_ROUTINE_LOG'):
+                print('routine %s t=%.1f use sequence (rush) item=%s seq=%s pc=%s mobile=%.2f' % (
+                    self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
+                    self.pawn.anim.sequence_seconds(seq) if seq else 0.0), file=sys.stderr)
             if seq:
+                if pc:
+                    mobile = self.pawn.anim.sequence_seconds(seq)
+                    if mobile > 0.0:
+                        self.pawn.anim.time_scale = mobile / pc
                 self.pawn.anim.play_sequence(seq, on_end=self._alarm_use_done)
             else:
                 self._alarm_use_done()
@@ -4603,7 +4650,14 @@ class Routine:
         self.urgent_item = it
         self._urgent_handler = None
         self.pc_hold = 0.0                    # a held station yields to the surprise
+        self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pawn.anim.time_scale = 1.0
+        w = self.pawn.world
+        if pcprofile.is_pc() and w is not None and it.tricked \
+                and getattr(it, 'pc_fire_before', False) and not it.pc_fired:
+            # the soap and marbles slips: game.exe's five-argument step
+            # scores first and plays the fall inside it (PCFireBefore)
+            w.s1_fire(self.pawn, it)
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
         # arm (Rottweiler.cs:1049-1052)
         self._urgent_action = {'kind': 'surprise_near'}
@@ -4619,6 +4673,14 @@ class Routine:
         self.state = self.USING
         seq = [a for a in seq if self.pawn.anim.has(a)]
         if seq:
+            pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)) \
+                if pcprofile.is_pc() else None
+            if pc:
+                # the PC fall (slip1/slip3, 31 frames) or doubletake3 (15):
+                # the mobile clip at the pace that lasts it
+                mobile = self.pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0:
+                    self.pawn.anim.time_scale = mobile / pc
             self.pawn.anim.play_sequence(seq, on_end=self._surprise_near_done)
         else:
             self._surprise_near_done()
@@ -4626,6 +4688,7 @@ class Routine:
     def _surprise_near_done(self):
         """the drain reaches StopAction(canPostponeStop: true): a tricked
         item goes angry first (RoutineActionSurpriseNear.cs:47-57)"""
+        self.pawn.anim.time_scale = 1.0       # the paced fall or doubletake is over
         it = self.urgent_item
         if it is not None and it.tricked and self.pawn.world is not None:
             self.pawn.world.play_angry(self.pawn, it,
@@ -4904,10 +4967,23 @@ class Routine:
             # go straight to StartAction (ActionManager.cs:608-648)
             self._start_action(start_next=what in ('first', 'advance'))
             return
+        if self.state == self.USING and self.pc_fire_at > 0.0:
+            # the PC's five-argument step fires so many seconds into the
+            # tricked use, before the trick's own clip (PCFireAt,
+            # docs/PC_ROUTINES.md "The fire's tail"); the paced use makes
+            # the PC seconds wall seconds
+            self.pc_fire_at -= dt
+            if self.pc_fire_at <= 0.0:
+                self.pc_fire_at = 0.0
+                it, self.pc_fire_item = self.pc_fire_item, None
+                w = self.pawn.world
+                if it is not None and w is not None and not it.pc_fired:
+                    w.s1_fire(self.pawn, it)
         if self.state == self.USING and self.pc_hold > 0.0:
             self.pc_hold -= dt
             if self.pc_hold <= 0.0:
                 self.pc_hold = 0.0
+                self.pc_fire_at = 0.0; self.pc_fire_item = None
                 self._finish()            # the held empty sequence completes
             return
         if self.state == self.USING and self.timer > 0.0:
@@ -5541,6 +5617,42 @@ class World:
             overflow = True
         return overflow
 
+    def s1_fire(self, pawn, item):
+        """the PC's trick fire (game.exe fcn.0047bd00, docs/PC_ROUTINES.md "The
+        fire's tail"): the bonus test, the score, the rage and the face, and
+        the shout the step plays after the trick's own clip. play_angry calls
+        it when the step fires after the animation (an OBJ2 station, a
+        doubletake); the tricked use calls it earlier at PCFireAt (the
+        five-argument stations, whose clip follows the fire) and the near
+        surprise before the fall (PCFireBefore, the slips). The mobile's
+        OnTrickDone score rides the fire, so the completion count and the
+        level's end follow it too."""
+        points = self._would_pay(item)
+        bonus = points > 0 and pawn.rage_current > 0
+        if points > 0:
+            # the profile's payment record (the harness reads it for the chains)
+            self.pay_log.append((round(self.time, 2), item.name, points, bool(bonus)))
+        if bonus:
+            pawn.angry_count_ticks += 1
+            self._on_compound_trick_done(item)   # the mobile's arm (cs:608)
+            self._audience_laugh(pawn, 'big')
+        else:
+            self._audience_laugh(pawn, 'medium')
+        if points > 0:
+            self._hud_angry(3 if bonus else 2 if points > 10 else 1)
+            pawn.rage_current, pawn.rage_hold = pcprofile.s1_rage_fire(
+                pawn.rage_current, item.pc_angry_time or pawn.rage_max)
+            pawn.rage_bonus = bonus
+            pawn.angry_meter = float(
+                pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))
+        item.pc_shout_secs = pcprofile.s1_shout_seconds(
+            points, bonus, item.pc_shout_index, item.pc_shout_skip)
+        if not item.dont_get_angry:
+            self._on_trick_done(item)              # cs:785-787, at the PC's fire
+        if self.level_script is not None:
+            self.level_script.on_trick_done()      # cs:789-792
+        item.pc_fired = True
+
     def play_angry(self, pawn, item, on_done=None):
         """Rottweiler.PlayAngryAnimation (Rottweiler.cs:552-797), the
         GameMode.Classic branch, with the name-hack heads, the extra-angry
@@ -5586,42 +5698,31 @@ class World:
                 p.play_directly(item.item_anim_when_angry)   # Item.cs:2654-2660
         seq = []
         nfh2 = self.woody is not None and self.woody.nfh2
-        if self.game is not None and not nfh2 and pcprofile.is_pc() \
-                and pawn.rage_max > 0:
-            # the PC's trick handler (game.exe fcn.0047bd00, docs/PC_ROUTINES.md
-            # "The anger and the bonus"): a trick that pays nothing changes
-            # nothing; otherwise the bonus is paid iff the rage current is
-            # above zero (fcn.004357e0), the current is raised to the trick's
-            # angrytime — the level's for a trick without one — and held 60
-            # ticks (fcn.00438b90), and the face bubble is 4 on a bonus, 3
-            # for more than 10 points, 2 otherwise (fcn.00438550) — the HUD's
-            # three angry faces in that order. The neighbour has one tantrum
-            # either way (his meter holds full 7.0-8.9 s on every angry of
-            # Badinfos' runs, first ones included — tools/pcref/thermo.py),
-            # where the mobile's levels (cs:597-607) play AngryEasyUp alone
-            # on an empty meter and AngryEasyDown before AngryHard on a hot one
-            points = self._would_pay(item)
-            bonus = points > 0 and pawn.rage_current > 0
-            if points > 0:
-                # the profile's payment record (the harness reads it for the chains)
-                self.pay_log.append((round(self.time, 2), item.name, points, bool(bonus)))
-            if bonus:
-                pawn.angry_count_ticks += 1
-                self._on_compound_trick_done(item)   # the mobile's arm (cs:608)
-                self._audience_laugh(pawn, 'big')
-                seq = [a for a in (item.angry_easy_down, item.angry_hard) if a]
-            else:
-                self._audience_laugh(pawn, 'medium')
-                if item.angry_easy_up:
-                    seq = [item.angry_easy_up]
-            if points > 0:
-                self._hud_angry(3 if bonus else 2 if points > 10 else 1)
-                pawn.rage_current, pawn.rage_hold = pcprofile.s1_rage_fire(
-                    pawn.rage_current, item.pc_angry_time or pawn.rage_max)
-                pawn.rage_bonus = bonus
-                pawn.angry_meter = float(
-                    pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))
-            if item.angry_hard:
+        pc_s1 = self.game is not None and not nfh2 and pcprofile.is_pc() \
+            and pawn.rage_max > 0
+        fired_early = False
+        pc_shout = 0.0
+        if pc_s1:
+            # the PC's trick step (game.exe fcn.0047bd00, docs/PC_ROUTINES.md
+            # "The anger and the bonus" and "The fire's tail"): the fire —
+            # s1_fire: the bonus iff the rage current is above zero, the
+            # score, the current raised to the trick's angrytime and held
+            # 60 ticks, the face — then one shout, shout2_extra on a bonus
+            # and a short one by the points otherwise, none on a flag-2
+            # step, then the repair. The fire has already happened when the
+            # PC's step scores before the trick's own clip (PCFireAt,
+            # PCFireBefore); the mobile's AngryHard plays at the pace that
+            # lasts the PC shout, the fix clips at the pace of the PC's
+            # repair or clean action (PCFixSeconds), where the mobile's
+            # levels (cs:597-607) play AngryEasyUp alone on an empty meter
+            # and AngryEasyDown before AngryHard on a hot one
+            fired_early = bool(getattr(item, 'pc_fired', False))
+            if not fired_early:
+                self.s1_fire(pawn, item)
+            pc_shout = item.pc_shout_secs or 0.0
+            item.pc_fired = False
+            item.pc_shout_secs = None
+            if item.angry_hard and pc_shout > 0.0:
                 seq = [item.angry_hard]
         elif self.game is not None and not nfh2:   # Classic (cs:595-612)
             if pawn.angry_meter <= 0.0:
@@ -5764,22 +5865,60 @@ class World:
         else:
             seq = list(item.rott_extra_angry) + seq
         # the fix animation rides at the tail of the same sequence (cs:767-777)
+        fix_seq = []
         if item.can_fix:
             if item.use_fix_sequence:
-                seq.extend(item.fix_sequence)
+                fix_seq = list(item.fix_sequence)
             elif not item.fix_without_animations and item.fix_animation:
-                seq.append(item.fix_animation)
+                fix_seq = [item.fix_animation]
+        if not pc_s1:
+            seq.extend(fix_seq)
         if item.fix_directly:                      # cs:781-784
             self._fix(item)
-        if not item.dont_get_angry:
-            self._on_trick_done(item)              # cs:785-787
-        if self.level_script is not None:
-            self.level_script.on_trick_done()      # cs:789-792
+        if not fired_early and not pc_s1:
+            if not item.dont_get_angry:
+                self._on_trick_done(item)          # cs:785-787
+            if self.level_script is not None:
+                self.level_script.on_trick_done()  # cs:789-792
         if not nfh2:
             # the meter stops decaying through the angry set — Classic only
             # (`!Woody.NFH2Path`, cs:793-796; Season 2 keeps decaying)
             pawn.can_decrease_angry = False
         seq = [a for a in seq if pawn.anim.has(a)]
+        if pc_s1:
+            # the PC order: the shout (paced), then the repair (paced to the
+            # PC action, none when the PC object has none) — two sequences
+            fixes = [a for a in fix_seq if pawn.anim.has(a)]
+            fix_secs = item.pc_fix_secs
+            if fix_secs is not None and fix_secs <= 0.0:
+                fixes = []
+
+            def play_fixes():
+                pawn.anim.time_scale = 1.0
+                if fixes:
+                    if fix_secs:
+                        mobile = pawn.anim.sequence_seconds(fixes)
+                        if mobile > 0.0:
+                            pawn.anim.time_scale = mobile / fix_secs
+                    pawn.anim.play_sequence(fixes, on_end=after_run)
+                else:
+                    if not seq and pawn.anim.seq_end_hook is not None:
+                        # nothing to play at all (a flag-3 step with no repair:
+                        # 112's skates) — the angry sequence still ends for the
+                        # behaviours (Rottweiler.OnAnimationSequenceEnded's
+                        # BehaviorOnAnimationSequenceEnded, cs:448: the
+                        # RollerSkater's SHOUT state waits for it)
+                        pawn.anim.seq_end_hook()
+                    after_run(bool(seq))
+
+            if seq:
+                mobile = pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0 and pc_shout > 0.0:
+                    pawn.anim.time_scale = mobile / pc_shout
+                pawn.anim.play_sequence(seq, on_end=play_fixes)
+            else:
+                play_fixes()
+            return
         if seq:
             if nfh2 and pcprofile.is_pc() and getattr(item, 'pc_laugh', None) is not None:
                 # the PC neighbour's reaction to a trick is one short clip

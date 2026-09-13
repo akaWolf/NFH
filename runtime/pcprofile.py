@@ -137,6 +137,43 @@ S1_TICK_HZ = 12
 S1_RAGE_HOLD_TICKS = 60
 
 
+# The Season 1 shout after a trick, read from game.exe (fcn.0047bd00,
+# docs/PC_ROUTINES.md "The fire's tail"): the fire scores, then plays one
+# clip on the neighbour — shout2_extra when the trick was a bonus (the rage
+# current above zero as it fired), else by the points and the step's index:
+# 5 or fewer shout0_light or shout2, 10 or fewer shout0_medium or shout2,
+# more shout0 or shout2, the second of each pair at index 1 (the tables at
+# 0x51b584, 0x51b590, 0x51b598, 0x51b5a0); a step carrying flag 2 plays
+# none (the tub's hair, the dirty towel, the bath candy, the fuel beer …).
+# The lengths are generic/anims.xml's frames at 12 a second. The mobile's
+# AngryHard plays at the pace that lasts the PC clip (World.play_angry);
+# the profile carries the index and the flag per item as PCShoutIndex and
+# PCShoutSkip (tools/pcref/pc_reactions.py from tools/pcref/fire_sites.py).
+S1_SHOUT_FRAMES = {'shout2_extra': 92, 'shout0_light': 25, 'shout0_medium': 45,
+                   'shout0': 26, 'shout2': 26}
+
+
+def s1_shout_clip(points, bonus, index=0, skip=False):
+    """the PC clip name the fire plays, or None"""
+    if skip or points <= 0:
+        return None
+    if bonus:
+        return 'shout2_extra'
+    if index:
+        return 'shout2'
+    if points <= 5:
+        return 'shout0_light'
+    if points <= 10:
+        return 'shout0_medium'
+    return 'shout0'
+
+
+def s1_shout_seconds(points, bonus, index=0, skip=False):
+    """the PC shout's seconds after a trick, 0 when the step plays none"""
+    clip = s1_shout_clip(points, bonus, index, skip)
+    return S1_SHOUT_FRAMES[clip] / float(S1_TICK_HZ) if clip else 0.0
+
+
 def s1_rage_fire(current, amount):
     """the trick handler's rage part: the new (current, hold)"""
     return max(current, amount), S1_RAGE_HOLD_TICKS

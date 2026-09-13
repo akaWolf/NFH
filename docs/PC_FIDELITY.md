@@ -796,34 +796,69 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   overflows rest on: with the same coins, decay and lap the port's 7.6-s
   tantrums spread six coins ~25 s further apart than the PC's reactions,
   a tenth of the gauge in decay — 204, 211 and 213 sat at 90 for it.
-- *Season 1 reactions (read 2026-09-22, not carried).* game.exe's trick
-  step (docs/PC_ROUTINES.md, "The fire's tail") pays after the tricked
-  object's OWN action (kit/foambottle's make_foampudding 3.17 s,
-  lir/stickybook's read_stickybook 3.92 — where the profile stretches the
-  mobile's tricked clip to the NORMAL station's stay, 8.0 and 9.42 s), or
-  after the doubletake for a walk-by, or BEFORE its own clip at the
-  five-argument sites (the soap slip: the fire, then slip1 2.58 s; the tub's
-  hair after the 2.83 s shower clip, the dirty towel), then plays a shout
-  whose length hangs on the bonus — shout2_extra 7.67 s after a bonus
-  trick, 2.08–3.75 s after a cold one (shout2 2.17 at the index-1 sites)
-  and none where the step carries flag 2 (the tub's hair, the dirty towel and
-  the bath candy at flags 3, 110's fuel beer, the laxative beer, the coffee
-  soil, the broken sofa, the cactus clock) — where
-  the profile plays AngryHard, 6.8 s, after every trick; and the repair is
-  the tricked object's `repair`/`clean` action (the picture 2.0 s, the
-  microwave and the soap 1.9, the loo 3.9, the foam pudding 1.9) where the
-  profile plays the mobile's fix clips (MumPictureClean ×3 3.4 s, FixMid
-  1.4). The port's cold links on 106 and 110 are these numbers: microwave
-  to pudding 18.7 s (the PC 15.0 — a 3.75 s shout and a 3.17 s pour against
-  6.8 and 8.0), picture to soap 21.0 (17.5 — the 3.4 s clean and the pay
-  after SlipRight's 3.3 s against 2.0 and the pay before slip1), fire to
-  extinguisher 23.2 (14.9 — the fuel beer's step carries flags 3, no shout
-  at all, against the port's 6.8 s AngryHard, plus the two door passes). Carrying them — the shout paced to the PC clip
-  by bonus, points and index, the fix to the PC action, the tricked clip to
-  the tricked action, the five-argument pay before the clip — puts 106 and
-  110 at 100 by the port's walks on paper; the mobile profile keeps its own.
-  Read in the code site by site (tools/pcref/fire_sites.py); the carry is
-  proposed, unconfirmed.
+- *Season 1 reactions (read 2026-09-22, carried the same day).* game.exe's
+  trick step (docs/PC_ROUTINES.md, "The fire's tail" and "The stands")
+  pays after the tricked object's OWN action (kit/foambottle's
+  make_foampudding 3.17 s, lir/stickybook's read_stickybook 3.92 — where the
+  port stretched the mobile's tricked clip to the NORMAL station's stay,
+  8.0 and 9.42 s), after the doubletake for a walk-by, or BEFORE its own
+  clip at the five-argument sites (the soap slip: the fire, then slip1
+  2.58 s; the tub's hair after the 2.83 s shower clip, the dirty towel), then
+  plays a shout whose length hangs on the bonus — shout2_extra 7.67 s after
+  a bonus trick, 2.08–3.75 s after a cold one (shout2 2.17 at the index-1
+  sites) and none where the step carries flag 2 (the tub's hair, the dirty
+  towel and the bath candy at flags 3, 110's fuel beer, the laxative beer,
+  the coffee soil, the broken sofa, the cactus clock) — where the port
+  played AngryHard, 6.8 s, after every trick; and the repair is the tricked
+  object's `repair`/`clean` action (the picture 2.0 s, the microwave and the
+  soap 1.9, the loo 3.9, the foam pudding 1.9) where the port played the
+  mobile's fix clips (MumPictureClean ×3 3.4 s, FixMid 1.4). The port's cold
+  links on 106 and 110 were these numbers: microwave to pudding 18.7 s (the
+  PC 15.0 — a 3.75 s shout and a 3.17 s pour against 6.8 and 8.0), picture
+  to soap 21.0 (17.5 — the 3.4 s clean and the pay after SlipRight's 3.3 s
+  against 2.0 and the pay before slip1), fire to extinguisher 23.2 (14.9 —
+  the fuel beer's step carries flags 3, no shout at all, against the port's
+  6.8 s AngryHard, plus the two door passes). The profile carries them on
+  every Season 1 level: `World.s1_fire` is the step's fire (the bonus test,
+  the score, the rage, the face, the shout's choice), called by
+  `play_angry` after the tricked stand (an OBJ2 station, a doubletake), by
+  the routine's use PCFireAt seconds into it (the five-argument stations,
+  the stands with actions after the fire — 0 = on arrival, the dirty
+  microwave of 104 before its 16.4 s of cooking) and by the near surprise
+  before the fall (PCFireBefore: the slips, the electric trap) — a rush's
+  use (108's toothbrush on the coffee rush, an AlarmAction) fires and paces
+  the same way; where the step plays nothing at all (a flag-3 step with
+  no repair: 112's skates) the angry sequence still ends for the behaviours
+  (Rottweiler.cs:448 — the RollerSkater's SHOUT state waits for it), and the
+  skates fire as the PC's site does, after the fall out of the window and
+  before the way back in (RollerSkaterBehavior's comeback); the mobile's
+  tricked clips play at the pace that lasts the PC stand
+  (PCUseSecondsTricked: the actions before the fire, the step's own clip,
+  the actions after it — less the normal use the mobile redoes after the
+  fix at a ReuseAfterFix item), AngryHard at the pace of the PC shout (none at
+  flags 2), the fix clips at the pace of the PC repair or clean
+  (PCFixSeconds, dropped at 0), the doubletake, the fall and the shock at
+  theirs (PCSurpriseSeconds, PCSlipSeconds). The stands come out of the
+  level classes' case chains simulated with the trick in place
+  (tools/pcref/trick_branches.py, the keys through tools/pcref/
+  pc_reactions.py, the shout index and flags through tools/pcref/
+  fire_sites.py); the pairings and the stands two tricks share (104's basin,
+  107's stool on the potter's wheel, 114's hat and medal box) are by hand in
+  pc_reactions.py's TABLE. With the carry 106 and 110 rate 100 in the PC's
+  own chain order (runs pcreact1: 106's gaps 11.7/19.1/17.2/13.6/6.3/17.2/
+  10.8/10.1 s, all hot; 110's 16.5/16.3/17.4/24.0/16.3), and the other
+  plans re-timed to the PC stands (runs pcreactS1c and pcfix5): 104, 105,
+  108, 109 and 112 rate 100 as well — 105 with the piano opening its chain
+  (the phone answered 26 s after the loo under the PC's loo stand, so it
+  rings after the kick instead), 108 with the toothbrush firing 1.9 s into
+  the coffee rush's use, 109 with the tabasco going in as the PC's 1.6-s
+  pins jump lets him lie down again, 112 with the skates firing at the
+  fall. 103 and 114 stay 97 by their laps — 103's kitchen three would have
+  to be armed inside one of his 9-s mail visits (the back door alone is
+  8 s from the fridge) and 114's polish pays only at the study cup, 42 s
+  after the horn and 30 before the pipe — and 111 70 by the room-pointer
+  catch; the mobile profile keeps its own clips and order (the 54-plan
+  regression is byte-identical to regmob4).
 - *Season 2 station durations.* The PC videos' HUD bubble (docs/
   PC_LAPS_DETAIL.md, the first lap of each episode) gives the neighbour's
   stay at each station once the walk to it is taken off (the icon shows

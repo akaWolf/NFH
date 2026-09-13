@@ -158,6 +158,58 @@ and the towel 18.0 s before the album (no shout at either), the cold microwave (
 shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
 and every bonus trick is followed by the 7.67 s shout2_extra.
 
+**The stands, read per level (2026-09-22).** What surrounds each fire in the level
+classes comes out of tools/pcref/trick_branches.py: the class's `run` is a switch of
+cases each ending in a yield (routine_order.py's walker), and a case posts its steps
+in one go — the DoActions, the fire, the repair — so the tricked STAND is the case
+chain simulated with the trick in place, cut at the walks (GoTo, the walk-and-enter
+helper fcn.00479e30 whose arrival plays the object's `enter`) and the bubbles: a
+variant test (fcn.0047a130 IsVariant(normal, variant), fcn.00413780 IsTricked, the
+OBJ3 test fcn.00479ff0) answers true for the trick in place or for an object a
+Switch has put into the world, false once the Switch or the repair helper took it
+out; a test kept in a class byte (`mov byte [edi+0x18], al` at 103's candle box,
+[esi+0x1c] at 102's beer, [edi+0x14]/[edi+0x15] at 104's basin) steers the later
+case that reads it; a helper asking the world after an object (the bath's
+fcn.0046bc90 looking up toi/tub_empty) answers true once a Switch took it out — the
+level fills the tub on the first lap and bathes on the next; the class's own helpers
+(the bath's station handlers fcn.0046ba20/0046bd50/0046c0a0) are entered one level
+deep. The stands that come out: a station's own action then the fire (the album's
+read_stickybook 3.92 s, the pudding's make_foampudding 3.17 then its `repair` 1.92,
+the candy's eat_bathcandy 0.83, the fire, the spit 1.58; 110's extinguisher —
+extinguish_explo 3.0, repair_extinguisher 1.42, extinguish 3.25, the fire, the
+barbecue's `repair` 1.92; the chair's enter 0.92 and cry 1.5, the fire, the table's
+repair 0.92, the enter and the 4.25 s eat; 111's washing machine give+wash+
+get_clothes 9.83; 112's sawed barbell 6.83; 113's cut ladder — the 1.42 s climb, the fire, the repair, then the normal enter, drill, touch and
+climb down 5.0; 114's hat —
+takehat and riphat 7.92, the fire, the give); the dirty microwave of 104 fires on
+arrival (PCFireAt 0 with an empty tricked stand: the mobile's clip runs at its own pace, the
+fire at its start), cleans 1.92 and cooks the pie 16.4 s after; the five-argument stands fire
+before their clip (the tub: the 2.83 s shower enter, the fire, show_hair 4.58; the
+towel: take_towel 0.25 and dry 1.58, the fire, show_black 3.08, take_towel; the
+toothbrush: take3 and brush_black_teeth 1.92, the fire, show_black_teeth 4.67,
+brush_teeth and take3 3.58; the coffee: make_coffee and drink_soil_coffee 6.17, the
+fire, the spit; the spray: growspray and the plant's grow 4.0, the fire, the fight
+2.58; the vacuum: take and vacuum_hole 3.25, the fire, vacuum_explode 2.58, the
+carpet's repair, vacuum2 and the give); the four-argument ones after their ready
+clip (the fuel beer after pour_fuel 2.42, the laxative beer after the sofa's enter,
+surprise, leave and the spit 3.17, the cactus clock after ring, hit_cactus and the
+bed's leave 4.08, the fart bag after the sofa's enter, surprise and leave 4.5). Two
+tricks can share a stand — 104's basin (shave_glue then grease_hair, or shave then
+grow_hair), 107's stool on the potter's wheel (the seat, the cry, the hurt and the
+stool's repair, then the wheel's potting), 114's hat and medal box (the box's take,
+takehat, then the rat's dance or wearmedals, then riphat or putbackhat, the give) —
+and the mobile's separate items each take their own part (tools/pcref/
+pc_reactions.py's TABLE). Where the mobile uses the item again after the fix (ReuseAfterFix:
+102's sofa, 104's microwave, 105's piano, 108's deck chair and toothbrush, 109's bed,
+110's chair, 113's ladder — Rottweiler.cs:707-714) the PC's actions after the fire are that
+normal use — the chair's enter and eat, the ladder's climb, drill, touch and climb down, the
+microwave's cooking — and the mobile's redo plays them at the pace of PCUseSeconds, so
+they stay out of the tricked stand's seconds. 112's skate (0x4632f5, flags 3) is its own kind: the window's `fallout`
+2.92 s, the fire, a wait, the walk back in — no shout, no repair (the profile fires it at the
+RollerSkater behaviour's comeback, before the mobile's run back and breath). The PC-only sites (102's toilet paper, 107's smeared
+picture, 114's plugged gun) and the mobile-only tricks (110's beer bottle, 113's
+ladder drill and radiator, 114's gold cup) have no pairing.
+
 Two more facts of the same state: no Season 1 trick carries a `quota2`-`quota4` in
 tricks.xml (every trick pays once, as the mobile's OnTrickDone does), and the level's end is
 the state machine of fcn.00436bb0 (docs/PC_VERIFICATION.md, "The level's end"): 5 = success

@@ -236,7 +236,9 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role', 'sprite',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_slip_secs', 'pc_surprise_secs', 'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -587,6 +589,28 @@ class Item:
         self.pc_use_secs_role = {r: [float(x) for x in (w if isinstance(w, list) else [w])]
                                  for r, w in vr.items() if w}
         self.pc_use_visit_role = {}
+        # the Season 1 trick step's own data under the profile (levels/pc
+        # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
+        # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and
+        # flag-2 skip, the repair/clean action's seconds (0 = the PC plays
+        # none), the TRICKED action's seconds for a station (the tricked
+        # object's own action, not the normal stay), the second of the
+        # tricked use at which the PC fires (a five-argument step whose
+        # clip follows the fire), the fire before the fall for a slip and
+        # the PC lengths of the fall (slip1/slip3) and the doubletake
+        def _f(k):
+            v = d.get(k)
+            return float(v) if v is not None else None
+        self.pc_shout_index = int(d.get('PCShoutIndex') or 0)
+        self.pc_shout_skip = bool(d.get('PCShoutSkip'))
+        self.pc_fix_secs = _f('PCFixSeconds')
+        self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
+        self.pc_fire_at = _f('PCFireAt')
+        self.pc_fire_before = bool(d.get('PCFireBefore'))
+        self.pc_slip_secs = _f('PCSlipSeconds')
+        self.pc_surprise_secs = _f('PCSurpriseSeconds')
+        self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
+        self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))

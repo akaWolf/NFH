@@ -14,6 +14,7 @@ Pawns by the owning component's pid, Zones via Level.zone_by_component.
 """
 
 import os
+import pcprofile
 from scene import GUI_DEPTH
 
 NONE = ('NONE', None)
@@ -567,6 +568,13 @@ class RollerSkaterBehavior(Behavior):
         rott = self.rott()
         if rott is None:
             return
+        if pcprofile.is_pc() and self.roller_skater is not None \
+                and self.roller_skater.tricked and not self.roller_skater.pc_fired:
+            # game.exe's skate site (0x4632f5): the fall out of the window
+            # (kit/window.fallout, 2.92 s), then the step's fire, then the
+            # wait and the walk back in — the shout state's play_angry below
+            # finds the trick fired (docs/PC_ROUTINES.md "The stands")
+            self.world.s1_fire(rott, self.roller_skater)
         rott.sprite.hidden = False
         rott.movement_paused = False                  # ContinueMovement
         rott.sprite.x, rott.sprite.y = self.entrance_location
