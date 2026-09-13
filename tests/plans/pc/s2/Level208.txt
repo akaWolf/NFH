@@ -4,6 +4,10 @@
 # after 157, the tap on a walk-by — all on lap 3 (178-233, peak 96) — and
 # the rake with Fifi LAST: Fifi sends him to the Mother (MotherRott, 20)
 # over the rake (20) while the meter is still up.
+# The rat's game (the PC's altar/rat) is taken during his lap-2 shoe and elephant
+# stand (104-136), before the bowl brings him to Zone04 (141): after the shoe, as
+# the mobile plan has it, the 7.75 s game left the elephant's round to his lap-3
+# walk to the shoe machine (Zone01, from 186) and the SafetyLine re-locked.
 take Balloons IT2_Balloon              # Zone05
 take Spade IT2_Shovel                  # Zone05
 take BoardNail IT2_Blades              # Zone02 (the Mother's zone; her sleep window)
@@ -13,8 +17,8 @@ whenusing IndianPlatform             # his lap-2 platform (80 s)
 usewith IndianMagician IT2_Balloon     # Zone03: ActivateItemTrick -> IndianPlatform.Tricked (TrickItem.cs:323-327)
 usewith SeeSaw IT2_Shovel              # Zone03: LinkedItemTrick of IndianPlatform
 whenusing ShoeMachine                # his lap-2 shoe machine (128 s)
+take Mouse IT2_Rat                     # Zone04 while he shoes and stands at the elephant (Zone01, 104-136): the PC's game (altar/rat's use, time 360: 7.75 s, PCMinigameTicks), then the take — dexterity search (unlocker IT_NONE, TakeItemCount 20)
 usewith ShoeMachine IT2_Blades         # Zone01
-take Mouse IT2_Rat                     # Zone04, dexterity search (unlocker IT_NONE, TakeItemCount 20): the minigame, then the take
 prime AngryElephant IT2_Rat            # Zone01: the DoublePrimingItem arm (Item.cs:1573-1589) primes the elephant, eats the rat, unlocks+primes SafetyLine (ObjectToPrimeWhenPrimed+UnlockObjectToPrime, Item.WoodyPrime)
 usewith SafetyLine IT2_Chalk_sponge    # Zone01, same visit: ActivateItemTrick -> AngryElephant.Tricked (TrickItem.cs:323-327)
 take Mouse IT2_Rat                     # a second rat: AddInventoryToObject(InventoryToAdd=Mouse) refilled it after the elephant round (Item.cs:1582)
