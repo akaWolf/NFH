@@ -1,78 +1,53 @@
-# Level111 under the PC profile: the PC data (level_laundry/tricks.xml)
-# pays vacuum_hole 13, clothes_food 12 and electrotrap 7 where the mobile
-# pays 15, 13 and 11 — 79 for the eight, so the 100 takes every one of the
-# seven ticks: all eight tricks in one lap of his (Badinfos' E11: 156, 180,
-# 196, 222, 249, 279, 301, 322 — gaps of 16-30 s, each inside the 8 s hold
-# plus the 23.6 s meter). His lap (~120 s): Detergent (Z03, 11-16) ->
-# Z01 -> Z09 (26-42: WM x3, Drier x3) -> Z01 (47) -> Z02 (55) -> Iron (Z06,
-# 59-63) -> Airer (Z07, 68-71) -> FishTank (Z08, 83-88) -> Airer (99-102)
-# -> Iron (106-120) -> loop. The mobile plan's arming order is kept (its
-# comments explain the carpet and the vacuum); what moves is everything
-# that pays: on PC the dirty carpet is a room trigger (level_laundry/
-# trigger.xml: position="room" type="always") — the neighbour goes for the
-# vacuum the moment he enters the living room, where the mobile's
-# OnChangeZone skips the carpet and only the dog's yell sends him
-# (Rottweiler.cs:188, 485-510); the profile restores the room trigger. The
-# iron pays at his first ironing after Woody's use (the overlay starts it
-# hot, the PC's phase); the airer at his [10] once armed after his [8]. So
-# the whole lap 3 is: the basement three on his visit (268-303), the
-# carpet on his Z02 entry -> the glued vacuum (~335), the iron at his [7]
-# (~358), the marbles on the balcony as he goes to the airer [8] (~372),
-# the tank at his [9] (~398), the airer at his [10] (~421) — Badinfos'
-# order on E11 (trap 158, washer 180, drier 196, vacuum 222, marbles 249,
-# tank 279, board 302, airer 322), every gap inside the window.
-# -- lap 1: he walks Z06 -> Z02 -> Z03 (Detergent, t~15) -> Z01 -> Z09 ------
-# -- lap 2, he is in the kitchen/basement: the study (the knife) -----------
-# -- lap 2, he is upstairs: the basement three (the marbles wait) ----------
-# -- lap 3, he is in the basement (the three pay there): the tour ----------
-# -- the balcony after his [8] prime, armed while he is at the tank --------
-# v14 (2026-09-17, the PC door pass and station durations): his lap is 117 s —
-# downstairs 0-58 (bedroom 0-5, living 5-10, kitchen 11-20, hall 20-26,
-# basement 26-44, hall 44-52, living 53-58) and upstairs 58-127 (bedroom,
-# balcony 77-84, bedroom, study 93-101, bedroom, balcony 110-117, bedroom) —
-# the washing machine's mobile cycles stretch lap 2 to ~200 s. Under the PC
-# catch a walk through his room is a catch and the study and the balcony are
-# reached only through the bedroom, so the upstairs is Woody's while he is
-# down (127-175) and never while he is up: the airer (12) has no window — its
-# prime is his own balcony use and the next one comes with him through the
-# bedroom — and is dropped; the marbles, the shovel and the fish tank go on his
-# second lap's descent, the carpet and the vacuum on his third. Seven tricks'
-# 67 of the PC's 79.
-take Drawer IT_Marbles               # Zone01 (~4): he is upstairs, then in the living room (5-10)
-whenzone Zone03                      # (10.7) he is in the kitchen: up through the living room (tiptoe: the dog) to the balcony
-take! TableShovel IT_Shovel          # Zone07 (~33)
-usewith! GroundMarbles@Zone07 IT_Marbles   # Zone07: his walk from the iron [7] to the airer [8] (77)
-prime! PlantSoil IT_Shovel           # Zone02 (~47): the held type becomes IT_Soil
-park! Zone03                         # (~50) the kitchen before he sits in the living room (52.6-57.8)
-take! Detergent IT_Detergent         # Zone03
-take! RubbishBinCable IT_Cable       # Zone03
-whenzone Zone06                      # (58) he is upstairs until 127: the hall and the basement
-take! BasementDrawer IT_Tongs        # Zone09
-usewith! Drier IT_Tongs              # RequireUnprime trio: pays at his use visit (~156)
-take! WineCellar IT_Winebottle
+# Level111 under the PC profile (v17, 2026-09-23): Badinfos' E11 chain in one lap of
+# his — the trap on the basement walk-in, the washer, the drier, the glued vacuum on
+# his living-room entry (the carpet's room trigger), the bedroom marbles on his walk
+# from the board to the balcony, the burnt board as he passes it, the fish tank, the
+# airer — the PC data's 79 points and all seven ticks (run 2026-09-23: 261.4, 283.0,
+# 297.7, 324.4, 349.5, 375.7, 397.4, 421.7; every gap 14.7-26.7 s, Badinfos' 16-29).
+# The board burns only between his first ironing of the lap (the give) and his second
+# (Level_Laundry's cases 8 and 16), the airer's bird food only between his two rack
+# visits: the bed hides Woody while he crosses the bedroom, the board goes in while
+# he is on the balcony, the bird food while he is at the tank. The rest is armed over
+# two laps: the shovel on his first kitchen, the paperknife on his second, the
+# machines and the trap while he is upstairs, the carpet, the vacuum, the tank and
+# the bedroom marbles on his third descent.
+take Drawer IT_Marbles               # Z01 (~5): he is in the bedroom, then the living room
+whenzone Zone03                      # (10.7) his kitchen: up through the living room (tiptoe: the dog)
+take! TableShovel IT_Shovel          # Z07
+park! Zone03                         # down to the kitchen (the side door) before he comes up (52.5)
+take! Detergent IT_Detergent         # Z03
+take! RubbishBinCable IT_Cable       # Z03
+whenzone Zone06                      # (57.8) he is upstairs until 116
+take! BasementDrawer IT_Tongs        # Z09
+take! WineCellar IT_Winebottle       # Z09
+take! Perch IT_Birdfood              # Z02
+prime! PlantSoil IT_Shovel           # Z02: the held type becomes IT_Soil
+park! Zone04                         # the bathroom, off his lap, while he comes down (116-122)
+whenzone Zone03                      # (122.3) his lap-2 kitchen: up to the study
+take! DeskDrawer IT_Paperknife       # Z08
+park! Zone03                         # down to the kitchen before he comes up (159.7)
+whenzone Zone06                      # (165) he is upstairs until 226: the basement three for his lap 3
+usewith! Drier IT_Tongs              # pays at his lap-3 drier
 usewith! WashingMachine IT_Winebottle
-usewith! ElectricTrap IT_Cable       # NoticeWhenWalkNearby, 7 on PC
-hide! Wardrobe                       # Zone01 by ~100: he crosses the hall 142-148 and 162-170
-whenzone Zone03                      # (~133) his second kitchen: the iron and the knife through the living room and the bedroom
-use! Iron                            # Zone06: hot since his [11] (the overlay's phase); pays at his next ironing
-take! DeskDrawer IT_Paperknife       # Zone08
-park! Zone03                         # (~167) the kitchen, off his way while he crosses the hall and sits (162-175)
-whenzone Zone06                      # (175.5) he is upstairs: the wardrobe
-hide! Wardrobe
-whenzone Zone03                      # (~250) his third kitchen: the fish tank
-usewith! FishTank IT_Detergent       # Zone08, 10 at his next look at the tank
-park! Zone03                         # (~282)
-whenzone Zone06                      # (~293) he is upstairs: the wardrobe
-hide! Wardrobe
-whenzone Zone03                      # (~370) his fourth kitchen: the living room from the hall
-usewith! DirtyCarpet IT_Soil         # Zone02: the room trigger for his Z02 entry
-usewith! Vacuum IT_Paperknife        # Zone02: the tool that pays 13 on PC
-whenzone Zone09                      # he is in the basement: back to the wardrobe
-hide! Wardrobe
-await GroundMarbles@Zone07 7
+usewith! ElectricTrap IT_Cable       # fires on his lap-3 walk-in (~248)
+park! Zone04                         # the bathroom while he comes down (226-248)
+whenzone Zone03                      # (232.7) his lap-3 kitchen: the living room behind him
+usewith! DirtyCarpet IT_Soil         # Z02: the room trigger for his lap-3 entry
+usewith! Vacuum IT_Paperknife        # Z02
+usewith! FishTank IT_Detergent       # Z08: fires at his lap-3 tank
+usewith! GroundMarbles@Zone06 IT_Marbles   # Z06 x 2.94: his lap-3 walk from the board to the balcony
+hide! Bed                            # Z06 before he comes up
+whenzone Zone07                      # his [8]: the airer's putclothes
+use! Iron                            # Z06: the board burns (his [7] gave the clothes)
+hide! Bed
+whenzone Zone08                      # his [9]: the tank's stand
+usewith! Airer IT_Birdfood           # Z07: primed by his [8]
+hide! Bed
 await ElectricTrap 7
 await WashingMachine 10
 await Drier 10
+await Vacuum 13
+await GroundMarbles@Zone06 7
 await Iron 10
 await FishTank 10
-await Vacuum 13
+await Airer 12

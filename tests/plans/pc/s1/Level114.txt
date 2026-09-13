@@ -1,55 +1,63 @@
-# Level114 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
-# Woody 2.1 running and 0.62 tiptoeing past the dog in the bedroom, the doors'
-# two clips in turn at the PC's ticks, the catch the room alone). His lap
-# (168 s, the idle run under the profile, runs/idlepc4): kitchen (polish) 6-17
-# > living 17-22 > bedroom 22-27 > study (the cup) 27-37 > bedroom 37-42 >
-# living 42-47 > kitchen (polish) 47-58 > living (pipe, gramophone, CDs) 58-95
-# > hall 96-104 > basement (shotgun) 104-114 > hall 114-122 > living 122-127 >
-# bedroom (hat, medals) 127-149 > balcony (horn) 149-159 > bedroom 159-167 >
-# living 167-173 > kitchen 173-184 > living 184-189 > bedroom 189-194 > study
-# 194-204 > ... > living 225-262 > hall 262-270 > basement 270-280 > hall
-# 280-288 > ... The hall and the bathroom are his only for the basement trips.
-# The bathroom and the basement are done while he polishes and plays, the
-# bedroom, the balcony and the study while he sits at the gramophone (58-95) —
-# the tiptoe past the dog makes that block ~58 s, past his first basement
-# window — the kitchen while he is down there (104-122), the basement traps and
-# the hall's marbles while he is upstairs (127-167), and the pipe and the
-# gramophone in the living room straight after the medals, while he is down
-# in the basement (104-114) — v12: the pipe and the gramophone then pay on his
-# lap-2 living-room stay (~233, ~238), 19 s after the cup's tin, and the trap
-# and the shotgun follow the marbles (~265-280): six of the eight ticks — the
-# tin's 52 s after the horn and the marbles' 27 s after the gramophone stay
-# cold, 97.
+# Level114 under the PC profile (v13, 2026-09-23): Badinfos' E14 chain (the HUD of
+# pc_s1_all_720.mp4: 100 %, 9/9, seven bonuses) — the tin polish at the cup first
+# (8, cold), then on his next living-room stay the gramophone (10, cold), the pipe
+# (+17 s), the electric trap on his basement walk-in (+24), the shotgun (13, +25 in
+# the trap's 27.7-s window), the marbles in the hall on his way up (+19), the hat
+# (+34 in the marbles' 35-s window), the medal box (+10) and the horn (+19): 79 +
+# 7 x 3. game.exe's level class checks the tobacco tin only at his SECOND pipe visit
+# of the stay (case 16, after the record plays; the first, case 7-8, takes the tin
+# and gives it back unchecked), so the PC run arms the tin and the record player
+# while the dog whistle keeps him upstairs, after that first visit: whistle from the
+# hall at his gramophone, gunpowder into the tin, the nail into the player, back into
+# the wardrobe. The hat, the medal box and the horn go in during his lap-2 basement
+# stay, after the marbles (Badinfos' balloon at 4:05, the shotgun at 4:01).
+# His idle lap under the profile (runs/idle5): kitchen (polish) 6-17 > study (the
+# cup) 27-37 > kitchen (polish back) 47-58 > living (pipe 65, gramophone 70, the
+# records 75, gramophone 80, pipe 84, gramophone 90) 58-95 > hall > basement
+# (shotgun 108) 104-114 > hall > living > bedroom (hat 131, medals 135-142) 127-149 >
+# balcony (horn 151-157) > bedroom > living > kitchen 173 > study (the cup 199) >
+# kitchen 215-226 > living (pipe 232, gramophone 238, records 242, gramophone 247,
+# pipe 252, gramophone 257) 226-263 > hall > basement 271-281 > ... > bedroom
+# 295-316 > balcony 316-326.
 take Drawer IT_Marbles                # Zone01 (3-8): IT_Marbles + IT_Shoepolish
-take Drawer IT_Whistle                # the overlay's whistle, PC-only
+take Drawer IT_Whistle                # the dog whistle (the overlay's SearchItem), PC-only
 take! FirstAid IT_Superglue           # Zone04 (10-16): the hall and the bathroom are his only from 96
 take! MouseHole IT_Rat                # Zone09 (~20): the basement is his only at 104-114
 take! BasementDrawer IT_Nail          # Zone09: the rusty nail for the record player
 park Zone01                           # the hall until he settles in the kitchen (47)
-whenzone Zone03                       # (47.5) his second polish, then the gramophone (58-95): the bedroom, the balcony and the study are free until 127
+whenzone Zone03                       # (47.5) his second polish, then the gramophone (58-95): upstairs is free until 127
 take! ShotgunShells IT_Munition       # Zone06, tiptoe past the dog
 take! BedDrawer IT_Balloon            # Zone06
-usewith! Horn IT_Balloon              # Zone07, 8: the balcony — its only visit is his 149-159
 take! DeskDrawer IT_Gunpowder         # Zone08: the gunpowder for the tobacco tin
-usewith! Hat IT_Superglue             # Zone06, 8
-usewith! MedalBox IT_Rat              # Zone06, 8 (~105; he is in the basement 104-114, the hall until 122)
-usewith! Pipe IT_Gunpowder            # Zone02 (~110), straight down the back door: the tin takes the gunpowder any time on PC, 10 — pays at his lap-2 pipe (~233), 19 s after the cup's tin
-usewith! Gramaphone IT_Nail           # Zone02 (~113): open since his first lap, 10 — the next use (~238)
-usewith! Polish IT_Shoepolish         # Zone03 (~117), 8: he carries the black tin to the cup on lap 2 (~214)
+park! Zone07                          # the balcony while he plays the gramophone (58-95): off his lap until 149
+whenzone Zone01                       # (95) he goes down: the hall 95-104, the basement 104-114, the hall 114-122
+usewith! Polish IT_Shoepolish         # Zone03 (~110), 8: he carries the black tin to the cup on lap 2 (~200) — the chain's first trick
 take! RubbishBinCable IT_Cable        # Zone03: IT_Cable + IT_Cork
 park Zone03                           # the kitchen is off his way until 173: he crosses the living room (122-127)
 whenzone Zone06                       # (127.5) he is upstairs until 167: the basement and the hall
-usewith! ElectricTrap IT_Cable        # Zone09 x=2.06, on his door(2.21) -> Shotgun(0.66) walk, 7: the shock on his way down (~270)
+usewith! ElectricTrap IT_Cable        # Zone09 x=2.06, on his door(2.21) -> Shotgun(0.66) walk, 7: the shock on his lap-2 walk-in
 usewith! Shotgun IT_Munition          # Zone09: Tricked, 13
 usewith! Shotgun IT_Cork              # Zone09: the cork
-usewith! GroundMarbles@Zone01 IT_Marbles   # Zone01, 7: he crosses the hall at ~262
-hide! Wardrobe                        # Zone01 (~160): his hall passes at ~262-270 and ~280-288, the shock's run
+hide! Wardrobe                        # Zone01 (~160): the hall is his only at his lap-2 basement trip
+whenusing Gramaphone                  # (~240) his lap-2 gramophone opens, after his first pipe visit
+walk -0.3 -2.1                        # out of the wardrobe onto the hall floor, 1.25 u short of the living-room door (x -1.55)
+whistle                               # the dog barks: he goes up to the bedroom and back
+whenzone Zone06                       # he is at the dog
+usewith! Pipe IT_Gunpowder            # Zone02: the tin, at his second pipe visit (after the record) — 10
+usewith! Gramaphone IT_Nail           # Zone02: the record player, at his play — 10
+hide! Wardrobe                        # Zone01 before he comes back down
+whenzone Zone09                       # his lap-2 basement: the trap and the shotgun keep him ~40 s
+usewith! GroundMarbles@Zone01 IT_Marbles   # Zone01, 7: he crosses the hall on his way up
+usewith! Hat IT_Superglue             # Zone06, 8
+usewith! MedalBox IT_Rat              # Zone06, 8
+usewith! Horn IT_Balloon              # Zone07, 8
+hide! Bed                             # Zone06: the hat, the medals and the horn from under the bed
 await Polish 8
-await GroundMarbles@Zone01 7
+await Gramaphone 10
+await Pipe 10
 await ElectricTrap 7
 await Shotgun 13
+await GroundMarbles@Zone01 7
 await Hat 8
 await MedalBox 8
 await Horn 8
-await Pipe 10
-await Gramaphone 10

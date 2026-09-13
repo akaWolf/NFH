@@ -1,31 +1,37 @@
-# Level103 under the PC profile (v3, 2026-09-17: the picture on the rush; the kitchen three pay a lap after the rush — its loo trip and the walk back are 31 s under the PC stands (2026-09-22), past any window — so 97 is this lap's ceiling; a kitchen-first chain (v4, tried 2026-09-22: the microwave, the boom and the soap armed during one of his 9-s mail visits, the mousetrap during the kitchen visit after) fails on Woody's walks — the back door alone is 8 s from the fridge, and the hall door is his): the viewer rating pays each trick's score
-# plus 3 per angry tick, so these six tricks' 85 need five ticks — every
-# trick but the first landing while his anger indicator is up. The PC's
-# indicator (game.exe, docs/PC_ROUTINES.md): a trick sets it to the level's
-# angrytime (180 ticks here, no trick has its own), 60 ticks of hold, then
-# one per tick at 12 Hz — 20 s, no pause for his tantrum. His lap (~85 s):
-# Candle, BirthdayCake, BirthdayCake (Zone03), LetterBox (Zone01), the
-# mousetrapped finger rushing to the first-aid kit (Zone04). The mobile
-# chain paid the picture on the rush out and then waited 30 s from the
-# first-aid kit to the kitchen; here the picture is armed once the rush
-# has passed it and pays on his way back (~95), the microwave on his
-# kitchen entry (~103): mousetrap (59) > toilet (77) > picture (95) >
-# microwave (103) > candle (107) > the slip (126) — five ticks.
-take Drawer IT_Boom               # Boom + Marker + Mousetrap in one take
+# Level103 under the PC profile (v5, 2026-09-23): Badinfos' E03 chain (the HUD of
+# pc_s1_all_720.mp4: 100 %, 6/6, five bonuses) — the microwave on his kitchen
+# entry (10, cold), the boom at the cake (+16.4 s), the mousetrap at the mailbox
+# (+16.9), the portrait on his rush to the first-aid kit (+13.4), the soap on the
+# BATHROOM floor (+14.6) and the loo (+12.5): 85 + 5 x 3. The kitchen is armed
+# from the living-room door while he reads his mail (the kitchen is empty
+# 13.8-24.6, 39.1-50.0, 64.5-75.0 ... under the profile, runs/idle5): the egg on one
+# visit, the fireworks into the candle box (x 2.01) and the egg into the microwave
+# (x 1.97) — half a unit from the door (x 1.54) — on the next; the mousetrap and the
+# marker go in while he is at the cake, the soap and the paper before all that.
+# (v3 paid the mousetrap first and the kitchen three a lap after the rush — its loo
+# trip and walk back are 31 s under the PC stands, past the 20-s window: 97.)
+take Drawer IT_Boom               # Zone01 (3-8): Boom + Marker + Mousetrap, he is in the kitchen 0-13.8
 take ToiletPaper IT_Wcpaper       # Zone04
-usewith Toilet IT_Wcpaper         # Neutral: pays only raw-Tricked, on the first-aid rush walk-by, score 10
-take SoapDish IT_Soap             # the one soap
-usewith MumPicture IT_Marker      # Zone01 walk-by (0.1), score 10: armed before the rush, it pays on the rush itself, a second after the mailbox (v3; armed after it, it paid on the walk back, 21 s after the toilet — a second past the 20 s window)
-usewith LetterBox IT_Mousetrap    # Zone01, score 20 -> RushToToilet (the FirstAid)
-whenzone Zone04                   # the rush has reached the first-aid kit (~76): the hall is his again at ~91, the kitchen at ~102
-take! Fridge IT_Egg               # Zone03: the kitchen is nobody's until ~102
-usewith! Candle IT_Boom           # Zone03, UseAtOtherPlace: explodes at the cake's use visit, score 25
-usewith! Ground@Zone03 IT_Soap    # Zone03, CauseSlip, score 10 (Ground@Zone04 is the alternative)
-usewith! Microwave IT_Egg         # Zone03, NoticeWhenWalkNearby: pays on his kitchen entry (~103), score 10
-park Zone02                       # never visited
-await LetterBox 20
-await Toilet 10                   # crossed on the rush to the first-aid kit
-await MumPicture 10
+usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by (0.1), 10, on the rush
+take SoapDish IT_Soap             # Zone04: the one soap
+usewith Ground@Zone04 IT_Soap     # Zone04 x -4.45: the bathroom floor, on his rush to the first-aid kit
+park Zone02                       # the living room, never his: through the hall once he is back in the kitchen
+walk 0.4 1.26                     # at the kitchen door (Zone02's DoorRight01 x 0.69)
+whenzone Zone01                   # his mail: the kitchen is empty ~10.9 s
+take! Fridge IT_Egg               # Zone03 x 5.6
+walk 0.4 1.26                     # back through the door before he comes in
+whenzone Zone03                   # he is back in the kitchen
+whenzone Zone01                   # his next mail
+usewith! Candle IT_Boom           # Zone03 x 2.01, UseAtOtherPlace: explodes at the cake's use visit, 25
+usewith! Microwave IT_Egg         # Zone03 x 1.97, NoticeWhenWalkNearby: pays on his kitchen entry, 10 — the chain's first
+walk 0.4 1.26                     # back through the door before he comes in
+whenzone Zone03                   # his chain visit: the microwave, the candle, the cake — the hall is free ~25 s
+usewith! LetterBox IT_Mousetrap   # Zone01 x 4.94, 20 -> RushToToilet (the first-aid kit)
+usewith! MumPicture IT_Marker     # Zone01 x 0.65, walk-by (0.1), 10: on the rush, off his mail path
+park! Zone02                      # out of the hall before his mail
 await Microwave 10
 await Candle 25
-await Ground@Zone03 10
+await LetterBox 20
+await MumPicture 10
+await Ground@Zone04 10
+await Toilet 10

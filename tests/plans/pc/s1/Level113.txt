@@ -1,53 +1,49 @@
-# Level113 under the PC profile: the standard plan plus the electric trap —
-# the PC's 'cable with socket'. levels/pc/Level113.overlay.json lifts the
-# trap's transform to the depth it has in L111/L114, so the click ray
-# reaches it instead of the basement door. It must go in on the FIRST
-# basement visit: once ValveMain is tricked his ValveMain actions are
-# removed and he never enters the basement again — which also makes the
-# basement safe afterwards. So: cable, then tongs, the hot valve on the way
-# (GetTrickedAtOnce: the radiator pays on its own a lap later — a slip on the
-# way to it drops that lap's radiator, ActionManager.cs:614-619), tatter,
-# trap, main valve (out by ~40 s, the wardrobe by 45); the hall drawer (fuse
-# + marbles) and the marbles on the hall spot behind the basement door while
-# he is down there (2026-09-17: the trap, the slip 19 s later, the sink 22 s
-# after that — two ticks; the ladder's tongs and the fuse at the drill a
-# third). 8/8, 96: the hall spot pays 7.
-# 2026-09-22 (the PC stands carried): the marbles go in at once (`usewith!`) — under
-# the PC's shorter valve stand (the shock 5.1 s, the shout 2.2) he is up the stairs by
-# ~78 and the gate held them past his crossing (the radiator then paid on lap 1, cold,
-# 29 s after the trap). Still 96: eight tricks' 87 need five ticks, and a radiator-
-# first chain (the hot valve's radiator ~77 > the sink > the marbles on his way down
-# > the trap on his second basement walk, tried as v5) breaks on the rush the hot
-# radiator starts — the sink paid 42 s after it and the basement walk came a lap later.
-
-take RubbishBinCable IT_Cable         # Z03
+# Level113 under the PC profile (v8, 2026-09-23). level_DIY's tricks.xml pays the
+# marbles 8 (the mobile data pays 8 only on the kitchen and bedroom spots, 7 on the
+# rest) and the chair once (lir/stoolkit_pain: the pain book's trick, played at the
+# chair kit — World._pc_trick_item), so the PC's eight make 88 and four bonuses give
+# the 100 — Badinfos' E13 (the HUD of pc_s1_all_720.mp4: 100 %, 8/8, four bonuses:
+# the fuse after the cut ladder, the bedroom marbles after the chair, the grinder in
+# the marbles' 27-s window, the trap on his rush). The port's lap leaves ~12 s between
+# his hall pass and the hot radiator's rush — Woody's two basement door passes take
+# ~9 s of it — so the same four links are made in another order of his lap: the
+# flooded sink first (cold) > the trap on his rush to the main valve > the cut ladder
+# (cold) > the fuse at the drill > the chair on lap 2 (cold) > the bedroom marbles >
+# the grinder > the hot radiator (cold); run 2026-09-23: 100.9, 117.3, 164.4, 180.4,
+# 221.4, 236.6, 259.9, 296.2. The main valve goes in before his first basement visit
+# (tricked there, it leaves his routine), the cable while he cooks at the radiator,
+# Woody waiting in the basement until he is at the sink; after the cut ladder the
+# pain book and the chair on the way down, then the kitchen through the living room's
+# side door — off his way basement > fuse box > study — and the fuse once he climbs
+# with his: the drill is 20 s off. The marbles and the grinder while he is in the
+# study (~40 s: the cut ladder, the drill).
+take RubbishBinCable IT_Cable         # Z03 (he is upstairs 0-41)
 take BasementDrawer IT_Tongs          # Z09
-use ValveHot                          # Z09, on the way from the drawer: GetTrickedAtOnce -> the Radiator at his lap-1 [3], 15 — the third link of the chain
-prime ElectricTrapTatter              # Z09: the bare click primes the trap
-usewith ElectricTrap IT_Cable        # Z09: 8 on his [2] walk in (the overlay lifts it above the door)
-use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at [4], 12
-hide Wardrobe                         # Z01: he crosses the hall to the basement (t~45)
-take Drawer IT_Fuse                   # Z01: IT_Fuse + IT_Marbles (he is in the basement, 55-75)
-usewith! GroundMarbles@Zone01:2 IT_Marbles  # the hall spot x=3.02, between the basement door (2.55) and the kitchen door (4.63), at once: under the PC's shorter valve stand (the shock 5.1 s, the shout 2.2) he is up the stairs by ~78 and the gate would hold the marbles past his crossing — he slips on his way to the kitchen (~80), the radiator drops off that lap
-hide Wardrobe                         # back in before he comes up (~75): the slip, the kitchen, the hall, the bathroom
-whenusing Sink                        # his [4] sink (17 s in Z04): the hall and the basement are clear — ungated, the leg met him crossing the hall once the PC's one-tantrum angry had moved his lap by 5 s
-take BedDrawer IT_Painbook            # Z06, while he is at the sink and in the basement (103-135)
-usewith Ladder IT_Tongs               # Z08, 15 at his lap-1 ladder [7] (~158): the drill [8] 5 s later carries the fuse — a tick
-use AngleGrinder                      # Z07, bare, 10 at his lap-2 [1] (~249)
-park Zone03                           # down through the living room before his hall pass (137-141): the kitchen is his only at the lap-2 radiator (~284)
-usewith FuseBox IT_Fuse               # Z01, after his prime (137.7) and before the drill (162.8): the hall is free once he climbs (141)
-park Zone03                           # back out of the hall while he is upstairs
-usewith ChairAssemblyBook IT_Painbook # Z02, after his descent (~178): GetTrickedAtOnce -> the chair [0] on lap 2 (~210), 10
-park Zone03                           # off his hall visit (~199) and the chair (~210)
-hide Wardrobe                         # Z01 while he is upstairs (~215-275): the awaits from inside — his hot-valve grab after the lap-2 radiator (an urgent, not the routine) crosses the hall into the basement, where a 'safest' park would sit
-
-await GroundMarbles@Zone01:2 7
+prime ElectricTrapTatter              # Z09: the tatter's water; the trap waits for the cable
+use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at his lap-1 sink (~99), 12 — the chain's first
+hide Wardrobe                         # Z01 before he comes down (46.5)
+whenzone Zone09                       # (55) his first basement: the valve, tricked, leaves his routine
+take! Drawer IT_Fuse                  # Z01: IT_Fuse + IT_Marbles
+hide! Wardrobe                        # before he crosses the hall (62.8)
+whenzone Zone03                       # (69) the kitchen
+usewith! ElectricTrap IT_Cable        # Z09 x 2.07, 8: the shock on his rush from the sink; Woody stays in the basement
+whenzone Zone01                       # (81) his lap-1 radiator is done
+use! ValveHot                         # Z09: the radiator hot for his lap-2 kitchen, 15 — the chain's last
+whenzone Zone04                       # (92) he is at the sink: up through the hall and the living room
+usewith! Ladder IT_Tongs              # Z08, 15: the cut ladder (~119)
+take! BedDrawer IT_Painbook           # Z06 on the way back
+usewith! ChairAssemblyBook IT_Painbook # Z02, 10: armed for his lap-2 chair (his way to the study passes x -1.7 > -0.49 only)
+park! Zone03                          # through the living room's side door: the kitchen is off his way basement > fuse box > study
+whenzone Zone02                       # (~147) he takes the fuse and climbs to the study
+usewith! FuseBox IT_Fuse              # Z01 by the kitchen stairs, 10: the shock at his drill
+usewith! GroundMarbles@Zone06 IT_Marbles   # Z06 x 2.41, 8: his study trips never cross it, his lap-2 way to the grinder does
+use! AngleGrinder                     # Z07, bare, 10: he stays in the study ~40 s (the cut ladder, the drill)
+hide! Bed                             # Z06 x 2.74
+await Sink 12
+await ElectricTrap 8
 await Ladder 15
 await FuseBox 10
 await ChairAssemblyBook 10
+await GroundMarbles@Zone06 8
 await AngleGrinder 10
 await Radiator 15
-await Sink 12
-
-
-await ElectricTrap 8
