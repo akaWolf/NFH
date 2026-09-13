@@ -169,11 +169,15 @@ neighbour scripts is the co-actor fight after a crash reaction), so the
 profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
-between them is not); and the PC's machine waits of 111 (its washer
-stays 24 and 47 s in the video, the level class's `wait` steps). Three
-natural laps differ from the PC's by more than
-15 % (111, 213, 210 — the neighbour's routine is compiled into game.exe,
-one class per level, not data); the Season 2 gauge is 100 000 rage long
+between them is not); the Season 2 runs the mobile has no moment for
+(201's tutorial, 205's water ski, 206's Mother at the ramp, 208's rake,
+214's crashes) and the PC's `failed` actions that send the neighbour
+running (`docs/PC_FIDELITY.md` "Season 2's runs"). 111's machines are the
+level class's DoActions (the washer's 24 s in the video is the walk and
+give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
+neighbour runs where game.exe sets his gait. Two natural laps differ from
+the PC's by more than 15 % (213, 210 — the neighbour's routine is compiled
+into game.exe, one class per level, not data); the Season 2 gauge is 100 000 rage long
 and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the coins are
 the levels' tricks.xml rage values. The Season 1 anger rule, the result
 captions and the map's perfect mark are read from the binaries and

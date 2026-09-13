@@ -1044,6 +1044,32 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Woody can no longer put the fuse back between his lap-1 take and his
   drill — the plan (v9) cuts the ladder and puts the fuse on his second
   lap, after the chair, the bedroom marbles and the grinder.
+- *Season 2's runs (2026-09-23).* GameLogic.dll keeps the gait at the
+  actor's +0x3c (the tables 0x100de870 / 0x100de8dc: mg, mg, mr, mrwc,
+  mgbowling1, skiwalk, mg_fifi, stair); a level script sets it to 2 before
+  a walk (fcn.1000e3e0), and generic/objects.xml gives the neighbour, the
+  Mother and Olga mr1 18 / mr0 9. Carried where the mobile has the same
+  moment: 206's pillow errands (six writes 0x1002ea9b-0x1002f0c4 — the
+  mobile's Urgent DeckChair / Pillows / DeckChair), 210's run to the
+  Mother's call (0x10018dd9 — the Urgent CallRTMother), 211's run to the
+  ringing cabin phone (0x1002fd04 — the alarm, CabinPhone's PCRunTo) and
+  to the WC after the sweets (0x10030e07 — the toilet run), 207's Olga to
+  the destroyed sand castle to lift him (0x10017606 — her hit-pawn after
+  the SandCastle, PCRunTo); the stairs keep their records. Olga's and the
+  Mother's other hits walk on PC and show the walk set. Open, with their
+  sites: the runs of 201's tutorial (the buffet 0x10028b74, the soap
+  puddle 0x10029797, the damaged buffet 0x1002ad27), 205's nailed water
+  ski (0x10024fde), 206's Mother to the ramp on the rabbit's crash
+  (0x1002bbd1, `fifi_crash`), 208's rake (0x1001d889), 210's second
+  (0x10019270), the bike (0x10033486) and 214's crashes (0x1003a27f,
+  0x1003c035); and a PC mechanic the mobile lacks — Woody's `failed`
+  actions on nine levels' objects (cn_b1's crayfish, cn_b2's duck cage,
+  cn_c1's toy-o-mat, in_b1's crayfish, in_b2's tool belt, in_c1's rat,
+  in_c2's coal, ship2's kukidentomat, ship3's boat, ship4's hatch) dispatch
+  the neighbour's `run` behaviour: the alarm step (vtable 0x100b0f68: the
+  loud sound, a running GoTo fcn.100080e1, `search`) and the `fight` step
+  (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`). The catch fiber
+  itself (0x100061dc) sets no gait.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it
