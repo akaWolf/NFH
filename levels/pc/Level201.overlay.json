@@ -12,7 +12,8 @@
    "object": "Buffet",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {

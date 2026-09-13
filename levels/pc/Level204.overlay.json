@@ -21,7 +21,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 1.5,
-    "PCLaugh": 4
+    "PCLaugh": 4,
+    "PCRunTo": true
    }
   },
   {

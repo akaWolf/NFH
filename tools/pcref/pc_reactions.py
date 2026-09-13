@@ -160,10 +160,17 @@ FIXRUN = {113: {'ValveMain': ('bas/valve_on', 'switch_off'), 'ValveHot': ('bas/h
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
 # Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
-# before the walk — 207's Olga to the destroyed sand castle to lift him
-# (0x10017606, the mobile's hit-pawn after the SandCastle), 211's neighbour to
-# the ringing cabin phone (0x1002fd04, the mobile's alarm)
-RUNTO_S2 = {207: ('SandCastle',), 211: ('CabinPhone',)}
+# before the walk — the co-actor's run to the neighbour after his crash (the
+# mobile's hit-pawn of the item's PawnToAffectWhenTricked): 201's Olga at the
+# damaged buffet (0x1002ad27), 204's at the rickshaw (0x10033486), 205's at
+# the table tennis (0x1002637e), 206's Mother to the ramp on the rabbit's
+# crash (0x1002bbd1), 207's Olga to the destroyed sand castle to lift him
+# (0x10017606), 214's Olga after the shower and the bouquet (0x1003c035, one
+# handler) and its Mother after the pistol (0x1003a27f) — each a gait write
+# then fcn.1000eb19's walk to "neighbor"; and 211's neighbour to the ringing
+# cabin phone (0x1002fd04, the mobile's alarm)
+RUNTO_S2 = {201: ('Buffet',), 204: ('PullKart',), 205: ('TabbleTennis',), 206: ('LaunchPad',),
+            207: ('SandCastle',), 211: ('CabinPhone',), 214: ('Shower', 'Bouquet', 'Pistol')}
 # the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
 # fire first, one fall clip, no clean, index 1) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)

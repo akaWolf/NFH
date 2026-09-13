@@ -12,21 +12,24 @@
    "object": "Shower",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {
    "object": "Pistol",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {
    "object": "Bouquet",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {

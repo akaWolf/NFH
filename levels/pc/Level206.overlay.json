@@ -21,7 +21,8 @@
    "set": {
     "PCExtraCoin": 30,
     "PCExtraCoin206": 30,
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {

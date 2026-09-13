@@ -13,7 +13,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 12.0,
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   },
   {

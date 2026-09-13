@@ -3371,8 +3371,6 @@ class Routine:
         rott = w.pawns.get('Rottweiler')
         linked = self.level.items.get(it.linked_item_trick) \
             if it.linked_item_trick else None
-        if olga is not None:
-            olga.pc_run_hit = bool(getattr(it, 'pc_run_to', False))
         if it.name == 'SandCastle':
             if olga is not None and olga.hit_pawn_action.get('sequence'):
                 olga.hit_pawn_action['sequence'][0] = 'SandCastleLiftOlga'
@@ -4933,10 +4931,9 @@ class Routine:
         # HitPawnAction.Urgent picks the run (RoutineActionMove.cs:72-75):
         # Olga's is serialized true, the Mother's only on Level210
         self.pawn.in_urgent = bool(self.pawn.hit_pawn_action.get('urgent'))
-        # the PC runs it where its script sets the gait before the walk (207:
-        # Olga to the destroyed sand castle, GameLogic 0x10017606 — the
-        # SandCastle's PCRunTo, _change_hit_pawn_animation_207); the fights of
-        # Olga and the Mother elsewhere walk
+        # the PC runs it where the co-actor's script sets her gait to 2
+        # before the walk to him (the trick item's PCRunTo, World.play_angry);
+        # her other walks to him the PC walks
         self.pawn.pc_run = bool(self.pawn.pc_run_hit) and pcprofile.is_pc()
         self.state = self.MOVING
         maxd = self.pawn.hit_pawn_action.get('max_distance') or 0.03
@@ -6037,6 +6034,10 @@ class World:
             self._start_wait_in_fear(pawn, on_done)
             afr = next((r for r in self.routines if r.pawn is affected), None)
             if afr is not None:
+                # on PC the co-actor's walk to him is her script's run where
+                # it sets her gait to 2 first (the item's PCRunTo:
+                # pc_reactions.py RUNTO_S2)
+                affected.pc_run_hit = bool(getattr(item, 'pc_run_to', False))
                 afr.run_to_hit_pawn(pawn)          # Pawn.RunToHitPawn
                 oit = afr.item
                 if oit is not None and oit.change_item_anim_when_affected \
