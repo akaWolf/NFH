@@ -87,10 +87,13 @@ objects, and the station branches play theirs themselves (kit/foambottle: `make_
 38 frames = 3.17 s, the OBJ2 step, then `repair` 23 ticks). So the order per trick kind: a
 station — the tricked object's own action, the fire, the shout, the repair; a doubletake
 (mum_smeared, microwavedirty, toiletstuffed, twistedantenna: fcn.0047d9e0 and its siblings) —
-doubletake1 and doubletake3 (15 frames each) as two DoActions with one wait, the fire, the
-shout, the repair; a slip (toi/groundsoap, the marbles: fcn.0047ddc0) — the fire FIRST, slip1
-(31 frames, 2.58 s) inside the step, the shout, then a second step with slip3 that pays nothing,
-the repair; and the other five-argument sites pay before their own clip too: the tub's hair
+doubletake1 and doubletake3 (15 frames each) as two DoActions with one wait (whether both
+play, 2.5 s, or the second replaces the first, 1.25 s, is unread: DoAction's step start,
+fcn.00477e00), the fire, the shout, the repair; a slip (toi/groundsoap, the marbles:
+fcn.0047ddc0) — the fire FIRST, slip1 (31 frames, 2.58 s) inside the step, the shout, then a
+second step with slip3 that pays nothing (the record's next quota is 0: the no-points branch;
+whether its clip still plays is unread — E06's 15.5 s from the soap to the hair fits without
+it), the repair; and the other five-argument sites pay before their own clip too: the tub's hair
 (`show_hair` on toi/shower after the 2.83 s `shower` clip), the dirty towel (`show_black`),
 the electrotrap, the mailbox trap, the vacuum, the sofa, the tabasco teeth, the coffee soil,
 the shoebrush, the ironing board, the plant fight, the rat. Index 1 (shout2 when cold) at the
@@ -98,9 +101,14 @@ OBJ2 sites of kit/foambottle, lir/stickybook, kit/foamcream, kit/bowlingball,
 toi/aftershave_glue, toi/grease_exchanged, kit/candlebox_boom, bal/suncream_sweet,
 bed/bed_pins, kit/babybottle_nitro, kit/stool_pins, kit/potterswheel_fast, bed/camera_flashy,
 kit/heater_hot, toi/basin_flooded, anc/fuse, bas/expander_elastic, anc/skippingrope_knotted,
-kit/binoculars_glue (kit/skate carries flags 3: no shout, no sync); the rest index 0; the
-five-argument sites' index and flags want a per-site read (some arguments travel in
-registers). Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
+kit/binoculars_glue (kit/skate carries flags 3: no shout, no sync) — read off the two
+immediates pushed before the object; where a register or a placeholder push stands for an
+argument (lir/bathcandy, anc/stinkflower, bed/stickyhat, bal/dove_free, anc/deadflower,
+wor/book_replaced and every five-argument site) the index and the flags are NOT read: the
+no-shout of the tub's hair, the dirty towel and the bath candy rests on E06's timings alone
+(7.0 s hair to towel, 18.0 towel to album with dry and leave, 8.5 candy to the rush's loo),
+and the four-argument step fcn.0047c3b0 (the marbles, bal/fuelbeer, kit/laxativebeer,
+lir/sofa_fartbag, bed/cactusclock) is unread past its constructor call. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
 and the towel 18.0 s before the album (no shout at either), the cold microwave (7 points:
 shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
 and every bonus trick is followed by the 7.67 s shout2_extra.
