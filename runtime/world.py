@@ -5226,6 +5226,19 @@ class DexterityState:
         self.rand_vec = [0.0, 0.0]       # UpdateMovementRandomVector
         self.last_rand_time = 0.0
         self.input = (0.0, 0.0)          # the frame's touch/mouse delta
+        # the PC's game (tools/pcref/pc_minigames.py): the action's `time`,
+        # its elapsed count, the level tick's accumulator, the game's own
+        # tick count (+0x20), the 10 % latch (+0x50), its progress (+0x1c),
+        # the wobble's three phases (+0x28..+0x38) and the frame's mouse
+        # motion in screen px (the PC's thumb is the mouse itself)
+        self.pc_total = 0
+        self.pc_elapsed = 0
+        self.pc_acc = 0.0
+        self.pc_ticks = 0
+        self.pc_latch = False
+        self.pc_progress = 0
+        self.pc_phase = [0.0, 0.0, 0.0]
+        self.pc_move = (0.0, 0.0)
 
     def start(self):
         """StartDexterity (DexterityComponent.cs:137-177)"""
@@ -5234,9 +5247,24 @@ class DexterityState:
         self.enabled = True
         w.is_dexterity_on = True
         self.percent = 20.0
+        ticks = getattr(self.item, 'pc_minigame_ticks', None) if pcprofile.is_pc() else None
+        self.pc_total = int(ticks) if ticks else 0
+        self.pc_elapsed = 0
+        self.pc_acc = 0.0
+        self.pc_ticks = 0
+        self.pc_latch = False
+        self.pc_progress = 0
+        self.pc_move = (0.0, 0.0)
+        if self.pc_total:
+            self.percent = 0.0
         self.first_time = False
         self.wrong = False
         self._rng = random.Random(random.random())   # seeded from the run's random state (tests/run_tricks.py)
+        if self.pc_total:
+            # the constructor (fcn.100507f4) starts each wobble phase at
+            # rand(8) quarter turns of its GetTickCount generator
+            self.pc_phase = [self._rng.randrange(8) * pcprofile.S2_GAME_QUARTER
+                             for _ in range(3)]
         if w.snap_camera is not None:
             w.snap_camera()              # SnapToWoodyImmediate (cs:149)
         W, H = w.screen_size
@@ -5274,6 +5302,17 @@ class DexterityState:
             self.cleanup()
             self.start_again = True
             return
+        if self.pc_total:
+            # the PC's thumb is the mouse (fcn.100508a1 reads it each level
+            # tick): the frame's motion moves it one to one, with neither the
+            # remaster's drift nor its margins
+            mx, my = self.pc_move
+            self.pc_move = (0.0, 0.0)
+            self.input = (0.0, 0.0)
+            self.fg[0] += mx
+            self.fg[1] += my
+            self._pc_tick(dt)
+            return
         dx, dy = self.input
         self.input = (0.0, 0.0)
         rx, ry = self._random_move()
@@ -5301,6 +5340,94 @@ class DexterityState:
                 self.percent = 12.0
             else:
                 self._lose()
+
+    def add_mouse(self, xrel, yrel):
+        """the player's mouse motion, screen px: the PC's thumb follows it one
+        to one (pc_move), the remaster's pick takes it as the touch delta at
+        25 (the viewer's scale, DexterityComponent.FixedUpdate cs:227)"""
+        if self.pc_total:
+            self.pc_move = (self.pc_move[0] + xrel, self.pc_move[1] + yrel)
+        else:
+            self.input = (self.input[0] + xrel * 25.0, self.input[1] - yrel * 25.0)
+
+    def _pc_offset(self):
+        """the thumb's displacement from the field's middle as the PC's game
+        reads it (pcprofile.s2_game_offset: whole px, x 10, each axis held)
+        — the port's field is the remaster's, its reference pixels (1280 x
+        800) taken for the PC's"""
+        W, H = self.world.screen_size
+        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * 1280.0 / W
+        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * 800.0 / H
+        return pcprofile.s2_game_offset(int(ox), int(oy))
+
+    def _pc_push(self, px, py):
+        """the level tick moves the mouse by the game's output (whole PC px)"""
+        W, H = self.world.screen_size
+        self.fg[0] += px * W / 1280.0
+        self.fg[1] += py * H / 800.0
+
+    def thumb_rect(self):
+        """the drawn thumb: the PC draws it at the displacement held to the
+        radius of 1000 (100 px, the game's +4/+8 in the state message,
+        0x10044869), the mouse itself may be further out"""
+        if not self.pc_total:
+            return tuple(self.fg)
+        W, H = self.world.screen_size
+        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * 1280.0 / W
+        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * 800.0 / H
+        r = (ox * ox + oy * oy) ** 0.5
+        if r <= 100.0:
+            return tuple(self.fg)
+        k = 100.0 / r
+        return (self.bg[0] + self.bg[2] / 2.0 + ox * k * W / 1280.0 - self.fg[2] / 2.0,
+                self.bg[1] + self.bg[3] / 2.0 + oy * k * H / 800.0 - self.fg[3] / 2.0,
+                self.fg[2], self.fg[3])
+
+    def _pc_tick(self, dt):
+        """the PC's game, once a level tick (12 a second): GameLogic.dll's
+        game object (fcn.100508a1) puts the thumb back on the middle over its
+        first three ticks and leaves the rate at 0; after them it rates the
+        thumb by its distance to the field's middle and pushes it by the
+        wobble (pcprofile.s2_game_rate / s2_game_push, the factor from the
+        combination's levels, PCMinigameLevels). The DoAction step
+        (fcn.10001b2c) adds the rate to the action's elapsed count, clamped at
+        its `time`, and hands the game the progress, elapsed x 100 / time
+        (fcn.100507dd, latching at 10). The count at the action's time wins it
+        (the object's action), below 0 fails it (the `failed` action). Open:
+        whether the DoAction step of a tick reads this tick's rate or the
+        last one's (the actors' steps against 0x1004482b in the level tick) —
+        one tick, 0.083 s, on every game"""
+        self.pc_acc += dt
+        step = 1.0 / pcprofile.TICKS_PER_SECOND
+        levels = getattr(self.item, 'pc_minigame_levels', None) or (0, 0)
+        while self.pc_acc >= step and self.enabled:
+            self.pc_acc -= step
+            self.pc_ticks += 1
+            dx, dy = self._pc_offset()
+            if self.pc_ticks < 4:
+                self._pc_push(int(-dx * 1000 / 10000), int(-dy * 1000 / 10000))
+                rate = 0
+            else:
+                rate = pcprofile.s2_game_rate(dx, dy, self.pc_progress, self.pc_latch)
+                self._pc_push(*pcprofile.s2_game_push(dx, dy, self.pc_progress,
+                                                      levels, self.pc_phase))
+            self.wrong = rate < 0
+            self.pc_elapsed = min(self.pc_elapsed + rate, self.pc_total)
+            if self.pc_elapsed < 0:
+                self.pc_elapsed = 0
+                self.pc_progress = 0
+                self.percent = 0.0
+                if self.item is not None and self.item.dexterity_cannot_lose:
+                    continue
+                self._lose()
+                return
+            self.pc_progress = self.pc_elapsed * 100 // self.pc_total
+            if self.pc_progress >= 10:
+                self.pc_latch = True
+            self.percent = float(self.pc_progress)
+            if self.pc_elapsed >= self.pc_total:
+                self._win()
+                return
 
     def _random_move(self):
         """UpdateRandomMovement (cs:341-359); Dificulty is 2"""
@@ -7970,8 +8097,10 @@ class World:
         if not woody.in_dexterity:
             self._dex_inv_used = used              # InvUsed
             woody.in_dexterity = True
-        if pcprofile.is_pc() and not woody.dexterity_done:
-            # the PC has no mini-games: the first click wins the game
+        if pcprofile.is_pc() and not woody.dexterity_done \
+                and not item.pc_minigame_ticks:
+            # a dexterity item with no PC game object (the overlays' PCMinigame
+            # Ticks, tools/pcref/pc_minigames.py): the first click wins it
             # outright, with WinDexterity's side effects (the search item's
             # ActivateTrickIfSearch coin, the DexterityOtherAnimation)
             ds = self.dex_states.get(item.dexterity_alert) \

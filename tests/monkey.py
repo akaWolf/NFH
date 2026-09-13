@@ -552,7 +552,10 @@ class Monkey(Recorder):
             self.v.virtual_mouse_down = not self.v.virtual_mouse_down
         if v.world.is_dexterity_on:      # fight the drifting pick
             for ds in v.world.dex_states.values():
-                if ds.enabled:
+                if ds.enabled and ds.pc_total:
+                    ds.add_mouse(rng.uniform(-40, 40) / 25.0,
+                                 -rng.uniform(-40, 40) / 25.0)
+                elif ds.enabled:
                     ds.input = (ds.input[0] + rng.uniform(-40, 40),
                                 ds.input[1] + rng.uniform(-40, 40))
         # the viewer-space pause (Space): rare, held 0.3-2 s

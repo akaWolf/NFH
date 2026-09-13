@@ -651,8 +651,7 @@ class App:
                 if self.viewer is not None and self.viewer.world.is_dexterity_on:
                     for ds in self.viewer.world.dex_states.values():
                         if ds.enabled:
-                            ds.input = (ds.input[0] + ev.motion.xrel * 25.0,
-                                        ds.input[1] - ev.motion.yrel * 25.0)
+                            ds.add_mouse(ev.motion.xrel, ev.motion.yrel)
             elif ev.type == sdl2.SDL_MOUSEBUTTONDOWN:
                 self._mouse = (ev.button.x, ev.button.y)
                 if ev.button.button == sdl2.SDL_BUTTON_LEFT:

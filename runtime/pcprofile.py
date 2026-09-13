@@ -228,6 +228,80 @@ def s2_rage_tick(meter, decay_per_tick):
     """one 1/12 s tick of the Season 2 gauge: the meter less the decay, not below zero"""
     return max(0.0, meter - decay_per_tick / 1000.0)
 
+
+# The Season 2 mini-game, read from GameLogic.dll (docs/PC_FIDELITY.md 2.6):
+# the game object (vtable 0x100b1a7c, constructor fcn.100507f4, run once a
+# level tick with the mouse by fcn.100508a1 from 0x1004482b) measures the
+# thumb from the field's middle in 1/10 px, (mouse - middle) x 10000 / 1000
+# with each axis held in -1000..1000 and the pair then to a radius of 1000.
+# Its first three ticks move the mouse back onto the middle and leave the
+# rate at the constructor's 0; after them it rates the distance and pushes
+# the mouse by three sinusoids — amplitudes 20, 10, 5 (0x100b1ff0), 0.064774,
+# -0.146118 and 0.369593 rad a tick (0x100cc838), the y's a quarter turn
+# ahead (0x100b2010, the binary's pi/4), a phase wrapped once above 6.283078
+# (0x100b2020) — times a factor that grows from the combination's startlevel
+# to its endlevel with the progress, min(progress, 90) / 90 (0x100b2028;
+# combine.xml through the object's +0x28/+0x2c, tools/pcref/pc_minigames.py);
+# the constructor starts each phase at rand(8) quarter turns. The level tick
+# then moves the mouse by the push (0x100448c6-0x100448db) and draws the
+# alarm field while the rate is negative (0x10044880).
+S2_GAME_AMPS = (20.0, 10.0, 5.0)
+S2_GAME_FREQS = (0.064774, -0.14611809302325582, 0.36959282352941175)
+S2_GAME_QUARTER = 0.78538475
+S2_GAME_TWO_PI = 6.283078
+
+
+def s2_game_offset(ox, oy):
+    """(mouse - middle) in whole px -> the game's displacement in 1/10 px, each axis held"""
+    return max(-1000, min(1000, ox * 10)), max(-1000, min(1000, oy * 10))
+
+
+def _s2_game_radius(dx, dy):
+    """the pair held to a radius of 1000, truncated (fcn.100508a1, 0x10050963 / 0x10050acd)"""
+    d2 = dx * dx + dy * dy
+    if d2 > 1000000:
+        r = math.sqrt(d2)
+        return int(dx * 1000 / r), int(dy * 1000 / r)
+    return dx, dy
+
+
+def s2_game_rate(dx, dy, progress, latched):
+    """the rate of a tick past the first three (0x1005099d-0x10050a17): by the squared
+    distance before the radius, 4 under 200, 3 under 400, 2 under 600, 1 under 800, beyond
+    it 0 or, once the progress has latched at 10, -(progress x 4 / 10) held in -40..-4"""
+    d2 = dx * dx + dy * dy
+    if d2 < 40000:
+        return 4
+    if d2 < 160000:
+        return 3
+    if d2 < 360000:
+        return 2
+    if d2 < 640000:
+        return 1
+    if latched:
+        return max(-40, min(-4, int(-progress * 4 / 10)))
+    return 0
+
+
+def s2_game_push(dx, dy, progress, levels, phases):
+    """the mouse push of a tick past the first three, in whole px (0x10050a1a-0x10050b35):
+    the wobble added to the displacement held to the radius, less the displacement, over
+    ten; `phases` advance in place"""
+    dx, dy = _s2_game_radius(dx, dy)
+    lo, hi = levels
+    factor = (hi - lo) * min(progress, 90) * (1.0 / 90.0) + lo
+    sx = sy = 0.0
+    for i, (amp, freq) in enumerate(zip(S2_GAME_AMPS, S2_GAME_FREQS)):
+        ph = phases[i]
+        sx += math.sin(ph) * factor * amp
+        sy += math.cos(ph + S2_GAME_QUARTER) * factor * amp
+        ph += freq
+        if ph > S2_GAME_TWO_PI:
+            ph -= S2_GAME_TWO_PI
+        phases[i] = ph
+    vx, vy = _s2_game_radius(dx + int(sx), dy + int(sy))
+    return int((vx - dx) * 1000 / 10000), int((vy - dy) * 1000 / 10000)
+
 # The Season 1 result screen, read from the PC binaries (docs/PC_VERIFICATION.md
 # "The level's end"). The level state machine (game.exe fcn.00436bb0, run
 # every tick from fcn.00439cd0) ends a level with 5 = success once the score

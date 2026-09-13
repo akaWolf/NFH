@@ -838,14 +838,20 @@ class Driver(Recorder):
             a = w.anim.sprite.anims[i]
             frames = len(a.pattern) if a.pattern else (a.end - a.start + 1)
             t += max(1, frames) / float(a.fps or 10.0)
+        # the PC's game (PCMinigameTicks, DexterityState._pc_tick): the thumb
+        # held in the middle ends it in 3 + ceil(time / 4) level ticks — a
+        # human knows the job is that much longer than the take
+        ticks = getattr(item, 'pc_minigame_ticks', None)
+        game = (3 + -(-int(ticks) // 4)) / pcprofile.TICKS_PER_SECOND \
+            if ticks else 0.0
         if t <= 0.0:
-            return self.USE_TIME
+            return self.USE_TIME + game
         # no cap: Level102's saw is SawSofa x3 = 14.3 s at 13 fps and the
         # trick lands only at the sequence end (Woody.cs:412-416) — a cap
         # sent Woody up for a job the beer run cannot hold; the sheet time
         # over the measured tick rate (the port runs Woody at 2x, see
         # _install_anim_probes)
-        return max(2.0, (t + 1.5) / self.anim_rate(w))
+        return max(2.0, (t + 1.5) / self.anim_rate(w)) + game
 
     def woody_need(self, zone_pid, x, item=None):
         """seconds for Woody to reach (zone, x) and finish a use there:
@@ -1875,6 +1881,11 @@ class Driver(Recorder):
                 on = True
                 ddx = (ds.bg[0] + ds.bg[2] / 2.0) - (ds.fg[0] + ds.fg[2] / 2.0)
                 ddy = (ds.bg[1] + ds.bg[3] / 2.0) - (ds.fg[1] + ds.fg[3] / 2.0)
+                if getattr(ds, 'pc_total', 0):
+                    # the PC's thumb is the mouse (DexterityState.pc_move, one
+                    # to one): half the way back a frame, as the steer below
+                    ds.pc_move = (ddx * 0.5, ddy * 0.5)
+                    continue
                 ds.input = (ddx * 30.0, -ddy * 30.0)
         return on
 
@@ -2311,10 +2322,12 @@ class Driver(Recorder):
         DuckCage, 206's DentureAdhesive)"""
         if typ == 'IT_NONE':
             typ = None
-        if os.environ.get('NFH_PROFILE', 'pc') != 'mobile':   # pcprofile.is_pc
-            # the PC has no mini-games: the profile's gate passes the first
-            # click — a dexterity trick item is a plain use, a dexterity
-            # search item is taken by the take leg that follows
+        if os.environ.get('NFH_PROFILE', 'pc') != 'mobile' \
+                and not getattr(self.item(name), 'pc_minigame_ticks', None):   # pcprofile.is_pc
+            # an item with no PC game object: the profile's gate passes the
+            # first click — a dexterity trick item is a plain use, a dexterity
+            # search item is taken by the take leg that follows; the PC's
+            # games (PCMinigameTicks) are played below like the mobile's
             it = self.item(name)
             if it.kind == 'SearchItem':
                 # a dexterity search: the unlocker held, one click, the item

@@ -150,7 +150,11 @@ class Recorder:
             r = 'forcewin'
         elif op == 'dex':
             for ds in v.world.dex_states.values():
-                if ds.enabled:
+                if ds.enabled and ds.pc_total:
+                    # the touch delta at the viewer's scale of 25, back to
+                    # the mouse's px for the PC's thumb (DexterityState.add_mouse)
+                    ds.add_mouse(float(parts[1]) / 25.0, -float(parts[2]) / 25.0)
+                elif ds.enabled:
                     ds.input = (ds.input[0] + float(parts[1]),
                                 ds.input[1] + float(parts[2]))
             r = 'dex'

@@ -240,7 +240,7 @@ class Item:
                  'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
-                 'pc_station_ends_on_trick', 'pc_run_to',
+                 'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -625,6 +625,12 @@ class Item:
         # the PC case runs to this fixing tool (113's valves: the gait's run
         # before the GoTo, Routine._pc_runs)
         self.pc_run_to = bool(d.get('PCRunTo'))
+        # the PC's mini-game on this dexterity item: its Woody action's
+        # `time`, the count the game's rate fills (DexterityState's PC branch)
+        self.pc_minigame_ticks = d.get('PCMinigameTicks')
+        # and its combination's startlevel / endlevel (combine.xml): the
+        # range the game's wobble factor grows through (fcn.100508a1)
+        self.pc_minigame_levels = d.get('PCMinigameLevels')
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')

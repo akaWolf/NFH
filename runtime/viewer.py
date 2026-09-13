@@ -499,8 +499,7 @@ class Viewer:
                     # FixedUpdate, cs:227); the mouse plays the touch role
                     for ds in self.world.dex_states.values():
                         if ds.enabled:
-                            ds.input = (ds.input[0] + ev.motion.xrel * 25.0,
-                                        ds.input[1] - ev.motion.yrel * 25.0)
+                            ds.add_mouse(ev.motion.xrel, ev.motion.yrel)
                 if ev.type == sdl2.SDL_MOUSEBUTTONDOWN and self.woody:
                     if self.handle_click(ev.button.x, ev.button.y) == 'restart':
                         continue

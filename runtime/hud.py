@@ -1227,7 +1227,7 @@ class Hud:
                 _sdl.SDL_RenderCopyEx(self.rnd, entry[0], srcr, dstr,
                                       180.0, None, _sdl.SDL_FLIP_NONE)
             self._blit(ds.spec['bg_item'], tuple(ds.item_rect))
-            self._blit(ds.spec['fg'], tuple(ds.fg))
+            self._blit(ds.spec['fg'], ds.thumb_rect())
 
     def _draw_progress_bars(self):
         """ProgressBar.OnGUI (ProgressBar.cs:247-272): the world-anchored
