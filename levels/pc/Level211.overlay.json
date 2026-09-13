@@ -67,7 +67,8 @@
    "object": "CabinPhone",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCRunTo": true
    }
   }
  ]

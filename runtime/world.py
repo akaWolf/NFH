@@ -460,6 +460,7 @@ class Pawn:
         self.sneak_toggle = False        # Woody.MbSneakToggle
         self.in_urgent = False           # Pawn.InUrgentMove
         self.pc_run = False              # the PC case's run gait (Routine._pc_runs)
+        self.pc_run_hit = False          # the next hit-pawn run is the PC script's run
         self.movement_paused = False     # Pawn.MovementPaused
         self.exit_confirmation_shown = False   # Pawn.ExitConfirmationShown
         self.waiting_for_exit_confirmation = False  # WaitingforExitConfirmation
@@ -675,7 +676,8 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWC' + direction
-            if self.in_urgent and not self._pc_walking_urgent():
+            if self._pc_gait() == 'run' or \
+                    (self.in_urgent and not self._pc_walking_urgent()):
                 return 'Run_' + direction
             if self.holding_cake:
                 return 'WalkPie_' + direction
@@ -688,7 +690,9 @@ class Pawn:
             return 'Walk_' + direction
         if self.role == 'Woody':
             return ('Walk_' if self.sneaking else 'Run_') + direction
-        if self.role in ('Mother', 'Olga') and self.in_urgent:
+        if self.role in ('Mother', 'Olga') and (
+                self._pc_gait() == 'run'
+                or (self.in_urgent and not self._pc_walking_urgent())):
             return 'Run_' + direction
         return 'Walk_' + direction
 
@@ -698,19 +702,19 @@ class Pawn:
         (Routine._pc_runs), the bowling ball's carry (105's case 11 sets
         gait 4 before the GoTo to the window, game.exe 0x46e4d3; the
         mobile's HasBowling), else the walk"""
-        if self.role != 'Rottweiler' or not pcprofile.is_pc() or pcprofile.SEASON2:
+        if self.role not in ('Rottweiler', 'Mother', 'Olga') or not pcprofile.is_pc():
             return 'walk'
         if self.in_urgent and self.pc_run:
             return 'run'
-        if self.has_bowling:
+        if self.has_bowling and not pcprofile.SEASON2:
             return 'bowling'
         return 'walk'
 
     def _pc_walking_urgent(self):
-        """an urgent the PC case walks (its gait left at mg: 110's
-        extinguisher, 111's vacuum and carpet) shows the walk set under the
-        Season 1 profile, as it moves at the walk records (Routine._pc_runs)"""
-        return pcprofile.is_pc() and not pcprofile.SEASON2 and not self.pc_run
+        """an urgent the PC walks (its gait left at mg: 111's vacuum and
+        carpet; Season 2's hits of Olga and the Mother) shows the walk set
+        under the profile, as it moves at the walk records (Routine._pc_runs)"""
+        return pcprofile.is_pc() and not self.pc_run
 
     def _portal_up_anim(self):
         """Rottweiler.GetPortalUpAnimation (Rottweiler.cs:398-413); Woody
@@ -719,7 +723,8 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWCUp'
-            if self.in_urgent and not self._pc_walking_urgent():
+            if self._pc_gait() == 'run' or \
+                    (self.in_urgent and not self._pc_walking_urgent()):
                 return self.portal_run_up or 'Run_Up'
             if self.has_fifi:
                 return 'FifiWalkUp'
@@ -735,7 +740,8 @@ class Pawn:
         if self.role == 'Rottweiler':
             if self.feel_sick:
                 return 'RunWCDown'
-            if self.in_urgent and not self._pc_walking_urgent():
+            if self._pc_gait() == 'run' or \
+                    (self.in_urgent and not self._pc_walking_urgent()):
                 return self.portal_run_down or 'Run_Down'
             if self.has_fifi:
                 return 'FifiWalkDown'
@@ -2742,9 +2748,13 @@ class Routine:
                 self.routine_behavior.on_move_to_routine_action(it, a)
             self.state = self.MOVING
             # an Urgent action is approached at a run (MoveToGoalUrgent,
-            # RoutineActionMove.cs:68-75); a station of the PC lap is walked to
+            # RoutineActionMove.cs:68-75); on PC the Season 2 ones are runs of
+            # the level script too (206's pillows: the gait set to 2 before
+            # each walk, GameLogic 0x1002ea9b-0x1002f0c4; 210's call of the
+            # Mother, 0x10018dd9) — Season 1 has no Urgent routine action
             self.pawn.in_urgent = bool(a.get('urgent'))
-            self.pawn.pc_run = False
+            self.pawn.pc_run = bool(a.get('urgent')) and pcprofile.is_pc() \
+                and pcprofile.SEASON2
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
@@ -3361,6 +3371,8 @@ class Routine:
         rott = w.pawns.get('Rottweiler')
         linked = self.level.items.get(it.linked_item_trick) \
             if it.linked_item_trick else None
+        if olga is not None:
+            olga.pc_run_hit = bool(getattr(it, 'pc_run_to', False))
         if it.name == 'SandCastle':
             if olga is not None and olga.hit_pawn_action.get('sequence'):
                 olga.hit_pawn_action['sequence'][0] = 'SandCastleLiftOlga'
@@ -4097,15 +4109,17 @@ class Routine:
         tool and the way back to the target (110's extinguisher, 113's
         valves); the other urgents the PC walks (111's vacuum and carpet
         cases leave the gait at 0)"""
-        if self.role != 'Rottweiler' or not pcprofile.is_pc() or pcprofile.SEASON2 \
-                or item is None:
+        if self.role != 'Rottweiler' or not pcprofile.is_pc() or item is None:
             return False
         w = self.pawn.world
         if kind == 'surprise_far' and w is not None and item.pid in w.alerters:
             return True
         if name == 'toilet':
+            # Season 2: 211's sweets send him to the loo at a run (the gait
+            # set to 2 before the walk to the WC, GameLogic 0x10030e07)
             return True
-        if kind in ('surprise_far', 'grab'):
+        if kind in ('surprise_far', 'grab') or name == 'alarm':
+            # 211's ringing cabin phone (0x1002fd04) with the Season 1 marks
             return bool(getattr(item, 'pc_run_to', False))
         if name == 'use_fixing':
             return bool(getattr(self._fix_tool, 'pc_run_to', False))
@@ -4919,7 +4933,11 @@ class Routine:
         # HitPawnAction.Urgent picks the run (RoutineActionMove.cs:72-75):
         # Olga's is serialized true, the Mother's only on Level210
         self.pawn.in_urgent = bool(self.pawn.hit_pawn_action.get('urgent'))
-        self.pawn.pc_run = False
+        # the PC runs it where its script sets the gait before the walk (207:
+        # Olga to the destroyed sand castle, GameLogic 0x10017606 — the
+        # SandCastle's PCRunTo, _change_hit_pawn_animation_207); the fights of
+        # Olga and the Mother elsewhere walk
+        self.pawn.pc_run = bool(self.pawn.pc_run_hit) and pcprofile.is_pc()
         self.state = self.MOVING
         maxd = self.pawn.hit_pawn_action.get('max_distance') or 0.03
         if self.pawn.zone is target_pawn.zone and \

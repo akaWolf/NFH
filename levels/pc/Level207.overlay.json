@@ -44,7 +44,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 11.5,
-    "PCLaugh": 0
+    "PCLaugh": 0,
+    "PCRunTo": true
    }
   },
   {

@@ -323,8 +323,15 @@ WALK_PX_PER_TICK = {
 # slide to the window (112 0x46312f, 5) and the bowling ball's carry to the window (105
 # 0x46e4d3, 4). generic/objects.xml's mr1 18 / mr0 9 (the mrwc records of level_sofa, bath,
 # piano and suntan the same), level_fitness's skate1 18, level_piano's mgbowling1 9.
+# Season 2 (GameLogic.dll): the actor's +0x3c indexes 0x100de870 / 0x100de8dc (mg, mg, mr,
+# mrwc, mgbowling1, skiwalk, mg_fifi, stair — UTF-16 literals at 0x100ab550-0x100ab5ac); a
+# level script sets 2 before a walk (fcn.1000e3e0) and the GoTo step's run flag (+0xd,
+# fcn.10007df9: the saved gait restored at its end) does the same — generic/objects.xml's
+# neighbor, mother and olga carry mr1 18 / mr0 9, and the stairs keep their stair records.
 GAIT_PX_PER_TICK = {
     ('Rottweiler', 'run'): (18, 9),       # (along the floor, up or down the room)
+    ('Mother', 'run'): (18, 9),
+    ('Olga', 'run'): (18, 9),
     ('Rottweiler', 'bowling'): (9, 9),    # mgbowling1 in both tables
     ('Rottweiler', 'skate'): (18, 18),    # skate1 in both tables
 }
@@ -354,8 +361,11 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False, gait='walk'
     if rec is None or n == 0.0 or not rule('walk'):
         return None
     h, v, st = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in rec)
-    if (role, gait) in GAIT_PX_PER_TICK and not stairs:
-        h, v = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in GAIT_PX_PER_TICK[(role, gait)])
+    if (role, gait) in GAIT_PX_PER_TICK:
+        gh, gv = (r * TICKS_PER_SECOND / PX_PER_UNIT for r in GAIT_PX_PER_TICK[(role, gait)])
+        h = gh
+        if not stairs:
+            v = gv
     pace = (st if stairs else v) if climbing else h
     return pace / n
 

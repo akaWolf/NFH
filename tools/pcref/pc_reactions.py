@@ -36,6 +36,7 @@ stand the tool cannot cut by itself (a station shared by two tricks, the
 normal use that follows a repair). An item not in it keeps the mobile clips.
 
     python3 tools/pcref/pc_reactions.py [--write] [106 110 ...]
+    python3 tools/pcref/pc_reactions.py --runs-s2     # RUNTO_S2 into the Season 2 overlays
 """
 import json
 import os
@@ -158,6 +159,11 @@ FIXRUN = {113: {'ValveMain': ('bas/valve_on', 'switch_off'), 'ValveHot': ('bas/h
 # fixing chain), the valves of FIXRUN
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
+# Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
+# before the walk — 207's Olga to the destroyed sand castle to lift him
+# (0x10017606, the mobile's hit-pawn after the SandCastle), 211's neighbour to
+# the ringing cabin phone (0x1002fd04, the mobile's alarm)
+RUNTO_S2 = {207: ('SandCastle',), 211: ('CabinPhone',)}
 # the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
 # fire first, one fall clip, no clean, index 1) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)
@@ -358,8 +364,24 @@ def write(n, sp):
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
 
 
+def write_runs_s2():
+    """RUNTO_S2's PCRunTo into the Season 2 overlays (that key alone)"""
+    for n, items in sorted(RUNTO_S2.items()):
+        p = os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)
+        ov = json.load(open(p))
+        patches = _strip_key(ov.get('patches', []), 'PCRunTo')
+        for item in items:
+            _set_key(patches, item, 'PCRunTo', True)
+        ov['patches'] = patches
+        json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
+        print('== Level%d PCRunTo %s' % (n, ', '.join(items)))
+
+
 def main(argv):
     do_write = '--write' in argv
+    if '--runs-s2' in argv:
+        write_runs_s2()
+        return
     levels = [int(a) for a in argv if a.isdigit()] or sorted(TB.LEVEL_DIR)
     for n in levels:
         sp = specs(n)
