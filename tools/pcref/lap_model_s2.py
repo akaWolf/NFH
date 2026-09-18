@@ -28,6 +28,24 @@ tools/pcref/lap_model.py does for Season 1:
   fcn.1000f779 (show), fcn.1000f5c9 — run and return at once (their run
   methods return 1).
 
+The bars: fcn.1000e7f2 walks to a `neighbor_hideout` object, enters it
+(fcn.10006bd4) and makes fcn.1000b154's object (vtable 0x100ab710, update
+0x1000b312), which counts its +0xc up to the pushed ticks +8 once a level
+tick while the object is there (the progress bar, counter x 100 / ticks)
+and then hands over to the pushed continuation: 212's bench `sleep` 60
+ticks, 209's curtain and 208's platform `inactive` 120 and 60, 202's mat,
+207's and 210's deck chairs `sleep` 120. `code_stays` pairs the parts with
+the mobile routine items (PAIRS).
+
+The walks are not the PC's yet: GameLogic's walk step fcn.10009215 moves
+one axis a tick along the path's points — the vertical first, at the gait's
+up/down records (0x100de870 / 0x100debe8: mg0 / mg2, 3 px), then the
+horizontal (0x100de8dc / 0x100de8b0: mg1 / mg3, 8 px, the first step with
+its `start` when +0x2c is set) — and nothing writes the stair gait 7 for the
+neighbour (the writes of +0x3c are 2 and 6, and the actions' own gait); the
+path builder (fcn.10009489) that lays the points through a door pair is not
+read, and the Geometry / walk_ticks below is a first cut, not the PC's.
+
 Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
 212 and 213 (214's with two empty steps, its bouquet and wheel); 201 (the
 tutorial), 202, 204, 205, 207 and 210 stop at a step whose handover comes
@@ -133,10 +151,17 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
             elif fn == 'fcn.1000e3e0':
                 ev.append(('GO', names[-1] if names else None)); al = 0
             elif fn == 'fcn.1000e7f2':
-                # an event subscription: the continuation is the step it hands over
-                fs = [x[1] for x in slots if x[0] == 'f']
-                if fs: nxt = fs[-1]
-                ev.append(('WAITEVENT', names, [hex(x) for x in fs])); al = None
+                # a timed stay (the bar): fcn.1000b154's object (vtable 0x100ab710,
+                # update 0x1000b312) counts its +0xc up to the pushed ticks +8 a
+                # level tick while the object is there, showing counter x 100 /
+                # ticks, and at the end hands over to the continuation it pushes
+                fs = [i for i, x in enumerate(slots) if x[0] == 'f']
+                ticks = None
+                if fs:
+                    nxt = slots[fs[-1]][1]
+                    after = [x[1] for x in slots[fs[-1] + 1:] if x[0] == 'i']
+                    ticks = after[0] if after else None
+                ev.append(('WAITEVENT', names, ticks)); al = None
             elif fn == 'fcn.100422a5':
                 ev.append(('IC', names)); al = None
             elif fn == 'fcn.10042b9e':
@@ -322,50 +347,293 @@ class Data:
 INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET'}
 
 
-def station_ticks(d, ev):
-    """the step's action time in ticks and its parts: DoActions, the enter/leave
-    of E6bd4/E6c2e; the message elements instant; waits unknown (None)"""
-    total = 0; parts = []; unknown = []
+def station_ticks(d, ev, ctx=None):
+    """the step's parts [(object, action, ticks)] — DoActions, the enter/leave of
+    E6bd4/E6c2e, a bar's enter and ticks (action 'bar'); the message elements
+    instant; the rest unknown (ticks None). `ctx` carries the last hideout
+    across steps (a leave whose object is a local of an earlier step)"""
+    ctx = {} if ctx is None else ctx
+    parts = []
     for e in ev:
         k = e[0]
         if k == 'DO':
             names = [x for x in e[1] if not x.startswith('$')]
             if len(names) >= 2:
-                t = d.action_ticks(names[0], names[1])
-                parts.append(('%s.%s' % (names[0].split('_', 1)[-1], names[1]), t))
-                if t is None: unknown.append(e)
-                else: total += t
+                parts.append((names[0], names[1], d.action_ticks(names[0], names[1])))
             else:
-                unknown.append(e)
+                parts.append((names[0] if names else '?', '?', None))
         elif k in ('E6bd4', 'E6c2e'):
             names = [x for x in e[1] if not x.startswith('$')]
+            if not names and ctx.get('hideout'):
+                names = [ctx['hideout']]
             act = 'enter' if k == 'E6bd4' else 'leave'
-            t = d.action_ticks(names[0], act) if names else None
-            parts.append(('%s.%s' % (names[0].split('_', 1)[-1] if names else '?', act), t))
-            if t is None: unknown.append(e)
-            else: total += t
+            if names: ctx['hideout'] = names[0]
+            ctx['inside'] = names[0] if (names and act == 'enter') else None
+            parts.append((names[0] if names else '?', act, d.action_ticks(names[0], act) if names else None))
+        elif k == 'WAITEVENT' and isinstance(e[2], int):
+            # fcn.1000e7f2: to the hideout, its `enter` (fcn.10006bd4), then the bar
+            obj = next((x for x in e[1] if d.real.get(x) or x in d.objects), None)
+            # (already inside — 209's curtain entered by the step — no second enter:
+            # the helper's first branch makes the bar at once)
+            if obj and ctx.get('inside') != obj:
+                t = d.action_ticks(obj, 'enter')
+                if t is not None:
+                    parts.append((obj, 'enter', t))
+            if obj: ctx['hideout'] = obj; ctx['inside'] = obj
+            parts.append((obj or '?', 'bar', e[2]))
         elif k in ('WAITEVENT', 'POLL', 'SHOUT', 'Eebbf', 'Ef82b', 'Ef51a', 'Ef779', 'Efac4', 'E2f40', 'E807f', 'RUNGO'):
-            unknown.append(e); parts.append((k, None))
-    return total, parts, unknown
+            parts.append(('-', k, None))
+    return parts
 
 
-def report(n):
+def lap_steps(n):
+    """the untricked lap: [(index, step address, icon, objects, parts)] and the
+    loop's first index (None when the walk stops)"""
     d = Data(n)
     st = level_start(n); lv = Level(n)
     steps, loop = walk(lv, st)
-    print('== %d  loop at step %s' % (n, loop))
-    lap = 0.0
+    out = []; ctx = {}
     for i, (cur, ev, nxt) in enumerate(steps):
         ic = [e[1] for e in ev if e[0] == 'IC']
-        go = [e[1] for e in ev if e[0] == 'GO']
-        tot, parts, unk = station_ticks(d, ev)
+        objs = set()
+        for e in ev:
+            if len(e) < 2:
+                continue
+            for x in (e[1] if isinstance(e[1], list) else [e[1]]):
+                if isinstance(x, str) and not x.startswith('$'):
+                    objs.add(x)
+        out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, station_ticks(d, ev, ctx)))
+    return out, loop
+
+
+def short(obj):
+    return obj.split('_', 1)[-1] if '_' in obj else obj
+
+
+def report(n):
+    rows, loop = lap_steps(n)
+    print('== %d  loop at step %s' % (n, loop))
+    lap = 0
+    for i, cur, icon, objs, parts in rows:
+        tot = sum(t for _o, _a, t in parts if t is not None)
+        unk = [a for _o, a, t in parts if t is None]
         if loop is not None and i >= loop: lap += tot
-        print('  %s %-12s %6.2f s  %s%s' % ('>>' if i == loop else '  ', (ic[0][0] if ic and ic[0] else '-'),
-              tot / 12.0, ', '.join('%s %s' % (p, '?' if t is None else round(t / 12.0, 2)) for p, t in parts),
-              '  [unknown: %s]' % ', '.join(u[0] for u in unk) if unk else ''))
-    print('  the lap\'s actions: %.1f s' % (lap / 12.0))
+        print('  %s %-12s %6.2f s  %s%s' % ('>>' if i == loop else '  ', icon, tot / 12.0,
+              ', '.join('%s.%s %s' % (short(o), a, '?' if t is None else round(t / 12.0, 2)) for o, a, t in parts),
+              '  [unknown: %s]' % ', '.join(unk) if unk else ''))
+    print("  the lap's actions: %.1f s" % (lap / 12.0))
 
 
 if __name__ == '__main__':
     for n in [int(x) for x in sys.argv[1:]] or range(201, 215):
         report(n)
+
+
+# -- the walks (a first cut; the transit rule is an assumption to check) ------------
+class Geometry:
+    """the level's rooms (level.xml: the floor line path1-path2 at its y), the
+    door pairs of its <neighbor> records and the hotspots of objects.xml; the
+    neighbour's speed records of generic/objects.xml (mg1 8 px a tick along the
+    floor, mg0 3 up and down, stair0 5 on a stair)"""
+    def __init__(self, n):
+        folder = canon.pc_level(n)['folder']
+        X = '%s/nfh2/x' % canon.ROOT
+        lvx = canon.read('%s/%s/level.xml' % (X, folder))
+        self.ob = canon.read('%s/%s/objects.xml' % (X, folder))
+        go = canon.read('%s/generic/objects.xml' % X)
+        m = re.search(r'<actor name="neighbor"[^>]*>(.*?)</actor>', go, re.S)
+        sp = {dict(re.findall(r'(\w+)="([^"]*)"', t))['name']: dict(re.findall(r'(\w+)="([^"]*)"', t))
+              for t in re.findall(r'<speed\b[^>]*/>', m.group(1))}
+        self.speed = {k: int(v['speed']) for k, v in sp.items()}
+        self.start = {k: int(v['start']) for k, v in sp.items()}
+        self.rooms = {}
+        for rm in re.finditer(r'<room name="(\w+)" offset="[^"]+" path1="([^"]+)" path2="([^"]+)">(.*?)</room>', lvx, re.S):
+            x1, y1 = map(int, rm.group(2).split('/')); x2, _ = map(int, rm.group(3).split('/'))
+            nb = [dict(re.findall(r'(\w+)="([^"]*)"', t)) for t in re.findall(r'<neighbor ([^>]*)/>', rm.group(4))]
+            self.rooms[rm.group(1)] = {'x1': min(x1, x2), 'x2': max(x1, x2), 'y': y1, 'nb': nb}
+        # the placements: a hotspot is relative to its object's level.xml position
+        self.pos = {}
+        for m2 in re.finditer(r'<(?:object|door|actor) ([^>]*)>', lvx):
+            at = dict(re.findall(r'(\w+)="([^"]*)"', m2.group(1)))
+            if 'name' in at and 'position' in at:
+                self.pos[at['name']] = tuple(map(int, at['position'].split('/')))
+        self.hot = {}
+        for om in re.finditer(r'<(object|door|actor) name="([^"]+)"[^>]*?(/?)>', self.ob):
+            if om.group(3):
+                continue
+            end = self.ob.find('</%s>' % om.group(1), om.end())
+            body = self.ob[om.end():end]
+            self.hot[om.group(2)] = {h: tuple(map(int, o.split('/'))) for h, o in re.findall(r'<hotspot name="(\w+)" offset="([^"]+)"', body)}
+
+    def room_of(self, obj):
+        return obj.split('/')[0] if '/' in obj else None
+
+    def point(self, obj, key='neighbor'):
+        h = self.hot.get(obj) or {}
+        p = h.get(key) or h.get('neighbor') or h.get('woody')
+        if p is None:
+            return None
+        ox, oy = self.pos.get(obj, (0, 0))
+        return p[0] + ox, p[1] + oy
+
+    def route(self, a, b):
+        """[(door out, door in)] from room a to room b over the <neighbor> records"""
+        if a == b: return []
+        prev = {a: None}; q = [a]
+        while q:
+            r = q.pop(0)
+            for nb in self.rooms.get(r, {}).get('nb', []):
+                far = nb['name']
+                if far in prev or far not in self.rooms: continue
+                prev[far] = (r, nb.get('doorin'), nb.get('doorout')); q.append(far)
+                if far == b:
+                    path = []; cur = b
+                    while prev[cur]:
+                        pr, din, dout = prev[cur]; path.append((din, dout)); cur = pr
+                    return path[::-1]
+        return None
+
+    def ticks(self, dx, dy, gait='mg'):
+        """one axis a tick, as game.exe's walk (fcn.0047c7f0): the floor at <gait>1,
+        the depth at <gait>0; the first step adds its `start`"""
+        dx, dy = abs(dx), abs(dy); t = 0
+        if dx:
+            s = self.speed[gait + '1']; st = self.start[gait + '1']
+            t += max(1, -(-(dx - st) // s) + 1) if dx > st else 1
+        if dy:
+            t += -(-dy // self.speed[gait + '0'])
+        return t
+
+
+def walk_ticks(g, frm, to):
+    """(room, x, y) -> object: the floor walks at mg, each door pair's hotspots at
+    the stair records (the assumption)"""
+    room, x, y = frm
+    r2 = g.room_of(to); p2 = g.point(to)
+    if p2 is None or r2 not in g.rooms:
+        return None, frm
+    t = 0
+    rt = g.route(room, r2)
+    if rt is None:
+        return None, frm
+    for d_in, d_out in rt:
+        # d_in is the door in this room ('room/far'), d_out the far room's ('far/room')
+        a = g.point(d_in); b = g.point(d_out, 'neighbor_out') or g.point(d_out)
+        if a is None or b is None:
+            return None, frm
+        t += g.ticks(a[0] - x, 0)
+        t += g.ticks(b[0] - a[0], b[1] - a[1], 'stair')
+        x, y = b; room = d_out.split('/')[0]
+    t += g.ticks(p2[0] - x, 0)
+    return t, (r2, p2[0], p2[1])
+
+
+def lap_estimate(n, verbose=False):
+    """the lap's seconds: the stays of lap_steps plus the walks between the steps'
+    targets (walk_ticks); None parts counted as 0 and reported"""
+    d = Data(n); g = Geometry(n)
+    st = level_start(n); lv = Level(n)
+    steps, loop = walk(lv, st)
+    if loop is None:
+        return None
+    ctx = {}
+    pos = None; total = 0; walks = 0; stays = 0; unknown = []
+    order = steps[loop:] + steps[:loop] + steps[loop:loop + 1]    # the lap, closed on its first step
+    for k, (cur, ev, nxt) in enumerate(order):
+        parts = station_ticks(d, ev, ctx)
+        target = None
+        for e in ev:
+            if e[0] == 'GO':
+                target = e[1] if e[1] and not str(e[1]).startswith('$') else None
+                if target is None:
+                    pick = [x[2] for x in ev if x[0] == 'IFVAR' and x[2] and not str(x[2]).startswith('$')]
+                    dos = [x[1][0] for x in ev if x[0] == 'DO' and x[1] and not x[1][0].startswith('$') and x[1][0] != 'neighbor']
+                    target = (pick or dos or [None])[0]
+                break
+        if target:
+            real = d.real.get(target, target)
+            if pos is None:
+                p = g.point(real)
+                pos = (g.room_of(real), p[0], p[1]) if p else None
+            else:
+                t, pos2 = walk_ticks(g, pos, real)
+                if t is None:
+                    unknown.append('walk to %s' % real)
+                else:
+                    if k > 0: walks += t
+                    pos = pos2
+                if verbose: print('   walk -> %-30s %5.1f s' % (real, (t or 0) / 12.0))
+        if k == len(order) - 1:
+            break            # the closing step: its walk ends the lap
+        s = sum(t for _o, _a, t in parts if t is not None)
+        unknown += ['%s.%s' % (short(o), a) for o, a, t in parts if t is None]
+        stays += s
+        if verbose: print('   stay %-30s %5.1f s' % ('+'.join('%s.%s' % (short(o), a) for o, a, _t in parts), s / 12.0))
+    return (walks + stays) / 12.0, walks / 12.0, stays / 12.0, unknown
+
+
+def video_laps():
+    out = {}
+    for line in open(os.path.join(os.path.dirname(os.path.dirname(HERE)), 'docs', 'PC_LAPS.md')):
+        m = re.match(r'\| (2\d\d) [^|]*\|[^|]*\| ([^|]*) \|', line)
+        if m:
+            v = re.findall(r'\d+', m.group(2))
+            if v: out[int(m.group(1))] = v
+    return out
+
+
+# the mobile stations against the code's parts, for the levels whose lap closes:
+# item -> [(step selector, object suffix, action)]; a selector is a substring of
+# one of the step's objects (None: any step)
+PAIRS = {
+    203: {'Microphone': [(None, 'stage', 'enter'), (None, 'stage', 'use'), (None, 'stage', 'leave')],
+          'ToiletPaper': [(None, 'toilet', 'shit')], 'ToiletFlush': [(None, 'toilet', 'flush')],
+          'Watermelon': [(None, 'melons', 'use')], 'Bicycle': [(None, 'bike', 'use')]},
+    208: {'ArmsBowl': [('statue', 'neighbor', 'lookaround'), (None, 'statue', 'take')],
+          'IndianPlatform': [(None, 'fakir', 'play'), (None, 'platform', 'enter'), (None, 'platform', 'bar'),
+                             (None, 'fakir', 'stop')],
+          'ShoeMachine': [(None, 'shoe_cleaner', 'use')],
+          'AngryElephant': [('elephant', 'neighbor', 'lookaround'), (None, 'elephant', 'fool')]},
+    211: {'Sweets': [(None, 'dish', 'use')], 'FishingRod': [(None, 'rod', 'use')],
+          'LifeBoat': [('boat', 'neighbor', 'lookaround'), (None, 'boat', 'use')],
+          'LifeJacket': [(None, 'lifevest', 'use')], 'DivingGear': [(None, 'diving', 'use')]},
+    212: {'PreAztecThrone': [('hands', 'neighbor', 'lookaround')], 'AztecThrone': [(None, 'hands', 'sit')],
+          'Whip': [(None, 'whip', 'use')], 'CigarBox': [(None, 'cigars', 'use')],
+          'SleepBench': [(None, 'bank', 'enter'), (None, 'bank', 'bar'), (None, 'bank', 'leave')],
+          'MechanicalBull': [(None, 'bullride', 'use')],
+          'PreParrotLedge': [(None, 'cliff', 'enter')],
+          'ParrotLedge': [(None, 'cliff', 'use'), (None, 'water', 'use'), (None, 'water_exit', 'leave')]},
+    213: {'LiveBull': [(None, 'limberwall', 'use')],
+          'PlantCarnivore': [('carnivore', 'neighbor', 'lookaround'), (None, 'carnivore', 'use')],
+          'Tortilla': [(None, 'tortilla', 'use')], 'Pinata': [(None, 'pinata', 'use')],
+          'CementBath': [('washingtub', 'neighbor', 'lookaround'), (None, 'washingtub', 'use')]},
+}
+
+
+def code_stays(n):
+    """{mobile item: seconds} from the lap's parts by PAIRS[n]; an item whose part
+    is missing or untimed is left out"""
+    rows, loop = lap_steps(n)
+    if loop is None:
+        return {}
+    lap = rows[loop:] + rows[:loop]
+    used = set(); out = {}
+    for item, sels in PAIRS.get(n, {}).items():
+        tot = 0; ok = True
+        for sel, osuf, act in sels:
+            hit = None
+            for i, cur, icon, objs, parts in lap:
+                if sel and not any(sel in o for o in objs):
+                    continue
+                for j, (o, a, t) in enumerate(parts):
+                    if (i, j) in used or a != act:
+                        continue
+                    if o == osuf or o.endswith('_' + osuf):
+                        hit = (i, j, t); break
+                if hit: break
+            if hit is None or hit[2] is None:
+                ok = False; break
+            used.add(hit[:2]); tot += hit[2]
+        if ok:
+            out[item] = round(tot / 12.0, 2)
+    return out

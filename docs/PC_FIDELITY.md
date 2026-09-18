@@ -1044,6 +1044,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Olga's picnic and bull ride, 208's fakir). Until those are read the
   video's stays stay: the code's actions alone would make every Season 2
   lap shorter than the PC's.
+  Read further (2026-09-23, later): the bars are timed — fcn.1000e7f2's
+  object counts a level tick at a time up to its pushed ticks (212's
+  bench `sleep` 60, 209's curtain 120, 208's platform 60, 202's mat and
+  207's and 210's deck chairs 120) after the hideout's `enter`; the
+  code's stays against the video's, per mobile item (lap_model_s2.py
+  code_stays): 203 Microphone 15.1 / 11.8, ToiletPaper 11.0 / 12.6,
+  ToiletFlush 4.9 / 6.1, Watermelon 3.6 / 14.7, Bicycle 8.5 / 12.5; 208
+  ArmsBowl 4.9 / 12.0, IndianPlatform 12.1 / 0.5, ShoeMachine 4.25 / 23.2,
+  AngryElephant 5.6 / 7.2; 211 Sweets 1.75 / 0.5, FishingRod 6.75 / 8.2,
+  LifeBoat 8.8 / 17.3, LifeJacket 6.6 / 10.2, DivingGear 5.7 / 7.0; 212
+  PreAztecThrone 3.6 / 2.9, AztecThrone 6.75 / 7.0, Whip 4.9 / 6.7,
+  CigarBox 7.25 / 14.0, SleepBench 12.5 / the mobile's, MechanicalBull
+  5.0 / 19.0, PreParrotLedge 1.9 / 5.3, ParrotLedge 8.7 / 9.9; 213 LiveBull
+  3.5 / 3.5, PlantCarnivore 8.2 / 12.8, Tortilla 1.5 / 4.0, Pinata 6.8 /
+  12.5, CementBath 9.25 / 28.5. The video's spans put a station's time on
+  its neighbour (208's platform in the shoe machine's span) and hold the
+  walk the port's geometry does not have: the PC's walk step
+  (fcn.10009215, one axis a tick, the vertical first at mg0 / mg2 3 px)
+  runs over the level.xml geometry through door pairs whose points the
+  path builder fcn.10009489 lays and which is not read yet. The switch to
+  the code's stays waits for that walk: carried alone they would shorten
+  every Season 2 lap by about a fifth.
 - *The other actors' stands.* The PC level data times an actor's action in
   ticks (`<action actor="mother" … time="120">` in objects.xml, 12 per
   second) or `auto` (its clip: the enter/leave stretches of a stand, a
