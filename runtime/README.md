@@ -1045,6 +1045,14 @@ Rottweiler: at once if he is walking, else deferred through
 TrickItem.cs:243-249). The viewer feeds mouse deltas, freezes the camera
 and mutes clicks while `IsDexterityOn`.
 
+Under the PC profile the same field plays the PC original's game instead
+(`DexterityState._pc_tick`, docs/PC_FIDELITY.md 2.6): the item's
+`PCMinigameTicks` (its PC action's `time`) and `PCMinigameLevels` (its
+combine.xml startlevel / endlevel) from the levels/pc overlays, the thumb
+moved one to one by the mouse, rated 4..-40 a level tick by its distance to
+the middle and pushed by GameLogic.dll's three-sinusoid wobble; the count
+reaching `time` wins, below 0 loses.
+
 ## The parity audit (docs/PARITY_AUDIT_PROMPT.md)
 
 Four passes over the decompile, the engine contracts it leans on, the level

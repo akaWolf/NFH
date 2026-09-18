@@ -125,7 +125,9 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   whistle on Level114 — measured in `docs/PC_VS_MOBILE.md`.
 - **The PC profile.** The PC's scoring (the S1 viewer rating, the S2
   COLLAPSE! board with the clock), its trick amounts, lap orders and
-  scores where they differ, the whistle, three lives, no minigames, the
+  scores where they differ, the whistle, three lives, the PC's own
+  minigame (since 2026-09-23: GameLogic's game object, `docs/PC_FIDELITY.md`
+  2.6), the
   rating's count-up and — since 2026-09-16, read from game.exe — the
   Season 1 anger itself (a trick sets the indicator to its `angrytime`,
   60 ticks of hold, one per tick at 12 Hz, +3 while above zero), and
@@ -170,9 +172,11 @@ profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
 between them is not); the Season 2 runs the mobile has no moment for
-(201's tutorial, 205's water ski, 206's Mother at the ramp, 208's rake,
-214's crashes) and the PC's `failed` actions that send the neighbour
-running (`docs/PC_FIDELITY.md` "Season 2's runs"). 111's machines are the
+(201's tutorial, 205's water ski, 208's rake, 210's second) and the PC's
+`failed` actions that send the neighbour running (`docs/PC_FIDELITY.md`
+"Season 2's runs"); the minigame's order of a tick's elapsed count against
+the game's update (one tick, 0.083 s) and the PC's field size (the
+remaster's reference pixels stand for it). 111's machines are the
 level class's DoActions (the washer's 24 s in the video is the walk and
 give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. Two natural laps differ from

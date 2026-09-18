@@ -114,12 +114,60 @@ gauge and the tricks stay as they were, the neighbour walks back into his
 routine and the clock never stops. The profile's `_respawn` does exactly
 that (the entrance location, the routine unfrozen, nothing reset).
 
-### 2.6 Dexterity mini-games (confidence: high)
+### 2.6 Dexterity mini-games (confidence: high — read in GameLogic.dll 2026-09-23)
 
-PC has none. Port: `_dexterity_gate` (world.py:7228) arms the minigame on
-the first pass and lets the second through. Profile switch: return the
-"done" branch on the first pass (auto-solve). The `unlock` legs in the plans
-become no-ops under the profile; the plans still run.
+The PC has them, one a level on 201-214 (the earlier "PC has none" and the
+profile's auto-solve are withdrawn): an objects.xml object flagged `game`
+whose Woody action (the hairpin, the reed, the tongs, the air pump, the
+brailer, the rasp, the crowbar, the beehive, the shards or a bare `use`)
+carries a `time` of 240-360, beside a `failed` action (game_failed, the
+neighbour's `run` behaviour — 201's toolbox sends `aux`); the level's
+combine.xml combination that takes the object names minigame/<tool>.xml
+(the field, the alarm field, the tool as the thumb, a vertical progress
+bar) and a `startlevel` / `endlevel` (1..4 on 201, 1..5 on 202-205, 1..6 on
+206, 2..6 on 207-210, 2..7 on 211 and 214, 3..7 on 212-213). GameLogic's
+DoAction step (fcn.10001b2c) advances the action's elapsed count by the
+game's rate instead of 1 and hands the game the progress (elapsed x 100 /
+time, fcn.100507dd, latching at 10). The game object (vtable 0x100b1a7c,
+constructor fcn.100507f4, fcn.100508a1 once a level tick with the mouse,
+from 0x1004482b) measures the thumb — the mouse itself — from the field's
+middle in 1/10 px, each axis held in -1000..1000 and the pair to a radius of
+1000; over its first three ticks it moves the mouse back onto the middle
+with the rate left at 0, after them it rates the distance — 4 under 200, 3
+under 400, 2 under 600, 1 under 800, beyond it 0 or, once latched,
+-(progress x 4 / 10) in -40..-4 — and pushes the mouse by three sinusoids,
+amplitudes 20, 10 and 5 times a factor that grows from startlevel to
+endlevel with min(progress, 90) / 90, 0.0648 / -0.1461 / 0.3696 rad a tick,
+the y a quarter turn ahead, each phase started at rand(8) quarter turns;
+the level tick moves the mouse by the push and shows the alarm field while
+the rate is negative. The levels reach the game through the object: the
+level parser's setter fcn.100452d7 (0x10048b74) stores the object message's
+game and the two levels at +0x10/+0x28/+0x2c, and the use_object step
+(fcn.10004353) hands them to fcn.10041735 as doubles, which the constructor
+keeps at +0x40/+0x48. The count reaching `time` is the object's action (the
+use step's progress == 100 at 0x10004c68), below 0 the `failed` one. Held
+in the middle the game lasts 3 + time/4 ticks: 5.25 s (210's brailer), 5.9 s
+(201, 205, 206, 209), 7.75 s (the 360s); a player who holds still loses it
+(the push walks the thumb out, the latched rate turns negative).
+
+The profile plays it on the remaster's field with the PC's rules
+(PCMinigameTicks, PCMinigameLevels — tools/pcref/pc_minigames.py;
+pcprofile.s2_game_rate / s2_game_push; DexterityState._pc_tick): the thumb
+follows the mouse one to one with no remaster drift or margins, the first
+three ticks centre it, the push and the alarm field are the PC's, the
+drawn thumb stops at the 100 px radius (thumb_rect). 214's game is the
+hatch's shards round (bottomright/hatch_closed, the phase his first fall
+leaves: the mobile Hatch's Dexterity set by HatchFixBehavior). The harness
+steers the thumb half the way back a frame and counts the game's length
+into its gate (use_time): 212's plate now goes before the whip, its take
+straight after the game (v2), and 208's rat during his lap-2 shoe
+(tests/plans/pc/s2). Open, with numbers: the field — the remaster's
+reference pixels (1280 x 800) stand for the PC's, the PC's field.tga is not
+on hand; the order of a tick's DoAction step against the game's update
+(0x1004482b) — whether the elapsed count takes this tick's rate or the last
+one's, one tick (0.083 s) on every game; 201's toolbox keeps the mobile's
+DexterityCannotLose (the PC's `failed` there sends `aux` running, an actor
+the port has no counterpart for).
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -154,7 +202,8 @@ Art, menus, HUD, tap controls (the port is already mouse-driven), IAP gates
   whistle). Each entry carries a `"source"` string (guide URL / video
   timestamp), the PC analogue of the runtime's `// cs:` citations.
 - `Game.rules`: `overflow_bonus = 'exactly_one' | 'at_least_one'`,
-  `dexterity = 'minigame' | 'auto'`, `lives = 0 | 3`.
+  `dexterity = 'minigame' | 'auto'`, `lives = 0 | 3` (the sketch; the
+  dexterity became the PC's own game, §2.6).
 - The whistle hook is the only new mechanism; it lives in the profile
   branch and is inert in `mobile`.
 - `tests/plans/pc/`: the plans that differ (114 with the whistle, 211 with
@@ -1053,23 +1102,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   mobile's Urgent DeckChair / Pillows / DeckChair), 210's run to the
   Mother's call (0x10018dd9 — the Urgent CallRTMother), 211's run to the
   ringing cabin phone (0x1002fd04 — the alarm, CabinPhone's PCRunTo) and
-  to the WC after the sweets (0x10030e07 — the toilet run), 207's Olga to
-  the destroyed sand castle to lift him (0x10017606 — her hit-pawn after
-  the SandCastle, PCRunTo); the stairs keep their records. Olga's and the
-  Mother's other hits walk on PC and show the walk set. Open, with their
-  sites: the runs of 201's tutorial (the buffet 0x10028b74, the soap
-  puddle 0x10029797, the damaged buffet 0x1002ad27), 205's nailed water
-  ski (0x10024fde), 206's Mother to the ramp on the rabbit's crash
-  (0x1002bbd1, `fifi_crash`), 208's rake (0x1001d889), 210's second
-  (0x10019270), the bike (0x10033486) and 214's crashes (0x1003a27f,
-  0x1003c035); and a PC mechanic the mobile lacks — Woody's `failed`
-  actions on nine levels' objects (cn_b1's crayfish, cn_b2's duck cage,
-  cn_c1's toy-o-mat, in_b1's crayfish, in_b2's tool belt, in_c1's rat,
-  in_c2's coal, ship2's kukidentomat, ship3's boat, ship4's hatch) dispatch
+  to the WC after the sweets (0x10030e07 — the toilet run), and the
+  co-actors' runs to him after his crash, each a gait write before
+  fcn.1000eb19's walk to "neighbor" — the mobile's hit-pawn of the trick
+  item's PawnToAffectWhenTricked, run where the item carries PCRunTo
+  (World.play_angry; pc_reactions.py RUNTO_S2): 201's Olga at the damaged
+  buffet (0x1002ad27), 204's at the rickshaw (0x10033486), 205's at the
+  table tennis (0x1002637e), 206's Mother to the ramp on the rabbit's crash
+  (0x1002bbd1), 207's Olga to the destroyed sand castle to lift him
+  (0x10017606), 214's Olga after the shower and the bouquet (0x1003c035,
+  one handler) and its Mother after the pistol (0x1003a27f); the stairs
+  keep their records. Their other walks to him the PC walks. Open, with
+  their sites: the runs of 201's tutorial (the buffet 0x10028b74, the soap
+  puddle 0x10029797), 205's nailed water ski (0x10024fde), 208's rake
+  (0x1001d889) and 210's second (0x10019270), which the mobile has no
+  moment for; and a PC mechanic the mobile lacks — the `failed` action of
+  every level's game object (§2.6; 201's toolbox sends `aux`) dispatches
   the neighbour's `run` behaviour: the alarm step (vtable 0x100b0f68: the
   loud sound, a running GoTo fcn.100080e1, `search`) and the `fight` step
-  (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`). The catch fiber
-  itself (0x100061dc) sets no gait.
+  (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`) — the profile
+  loses the game the mobile's way (DexterityFailed, the Rottweiler's
+  alert). The catch fiber itself (0x100061dc) sets no gait.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it
