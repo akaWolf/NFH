@@ -176,7 +176,9 @@ between them is not); the Season 2 runs the mobile has no moment for
 `docs/PC_FIDELITY.md` "Season 2's runs"); the minigame's order of a tick's
 elapsed count against the game's update (one tick, 0.083 s), the PC's field
 size (the remaster's reference pixels stand for it) and 203's Olga shout
-before the run. 111's machines are the
+before the run; the Season 2 station stays, still the PC video's — the
+code's lap (tools/pcref/lap_model_s2.py) closes seven levels, but its
+waits on events and on Olga and the Mother are not read yet. 111's machines are the
 level class's DoActions (the washer's 24 s in the video is the walk and
 give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. Two natural laps differ from

@@ -1028,6 +1028,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Mother's PC stands (the entry below): with her 8.3 s at the statue
   hideout for the mobile's 19.9 the cigar room opens more often, and the
   mobile plan under the profile overflows at 279 s.
+  The source is the video, not the code — open, and read as far as it
+  goes (2026-09-23): tools/pcref/lap_model_s2.py walks each level script
+  of GameLogic.dll along the untricked path and times its sequences from
+  the data (a DoAction's `time` or its animation's frames, a hideout's
+  enter/leave, the message elements at once). On the seven levels whose
+  laps it closes the actions are shorter than the video's stays at most
+  stations — 212's bull ride 5.0 s (the `ride` clip, 60 frames) against
+  19.0, the cigars 7.25 (`smoke`, 87) against 14.0, the whip 4.9 against
+  6.7, 213's cement bath 9.25 against 28.5, its tortilla 1.5 against 4.0,
+  211's life boat 8.8 against 17.3 — and the lap's actions sum to 29.6 s
+  (211), 38.1 (212) and 42.7 (213) against video laps of 68-117, 113 and
+  136 s: the rest is the walks and the waits the model does not time yet
+  (212's bench `sleep` event, 209's curtain `inactive`, 213's polls on
+  Olga's picnic and bull ride, 208's fakir). Until those are read the
+  video's stays stay: the code's actions alone would make every Season 2
+  lap shorter than the PC's.
 - *The other actors' stands.* The PC level data times an actor's action in
   ticks (`<action actor="mother" … time="120">` in objects.xml, 12 per
   second) or `auto` (its clip: the enter/leave stretches of a stand, a
