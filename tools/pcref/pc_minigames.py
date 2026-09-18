@@ -32,7 +32,12 @@ the use_object step hands the game (fcn.10004353: the object's +0x28/+0x2c
 as doubles to fcn.10041735 and the constructor fcn.100507f4, +0x40/+0x48).
 fcn.100508a1 grows a factor from startlevel to endlevel with the progress
 (min(progress, 90) / 90) and pushes the mouse each tick by three sinusoids of
-it (PCMinigameLevels; DexterityState._pc_tick).
+it (PCMinigameLevels; DexterityState._pc_tick). A lost game plays the object's
+`failed` action (PCMinigameFailed, its behavioractor): the neighbour's `run`
+on eleven levels; on 203 Olga's `shout`, her shout_chinese whose own
+behaviour is the neighbour's `run` (cn_c2's olga actor); on 201's tutorial
+toolbox `run` on `aux`, the level's invisible dummy at 0/0 (ship1/level.xml),
+and on 212's spikes and 213's pinata no behaviour at all — nobody comes.
 
 The pairing mobile dexterity item -> PC game object is by hand (the items'
 DexterityUnlocker against the objects' actions). 214's shards round is the
@@ -83,6 +88,17 @@ def action_time(n, obj, act):
     return int(a.group(1))
 
 
+def failed_actor(n, obj):
+    """whom the game object's `failed` action sends: its behavioractor, '' for
+    none (212's spikes, 213's pinata)"""
+    folder = canon.pc_level(n)['folder']
+    s = canon.read('%s/nfh2/x/%s/objects.xml' % (canon.ROOT, folder))
+    m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), s, re.S)
+    a = re.search(r'<action name="failed"([^>]*)>', m.group(1), re.S)
+    b = re.search(r'behavioractor="(\w+)"', a.group(1)) if a else None
+    return b.group(1) if b else ''
+
+
 def game_levels(n, obj):
     """the startlevel / endlevel of the combination that plays obj's game"""
     folder = canon.pc_level(n)['folder']
@@ -110,9 +126,10 @@ def main(argv):
     for n, (item, obj, act) in sorted(PAIRS.items()):
         t = action_time(n, obj, act)
         lo, hi = game_levels(n, obj)
+        fa = failed_actor(n, obj)
         kind = item_kind(n, item)
-        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d' % (
-            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi))
+        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s' % (
+            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, fa))
         if not write or kind is None:
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
@@ -123,6 +140,7 @@ def main(argv):
             if isinstance(st, dict):
                 st.pop('PCMinigameTicks', None)
                 st.pop('PCMinigameLevels', None)
+                st.pop('PCMinigameFailed', None)
         patches = [e for e in patches if not (isinstance(e.get('set'), dict) and not e['set'])]
         e = next((e for e in patches if e.get('object') == item and e.get('component') == kind
                   and isinstance(e.get('set'), dict)), None)
@@ -131,12 +149,18 @@ def main(argv):
             patches.append(e)
         e['set']['PCMinigameTicks'] = t
         e['set']['PCMinigameLevels'] = [lo, hi]
+        e['set']['PCMinigameFailed'] = fa
         ov['patches'] = patches
         note = (" The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the"
                 " game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and"
-                " endlevel of its combine.xml combination (the wobble's range).")
-        if 'pc_minigames.py' not in ov.get('source', ''):
-            ov['source'] = ov.get('source', '') + note
+                " endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the"
+                " behavioractor of its `failed` action (the actor a lost game sends running).")
+        src = ov.get('source', '')
+        i = src.find(' The mini-game (tools/pcref/pc_minigames.py)')
+        if i >= 0:
+            j = src.find(' The ', i + 1)
+            src = src[:i] + (src[j:] if j >= 0 else '')
+        ov['source'] = src + note
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
         open(p, 'a').write('\n')
     return 0

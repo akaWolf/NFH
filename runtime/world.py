@@ -2223,6 +2223,7 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
+        self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
         self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
@@ -4107,8 +4108,11 @@ class Routine:
         tool and the way back to the target (110's extinguisher, 113's
         valves); the other urgents the PC walks (111's vacuum and carpet
         cases leave the gait at 0)"""
+        run_next, self.pc_run_next = self.pc_run_next, False
         if self.role != 'Rottweiler' or not pcprofile.is_pc() or item is None:
             return False
+        if run_next:
+            return True
         w = self.pawn.world
         if kind == 'surprise_far' and w is not None and item.pid in w.alerters:
             return True
@@ -5200,7 +5204,15 @@ def _dex_surprise(world, rt, item):
     a = rt.action
     if a is not None and a.get('hide_object') and rt.item is not None:
         world.set_active_object_hidden(rt.item, False)
+    if pcprofile.is_pc() and getattr(item, 'pc_minigame_ticks', None):
+        # the PC's game lost: its object's `failed` action sends the
+        # neighbour's `run` behaviour (GameLogic's registry fcn.1003ef32:
+        # `run`, the UTF-16 string at 0x100b21c4, -> 0x1003e278; its step
+        # 0x1003dec1, vtable 0x100b0f7c) — the alarm sound, a running GoTo
+        # to the object (fcn.100080e1) and `search` there
+        rt.pc_run_next = True
     rt.start_urgent(item)
+    rt.pc_run_next = False               # a frozen manager never took it
 
 
 class DexterityState:
@@ -5414,12 +5426,16 @@ class DexterityState:
             self.wrong = rate < 0
             self.pc_elapsed = min(self.pc_elapsed + rate, self.pc_total)
             if self.pc_elapsed < 0:
+                # the `failed` action: the PC game can always be lost (201's
+                # toolbox too, the mobile's DexterityCannotLose); its
+                # behaviour sends the neighbour running — straight or through
+                # Olga's shout (203) — or nobody (201's `aux`, 212's spikes,
+                # 213's pinata: PCMinigameFailed)
                 self.pc_elapsed = 0
                 self.pc_progress = 0
                 self.percent = 0.0
-                if self.item is not None and self.item.dexterity_cannot_lose:
-                    continue
-                self._lose()
+                self._lose(alert=getattr(self.item, 'pc_minigame_failed', None)
+                           in ('neighbor', 'olga'))
                 return
             self.pc_progress = self.pc_elapsed * 100 // self.pc_total
             if self.pc_progress >= 10:
@@ -5489,14 +5505,15 @@ class DexterityState:
         if it.dexterity_trick_item or it.take_item_count > 0:
             self.start_again = True
 
-    def _lose(self):
+    def _lose(self, alert=True):
         """LoseDexterity (cs:361-367)"""
         self.cleanup()
         w = self.world
         if w.woody is not None and w.woody.anim.has('DexterityFailed'):
             w.woody.anim.play_single('DexterityFailed')
         self.start_again = True
-        self.alert()
+        if alert:
+            self.alert()
 
     def cleanup(self):
         """CleanUp (cs:390-406)"""

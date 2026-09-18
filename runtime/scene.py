@@ -241,6 +241,7 @@ class Item:
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
+                 'pc_minigame_failed',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -631,6 +632,8 @@ class Item:
         # and its combination's startlevel / endlevel (combine.xml): the
         # range the game's wobble factor grows through (fcn.100508a1)
         self.pc_minigame_levels = d.get('PCMinigameLevels')
+        # and whom its `failed` action sends (the behavioractor; '' none)
+        self.pc_minigame_failed = d.get('PCMinigameFailed')
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')
