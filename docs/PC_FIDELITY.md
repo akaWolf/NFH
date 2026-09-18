@@ -120,8 +120,10 @@ The PC has them, one a level on 201-214 (the earlier "PC has none" and the
 profile's auto-solve are withdrawn): an objects.xml object flagged `game`
 whose Woody action (the hairpin, the reed, the tongs, the air pump, the
 brailer, the rasp, the crowbar, the beehive, the shards or a bare `use`)
-carries a `time` of 240-360, beside a `failed` action (game_failed, the
-neighbour's `run` behaviour — 201's toolbox sends `aux`); the level's
+carries a `time` of 240-360, beside a `failed` action (game_failed and a
+behaviour: the neighbour's `run` on eleven levels, Olga's `shout` on 203 —
+her shout_chinese, whose own behaviour is his `run` — `run` on 201's
+invisible `aux`, none on 212 and 213); the level's
 combine.xml combination that takes the object names minigame/<tool>.xml
 (the field, the alarm field, the tool as the thumb, a vertical progress
 bar) and a `startlevel` / `endlevel` (1..4 on 201, 1..5 on 202-205, 1..6 on
@@ -148,14 +150,22 @@ keeps at +0x40/+0x48. The count reaching `time` is the object's action (the
 use step's progress == 100 at 0x10004c68), below 0 the `failed` one. Held
 in the middle the game lasts 3 + time/4 ticks: 5.25 s (210's brailer), 5.9 s
 (201, 205, 206, 209), 7.75 s (the 360s); a player who holds still loses it
-(the push walks the thumb out, the latched rate turns negative).
+(the push walks the thumb out, the latched rate turns negative). The `run`
+behaviour (GameLogic's registry fcn.1003ef32 maps the UTF-16 `run` at
+0x100b21c4 to 0x1003e278; its step 0x1003dec1, vtable 0x100b0f7c) plays the
+alarm sound, runs the actor to the object (the running GoTo fcn.100080e1)
+and starts `search` there.
 
 The profile plays it on the remaster's field with the PC's rules
 (PCMinigameTicks, PCMinigameLevels — tools/pcref/pc_minigames.py;
 pcprofile.s2_game_rate / s2_game_push; DexterityState._pc_tick): the thumb
 follows the mouse one to one with no remaster drift or margins, the first
 three ticks centre it, the push and the alarm field are the PC's, the
-drawn thumb stops at the 100 px radius (thumb_rect). 214's game is the
+drawn thumb stops at the 100 px radius (thumb_rect); a lost game sends
+the neighbour onto the object at a run where the `failed` behaviour
+reaches him (the mobile's surprise, Routine.pc_run_next) and nobody on
+201, 212 and 213 (PCMinigameFailed; 201's toolbox loses like the rest, the
+mobile's DexterityCannotLose aside). 214's game is the
 hatch's shards round (bottomright/hatch_closed, the phase his first fall
 leaves: the mobile Hatch's Dexterity set by HatchFixBehavior). The harness
 steers the thumb half the way back a frame and counts the game's length
@@ -165,9 +175,10 @@ straight after the game (v2), and 208's rat during his lap-2 shoe
 reference pixels (1280 x 800) stand for the PC's, the PC's field.tga is not
 on hand; the order of a tick's DoAction step against the game's update
 (0x1004482b) — whether the elapsed count takes this tick's rate or the last
-one's, one tick (0.083 s) on every game; 201's toolbox keeps the mobile's
-DexterityCannotLose (the PC's `failed` there sends `aux` running, an actor
-the port has no counterpart for).
+one's, one tick (0.083 s) on every game; 203's Olga shout_chinese before
+his run is not played (the port's Olga has no such clip; he starts at the
+loss), and his run keeps the mobile's moment (at once if he walks, else
+when his clip ends) where the PC's `always` may start it at once.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -1116,13 +1127,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   their sites: the runs of 201's tutorial (the buffet 0x10028b74, the soap
   puddle 0x10029797), 205's nailed water ski (0x10024fde), 208's rake
   (0x1001d889) and 210's second (0x10019270), which the mobile has no
-  moment for; and a PC mechanic the mobile lacks — the `failed` action of
-  every level's game object (§2.6; 201's toolbox sends `aux`) dispatches
-  the neighbour's `run` behaviour: the alarm step (vtable 0x100b0f68: the
-  loud sound, a running GoTo fcn.100080e1, `search`) and the `fight` step
-  (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`) — the profile
-  loses the game the mobile's way (DexterityFailed, the Rottweiler's
-  alert). The catch fiber itself (0x100061dc) sets no gait.
+  moment for. A PC mechanic the mobile lacks — the `failed` action of
+  every level's game object (§2.6) dispatches the neighbour's `run`
+  behaviour (0x1003e278: the alarm sound, a running GoTo fcn.100080e1,
+  `search`) — carried: a lost game's surprise onto the object runs
+  (Routine.pc_run_next), nobody comes on 201, 212 and 213. The `fight`
+  step (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`) is the
+  registry's other generic behaviour. The catch fiber itself (0x100061dc)
+  sets no gait.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it

@@ -172,11 +172,11 @@ profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
 the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
 between them is not); the Season 2 runs the mobile has no moment for
-(201's tutorial, 205's water ski, 208's rake, 210's second) and the PC's
-`failed` actions that send the neighbour running (`docs/PC_FIDELITY.md`
-"Season 2's runs"); the minigame's order of a tick's elapsed count against
-the game's update (one tick, 0.083 s) and the PC's field size (the
-remaster's reference pixels stand for it). 111's machines are the
+(201's tutorial, 205's water ski, 208's rake, 210's second —
+`docs/PC_FIDELITY.md` "Season 2's runs"); the minigame's order of a tick's
+elapsed count against the game's update (one tick, 0.083 s), the PC's field
+size (the remaster's reference pixels stand for it) and 203's Olga shout
+before the run. 111's machines are the
 level class's DoActions (the washer's 24 s in the video is the walk and
 give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. Two natural laps differ from
