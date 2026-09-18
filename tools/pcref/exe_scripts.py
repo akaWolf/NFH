@@ -81,7 +81,9 @@ def globals_map(exe):
         return m.group(0).decode('utf-16le') if m else None
 
     sites = []
-    for m in re.finditer(rb'\x68(....)\x68(....)\xe8', b):
+    # re.S: an address byte 0x0a is a newline to `.` (the scan missed
+    # 'marker', 0x519d60 <- 0x4ab430)
+    for m in re.finditer(rb'\x68(....)\x68(....)\xe8', b, re.S):
         s_va, g_va = struct.unpack('<I', m.group(1))[0], struct.unpack('<I', m.group(2))[0]
         if 0x4d0000 <= s_va < 0x4f0000 and 0x510000 <= g_va < 0x530000:
             name = wide_at(s_va)
@@ -115,8 +117,10 @@ GL_CALLS = {'fcn.1000e3e0': 'GOTO', 'fcn.10002cd5': 'ACTION', 'fcn.100422a5': 'I
 def main_gl(dll, dump, xml_root=os.path.expanduser('~/nfh-bench/pcref/pc/nfh2/x'),
             gmap=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'exe', 'nfh2_gamelogic_globals.json')):
     """the Season 2 scripts out of GameLogic.dll (base 0x10000000): the
-    String globals come from exe/nfh2_gamelogic_globals.json (their init is
-    not the S1 push-push-call form), the level blocks are the copies of the
+    String globals come from exe/nfh2_gamelogic_globals.json (the same
+    push-push-call init as Season 1's: the map's first cut missed every
+    constant whose address holds a 0x0a byte, the short UTF-16 names among
+    them — `use`, `sit`, `run` — added 2026-09-23), the level blocks are the copies of the
     engine's string table in address order, split at each copy's 'trick',
     and a block's level is the objects.xml whose room/object names
     ('pond/bridge' -> 'pond_bridge') it shares most; the calls above"""
