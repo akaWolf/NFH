@@ -247,7 +247,7 @@ class Item:
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
-                 'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending',
+                 'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
@@ -633,6 +633,10 @@ class Item:
         # mat under Olga — her lie-down, the sun loop, the wake-up, the get-up)
         self.pc_item_clip_secs = dict(d.get('PCItemClipSeconds') or {})
         self.pc_cut_pending = False      # the use's loop called off before it began
+        # a tricked station whose shout and repair the PC plays back at it
+        # after a run (PCTrickReturn, pc_reactions.py RETURN_S2: 205's nailed
+        # skis — {'pant': seconds} standing before the shout)
+        self.pc_trick_return = dict(d.get('PCTrickReturn') or {}) or None
         # the tricked use's clip after which the PC's trick action has ended
         # and paid (PCCreditAfter, pc_durations_s2.py CREDIT: 202's shark on
         # the sea's `enter`); pc_credited — paid there, the tantrum does not

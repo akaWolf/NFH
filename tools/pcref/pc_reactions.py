@@ -176,6 +176,12 @@ RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
 RUNTO_S2 = {201: ('Buffet',), 204: ('PullKart',), 205: ('TabbleTennis',), 206: ('LaunchPad',),
             207: ('SandCastle',), 210: ('Elephant',), 211: ('CabinPhone',),
             214: ('Shower', 'Bouquet', 'Pistol')}
+# the tricked stations whose shout and repair the PC plays back at the item
+# after a run (PCTrickReturn, the station's next visit): 205's nailed skis —
+# after the ride the script runs him back to the ski (0x10024fde: gait 2),
+# where he pants (`pant`), shouts (fcn.1000f977) and repairs it (0x1002512d)
+# before the lap goes on (0x10024929); the neighbour's actions, by name
+RETURN_S2 = {205: {'WaterSkiis': ('pant',)}}
 # the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
 # fire first, one fall clip, no clean, index 1) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)
@@ -184,7 +190,7 @@ TRAP_NAMES = ('ElectricTrap',)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
-        'PCReturnSeconds', 'PCRunTo')
+        'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn')
 
 _ROWS = None
 _LEVELS = None
@@ -377,13 +383,34 @@ def write(n, sp):
 
 
 def write_runs_s2():
-    """RUNTO_S2's PCRunTo into the Season 2 overlays (that key alone)"""
-    for n, items in sorted(RUNTO_S2.items()):
+    """RUNTO_S2's PCRunTo and RETURN_S2's PCTrickReturn into the Season 2
+    overlays (those keys alone)"""
+    import lap_model_s2
+    for n in sorted(set(RUNTO_S2) | set(RETURN_S2)):
         p = os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)
         ov = json.load(open(p))
-        patches = _strip_key(ov.get('patches', []), 'PCRunTo')
-        for item in items:
-            _set_key(patches, item, 'PCRunTo', True)
+        items = RUNTO_S2.get(n, ())
+        want = {(item, 'PCRunTo'): True for item in items}
+        d = lap_model_s2.Data(n) if n in RETURN_S2 else None
+        for item, acts in RETURN_S2.get(n, {}).items():
+            ticks = sum(d.action_ticks('neighbor', a) or 0 for a in acts)
+            want[(item, 'PCTrickReturn')] = {'pant': round(ticks / FPS, 2)}
+            print('== Level%d PCTrickReturn %s: pant %.2f s' % (n, item, ticks / FPS))
+        # the keys set in place (a patch's other keys and order kept), the
+        # ones no longer wanted dropped, the new ones added
+        patches = ov.get('patches', [])
+        for e in patches:
+            st = e.get('set') or {}
+            for key in ('PCRunTo', 'PCTrickReturn'):
+                if key in st and e.get('component') == 'TrickItem':
+                    v = want.pop((e['object'], key), None)
+                    if v is None:
+                        st.pop(key)
+                    else:
+                        st[key] = v
+        patches = [e for e in patches if e.get('set') != {}]
+        for (item, key), v in want.items():
+            _set_key(patches, item, key, v)
         ov['patches'] = patches
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
         print('== Level%d PCRunTo %s' % (n, ', '.join(items)))

@@ -667,6 +667,10 @@ predicate, then the all-tricks win.
   (`World.play_use_item_anim`: Olga's mat). A wait with `abort` fires the
   use's PawnToAbortMutexOnFinish at its release (his play: Olga's table
   mutex ends as it starts).
+- **The PC profile's return to a tricked station** (PCTrickReturn,
+  `Routine._pc_defer_angry` / `_pc_return_use`): the tricked use pays as
+  it ends and its angry set waits for the station's next visit, reached
+  at a run, after `pant` seconds standing (205's nailed skis).
 - **The PC profile's 207 board** (`Level207MotherBehavior`): the board's
   sets keep their WaitWatch, released as the Mother sits in her deck
   chair (her DeckChair use); at her get-up — the end of her chair's bar,

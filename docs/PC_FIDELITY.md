@@ -1334,11 +1334,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   neighbor_shout spot to shout, and to wheeze (0x10028b74 -> 0x1002833c,
   0x10029797 -> 0x100294fc), where the mobile tutorial walks him on
   through his lap (CrashShort / CrashLong, the anger, the deck rail or the
-  captain's hat); and 205's nailed water ski — after the ride the script
-  runs him back to the ski (0x10024fde), he pants and repairs it there
-  (0x1002512d) before the lap goes on (0x10024929), where the mobile
-  plays the anger and the fix at the ride's end and walks back on the
-  skates to put them (SkiWalk, 8.5 s from x -5.8 to -3.7 on the 205 run).
+  captain's hat). 205's nailed water ski is carried since 2026-09-24: after
+  the ride — whose record pays as it ends — the script runs him back to the
+  ski (0x10024fde: gait 2), he pants there (`pant`, 34 ticks), shouts and
+  repairs it (0x1002512d) before the lap goes on (0x10024929), where the
+  mobile plays the anger and the fix at the ride's end and walks back on
+  the skates to put them (SkiWalk, 8.5 s from x -5.8 to -3.7 on the 205
+  run); under the profile the tricked ride pays at its end and its anger
+  and fix wait for the station's next visit, reached at a run, after the
+  pant standing (PCTrickReturn, tools/pcref/pc_reactions.py RETURN_S2;
+  `Routine._pc_defer_angry`, `_pc_return_use`) — the scene 25 s from the
+  ride's start where it had been 29.5.
   A PC mechanic the mobile lacks — the `failed` action of
   every level's game object (§2.6) dispatches the neighbour's `run`
   behaviour (0x1003e278: the alarm sound, a running GoTo fcn.100080e1,
@@ -1522,7 +1528,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   gong 42 and jade dummy 45, 211's ladder 51, 209's fakir `spit` 18 in the
   model's lap). The idle lap is 101.6 s against the
   video's 102 (116.2 before; the model with the PC's walks 111.9). The v3
-  plan rates 100 under it (runs/p2045: 337.2 s, the pile on lap 3); its
+  plan rates 100 under it (runs/p205c: 334.5 s with the ski's return, the pile on lap 3); its
   notes were re-timed (v4).
 - *207's board (2026-09-24).* The neighbour's script (GameLogic.dll): the
   board step 0x100169c5 walks him onto the diving board and plays `wait`,

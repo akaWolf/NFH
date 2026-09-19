@@ -2710,6 +2710,8 @@ class Routine:
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
+        self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
+        self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
@@ -3246,6 +3248,11 @@ class Routine:
             self.pawn.in_urgent = bool(a.get('urgent'))
             self.pawn.pc_run = bool(a.get('urgent')) and pcprofile.is_pc() \
                 and pcprofile.SEASON2
+            if self.pc_return is not None and it is self.pc_return:
+                # back to the tricked station at a run (PCTrickReturn: 205's
+                # nailed skis, the gait write 0x10024fde before the GoTo)
+                self.pawn.in_urgent = True
+                self.pawn.pc_run = True
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
@@ -3304,6 +3311,9 @@ class Routine:
         if a.get('remove_skates'):
             self.pawn.has_skates = False
         w = self.pawn.world
+        if self.pc_return is not None and it is self.pc_return and w is not None:
+            self._pc_return_use(it)
+            return
         # Item.Use turns the item's sleep bar on: the Rottweiler-actor bar at
         # its head (Item.cs:831-834), the Mother-actor bar at its tail
         # (cs:861-864) and in MotherUse (cs:1110-1113); RottweilerPrime does
@@ -4326,6 +4336,8 @@ class Routine:
             # Drawing (L107) and the Rake (L202) go angry like any TrickItem
             if it.kind in TRICK_KINDS and it.is_tricked(self.level.items):
                 target = self._tricked_item(it)
+                if target is not None and self._pc_defer_angry(it, target):
+                    return
                 if target is not None:
                     self._angry_target = target
                     w.play_angry(self.pawn, target, on_done=self._angry_done)
@@ -4333,6 +4345,48 @@ class Routine:
         self._action_stopped()
         self._pending = 'advance'
         self._check_parked_runs()
+
+    def _pc_defer_angry(self, it, target):
+        """the PC's shout and repair of a tricked station played back at it
+        after a run (PCTrickReturn: 205's nailed skis — the ride's record
+        pays as the ride ends, then the script runs him to the ski, 0x10024fde,
+        pants, shouts and repairs it, 0x1002512d): the coin now, the station's
+        next visit — reached at a run — plays the rest"""
+        if not pcprofile.is_pc() or not getattr(target, 'pc_trick_return', None) \
+                or target is not it or not self.actions:
+            return False
+        nxt = self.actions[self._next_index(self.index)]
+        if nxt.get('item') != it.pid:
+            return False
+        w = self.pawn.world
+        if not target.pc_credited:
+            w.pc_s2_credit(self.pawn, target)
+        self.pc_return = target
+        self._action_stopped()
+        self._pending = 'advance'
+        self._check_parked_runs()
+        return True
+
+    def _pc_return_use(self, it):
+        """the return visit of a deferred station (PCTrickReturn): he stands
+        panting for its seconds (`pant`, 205), then the shout and the repair
+        — the angry set — and the visit ends as the angry's does"""
+        self.pc_return = None
+        self.pawn.pc_run = False
+        self.state = self.USING
+        self.timer = 0.0
+        w = self.pawn.world
+        self.pawn._stand()
+
+        def shout():
+            self._angry_target = it
+            w.play_angry(self.pawn, it, on_done=self._angry_done)
+        pant = float((it.pc_trick_return or {}).get('pant') or 0.0)
+        if pant > 0.0:
+            self.pc_hold = pant
+            self.pc_hold_cb = shout
+        else:
+            shout()
 
     def _angry_done(self):
         """the second StopAction arrives with canPostponeStop=false: the
@@ -4459,6 +4513,7 @@ class Routine:
         self.pawn.anim.time_scale = 1.0
         self._pc_clip_end()
         self.pc_hold = 0.0
+        self.pc_hold_cb = None
         self.pc_mutex_left = None
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         if a is None or a.get('move_only'):
@@ -5788,7 +5843,11 @@ class Routine:
             if self.pc_hold <= 0.0:
                 self.pc_hold = 0.0
                 self.pc_fire_at = 0.0; self.pc_fire_item = None
-                self._finish()            # the held empty sequence completes
+                cb, self.pc_hold_cb = self.pc_hold_cb, None
+                if cb is not None:
+                    cb()
+                else:
+                    self._finish()        # the held empty sequence completes
             return
         if self.state == self.USING and self.timer > 0.0:
             self.timer -= dt

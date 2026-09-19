@@ -220,11 +220,12 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 Open: the frame pacer of game.exe (the level tick at 12 Hz is measured off
 the HUD clock; the 60 Hz timer and the level's update are read, the gate
 between them is not — no binary carries 1/12, GFXEngine's 83 ms is the
-sprites' frame interval); two Season 2 runs whose scene the mobile plays
+sprites' frame interval); a Season 2 run whose scene the mobile plays
 otherwise (201's tutorial runs him to the entry to shout after the soap
-puddle, 205's back to the nailed water ski to pant and repair it; the
-calls' runs of 208 and 210 are the Urgent ones, 210's Mother's to him on
-Fifi's fall is carried; `docs/PC_FIDELITY.md` "Season 2's runs"); the PC's
+puddle; 205's back to the nailed water ski to pant and repair it is
+carried since 2026-09-24, the calls' runs of 208 and 210 are the Urgent
+ones, 210's Mother's to him on Fifi's fall is carried; `docs/PC_FIDELITY.md`
+"Season 2's runs"); the PC's
 field image (the data archive holds no TGA; the game's 100 px radius is
 carried) and 203's Olga shout before the run (her `shout` has no clip in
 the port); and the gap between the model's walks on the PC's rooms and

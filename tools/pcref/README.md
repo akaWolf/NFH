@@ -97,6 +97,10 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   before the GoTo — 101/102's antenna, 110's extinguisher, 113's valves)
   and FIXRUN 113's valve stations after the flood and the hot heater (the
   switch alone); 111's machines leave their give to the prime leg.
+  `--runs-s2` writes Season 2's RUNTO_S2 (PCRunTo) and RETURN_S2
+  (PCTrickReturn: a tricked station whose shout and repair the PC plays
+  back at it after a run — 205's nailed skis, `pant` the seconds he stands
+  first; 2026-09-24), both in place.
 - `gamedata.py <gamedata.bnd> list|cat|grep|tags …`: the PC original's data archive
   (a plain ZIP of XML and TGA: per level `level.xml`, `objects.xml`,
   `tricks.xml`, `anims.xml`, `trigger.xml`; copies in ~/nfh-bench/pcref/pc) —

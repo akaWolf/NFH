@@ -35,7 +35,10 @@
     "PCUseSeconds": [
      17.33,
      0.58
-    ]
+    ],
+    "PCTrickReturn": {
+     "pant": 2.83
+    }
    }
   },
   {
