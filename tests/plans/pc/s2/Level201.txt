@@ -1,0 +1,31 @@
+# Level201 under the PC profile — the PC's own tutorial (runtime/tutorial.py
+# TutorialPC201: GameLogic.dll's `aux` director and the neighbour's script,
+# docs/PC_FIDELITY.md "201's tutorial"). Woody starts in bottomleft (Zone01,
+# level.xml's woody at 300/680), the neighbour at the bridge; the doors are
+# open and the chest, the puddle, the vanity bag and the spaghetti pot wait
+# for the director to show them. `tutorial <message>` parks until the director
+# has shown that message. The waypoints are level.xml's signs at their mobile
+# x (the zones' PCRoom), Woody's arrival within 50 px (fcn.1000e2bd).
+walk -2.51 -1.46                  # waypoint1 (bottomleft 450): waypoint2 shown
+walk 2.75 -1.46                   # waypoint2 (bottomright 1000): the chest opens
+take SoapChest IT2_Soap           # soapbox: waypoint3 shown
+walk 4.84 -1.46                   # waypoint3 (bottomright 1200): his demo lap
+tutorial soappuddle               # his left slip: the puddle takes soap now
+usewith WaterPuddle IT2_Soap
+park Zone02                       # moveaway: the lower deck
+tutorial beautycase               # awaitslip: his crash_short; the vanity bag opens
+take VanityBag IT2_Hairpin
+walk -2.70 -1.46                  # waypoint4 (bottomleft 430): the toolbox's marker
+unlock ToolBox IT2_Hairpin        # the game (270 ticks)
+take ToolBox IT2_Knife            # the cupboard hands the knife and the pipe wrench
+usewith Buffet IT2_Knife          # table
+park Zone01                       # moveaway2: the lower deck
+tutorial combo                    # awaitpain: the damaged buffet, Olga's fight, the repair
+take SoapChest IT2_Soap
+usewith WaterPuddle IT2_Soap
+usewith DeckRail IT2_Pipetongs
+park Zone02                       # combo4: the lower deck
+tutorial danke                    # awaitslip2: crash_long, the entry, the wheeze, the shout
+take SpaghettiCar IT2_Spaghetti
+usewith CaptainHat IT2_Spaghetti
+await CaptainHat 0
