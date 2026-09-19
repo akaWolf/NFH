@@ -420,13 +420,20 @@ WOODY = {
     },
 }
 ACTOR = {role: actor for actor, role in ROLES}
+# a station whose GoTo takes another hotspot of its object per visit, in the
+# mobile's visit order: 201's puddle — the slip's GoTo is its `neighbor`
+# hotspot (0x1002847f, 0x1002a769), the left slip's `neighborleft`
+# (0x10028ea6, 0x1002a4ea); PCApproach `x` is then one per visit
+VISIT_HOTSPOTS = {201: {'WaterPuddle': ('neighbor', 'neighborleft')}}
 
 
 def approaches(n):
-    """[(item, zone, component, {role: {'obj', 'x', 'px', 'routes'[, 'tx']}})]:
-    per station the PC object's `<actor>` hotspot x, its height against the
-    room's floor, the neighbour's move along the floor over its actions
-    (lap_model_s2.code_moves, per visit where the item has several) and the
+    """[(item, zone, component, {role: {'obj', 'x', 'px', 'routes'[, 'tx',
+    'txt']}})]: per station the PC object's `<actor>` hotspot x (one per visit
+    where the GoTo takes another hotspot per visit, VISIT_HOTSPOTS), its height
+    against the room's floor, the neighbour's move along the floor over its
+    actions (lap_model_s2.code_moves, per visit where the item has several;
+    txt after a tricked visit where it differs, code_moves_tricked) and the
     PC's routes to the role's other stations in other
     rooms — the mobile zones of the path finder's rooms (Geometry.route: the
     Dijkstra of fcn.1000a421 from this hotspot to the other's), where the
@@ -437,6 +444,7 @@ def approaches(n):
     zmap = room_map(n, g, doors, zones)
     raw = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))
     moves = S.code_moves(n)
+    tricked = S.code_moves_tricked(n)
     out = []
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
@@ -461,10 +469,16 @@ def approaches(n):
                 if rt is not None:
                     routes[other] = [zmap[r]] + [zmap[g.room_of(dout)] for _din, dout in rt]
             per[role] = {'obj': obj, 'x': p[0], 'px': p[1] - g.floor(r), 'routes': routes}
+            hs = VISIT_HOTSPOTS.get(n, {}).get(name) if role == 'Rottweiler' else None
+            if hs:
+                per[role]['x'] = [g.point(obj, h, exact=True)[0] for h in hs]
             if role == 'Rottweiler' and name in moves:
                 # the station's actions move him along the floor (their
                 # <translation>s): his next walk leaves from x + tx (per visit)
                 per[role]['tx'] = moves[name]
+            if role == 'Rottweiler' and name in tricked:
+                # ... and the tricked visit's (the step's tricked variants)
+                per[role]['txt'] = tricked[name]
         obj = WOODY.get(n, {}).get(name)
         if obj is not None:
             # Woody's run up or down to the object's `woody` hotspot (his clicks
@@ -661,7 +675,8 @@ def main(argv):
                 " floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the"
                 " actors' stations and"
                 " Woody's items = per role the PC object's <actor> hotspot x and its height against the"
-                " room's floor (tx: the neighbour's move over the station's actions, their <translation>s);"
+                " room's floor (tx: the neighbour's move over the station's actions, their <translation>s; txt: after"
+                " a tricked visit);"
                 " PCRoom on each Zone = its PC room's floor line and <neighbor> records with"
                 " the doors' <actor> hotspots, for the path finder's routes.")
         src = ov.get('source', '')

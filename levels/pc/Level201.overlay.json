@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E01 All Aboard: +45 the puddle (87 s), +51 the buffet (158), +57 the rail pair (202, full), the hat +19 at the full bar (258). PC data (ship1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor (tx: the neighbour's move over the station's actions, their <translation>s); PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E01 All Aboard: +45 the puddle (87 s), +51 the buffet (158), +57 the rail pair (202, full), the hat +19 at the full bar (258). PC data (ship1/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor (tx: the neighbour's move over the station's actions, their <translation>s; txt: after a tricked visit); PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes. The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running), PCMinigameFailedClip = the clip that actor's behaviour plays first when it is not the neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour is his run). Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit. The tutorial (tools/pcref/pc_tutorial201.py): PCTutorial on the TutorialScriptCamera = the PC's own 201 tutorial the profile runs in place of the mobile's LevelScript and camera script (runtime/tutorial.py TutorialPC201, GameLogic.dll's `aux` director and neighbour scripts): the director's texts (ship1/strings.xml), the four waypoints and Woody's start (level.xml, in the mobile zones by PCRoom), the entry's neighbor_entry / neighbor_shout hotspots (objects.xml), the neighbour's wheeze frames (generic/anims.xml), the at-object tolerance of fcn.1000e2bd (GameLogic.dll 0x100cc814), the PC objects and inventory against the mobile items.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -13,28 +13,39 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCRunTo": true
+    "PCRunTo": true,
+    "PCUseSecondsTricked": 3.67,
+    "PCUseSeconds": 4.92
    }
   },
   {
    "object": "CaptainHat",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 8.08,
+    "PCUseSeconds": 9.67
    }
   },
   {
    "object": "WaterPuddle",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 3.42,
+    "PCUseSecondsLinked": 6.25,
+    "PCUseSeconds": [
+     0.92,
+     0.92
+    ]
    }
   },
   {
    "object": "DeckRail",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSeconds": 4.0
    }
   },
   {
@@ -308,7 +319,10 @@
     "PCApproach": {
      "Rottweiler": {
       "obj": "topright/waterpuddle",
-      "x": 1020,
+      "x": [
+       1020,
+       1130
+      ],
       "px": 0,
       "routes": {
        "CaptainHat": [
@@ -319,7 +333,11 @@
         "Zone03",
         "Zone04"
        ]
-      }
+      },
+      "tx": [
+       80,
+       -100
+      ]
      },
      "Woody": {
       "obj": "topright/waterpuddle",
@@ -680,6 +698,107 @@
        }
       }
      ]
+    }
+   }
+  },
+  {
+   "object": "TutorialScriptCamera",
+   "component": "TutorialScriptCameraNFH2",
+   "set": {
+    "PCTutorial": {
+     "texts": {
+      "welcome": "Welcome to the new episodes of the 'Neighbours From Hell' Show! \n \nI'm Joe, the director, and in this introductory episode I'll explain how to play tricks on the nasty neighbour with Woody, the hero of our show. \n \nHave fun!",
+      "waypoint1": "You can use the mouse to give Woody orders. To make Woody walk around, please move the mouse pointer to the desired location and press the left mouse button (left click). \n \nNow make Woody walk to the green mark to his right.",
+      "waypoint2": "Very good! You can only see a section of the game world on your screen. Move to another section using the mouse or the arrow keys on your keyboard. This is called 'scrolling'. \n \nNow scroll to the right, and make Woody go to the next green waypoint.",
+      "soapbox": "Excellent! If you move your mouse pointer over an object, the text window of the status bar indicates what Woody will now do if you left-click on the object. The mouse pointer will take on a different shape, depending on your actions. \n \nTry it out with the treasure chest next to Woody.",
+      "waypoint3": "Brilliant! Woody found a bar of soap in the chest. All objects found will automatically be put in the inventory at the bottom of the screen. To look at these inventory objects, simply leave your mouse pointer on the object for a while. \n \nNow go to the next waypoint to watch the neighbour make his appearance.",
+      "waypoint4": "!missing!",
+      "neighbordemo": "In each episode, the neighbour follows a routine. The thought bubble over his portrait at the bottom left will indicate what he'll do next. \n \nIn later episodes, the neighbour will sometimes be asleep, in which case he won't be able to see Woody. This is indicated by a green background in the portrait. \n \nNow watch the neighbour's activities.",
+      "soappuddle": "As we have seen, the neighbour keeps stepping into a puddle - and this is where we are going to prepare the first trick. \n \nTo do so, please click on the soap bar in the inventory and use this with the puddle of water by clicking on the puddle. Alternatively, you can drag the soap onto the puddle. \n \nThe neighbour will meanwhile be waiting in the next room. Let's go!",
+      "moveaway": "Alright, everything's ready for the neighbour now! \n \nWoody should never be in the same room as his nasty neighbour because he would be beaten up and lose one of his three lives. Therefore please send him to the lower deck.",
+      "awaitslip": "Now enjoy the delightful sight of the neighbour slipping on the soap. \n \nHa ha!",
+      "beautycase": "For each trap the neighbour walks into, Woody is rewarded with a gold coin  The anger indicator at the left side rises and then slowly falls again. If the anger indicator rises over 100% at the end of a level, the neighbour will have a fit of rage, and you will be awarded a prize. \n \nNow we need an item from the vanity bag by the deck chair for the next trick.",
+      "toolbox": "A hairpin! Woody can use this to pick the lock of the tool cupboard. However, this requires some dexterity. Therefore you will have to undergo a little dexterity training first. \n \nFirst of all, send Woody to the next waypoint to get a more detailed explanation of the dexterity exercise.",
+      "minigame_desc": "In this exercise you are supposed to keep the item in the centre by moving the mouse in the opposite direction. \n \nYour progress is indicated by a green progress bar. If this bar sinks below zero, you have failed and the neighbour will come running. In this case, Woody should take to his heels! \n \nYou can cancel the exercise by pressing the right mouse button. \n \nNow use the hairpin with the tool cupboard in order to start the game. Good luck!",
+      "minigame": "Remember: You must move the mouse in the opposite direction to keep the item in the centre.",
+      "hurry": "Sorry - no luck this time! The neighbour will come running to see what's going on. \n \nQuickly go to the upper deck to hide from him!",
+      "auweia": "Oh dear! The neighbour has discovered Woody. Now he'll get a thrashing!",
+      "wait1": "Very good! You were fast enough. Now wait for the neighbour to disappear again.",
+      "wait2": "Woody has now lost one of his three lives. As long as Woody's image flashes, the neighbour is unable to see him. \n \nNow wait until the neighbour has returned to the upper deck, and try again.",
+      "goback": "Right, the coast is clear. You can try it once more by using the hairpin with the tool cupboard. \n \nAnd remember: you must move the mouse in the opposite direction to keep the item in the centre.",
+      "table": "Congratulations, Woody has found a penknife and a pipe wrench! \n \nAt the top left there is Olga, a fellow traveller the neighbour is making eyes at. Olga poses no threat to Woody, but Woody can disrupt the neighbour's advances. \n \nIf you use the penknife to cut the sticky tape around the table leg you will see what I mean. Meanwhile, the neighbour will be detained in the next room.",
+      "moveaway2": "Now go to the lower deck to make the neighbour start walking.",
+      "awaitpain": "The neighbour continues with his routine now. He will soon try to flirt with Olga. Thanks to the broken table leg, this flirtation will end badly for the neighbour. \n \nBut see for yourself...",
+      "combo": "Some tricks can be enhanced by building up a chain of tricks. Let's try this now. \n \nGet another bar of soap from the treasure chest and put it into the puddle of water. In addition to this, open the deck railing door using the pipe wrench. ",
+      "combo2": "Very good. \n \nNow open the deck railing to the right of the puddle with the pipe wrench so that nothing will stop the neighbour from sliding over the planks.",
+      "combo3": "OK. \n \nNow put the soap into the puddle to make the trick work.",
+      "combo4": "Perfect! \n \nNow go to the lower deck to make the neighbour start walking!",
+      "awaitslip2": "Now the neighbour will take a nice trip into the deep sea. \n \nHa ha!",
+      "danke": "Bravo! You have achieved the minimum ratings and can leave this episode using the green button at the bottom of the screen. \n \nBut there's another possible trick to be played in this episode, as you can see from the coin display at the top. Would you like to try to find it? \n \nAnd remember: Always take care not to get caught!"
+     },
+     "waypoints": {
+      "waypoint1": [
+       "Zone01",
+       450,
+       680
+      ],
+      "waypoint2": [
+       "Zone02",
+       1000,
+       680
+      ],
+      "waypoint3": [
+       "Zone02",
+       1200,
+       680
+      ],
+      "waypoint4": [
+       "Zone01",
+       430,
+       680
+      ]
+     },
+     "rooms": {
+      "bottomleft": "Zone01",
+      "bottomright": "Zone02",
+      "topright": "Zone03",
+      "topleft": "Zone04"
+     },
+     "items": {
+      "bottomleft/beautycase": "VanityBag",
+      "topleft/buffet": "Buffet",
+      "topright/waterpuddle": "WaterPuddle",
+      "topleft/spaghetticar": "SpaghettiCar",
+      "topright/reling": "DeckRail",
+      "bottomleft/soapchest": "SoapChest",
+      "bottomright/toolbox": "ToolBox",
+      "topleft/captncap": "CaptainHat"
+     },
+     "inventory": {
+      "soap": "IT2_Soap",
+      "hairpin": "IT2_Hairpin",
+      "knife": "IT2_Knife",
+      "pipetongs": "IT2_Pipetongs",
+      "spaghetti": "IT2_Spaghetti"
+     },
+     "woody": [
+      "Zone01",
+      300,
+      680
+     ],
+     "entry": [
+      "Zone04",
+      -150,
+      330
+     ],
+     "shout": [
+      "Zone04",
+      240,
+      330
+     ],
+     "wheeze": 30,
+     "at_px": 50,
+     "rail_repair": 19
     }
    }
   }

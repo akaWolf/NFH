@@ -165,7 +165,9 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
+CODE = (201, 202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
+# the levels whose tricked visits are the code's too (code_stays_tricked)
+TRICKED = (201,)
 
 
 def pc_spans(n):
@@ -346,6 +348,18 @@ def main(argv):
                         _set_key(ov['patches'], item, 'PCCreditAfter', credit)
                 for item, wt in waits.items():
                     _set_key(ov['patches'], item, 'PCWaitFor', wt)
+                if n in TRICKED:
+                    # the tricked visit's stand (lap_model_s2.code_stays_tricked:
+                    # the step's tricked variant up to its SHOUT) and the
+                    # linked variant's where the script plays another step
+                    for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked'):
+                        ov['patches'] = _strip_key(ov['patches'], k)
+                    for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
+                        if item in clips:
+                            continue      # timed per clip (CLIPS)
+                        _set_key(ov['patches'], item, 'PCUseSecondsTricked', tr['tricked'])
+                        if tr.get('linked') is not None:
+                            _set_key(ov['patches'], item, 'PCUseSecondsLinked', tr['linked'])
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])

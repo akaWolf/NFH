@@ -35,7 +35,9 @@ fcn.100508a1 grows a factor from startlevel to endlevel with the progress
 it (PCMinigameLevels; DexterityState._pc_tick). A lost game plays the object's
 `failed` action (PCMinigameFailed, its behavioractor): the neighbour's `run`
 on eleven levels; on 203 Olga's `shout`, her shout_chinese whose own
-behaviour is the neighbour's `run` (cn_c2's olga actor); on 201's tutorial
+behaviour is the neighbour's `run` (cn_c2's olga actor; PCMinigameFailedClip:
+the port's Olga plays her Shout for the clip's 69 frames, then her
+EatChinese); on 201's tutorial
 toolbox `run` on `aux`, the level's invisible dummy at 0/0 (ship1/level.xml),
 and on 212's spikes and 213's pinata no behaviour at all — nobody comes.
 
@@ -88,6 +90,40 @@ def action_time(n, obj, act):
     return int(a.group(1))
 
 
+# the PC's actor animations the port's sprites play under another name
+CLIPS = {('olga', 'shout_chinese'): 'Shout', ('olga', 'eat_chinese'): 'EatChinese'}
+
+
+def failed_clip(n, obj):
+    """the clip a lost game's behaviour plays on its actor when that is not
+    the neighbour's own `run`: the actor's level record's action named after
+    the behaviour — 203's olga `shout`: shout_chinese, 69 frames at 12 a
+    second, then eat_chinese; its own behaviour, the neighbour's `run`, fires
+    as it starts — as {role, clip, secs, then}, None elsewhere"""
+    folder = canon.pc_level(n)['folder']
+    s = canon.read('%s/nfh2/x/%s/objects.xml' % (canon.ROOT, folder))
+    m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), s, re.S)
+    a = re.search(r'<action name="failed"([^>]*)>', m.group(1), re.S)
+    at = dict(re.findall(r'(\w+)="([^"]*)"', a.group(1))) if a else {}
+    actor, beh = at.get('behavioractor'), at.get('behavior')
+    if not actor or actor in ('neighbor', 'aux') or not beh:
+        return None
+    r = re.search(r'<actor name="%s"[^>]*>(.*?)</actor>' % re.escape(actor), s, re.S)
+    b = re.search(r'<action name="%s" actor="%s"([^>]*)>' % (re.escape(beh), re.escape(actor)),
+                  r.group(1)) if r else None
+    if b is None:
+        return None
+    ba = dict(re.findall(r'(\w+)="([^"]*)"', b.group(1)))
+    import lap_model_s2
+    frames = lap_model_s2.Data(n).frames.get((actor, ba.get('actoranim')))
+    if not frames:
+        return None
+    role = {'olga': 'Olga', 'mother': 'Mother'}[actor]
+    return {'role': role, 'clip': CLIPS[(actor, ba['actoranim'])],
+            'secs': round(frames / 12.0, 4),
+            'then': CLIPS.get((actor, ba.get('actornextanim')))}
+
+
 def failed_actor(n, obj):
     """whom the game object's `failed` action sends: its behavioractor, '' for
     none (212's spikes, 213's pinata)"""
@@ -127,34 +163,39 @@ def main(argv):
         t = action_time(n, obj, act)
         lo, hi = game_levels(n, obj)
         fa = failed_actor(n, obj)
+        fc = failed_clip(n, obj)
         kind = item_kind(n, item)
-        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s' % (
-            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, fa))
+        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s%s' % (
+            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, fa,
+            (' (%s %s %.2f s)' % (fc['role'], fc['clip'], fc['secs'])) if fc else ''))
         if not write or kind is None:
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
         ov = json.load(open(p))
         patches = ov.get('patches', [])
-        for e in patches:
-            st = e.get('set')
-            if isinstance(st, dict):
-                st.pop('PCMinigameTicks', None)
-                st.pop('PCMinigameLevels', None)
-                st.pop('PCMinigameFailed', None)
-        patches = [e for e in patches if not (isinstance(e.get('set'), dict) and not e['set'])]
-        e = next((e for e in patches if e.get('object') == item and e.get('component') == kind
-                  and isinstance(e.get('set'), dict)), None)
+        # the keys rewritten in place: in the patch that holds them, else the
+        # item's first patch, else a new one (a patch they shared with another
+        # writer's keys keeps those)
+        e = next((e for e in patches if isinstance(e.get('set'), dict)
+                  and 'PCMinigameTicks' in e['set']), None) \
+            or next((e for e in patches if e.get('object') == item and e.get('component') == kind
+                     and isinstance(e.get('set'), dict)), None)
         if e is None:
             e = {'object': item, 'component': kind, 'set': {}}
             patches.append(e)
+        e['set'].pop('PCMinigameFailedClip', None)
         e['set']['PCMinigameTicks'] = t
         e['set']['PCMinigameLevels'] = [lo, hi]
         e['set']['PCMinigameFailed'] = fa
+        if fc:
+            e['set']['PCMinigameFailedClip'] = fc
         ov['patches'] = patches
         note = (" The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the"
                 " game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and"
                 " endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the"
-                " behavioractor of its `failed` action (the actor a lost game sends running).")
+                " behavioractor of its `failed` action (the actor a lost game sends running),"
+                " PCMinigameFailedClip = the clip that actor's behaviour plays first when it is not the"
+                " neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour is his run).")
         src = ov.get('source', '')
         i = src.find(' The mini-game (tools/pcref/pc_minigames.py)')
         if i >= 0:
