@@ -206,12 +206,14 @@ closes (203 99.5 s / 105, 208 82.5 / 85.5, 209 102.7 / 104, 211 80.8 / 85,
 to shower); against the PC video 204 (-2 %), 205 (-12 %), 207 (+2 %) and
 210 (-15 %) are close, 202 is 60 s against 94 (its mat, beer and sea wait
 on the kid's and Olga's behaviours and the `waitsea` poll, which the
-level's code hands over to their scripts); the Season 2 gauge is 100 000
-rage long and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the
-coins are the levels' tricks.xml rage values. The Season 1 anger rule, the
-result captions and the map's perfect mark are read from the binaries and
-carried (`docs/PC_ROUTINES.md`, `docs/PC_VERIFICATION.md`).
-`docs/GAMEPLAY.md` §10–§11 list what resists a clean reimplementation.
+level's code hands over to their scripts — his swim waits in the sea for
+the sub Olga launches from her mat, `docs/PC_LAPS.md`); the Season 2 gauge
+is 100 000 rage long and falls by leveldata's `time` every 1/12 s (0.36
+%/s), and the coins are the levels' tricks.xml rage values. The Season 1
+anger rule, the result captions and the map's perfect mark are read from
+the binaries and carried (`docs/PC_ROUTINES.md`,
+`docs/PC_VERIFICATION.md`). `docs/GAMEPLAY.md` §10–§11 list what resists a
+clean reimplementation.
 
 ## What makes this tractable
 

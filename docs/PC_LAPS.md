@@ -135,7 +135,13 @@ within 6 %; against the video on the levels the code does not close 204
 89.3 / 102, 207 109.3 / 107, 210 86.8 / 102 (120.7 before the path finder's
 routes: the walks around the pool ring), 202 60.2 / 94 — its mat, beer and
 sea hand over to the kid's and Olga's behaviours and the `waitsea` poll,
-which the port's stays (PCUseSeconds 0.5, 0.5, 9.5, 21.0) do not hold. 201
+which the port's stays (PCUseSeconds 0.5, 0.5, 9.5, 21.0) do not hold (read
+2026-09-23: his swim step 0x10022449 goes into the sea, flag 4 on, and
+plays `waitsea`, re-run each tick, until the `sub` object shows —
+0x100224a8-0x10022563 — which Olga's script switches into the sea when she
+leaves her mat, fcn.10022ecb; then the dive and the run ashore to the
+beach sub, 0x10022078, and a 97-tick bar in the sea, 0x10021de0; the port's
+swim ends on its 9.5 s, before her OlgaPutSub). 201
 (the tutorial) and 206 (his waits on the Mother) have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
