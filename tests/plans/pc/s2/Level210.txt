@@ -1,33 +1,36 @@
-# Level210 under the PC profile (v23, the Season 2 walks by code). His lap is ~120 s:
-# the chair (Zone01) 3-46, the call and the basket (the pool, Zone04) 50-66, through
-# the elephant's room (Zone03) to the shop (Zone02) 74-98, the elephant 98-108, the
-# basket put in the pool 108-130, the chair again 132-167, the call 170, the basket
-# 177, the shop 198, the elephant 219. The Mother sits in the pool: naps 6-26,
-# 58-77, 92-112, 127-147, 179-198, 213-233, 248-267 (MotherSleepSingle), looks
-# between; Olga showers on the beach. Everything is armed during lap 1 for the pile
-# on lap 2: the chair and the pylon (132), the basket's three (177), the shop's
-# hedgehog (198), the elephant (219); the octopus goes into the shop after the
-# hedgehog has paid, for lap 3.
+# Level210 under the PC profile (v24, 2026-09-24: the Season 2 walks by code and
+# 210's call by code). His lap is ~99 s, call to call: the Mother's call (26) gets him
+# out of his chair (Zone01) and over to hers in the pool (Zone04, 31), her order sends
+# him to the basket (35: Fifi's tickle and the take), through the elephant's room
+# (Zone03) to the shop (Zone02) 55-61, the elephant 72-74, the basket put 83-84 and
+# back to his chair (96), where he waits for her next check. The Mother sits and naps
+# 20 s after each order (33-53); at a nap's end she looks for him in his chair — away,
+# she stays awake 15 s and naps 20 more (53-68-88-103-123); in it, she gets up and
+# calls once he is awake (125). Olga showers on the beach. Everything is armed during
+# lap 1: the chair and the pylon pay at his first return (103), the basket's three at
+# his lap-2 basket (134-136), the shop's hedgehog (167), the elephant (183); the octopus
+# goes into the shop after the hedgehog has paid, for lap 3 (263, the collapse;
+# runs/call210s2c: 100 at 262.7 s).
 take SeaUrchin IT2_Hedgehog            # Zone02: the first urchin, for the deck chair
 take! OlgaBra IT2_Bra                  # Zone01: Olga's first shower; he sleeps in the chair
 prime WaterMelons IT2_Bra              # Zone03 -> IT2_Bra_sling
 take AlmsBowl IT2_Bone                 # Zone03
-park Zone02                            # the shop, his again only at 74
-whenusing DogBasket                    # (56) his lap-1 basket in the pool
-park Zone01                            # the beach, empty of him from 50
-whenzone Zone03                        # (66) he leaves the pool through the elephant's room for the shop
-take! FishNet IT2_Brailer              # Zone04 on her nap (58-77)
+park Zone02                            # the shop, his only at 55
+whenusing DogBasket                    # (35) his lap-1 basket in the pool
+park Zone01                            # the beach, empty of him from 27
+whenzone Zone03                        # (42) he leaves the pool through the elephant's room for the shop
+take! FishNet IT2_Brailer              # Zone04 on her nap (33-53)
 take CricketBat IT2_Bat                # Zone01
 take SuntanOil IT2_Sunoil              # Zone01
 unlock ToolBelt IT2_Brailer            # Zone01: the tongs
 prime Valve IT2_Tongs                  # Zone01: the pool drains (the fall_empty coin)
 take ValveWaterPuddle IT2_Oktopus      # Zone01
 usewith Pylon IT2_Bra_sling            # Zone01: the chair's linked coin
-usewith DeckChair IT2_Hedgehog         # Zone01: chair + pylon at his lap-2 chair (132)
+usewith DeckChair IT2_Hedgehog         # Zone01: chair + pylon at his return to the chair (96)
 take SeaUrchin IT2_Hedgehog            # Zone02: the second urchin, for the shop
-usewith TurbanShop IT2_Hedgehog        # Zone02: his lap-2 shop (198)
-usewith Elephant IT2_Bat               # Zone03: his lap-2 elephant (219)
-whenanim Mother MotherSleepSingle      # a nap with him on the beach (127-147)
+usewith TurbanShop IT2_Hedgehog        # Zone02: his lap-2 shop (161)
+usewith Elephant IT2_Bat               # Zone03: his lap-2 elephant (181)
+whenanim Mother MotherSleepSingle      # a nap with him on the beach (103-123)
 usewith! DivingBoard IT2_Sunoil        # Zone04: the oil first
 usewith! DogBasket IT2_Bone            # Zone04: the bone after it — his lap-2 call pays bone, water and empty pool at once
 park Zone01                            # out of the pool before her look, off his way to the shop

@@ -1433,6 +1433,72 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   202 was re-planned to it (tests/plans/pc/s2 v5): the rail pays at his
   lap-3 rail and the mat, the rake and the shark on his lap 4 — 104, the
   collapse, 100.
+- *210's call (2026-09-24).* The Mother's script (GameLogic.dll): her
+  sleep step 0x10018c0b walks her into pool/deckchair (its `enter`,
+  sitdown, 9 frames) for fcn.1000e7f2's bar of 240 ticks, the chair's
+  `sleep` and her flag 4 on (0x10018d60); at the bar's end the check
+  0x10018983 looks at his current object (fcn.10049190). Not his beach
+  deck chair: the awake step 0x100187d8 — the chair's `awake`, her flag 4
+  off (fcn.100185e5), a bar of 180 — and the sleep step again. The chair
+  with his flag 4 on: she stays awake and the step re-runs each tick. The
+  chair with his flag 4 off: her sequence is the chair's `leave` (getup,
+  16 frames) and `callneighbor`, whose behavior="call" (generic/
+  objects.xml, fired as it starts) his handler 0x1001b4f6 answers at once
+  — his call step 0x1001911e plays his chair's `leave` (17 frames), swaps
+  the guarded chair for the plain one and runs him (the gait write
+  0x10019270) to her chair's `neighbor` hotspot, where her order step
+  0x10018682 polls for him (fcn.1000e172) and plays `order`: its
+  behavior="order" sends him on (0x1001aecc: the walk to Fifi, her
+  `tickle`, 19 frames, then the take 0x1001aac8) and her back to the sleep
+  step. Her call, her wait and her order stand where she got up (the
+  chair's `mother` and `mother_out` hotspots are one point). His chair
+  step 0x100195a4 is the chair's `enter`, a bar of 120 ticks and the
+  `wakeup` (0x10018f4a), after which a flag element (fcn.1000fac4 — the
+  only one of mask 4 in GameLogic.dll, 0x1001902c; its run 0x1000d037
+  calls the setter) clears his flag 4: he sits awake, seen by the catch,
+  until her call. The mobile's pair is the same shape driven by the data
+  (MotherWakeSleepBehavior's check on his current item at her look's
+  start, the calls' PawnToStopInfiniteAnimation ending the other's loop at
+  its next round): her look always, a loop's round of latency both ways,
+  and her walks between the chair and the call spot (1.0 and 2.3 s).
+  Carried under the profile: her chair per clip (PCClipSecondsRole: the
+  sit 0.75, the three sleeps 6.67 — the 240, which the mobile's repeat
+  from TargetSequenceIndex 2 plays alone, the pillow pose none — the look
+  15, the 180, the get-up 1.33); the check as her look starts
+  (MotherWakeSleepBehavior: he away — the look and the sleeps again; he
+  in his chair — the look held until his flag 4 is off, then the get-up);
+  his chair per clip (the enter 0.58, the sun 2.5 × 4, the wakeup 0.33)
+  with the awake loop held until her call begins (PCWaitFor `at` start)
+  and his flag 4 off from it (PCHideout, tools/pcref/pc_catch_s2.py with
+  the flag element); his stands at her chair none and her wait held
+  until he has come (PCWaitForRole); a station of the same PC object
+  reached with no walk (`Pawn._pc_departure_step`: her call spot and her
+  chair; the routine actors only); his stays the code's from her order on
+  (tools/pcref/lap_model_s2.py LAP_START: Fifi's tickle and take 2.5, the
+  shop 6.33, the elephant 1.92, the put 1.0). A clip of 0 s is skipped
+  (the AnimPlayer's clip_pace). The idle lap under it is 98.7 s call to
+  call, the lap quantized by her checks (35 s, 180 + 240 ticks, each one
+  he misses); the model with the PC's walks — 62.8 s of legs where the
+  port walks 53.4 on the mobile rooms — comes to ~101, the video's first
+  lap to 107 (the stays before, the video's, had it at 86.8). The v23
+  plan rates 100 under it (runs/call210s2c: 262.7 s); its notes were
+  re-timed (v24).
+- *The overlay writers' shared patches (2026-09-24).* tools/pcref/
+  pc_walks_s2.py rebuilt its keys (PCPass, PCApproach, PCRoom) by dropping
+  every patch that carried them, pc_catch_s2.py its PCHideout likewise, and
+  a patch they share with the duration tools' keys lost those: since the
+  routes of 2026-09-23 207's Bartender (8.7 s, the video's), 209's
+  TadjMahal (11.67, the code's), 212's PreAztecThrone (his look at the
+  hands, 3.58) and PreParrotLedge (the cliff's `enter`, 1.92), 213's
+  MechanicalBullControlsWait (6.4) and its Mother's stands (12.5, 19.7)
+  had played at the mobile's pace, and the source notes after theirs were
+  gone. The writers rewrite their own keys in place now and end their
+  notes at their own last words; run in any order they reproduce the
+  overlays. With the stays back the idle laps are 209 100.8 s (102.7
+  before), 212 119.4 (125.2) and 213 126.6 (125.3) against the model's
+  104, 124 and 123; 212's pile had slid onto two laps (90), and was
+  re-planned onto his lap 7 (tests/plans/pc/s2 v5: the whip armed after
+  his lap-6 visit; runs/p212o, 100 at 837.6 s); the others keep 100.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it

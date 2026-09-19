@@ -186,7 +186,19 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   and the shark paid as the shark sea's `enter` ends (per clip:
   PCClipSeconds, PCWaitFor, PCCreditAfter; "202's mat and swim") — his
   lap is 82 s where the video's stays had made it 60; 202 was re-planned
-  to it.
+  to it. And 210's call (2026-09-24): the Mother naps 240 ticks in her
+  chair and at each nap's end looks for him in his — away, she stays
+  awake 180 and naps again; in it, she gets up and calls once his sun
+  bar and `wakeup` are over; the call gets him out of his chair and
+  running to hers, where her order sends him to Fifi (her tickle, the
+  take) — her chair, his chair and the handshake per clip at the code's
+  ticks (PCClipSeconds, PCClipSecondsRole, PCWaitFor at the other's
+  start, PCWaitForRole; "210's call"). His lap is 99 s call to call; the
+  v23 plan still rates 100. The overlay writers of the walk and the catch
+  had dropped the duration tools' keys sharing a patch since the routes
+  of 2026-09-23 (207's bartender, 209's Taj, 212's throne look and
+  ledge step, 213's control wait and the Mother's stands): they rewrite
+  their keys in place now and the stays are back.
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
@@ -201,18 +213,18 @@ Fifi's fall is carried; `docs/PC_FIDELITY.md` "Season 2's runs"); the PC's
 field image (the data archive holds no TGA; the game's 100 px radius is
 carried) and 203's Olga shout before the run (her `shout` has no clip in
 the port); and the stays of the Season 2 levels whose lap the code does
-not close (204, 205, 207, 210 — the video's, re-derived against the PC
+not close (204, 205, 207 — the video's, re-derived against the PC
 walk; their laps hand over to the co-actors' scripts). 111's machines are
 the level class's DoActions (the washer's 24 s in the video is the walk
 and give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. The Season 2 idle laps under
-the profile (2026-09-23, the lap period on the neighbour's first station)
-sit within 6 % of GameLogic's lap model on the eight levels it closes (203
-99.5 s / 105, 208 82.5 / 85.5, 209 102.7 / 104, 211 80.8 / 85, 212 125.2 /
-124, 213 125.3 / 123, 214 85.3 / 90.3 — the video's 91 shower to shower —
-and 202 81.7 / 80.7 plus his wait for Olga's sub, the video's 70 and
-90-94); against the PC video 204 (-2 %), 205 (-12 %), 207 (+2 %) and 210
-(-15 %) are close; the Season 2 gauge is 100 000 rage long and falls by
+the profile (2026-09-24, the lap period on the neighbour's first station)
+sit within 6 % of GameLogic's lap model on the nine levels it times (203
+99.5 s / 105, 208 82.5 / 85.5, 209 100.8 / 104, 211 80.8 / 85, 212 119.4
+/ 124, 213 126.6 / 123, 214 85.3 / 90.3 — the video's 91 shower to shower
+— 202 81.7 / 80.7 plus his wait for Olga's sub, the video's 70 and 90-94,
+and 210 98.7 / ~101 with its call, the video's first lap 107); against
+the PC video 204 (-2 %), 205 (-12 %) and 207 (+2 %) are close; the Season 2 gauge is 100 000 rage long and falls by
 leveldata's `time` every 1/12 s (0.36 %/s), and the coins are the levels'
 tricks.xml rage values. The Season 1 anger rule, the result captions and
 the map's perfect mark are read from the binaries and carried

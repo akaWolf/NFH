@@ -156,6 +156,7 @@ class AnimPlayer:
         self.slow_factor = None          # Owner.ShouldSlowAnimations hook
         self.time_scale = 1.0            # the PC profile's station pace (RoutineAction._pc_use_seconds)
         self.clip_pace = None            # the profile's per-clip seconds of a use (PCClipSeconds)
+        self.skip_clip = False           # the profile's clip of 0 seconds: ended on the next tick
         self.hold_clip = None            # the profile's held clip (PCWaitFor): it loops until released
         self.ignore_infinite = False     # SetIgnoreInfiniteLoop
         self.ignore_infinite_once = False
@@ -233,10 +234,12 @@ class AnimPlayer:
         self._second_end = False         # a new play ends the extra period
         if self.clip_pace is not None:
             # the PC profile's use timed per clip (PCClipSeconds): each clip at
-            # the pace that lasts its PC seconds, the others at their own
+            # the pace that lasts its PC seconds, the others at their own; a
+            # clip of 0 the PC does not play — it ends on the next tick
             secs = self.clip_pace.get(name)
             mobile = self.sequence_seconds([name]) if secs else 0.0
             self.time_scale = mobile / secs if (secs and mobile > 0.0) else 1.0
+            self.skip_clip = secs is not None and secs <= 0.0
         self._set_start()
         # InitializeCurrentAnimation -> Owner.BehaviorPlayAnimation(name)
         for h in self.on_play:
@@ -458,6 +461,11 @@ class AnimPlayer:
         CurrentAnimation refreshes nothing either (cs:179-185: both Refresh
         arms need `CurrentAnimation != null`)."""
         if self.sprite.hidden or self.sprite.current is None:
+            return
+        if self.skip_clip:
+            # a clip the PC does not play (clip_pace 0): the sequence goes on
+            self.skip_clip = False
+            self._stop_single()
             return
         # animationTime is a C# float (AnimationControllerBase.cs:17), and
         # so is Time.deltaTime: 0.5f - 30 * 0.016666668f lands below zero on
@@ -1552,12 +1560,18 @@ class Pawn:
         (fcn.10009177's first waypoint) — the floor step BuildPathToTarget
         inserts for an off-floor start lasts that run, and a pawn the mobile
         scene keeps on the floor stands it out before its first step; a path
-        to a station at the same PC x has no run (straight on)"""
+        to a station at the same PC x has no run (straight on), and a level
+        script's actor bound for a station of the same PC object walks none
+        at all: its GoTo finds the actor at the object's hotspot and returns
+        at once (fcn.1000e3e0) — the mobile scene's two use spots (210's
+        Mother between her chair and her call, 206's weights, 213's Olga at
+        the picnic) are one on the PC, the pawn is put on the next. Woody's
+        walks are the player's clicks, not a script's GoTo"""
         dep, self._pc_depart = self._pc_depart, None
         self._pc_from_x = None
         if dep is None or not steps or self.portal_move:
             return
-        pcx, px, x0, y0, _it = dep
+        pcx, px, x0, y0, src = dep
         if abs(self.sprite.x - x0) > 0.1 or abs(self.sprite.y - y0) > 0.1:
             return                        # it has moved since the station
         last = steps[-1]
@@ -1565,6 +1579,17 @@ class Pawn:
         ap = it.pc_approach.get(self.role) if it is not None else None
         if ap is not None and ap.get('x') == pcx:
             self._pc_from_x = pcx
+            sap = src.pc_approach.get(self.role) \
+                if (src is not None and self.role != 'Woody') else None
+            if sap is not None and sap.get('obj') == ap.get('obj') \
+                    and all(st.get('kind') in ('point', 'item') for st in steps):
+                tx, ty = self._step_target(last)
+                if it.should_walk_up or it.should_walk_down:
+                    ty = it.y             # at its use location, climbed
+                self.sprite.x, self.sprite.y = tx, ty
+                self._arm_item_snap(it, tx)
+                self._pc_arrived(it)
+                del steps[:]              # arrived: the path finishes at once
             return
         ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': px}, self.sneaking)
         if not ticks:
@@ -3243,6 +3268,11 @@ class Routine:
         # StartAction interposes a MoveAction when the pawn is away); the
         # ignore-loop release opens it (RoutineActionUse.cs:152-171)
         self._infinite_flags_on_start(a, it)
+        if pcprofile.is_pc():
+            # a clip held elsewhere until this role's use of this item begins
+            # (PCWaitFor `at` start: the behavior= message an action fires as
+            # it starts, a poll on the actor's arrival)
+            it.pc_began.add(self.role)
         if a.get('mutex'):
             # MutexAction parks on its looping animation until another action's
             # PawnToAbortMutexOnFinish releases it (RoutineActionUse.cs:172-179)
@@ -4152,6 +4182,7 @@ class Routine:
     def _pc_clip_end(self):
         """the per-clip timing, the hold and the credit watch end with the use"""
         self.pawn.anim.clip_pace = None
+        self.pawn.anim.skip_clip = False
         self._pc_credit = None
         if self._pc_wait is not None:
             self._pc_wait = None
@@ -4169,7 +4200,8 @@ class Routine:
         table = it.pc_clip_secs if self.role == 'Rottweiler' \
             else it.pc_clip_secs_role.get(self.role)
         self.pawn.anim.clip_pace = dict(table) if table else None
-        wf = it.pc_wait_for if self.role == 'Rottweiler' else None
+        wf = it.pc_wait_for if self.role == 'Rottweiler' \
+            else it.pc_wait_for_role.get(self.role)
         if wf:
             self._pc_wait = dict(wf, released=None)
             self.pawn.anim.hold_clip = wf['clip']
@@ -4177,14 +4209,17 @@ class Routine:
     def _pc_wait_tick(self, dt):
         """the held clip's release (PCWaitFor): once the awaited role has used
         the awaited item (its pc_put mark, consumed here — the one sub in the
-        sea) the clip plays on for the `then` seconds, then the sequence goes
-        on"""
+        sea), or begun to (`at` start: its pc_began mark — 210's call and his
+        arrival at her chair), the clip plays on for the `then` seconds, then
+        the sequence goes on"""
         wt = self._pc_wait
         if wt['released'] is None:
             src = next((i for i in self.level.items.values()
                         if i.name == wt['item']), None)
-            if src is not None and wt['role'] in src.pc_put:
-                src.pc_put.discard(wt['role'])
+            marks = None if src is None else \
+                (src.pc_began if wt.get('at') == 'start' else src.pc_put)
+            if marks is not None and wt['role'] in marks:
+                marks.discard(wt['role'])
                 wt['released'] = 0.0
             return
         wt['released'] += dt

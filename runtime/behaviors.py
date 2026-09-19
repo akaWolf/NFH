@@ -2199,6 +2199,7 @@ class MotherWakeSleepBehavior(Behavior):
         self.target_sequence_index = self.value('TargetSequenceIndex', 0)
         # the ProgressBar GameObject (cs:16): the bar component on it
         self.progress_bar_go = (self.d.get('ProgressBar') or {}).get('path')
+        self._pc_wait = False            # the PC check found him in his chair
         world.subscribe('mother_urgent', self._on_mother_urgent)  # cs:17-20
 
     def play_animation(self, name):
@@ -2208,10 +2209,44 @@ class MotherWakeSleepBehavior(Behavior):
         it = self.action_item('Rottweiler')
         self.mother.anim.ignore_infinite = True       # SetIgnoreInfiniteLoopOnce
         self.mother.anim.ignore_infinite_once = True
-        if it is not self.target_item:
+        if pcprofile.is_pc():
+            # the PC's check (210's Mother script, 0x10018983) as her sleep's
+            # bar ends: he sits in his chair (his current object the chair's,
+            # fcn.10049190) — she stays awake (fcn.100185e5) until his flag 4
+            # is clear (fcn.100450dc: his `wakeup` clears it, 0x1001902c), the
+            # step re-run each tick, then gets up and calls him (update); he
+            # is not — she stays awake for the 180-tick bar (0x100187d8) and
+            # sleeps the 240 again (0x10018c0b) before the next check
+            if self._pc_in_chair():
+                self.mother.anim.ignore_infinite = False
+                self.mother.anim.ignore_infinite_once = False
+                self._pc_wait = True
+            else:
+                self.mother.anim.set_sequence_override(self.target_sequence_index)
+        elif it is not self.target_item:
             self.mother.anim.set_sequence_override(self.target_sequence_index)
         # both arms end in Invoke("ProgressBarDelay", 2f) (cs:33, 40)
         self.world.call_later(2.0, self._progress_bar_delay)
+
+    def _pc_in_chair(self):
+        """the neighbour sits in his chair: his routine's use of it, enter to
+        leave (the PC check's current object)"""
+        rt = self.routine('Rottweiler')
+        return rt is not None and rt.urgent_item is None \
+            and rt.item is self.target_item and rt.state == rt.USING
+
+    def update(self, dt):
+        """the PC check's poll: once his flag 4 is clear she gets up"""
+        if not self._pc_wait or self.mother is None:
+            return
+        a = self.mother.anim.anim
+        if a is None or a.name != self.target_animation:
+            self._pc_wait = False                 # the look was cut elsewhere
+            return
+        rott = self.rott()
+        if rott is not None and not rott.pc_flag4:
+            self._pc_wait = False
+            self.mother.anim._stop_single()       # her get-up, then the call
 
     def _progress_bar_delay(self):
         """ProgressBarDelay (cs:46-52): ProgressBar.RestoreVariables on the

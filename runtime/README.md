@@ -650,7 +650,21 @@ predicate, then the all-tricks win.
   sub), and pays a tricked use's record as the named clip ends
   (PCCreditAfter: 202's shark on the sea's `enter`, the overflow's tick
   counted there, the tantrum at the use's end not paying again). Only
-  items carrying those keys take the path.
+  items carrying those keys take the path. A clip of 0 s is skipped on
+  the next tick (`AnimPlayer.skip_clip`: 210's stands at the Mother's
+  call); a wait `at` start releases when the other role's use of the
+  item begins (`Item.pc_began`, marked in `Routine._use`: 210's awake
+  chair until her call), and another role holds its clip likewise
+  (PCWaitForRole: her wait until he stands at her chair).
+- **The PC profile's 210 check** (`MotherWakeSleepBehavior`): her look's
+  start is the PC's check at her nap's end — he in his chair: the look
+  held until his `pc_flag4` clears, then her get-up and call; else the
+  look once and the sleeps again (no check on his current item).
+- **The PC profile's same-object stations** (`Pawn._pc_departure_step`):
+  a routine actor bound for a station whose PCApproach names the PC
+  object it stands at is put on the station with no walk — the GoTo
+  returns at once there (210's Mother between her chair and her call,
+  206's weights, 213's Olga at the picnic); Woody walks as before.
 
 Standing in the open while the routine passes through your zone gets you caught;
 19 of the 28 levels do exactly that to an idle Woody within three minutes.

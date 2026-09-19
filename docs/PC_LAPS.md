@@ -124,19 +124,23 @@ more.
 Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
 the walks); faster: 106, 113, 213, 214 (−11..−19 %); the rest within ±10 %.
 
-The Season 2 laps under the profile (2026-09-23: the walk, the stays, the
+The Season 2 laps under the profile (2026-09-24: the walk, the stays, the
 routes and the catch by GameLogic.dll; idle runs, the lap period on the
-neighbour's first station, ~/nfh-bench/runs/idle2s2): against the code's lap
+neighbour's first station, ~/nfh-bench/runs/idle5s2): against the code's lap
 model (tools/pcref/lap_model_s2.py) 203 99.5 s / 105, 208 82.5 / 85.5, 209
-102.7 / 104, 211 80.8 / 85, 212 125.2 / 124, 213 125.3 / 123, 214 85.3 /
-90.3 (its Mother's script and the pistol's poll carried the same night) and
-202 81.7 / 80.7 plus his wait at the shore for Olga's sub (its mat and swim
+100.8 / 104, 211 80.8 / 85, 212 119.4 / 124, 213 126.6 / 123, 214 85.3 /
+90.3 (its Mother's script and the pistol's poll carried 2026-09-23), 202
+81.7 / 80.7 plus his wait at the shore for Olga's sub (its mat and swim
 carried the same night: docs/PC_FIDELITY.md "202's mat and swim"; the
-video's 70 and 90-94; 60.2 before, on the video's stays) — within 6 %;
-against the video on the levels the code does not close 204 79.2 / 81, 205
-89.3 / 102, 207 109.3 / 107, 210 86.8 / 102 (120.7 before the path finder's
-routes: the walks around the pool ring). 201 (the tutorial) and 206 (his
-waits on the Mother) have no free lap.
+video's 70 and 90-94; 60.2 before, on the video's stays) and 210 98.7 / ~101
+(its call carried 2026-09-24, "210's call": the model's walks on the PC's
+rooms are 62.8 s where the port's are 53.4, and her checks quantize the lap;
+the video's first lap 107, 86.8 before on the video's stays) — within 6 %;
+209, 212 and 213 moved when the stays the walk writer had dropped since the
+routes came back (102.7, 125.2 and 125.3 before, "The overlay writers'
+shared patches"). Against the video on the levels the code does not close
+204 79.2 / 81, 205 89.3 / 102 (116.2 with the Olga-mat scene), 207 109.3 /
+107. 201 (the tutorial) and 206 (his waits on the Mother) have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,
