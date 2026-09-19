@@ -167,7 +167,7 @@ LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
 CODE = (201, 202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
 # the levels whose tricked visits are the code's too (code_stays_tricked)
-TRICKED = (201,)
+TRICKED = CODE
 
 
 def pc_spans(n):
@@ -295,7 +295,7 @@ def clip_secs(n):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or list(range(202, 215))   # or 101-114 with the Season 1 idle visits
+    levels = [int(a) for a in argv if a.isdigit()] or list(range(201, 215))   # or 101-114 with the Season 1 idle visits
     for n in levels:
         rows = pair(n)
         print('== %d' % n)
@@ -349,17 +349,40 @@ def main(argv):
                 for item, wt in waits.items():
                     _set_key(ov['patches'], item, 'PCWaitFor', wt)
                 if n in TRICKED:
-                    # the tricked visit's stand (lap_model_s2.code_stays_tricked:
-                    # the step's tricked variant up to its SHOUT) and the
-                    # linked variant's where the script plays another step
-                    for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked'):
+                    # the tricked visit (lap_model_s2.code_stays_tricked: the
+                    # station's step with the item's trick in the scene): its
+                    # stand up to the SHOUT, the SHOUT's level with the
+                    # repair after it (0: none) where the step has a SHOUT of a
+                    # level the walker reads, and the second its first named
+                    # record pays at (fcn.1000140b) where no clip carries it;
+                    # the same for the linked variant (both tricks in the
+                    # scene, or the script's other step) with the second the
+                    # linked trick's own record pays at (PCLinkedPaysAt)
+                    for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
+                              'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
+                              'PCLinkedPaysAt'):
                         ov['patches'] = _strip_key(ov['patches'], k)
                     for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
                         if item in clips:
                             continue      # timed per clip (CLIPS)
-                        _set_key(ov['patches'], item, 'PCUseSecondsTricked', tr['tricked'])
+                        if tr['tricked'] is not None and (tr['tricked'] > 0 or tr['credit'] is not None):
+                            # (a variant with no action of its own — 214's
+                            # captain's door on the bridge — plays nothing to time)
+                            _set_key(ov['patches'], item, 'PCUseSecondsTricked', tr['tricked'])
                         if tr.get('linked') is not None:
                             _set_key(ov['patches'], item, 'PCUseSecondsLinked', tr['linked'])
+                        if tr['shout'] is not None and tr['shout'] >= 0:
+                            _set_key(ov['patches'], item, 'PCShout', tr['shout'])
+                            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+                        if tr['credit'] is not None and item not in CREDIT.get(n, {}):
+                            _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
+                        if tr.get('linked_credit') is not None:
+                            _set_key(ov['patches'], item, 'PCCreditAtLinked', tr['linked_credit'])
+                        if tr.get('linked_shout') is not None and tr['linked_shout'] >= 0:
+                            _set_key(ov['patches'], item, 'PCShoutLinked', tr['linked_shout'])
+                            _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
+                        if tr.get('linked_pays') is not None:
+                            _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
