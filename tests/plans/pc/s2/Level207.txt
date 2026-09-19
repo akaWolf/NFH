@@ -56,3 +56,4 @@ await Elephant 0
 await Shell 0
 await BeachTowel 0
 await SandCastle 0
+await 7                           # the extra coin: the billboard's bill, paid as he resumes after Olga's lift (the level's done count is its records)
