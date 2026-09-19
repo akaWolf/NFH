@@ -164,35 +164,41 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   stations — and the stays on the six levels whose lap the code closes
   are the code's (`docs/PC_FIDELITY.md` "Season 2 walks"); the plans of
   203, 206, 207, 208, 210-214 were re-timed to it (213's pile on his lap
-  3, 212's on lap 5).
+  3, 212's on lap 5). Since 2026-09-23 the Season 2 catch is the PC's as
+  well — generic/trigger.xml's room trigger for the neighbour and the
+  Mother: the same room pointer (none mid-pass) and neither in a hideout,
+  the catchers' being their neighbor_hideout stations and the level
+  steps' sleeps (`docs/PC_FIDELITY.md` "The Season 2 catch") — and every
+  Season 2 walk routes with the PC's path finder, Woody's to his items'
+  PC hotspots included ("Season 2 routes and Woody's runs").
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
-Open: the Season 2 catch on PC — the watch predicate's modes are read
-(the same room, the same room and floor with a vertical distance below
-15, always; the hideout flag exempts; no sneaking or busy term) and the
-catch objects are created from the per-level actor scripts, but what
-decides to create them is unread (the scripted walk-up-and-fight of the
-neighbour scripts is the co-actor fight after a crash reaction), so the
-profile's Season 2 keeps the mobile predicates (`docs/PC_VERIFICATION.md`);
-the frame pacer of game.exe (the level tick at 12 Hz is measured off the
+Open: the frame pacer of game.exe (the level tick at 12 Hz is measured off the
 HUD clock; the 60 Hz timer and the level's update are read, the gate
-between them is not); the Season 2 runs the mobile has no moment for
-(201's tutorial, 205's water ski, 208's rake, 210's second —
-`docs/PC_FIDELITY.md` "Season 2's runs"); the minigame's order of a tick's
-elapsed count against the game's update (one tick, 0.083 s), the PC's field
-size (the remaster's reference pixels stand for it) and 203's Olga shout
-before the run; Woody's own runs to his Season 2 items (the PC walks
-him to each item's `woody` hotspot at 6 px a tick; the port has not
-paired his ~295 items with the PC objects yet), the routes of the
-Season 2 walks that do not leave a station, and the stays of the Season
-2 levels whose lap the code does not close (202, 204, 205, 207, 210 —
-the video's, re-derived against the PC walk). 111's machines are the
+between them is not — no binary carries 1/12, GFXEngine's 83 ms is the
+sprites' frame interval); the Season 2 runs the mobile has no moment for
+(201's tutorial, 205's water ski, 208's rake — his lap's step runs to a
+tricked rake and crashes — 210's second; `docs/PC_FIDELITY.md` "Season
+2's runs"); the minigame's order of a tick's elapsed count against the
+game's update (one tick, 0.083 s: the level tick runs its job list before
+the game's update, whether the DoAction steps are in it is unread), the
+PC's field image (the data archive holds no TGA; the game's 100 px radius
+is carried) and 203's Olga shout before the run (her `shout` has no clip
+in the port); and the stays of the Season 2 levels whose lap the code
+does not close (202, 204, 205, 207, 210 — the video's, re-derived
+against the PC walk; their laps hand over to the co-actors' scripts). 111's machines are the
 level class's DoActions (the washer's 24 s in the video is the walk and
 give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
-neighbour runs where game.exe sets his gait. Two natural laps differ from
-the PC's by more than 15 % (213, 210 — the neighbour's routine is compiled
-into game.exe, one class per level, not data); the Season 2 gauge is 100 000 rage long
+neighbour runs where game.exe sets his gait. The Season 2 idle laps under
+the profile (2026-09-23, the lap period on the neighbour's first station)
+sit within 5 % of GameLogic's lap model on the six levels it closes (203
+99.5 s / 105, 208 82.5 / 85.5, 209 102.7 / 104, 211 80.8 / 85, 212 125.2
+/ 124, 213 125.3 / 123); against the PC video 204 (-2 %), 205 (-12 %), 207
+(+2 %) and 210 (-15 %) are close, 202 is 60 s against 94 (its mat, beer and
+sea wait on the kid's and Olga's behaviours and the `waitsea` poll, which
+the level's code hands over to their scripts) and 214's handshake keeps the
+mobile pace (113 s against 75); the Season 2 gauge is 100 000 rage long
 and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the coins are
 the levels' tricks.xml rage values. The Season 1 anger rule, the result
 captions and the map's perfect mark are read from the binaries and

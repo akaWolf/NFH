@@ -32,6 +32,98 @@ def _f32(x):
     return _f32_unpack(_f32_pack(x))[0]
 
 
+def pc_room_x(zone, x):
+    """a mobile x of `zone` on its PC room's floor line (Zone.pc_room: the
+    zone's walking limits against the room's path1-path2)"""
+    pr = zone.pc_room
+    w = (zone.right - zone.left) or 1.0
+    return pr['x1'] + (x - zone.left) * (pr['x2'] - pr['x1']) / w
+
+
+def pc_route(level, role, zone, pos, dest, target):
+    """the PC's GoTo route (GameLogic.dll fcn.1000a711 -> fcn.1000a421 /
+    fcn.1000a12d; tools/pcref/lap_model_s2.Geometry.route): a Dijkstra over
+    the rooms whose hop costs the Manhattan distance from the node's point to
+    the near door's `<actor>` hotspot (fcn.10049e01) plus the record's
+    `costs`, a hop into the target room the far door's distance to the
+    target as well (fcn.1000a5b7); a room is entered at the far door's
+    hotspot, the open list is kept sorted with a new node before the equal
+    ones (fcn.1000a097), a known room re-parented only for a lower cost, the
+    goal tested as a node is popped; the records are level.xml's in order
+    (Zone.pc_room `nb`). `pos` and `target` are PC points (target None: no
+    last leg). Returns the mobile hops [(zone pid, door)] — a locked or
+    disabled door is no record — or None"""
+    if getattr(zone, 'pc_room', None) is None or getattr(dest, 'pc_room', None) is None:
+        return None
+    by_name = {z.name: z for z in level.zones}
+    start = {'zone': zone, 'pos': pos, 'cost': 0, 'parent': None}
+    nodes = {zone.name: start}
+    opn = [start]
+
+    def insert(nd):
+        k = 0
+        while k < len(opn) and nd['cost'] > opn[k]['cost']:
+            k += 1
+        opn.insert(k, nd)
+    while opn:
+        nd = opn.pop(0)
+        if nd['zone'] is dest:
+            zs = []
+            while nd is not None:
+                zs.append(nd['zone'])
+                nd = nd['parent']
+            zs.reverse()
+            hops = []
+            for z1, z2 in zip(zs, zs[1:]):
+                d = next((d for nb, d in level.graph.get(z1.pid, ()) if nb == z2.pid), None)
+                if d is None:
+                    return None
+                hops.append((z2.pid, d))
+            return hops
+        for rec in nd['zone'].pc_room.get('nb', ()):
+            fz = by_name.get(rec['zone'])
+            a = rec['near'].get(role)
+            b = rec['far'].get(role)
+            if fz is None or a is None or b is None or getattr(fz, 'pc_room', None) is None:
+                continue
+            d = next((d for nb, d in level.graph.get(nd['zone'].pid, ()) if nb == fz.pid), None)
+            if d is None or d.disabled or d.locked:
+                continue
+            c = abs(nd['pos'][1] - a[1]) + abs(nd['pos'][0] - a[0]) + rec['costs']
+            if fz is dest and target is not None:
+                c += abs(b[1] - target[1]) + abs(b[0] - target[0])
+            ex = nodes.get(fz.name)
+            if ex is not None:
+                if ex['cost'] > nd['cost'] + c:
+                    ex.update(cost=nd['cost'] + c, parent=nd, pos=(b[0], b[1]))
+                    if ex in opn:
+                        opn.remove(ex)
+                    insert(ex)
+                continue
+            new = {'zone': fz, 'pos': (b[0], b[1]), 'cost': nd['cost'] + c, 'parent': nd}
+            nodes[fz.name] = new
+            insert(new)
+    return None
+
+
+def pc_target(role, zone, step):
+    """the PC point a path's last step walks to: a station's hotspot
+    (Item.pc_approach), else the item's or the point's x on the room's floor
+    line; None where the step names neither"""
+    pr = getattr(zone, 'pc_room', None)
+    if pr is None or not isinstance(step, dict):
+        return None
+    it = step.get('item') if step.get('kind') == 'item' else None
+    ap = it.pc_approach.get(role) if it is not None else None
+    if ap:
+        return (ap['x'], pr['floor'] + ap['px'])
+    if it is not None:
+        return (pc_room_x(zone, it.x), pr['floor'])
+    if step.get('x') is not None:
+        return (pc_room_x(zone, step['x']), pr['floor'])
+    return None
+
+
 class AnimPlayer:
     """AnimationControllerBase.Refresh, one animation controller.
 
@@ -484,6 +576,14 @@ class Pawn:
         self._pc_from_x = None
         self._pc_step_t = 0.0
         self._pc_hold_t = 0.0
+        # the PC profile's Season 2 catch (World._pc_s2_sees): the catcher's
+        # flag 4 (Item.pc_hideout) with the use it belongs to, whether it
+        # outlives that use, the clip last read; Woody's hideout leave clip
+        self.pc_flag4 = False
+        self._pc_use = None
+        self._pc_keep = False
+        self._pc_clip = None
+        self._pc_leave_anim = None
         self.velocity = (0.0, 0.0)       # Pawn.Velocity — a field that
                                          # outlives the frame (cs:855-880)
         self._item_snap = None           # MoveToItem's head, deferred one
@@ -794,6 +894,22 @@ class Pawn:
         pd = door.pawn_deltas.get(self.role, (0.0, 0.0))
         return door.x + door.dx + pd[0], door.y + door.dy + pd[1]
 
+    def pc_room(self):
+        """the PC's room pointer the Season 2 catch compares (fcn.1003f573 ->
+        fcn.10040a7d): none from a pass's `<actor>_in` to its `<actor>_out` —
+        the straight movement or the enter and leave clips set it to none
+        (fcn.100037f8, fcn.10003647) and the far room is set at `_out`
+        (fcn.10003454) — i.e. on a hop's steps up to the transfer
+        (_pc_hop_steps) less the `out` run stood before one, and inside a back
+        door's clips (is_warping); else the zone"""
+        if self.is_warping:
+            return None
+        s = self._step
+        if s is not None and s.get('pc_hop') is not None and self.state == self.WALK \
+                and not (s.get('pc_prehold', 0.0) > 0.0 and self._pc_hold_t < s['pc_prehold'] - 1e-9):
+            return None
+        return self.zone
+
     def moving_to_adjacent_zone(self):
         """Pawn.IsMovingToAdjacentZone = TransitionMove: the current path
         step heads through a Transition door (Pawn.cs:1281-1283, 1712)."""
@@ -867,6 +983,7 @@ class Pawn:
         self.hiding = True
         self.hiding_item = item
         self.last_hiding_item = item     # LastHidingItem = HidingItem
+        self._pc_leave_anim = None
         if item.hide_woody:
             self.sprite.hidden = True
         p = self.world.players.get(id(item.sprite)) \
@@ -899,6 +1016,10 @@ class Pawn:
             p.play_directly(item.hide_idle)
         if item.leave_animation and self.anim.has(item.leave_animation):
             self.anim.play_single(item.leave_animation)
+            # the PC's leave step clears flag 4 once its `leave` has played
+            # (GameLogic.dll 0x10006ab7): hidden to the Season 2 catch for
+            # the clip (World._pc_s2_sees)
+            self._pc_leave_anim = item.leave_animation
 
     def _capture_click(self, dest):
         """GetMoveDestination's GoZone / y-threshold bookkeeping, common to
@@ -1006,6 +1127,9 @@ class Pawn:
             hops = self.level.find_path(self.go_zone.pid, dest.pid)
         if hops is None and dest.pid != self.zone.pid and pcprofile.is_pc():
             hops = self._pc_station_route(dest, final_step)
+        if hops is None and dest.pid != self.zone.pid and pcprofile.is_pc() \
+                and pcprofile.s2_routes(self.nfh2):
+            hops = self._pc_room_route(dest, final_step)
         if hops is None and dest.pid != self.zone.pid:
             hops = self.level.find_path(self.zone.pid, dest.pid)
             if hops is None:
@@ -1395,6 +1519,23 @@ class Pawn:
                 return None
             hops.append((p2, d))
         return hops
+
+    def _pc_room_route(self, dest, final_step):
+        """the PC profile's Season 2 route of a walk from anywhere (pc_route:
+        the GoTo's Dijkstra, fcn.1000a711 -> fcn.1000a421) — from the station
+        the pawn stands at (its hotspot, _pc_depart) or its x on the room's
+        floor line, to the last step's PC point (pc_target)"""
+        z = self.zone
+        if z is None or getattr(z, 'pc_room', None) is None:
+            return None
+        dep = self._pc_depart
+        if dep is not None and abs(self.sprite.x - dep[2]) <= 0.1 \
+                and abs(self.sprite.y - dep[3]) <= 0.1:
+            pos = (dep[0], z.pc_room['floor'] + dep[1])
+        else:
+            pos = (pc_room_x(z, self.sprite.x), z.pc_room['floor'])
+        last = final_step[-1] if isinstance(final_step, list) and final_step else final_step
+        return pc_route(self.level, self.role, z, pos, dest, pc_target(self.role, dest, last))
 
     def _pc_departure_step(self, steps):
         """the PC profile's Season 2 departure: a path that leaves a station
@@ -7686,6 +7827,15 @@ class World:
         woody = self.woody
         if woody is None or self.game.ending or self.game.got_caught:
             return False
+        if pcprofile.is_pc() and pcprofile.s2_sight(woody.nfh2):
+            # the PC has one catch, the level tick's watch predicate
+            # (_pc_s2_sees): the crossing check reads it as well
+            for role in ('Rottweiler', 'Mother'):
+                p = self.pawns.get(role)
+                if p is not None and self._pc_s2_sees(p):
+                    self._catch(p)
+                    return True
+            return False
         rott = self.pawns.get('Rottweiler')
         if rott is not None and woody.zone is not None \
                 and rott.zone is not None \
@@ -9121,6 +9271,69 @@ class World:
                 and (not catcher.anim.blocking or not woody.sneaking)
                 and not woody.anim.blocking)
 
+    def _pc_flag4_tick(self):
+        """the catchers' flag 4 under the profile's Season 2 catch (Item.
+        pc_hideout, tools/pcref/pc_catch_s2.py): the enter step of a station
+        whose PC object is a neighbor_hideout sets it (GameLogic.dll
+        0x100067e9) as the routine's use of the station starts, the leave
+        step's end clears it (0x10006ab7) as the use ends — unless `until`
+        keeps it to the next station's end (209's shoe mat, 0x10020d0e) —
+        and the level steps set or clear it with the clips they name (the
+        sleep and the wake of 202, 206, 210 and 214)"""
+        for r in self.routines:
+            p = r.pawn
+            if p.role not in ('Rottweiler', 'Mother'):
+                continue
+            it = r.item if (r.state == r.USING and r.urgent_item is None) else None
+            spec = it.pc_hideout.get(p.role) if it is not None else None
+            use = (r.index, id(it)) if spec is not None else None
+            if use != p._pc_use:
+                if p._pc_use is not None and not p._pc_keep:
+                    p.pc_flag4 = False
+                p._pc_use = use
+                p._pc_clip = None
+                p._pc_keep = False
+                if spec is not None:
+                    until = spec.get('until')
+                    if until is None:
+                        p.pc_flag4 = True
+                    elif r.actions:
+                        nxt = r.actions[(r.index + 1) % len(r.actions)]
+                        nit = self.level.items.get(nxt['item']) if nxt.get('item') else None
+                        if nit is not None and nit.name == until:
+                            p.pc_flag4 = True
+                            p._pc_keep = True
+            if spec is not None:
+                a = p.anim.anim
+                clip = a.name if a is not None else None
+                if clip != p._pc_clip:
+                    p._pc_clip = clip
+                    if clip in spec.get('clear', ()):
+                        p.pc_flag4 = False
+                    elif clip in spec.get('set', ()):
+                        p.pc_flag4 = True
+
+    def _pc_s2_sees(self, catcher):
+        """the Season 2 catch under the profile: generic/trigger.xml's `fight`
+        on Woody, position room, type always — the watch predicate
+        fcn.1003f573 under mode 1 (pcprofile.s2_sight): both room pointers
+        set and equal (Pawn.pc_room), neither party's flag 4 — Woody hiding
+        or in his hideout's leave clip (the leave step clears it once the
+        clip has played, 0x10006ab7), the catcher's pc_flag4. No busy,
+        sleep, sneak or animation term."""
+        woody = self.woody
+        if woody is None or catcher is None:
+            return False
+        rw, rc = woody.pc_room(), catcher.pc_room()
+        if rw is None or rc is None or rw.pid != rc.pid:
+            return False
+        if woody.hiding:
+            return False
+        la = woody._pc_leave_anim
+        if la is not None and woody.anim.anim is not None and woody.anim.anim.name == la:
+            return False
+        return not catcher.pc_flag4
+
     def can_rottweiler_see_woody(self):
         """GameInfo.CanRottweilerSeeWoody (GameInfo.cs:181-192), the Classic
         detection predicate. Pure zone containment; the Bed special case swaps
@@ -9137,6 +9350,8 @@ class World:
         routine = next((r for r in self.routines if r.pawn is rott), None)
         if routine is None or not routine.actions or not routine.started:
             return False
+        if pcprofile.is_pc() and pcprofile.s2_sight(woody.nfh2):
+            return self._pc_s2_sees(rott)
         if not self._detect_common(rott):
             return False
         it = routine.item if routine else None
@@ -9171,6 +9386,8 @@ class World:
         routine = next((r for r in self.routines if r.pawn is mother), None)
         if routine is None or not routine.actions or not routine.started:
             return False
+        if pcprofile.is_pc() and pcprofile.s2_sight(self.woody.nfh2):
+            return self._pc_s2_sees(mother)
         if pcprofile.is_pc() and pcprofile.sees_while_busy(self.woody.nfh2):
             return self._detect_common(mother)
         # Mother.CanSeeWoody defers to the primary behavior (Mother.cs:103-106)
@@ -9763,6 +9980,9 @@ class World:
             fsm.tick(dt)
         if self.woody:
             self.woody.tick(dt)
+        if pcprofile.is_pc() and self.woody is not None \
+                and pcprofile.s2_sight(self.woody.nfh2):
+            self._pc_flag4_tick()
         # the WinGameAnimations coroutine (GameInfo.cs:298-302): armed by
         # WinGameOnCompleteAllTricks, it runs on its own clock outside
         # Update's GameEnding gate and fires PlayWinAnimations after 2.5 s

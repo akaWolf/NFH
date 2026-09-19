@@ -196,10 +196,14 @@ stands out the PC's run up to its `<actor>_in`, the complex steps through the
 transfer last the straight movement's ticks (the zone flips at `<actor>_out`,
 as the PC's room pointer does), and the next step stands out the run down to
 the far floor; a back door's climb, strips and descent last the same runs and
-the doors' `enter` / `leave` clips. The routine stations add the PC's runs up
-or down to their hotspots (`Item.pc_approach`), and a walk from one station to
-another takes the PC path finder's route. No step is added or removed, so the
-step counts the mid-stairs reroutes read stay the mobile's.
+the doors' `enter` / `leave` clips. The routine stations and Woody's items
+add the PC's runs up or down to their hotspots (`Item.pc_approach`), and every
+walk between rooms takes the PC path finder's route (`world.pc_route` over
+`Zone.pc_room`, from the station's hotspot or the pawn's x on the floor line;
+`Pawn._pc_station_route` keeps the precomputed station pairs, which it
+reproduces) — the mobile's `Level.find_path` stays for the mid-stairs reroute
+from GoZone. No step is added or removed, so the step counts the mid-stairs
+reroutes read stay the mobile's.
 
 `AnimPlayer` mirrors `AnimationControllerBase`: an animation ending pulls the
 next from the queue, and the queue draining fires the callback — which is what
@@ -628,6 +632,15 @@ predicate, then the all-tricks win.
   `Mother.OnCaughtWoody` runs the same `HitWoody` (Mother.cs:108-111), and
   every Season-2 Mother carries all four hit sequences. Her
   `Mother.CanSeeWoody` defers to level behaviors (not ported, default true).
+- **The PC profile's Season 2 catch** (`pcprofile.s2_sight`,
+  `World._pc_s2_sees`): GameLogic.dll's room trigger of generic/trigger.xml
+  in place of both predicates and the crossing check — `Pawn.pc_room` equal
+  (none on a hop's steps up to the transfer, less a stood `out` run, and
+  inside a back door's clips), Woody neither hiding nor in his hideout's
+  leave clip, the catcher's `pc_flag4` clear (`World._pc_flag4_tick`: the
+  PC's flag 4 over his neighbor_hideout station's use, `Item.pc_hideout`,
+  with the level steps' sleep and wake clips); no IgnoreWoody, IsSleeping,
+  blocking-animation or DonePassing term. The DelayStart gate stays.
 
 Standing in the open while the routine passes through your zone gets you caught;
 19 of the 28 levels do exactly that to an idle Woody within three minutes.

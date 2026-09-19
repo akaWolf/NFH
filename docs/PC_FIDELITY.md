@@ -175,7 +175,12 @@ straight after the game (v2), and 208's rat during his lap-2 shoe
 reference pixels (1280 x 800) stand for the PC's, the PC's field.tga is not
 on hand; the order of a tick's DoAction step against the game's update
 (0x1004482b) — whether the elapsed count takes this tick's rate or the last
-one's, one tick (0.083 s) on every game; 203's Olga shout_chinese before
+one's, one tick (0.083 s) on every game (reread 2026-09-23: the level tick
+fcn.10044234 runs its job list — [level+0x18], each job's slot 2 run and
+re-queued unless done, 0x10044430-0x100444f5 — well before the game's
+update, so a DoAction run from that list takes the previous tick's rate;
+that the actors' DoAction steps are run from that list is the link not
+read); 203's Olga shout_chinese before
 his run is not played (the port's Olga has no such clip; he starts at the
 loss), and his run keeps the mobile's moment (at once if he walks, else
 when his clip ends) where the PC's `always` may start it at once.
@@ -1138,14 +1143,75 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (208: the shoe machine 26.2 / 27.9, the elephant 4.5 / 3.8, the bowl
   10.8 / 11.8, the platform 15.3 / 15.2; 213: the plant 16.7 / 16.5, the
   picnic 16.2 / 16.7, the cement 17.2 / 17.6), and with the code's stays
-  208's lap is 82.5 s for the model's 85.5 and the video's 86. Open: Woody's
-  own runs to his items (his `woody` hotspots at 6 px a tick) are not
-  carried — it needs his ~295 items paired with the PC objects, which the
-  nearest-object proposal leaves ambiguous on 97; a walk that does not
-  leave a station (after a trick's reaction, a run, a chase) keeps the
-  mobile's route; the detection keeps the mobile's PassingComplexMove
-  window over a pass, where the PC's actor is in no room from
-  `<actor>_in` to `<actor>_out`.
+  208's lap is 82.5 s for the model's 85.5 and the video's 86. (Woody's
+  own runs, the routes of the other walks and the detection over a pass:
+  the entries below.)
+- *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
+  routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
+  walks between two stations: `world.pc_route` runs the Dijkstra at the
+  port's walk — from the station the pawn stands at (its hotspot) or its x
+  on the room's floor line, to the last step's hotspot or x — over each
+  zone's PC room (PCRoom: the floor line, the <neighbor> records in
+  level.xml's order with the doors' `<actor>` hotspots per pawn and the
+  `costs`); on the 338 station pairs it gives the precomputed routes
+  exactly. Each of the 14 levels' zone graphs has one ring, so a walk to
+  the far side of it — a run after a trick, a chase, a fetch of the fixing
+  tool, Woody's own clicks — now goes the way the PC's distances pick, not
+  the mobile's hop count. Woody's items carry his PC object's `woody`
+  hotspot (PCApproach `Woody`, 204 items: a search item by its
+  InventoryItems type against the PC container's <content>, a trick item by
+  the inventory it takes against the PC action of that name, a hide item
+  by the `hideout` object, in the room its zone maps to — tools/pcref/
+  pc_walks_s2.py WOODY, seven by hand: 212's parrot nest holds `ruby_2`,
+  202's and 207's crayfish share the game object's hotspot, 208's rake and
+  Fifi are the primary objects' `use`, 210's octopus is spelled so, 204's
+  gong grease stands at the gong; 208's Indian magician and 209's cow have
+  no PC object), so his walk to an item stands the run up to it (6 px a
+  tick, 8 on average for the hotspots off the floor, to 25 for 213's
+  skeleton) and his next walk the run down, as the stations' do.
+- *The Season 2 catch (2026-09-23, read in GameLogic.dll and Loader.dll,
+  carried).* The catch is data: generic/trigger.xml gives the neighbour
+  and the Mother a `fight` behaviour on Woody, `<trigger object="woody"
+  position="room" type="always"/>`, and Woody a `die` one on either; Olga
+  and the other actors have none. Loader.dll's trigger parser
+  (0x1000a869-0x1000a936) makes `position` room / nearobj / house the
+  mode bits 1 / 2 / 4 and `type` once / always 0x1000 / 0x2000 of the
+  AddObjectTriggerMsg's `flag`; GameLogic.dll files the message
+  (fcn.1004fa5c: actor, actionactor, behavior, flag, object) in the watch
+  table the level tick walks (fcn.1003fc90), and a firing entry starts
+  the behaviour (fcn.1003f086 -> fcn.10005b94: Woody's fear, the fight,
+  the respawn). Mode 1 of the predicate fcn.1003f573 is the whole rule:
+  both room pointers set and equal — a pass holds none from `<actor>_in`
+  to `<actor>_out` — the target placed (flag 0x20) and neither party's
+  flag 4; no busy, sleep, sneak or animation term. Flag 4 is the hideout:
+  the enter step (vtable 0x100ab2ec) sets it when the entered object
+  carries hideout or neighbor_hideout (0x100067d4), the leave step
+  clears it once its `leave` has played (0x10006ab7), and nine level
+  steps — every other mask-4 call of the flag setter — set or clear it
+  themselves: 202's neighbour from his arrival at the sea (0x1002248d)
+  and awake on his mat at the beer (0x10022a5b), 206's, 210's and 214's
+  Mother asleep and awake in her deck chair (0x1002b77b / 0x1002b9e3,
+  0x10018d60 / 0x1001866f, 0x1003a1c5 / 0x10039efa), 209's neighbour from
+  the shoe mat on to the curtain's leave (0x10020d0e). The catchers'
+  neighbor_hideout stations — the ones the level scripts enter
+  (fcn.1000ea30, fcn.1000e7f2, fcn.10006bd4) — are the ones the mobile's
+  ProgressBar sleep windows sit on (202's mat, 207's towel, 208's
+  platform, 209's Taj, 210's chair, 212's bench, the Mothers' deck chairs,
+  pool and dressing rooms) and 202's sea; the mobile's windows are the
+  bars' sequence spans and its catch had its own terms (IgnoreWoodyWhenUse,
+  the blocking animations, IsSleeping, PassingComplexMove,
+  DonePassingToOtherZone). Carried (tools/pcref/pc_catch_s2.py,
+  `pcprofile.s2_sight`, `World._pc_s2_sees` / `_pc_flag4_tick`,
+  `Pawn.pc_room`): PCHideout on 16 stations, per role the flag's span —
+  the whole use, less the clips from a level step's clear on
+  (BeachGetBeer, MotherLook / MotherLookLoop) and back from a `set` clip
+  (MotherSleep*), 209's shoe mat kept through the Taj's use; Woody hidden
+  while hiding and through his hideout's leave clip; a pawn in no room on
+  a hop's steps up to the transfer (less the `out` run stood before one)
+  and inside a back door's clips; the crossing check reads the same
+  predicate. The driver's dodge counts the `in` run into Woody's way out
+  (on the mobile he was safe from the step that heads for the stairs:
+  212's Mother walked in on him there).
 - *The other actors' stands.* The PC level data times an actor's action in
   ticks (`<action actor="mother" … time="120">` in objects.xml, 12 per
   second) or `auto` (its clip: the enter/leave stretches of a stand, a

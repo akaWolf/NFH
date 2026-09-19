@@ -124,6 +124,19 @@ more.
 Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
 the walks); faster: 106, 113, 213 (−12..−19 %); the rest within ±10 %.
 
+The Season 2 laps under the profile (2026-09-23: the walk, the stays, the
+routes and the catch by GameLogic.dll; idle runs, the lap period on the
+neighbour's first station, ~/nfh-bench/runs/idle2s2): against the code's lap
+model (tools/pcref/lap_model_s2.py) 203 99.5 s / 105, 208 82.5 / 85.5, 209
+102.7 / 104, 211 80.8 / 85, 212 125.2 / 124, 213 125.3 / 123 — within 5 %;
+against the video on the levels the code does not close 204 79.2 / 81, 205
+89.3 / 102, 207 109.3 / 107, 210 86.8 / 102 (120.7 before the path finder's
+routes: the walks around the pool ring), 202 60.2 / 94 — its mat, beer and
+sea hand over to the kid's and Olga's behaviours and the `waitsea` poll,
+which the port's stays (PCUseSeconds 0.5, 0.5, 9.5, 21.0) do not hold — and
+214 112.8 / 75 on the mobile pace of its handshake. 201 (the tutorial) and 206
+(his waits on the Mother) have no free lap.
+
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,
 walked at the neighbour's speed records (8 px a tick along the floor, 3 up

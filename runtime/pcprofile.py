@@ -550,9 +550,28 @@ SEES_WHILE_BUSY = True
 
 
 def sees_while_busy(nfh2=False):
-    """Season 1 only: GameLogic.dll's watch predicate (fcn.1003f573) reads mode bits whose meaning is
-    still open, so Season 2 keeps the mobile's busy windows until they are read"""
+    """Season 1 only: Season 2's catch is GameLogic.dll's watch predicate (s2_sight)"""
     return SEES_WHILE_BUSY and not nfh2 and rule('sight')
+
+
+# -- the Season 2 catch (docs/PC_VERIFICATION.md "detection", tools/pcref/pc_catch_s2.py) ----
+# generic/trigger.xml: the neighbour's and the Mother's `fight` on Woody, position="room"
+# type="always" — Loader.dll's trigger parser (0x1000a869-0x1000a936: room 1, nearobj 2,
+# house 4; once 0x1000, always 0x2000) into AddObjectTriggerMsg (GameLogic fcn.1004fa5c), the
+# level tick's watch walker (fcn.1003fc90) and predicate (fcn.1003f573) under mode 1: both room
+# pointers set and equal — none from a pass's `<actor>_in` to its `<actor>_out` (fcn.100037f8,
+# fcn.10003647, fcn.10003454) — the target placed (0x20), neither party's flag 4: the enter step
+# into a hideout or neighbor_hideout object to the leave step's end (0x100067e9, 0x10006ab7) and
+# the level steps' own sets and clears (Item.pc_hideout). No busy, sleep or animation term.
+def s2_sight(nfh2=False):
+    """the Season 2 catch is the PC's room and flag-4 rule"""
+    return nfh2 and rule('sight')
+
+
+def s2_routes(nfh2=False):
+    """Season 2's walks between rooms take the PC path finder's route (world.pc_route, the
+    GoTo's Dijkstra over the rooms' door hotspots, fcn.1000a421) from wherever they start"""
+    return nfh2 and rule('walk')
 
 
 def gait_speed(role, gait):

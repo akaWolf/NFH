@@ -349,6 +349,27 @@ class Driver(Recorder):
                                   abs(i.target_x - w.sprite.x)))
         return spots[0] if self.hops(here, spots[0].zone) < 99 else None
 
+    def zone_path(self, p, a_pid, x, b_pid, item=None):
+        """the hops a walk of pawn p from (zone a, x) to zone b takes: under
+        the profile's Season 2 the PC path finder's route (world.pc_route from
+        the x on the room's floor line to the item's hotspot or x), else the
+        mobile Level.find_path"""
+        L = self.v.level
+        if a_pid == b_pid:
+            return []
+        if p is not None and pcprofile.is_pc() \
+                and pcprofile.s2_routes(bool(getattr(p, 'nfh2', False))):
+            import world as _w
+            z0, z1 = L.zone_by_pid(a_pid), L.zone_by_pid(b_pid)
+            if z0 is not None and z1 is not None and z0.pc_room and z1.pc_room:
+                pos = (_w.pc_room_x(z0, x), z0.pc_room['floor'])
+                tgt = _w.pc_target(p.role, z1, {'kind': 'item', 'item': item}) \
+                    if item is not None else None
+                hops = _w.pc_route(L, p.role, z0, pos, z1, tgt)
+                if hops is not None:
+                    return hops
+        return L.find_path(a_pid, b_pid)
+
     def hops(self, a_pid, b_pid):
         if a_pid == b_pid:
             return 0
@@ -513,6 +534,10 @@ class Driver(Recorder):
         the PC profile (Season 1) only the neighbour asleep in his hideout —
         the Bed of 109 — is blind, and only to a sneaking or standing Woody
         (pcprofile.sees_while_busy); the auto-sneak tiptoes there"""
+        if pcprofile.is_pc() and pcprofile.s2_sight(getattr(self.v.woody, 'nfh2', False)):
+            # Season 2: the PC's flag 4 at the catcher's station (World.
+            # _pc_flag4_tick, Item.pc_hideout)
+            return p.pc_flag4
         if not p.is_sleeping:
             return False
         if pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(self.v.woody, 'nfh2', False)):
@@ -523,8 +548,9 @@ class Driver(Recorder):
 
     def _ignoring_safe(self, p):
         """IgnoreWoodyWhenUse: a window on the mobile, none on the PC"""
+        nfh2 = getattr(self.v.woody, 'nfh2', False)
         return p.ignore_woody and not (
-            pcprofile.is_pc() and pcprofile.sees_while_busy(getattr(self.v.woody, 'nfh2', False)))
+            pcprofile.is_pc() and (pcprofile.sees_while_busy(nfh2) or pcprofile.s2_sight(nfh2)))
 
     def sleep_left(self, p):
         """seconds until a sleeping catcher wakes: the bar's sleep window
@@ -532,6 +558,8 @@ class Driver(Recorder):
         (ProgressBar.cs:148 — the elements after AnimationEndIndex are the
         get-up), so count the current element's remainder plus the elements
         up to that index; 0 when no bar explains the sleep"""
+        if pcprofile.is_pc() and pcprofile.s2_sight(getattr(self.v.woody, 'nfh2', False)):
+            return self._pc_flag4_left(p)
         best = None
         player = p.anim
         for pb in getattr(self.world, 'progress_bars', ()):
@@ -562,6 +590,37 @@ class Driver(Recorder):
                     left += length(player.sprite.anims[i])
             best = left if best is None else min(best, left)
         return best if best is not None else 0.0
+
+    def _pc_flag4_left(self, p):
+        """seconds the catcher's flag 4 still holds under the profile's Season
+        2 catch: the station's clips up to the first one that clears it
+        (Item.pc_hideout `clear`), else the rest of the use; the clip that
+        plays counts for its remainder only when it holds the flag"""
+        if not p.pc_flag4:
+            return 0.0
+        r = next((r for r in self.world.routines if r.pawn is p), None)
+        it = r.item if r is not None else None
+        spec = it.pc_hideout.get(p.role) if it is not None else None
+        if spec is None:
+            return 0.0
+        clears = set(spec.get('clear', ()))
+        player = p.anim
+
+        def length(a):
+            n = len(a.pattern) if a.pattern else (a.end - a.start + 1)
+            return max(1, n) / float(a.fps or 10.0)
+        a = player.anim
+        done = player.pat_idx if a.pattern else (player.frame - a.start)
+        left = max(0.0, length(a) - max(0, done) / float(a.fps or 10.0))
+        for name in player.seq[player.seq_index:]:
+            if name in clears:
+                break
+            i = player.by_name.get(name)
+            if i is not None:
+                left += length(player.sprite.anims[i])
+        role = getattr(player, '_probe_role', None)
+        return left / float(max(1, self._anim_rate.get(role, 1))) \
+            / (getattr(player, 'time_scale', 1.0) or 1.0)
 
     def eta_to_zone(self, p, zone_pid, horizon=60.0, after=0.0):
         """seconds until catcher p stands in zone_pid, or None past the
@@ -704,7 +763,7 @@ class Driver(Recorder):
             sp = spd or speed
             if frm is not None:
                 t += self.pc_station_secs(frm, p, it)
-            path = self.v.level.find_path(zone, it.zone) \
+            path = self.zone_path(p, zone, x, it.zone, it) \
                 if zone != it.zone else []
             if path is None:
                 return None, t, x, zone
@@ -923,12 +982,16 @@ class Driver(Recorder):
         the gate shut on rooms the neighbour leaves for ~10 s per lap"""
         if item is None:
             return self.USE_TIME
+        w = self.v.woody
+        # the profile's Season 2: his run up or down to the PC object's
+        # `woody` hotspot before the use, and back to the floor after it
+        # (Item.pc_approach, Pawn._pc_station_ticks / _pc_departure_step)
+        run = self.pc_station_secs(item, w)
         if item.kind == 'HideItem':
             # HideItem.InternalUse -> Woody.Hide sets Hiding the moment he
             # arrives (README "Hiding"): the climb-in animation plays with
             # him already out of both catch predicates
-            return 0.5
-        w = self.v.woody
+            return 0.5 + run
         names = list(item.animation_sequence) if item.use_woody_sequence \
             else ([item.animation] if item.animation else [])
         t = 0.0
@@ -946,13 +1009,13 @@ class Driver(Recorder):
         game = (3 + -(-int(ticks) // 4)) / pcprofile.TICKS_PER_SECOND \
             if ticks else 0.0
         if t <= 0.0:
-            return self.USE_TIME + game
+            return self.USE_TIME + game + 2.0 * run
         # no cap: Level102's saw is SawSofa x3 = 14.3 s at 13 fps and the
         # trick lands only at the sequence end (Woody.cs:412-416) — a cap
         # sent Woody up for a job the beer run cannot hold; the sheet time
         # over the measured tick rate (the port runs Woody at 2x, see
         # _install_anim_probes)
-        return max(2.0, (t + 1.5) / self.anim_rate(w)) + game
+        return max(2.0, (t + 1.5) / self.anim_rate(w)) + game + 2.0 * run
 
     def woody_need(self, zone_pid, x, item=None):
         """seconds for Woody to reach (zone, x) and finish a use there:
@@ -961,7 +1024,7 @@ class Driver(Recorder):
         w = self.v.woody
         if w.zone is None:
             return 99.0
-        path = self.v.level.find_path(w.zone.pid, zone_pid) \
+        path = self.zone_path(w, w.zone.pid, w.sprite.x, zone_pid, item) \
             if w.zone.pid != zone_pid else []
         if path is None:
             return 99.0
@@ -1028,7 +1091,7 @@ class Driver(Recorder):
         w = self.v.woody
         path = []
         if w is not None and w.zone is not None and w.zone.pid != zone_pid:
-            path = self.v.level.find_path(w.zone.pid, zone_pid) or []
+            path = self.zone_path(w, w.zone.pid, w.sprite.x, zone_pid, item) or []
         # the zone he starts from counts too: leaving a hiding spot or
         # crossing his own room to the first door takes time, and a
         # catcher walking in meanwhile catches him there
@@ -1575,6 +1638,12 @@ class Driver(Recorder):
                 # keep walking — turning back toward the wardrobe or a
                 # farther door is what gets him caught mid-room
                 wd_left = self._woody_door_eta(w)
+                if pcprofile.is_pc() and pcprofile.s2_sight(getattr(w, 'nfh2', False)):
+                    # Season 2's catch reads the PC room pointer: he is out
+                    # once the pass's straight movement begins, and a re-click
+                    # there rebuilds the route and its `in` run in the room
+                    # (212's stairs, the Mother walking in)
+                    wd_left = self._woody_out_eta(w)
                 if wd_left is not None and wd_left < soonest + 1.5:
                     return
         # the flee route: the reachable parkable zone whose route keeps
@@ -1631,6 +1700,14 @@ class Driver(Recorder):
             # on Season 2 the margin outran an ignoring catcher's window and Woody hid
             # again the moment a leg unhid him (Level209's hot shoe)
             exit_time += 1.0
+        if pcprofile.is_pc() and pcprofile.s2_sight(getattr(w, 'nfh2', False)) \
+                and first_door is not None and first_door.is_transition:
+            # Season 2's catch reads the PC room pointer: Woody is out of this
+            # room once the hop's straight movement starts, after its `in`
+            # run (Pawn.pc_room) — the mobile's walk-through was safe from
+            # the step that heads for it (212's stairs, the Mother walking
+            # in); a back door's climb above is its `in` run already
+            exit_time += self._out_of_zone_delay(first_door)
         # a sleeper's wake time is a sequence-length estimate (sleep_left,
         # ~2 s off on Level207's Mother: read 2.8 s at the moment she got
         # up) — leave with the same margin the gate keeps
@@ -1648,7 +1725,8 @@ class Driver(Recorder):
         hide = next((i for i in self.v.level.items.values()
                      if i.kind == 'HideItem' and i.zone == here
                      and i.collider is not None
-                     and abs(i.target_x - w.sprite.x) / self.woody_speed(here) + 1.0 < soonest),
+                     and abs(i.target_x - w.sprite.x) / self.woody_speed(here) + 1.0
+                     + self.pc_station_secs(i, w) < soonest),
                     None) if soonest is not None else None
         if hide is not None:
             if self.click_item(hide) == 'transit':
@@ -1717,6 +1795,34 @@ class Driver(Recorder):
                 # 'transfer' step (no door warp)
                 if s.get('transfer') is not None:
                     return t
+        return None
+
+    def _woody_out_eta(self, w):
+        """the profile's Season 2: seconds until Woody is in no room — his
+        pass's straight movement begun (Pawn.pc_room) — on his live steps: 0
+        on a hop's step, else the walk to the plain step before the hop and
+        its `in` run; None without a hop ahead"""
+        if w.pc_room() is None:
+            return 0.0
+        steps = ([w._step] if getattr(w, '_step', None) is not None
+                 else []) + list(getattr(w, 'steps', []))
+        x = w.sprite.x
+        t = 0.0
+        zone = w.zone.pid if w.zone is not None else None
+        sp = self.woody_speed(zone) if zone is not None else 2.0
+        for s in steps:
+            if s.get('pc_hop') is not None:
+                return t + s.get('pc_prehold', 0.0)
+            if s.get('kind') == 'door':
+                return None
+            if s.get('kind') in ('point', 'cpoint', 'item'):
+                tx = s.get('x', x)
+                t += abs(tx - x) / sp + s.get('pc_prehold', 0.0)
+                x = tx
+                run = s.get('pc_hold_run')
+                if run is not None:
+                    pt = self.pc_pass_times(run[1], w, 'Woody')
+                    t += pt[0] if pt is not None else 0.0
         return None
 
     def _next_zone(self, w):
@@ -1847,7 +1953,8 @@ class Driver(Recorder):
                 # BFS) would otherwise walk him through the room the
                 # detour avoids (Level210: Zone01 -> Zone03 by Zone02, not
                 # by the stairs the neighbour is coming down)
-                bfs = self.v.level.find_path(here, z.pid) or []
+                wz = self.v.woody
+                bfs = self.zone_path(wz, here, wz.sprite.x, z.pid) or []
                 zone_click = z
                 if [q for q, _d in bfs] != [q for q, _d in path]:
                     zone_click = self.v.level.zone_by_pid(path[0][0]) or z
@@ -2484,8 +2591,9 @@ class Driver(Recorder):
         self._leg_zone = it.zone
         self._leg_x = it.target_x
         self._leg_item = it
-        ok = self.wait_until(lambda: self.gate_open(it.zone, it.target_x, it),
-                             90.0)
+        # `unlock!` — the human's call: no gate wait (wait_gate's rush)
+        ok = getattr(self, '_rush', False) or \
+            self.wait_until(lambda: self.gate_open(it.zone, it.target_x, it), 90.0)
         if not ok:
             return False, 'zone never clear'
         if typ is not None and not self.select_type(typ):
@@ -2788,6 +2896,12 @@ class Driver(Recorder):
         if not ok:
             return False, 'zone never clear'
         self.select_type(None)
+        if pcprofile.is_pc() and getattr(w, 'nfh2', False):
+            # a click while a take still locks the input is dropped
+            # (BlockWhenItemPick, Woody.cs:534-538) and the poke comes 3 s
+            # later: the human clicks the moment he is free (212's statue
+            # right after the plate, the Mother walking in)
+            self.wait_until(lambda: self._woody_free(w), 5.0)
         self.click_item(it)
         ok = self.wait_until(lambda: w.hiding, LEG_TIMEOUT,
                              poke=lambda: self.click_item(it))

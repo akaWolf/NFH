@@ -154,7 +154,7 @@ def _mono_qsort(a, cmp, low0, high0):
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
                  'play_left', 'play_right', 'ty', 'height_delta', 'tx',
-                 'name_string', 'end_string')
+                 'name_string', 'end_string', 'pc_room')
 
     def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0,
                  tx=0.0):
@@ -166,6 +166,9 @@ class Zone:
         self.height_delta = height_delta    # Zone.HeightDelta
         self.name_string = ''               # Zone.NameString
         self.end_string = ''                # Zone.EndString
+        # the PC profile's Season 2 room for the path finder's routes
+        # (levels/pc overlays' PCRoom, tools/pcref/pc_walks_s2.py)
+        self.pc_room = None
         # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
         # the collider box is containment, these are the walking limits
         self.play_left = x - w * 0.5
@@ -187,6 +190,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
+                 'pc_hideout',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -399,6 +403,10 @@ class Item:
         # and its height against the room's floor (levels/pc overlays,
         # tools/pcref/pc_walks_s2.py)
         self.pc_approach = d.get('PCApproach') or {}
+        # the PC profile's Season 2 catch: per role the span of the PC's flag 4
+        # at this station — the catcher neither catches nor is seen
+        # (levels/pc overlays, tools/pcref/pc_catch_s2.py)
+        self.pc_hideout = d.get('PCHideout') or {}
         self.should_walk_down = bool(d.get('ShouldWalkDown'))
         self.item_use_height = d.get('ItemUseHeight', 0.01)
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
@@ -1600,6 +1608,7 @@ class Level:
                  height_delta=o['data'].get('HeightDelta') or 0.0)
         z.name_string = o['data'].get('NameString') or ''
         z.end_string = o['data'].get('EndString') or ''
+        z.pc_room = o['data'].get('PCRoom')
         self.zones.append(z)
         self._zone_comp[pid] = z          # behaviors reference the component
 
