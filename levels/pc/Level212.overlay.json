@@ -93,7 +93,7 @@
    "set": {
     "PCLaugh": 3,
     "PCShout": 1,
-    "PCFixSeconds": 0,
+    "PCFixSeconds": 1.58,
     "PCUseSeconds": 12.5
    }
   },

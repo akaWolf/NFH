@@ -1165,7 +1165,13 @@ TRICKED_ROWS = {206: {'Weights': (7, ('dumbbell', 'olga')), 'DynamiteBox': (9, (
 # (ActivateItemTrick; bottomleft/washbucket_manip) while Olga showers — the
 # step's bucket branch is the guarded shower's (0x1003b87b; the mobile's
 # trigger is her shower pose, WashbucketBehavior)
-TRICKED_BY = {214: {'Shower': ('Washbucket', {'bottomleft_shipshower_guarded'}, {'bottomleft_shipshower'})}}
+TRICKED_BY = {214: {'Shower': ('Washbucket', {'bottomleft_shipshower_guarded'}, {'bottomleft_shipshower'})},
+              # 203's stage: the PC breaks it through the generator's tights
+              # alone (cn_c2 combine.xml has no microphone trick; the stage
+              # step asks for generator_manip, 0x1003450b); the mobile's
+              # DieselGenerator activates the Microphone's trick
+              # (ActivateItemTrick)
+              203: {'Microphone': ('DieselGenerator', set(), set())}}
 # the level's aux script, whose update runs each level tick (the `aux` entry
 # of the scripts' factory table: me_c1's factory 0x10034dba, registered at
 # 0x1001265b, builds the handler of vtable 0x100af928, whose update 0x10034fec
@@ -1487,6 +1493,15 @@ def code_stays_tricked(n):
                     lvk = Level(n); lvk.present = set(lvi.present)
                     _e, nx1 = run_step(lvk, lap[i][1], dict(byi))
                     e['rejoins'] = nx2 == nx1
+                    if e['shout'] is not None and e['shout'] >= 0 and e['repair'] is None \
+                            and nx2 is not None and nx2 != nx1:
+                        # the repair in the step the tricked flow hands over
+                        # to off the lap (203's generator after the stage's
+                        # crash, 0x100343a5: its walk, `repair` and switch back)
+                        evr, _nr = run_step(lvj, nx2, dict(byi))
+                        rp = [t for _o, a, t in station_ticks(d, evr, {}) if a == 'repair']
+                        if rp and None not in rp:
+                            e['repair'] = round(sum(rp) / 12.0, 2)
                     out[item] = e
                     where[item] = (i, ev2)
                     break

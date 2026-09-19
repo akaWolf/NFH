@@ -488,6 +488,18 @@ def approaches(n):
             if p is None or r not in g.rooms:
                 raise KeyError('%d: %s has no woody hotspot in a room' % (n, obj))
             per['Woody'] = {'obj': obj, 'x': p[0], 'px': p[1] - g.floor(r), 'routes': {}}
+            # his own action's <translation object="false"> on the object (the
+            # action is the inventory the mobile item takes: 208's
+            # chalk_sponge on the elephant's line, -45): his next walk leaves
+            # from x + tx
+            dm = S.Data(n)
+            for inv in (d.get('RequiredInventory'), d.get('SecondRequiredInventory')):
+                if not inv or inv == 'IT_NONE':
+                    continue
+                dx, _dy = dm.translation(obj.replace('/', '_'), S.canon.norm(inv), actor='woody')
+                if dx:
+                    per['Woody']['tx'] = dx
+                    break
         out.append((name, (d.get('Zone') or {}).get('name'), o['type'], per))
     return out
 

@@ -426,7 +426,8 @@
       "obj": "elephant/elephant_gone",
       "x": 207,
       "px": -10,
-      "routes": {}
+      "routes": {},
+      "tx": -45
      }
     }
    }
