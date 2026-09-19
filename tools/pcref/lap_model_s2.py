@@ -1198,8 +1198,9 @@ AUX_UPDATE = {212: (0x10034c0f, 0x10034e05)}
 # Harpoon, LaunchPad, Harpoon, LaunchPad) are the rows 2-6: the load, the
 # take, the shoot, the put, Fifi's take. (item: the arming row, the shot's
 # step in the flow from it, the co-actor, the arming and the firing visit
-# of the item among its lap visits; the linked item: its firing visit, the
-# visit that drops it, the take's row)
+# of the item among its lap visits; the linked item: the visit whose
+# variant decides it (the take), the visit that drops a late one (the put),
+# the take's row)
 TRICKED_ARM = {206: {'LaunchPad': (2, 2, 'mother', 1, 2)}}
 TRICKED_ARM_LINKED = {206: {'Harpoon': (1, 2, 3)}}
 # a tricked flow's toilet rush and what the co-actor does on it: 211's
@@ -1219,6 +1220,39 @@ TRICKED_RUSH = {211: {'Sweets': ('topleft_wcright', 'puke', 'olga', 'mad')}}
 # 0x10029a6c after her fight: the SHOUT that takes the actor for its level,
 # the repair; the knife is spent by then)
 TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
+
+
+def _repair_walk(n, d, ev):
+    """(ticks, (x, px) | None): the walk a tricked flow makes to its repair —
+    from the station its last GoTo before the repair's took him to (the
+    object of the first action after that GoTo) to the repaired object's
+    `neighbor` hotspot (walk_ticks), and where it leaves him (the hotspot's x
+    and height against the room's floor); (0, None) when the repair is where
+    he stands or no GoTo placed him before it (211's sign after the women's
+    wc: 34 ticks; 203's generator after the stage)"""
+    pos, go, target = None, False, None
+    for e in ev or []:
+        if e[0] == 'GO':
+            go = True
+            continue
+        if e[0] == 'DO' and e[1]:
+            names = [x for x in e[1] if not str(x).startswith('$')]
+            if len(names) >= 2 and names[1] == 'repair':
+                target = names[0]
+                break
+            if go and names and names[0] != 'neighbor':
+                pos, go = names[0], False
+    if target is None or pos is None:
+        return 0, None
+    g = Geometry(n)
+    a, b = d.real.get(pos, pos), d.real.get(target, target)
+    p, q = g.point(a), g.point(b)
+    if a == b or p is None or q is None:
+        return 0, None
+    t, _pos = walk_ticks(g, (g.room_of(a), p[0], p[1]), b, data=d)
+    if not t:
+        return 0, None
+    return t, (q[0], q[1] - g.floor(g.room_of(b)))
 
 
 def _step_parts_split(d, ev, own=None):
@@ -1480,9 +1514,14 @@ def code_stays_tricked(n):
                         for stp in steps:
                             evc += run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
                         cstand, clevel, crepair, _c = _step_parts_split(d, evc)
+                        wk, dep = _repair_walk(n, d, evc) if crepair is not None else (0, None)
                         e.update({'shout': clevel,
-                                  'repair': round(crepair / 12.0, 2) if crepair is not None else None,
+                                  'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
+                        if dep is not None:
+                            # the repair's walk leaves him at the repaired
+                            # object (211's sign)
+                            e['fix_depart'] = dep
                         if kind == 'fight':
                             ft = d.action_ticks('neighbor', 'fight', actor=actor)
                             e['hit'] = {actor: round(ft / 12.0, 2) if ft is not None else None}
@@ -1501,7 +1540,11 @@ def code_stays_tricked(n):
                         evr, _nr = run_step(lvj, nx2, dict(byi))
                         rp = [t for _o, a, t in station_ticks(d, evr, {}) if a == 'repair']
                         if rp and None not in rp:
-                            e['repair'] = round(sum(rp) / 12.0, 2)
+                            # (and the walk to it: 203's stage to the generator)
+                            wk, dep = _repair_walk(n, d, ev2 + evr)
+                            e['repair'] = round((sum(rp) + wk) / 12.0, 2)
+                            if dep is not None:
+                                e['fix_depart'] = dep
                     out[item] = e
                     where[item] = (i, ev2)
                     break
@@ -1597,33 +1640,22 @@ def code_stays_tricked(n):
         if item in out or item not in trick:
             continue
         # the linked item's own shot where the other is not armed: the take
-        # step's tricked branch and the shot it hands over to, with the walk
-        # its GoTo makes from the take to the shot's object
+        # step's tricked branch hands over to the shot at the other object
+        # (0x1002da29: the GoTo there, the rubber bear, SHOUT) and on to the
+        # put step. The mobile plays that shot at the pad's shoot through the
+        # pad's DependsOn (the harpoon's UseAtOtherPlace): the walks there and
+        # back are the port's own between the stations, the stand the shot
         rows, _loop = lap_steps(n)
         lvi, byi = _row_level(n, snaps, trow)
         lv2 = Level(n)
         lv2.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
         by = dict(byi)
-        ev1, nx = run_step(lv2, rows[trow][1], by)
+        _ev1, nx = run_step(lv2, rows[trow][1], by)
         ev2 = run_step(lv2, nx, by)[0] if nx else []
-        stand, level, repair, credit = _step_parts_split(d, ev1 + ev2)
-        g = Geometry(n)
-        take = next((x[1][0] for x in ev1 if x[0] == 'DO' and x[1]), None)
-        dest = next((x[1][0] for x in ev2 if x[0] == 'DO' and x[1]), None)
-        walk_t = None
-        if take and dest:
-            p = g.point(d.real.get(take, take))
-            if p is not None:
-                walk_t, _pos = walk_ticks(g, (g.room_of(d.real.get(take, take)), p[0], p[1]),
-                                          d.real.get(dest, dest), data=d)
-        if stand is not None and walk_t is not None:
-            stand += walk_t
-            if credit is not None:
-                credit += walk_t
+        stand, level, repair, credit = _step_parts_split(d, ev2)
         out[item] = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                      'repair': round(repair / 12.0, 2) if repair is not None else None,
                      'credit': round(credit / 12.0, 2) if credit is not None else None,
-                     'walk': round(walk_t / 12.0, 2) if walk_t is not None else None,
                      'arm': [fire_v, drop_v], 'rejoins': True}
     for item, (obj, act, actor, her) in TRICKED_RUSH.get(n, {}).items():
         if item not in out:

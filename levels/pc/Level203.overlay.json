@@ -28,8 +28,12 @@
     "PCLaugh": 3,
     "PCUseSecondsTricked": 13.25,
     "PCShout": 1,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 4.25,
     "PCCreditAt": 6.92,
+    "PCFixDepart": [
+     1147,
+     -22
+    ],
     "PCUseSeconds": 15.08
    }
   },

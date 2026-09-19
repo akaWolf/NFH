@@ -371,7 +371,7 @@ def main(argv):
                               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
                               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
                               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-                              'PCToiletPaysAt'):
+                              'PCToiletPaysAt', 'PCFixDepart'):
                         ov['patches'] = _strip_key(ov['patches'], k)
                     sys.path.insert(0, HERE)
                     import lap_model_s2
@@ -416,6 +416,10 @@ def main(argv):
                             # the linked shot's third record, its own tick
                             # (206's rubberrabbit: the ExtraCoin206)
                             _set_key(ov['patches'], item, 'PCExtraPaysAtLinked', tr['linked_extra_at'])
+                        if tr.get('fix_depart') is not None:
+                            # the repair's walk leaves him at the repaired
+                            # object: his next walk from its hotspot (x, px)
+                            _set_key(ov['patches'], item, 'PCFixDepart', list(tr['fix_depart']))
                         if tr.get('toilet_pays_at') is not None:
                             # the rush's own record, its tick into the wc's
                             # action (211's wcright, 27 of the puke's 40)

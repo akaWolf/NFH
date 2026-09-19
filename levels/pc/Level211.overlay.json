@@ -30,11 +30,15 @@
     "PCLaugh": 3,
     "PCUseSecondsTricked": 2.08,
     "PCShout": 1,
-    "PCFixSeconds": 2.0,
+    "PCFixSeconds": 4.83,
     "PCHitSeconds": {
      "Olga": 3.0
     },
     "PCCreditAt": 1.25,
+    "PCFixDepart": [
+     410,
+     -36
+    ],
     "PCToiletPaysAt": 2.25,
     "PCUseSeconds": 1.75
    }
