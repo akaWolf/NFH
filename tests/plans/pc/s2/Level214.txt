@@ -1,43 +1,45 @@
-# Level214 under the PC profile (v2, 2026-09-23: the Season 2 walks, routes and
-# catch by code and 214's handshake by code). His lap is ~85 s — the shower
-# (Zone01), the bouquet (Zone04), the captain's door and the pistol (Zone03), the
-# hatch (Zone02) — and the Mother's is locked to his pistol: its `standup` puts her
-# to sleep in her chair (Zone03) for 50 s, then she walks to the reling (Zone02)
-# for 6.7 s and back to sit awake until his next pistol (he waits there for her).
-# Zone03 is safe while she sleeps and he is away; Zone02 is free between his
-# hatch and her reling walk, the only way out of it the Zone01 door while he
-# climbs from Zone01 to Zone04. The hatch goes twice, the fish into the bouquet
-# after the second fall; the door, the mug, the wheel and the ammo go at once
-# after one of his pistols, so the wheel's 80 (559) and the pistol's 40 (583) pay
-# on one lap — the collapse (runs/c214e: 100 at 583 s).
+# Level214 under the PC profile (v3, 2026-09-24: the Season 2 walk by code — the out run
+# stood, the passes and the floor at the PC's ticks, the door claim). His lap is ~92 s — the
+# shower (Zone01), the bouquet (Zone04), the captain's door and the pistol (Zone03), the
+# hatch (Zone02) — and the Mother's is locked to his pistol: its `standup` puts her to sleep
+# in her chair (Zone03) for 50 s, then she walks to the reling (Zone02) for 6.7 s and back
+# to sit awake until his next pistol (he waits there for her). Zone03 is safe while she
+# sleeps and he is away; Zone02 is free between his hatch and her reling walk, the only way
+# out of it the Zone01 door once he is on his way up to Zone04 — Woody goes as he stands out
+# his `in` run at the stairs (107) or climbs them (202). The hatch goes twice, the fish into
+# the bouquet after the second fall; the deck chair at once while she sleeps and he showers
+# (460); the door, the mug, the wheel and the ammo at once after his next pistol, so the
+# wheel's 80 (592) and the pistol's 40 (616) pay on one lap — the collapse (runs/rp214d: 100
+# at 615.7 s).
 take Carpet IT2_Carpet                 # Zone01
 take Ammo IT2_Ammo                     # Zone01
-usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his first Hatch visit (75)
-await Hatch 0                          # his first fall (80): his first Fix turns the hatch into its dexterity round (HatchFixBehavior, Item.cs:2550-2570)
-take Shards IT2_Shards                 # Zone03 while the Mother sleeps (48-98) and he is at the shower
-unlock! Hatch IT2_Shards               # Zone02 at once: he has left it (89), her reling walk comes at 109
-park! Zone01                           # through the Zone01 door as he climbs to Zone04 (~105)
-await 2                                # his second fall (168): the angry's ShowObjects activates the fish, the second Fix writes the hatch off
+usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his first Hatch visit (78)
+await Hatch 0                          # his first fall (84): his first Fix turns the hatch into its dexterity round (HatchFixBehavior, Item.cs:2550-2570)
+take Shards IT2_Shards                 # Zone03 while the Mother sleeps (~50-101) and he is at the shower (86)
+unlock! Hatch IT2_Shards               # Zone02 at once (103): he has left it, her reling walk comes at ~111
+whenanim Rottweiler Stand_Left         # (107) his `in` run at the stairs up to Zone04 ...
+park! Zone01                           # ... through the Zone01 door behind him
+await 2                                # his second fall (177): the angry's ShowObjects activates the fish, the second Fix writes the hatch off
 activated HatchFish
-take HatchFish IT2_Fish                # Zone02 once he has left it (~174)
-whenanim Rottweiler Walk_Up            # (~192) his climb from Zone01 to Zone04 ...
-park! Zone01                           # ... Zone02's only way out before her reling walk comes in (~197)
-usewith Bouquet IT2_Fish               # Zone04 once he has left it for the door (~212): his next bouquet pays (280) and sends Olga to the shower
+take HatchFish IT2_Fish                # Zone02 once he has left it (195)
+whenanim Rottweiler Walk_Up            # (202) his climb from Zone01 to Zone04 ...
+park! Zone01                           # ... Zone02's only way out before her reling walk comes in
+usewith Bouquet IT2_Fish               # Zone04 once he has left it for the door (231): his next bouquet pays (296) and sends Olga to the shower
 activated Washbucket                   # her OlgaShipShowerSwiffer pose activates the bucket (WashbucketBehavior.cs:22-29), her Idle pose the cloth (cs:33-36)
 activated Cloth
 take Cloth IT2_Swiffer                 # the glass wants the swiffer
 usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
-usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash) at his next shower (425)
-take Handbag IT2_Pills                 # Zone03 while she sleeps
+usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash) at his next shower (453)
+take Handbag IT2_Pills                 # Zone03 while she sleeps (443)
 take Mat IT2_Code                      # Zone03, the same visit
 activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156)
 take BirdDead IT2_Key                  # Zone04
-hide DeckChair                         # Zone03 before she wakes (440): he comes up through Zone04 for the door
-whenusing Pistol                       # (~470) his pistol: she sleeps 50 s, he leaves Zone03 for the shower
+hide! DeckChair                        # Zone03 at once (460), she asleep in hers and he at the shower: he comes up through Zone04 for the door
+whenusing Pistol                       # (501) his pistol: she sleeps 50 s, he leaves Zone03 for the shower
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
 usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
-usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash): his next door step goes up to the wheel (540, the 80 at 559)
-usewith Pistol IT2_Ammo                # Zone03, the same window: his pistol after the wheel (575) — 40 on the wheel's 80, the collapse
+usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash): his next door step goes up to the wheel (the 80 at 592)
+usewith Pistol IT2_Ammo                # Zone03, the same window: his pistol after the wheel (616) — 40 on the wheel's 80, the collapse
 await Shower 0
 await Bouquet 0
 await CaptainWheel 0

@@ -18,8 +18,8 @@ usewith ToiletSign IT2_Rasp            # Zone04 (KeepAfterUse: the rasp stays; D
 usewith FishingRod IT2_Bentnail       # Zone04, the same window: ActivateItemTrick -> OlgaStandStill
 usewith Sweets IT2_Pissballs           # Zone04: RushToToilet; with the sign tricked Toilet211Behavior (Item.cs:2373-2384) sends him to the women's toilet, sets Olga on him and pays an extra TrickDone
 take CompressedAir IT2_Pressuretank    # Zone01 again (KeepFull)
+unlock LifeBoat IT2_Rasp               # Zone01, before his lap-3 boat (218 s under the PC walks): the dexterity trick item (DexterityTrickItem, unlocker IT2_Rasp, DexterityKeepItem) — the done-pass falls out of CanWoodyUse's chain and the boat is tricked (Item.cs:1475-1507; RemoveFromRoutineAfterUseTricked)
 usewith OlgaChild IT2_Pressuretank     # Zone04 (the Mother's action; LinkedItemTrick of the CabinPhone)
-unlock LifeBoat IT2_Rasp               # Zone01, before his lap-3 boat (206 s under the PC walks): the dexterity trick item (DexterityTrickItem, unlocker IT2_Rasp, DexterityKeepItem) — the done-pass falls out of CanWoodyUse's chain and the boat is tricked (Item.cs:1475-1507; RemoveFromRoutineAfterUseTricked)
 usewith PayPhone IT2_Coin              # Zone04: ActivateItemTrick -> CabinPhone (Zone05) + AlarmItem/CauseAlarm: the phone rings and he runs to answer it (AnswerPhoneNFH2)
 await LifeJacket 0
 await DivingGear 0
