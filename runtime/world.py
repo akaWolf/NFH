@@ -4141,6 +4141,8 @@ class Routine:
             it.pawn_to_affect = spec.get('pid')
         it.play_angry_after_toilet = True
         it.extra_coin_toilet_211 = True    # feeds the NFH2 anger ladder
+        if pcprofile.is_pc() and it.pc_toilet_pays_at is not None:
+            return            # booked with its record in the wc (World.pc_s2_extra_credit)
         w.game.trick_done(it.trick_score)
 
     def _fish_plant(self, it):
@@ -5142,6 +5144,16 @@ class Routine:
             # Tricked, PCFireAt — docs/PC_ROUTINES.md "The stands")
             pc = self._pc_use_seconds(it) if pcprofile.is_pc() else 0.0
             w = self.pawn.world
+            if pcprofile.is_pc() and pcprofile.SEASON2 and self.role == 'Rottweiler' \
+                    and getattr(self, '_toilet_run', False):
+                # the rush's own record this far into the wc's puke (211's
+                # wcright, 27 of its 40 ticks: PCToiletPaysAt, fcn.1000140b)
+                src = next((x for x in self.level.items.values()
+                            if x.play_angry_after_toilet and x.extra_coin_toilet_211
+                            and x.pc_toilet_pays_at is not None), None)
+                if src is not None:
+                    self.pc_credit3_timer = float(src.pc_toilet_pays_at)
+                    self.pc_credit3_item = src
             ft = self._pc_trick_item(it)
             if pcprofile.is_pc() and self.role == 'Rottweiler' \
                     and getattr(ft, 'pc_fire_at', None) is not None \
@@ -5338,6 +5350,14 @@ class Routine:
             toilet_continue = bool(self.pawn.toilet_action.get(
                 'continue_to_next'))
             it2 = self.item
+            if pcprofile.is_pc() and pcprofile.SEASON2:
+                # the PC's rush goes on from the wc to its SHOUT (211:
+                # 0x10030dc2's puke, then 0x10030d0f on Olga's fight): the
+                # rush's own item, whichever action the routine had reached —
+                # the mobile reads the interrupted action's (ActionManager.cs:
+                # 597), the fishing rod by then, and loses it
+                it2 = next((x for x in self.level.items.values()
+                            if x.play_angry_after_toilet), it2)
             if it2 is not None and it2.play_angry_after_toilet \
                     and self.pawn.world is not None and not toilet_continue:
                 # StopUrgentAction's after-toilet angry (ActionManager.cs:
@@ -6987,6 +7007,16 @@ class World:
         linked = items.get(item.linked_item_trick) \
             if item.linked_item_trick else None
         aux = item if item.kind in TRICK_KINDS else None
+        if part == 'toilet':
+            # 211's rush record at its tick of the wc's puke (wcright, 27 of
+            # 40; PCToiletPaysAt) — the ladder's cs:615-619 arm alone
+            item.extra_coin_toilet_211 = False
+            pawn.angry_meter += 20.0
+            overflow = pawn.angry_meter > pawn.angry_max
+            if overflow:
+                pawn.angry_meter = pawn.angry_max
+                pawn.pc_rage_full = True
+            return overflow
         if part == 'extra':
             # 206's linked shot's third record at its own tick (the
             # ExtraCoin206, PCExtraPaysAtLinked: rubberrabbit 50 ticks into
@@ -7001,7 +7031,9 @@ class World:
             return overflow
         if part == 'linked':
             pass
-        elif item.extra_coin_toilet_211:       # cs:615-619
+        elif item.extra_coin_toilet_211 and not (pcprofile.is_pc()
+                                                 and item.pc_toilet_pays_at is not None):  # cs:615-619
+            # (under the profile at its record's tick: the `toilet` part)
             item.extra_coin_toilet_211 = False
             pawn.angry_meter += 20.0
         elif item.compound_extra_coin and aux is not None \
@@ -7135,14 +7167,19 @@ class World:
     def pc_s2_extra_credit(self, pawn, item):
         """the linked shot's third record at its tick (206's rubberrabbit,
         50 ticks into the ramp's rubberrabbit: the ExtraCoin206 the mobile
-        pays with the ladder, PCExtraPaysAtLinked): its rage, the overflow's
-        tick and whistle, and its completion (the level's done count is its
-        credited records, fcn.100522e6 — the mobile books it as the linked
-        use starts, Item.ExtraCoin206Calculation)"""
-        if self.game is None or not item.extra_coin_206:
+        pays with the ladder, PCExtraPaysAtLinked) or the rush's own in the
+        wc (211's wcright, 27 ticks into the puke: the Toilet211 extra coin,
+        PCToiletPaysAt): its rage, the overflow's tick and whistle, and its
+        completion (the level's done count is its credited records,
+        fcn.100522e6 — the mobile books it as the use starts,
+        Item.ExtraCoin206Calculation, Item.Toilet211Behavior)"""
+        if self.game is None:
+            return
+        part = 'extra' if item.extra_coin_206 else 'toilet' if item.extra_coin_toilet_211 else None
+        if part is None:
             return
         was = pawn.angry_meter >= pawn.angry_max
-        if self._s2_credit(pawn, item, part='extra') and not was:
+        if self._s2_credit(pawn, item, part=part) and not was:
             pawn.angry_count_ticks += 1
             self._hud_angry(3)
             if self.hud is not None:
@@ -7195,6 +7232,8 @@ class World:
         (PCHitSeconds / PCHitSecondsLinked)"""
         if not pcprofile.is_pc() or self.game is None or item.pawn_to_affect is None:
             return
+        if item.play_angry_after_toilet:
+            return        # the co-actor answers the wc's puke (211: Olga's handler 0x100318ce)
         items = self.level.items
         linked = items.get(item.linked_item_trick) if item.linked_item_trick else None
         both = linked is not None and linked.tricked and item.tricked \
