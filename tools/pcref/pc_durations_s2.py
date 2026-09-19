@@ -370,7 +370,7 @@ def main(argv):
                     for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
                               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
                               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
-                              'PCExtraCoinLinked'):
+                              'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire'):
                         ov['patches'] = _strip_key(ov['patches'], k)
                     sys.path.insert(0, HERE)
                     import lap_model_s2
@@ -411,6 +411,18 @@ def main(argv):
                             _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
                             _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
                             _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))
+                        elif tr.get('linked_extra_at') is not None:
+                            # the linked shot's third record, its own tick
+                            # (206's rubberrabbit: the ExtraCoin206)
+                            _set_key(ov['patches'], item, 'PCExtraPaysAtLinked', tr['linked_extra_at'])
+                        if tr.get('arm') and tr.get('hit'):
+                            # the visits the trick arms and fires at (206's
+                            # load and shoot: lap_model_s2.TRICKED_ARM)
+                            _set_key(ov['patches'], item, 'PCTrickArm', tr['arm'])
+                        elif tr.get('arm'):
+                            # the linked item's own firing visit and the visit
+                            # that drops it (206's harpoon: the take, the put)
+                            _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])

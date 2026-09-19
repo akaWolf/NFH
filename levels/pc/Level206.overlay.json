@@ -23,7 +23,24 @@
     "PCExtraCoin": 30,
     "PCExtraCoin206": 30,
     "PCLaugh": 3,
-    "PCRunTo": true
+    "PCRunTo": true,
+    "PCUseSecondsTricked": 6.75,
+    "PCUseSecondsLinked": 6.08,
+    "PCShout": 1,
+    "PCFixSeconds": 1.58,
+    "PCHitSeconds": {
+     "Mother": 3.25
+    },
+    "PCCreditAt": 4.08,
+    "PCCreditAtLinked": 3.33,
+    "PCShoutLinked": 1,
+    "PCFixSecondsLinked": 1.58,
+    "PCLinkedPaysAt": 3.75,
+    "PCExtraPaysAtLinked": 4.17,
+    "PCTrickArm": [
+     1,
+     2
+    ]
    }
   },
   {
@@ -49,7 +66,15 @@
    "object": "Harpoon",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 8.75,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCCreditAt": 6.33,
+    "PCTrickFire": [
+     1,
+     2
+    ]
    }
   },
   {

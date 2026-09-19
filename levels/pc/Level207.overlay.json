@@ -52,6 +52,7 @@
    "set": {
     "PCLaugh": 0,
     "PCRunTo": true,
+    "AngerAmount": 20,
     "PCUseSecondsTricked": 8.25,
     "PCUseSecondsLinked": 9.17,
     "PCShout": 0,
@@ -66,8 +67,7 @@
     },
     "PCResumeHeadSeconds": 2.17,
     "PCExtraCoinLinked": 30,
-    "PCUseSeconds": 7.75,
-    "AngerAmount": 20
+    "PCUseSeconds": 7.75
    }
   },
   {

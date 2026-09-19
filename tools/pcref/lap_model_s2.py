@@ -97,7 +97,7 @@ ELEM = {'fcn.10002cd5': 'DO', 'fcn.1000f6c7': 'SWITCH', 'fcn.1000f977': 'SHOUT',
         # and appends it (fcn.1000ef28)
         'fcn.1000efcd': 'DO', 'fcn.1000f03c': 'Eebbf', 'fcn.1000f08e': 'E6bd4', 'fcn.1000f0f4': 'E6c2e',
         'fcn.1000fd91': 'Ef82b', 'fcn.1000fdee': 'Ef779', 'fcn.1000fe66': 'SWITCH', 'fcn.1000fede': 'SHOUT',
-        'fcn.1000ffb8': 'Ef51a', 'fcn.1001000a': 'Ef8cd',
+        'fcn.1000ffb8': 'Ef51a', 'fcn.1001000a': 'Ef8cd', 'fcn.1000ff47': 'SET',
         # a wait of so many ticks (vtable 0x100ab804: its run 0x1000c9de counts
         # the pushed ticks down; 205's mat step waits 72 after the `talk`)
         'fcn.1000ca24': 'WAIT'}
@@ -123,6 +123,11 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
     first_push = None     # the first argument pushed since the last call (its last parameter)
     consts = {}; pending_push = None
     pose = False          # the element E2f40 appends is a pose element (fcn.10014c5c / fcn.1000de51)
+    stepv = None          # the local the prologue saves the step object (ecx) in
+    stepr = set()         # the registers loaded from it: 213's limberwall step tests its
+                          # own byte +0x28 through eax (0x10038ab1)
+    entered = False       # past the prologue (its SEH call fcn.10059e30)
+    gpush = []            # names pushed by their globals' addresses (fcn.10014cf7's)
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -151,6 +156,20 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                 first_push = 'reg'        # a register or a slot written after it
         m = re.match(r'push (0x[0-9a-f]+|[0-9]+)$', t)
         if m and not t.startswith('push 0x100'): slots.append(('i', int(m.group(1), 0)))
+        m = re.match(r'mov dword \[ebp - (0x[0-9a-f]+)\], ecx$', t)
+        if m and not entered and stepv is None:
+            stepv = m.group(1)
+        m = re.match(r'mov (e[a-z]x), dword \[ebp - (0x[0-9a-f]+)\]$', t)
+        if m:
+            if m.group(2) == stepv:
+                stepr.add(m.group(1))
+            else:
+                stepr.discard(m.group(1))
+        elif re.match(r'(mov|lea|pop|xor|add|sub|and|or|inc|dec|imul|movzx|movsx) (e[a-z]x)\b', t):
+            stepr.discard(re.match(r'\w+ (e[a-z]x)', t).group(1))
+        m = re.match(r'push (0x100e[0-9a-f]{4})$', t)
+        if m:
+            gpush.append(gname(m.group(1)))
         # the constants the general registers hold (a SHOUT's level is often
         # one: the zeroed ebx of the prologue, 212's bull's `xor edi, edi`,
         # 203's toilet's `push 2; pop eax` or `xor eax, eax` by its bytes)
@@ -190,9 +209,17 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
         if m: bytevars[m.group(1)] = al
         m = re.match(r'mov byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+|bl)$', t)
         if m: bytevars['obj' + m.group(1)] = 0 if m.group(2) == 'bl' else int(m.group(2), 0)
+        m = re.match(r'mov byte \[(e[a-z]x) \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+|bl)$', t)
+        if m and m.group(1) in stepr:
+            # the step object's byte through the register loaded from its
+            # saved local (213: 0x10038c18 after the bull's charge)
+            bytevars['obj' + m.group(2)] = 0 if m.group(3) == 'bl' else int(m.group(3), 0)
         if t.startswith('call '):
             for r in ('eax', 'ecx', 'edx'):
                 consts.pop(r, None)
+                stepr.discard(r)
+            if not t.startswith('call fcn.10059e30'):
+                entered = True
         m = re.match(r'call (fcn\.[0-9a-f]+)', t)
         if m:
             fn = m.group(1)
@@ -247,6 +274,14 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                 nm = names[-1] if names else None
                 if nm: lv.present.add(nm.replace('/', '_'))
                 ev.append(('SHOW', nm)); al = None
+            elif fn == 'fcn.10014cf7':
+                # the show element (fcn.10014772: vtable 0x100ab978, Ef779's)
+                # built by hand, its object and room pushed by their globals'
+                # addresses (212's aux: the parrot's shit on the ledge, 0x10034f09)
+                args = list(reversed(gpush))
+                if args:
+                    lv.present.add(args[0].replace('/', '_'))
+                ev.append(('Ef779', args, [])); al = None
             elif fn in ('fcn.10014c5c', 'fcn.1000de51'):
                 # 207's pose element (fcn.1000de51: vtable 0x100ab990, update
                 # 0x1000cfaa sets the actor's animation and returns 1 at once)
@@ -278,6 +313,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                 al = unknown   # an unknown predicate (a trigger latch, another actor's
                                # state) reads false, or true on a poll's re-run
             slots = []
+            gpush = []
             first_push = None
             k += 1; continue
         # the flags: ZF from the tests the scripts branch on; any other
@@ -287,6 +323,9 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
         m = re.match(r'cmp byte \[ebp - (0x[0-9a-f]+)\], (bl|0)$', t)
         if m:
             v = bytevars.get(m.group(1)); zf = None if v is None else (v == 0); k += 1; continue
+        m = re.match(r'cmp byte \[(e[a-z]x) \+ (0x[0-9a-f]+)\], (bl|0)$', t)
+        if m and m.group(1) in stepr:
+            zf = (bytevars.get('obj' + m.group(2)) or 0) == 0; k += 1; continue
         m = re.match(r'cmp byte \[e(?:di|si|bx|cx) \+ (0x[0-9a-f]+)\], (bl|0)$', t)
         if m:
             # the step object's own byte (ecx is the step at its entry: 214's
@@ -576,6 +615,13 @@ def station_ticks(d, ev, ctx=None):
         elif k == 'Ef779':
             # an object shown in a room: vtable 0x100ab978, update 0x1000ce9c
             # (fcn.10043d66, then 1 at once)
+            continue
+        elif k == 'Eebbf':
+            # the camera back (fcn.1000ebbf -> fcn.1000dc0c: vtable
+            # 0x100ab954, the camera's update 0x1000d70b): its flags from
+            # the builder's argument, bit 0 clear -> fcn.1000d559, whose one
+            # return is `mov al, 1` (0x1000d6fd) — done on its first update
+            # (206's being_hit after the SHOUT, 0x1002df34)
             continue
         elif k == 'Ef51a':
             # the camera on the neighbour, done on its first update: the
@@ -1120,6 +1166,36 @@ TRICKED_ROWS = {206: {'Weights': (7, ('dumbbell', 'olga')), 'DynamiteBox': (9, (
 # step's bucket branch is the guarded shower's (0x1003b87b; the mobile's
 # trigger is her shower pose, WashbucketBehavior)
 TRICKED_BY = {214: {'Shower': ('Washbucket', {'bottomleft_shipshower_guarded'}, {'bottomleft_shipshower'})}}
+# the level's aux script, whose update runs each level tick (the `aux` entry
+# of the scripts' factory table: me_c1's factory 0x10034dba, registered at
+# 0x1001265b, builds the handler of vtable 0x100af928, whose update 0x10034fec
+# calls these two): what it does to a trick's scene belongs to the trick —
+# 212's fed parrot eats (parrot_manip's `use`, actor aux) and leaves its shit
+# on the ledge (fcn.10034e05: the show element at 0x10034f09) before his
+# ledge visit finds it (0x10035577); the throne's halves turn the wheel
+# (fcn.10034c0f)
+AUX_UPDATE = {212: (0x10034c0f, 0x10034e05)}
+# a trick one step arms and a later step fires: 206's rabbit on the ramp.
+# The load step 0x1002e3df asks IfVariant ramp / ramp_manip: with the rabbit
+# on, the manipulated ramp's `load` and the hand-over to the harpoon step
+# 0x1002e27f (its IfVariant harpoon / harpoon_manip decides the shot: the
+# plain take -> 0x1002df9b's shootrabbit, the rubber's -> 0x1002e0fd's
+# rubberrabbit), whose shot's behavior fifi_crash sends the Mother to him;
+# 0x1002de6a waits for her hit (the latch at [step+0x24], fcn.10013269) and
+# plays SHOUT 1, 0x1002dbc4 the ramp's repair. The shoot step of the lap
+# (0x1002d948) asks nothing: a rabbit put on after the load waits for the
+# next load. Without the rabbit the take step 0x1002dd0a's rubber branch
+# shoots the rubber bear at once (0x1002da29: the ramp's rubberbear, SHOUT
+# 1) and goes on to the put (0x1002d578), past the lap's shoot step; the put
+# step switches a manipulated harpoon back (a rubber put on after the take
+# is gone). The mobile's pad visits (RottweilerActionManager: LaunchPad,
+# Harpoon, LaunchPad, Harpoon, LaunchPad) are the rows 2-6: the load, the
+# take, the shoot, the put, Fifi's take. (item: the arming row, the shot's
+# step in the flow from it, the co-actor, the arming and the firing visit
+# of the item among its lap visits; the linked item: its firing visit, the
+# visit that drops it, the take's row)
+TRICKED_ARM = {206: {'LaunchPad': (2, 2, 'mother', 1, 2)}}
+TRICKED_ARM_LINKED = {206: {'Harpoon': (1, 2, 3)}}
 # a station's tricked variant where the lap's step has none and other steps of
 # the script play it, their events in order: 201's damaged buffet in the
 # tutorial (0x10029c4a: the flirt that sends Olga's buffet_crash, his crash;
@@ -1203,6 +1279,15 @@ def tricked_presence(n):
         if shown:
             out.setdefault(name, (set(), set()))
             out[name][0].update(shown); out[name][1].update(hidden)
+    for name, (shown, hidden) in out.items():
+        # the aux update's doing on the tricked scene (AUX_UPDATE)
+        for fn in AUX_UPDATE.get(n, ()):
+            lv = Level(n)
+            lv.present = (lv.present - hidden) | shown
+            before = set(lv.present)
+            run_step(lv, fn, {})
+            shown |= lv.present - before
+            hidden |= before - lv.present
     return out
 
 
@@ -1426,6 +1511,94 @@ def code_stays_tricked(n):
                 e['cont'] = 0.0
             e['rejoins'] = nx2 == nx1
             out[item] = e
+    for item, (row, k_shot, actor, arm, fire) in TRICKED_ARM.get(n, {}).items():
+        if item in out or item not in trick:
+            continue
+        rows, _loop = lap_steps(n)
+        lvi, byi = _row_level(n, snaps, row)
+        lnk = mobile_linked(n).get(item)
+
+        def flow(items):
+            # the armed flow from the arming step to the shot, then the step
+            # that waits for the co-actor's hit (its latch taken as set) and
+            # the one after it (the repair)
+            lv2 = Level(n)
+            lv2.present = set(lvi.present)
+            for x in items:
+                lv2.present = (lv2.present - trick[x][1]) | trick[x][0]
+            by = dict(byi)
+            cur, shot = rows[row][1], None
+            for _k in range(k_shot + 1):
+                if cur is None:
+                    return None
+                shot, cur = run_step(lv2, cur, by)
+            if cur is None:
+                return None
+            ev_s, nx_s = run_step(lv2, cur, by, unknown=1)
+            ev_r = run_step(lv2, nx_s, by)[0] if nx_s else []
+            return shot, shot + ev_s + ev_r
+
+        f1 = flow((item,))
+        if f1 is None:
+            continue
+        shot1, all1 = f1
+        stand, level, repair, credit = _step_parts_split(d, all1)
+        ft = d.action_ticks('neighbor', 'fight', actor=actor)
+        e = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
+             'repair': round(repair / 12.0, 2) if repair is not None else None,
+             'credit': round(credit / 12.0, 2) if credit is not None else None,
+             'hit': {actor: round(ft / 12.0, 2) if ft is not None else None},
+             'arm': [arm, fire], 'rejoins': True}
+        f2 = flow((item, lnk)) if lnk in trick else None
+        if f2 is not None:
+            shot2, all2 = f2
+            stand2, level2, repair2, _c = _step_parts_split(d, all2)
+            mine = set(nm for nm, _t in _step_records(d, shot1))
+            recs = _step_records(d, all2)
+            credit2 = next((t for nm, t in recs if nm in mine), None)
+            others = [(nm, t) for nm, t in recs if nm not in mine]
+            e.update({'linked': round(stand2 / 12.0, 2) if stand2 is not None else None,
+                      'linked_shout': level2,
+                      'linked_repair': round(repair2 / 12.0, 2) if repair2 is not None else None,
+                      'linked_credit': round(credit2 / 12.0, 2) if credit2 is not None else None,
+                      'linked_pays': round(others[0][1] / 12.0, 2) if others else None})
+            if len(others) > 1:
+                # the third record of the linked shot (206's rubberrabbit: the
+                # mobile's ExtraCoin206)
+                e.update({'linked_extra': others[1][0], 'linked_extra_at': round(others[1][1] / 12.0, 2)})
+        out[item] = e
+    for item, (fire_v, drop_v, trow) in TRICKED_ARM_LINKED.get(n, {}).items():
+        if item in out or item not in trick:
+            continue
+        # the linked item's own shot where the other is not armed: the take
+        # step's tricked branch and the shot it hands over to, with the walk
+        # its GoTo makes from the take to the shot's object
+        rows, _loop = lap_steps(n)
+        lvi, byi = _row_level(n, snaps, trow)
+        lv2 = Level(n)
+        lv2.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
+        by = dict(byi)
+        ev1, nx = run_step(lv2, rows[trow][1], by)
+        ev2 = run_step(lv2, nx, by)[0] if nx else []
+        stand, level, repair, credit = _step_parts_split(d, ev1 + ev2)
+        g = Geometry(n)
+        take = next((x[1][0] for x in ev1 if x[0] == 'DO' and x[1]), None)
+        dest = next((x[1][0] for x in ev2 if x[0] == 'DO' and x[1]), None)
+        walk_t = None
+        if take and dest:
+            p = g.point(d.real.get(take, take))
+            if p is not None:
+                walk_t, _pos = walk_ticks(g, (g.room_of(d.real.get(take, take)), p[0], p[1]),
+                                          d.real.get(dest, dest), data=d)
+        if stand is not None and walk_t is not None:
+            stand += walk_t
+            if credit is not None:
+                credit += walk_t
+        out[item] = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
+                     'repair': round(repair / 12.0, 2) if repair is not None else None,
+                     'credit': round(credit / 12.0, 2) if credit is not None else None,
+                     'walk': round(walk_t / 12.0, 2) if walk_t is not None else None,
+                     'arm': [fire_v, drop_v], 'rejoins': True}
     for item, (stp, tricks) in TRICKED_VIA.get(n, {}).items():
         lv2 = Level(n)
         lv2.present = set(lv.present)

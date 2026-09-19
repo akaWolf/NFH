@@ -61,13 +61,15 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 8.67,
-    "PCUseSecondsLinked": 10.67,
-    "PCShout": -1,
+    "PCUseSecondsTricked": 7.75,
+    "PCUseSecondsLinked": 9.75,
+    "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCShoutLinked": 0,
+    "PCCreditAt": 0.42,
+    "PCCreditAtLinked": 0.42,
+    "PCShoutLinked": 2,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 4.17,
+    "PCLinkedPaysAt": 3.25,
     "PCUseSeconds": 8.67
    }
   },
