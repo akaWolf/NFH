@@ -70,6 +70,15 @@ CLIPS_ROLE = {210: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('pool_dec
                                            'OlgaPutSubTricked': ('beachleft_shark', 'take')})}}
 
 
+# level -> mobile item -> {the item's clip: the PC's part} — an item's own
+# clips while another role uses it hidden (PCItemClipSeconds): 205's mat,
+# Olga's lie-down (the mat's `enter`), the sun loop, the `wakeup` and the
+# `leave` her `pingpong` step plays (0x10025b2a) — the mobile's UseNormal-
+# Sequence, frame for frame the PC's at 8 a second
+ITEM_CLIPS = {205: {'OlgaMatBeach': ('Olga', {'N2TrickItemExtra1': ('beachright_mat_guarded', 'enter'),
+                                              'N2TrickItemUseNormal': ('anim', 'beachright/mat', 'sun'),
+                                              'N2TrickItemExtra3': ('beachright_mat_guarded', 'wakeup'),
+                                              'N2TrickItemExtra2': ('beachright_mat_guarded', 'leave')})}}
 # level -> mobile item -> (role, wait): another actor's clip held until a role
 # has used an item or begun to (PCWaitForRole, the runtime's PCWaitFor for that
 # role): 210's Mother waits at her chair after the call until he stands there
@@ -78,15 +87,20 @@ WAITS_ROLE = {210: {'CallRTMother': ('Mother', {'clip': 'MotherStandDownInfinite
                                                 'item': 'CallRTMother', 'at': 'start', 'then': 0.0})}}
 
 
-def role_clips(n):
+def item_clips(n):
+    """{item: {clip: seconds}} of ITEM_CLIPS (the specs of CLIPS_ROLE)"""
+    return {item: cl for item, (_role, cl) in role_clips(n, ITEM_CLIPS).items()}
+
+
+def role_clips(n, tables=CLIPS_ROLE):
     """{item: (role, {clip: seconds})} of CLIPS_ROLE, read from the level data"""
-    if n not in CLIPS_ROLE:
+    if n not in tables:
         return {}
     sys.path.insert(0, HERE)
     import lap_model_s2
     d = lap_model_s2.Data(n)
     out = {}
-    for item, (role, table) in CLIPS_ROLE[n].items():
+    for item, (role, table) in tables[n].items():
         cl = {}
         for clip, src in table.items():
             if src[0] == 'anim':
@@ -159,7 +173,8 @@ def pc_actions(d):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE))
+    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE)
+                                                             | set(ITEM_CLIPS))
     mob = json.load(open(os.path.join(SCRATCH, 's2_idle_others.json')))
     for n in levels:
         d = S2[n]; acts = pc_actions(d)
@@ -185,6 +200,9 @@ def main(argv):
         rclips = role_clips(n)
         for item, (role, cl) in sorted(rclips.items()):
             print('   %-18s %-7s clips %s' % (item, role, ', '.join('%s %.2f' % kv for kv in sorted(cl.items()))))
+        iclips = item_clips(n)
+        for item, cl in sorted(iclips.items()):
+            print('   %-18s item    clips %s' % (item, ', '.join('%s %.2f' % kv for kv in sorted(cl.items()))))
         rwaits = WAITS_ROLE.get(n, {})
         for item, (role, wt) in sorted(rwaits.items()):
             print('   %-18s %-7s holds %s until %s %s %s' % (
@@ -193,8 +211,11 @@ def main(argv):
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
             ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
-            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole', 'PCWaitForRole'):
+            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole', 'PCWaitForRole',
+                      'PCItemClipSeconds'):
                 ov['patches'] = _strip_key(ov['patches'], k)
+            for item, cl in iclips.items():
+                _set_key(ov['patches'], item, 'PCItemClipSeconds', cl)
             for item, (role, cl) in rclips.items():
                 _set_key(ov['patches'], item, 'PCClipSecondsRole', {role: cl})
             for item, (role, wt) in rwaits.items():
@@ -216,6 +237,9 @@ def main(argv):
             note3 = " Another actor's clips at the PC's ticks (tools/pcref/pc_durations_others.py CLIPS_ROLE): PCClipSecondsRole, the level data's actions and clips paired by hand."
             if rclips and 'CLIPS_ROLE' not in ov['source']:
                 ov['source'] += note3
+            note5 = " An item's own clips while another role uses it hidden (tools/pcref/pc_durations_others.py ITEM_CLIPS): PCItemClipSeconds, the level data's actions and clips paired by hand."
+            if iclips and 'ITEM_CLIPS' not in ov['source']:
+                ov['source'] += note5
             note4 = " Another actor's clip held (tools/pcref/pc_durations_others.py WAITS_ROLE): PCWaitForRole, until a role's use of an item has begun (at start) or ended."
             if rwaits and 'WAITS_ROLE' not in ov['source']:
                 ov['source'] += note4

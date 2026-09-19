@@ -57,8 +57,11 @@ Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
 212, 213 and 214 (its hatch behind the step's own byte, its bouquet behind
 IsVariant's null test — both read since the same evening); 201 (the
 tutorial), 202, 204, 205, 207 and 210 stop at a step whose handover comes
-from another actor's script. Not modelled: 206's and 214's waits on the
-Mother, 213's polls on Olga's picnic and bull ride, 209's fakir `spit`. With
+from another actor's script — 205 and 210 are timed from a start step round
+to that handover since 2026-09-24 (LAP_START; their handshakes are the
+runtime's, docs/PC_FIDELITY.md "205's table", "210's call"). Not modelled:
+206's and 214's waits on the Mother, 213's polls on Olga's picnic and bull
+ride, 209's fakir `spit`. With
 the walks the laps come to 105 s (203), 85.5 (208), 104 (209), 85 (211), 124
 (212), 123 (213) and 90.3 (214) against the PC video's 84-112, 86, 97, 85, 113,
 136 and 91 (214's shower to shower, docs/PC_LAPS_DETAIL.md) —
@@ -92,7 +95,10 @@ ELEM = {'fcn.10002cd5': 'DO', 'fcn.1000f6c7': 'SWITCH', 'fcn.1000f977': 'SHOUT',
         # and appends it (fcn.1000ef28)
         'fcn.1000efcd': 'DO', 'fcn.1000f03c': 'Eebbf', 'fcn.1000f08e': 'E6bd4', 'fcn.1000f0f4': 'E6c2e',
         'fcn.1000fd91': 'Ef82b', 'fcn.1000fdee': 'Ef779', 'fcn.1000fe66': 'SWITCH', 'fcn.1000fede': 'SHOUT',
-        'fcn.1000ffb8': 'Ef51a', 'fcn.1001000a': 'Ef8cd'}
+        'fcn.1000ffb8': 'Ef51a', 'fcn.1001000a': 'Ef8cd',
+        # a wait of so many ticks (vtable 0x100ab804: its run 0x1000c9de counts
+        # the pushed ticks down; 205's mat step waits 72 after the `talk`)
+        'fcn.1000ca24': 'WAIT'}
 class Level:
     def __init__(self, n):
         self.n = n
@@ -134,8 +140,8 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
         if m: slots.append(('o', m.group(1)))
         m = re.match(r'mov byte \[ebp - (0x[0-9a-f]+)\], al$', t)
         if m: bytevars[m.group(1)] = al
-        m = re.match(r'mov byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+)$', t)
-        if m: bytevars['obj' + m.group(1)] = int(m.group(2), 0)
+        m = re.match(r'mov byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+|bl)$', t)
+        if m: bytevars['obj' + m.group(1)] = 0 if m.group(2) == 'bl' else int(m.group(2), 0)
         m = re.match(r'call (fcn\.[0-9a-f]+)', t)
         if m:
             fn = m.group(1)
@@ -236,14 +242,27 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
         if m: k = at(int(m.group(1), 16)); continue
         k += 1
     return ev, nxt
-def walk(lv, start, maxsteps=80, trace=False):
-    steps = []; cur = start; seenkeys = {}; bytevars = {}
+def walk(lv, start, maxsteps=80, trace=False, bytes0=None):
+    steps = []; cur = start; seenkeys = {}; bytevars = dict(bytes0 or {})
     for _ in range(maxsteps):
         key = (cur, tuple(sorted((k, v) for k, v in bytevars.items() if k.startswith('obj'))))
         if key in seenkeys: return steps, seenkeys[key]
         seenkeys[key] = len(steps)
         ev, nxt = run_step(lv, cur, dict(bytevars), trace=trace)
         if nxt is None or nxt == cur:
+            b2 = dict(bytevars)
+            run_step(lv, cur, b2)
+            if any(k.startswith('obj') and b2.get(k) != bytevars.get(k) for k in b2):
+                # a step in phases: its first pass writes its own byte and
+                # returns, the next one goes on (205's mat: the `talk`, then —
+                # the byte cleared — the 72-tick wait and the table)
+                ev2, nxt2 = run_step(lv, cur, dict(b2), trace=trace)
+                if nxt2 is not None and nxt2 != cur:
+                    bytevars.update(b2)
+                    run_step(lv, cur, bytevars)
+                    steps.append((cur, ev + ev2, nxt2))
+                    cur = nxt2
+                    continue
             # a poll: the step re-runs each tick until its trigger holds (a latch
             # fcn.10013269, another actor's state) — the pass that hands over
             ev2, nxt2 = run_step(lv, cur, bytevars, trace=trace, unknown=1)
@@ -336,6 +355,11 @@ class Data:
         e = self.objects.get(o) or self.generic.get(obj)
         if e is None:
             return None
+        g = self.generic.get(obj)
+        if (actor, name) not in e['act'] and g is not None and (actor, name) in g['act']:
+            # a level's own actor record (205's neighbor: crash, pant, talk)
+            # adds to the generic one (lookaround, shout …)
+            e = g
         if (actor, name) not in e['act']:
             # an object's own action (the fakir's `play`: actor = the object)
             own = [v for (ac, nm), v in e['act'].items() if nm == name and ac == o] \
@@ -375,6 +399,11 @@ class Data:
             f = self.frames.get((g, oa)) or self.frames.get((o, oa))
             if f:
                 return f
+            if aa in ('inv', 'ms', '') and t == 'auto' \
+                    and any(k[0] == g for k in self.frames):
+                # the object's gfx has no such animation and the actor plays
+                # none: the action lasts nothing (205's `putski`)
+                return 0
         return None
 
 
@@ -420,6 +449,8 @@ def station_ticks(d, ev, ctx=None):
                     parts.append((obj, 'enter', t))
             if obj: ctx['hideout'] = obj; ctx['inside'] = obj
             parts.append((obj or '?', 'bar', e[2]))
+        elif k == 'WAIT':
+            parts.append(('-', 'wait', e[2][-1] if e[2] else None))
         elif k in ('WAITEVENT', 'POLL', 'SHOUT', 'Eebbf', 'Ef82b', 'Ef51a', 'Ef779', 'Efac4', 'E2f40', 'E807f', 'RUNGO'):
             parts.append(('-', k, None))
     return parts
@@ -428,7 +459,13 @@ def station_ticks(d, ev, ctx=None):
 # the step a lap starts from where it is not the level's first: 210's lap runs
 # from the Mother's `order` (his handler 0x1001b4f6 -> 0x1001aecc: the walk to
 # Fifi and her `tickle`, then the take 0x1001aac8, the level's first step)
-LAP_START = {210: 0x1001aecc}
+LAP_START = {210: 0x1001aecc,
+             # 205's from his play at the table (0x100254d5 -> 0x100251eb: the
+             # skis), which waits for Olga, round to the table again
+             205: 0x100251eb}
+# the step object's bytes at a lap's start (205's script arms its mat step's
+# `talk` in its constructor, 0x10025a9f, and the table step re-arms it)
+LAP_BYTES = {205: {'obj0xd': 1}}
 
 
 def lap_steps(n):
@@ -436,7 +473,7 @@ def lap_steps(n):
     loop's first index (None when the walk stops)"""
     d = Data(n)
     st = LAP_START.get(n) or level_start(n); lv = Level(n)
-    steps, loop = walk(lv, st)
+    steps, loop = walk(lv, st, bytes0=LAP_BYTES.get(n))
     out = []; ctx = {}
     for i, (cur, ev, nxt) in enumerate(steps):
         ic = [e[1] for e in ev if e[0] == 'IC']
@@ -772,11 +809,21 @@ PAIRS = {
           'TurbanShop': [(None, 'fifi', 'put3'), (None, 'turbanshop', 'try_turban'), (None, 'fifi', 'take3')],
           'Elephant': [(None, 'fifi', 'put1'), (None, 'fifi', 'take1')],
           'DogBasketPut': [(None, 'pool_fifi_sleep', 'put')]},
+    # his lap after the table (the skis ridden, walked back and put — the
+    # mobile's two WaterSkiis visits —, the chef's eel, the rocket, the sand
+    # lion's look and kick, whose `dirt` and `build` are the kid's own
+    # sequences) and the mat: the `talk` that calls Olga to the table and the
+    # 72-tick wait; the table's play waits for her (pc_durations_s2.py CLIPS)
+    205: {'WaterSkiis': [[(None, 'waterski_guarded', 'skiing')], [(None, 'waterski_guarded', 'putski')]],
+          'Chef': [(None, 'chef', 'cut_eel'), (None, 'chef', 'eat_eel')],
+          'Rockets': [(None, 'rocket', 'ignite')],
+          'SandSculpture': [('sandlion', 'neighbor', 'lookaround'), (None, 'sandlion', 'kick')],
+          'OlgaMatBeach': [(None, 'neighbor', 'talk'), (None, '-', 'wait')]},
 }
 
 
 # the levels whose unclosed walk still covers every station (code_stays)
-OPEN_LAPS = (210,)
+OPEN_LAPS = (205, 210)
 
 
 def code_stays(n):

@@ -100,7 +100,15 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
               # plays `order`, whose behavior="order" (generic objects.xml)
               # sends him on to Fifi as it starts (his handler 0x1001b4f6 ->
               # 0x1001aecc) — the mobile's three stands there take no time
-              'CallRTMother': {'Stand_Left': ('none',)}}}
+              'CallRTMother': {'Stand_Left': ('none',)}},
+        # 205's table (his table step 0x100254d5: `play` on the guarded table
+        # once Olga is there) and the skis' put (`putski`, whose objanim the
+        # PC has not: no time — the ride's visit keeps its stay, KEEP_STAYS)
+        205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play')},
+              'WaterSkiis': {'SkiPut': ('none',)}}}
+# the items whose per-visit stays stand beside their clips: the clips time a
+# visit whose stay is 0 (205's second WaterSkiis, the put)
+KEEP_STAYS = {205: {'WaterSkiis'}}
 # the tricked use's clip after which the PC's trick action has ended
 # (PCCreditAfter): the record's action (objects.xml) pays as it completes —
 # the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
@@ -112,6 +120,13 @@ CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', '
 # then the dive step plays the kid's dive and run ashore (0x10022046)
 WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarine',
                             'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}},
+         # 205's table: his step polls for the guarded table Olga's `pingpong`
+         # step shows as she arrives (0x10025d76), then plays; the play's
+         # behavior="sun" (cn_b2 objects.xml, fired as it starts) sends her
+         # back to her mat at once (her step 0x1002621c) — `abort`: the use's
+         # PawnToAbortMutexOnFinish at the release
+         205: {'TabbleTennis': {'clip': 'Tennis', 'role': 'Olga', 'item': 'TabbleTennis', 'at': 'start',
+                                'then': [('beachright_pingpong_guarded', 'play')], 'abort': True}},
          # 210's chair: awake until her call — her `callneighbor` carries
          # behavior="call" (generic objects.xml), fired as it starts, and his
          # handler (0x1001b4f6) sends him out of the chair at once (0x1001911e:
@@ -146,7 +161,7 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (202, 203, 208, 209, 210, 211, 212, 213, 214)
+CODE = (202, 203, 205, 208, 209, 210, 211, 212, 213, 214)
 
 
 def pc_spans(n):
@@ -266,8 +281,9 @@ def clip_secs(n):
         then = sum(d.action_ticks(o, a) or 0 for o, a in w['then'])
         waits[item] = {'clip': w['clip'], 'role': w['role'], 'item': w['item'],
                        'then': round(then / 12.0, 2)}
-        if w.get('at'):
-            waits[item]['at'] = w['at']
+        for k in ('at', 'abort'):
+            if w.get(k):
+                waits[item][k] = w[k]
     return clips, waits
 
 
@@ -298,7 +314,8 @@ def main(argv):
                 per[item] = [secs] * k
         clips, waits = clip_secs(n)
         for item in clips:
-            per.pop(item, None)            # timed per clip, no whole stay
+            if item not in KEEP_STAYS.get(n, ()):
+                per.pop(item, None)        # timed per clip, no whole stay
         for item, cl in sorted(clips.items()):
             print('   %-26s clips %s' % (item, ', '.join('%s %s' % kv for kv in sorted(cl.items()))))
         for item, wt in sorted(waits.items()):
