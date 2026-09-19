@@ -135,12 +135,14 @@ carried the same night: docs/PC_FIDELITY.md "202's mat and swim"; the
 video's 70 and 90-94; 60.2 before, on the video's stays) and 210 98.7 / ~101
 (its call carried 2026-09-24, "210's call": the model's walks on the PC's
 rooms are 62.8 s where the port's are 53.4, and her checks quantize the lap;
-the video's first lap 107, 86.8 before on the video's stays) — within 6 %;
+the video's first lap 107, 86.8 before on the video's stays) and 205 101.6 /
+111.9 (its table carried 2026-09-24, "205's table": the model's walks are
+63.5 s, the video's lap 102; 116.2 before with the mobile's mat scene) —
+within 6 % but 205's −9 %;
 209, 212 and 213 moved when the stays the walk writer had dropped since the
 routes came back (102.7, 125.2 and 125.3 before, "The overlay writers'
 shared patches"). Against the video on the levels the code does not close
-204 79.2 / 81, 205 89.3 / 102 (116.2 with the Olga-mat scene), 207 109.3 /
-107. 201 (the tutorial) and 206 (his waits on the Mother) have no free lap.
+204 79.2 / 81, 207 109.3 / 107. 201 (the tutorial) and 206 (his waits on the Mother) have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,

@@ -1,20 +1,19 @@
-# Level205 under the PC profile (v3, 2026-09-17: the profile's Season 2 paces).
-# His lap (~96 s, runs/idlepc2s2): the mat and the table tennis (Zone02, 0-35:
-# tennis 22), the water skis (Zone01, 35-71: 38), the chef (Zone04, 71-83:
-# 73), the rockets and the sand sculpture (Zone01, 83-106: 86, 91.5), Zone02
-# again (106-130: tennis 117), the skis (133.5), the chef (168), the rockets
-# (181.5), the sculpture (187.5), the tennis (212) ... The gauge is 100 000
-# rage and falls 0.36 % a second (pcprofile.s2_rage_tick); the five coins —
+# Level205 under the PC profile (v4, 2026-09-24: the Season 2 walks by code and
+# 205's table by code). His lap is ~102 s: the mat (Zone02, 2.5: the `talk` that
+# calls Olga off her mat to the table, and the 72-tick wait), the table (10.7: the
+# play once she is there, 4.25 s), the water skis (Zone01, 28.5: the ride 17.3 s,
+# the put 49.8), the chef (Zone04, 62.8), the rockets and the sand sculpture
+# (Zone01, 81.8, 87.8), the mat again (103.7), the table (112) ... The gauge is
+# 100 000 rage and falls 0.36 % a second (pcprofile.s2_rage_tick); the five coins —
 # the tennis 25, the skis 30, the chef 40, the rockets 30, the sculpture 20 —
-# overflow only inside one lap, and each coin's own anger stretches the lap:
-# with the tennis first (v2) the five read 25, 40, 65, 87 and 99.97 at the
-# sculpture — three hundredths short; so the tennis is armed after his lap-2
-# tennis and lands last, after the sculpture (~90 -> 108). Each trick is armed after its lap-1 visit and before its lap-2 one:
-# the tennis once he has left Zone02 (35), the skis, the rockets and the
-# sculpture during his lap-2 Zone02 stay (106-130), the eels once he is back
-# in Zone01 (131, before the chef at 168). The earlier version armed
-# everything at once and the coins spread over two laps (90, no overflow).
-unlock DuckCage                   # Zone02: Dexterity, DexterityUnlocker IT_NONE — while he is in Zone01 (35-71)
+# overflow only inside one lap, the tennis last (with it first, v2, the five read
+# 25, 40, 65, 87 and 99.97 at the sculpture — three hundredths short). Each trick
+# is armed after its previous visit: the skis, the rockets and the sculpture
+# during his lap-3 Zone02 stay (204-218), the egg once he has left the table, the
+# eels before his lap-3 chef — the skis pay at 249, the chef 281, the rockets
+# 298, the sculpture 312 and the tennis 338, the collapse (runs/p205a: 100 at
+# 338.0 s).
+unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
 take DuckCage IT2_Egg
 take HammerNails IT2_Tools
 take BicycleTubeBox IT2_Tube
@@ -23,12 +22,12 @@ usewith LionStatue IT2_Bangers    # Zone03: the statue must be tricked before it
 take Glasses IT2_Glasses          # RequirePriming, PrimingItem LionStatue
 prime LionStatue IT2_Glasses      # -> IT2_Lionhead
 take Anchor IT2_Rope
-whenzone Zone02                   # (106) his lap-2 mat and tennis: Zone01's three
-usewith! WaterSkiis IT2_Tools     # Zone01: Primed at load, RottweilerUseTogglesPrime, no RequirePriming — 30 at 133.5
-usewith! Rockets IT2_Rope         # Zone01: action [5] — 30 at 181.5
-usewith! SandSculpture IT2_Lionhead   # Zone01: action [6] — 20 at 187.5
-usewith TabbleTennis IT2_Egg      # Zone02 once he has left it (130.7): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-3 tennis (~212), the coin AFTER the sculpture
-usewith Eals IT2_Tube             # Zone04: SetTrickedOnItem -> Chef — 40 at 168
+whenzone Zone02                   # (204) his lap-3 mat and tennis: Zone01's three
+usewith! WaterSkiis IT2_Tools     # Zone01: Primed at load, RottweilerUseTogglesPrime, no RequirePriming — 30 at 249
+usewith! Rockets IT2_Rope         # Zone01: action [5] — 30 at 298
+usewith! SandSculpture IT2_Lionhead   # Zone01: action [6] — 20 at 312
+usewith TabbleTennis IT2_Egg      # Zone02 once he has left it (218): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-4 tennis (338), the coin AFTER the sculpture
+usewith Eals IT2_Tube             # Zone04: SetTrickedOnItem -> Chef — 40 at 281
 await TabbleTennis 0
 await WaterSkiis 0
 await Chef 0

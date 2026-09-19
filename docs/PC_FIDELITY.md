@@ -1483,6 +1483,43 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   lap to 107 (the stays before, the video's, had it at 86.8). The v23
   plan rates 100 under it (runs/call210s2c: 262.7 s); its notes were
   re-timed (v24).
+- *205's table (2026-09-24).* The neighbour's script (GameLogic.dll:
+  its constructor 0x10025a88 starts him at the mat step and arms the
+  step's `talk`, byte +0xd) walks him to Olga's mat (0x100258fd) and
+  plays `talk` — behavior="pingpong" on Olga (cn_b2 objects.xml, fired as
+  it starts) — then a wait element of 72 ticks (fcn.1000ca24, vtable
+  0x100ab804: its run 0x1000c9de counts them down), and goes to the table
+  (0x100254d5), where he waits, the step re-run each tick, until the
+  guarded table shows, then plays `play` (51 ticks), whose behavior="sun"
+  sends Olga back; then the skis (0x100251eb: `skiing`, 208 ticks, the
+  ride's translations; 0x10024e37: the gait 5, skiwalk, back to the ski
+  and `putski`, which has no animation and lasts nothing), the chef
+  (`cut_eel`, `eat_eel`), the rocket (`ignite`), the sand lion
+  (`lookaround`, `kick`; the kid's `dirt` and `build` are the kid's own
+  sequences) and the mat again. Olga's script answers `pingpong` on her
+  mat with its `wakeup` and `leave` (0x10025b2a) and walks to the table,
+  where she swaps it for the guarded one (0x10025d76) — off her mat
+  already, straight to the table — and `sun` with the walk back and the
+  mat's `enter` (0x1002621c). The mobile's pair is a mutex handshake: he
+  parks at the mat until her mat use ends — its sun loop set to end at its
+  round by his arrival (ItemToStopInfiniteAnimation), up to 11 s, then the
+  wake-up and get-up at 8 a second — and plays Tennis at the table at
+  once, she parks there until his Tennis ends. Carried under the profile:
+  his mat a timed mutex (PCUseSeconds 6.17 — the talk and the wait; her
+  abort of it ignored), her mat's loop cut at his arrival
+  (ItemToStopInfiniteAnimation at once; not on the mat yet, her next mat
+  use passes at once — `Item.pc_cut_pending`), the mat's clips at the
+  PC's ticks under her (PCItemClipSeconds: the lie-down and the get-up
+  0.67, the sun loop 7.58, the wake-up 2.83), his Tennis held until her
+  table use has begun and played for the `play` (PCWaitFor `at` start,
+  4.25 s; `abort`: her table mutex ends as it starts), and his stays the
+  code's (the ride 17.33 and the put 0, the chef 7.25, the rocket 2.17, the
+  lion 7.08; tools/pcref/lap_model_s2.py now reads the wait element, a
+  step in phases — the mat's `talk`, then its wait — and a level's own
+  actor record over the generic one). The idle lap is 101.6 s against the
+  video's 102 (116.2 before; the model with the PC's walks 111.9). The v3
+  plan rates 100 under it (runs/p205a: 338.0 s, the pile on lap 3); its
+  notes were re-timed (v4).
 - *The overlay writers' shared patches (2026-09-24).* tools/pcref/
   pc_walks_s2.py rebuilt its keys (PCPass, PCApproach, PCRoom) by dropping
   every patch that carried them, pc_catch_s2.py its PCHideout likewise, and

@@ -656,6 +656,17 @@ predicate, then the all-tricks win.
   item begins (`Item.pc_began`, marked in `Routine._use`: 210's awake
   chair until her call), and another role holds its clip likewise
   (PCWaitForRole: her wait until he stands at her chair).
+- **The PC profile's 205 table**: a MutexAction whose item carries a PC
+  stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
+  role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
+  `talk` and the 72-tick wait. ItemToStopInfiniteAnimation cuts the
+  item's loop at once (the `talk`'s behavior="pingpong" answered on the
+  next tick); an item not in its loop yet passes its next use at once
+  (`Item.pc_cut_pending`, every clip skipped). An item's own use clips
+  run at PCItemClipSeconds while another role uses it hidden
+  (`World.play_use_item_anim`: Olga's mat). A wait with `abort` fires the
+  use's PawnToAbortMutexOnFinish at its release (his play: Olga's table
+  mutex ends as it starts).
 - **The PC profile's 210 check** (`MotherWakeSleepBehavior`): her look's
   start is the PC's check at her nap's end — he in his chair: the look
   held until his `pc_flag4` clears, then her get-up and call; else the

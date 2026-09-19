@@ -2709,6 +2709,7 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
+        self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
@@ -3278,6 +3279,12 @@ class Routine:
             # PawnToAbortMutexOnFinish releases it (RoutineActionUse.cs:172-179)
             self.state = self.USING
             self.timer = 0.0
+            secs = self._pc_use_seconds(it) if pcprofile.is_pc() else 0.0
+            if secs > 0.0:
+                # the PC's step has no mutex: it lasts its own actions and
+                # goes on (205's mat: the `talk` and the 72-tick wait,
+                # 0x100258fd), whoever else is done (PCUseSeconds)
+                self.pc_mutex_left = secs
             if a.get('hide_owner'):
                 # HideOwnerDuringUse -> Owner.SetHidden(true), cs:174-177
                 self.pawn.set_hidden(True)
@@ -4221,6 +4228,11 @@ class Routine:
             if marks is not None and wt['role'] in marks:
                 marks.discard(wt['role'])
                 wt['released'] = 0.0
+                if wt.get('abort') and self.action is not None:
+                    # the released clip is the PC's action whose behavior=
+                    # message sends the other off as it starts (205's `play`:
+                    # "sun" on Olga): her mutex ends now, not at the use's end
+                    self._abort_parked_mutex(self.action.get('abort_mutex_pawn'))
             return
         wt['released'] += dt
         if wt['released'] < float(wt['then']) - 1e-9:
@@ -4410,6 +4422,19 @@ class Routine:
         t = self._anim_by_pid(a.get('stop_inf_item'))
         if t is not None:
             t.ignore_infinite = True
+            if pcprofile.is_pc():
+                # the PC's action fires its behavior= message as it starts and
+                # the other script answers on the next tick (205's `talk`:
+                # behavior="pingpong" on Olga, whose step 0x10025b2a gets her
+                # off the mat — `wakeup`, `leave`): the loop ends at once;
+                # not on the mat yet, she goes straight to the table — her
+                # next use of it passes at once (World.play_use_item_anim)
+                if t.anim is not None and t.anim.infinite:
+                    t._stop_single()
+                else:
+                    stop_it = self.level.items.get(a.get('stop_inf_item'))
+                    if stop_it is not None:
+                        stop_it.pc_cut_pending = True
         if it.tricked:
             t = self._anim_by_pid(a.get('stop_inf_pawn_tricked'))
             if t is not None:
@@ -4434,6 +4459,7 @@ class Routine:
         self.pawn.anim.time_scale = 1.0
         self._pc_clip_end()
         self.pc_hold = 0.0
+        self.pc_mutex_left = None
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         if a is None or a.get('move_only'):
             return
@@ -4489,6 +4515,8 @@ class Routine:
             return
         for rt in self.pawn.world.routines:
             if rt.role == role:
+                if rt.pc_mutex_left is not None:
+                    return                # the PC's step times itself
                 rt.pawn.set_hidden(False)
                 act = rt.action
                 if act is not None and act.get('mutex') \
@@ -5721,6 +5749,13 @@ class Routine:
             # 'first' and 'advance' are StartNextAction; 'skip' and 'start'
             # go straight to StartAction (ActionManager.cs:608-648)
             self._start_action(start_next=what in ('first', 'advance'))
+            return
+        if self.state == self.USING and self.pc_mutex_left is not None:
+            self.pc_mutex_left -= dt
+            if self.pc_mutex_left <= 1e-9:
+                # the timed mutex ends as an abort would (_abort_parked_mutex)
+                self._action_stopped()
+                self._pending = 'advance'
             return
         if self.state == self.USING and self._pc_wait is not None:
             self._pc_wait_tick(dt)
@@ -7474,6 +7509,24 @@ class World:
             return
         seq = [x for x in item.use_normal_sequence if p.has(x)]
         if seq:
+            if pcprofile.is_pc() and (item.pc_item_clip_secs or item.pc_cut_pending):
+                # the item's own clips at the PC's ticks while another role
+                # uses it hidden (PCItemClipSeconds: 205's mat under Olga);
+                # a use the PC's script has already called off passes at once
+                # (every clip skipped: 205's first mat, the `pingpong` come
+                # before she lay down)
+                if item.pc_cut_pending:
+                    item.pc_cut_pending = False
+                    p.clip_pace = {x: 0.0 for x in seq}
+                else:
+                    p.clip_pace = dict(item.pc_item_clip_secs)
+                inner = on_end
+
+                def on_end():
+                    p.clip_pace = None
+                    p.time_scale = 1.0
+                    if inner is not None:
+                        inner()
             p.play_sequence(seq, on_end=on_end)
 
     def play_tricked_item_anim(self, item, pawn=None):
