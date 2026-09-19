@@ -63,6 +63,8 @@
     "PCLaugh": 3,
     "PCUseSecondsTricked": 8.67,
     "PCUseSecondsLinked": 10.67,
+    "PCShout": -1,
+    "PCFixSeconds": 0,
     "PCShoutLinked": 0,
     "PCFixSecondsLinked": 0,
     "PCLinkedPaysAt": 4.17,

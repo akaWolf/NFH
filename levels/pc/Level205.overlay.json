@@ -35,6 +35,10 @@
     "PCTrickReturn": {
      "pant": 2.83
     },
+    "PCUseSecondsTricked": 17.33,
+    "PCShout": 1,
+    "PCFixSeconds": 1.58,
+    "PCCreditAt": 6.0,
     "PCUseSeconds": [
      17.33,
      0.58

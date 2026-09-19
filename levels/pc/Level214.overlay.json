@@ -14,6 +14,13 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCUseSecondsTricked": 4.0,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Olga": 3.5
+    },
+    "PCCreditAt": 2.5,
     "PCUseSeconds": 3.58
    }
   },
@@ -23,6 +30,13 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCUseSecondsTricked": 18.33,
+    "PCShout": 0,
+    "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Mother": 3.25
+    },
+    "PCCreditAt": 5.42,
     "PCUseSeconds": 8.25
    }
   },
@@ -32,6 +46,13 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCUseSecondsTricked": 4.17,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Olga": 3.5
+    },
+    "PCCreditAt": 2.5,
     "PCUseSeconds": 4.17
    }
   },
@@ -57,7 +78,11 @@
    "object": "CaptainWheel",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 12.5,
+    "PCShout": 2,
+    "PCFixSeconds": 0,
+    "PCCreditAt": 4.58
    }
   },
   {
@@ -458,6 +483,8 @@
       "routes": {}
      }
     },
+    "PCShout": -1,
+    "PCFixSeconds": 0,
     "PCUseSeconds": 4.33
    }
   },

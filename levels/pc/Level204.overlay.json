@@ -32,6 +32,12 @@
    "set": {
     "PCLaugh": 4,
     "PCRunTo": true,
+    "PCUseSecondsTricked": 3.67,
+    "PCShout": 0,
+    "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Olga": 3.5
+    },
     "PCCreditAt": 2.0,
     "PCUseSeconds": 5.83
    }
@@ -53,6 +59,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCUseSecondsTricked": 5.0,
+    "PCShout": 3,
+    "PCFixSeconds": 1.58,
+    "PCCreditAt": 3.17,
     "PCUseSeconds": 3.5
    }
   },

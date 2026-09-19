@@ -15,6 +15,12 @@
     "AngerAmount": 30,
     "PCLaugh": 0,
     "PCRunTo": true,
+    "PCUseSecondsTricked": 9.08,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Mother": 3.25
+    },
     "PCUseSeconds": 1.92
    }
   },
@@ -26,6 +32,8 @@
     "PCLaugh": 0,
     "PCUseSecondsTricked": 5.17,
     "PCUseSecondsLinked": 7.42,
+    "PCShout": -1,
+    "PCFixSeconds": 0,
     "PCCreditAt": 1.75,
     "PCCreditAtLinked": 1.75,
     "PCShoutLinked": 1,
@@ -43,7 +51,8 @@
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCCreditAt": 1.92,
-    "PCUseSeconds": 6.33
+    "PCUseSeconds": 6.33,
+    "AngerAmount": 27
    }
   },
   {

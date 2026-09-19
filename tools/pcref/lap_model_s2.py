@@ -113,12 +113,16 @@ class Level:
                 self.present.add(a['name'].replace('/', '_'))
     def is_present(self, name):
         return name.replace('/', '_') in self.present
-def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
-    """one step: returns (events, next)"""
+def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
+    """one step: returns (events, next); `unknown` takes a poll's awaited
+    object as shown, `streq` a name compare the walker cannot resolve (an
+    object's animation against a name, fcn.1004948f) as holding — the poll
+    that waits for another actor's action"""
     k = at(start); seen = set(); ev = []; nxt = None
     slots = []; al = None; vars_ = {}; regs = {}; zf = None
     first_push = None     # the first argument pushed since the last call (its last parameter)
     consts = {}; pending_push = None
+    pose = False          # the element E2f40 appends is a pose element (fcn.10014c5c / fcn.1000de51)
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -214,6 +218,8 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
                 ev.append(('PRESENT', nm, al))
             elif fn == 'fcn.100585c0':
                 al = 1 if len(names) >= 2 and names[-1].replace('/', '_') == names[-2].replace('/', '_') else 0
+                if streq and len(names) < 2:
+                    al = 1
                 ev.append(('STREQ', names[-2:], al))
             elif fn == 'fcn.1000e3e0':
                 ev.append(('GO', names[-1] if names else None)); al = 0
@@ -241,6 +247,10 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
                 nm = names[-1] if names else None
                 if nm: lv.present.add(nm.replace('/', '_'))
                 ev.append(('SHOW', nm)); al = None
+            elif fn in ('fcn.10014c5c', 'fcn.1000de51'):
+                # 207's pose element (fcn.1000de51: vtable 0x100ab990, update
+                # 0x1000cfaa sets the actor's animation and returns 1 at once)
+                pose = True
             elif fn in ELEM:
                 args = list(reversed(names))
                 kind = ELEM[fn]
@@ -256,7 +266,11 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
                     # a constant, or the step's own argument written into the
                     # reserved slot (201's buffet: [ebp+0xc], the actor)
                     imms = [first_push] if isinstance(first_push, int) else []
-                ev.append((kind, args, imms)); al = None
+                if kind == 'E2f40' and pose:
+                    ev.append((kind, args, imms, 'instant')); pose = False
+                else:
+                    ev.append((kind, args, imms))
+                al = None
             elif fn in ('fcn.1000aeb8', 'fcn.1000ae19', 'fcn.100088be', 'fcn.10059e30', 'fcn.10009b58',
                         'fcn.1000ee93', 'fcn.1000eec6', 'fcn.1000ef28', 'fcn.10049216'):
                 pass
@@ -295,12 +309,17 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
         if m: k = at(int(m.group(1), 16)); continue
         k += 1
     return ev, nxt
-def walk(lv, start, maxsteps=80, trace=False, bytes0=None):
+def walk(lv, start, maxsteps=80, trace=False, bytes0=None, snaps=None):
+    """the steps from `start`: [(step, events, next)] and the index the lap
+    loops back to (None when it stops); `snaps` collects the scene and the
+    step bytes as the walk enters each step"""
     steps = []; cur = start; seenkeys = {}; bytevars = dict(bytes0 or {})
     for _ in range(maxsteps):
         key = (cur, tuple(sorted((k, v) for k, v in bytevars.items() if k.startswith('obj'))))
         if key in seenkeys: return steps, seenkeys[key]
         seenkeys[key] = len(steps)
+        if snaps is not None:
+            snaps.append((set(lv.present), dict(bytevars)))
         ev, nxt = run_step(lv, cur, dict(bytevars), trace=trace)
         if nxt is None or nxt == cur:
             b2 = dict(bytevars)
@@ -508,7 +527,7 @@ class Data:
 # once): Ef82b hides an object (vtable 0x100ab984, update 0x1000cf2a:
 # fcn.10042b9e), Efac4 sets an actor's flag (vtable 0x100ab9a8, update
 # 0x1000d037: fcn.100450bf with the element's two values)
-INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET', 'Ef82b', 'Efac4'}
+INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET', 'Ef82b', 'Efac4', 'Ef779'}
 
 
 def station_ticks(d, ev, ctx=None):
@@ -552,6 +571,21 @@ def station_ticks(d, ev, ctx=None):
             parts.append((obj or '?', 'bar', e[2]))
         elif k == 'WAIT':
             parts.append(('-', 'wait', e[2][-1] if e[2] else None))
+        elif k == 'E2f40' and len(e) > 3 and e[3] == 'instant':
+            continue
+        elif k == 'Ef779':
+            # an object shown in a room: vtable 0x100ab978, update 0x1000ce9c
+            # (fcn.10043d66, then 1 at once)
+            continue
+        elif k == 'Ef51a':
+            # the camera on the neighbour, done on its first update: the
+            # builder fcn.1000f51a sets the flag 8 for a nonzero last
+            # argument, with which the update (0x1000d70b -> fcn.1000d31a,
+            # 0x1000d33d-0x1000d354) waits while the level's slot 0x50 holds
+            # — [level+0xc] set, Woody's mini-game running (the level update
+            # runs the game object at +0xc, 0x10044816-0x1004482b); no
+            # mini-game in the lap, no wait
+            continue
         elif k in ('WAITEVENT', 'POLL', 'SHOUT', 'Eebbf', 'Ef51a', 'Ef779', 'E2f40', 'E807f', 'RUNGO'):
             parts.append(('-', k, None))
     return parts
@@ -1024,6 +1058,68 @@ def code_moves(n):
 # the script than the lap's: 201's puddle by the open rail (the combo,
 # 0x100297c5: crash_long; the lap's puddle step 0x1002847f plays crash_short)
 LINKED_STEP = {201: {'WaterPuddle': 0x100297c5}}
+# a linked variant whose step hands over to a poll step before its SHOUT:
+# {level: {item: (the poll step, the object, its animation, the co-actor)}} —
+# 207's sand castle over the hedgehog's towel ends with the castle's fall
+# (its behavior kid_cry on Olga), and 0x1001513f re-runs until the destroyed
+# castle shows Olga's `n_lift` (fcn.1004948f, the object's animation, against
+# the global n_lift, 0x100151dd-0x10015229), then plays the neighbour's
+# `enter` of beachleft/bill (the billboard, record `bill` at 30), its
+# `leave`, SHOUT 2, the flag 0x40000 and the camera off, and goes back to
+# the lap's next step 0x10014d46
+LINKED_CONT = {207: {'SandCastle': (0x1001513f, 'beachleft_sandcastle_destroyed', 'n_lift', 'olga')}}
+# a tricked visit whose reaction is not in the station's step: {level: {item:
+# (kind, co-actor, steps)}} — 'steps': the steps the tricked flow goes on to,
+# in order (204's gong: the elvis hits him, the action's behavior `gong` on
+# him sends his script to 0x10032f52 — its tricked branch the leave, SHOUT
+# 3, the camera off and the repair, 0x10033046-0x10033140; 205's nailed
+# skis: the run back, pant, SHOUT 1 and the repair, 0x10024fc2); 'fight':
+# the co-actor's run to him and the generic `fight` (fcn.1000eb19; the
+# action's behavior olga_fight / mother_fight on him), then the neighbour's
+# step his behaviour handler picks for it (204's rickshaw: olga_fight ->
+# 0x10032b6f, 0x100331e4-0x1003322d; 207's shell: 0x1001596a, 0x1001736a;
+# 210's elephant: the Mother, mother_fight -> 0x1001a379, 0x1001b597-
+# 0x1001b5ba; 214's shower 0x1003ba90 and bouquet 0x1003b677 on
+# olga_fight, the pistol 0x1003b328 on mother_fight, 0x1003bb9a-0x1003bbff)
+TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,)),
+                      'PullKart': ('fight', 'olga', (0x10032b6f,))},
+                205: {'WaterSkiis': ('steps', None, (0x10024fc2,))},
+                207: {'Shell': ('fight', 'olga', (0x1001596a,))},
+                210: {'Elephant': ('fight', 'mother', (0x1001a379,))},
+                211: {'Sweets': ('steps', None, (0x10030dc2, 0x10030d0f, 0x10030b9d))},
+                214: {'CaptainDoor': ('steps', None, (0x1003af18,)),
+                      'Shower': ('fight', 'olga', (0x1003ba90,)),
+                      'Bouquet': ('fight', 'olga', (0x1003b677,)),
+                      'Pistol': ('fight', 'mother', (0x1003b328,))}}
+# the scene a tricked continuation needs besides the item's own trick: 211's
+# sweets with the toilet sign tricked (the mobile's LinkedTrickRushToilet)
+# run to the women's toilet (0x10030dc2: wcright's puke, the beat, then SHOUT
+# 1 in 0x10030d0f and the sign's repair in 0x10030b9d)
+CONT_SCENE = {211: {'Sweets': ('ToiletSign',)},
+              # 214's door opened: up to the bridge, the steering with the
+              # drugged captain (no SHOUT), then the pistol
+              214: {'CaptainDoor': ('CaptainMug',)}}
+# a mobile station the lap reaches only through another's tricked flow:
+# {level: {item: (the step, the tricks in the scene)}} — 214's wheel, up on
+# the bridge from the opened captain's door (0x1003af18: the steering's
+# variant, the manipulated one first; the captain drugged by the mug)
+TRICKED_VIA = {214: {'CaptainWheel': (0x1003af18, ('CaptainDoor', 'CaptainMug', 'CaptainWheel'))}}
+# a level whose mobile lap the PC's does not pair with (206: the mobile's
+# neighbour visits the Mother's deck chair and Olga's pillows between his
+# Fifi rounds, the PC's lap has neither): {level: {item: (the walk's row,
+# the objects of its parts that are the item's)}}, the tricked visit read
+# from the row's step with the item's trick in the scene, and where that
+# step hands over to one off the lap, its steps up to their SHOUT (206's
+# dynamite bag, the adhesive's: taken, then 0x1002c550's lookaround and
+# the reling's explode, SHOUT 1)
+TRICKED_ROWS = {206: {'Weights': (7, ('dumbbell', 'olga')), 'DynamiteBox': (9, ('dynamitebag',))}}
+# the item whose trick puts a station's tricked variant in the scene where
+# the mobile station takes no inventory of its own, with what else the
+# variant needs shown: 214's shower, tricked by the fish in the wash bucket
+# (ActivateItemTrick; bottomleft/washbucket_manip) while Olga showers — the
+# step's bucket branch is the guarded shower's (0x1003b87b; the mobile's
+# trigger is her shower pose, WashbucketBehavior)
+TRICKED_BY = {214: {'Shower': ('Washbucket', {'bottomleft_shipshower_guarded'}, {'bottomleft_shipshower'})}}
 # a station's tricked variant where the lap's step has none and other steps of
 # the script play it, their events in order: 201's damaged buffet in the
 # tutorial (0x10029c4a: the flirt that sends Olga's buffet_crash, his crash;
@@ -1110,20 +1206,53 @@ def tricked_presence(n):
     return out
 
 
-def _tricked_run(n, lv, item, cur, trick):
+def lap_state(n):
+    """[(the scene, the step bytes)] as the untricked lap's walk enters each
+    of its steps (lap_steps' indices): a station's tricked run starts from
+    the scene the lap has there — 209's shoe mat holds his shoes when he
+    comes out of the curtain, which the level's opening scene does not"""
+    st = LAP_START.get(n) or level_start(n)
+    lv = Level(n)
+    for hid, shown in LAP_PRESENT.get(n, ()):
+        lv.present.discard(hid); lv.present.add(shown)
+    snaps = []
+    walk(lv, st, bytes0=LAP_BYTES.get(n), snaps=snaps)
+    return snaps
+
+
+def _row_level(n, snaps, row):
+    """(a Level with the lap's scene at the walk's step `row`, its bytes)"""
+    pres, by = snaps[row]
+    lv = Level(n)
+    lv.present = set(pres)
+    return lv, by
+
+
+def _tricked_run(n, lv, item, cur, trick, bytes0=None):
     """the step `cur` run with the item's trick in the scene (tricked_presence);
     None when the trick changes none of its DoActions"""
     shown, hidden = trick.get(item, (set(), set()))
     if not shown:
         return None
+    by = bytes0 if bytes0 is not None else (LAP_BYTES.get(n) or {})
     lv2 = Level(n)
     lv2.present = (set(lv.present) - hidden) | shown
-    ev2, _nx = run_step(lv2, cur, dict(LAP_BYTES.get(n) or {}))
-    ev1, _nx = run_step(lv, cur, dict(LAP_BYTES.get(n) or {}))
+    ev2, _nx = run_step(lv2, cur, dict(by))
+    lv1 = Level(n)
+    lv1.present = set(lv.present)
+    ev1, _nx = run_step(lv1, cur, dict(by))
     dos = lambda ev: [tuple(e[1]) for e in ev if e[0] == 'DO']
     if dos(ev2) == dos(ev1):
         return None
     return ev2
+
+
+def trick_rage(n):
+    """{record: rage in the port's units} — tricks.xml's rage / 1000"""
+    folder = canon.pc_level(n)['folder']
+    tr = canon.read('%s/nfh2/x/%s/tricks.xml' % (canon.ROOT, folder))
+    return {m.group(1): int(m.group(2)) // 1000
+            for m in re.finditer(r'<trick name="([^"]+)"[^>]*rage="(\d+)"', tr)}
 
 
 def mobile_linked(n):
@@ -1194,6 +1323,9 @@ def code_stays_tricked(n):
     for hid, shown in LAP_PRESENT.get(n, ()):
         lv.present.discard(hid); lv.present.add(shown)
     trick = tricked_presence(n)
+    for item, (by, more, less) in TRICKED_BY.get(n, {}).items():
+        if by in trick:
+            trick[item] = (set(trick[by][0]) | more, set(trick[by][1]) | less)
 
     def entry(ev2, own=None):
         stand, level, repair, credit = _step_parts_split(d, ev2, own)
@@ -1220,17 +1352,89 @@ def code_stays_tricked(n):
         return own
     out = {}
     where = {}
+    snaps = lap_state(n)
     for item, (many, visits) in pairs.items():
         for v in visits:
             if v is None or item in out:
                 continue
             for i in sorted(set(i for i, _j, _p in v)):
-                ev2 = _tricked_run(n, lv, item, lap[i][1], trick)
+                lvi, byi = _row_level(n, snaps, lap[i][0])
+                ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi)
                 e = entry(ev2, own_of(item, i)) if ev2 is not None else None
                 if e is not None:
+                    cont = TRICKED_CONT.get(n, {}).get(item)
+                    if cont is not None and e['shout'] == -1:
+                        # the reaction's steps: the scene the tricked step
+                        # leaves, each step's events in turn (polls passed)
+                        kind, actor, steps = cont
+                        s1, h1 = trick[item]
+                        lvc = Level(n)
+                        lvc.present = (set(lvi.present) - h1) | s1
+                        for other in CONT_SCENE.get(n, {}).get(item, ()):
+                            if other in trick:
+                                lvc.present = (lvc.present - trick[other][1]) | trick[other][0]
+                        run_step(lvc, lap[i][1], dict(byi))
+                        evc = []
+                        for stp in steps:
+                            evc += run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
+                        cstand, clevel, crepair, _c = _step_parts_split(d, evc)
+                        e.update({'shout': clevel,
+                                  'repair': round(crepair / 12.0, 2) if crepair is not None else None,
+                                  'cont': round(cstand / 12.0, 2) if cstand is not None else None})
+                        if kind == 'fight':
+                            ft = d.action_ticks('neighbor', 'fight', actor=actor)
+                            e['hit'] = {actor: round(ft / 12.0, 2) if ft is not None else None}
+                    # a tricked step with no SHOUT whose flow goes on to the
+                    # lap's next step plays no reaction at all
+                    lvj = Level(n); lvj.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
+                    _e, nx2 = run_step(lvj, lap[i][1], dict(byi))
+                    lvk = Level(n); lvk.present = set(lvi.present)
+                    _e, nx1 = run_step(lvk, lap[i][1], dict(byi))
+                    e['rejoins'] = nx2 == nx1
                     out[item] = e
                     where[item] = (i, ev2)
                     break
+    if TRICKED_ROWS.get(n):
+        rows, _loop = lap_steps(n)
+        for item, (row, owns) in TRICKED_ROWS[n].items():
+            if item in out or item not in trick:
+                continue
+            cur = rows[row][1]
+            lvi, byi = _row_level(n, snaps, row)
+            own = lambda o, a, owns=owns: any(x in o for x in owns)
+            ev2 = _tricked_run(n, lvi, item, cur, trick, byi)
+            if ev2 is None:
+                continue
+            e = entry(ev2, own)
+            s1, h1 = trick[item]
+            lvc = Level(n); lvc.present = (set(lvi.present) - h1) | s1
+            _e, nx2 = run_step(lvc, cur, dict(byi))
+            lvk = Level(n); lvk.present = set(lvi.present)
+            _e, nx1 = run_step(lvk, cur, dict(byi))
+            if e['shout'] == -1 and nx2 != nx1 and nx2 is not None:
+                # the tricked flow's own step off the lap: its parts up to
+                # its SHOUT go on the stand, its records after the item's
+                evc, _nx = run_step(lvc, nx2, dict(byi), unknown=1, streq=1)
+                cstand, clevel, crepair, ccredit = _step_parts_split(d, evc)
+                base = round(e['tricked'] * 12) if e['tricked'] is not None else None
+                if cstand is not None and base is not None:
+                    e['tricked'] = round((base + cstand) / 12.0, 2)
+                    if e['credit'] is None and ccredit is not None:
+                        e['credit'] = round((base + ccredit) / 12.0, 2)
+                e['shout'] = clevel
+                e['repair'] = round(crepair / 12.0, 2) if crepair is not None else None
+                e['cont'] = 0.0
+            e['rejoins'] = nx2 == nx1
+            out[item] = e
+    for item, (stp, tricks) in TRICKED_VIA.get(n, {}).items():
+        lv2 = Level(n)
+        lv2.present = set(lv.present)
+        for it in tricks:
+            if it in trick:
+                lv2.present = (lv2.present - trick[it][1]) | trick[it][0]
+        e = entry(run_step(lv2, stp, dict(LAP_BYTES.get(n) or {}), unknown=1)[0])
+        if e is not None and item not in out:
+            out[item] = e
     for item, stps in TRICKED_STEP.get(n, {}).items():
         lv2 = Level(n)
         lv2.present = set(lv.present)
@@ -1256,9 +1460,10 @@ def code_stays_tricked(n):
             continue
         i, ev1 = where[item]
         (s1, h1), (s2, h2) = trick[item], trick[lnk]
+        lvi, byi = _row_level(n, snaps, lap[i][0])
         lv2 = Level(n)
-        lv2.present = (set(lv.present) - h1 - h2) | s1 | s2
-        ev2, _nx = run_step(lv2, lap[i][1], dict(LAP_BYTES.get(n) or {}))
+        lv2.present = (set(lvi.present) - h1 - h2) | s1 | s2
+        ev2, _nx = run_step(lv2, lap[i][1], dict(byi))
         if dos(ev2) == dos(ev1):
             continue
         own = own_of(item, i)
@@ -1270,10 +1475,29 @@ def code_stays_tricked(n):
         recs = _step_records(d, ev2, own)
         credit = next((t for nm, t in recs if nm in mine), None)
         pays = next((t for nm, t in recs if nm not in mine), None)
-        out[item].update({'linked': round(stand / 12.0, 2), 'linked_shout': level,
-                          'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
-                          'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
-                          'linked_pays': round(pays / 12.0, 2) if pays is not None else None})
+        e = {'linked': round(stand / 12.0, 2), 'linked_shout': level,
+             'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
+             'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
+             'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
+        cont = LINKED_CONT.get(n, {}).get(item)
+        if cont is not None and level == -1:
+            # the poll step after it: the co-actor's action the poll waits
+            # for (its start ends the poll), then the step's parts up to its
+            # SHOUT — the part the co-actor's action covers, the rest after
+            # it, the record they pay and its second from the action's start
+            step, obj, anim, actor = cont
+            evc, _nx = run_step(lv2, step, dict(byi), unknown=1, streq=1)
+            lift = d.action_ticks(obj, anim, actor=actor)
+            cstand, clevel, crepair, _c = _step_parts_split(d, evc)
+            crecs = _step_records(d, evc)
+            if lift is not None and cstand is not None and crecs:
+                e.update({'linked_shout': clevel,
+                          'linked_repair': round(crepair / 12.0, 2) if crepair is not None else None,
+                          'linked_hit': round(lift / 12.0, 2),
+                          'linked_after_hit': round(max(0, cstand - lift) / 12.0, 2),
+                          'linked_extra': crecs[0][0],
+                          'linked_extra_at': round(crecs[0][1] / 12.0, 2)})
+        out[item].update(e)
     return out
 
 
@@ -1292,14 +1516,37 @@ def code_moves_tricked(n):
     lv = Level(n)
     for hid, shown in LAP_PRESENT.get(n, ()):
         lv.present.discard(hid); lv.present.add(shown)
-    steps, _loop = walk(lv, st, bytes0=LAP_BYTES.get(n))
+    snaps = []
+    steps, _loop = walk(lv, st, bytes0=LAP_BYTES.get(n), snaps=snaps)
     events = {cur: ev for cur, ev, _nxt in steps}
     out = {}
     for item, (many, visits) in pairs.items():
-        if many or visits[0] is None:
+        if any(v is None for v in visits):
+            continue
+        if many:
+            # a two-way station: each visit's step run with its variants
+            # (201's puddle: the slip's crash_short and the left slip's)
+            base = moves.get(item) or [0] * len(visits)
+            per = []
+            for k, v in enumerate(visits):
+                i = max(i for i, _j, _p in v)
+                per.append(_tricked_move(n, d, lap, events, snaps, i, base[k]))
+            if per != base:
+                out[item] = per
             continue
         i = max(i for i, _j, _p in visits[0])
+        dx = _tricked_move(n, d, lap, events, snaps, i, moves.get(item, 0))
+        if dx != moves.get(item, 0):
+            out[item] = dx
+    return out
+
+
+def _tricked_move(n, d, lap, events, snaps, i, untricked):
+    """the move after the lap row i's step run with the tricked variants of
+    its IsVariant pairs shown (the untricked move where it has none)"""
+    if True:
         cur = lap[i][1]
+        lv, byi = _row_level(n, snaps, lap[i][0])
         alts = []
         for e in events.get(cur) or []:
             if e[0] != 'IFVAR':
@@ -1309,20 +1556,16 @@ def code_moves_tricked(n):
             if len(cands) > 1 and e[2] == cands[0]:
                 alts.append((cands[0], cands[1]))
         if not alts:
-            continue
+            return untricked
         lv2 = Level(n)
         lv2.present = set(lv.present)
         for pick, alt in alts:
             lv2.present.discard(pick); lv2.present.add(alt)
-        ev2, _nx = run_step(lv2, cur, dict(LAP_BYTES.get(n) or {}))
+        ev2, _nx = run_step(lv2, cur, dict(byi))
         parts = station_ticks(d, ev2, {})
         if any(a == 'leave' for _o, a, _t in parts):
-            dx = 0
-        else:
-            dx = sum(d.translation(o, a)[0] for o, a, _t in parts)
-        if dx != moves.get(item, 0):
-            out[item] = dx
-    return out
+            return 0
+        return sum(d.translation(o, a)[0] for o, a, _t in parts)
 
 
 def _paired_parts(n):

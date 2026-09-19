@@ -28,6 +28,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCUseSecondsTricked": 2.08,
+    "PCShout": 1,
+    "PCFixSeconds": 2.0,
+    "PCCreditAt": 1.25,
     "PCUseSeconds": 1.75
    }
   },
@@ -581,7 +585,8 @@
       "px": -31,
       "routes": {}
      }
-    }
+    },
+    "PCUseSeconds": 3.33
    }
   },
   {
@@ -1117,6 +1122,13 @@
       }
      ]
     }
+   }
+  },
+  {
+   "object": "ToiletMen",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.08
    }
   }
  ]

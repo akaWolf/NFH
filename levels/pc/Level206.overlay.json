@@ -38,7 +38,11 @@
    "object": "Weights",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 13.0,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCCreditAt": 8.33
    }
   },
   {
@@ -52,7 +56,11 @@
    "object": "DynamiteBox",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSecondsTricked": 13.83,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCCreditAt": 8.5
    }
   },
   {

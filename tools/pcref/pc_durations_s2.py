@@ -166,8 +166,17 @@ def _set_key(patches, item, key, value):
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
 CODE = (201, 202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
+# the stations a tricked flow runs him to, off his lap: the use there lasts
+# the level script's action — 211's sweets send him to the toilet
+# (0x10030dc2): the women's wc with the sign tricked (wcright's `puke`, whose
+# record wcright pays at 27), else the men's (wcleft's)
+RUSH = {211: {'ToiletWomen': ('topleft_wcright', 'puke'), 'ToiletMen': ('topleft_wcleft', 'puke')}}
+# the level scripts' actor names as the port's roles
+ROLE = {'olga': 'Olga', 'mother': 'Mother', 'neighbor': 'Rottweiler'}
 # the levels whose tricked visits are the code's too (code_stays_tricked)
-TRICKED = CODE
+# ... and 206's, whose untricked stays stay the video's (its mobile lap has
+# visits the PC's does not: lap_model_s2.TRICKED_ROWS)
+TRICKED = CODE + (206,)
 
 
 def pc_spans(n):
@@ -360,8 +369,12 @@ def main(argv):
                     # linked trick's own record pays at (PCLinkedPaysAt)
                     for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
                               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
-                              'PCLinkedPaysAt'):
+                              'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
+                              'PCExtraCoinLinked'):
                         ov['patches'] = _strip_key(ov['patches'], k)
+                    sys.path.insert(0, HERE)
+                    import lap_model_s2
+                    rage = lap_model_s2.trick_rage(n)
                     for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
                         if item in clips:
                             continue      # timed per clip (CLIPS)
@@ -374,6 +387,14 @@ def main(argv):
                         if tr['shout'] is not None and tr['shout'] >= 0:
                             _set_key(ov['patches'], item, 'PCShout', tr['shout'])
                             _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+                        elif tr['shout'] == -1 and (tr.get('rejoins') or 'cont' in tr):
+                            # no SHOUT in the tricked flow at all: no reaction
+                            _set_key(ov['patches'], item, 'PCShout', -1)
+                            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+                        if tr.get('hit'):
+                            # the co-actor's `fight` (the generic action's ticks)
+                            _set_key(ov['patches'], item, 'PCHitSeconds',
+                                     {ROLE[a]: v for a, v in tr['hit'].items() if v is not None})
                         if tr['credit'] is not None and item not in CREDIT.get(n, {}):
                             _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
                         if tr.get('linked_credit') is not None:
@@ -383,9 +404,22 @@ def main(argv):
                             _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
                         if tr.get('linked_pays') is not None:
                             _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
+                        if tr.get('linked_hit') is not None and tr.get('linked_extra_at') == tr['linked_hit']:
+                            # the co-actor's action the linked flow waits on,
+                            # the rest of the flow's parts after it, and the
+                            # record they pay — at the action's end
+                            _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
+                            _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
+                            _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
+            if n >= 200 and n in RUSH:
+                d = lap_model_s2.Data(n)
+                for item, (obj, act) in RUSH[n].items():
+                    t = d.action_ticks(obj, act)
+                    if t is not None:
+                        _set_key(ov['patches'], item, 'PCUseSeconds', round(t / 12.0, 2))
             note = ' Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit.'
             if n in CODE:
                 note = ' Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll\'s level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap\'s actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit.'
