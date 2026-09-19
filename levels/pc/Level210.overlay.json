@@ -1,5 +1,5 @@
 {
- "source": "PC The Enlightenment: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py, the bubble naming his activity): +26 at the shop (170 s), +34 at the elephant (191), +22 at the deck chair (239), +61 at the dog basket with the diving board and the drained pool (299, the gauge full), the second shop coin capped. Scaled to the 100 gauge (the video's full reads 92): shop 28, elephant 37, chair+pylon 24, basket+board 52 (+10 the code's extra coin). PC data (in_b2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on TurbanShop 27 (hedgehog and octopus, its two tricks) and Elephant 30 (dogattack_bat, the cricket bat — 2026-09-17: the earlier 27 took the octopus for the elephant); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The drained pool: `pool/divingboard_oil` `fall_empty` credits fifi_bone, fall_water and fall_empty (20 each, tricks.xml) in one action — the basket's extra is 20 (PCExtraCoin), the mobile's 10. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations = per role the PC object's <actor> hotspot x and its height against the room's floor. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit.",
+ "source": "PC The Enlightenment: the anger gauge's jumps in Badinfos' 100% run (tools/pcref/gauge.py, the bubble naming his activity): +26 at the shop (170 s), +34 at the elephant (191), +22 at the deck chair (239), +61 at the dog basket with the diving board and the drained pool (299, the gauge full), the second shop coin capped. Scaled to the 100 gauge (the video's full reads 92): shop 28, elephant 37, chair+pylon 24, basket+board 52 (+10 the code's extra coin). PC data (in_b2/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on TurbanShop 27 (hedgehog and octopus, its two tricks) and Elephant 30 (dogattack_bat, the cricket bat — 2026-09-17: the earlier 27 took the octopus for the elephant); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The drained pool: `pool/divingboard_oil` `fall_empty` credits fifi_bone, fall_water and fall_empty (20 each, tricks.xml) in one action — the basket's extra is 20 (PCExtraCoin), the mobile's 10. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The catch (tools/pcref/pc_catch_s2.py): PCHideout on the catchers' stations = per role the span of the PC's flag 4 (the enter step to the leave step, less the level steps' clears), in which the neighbour or the Mother neither catches nor is seen. The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -66,6 +66,34 @@
      6
     ],
     "PCMinigameFailed": "neighbor"
+   }
+  },
+  {
+   "object": "DeckChairMother",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCHideout": {
+     "Mother": {
+      "clear": [
+       "MotherLookLoop"
+      ],
+      "set": [
+       "MotherSleepPillow",
+       "MotherSleepSingle"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "object": "DeckChair",
+   "component": "TrickItem",
+   "zone": "Zone01",
+   "set": {
+    "PCHideout": {
+     "Rottweiler": {}
+    }
    }
   },
   {
@@ -261,6 +289,36 @@
    }
   },
   {
+   "object": "Pylon",
+   "component": "TrickItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/pole",
+      "x": 239,
+      "px": 20,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "DivingBoard",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "pool/divingboard",
+      "x": 639,
+      "px": -54,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
    "object": "DogBasket",
    "component": "TrickItem",
    "zone": "Zone04",
@@ -285,6 +343,12 @@
         "Zone03"
        ]
       }
+     },
+     "Woody": {
+      "obj": "pool/fifi_sleep",
+      "x": 639,
+      "px": -44,
+      "routes": {}
      }
     }
    }
@@ -318,6 +382,27 @@
         "Zone02"
        ]
       }
+     },
+     "Woody": {
+      "obj": "bar/elefant",
+      "x": 1256,
+      "px": -1,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "WaterMelons",
+   "component": "TrickItem",
+   "zone": "Zone03",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "bar/melons",
+      "x": 1066,
+      "px": 0,
+      "routes": {}
      }
     }
    }
@@ -348,8 +433,7 @@
        ]
       }
      }
-    },
-    "PCUseSeconds": 11.0
+    }
    }
   },
   {
@@ -368,6 +452,51 @@
    }
   },
   {
+   "object": "ValveWaterPuddle",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/octopus",
+      "x": 299,
+      "px": -66,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Valve",
+   "component": "TrickItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/poolvalve",
+      "x": 299,
+      "px": -36,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "FishNet",
+   "component": "SearchItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "pool/brailer",
+      "x": 524,
+      "px": -19,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
    "object": "CallRTMother",
    "component": "TrickItem",
    "zone": "Zone04",
@@ -379,8 +508,22 @@
       "px": -23,
       "routes": {}
      }
-    },
-    "PCUseSeconds": 3.0
+    }
+   }
+  },
+  {
+   "object": "AlmsBowl",
+   "component": "SearchItem",
+   "zone": "Zone03",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "bar/statue",
+      "x": 938,
+      "px": -31,
+      "routes": {}
+     }
+    }
    }
   },
   {
@@ -393,6 +536,66 @@
       "obj": "beachleft/shower_guarded",
       "x": 567,
       "px": -43,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "SeaUrchin",
+   "component": "SearchItem",
+   "zone": "Zone02",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachright/hedgehog",
+      "x": 1081,
+      "px": 15,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "SuntanOil",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/sunoil",
+      "x": 247,
+      "px": -20,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Bin",
+   "component": "HideItem",
+   "zone": "Zone03",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "bar/basket",
+      "x": 1155,
+      "px": -27,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "OlgaBra",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/bra",
+      "x": 697,
+      "px": -13,
       "routes": {}
      }
     }
@@ -428,6 +631,12 @@
         "Zone03"
        ]
       }
+     },
+     "Woody": {
+      "obj": "beachright/turbanshop",
+      "x": 1245,
+      "px": -51,
+      "routes": {}
      }
     }
    }
@@ -442,6 +651,21 @@
       "obj": "beachleft/mat_olga_guarded",
       "x": 562,
       "px": 27,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "CricketBat",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/bat",
+      "x": 375,
+      "px": 53,
       "routes": {}
      }
     }
@@ -476,7 +700,308 @@
         "Zone03"
        ]
       }
+     },
+     "Woody": {
+      "obj": "beachleft/deckchair",
+      "x": 209,
+      "px": -10,
+      "routes": {}
      }
+    }
+   }
+  },
+  {
+   "object": "ToolBelt",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "beachleft/toolbelt",
+      "x": 108,
+      "px": -11,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Zone01",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "beachleft",
+     "x1": 100,
+     "x2": 740,
+     "floor": 600,
+     "nb": [
+      {
+       "zone": "Zone04",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         440,
+         540
+        ],
+        "Woody": [
+         440,
+         540
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         440,
+         300
+        ],
+        "Woody": [
+         440,
+         300
+        ]
+       }
+      },
+      {
+       "zone": "Zone02",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         770,
+         600
+        ],
+        "Woody": [
+         770,
+         600
+        ],
+        "Olga": [
+         770,
+         600
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         960,
+         600
+        ],
+        "Woody": [
+         960,
+         600
+        ],
+        "Olga": [
+         960,
+         600
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone02",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "beachright",
+     "x1": 1010,
+     "x2": 1350,
+     "floor": 600,
+     "nb": [
+      {
+       "zone": "Zone01",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         960,
+         600
+        ],
+        "Woody": [
+         960,
+         600
+        ],
+        "Olga": [
+         960,
+         600
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         770,
+         600
+        ],
+        "Woody": [
+         770,
+         600
+        ],
+        "Olga": [
+         770,
+         600
+        ]
+       }
+      },
+      {
+       "zone": "Zone03",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         1055,
+         530
+        ],
+        "Woody": [
+         1055,
+         530
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         1055,
+         310
+        ],
+        "Woody": [
+         1055,
+         310
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone03",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "bar",
+     "x1": 880,
+     "x2": 1250,
+     "floor": 290,
+     "nb": [
+      {
+       "zone": "Zone02",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         1055,
+         310
+        ],
+        "Woody": [
+         1055,
+         310
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         1055,
+         530
+        ],
+        "Woody": [
+         1055,
+         530
+        ]
+       }
+      },
+      {
+       "zone": "Zone04",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         830,
+         290
+        ],
+        "Woody": [
+         830,
+         290
+        ],
+        "Mother": [
+         830,
+         290
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         700,
+         290
+        ],
+        "Woody": [
+         700,
+         290
+        ],
+        "Mother": [
+         700,
+         290
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone04",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "pool",
+     "x1": 105,
+     "x2": 650,
+     "floor": 290,
+     "nb": [
+      {
+       "zone": "Zone01",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         440,
+         300
+        ],
+        "Woody": [
+         440,
+         300
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         440,
+         540
+        ],
+        "Woody": [
+         440,
+         540
+        ]
+       }
+      },
+      {
+       "zone": "Zone03",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         700,
+         290
+        ],
+        "Woody": [
+         700,
+         290
+        ],
+        "Mother": [
+         700,
+         290
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         830,
+         290
+        ],
+        "Woody": [
+         830,
+         290
+        ],
+        "Mother": [
+         830,
+         290
+        ]
+       }
+      }
+     ]
     }
    }
   }

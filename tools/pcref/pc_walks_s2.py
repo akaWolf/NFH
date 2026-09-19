@@ -163,6 +163,248 @@ STATIONS = {
           'DeckChairMother': {'Mother': 'topright/deckchair'},
           'MotherWait': {'Mother': 'bottomright/reling'}},
 }
+# Woody's items: the mobile item -> the PC object his GoTo walks to (its `woody`
+# hotspot) — a search item by its InventoryItems' type = the PC container's <content>,
+# a trick item by the inventory it takes = the PC action of that name, a hide item =
+# the PC `hideout` object, in the PC room the item's zone maps to (room_map); the
+# item's x against the room's objects only where a pair of objects shares the key.
+# By hand: 212's parrot nest (its ruby is `ruby_2`), 202's and 207's crayfish (the
+# game object and the container share the hotspot), 208's rake and Fifi (the
+# primary objects' `use`), 210's octopus (spelled `octopus`), 204's gong grease (the
+# gong: the PC takes no rice there). No PC object: 208's Indian magician, 209's cow.
+WOODY = {
+    201: {
+        'SoapChest': 'bottomleft/soapchest',
+        'ToolBox': 'bottomright/toolbox',
+        'VanityBag': 'bottomleft/beautycase',
+        'SpaghettiCar': 'topleft/spaghetticar',
+        'CaptainHat': 'topleft/captncap',
+        'Buffet': 'topleft/buffet',
+        'WaterPuddle': 'topright/waterpuddle',
+        'DeckRail': 'topright/reling',
+    },
+    202: {
+        'BeerMat': 'beachright/mat_hn',
+        'Rake': 'pond/rake_ground',
+        'Weed': 'beachleft/weed',
+        'SawFish': 'beachleft/sign',
+        'Submarine': 'beachleft/sub',
+        'CrayFish': 'beachleft/crayfish_container',
+        'Sandbucket': 'beachleft/bucket',
+        'RubbishBin': 'shop/waste',
+        'EelBox': 'shop/aquarium',
+        'Reed': 'beachright/reed',
+        'Pond': 'pond/pond',
+        'BridgeRail': 'pond/bridge',
+    },
+    203: {
+        'OlgaBag': 'groundright/olgahandbag_container',
+        'ChiliSoup': 'groundright/piripiri',
+        'Bicycle': 'groundleft/bike',
+        'Watermelon': 'wallleft/melons',
+        'ToiletFlush': 'groundleft/ricechute',
+        'ToiletPaper': 'groundleft/toiletpaper',
+        'ToolPelt': 'wallleft/wrench',
+        'OilCan': 'wallright/oilcan',
+        'DieselGenerator': 'wallright/generator',
+        'CannonBall': 'wallleft/cannonballs',
+    },
+    204: {
+        'Vase': 'groundright/vase',
+        'JadeNecklace': 'groundright/jade',
+        'RiceBowl': 'groundright/ricebowl',
+        'PullKart': 'groundleft/rickshaw',
+        'UmbrellaStand': 'groundleft/shadesocket',
+        'Karate': 'groundleft/headbanging',
+        'GongGrease': 'wallleft/gong',
+        'GongDrumstick': 'wallleft/gong',
+        'ToyDispenser': 'wallleft/toy_o_mat_container',
+        'Bricks': 'wallright/bricks',
+        'OlgaKid': 'wallright/kid',
+        'HotDog': 'wallright/hotdogshop',
+        'BonsaiScissors': 'wallright/scissors',
+    },
+    205: {
+        'Anchor': 'beachright/anchor',
+        'TabbleTennis': 'beachright/pingpong',
+        'Banger': 'beachleft/bangers',
+        'Rockets': 'beachleft/firework',
+        'WaterSkiis': 'beachleft/waterski',
+        'SandSculpture': 'beachleft/sandlion',
+        'Eals': 'shop/eelbasket',
+        'Glasses': 'shop/glasses',
+        'DuckCage': 'shop/duckcage_container',
+        'BicycleTubeBox': 'pond/box_open',
+        'HammerNails': 'pond/hammer',
+        'LionStatue': 'pond/statue',
+    },
+    206: {
+        'ToyBox': 'bottomleft/toybox',
+        'SportsBag': 'bottomright/rubberbag',
+        'Weights': 'bottomright/dumbbell',
+        'LaunchPad': 'bottomleft/ramp',
+        'Harpoon': 'bottomleft/harpoon',
+        'DentureAdhesive': 'topleft/kukidentomat_open',
+        'FleaBlanket': 'topleft/fleablanket',
+        'Pipe': 'topright/ventpipe',
+        'Pillows': 'topright/pillows',
+        'DynamiteBox': 'topright/dynamitebag',
+    },
+    207: {
+        'SeaUrchin': 'beachright/hedgehog',
+        'CrayFish': 'beachright/crayfish_container',
+        'Moped2': 'bar/moped',
+        'Shell': 'beachright/shell',
+        'Moped': 'beachleft/spring',
+        'Whisky': 'beachleft/whiskey',
+        'BeachTowel': 'beachleft/mat',
+        'SandCastle': 'beachleft/sandcastle',
+        'BeachChair': 'beachleft/beachchair',
+        'PoolAwning': 'pool/awning_pole',
+        'PoolBoard': 'pool/divingboard',
+        'MopedPool': 'pool/spring',
+        'Tap': 'beachright/tap',
+        'Bartender': 'bar/bar',
+        'IceBucket': 'bar/bucket_bar',
+        'BBQ': 'bar/barbecue',
+        'Elephant': 'bar/elefant',
+    },
+    208: {
+        'Spade': 'tadj_mahal/shovel',
+        'Balloons': 'tadj_mahal/bowl',
+        'Basket': 'elephant/basket',
+        'Snake': 'bazar/snake',
+        'Rake': 'bazar/rake_primary',
+        'Cable': 'bazar/powerpole',
+        'Chalk': 'bazar/sponge',
+        'BoardNail': 'bazar/blades',
+        'Fifi': 'bazar/fifi_primary',
+        'AngryElephant': 'elephant/elephant',
+        'SafetyLine': 'elephant/elephant_gone',
+        'ShoeMachine': 'tadj_mahal/shoe_cleaner',
+        'ArmsBowl': 'altar/statue',
+        'ElectricTap': 'elephant/tap',
+        'Mouse': 'altar/rat_container',
+        'SeeSaw': 'amusement/seesaw',
+    },
+    209: {
+        'Basket': 'tadj_mahal/basket',
+        'HotShoe': 'tadj_mahal/shoe_mat',
+        'Drain': 'tadj_mahal/gully',
+        'IceCream': 'bazar/icecream_machine',
+        'PairOfBellows': 'bazar/air_pump',
+        'AsbestosNappies': 'bazar/pants',
+        'Coal': 'coal_area/coal',
+        'Trough': 'coal_area/trough',
+        'FireChannel': 'fire_fakir/groove',
+        'Flowers': 'fire_fakir/gras',
+        'CowCrap': 'holy_cow/crap',
+        'ConstructionSet': 'holy_cow/fuel',
+    },
+    210: {
+        'SeaUrchin': 'beachright/hedgehog',
+        'TurbanShop': 'beachright/turbanshop',
+        'AlmsBowl': 'bar/statue',
+        'WaterMelons': 'bar/melons',
+        'Bin': 'bar/basket',
+        'Elephant': 'bar/elefant',
+        'FishNet': 'pool/brailer',
+        'DivingBoard': 'pool/divingboard',
+        'DogBasket': 'pool/fifi_sleep',
+        'ToolBelt': 'beachleft/toolbelt',
+        'Pylon': 'beachleft/pole',
+        'DeckChair': 'beachleft/deckchair',
+        'SuntanOil': 'beachleft/sunoil',
+        'ValveWaterPuddle': 'beachleft/octopus',
+        'Valve': 'beachleft/poolvalve',
+        'CricketBat': 'beachleft/bat',
+        'OlgaBra': 'beachleft/bra',
+    },
+    211: {
+        'Urinal': 'bottomright/pissoir',
+        'LifeJacket': 'bottomleft/lifevest',
+        'DivingGear': 'bottomright/diving',
+        'CompressedAir': 'bottomleft/gasbottles',
+        'LifeBoat': 'bottomleft/boat',
+        'DeckChair': 'bottomleft/deckchair_woody',
+        'FishingRod': 'topleft/rod',
+        'OlgaSeaView': 'topleft/rod',
+        'ToiletSign': 'topleft/wcsign',
+        'OlgaStandStill': 'topleft/rod',
+        'OlgaChild': 'kid',
+        'PayPhone': 'topleft/phone',
+        'Sweets': 'topleft/dish',
+        'Handbag': 'topright/handbag',
+        'Dog': 'fifi',
+        'FireExtinguisher': 'topright/extinguisher',
+        'ChestDrawer': 'cabin/chest',
+        'MumPicture': 'cabin/picture',
+        'Plate': 'cabin/plate',
+    },
+    212: {
+        'Corn': 'midleft/corn',
+        'RubyThrone': 'topright/ruby',
+        'AztecThrone': 'topright/throne_empty',
+        'AztecThrone2': 'topright/throne_empty',
+        'Crowbar': 'topright/crowbar',
+        'RotatingStoneDisc': 'topright/wheel_turning',
+        'PaintPot': 'midleft/paint',
+        'SleepBench': 'midleft/bank',
+        'CigarBox': 'midleft/cigars',
+        'MechanicalBull': 'bottomleft/bullride',
+        'Skeleton': 'bottomleft/skeleton',
+        'ClosedMine1': 'bottomleft/mine',
+        'Lorry': 'bottomleft/lorry',
+        'ParrotNest': 'bottomright/parrot_nest',
+        'StatueHidden': 'midright/statue_hideout',
+        'Resin': 'midright/resin',
+        'Whip': 'midright/whip',
+        'WhipStonePlate': 'midright/spikes',
+        'BoatCoinSlot': 'bottomright/rent_a_boat',
+        'ParrotLedge': 'bottomright/parrot',
+    },
+    213: {
+        'StatueHidden': 'midright/statue_hideout',
+        'CementBag': 'midleft/cement',
+        'PlantCarnivore': 'topright/carnivore',
+        'Tortilla': 'bottomright/tortilla',
+        'Flowers': 'topright/flowers',
+        'StatueHand': 'midright/hand',
+        'BoatPicnic': 'bottomright/picnic',
+        'Chili': 'midright/chili',
+        'Wasp': 'midleft/beehive',
+        'CementBath': 'midleft/washingtub',
+        'LiveBull': 'midleft/bull',
+        'LiveBullFeed': 'midleft/bull',
+        'Jar': 'midleft/jar',
+        'Termite': 'bottomleft/termitehouse',
+        'MechanicalBullControls': 'bottomleft/bullride_controls',
+        'Pinata': 'bottomleft/pinata',
+        'Skeleton': 'bottomleft/skeleton_tequila',
+        'ChickenWings': 'bottomleft/chickenwings',
+        'Lorry': 'bottomleft/lorry',
+        'Piranha': 'bottomright/piranha',
+    },
+    214: {
+        'CaptainMug': 'bridge/grog',
+        'CaptainWheel': 'bridge/steering',
+        'Hatch': 'bottomright/hatch_closed',
+        'HatchFish': 'bottomright/fish',
+        'Ammo': 'bottomleft/ammunition',
+        'Washbucket': 'bottomleft/washbucket',
+        'Cloth': 'bottomleft/swiffer',
+        'Carpet': 'bottomleft/carpet',
+        'Glass': 'bridge/glass',
+        'BirdDead': 'topleft/parakeet_dead',
+        'Bouquet': 'topleft/bouquet',
+        'Shards': 'topright/shards',
+        'Pistol': 'bottomleft/pistol',
+        'Mat': 'topright/shoe_mat',
+        'CaptainDoor': 'topright/door_closed',
+        'Handbag': 'topright/handbag',
+        'DeckChair': 'topright/deckchair_woody',
+    },
+}
 ACTOR = {role: actor for actor, role in ROLES}
 
 
@@ -182,10 +424,11 @@ def approaches(n):
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
         name = (d.get('m_GameObject') or {}).get('name')
-        if name not in STATIONS.get(n, {}) or 'Zone' not in d or o['type'] in ('Transition', 'Door'):
+        if (name not in STATIONS.get(n, {}) and name not in WOODY.get(n, {})) \
+                or 'Zone' not in d or o['type'] in ('Transition', 'Door'):
             continue
         per = {}
-        for role, obj in STATIONS[n][name].items():
+        for role, obj in STATIONS.get(n, {}).get(name, {}).items():
             actor = ACTOR[role]
             p = g.point(obj, actor, exact=True)
             r = g.room_of(obj)
@@ -201,6 +444,15 @@ def approaches(n):
                 if rt is not None:
                     routes[other] = [zmap[r]] + [zmap[g.room_of(dout)] for _din, dout in rt]
             per[role] = {'obj': obj, 'x': p[0], 'px': p[1] - g.floor(r), 'routes': routes}
+        obj = WOODY.get(n, {}).get(name)
+        if obj is not None:
+            # Woody's run up or down to the object's `woody` hotspot (his clicks
+            # route themselves)
+            p = g.point(obj, 'woody', exact=True)
+            r = g.room_of(obj)
+            if p is None or r not in g.rooms:
+                raise KeyError('%d: %s has no woody hotspot in a room' % (n, obj))
+            per['Woody'] = {'obj': obj, 'x': p[0], 'px': p[1] - g.floor(r), 'routes': {}}
         out.append((name, (d.get('Zone') or {}).get('name'), o['type'], per))
     return out
 
@@ -261,6 +513,38 @@ def room_map(n, g, doors, zones):
     return best[1]
 
 
+def rooms(n):
+    """{zone: PCRoom} — per mobile zone its PC room for the GoTo's path finder
+    (fcn.1000a711 -> fcn.1000a421): the floor line's x1, x2 and y, and the
+    room's <neighbor> records in level.xml's order, each with the far zone, the
+    record's `costs` and per pawn role the near and the far door's `<actor>`
+    hotspot — a hop costs the Manhattan distance from the node's point to the
+    near one plus the costs, into the target room the far one's distance to
+    the target as well, and the far room is entered at the far one"""
+    g = S.Geometry(n)
+    doors, zones = mobile_doors(n)
+    m = room_map(n, g, doors, zones)
+    out = {}
+    for r, z in m.items():
+        v = g.rooms[r]
+        nb = []
+        for rec in v['nb']:
+            far = rec['name']
+            if far not in m:
+                continue
+            near_h, far_h = {}, {}
+            for actor, role in ROLES:
+                a = g.point(rec.get('doorin'), actor, exact=True)
+                b = g.point(rec.get('doorout'), actor, exact=True)
+                if a is None or b is None:
+                    continue
+                near_h[role] = [a[0], a[1]]
+                far_h[role] = [b[0], b[1]]
+            nb.append({'zone': m[far], 'costs': int(rec.get('costs', 0)), 'near': near_h, 'far': far_h})
+        out[z] = {'room': r, 'x1': v['x1'], 'x2': v['x2'], 'floor': v['y'], 'nb': nb}
+    return out
+
+
 def passes(n):
     """[(mobile door name, zone, far zone, component, near PC door, far PC
     door, {role: pass})] — a pass {'in', 'dx', 'dy', 'out'} or {'in',
@@ -318,12 +602,17 @@ def main(argv):
         for name, z, comp, per in approaches(n):
             patches.append({'object': name, 'component': comp, 'zone': z,
                             'set': {'PCApproach': per}})
+        patches = [e for e in patches if not ('PCRoom' in (e.get('set') or {}))]
+        for z, pr in sorted(rooms(n).items()):
+            patches.append({'object': z, 'component': 'Zone', 'set': {'PCRoom': pr}})
         ov['patches'] = patches
         note = (" The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC"
                 " pass of the door pair it stands for — the near door's <actor>_in against the room's floor,"
                 " the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far"
-                " floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations = per"
-                " role the PC object's <actor> hotspot x and its height against the room's floor.")
+                " floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and"
+                " Woody's items = per role the PC object's <actor> hotspot x and its height against the"
+                " room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with"
+                " the doors' <actor> hotspots, for the path finder's routes.")
         src = ov.get('source', '')
         i = src.find(' The door passes (tools/pcref/pc_walks_s2.py)')
         if i >= 0:

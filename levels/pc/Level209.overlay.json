@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E09 Burning With Ambition: +19 the ice cream (67 s), +25 the cow (87), +25 the fakir (110), +25 and +25 the hot shoe with its drain (142, 144), +22 the coal at the full bar (160). PC data (in_c2/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations = per role the PC object's <actor> hotspot x and its height against the room's floor. Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E09 Burning With Ambition: +19 the ice cream (67 s), +25 the cow (87), +25 the fakir (110), +25 and +25 the hot shoe with its drain (142, 144), +22 the coal at the full bar (160). PC data (in_c2/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The catch (tools/pcref/pc_catch_s2.py): PCHideout on the catchers' stations = per role the span of the PC's flag 4 (the enter step to the leave step, less the level steps' clears), in which the neighbour or the Mother neither catches nor is seen. The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -72,6 +72,38 @@
    }
   },
   {
+   "object": "DressingRoom",
+   "component": "TrickItem",
+   "zone": "Zone02",
+   "set": {
+    "PCHideout": {
+     "Mother": {}
+    }
+   }
+  },
+  {
+   "object": "TadjMahal",
+   "component": "TrickItem",
+   "zone": "Zone05",
+   "set": {
+    "PCHideout": {
+     "Rottweiler": {}
+    }
+   }
+  },
+  {
+   "object": "HotShoe",
+   "component": "TrickItem",
+   "zone": "Zone05",
+   "set": {
+    "PCHideout": {
+     "Rottweiler": {
+      "until": "TadjMahal"
+     }
+    }
+   }
+  },
+  {
    "object": "TransitionRightComplex",
    "component": "Transition",
    "zone": "Zone01",
@@ -282,6 +314,21 @@
    }
   },
   {
+   "object": "FireChannel",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "fire_fakir/groove",
+      "x": 259,
+      "px": 0,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
    "object": "IceCream",
    "component": "TrickItem",
    "zone": "Zone02",
@@ -315,6 +362,12 @@
         "Zone01"
        ]
       }
+     },
+     "Woody": {
+      "obj": "bazar/icecream_machine",
+      "x": 668,
+      "px": -38,
+      "routes": {}
      }
     }
    }
@@ -355,6 +408,12 @@
         "Zone01"
        ]
       }
+     },
+     "Woody": {
+      "obj": "coal_area/coal",
+      "x": 1285,
+      "px": 0,
+      "routes": {}
      }
     }
    }
@@ -398,6 +457,36 @@
    }
   },
   {
+   "object": "AsbestosNappies",
+   "component": "SearchItem",
+   "zone": "Zone02",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "bazar/pants",
+      "x": 1186,
+      "px": -44,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "ConstructionSet",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "holy_cow/fuel",
+      "x": 353,
+      "px": -46,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
    "object": "DressingRoom",
    "component": "TrickItem",
    "zone": "Zone02",
@@ -407,6 +496,36 @@
       "obj": "bazar/dressing_room",
       "x": 951,
       "px": -70,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Basket",
+   "component": "HideItem",
+   "zone": "Zone05",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "tadj_mahal/basket",
+      "x": 540,
+      "px": -19,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Drain",
+   "component": "TrickItem",
+   "zone": "Zone05",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "tadj_mahal/gully",
+      "x": 820,
+      "px": -25,
       "routes": {}
      }
     }
@@ -442,8 +561,22 @@
        ]
       }
      }
-    },
-    "PCUseSeconds": 11.67
+    }
+   }
+  },
+  {
+   "object": "CowCrap",
+   "component": "SearchItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "holy_cow/crap",
+      "x": 254,
+      "px": -23,
+      "routes": {}
+     }
+    }
    }
   },
   {
@@ -475,6 +608,72 @@
         "Zone01"
        ]
       }
+     },
+     "Woody": {
+      "obj": "tadj_mahal/shoe_mat",
+      "x": 820,
+      "px": -25,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "PairOfBellows",
+   "component": "SearchItem",
+   "zone": "Zone02",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "bazar/air_pump",
+      "x": 1096,
+      "px": -12,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Flowers",
+   "component": "SearchItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "fire_fakir/gras",
+      "x": 323,
+      "px": -63,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Flowers",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "fire_fakir/gras",
+      "x": 323,
+      "px": -63,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "Trough",
+   "component": "TrickItem",
+   "zone": "Zone03",
+   "set": {
+    "PCApproach": {
+     "Woody": {
+      "obj": "coal_area/trough",
+      "x": 1285,
+      "px": 0,
+      "routes": {}
      }
     }
    }
@@ -516,6 +715,316 @@
        ]
       }
      }
+    }
+   }
+  },
+  {
+   "object": "Zone01",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "holy_cow",
+     "x1": 22,
+     "x2": 384,
+     "floor": 870,
+     "nb": [
+      {
+       "zone": "Zone02",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         335,
+         870
+        ],
+        "Woody": [
+         335,
+         870
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         615,
+         870
+        ],
+        "Woody": [
+         615,
+         870
+        ]
+       }
+      },
+      {
+       "zone": "Zone04",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         220,
+         870
+        ],
+        "Woody": [
+         220,
+         870
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         220,
+         530
+        ],
+        "Woody": [
+         220,
+         530
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone02",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "bazar",
+     "x1": 550,
+     "x2": 1362,
+     "floor": 870,
+     "nb": [
+      {
+       "zone": "Zone01",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         615,
+         870
+        ],
+        "Woody": [
+         615,
+         870
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         335,
+         870
+        ],
+        "Woody": [
+         335,
+         870
+        ]
+       }
+      },
+      {
+       "zone": "Zone05",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         770,
+         870
+        ],
+        "Woody": [
+         770,
+         870
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         770,
+         475
+        ],
+        "Woody": [
+         770,
+         475
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone03",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "coal_area",
+     "x1": 1055,
+     "x2": 1354,
+     "floor": 475,
+     "nb": [
+      {
+       "zone": "Zone05",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         1030,
+         475
+        ],
+        "Woody": [
+         1030,
+         475
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         870,
+         475
+        ],
+        "Woody": [
+         870,
+         475
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone04",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "fire_fakir",
+     "x1": 8,
+     "x2": 370,
+     "floor": 470,
+     "nb": [
+      {
+       "zone": "Zone05",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         325,
+         470
+        ],
+        "Woody": [
+         325,
+         470
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         520,
+         475
+        ],
+        "Woody": [
+         520,
+         475
+        ]
+       }
+      },
+      {
+       "zone": "Zone01",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         220,
+         530
+        ],
+        "Woody": [
+         220,
+         530
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         220,
+         870
+        ],
+        "Woody": [
+         220,
+         870
+        ]
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "object": "Zone05",
+   "component": "Zone",
+   "set": {
+    "PCRoom": {
+     "room": "tadj_mahal",
+     "x1": 518,
+     "x2": 924,
+     "floor": 475,
+     "nb": [
+      {
+       "zone": "Zone03",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         870,
+         475
+        ],
+        "Woody": [
+         870,
+         475
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         1030,
+         475
+        ],
+        "Woody": [
+         1030,
+         475
+        ]
+       }
+      },
+      {
+       "zone": "Zone02",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         770,
+         475
+        ],
+        "Woody": [
+         770,
+         475
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         770,
+         870
+        ],
+        "Woody": [
+         770,
+         870
+        ]
+       }
+      },
+      {
+       "zone": "Zone04",
+       "costs": 500,
+       "near": {
+        "Rottweiler": [
+         520,
+         475
+        ],
+        "Woody": [
+         520,
+         475
+        ]
+       },
+       "far": {
+        "Rottweiler": [
+         325,
+         470
+        ],
+        "Woody": [
+         325,
+         470
+        ]
+       }
+      }
+     ]
     }
    }
   }
