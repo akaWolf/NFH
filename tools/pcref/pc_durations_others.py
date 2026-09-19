@@ -40,6 +40,39 @@ ALIAS = {
 # whose fcn.1000e7f2 bar holds her in the chair (lap_model_s2.run_step reads the
 # pushed ticks)
 BARS = {214: {'DeckChairMother': (0x1003a0b8, 'topright_deckchair')}}
+# level -> mobile item -> (role, {mobile clip: the PC's part}) — another actor's
+# clips at the PC's ticks (PCClipSecondsRole): (object, action) of the level
+# data, ('anim', object, clip) a clip's frames (a loop's pace). 202's Olga on
+# her mat (beachleft/mat_olga_guarded: `enter`, the `sun` loop, the `wakeup`
+# her script plays on `kid_cry`, 0x100233ed, and `leave`) and at the sub
+# (beachleft/sub's `take`, takesub; the shark's, takeshark)
+CLIPS_ROLE = {202: {'OlgaMat': ('Olga', {'BeachLayDown': ('beachleft_mat_olga_guarded', 'enter'),
+                                         'TowelSleep': ('anim', 'beachleft/mat_olga_guarded', 'sun'),
+                                         'TowelLaydown': ('beachleft_mat_olga_guarded', 'wakeup'),
+                                         'BeachGetUp': ('beachleft_mat_olga_guarded', 'leave')}),
+                    'Submarine': ('Olga', {'OlgaPutSub': ('beachleft_sub', 'take'),
+                                           'OlgaPutSubTricked': ('beachleft_shark', 'take')})}}
+
+
+def role_clips(n):
+    """{item: (role, {clip: seconds})} of CLIPS_ROLE, read from the level data"""
+    if n not in CLIPS_ROLE:
+        return {}
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    out = {}
+    for item, (role, table) in CLIPS_ROLE[n].items():
+        cl = {}
+        for clip, src in table.items():
+            if src[0] == 'anim':
+                t = d.frames.get((src[1], src[2]))
+            else:
+                t = d.action_ticks(src[0], src[1], actor=role.lower())
+            if t is not None:
+                cl[clip] = round(t / 12.0, 2)
+        out[item] = (role, cl)
+    return out
 
 
 def bar_secs(n, step, chair):
@@ -94,7 +127,7 @@ def pc_actions(d):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS))
+    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE))
     mob = json.load(open(os.path.join(SCRATCH, 's2_idle_others.json')))
     for n in levels:
         d = S2[n]; acts = pc_actions(d)
@@ -117,12 +150,17 @@ def main(argv):
             print('   %-18s Mother  sit %.2f s, sleep %.2f s, get-up %.2f s  <- the step %#x\'s bar and %s\'s enter/leave' % (
                 item, sit, sleep, getup, step, chair))
             bars[item] = (sit, sleep, getup)
+        rclips = role_clips(n)
+        for item, (role, cl) in sorted(rclips.items()):
+            print('   %-18s %-7s clips %s' % (item, role, ', '.join('%s %.2f' % kv for kv in sorted(cl.items()))))
         if write:
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
             ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
-            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds'):
+            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole'):
                 ov['patches'] = _strip_key(ov['patches'], k)
+            for item, (role, cl) in rclips.items():
+                _set_key(ov['patches'], item, 'PCClipSecondsRole', {role: cl})
             for item, roles in per.items():
                 _set_key(ov['patches'], item, 'PCUseSecondsRole', roles)
             for item, (sit, sleep, getup) in bars.items():
@@ -135,6 +173,9 @@ def main(argv):
             note2 = " The Mother's bar in her chair (tools/pcref/pc_durations_others.py BARS): PCSitSeconds the chair's enter, PCSleepSeconds the sleep step's bar ticks, PCGetUpSeconds the chair's leave, at 12 a second."
             if bars and 'BARS' not in ov['source']:
                 ov['source'] += note2
+            note3 = " Another actor's clips at the PC's ticks (tools/pcref/pc_durations_others.py CLIPS_ROLE): PCClipSecondsRole, the level data's actions and clips paired by hand."
+            if rclips and 'CLIPS_ROLE' not in ov['source']:
+                ov['source'] += note3
             json.dump(ov, open(p, 'w'), indent=1, ensure_ascii=False); open(p, 'a').write('\n')
             print('   wrote', p)
 

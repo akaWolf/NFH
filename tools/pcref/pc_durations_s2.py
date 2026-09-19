@@ -57,11 +57,46 @@ PER_LEVEL = {
 }
 SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake',
         'Toilet', 'Phone', 'Vacuum', 'Towel', 'Candy', 'MagnesiumBottle'}   # other actors' icons, a walk-by without a use; Season 1 stations the mobile routine has not or takes in a second
-# stations kept at the mobile pace per level (none since 2026-09-23: 214's
-# neighbour-Mother handshake is the PC's under the profile — he polls her at
-# the pistol, GameLogic 0x1003abc9-0x1003ad7d, RottweilerMotherBehaviour — and
-# its stays are the code's)
-SKIP_LEVEL = {}
+# stations kept out of the whole-stay pairing per level: 202's swim is timed
+# per clip with its wait for Olga's sub (CLIPS, WAITS below). (214's
+# neighbour-Mother handshake is the PC's under the profile since 2026-09-23 —
+# he polls her at the pistol, GameLogic 0x1003abc9-0x1003ad7d,
+# RottweilerMotherBehaviour — and its stays are the code's.)
+SKIP_LEVEL = {202: {'Swimming'}}
+# a station's clips at the PC's ticks (PCClipSeconds): mobile clip -> the code's
+# part — (object, action) of the level data, ('bar', step) the ticks the step's
+# fcn.1000e7f2 pushes, ('anim', actor, clip) a clip's frames (a loop's pace).
+# 202's swim (GameLogic 0x10022410, 0x10022046, 0x10021d68): he waits at the
+# shore, the kid's sub dives and runs ashore, he goes into the sea (its
+# `enter`), holds the bar, and the GoTo to the bridge leaves the sea (its
+# `leave`); tricked, the shark's bar (0x10021fb9)
+CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
+                            'EnterSea': ('beachright_theocean', 'enter'),
+                            'SeeSub': ('bar', 0x10021d68),
+                            'SeeShark': ('bar', 0x10021fb9),
+                            'LeaveSea': ('beachright_theocean', 'leave')},
+               # his mat and beer (the mat step 0x10022c8d: the hideout's `enter`,
+               # the bar of 120 ticks over the mobile's seven sleep clips; the
+               # beer step 0x1002299f: the `use`, getbeer — tricked the crab's,
+               # takecrab — and the `leave`): its flag 4 ends where the PC's does
+               'BeerMat': {'BeachLayDown': ('beachright_mat_hn_guarded', 'enter'),
+                           'BeachPinLayDown': ('beachright_mat_hn_guarded', 'enter'),
+                           'BeachSleep': ('bar', 0x10022c8d, 7),
+                           'BeachSleepCrab': ('bar', 0x10022c8d, 7),
+                           'BeachGetBeer': ('beachright_mat_hn_guarded', 'use'),
+                           'BeachCrabGetBeer': ('beachright_mat_hn_guarded_manip', 'use'),
+                           'BeachGetUp': ('beachright_mat_hn_guarded', 'leave')}}}
+# the tricked use's clip after which the PC's trick action has ended
+# (PCCreditAfter): the record's action (objects.xml) pays as it completes —
+# the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
+# sea's `enter` (entersea), before the 119-tick bar the mobile's SeeShark plays
+CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', 'shark')}}
+# a clip held until another role has used an item (PCWaitFor), then `then` —
+# the (object, action) parts after it: 202's swim step polls for the `sub`
+# (0x100224a8-0x10022563) that Olga's Submarine use switches into the sea,
+# then the dive step plays the kid's dive and run ashore (0x10022046)
+WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarine',
+                            'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}}}
 MIN_STAY = 0.5
 
 
@@ -89,7 +124,7 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (203, 208, 209, 211, 212, 213, 214)
+CODE = (202, 203, 208, 209, 211, 212, 213, 214)
 
 
 def pc_spans(n):
@@ -170,6 +205,46 @@ def pair(n):
     return out
 
 
+def clip_secs(n):
+    """({item: {clip: seconds}}, {item: wait}) of CLIPS and WAITS, read from the
+    level data and the code (tools/pcref/lap_model_s2.py)"""
+    if n not in CLIPS and n not in WAITS:
+        return {}, {}
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    clips = {}
+    for item, table in CLIPS.get(n, {}).items():
+        out = {}
+        for clip, src in table.items():
+            if src[0] == 'bar':
+                ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), src[1], {})
+                t = next((e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)), None)
+                if t is not None and len(src) > 2:
+                    t = t / float(src[2])      # the bar over so many mobile clips
+            elif src[0] == 'anim':
+                t = d.frames.get((src[1], src[2])) or d.gframes.get((src[1], src[2]))
+            else:
+                t = d.action_ticks(src[0], src[1])
+            if t is not None:
+                out[clip] = round(t / 12.0, 2)
+        clips[item] = out
+    for item, (clip, obj, act, rec) in CREDIT.get(n, {}).items():
+        # the record must sit on that action in the level's objects.xml
+        text = lap_model_s2.canon.read('%s/nfh2/x/%s/objects.xml' % (
+            lap_model_s2.canon.ROOT, lap_model_s2.canon.pc_level(n)['folder']))
+        m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), text, re.S)
+        am = m and re.search(r'<action name="%s"[^>]*>(.*?)</action>' % act, m.group(1), re.S)
+        assert am and 'name="%s"' % rec in am.group(1), (obj, act, rec)
+        clips.setdefault(item, {})['@credit'] = clip
+    waits = {}
+    for item, w in WAITS.get(n, {}).items():
+        then = sum(d.action_ticks(o, a) or 0 for o, a in w['then'])
+        waits[item] = {'clip': w['clip'], 'role': w['role'], 'item': w['item'],
+                       'then': round(then / 12.0, 2)}
+    return clips, waits
+
+
 def main(argv):
     write = '--write' in argv
     levels = [int(a) for a in argv if a.isdigit()] or list(range(202, 215))   # or 101-114 with the Season 1 idle visits
@@ -187,9 +262,21 @@ def main(argv):
             import lap_model_s2
             code = lap_model_s2.code_stays(n)
             for item, secs in sorted(code.items()):
+                if isinstance(secs, list):
+                    # one per visit, in the routine's order
+                    print('   %-26s code %s s per visit (video %s)' % (item, secs, per.get(item)))
+                    per[item] = list(secs)
+                    continue
                 k = len(per.get(item, [])) or 1
                 print('   %-26s code %5.2f s (video %s)' % (item, secs, per.get(item)))
                 per[item] = [secs] * k
+        clips, waits = clip_secs(n)
+        for item in clips:
+            per.pop(item, None)            # timed per clip, no whole stay
+        for item, cl in sorted(clips.items()):
+            print('   %-26s clips %s' % (item, ', '.join('%s %s' % kv for kv in sorted(cl.items()))))
+        for item, wt in sorted(waits.items()):
+            print('   %-26s holds %s until %s used %s, then %.2f s' % (item, wt['clip'], wt['role'], wt['item'], wt['then']))
         stays = sum(v for vals in per.values() for v in vals)
         lap = port_lap(n); walks = sum(v['walk'] for v in lap)
         print('   sum of stays %.1f + the port lap\'s walks %.1f = %.1f s' % (stays, walks, stays + walks))
@@ -198,6 +285,18 @@ def main(argv):
             ov = json.load(open(p))
             if n >= 200:
                 ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSeconds')
+                for k in ('PCClipSeconds', 'PCWaitFor'):
+                    ov['patches'] = _strip_key(ov['patches'], k)
+                ov['patches'] = _strip_key(ov['patches'], 'PCCreditAfter')
+                for item, cl in clips.items():
+                    cl = dict(cl)
+                    credit = cl.pop('@credit', None)
+                    if cl:
+                        _set_key(ov['patches'], item, 'PCClipSeconds', cl)
+                    if credit:
+                        _set_key(ov['patches'], item, 'PCCreditAfter', credit)
+                for item, wt in waits.items():
+                    _set_key(ov['patches'], item, 'PCWaitFor', wt)
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])

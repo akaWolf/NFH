@@ -152,6 +152,12 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
             elif fn == 'fcn.1000ec67':
                 nm = names[-1] if names else None
                 al = 1 if (nm and lv.is_present(nm)) else 0
+                if not al and nm and unknown:
+                    # a poll's re-run: the object it waits for has been shown
+                    # by another actor's script (202's swim step waits for the
+                    # `sub` Olga switches into the sea, 0x100224a8)
+                    al = 1
+                    lv.present.add(nm.replace('/', '_'))
                 ev.append(('PRESENT', nm, al))
             elif fn == 'fcn.100585c0':
                 al = 1 if len(names) >= 2 and names[-1].replace('/', '_') == names[-2].replace('/', '_') else 0
@@ -297,7 +303,8 @@ def _actions_of(text):
         end = text.find('</%s>' % om.group(1), om.end())
         body = text[om.end():end if end >= 0 else len(text)]
         gfx = dict(re.findall(r'(\w+)="([^"]*)"', om.group(3))).get('gfx')
-        e = out.setdefault(om.group(2), {'gfx': gfx, 'act': {}})
+        e = out.setdefault(om.group(2), {'gfx': gfx, 'act': {}, 'flags': set()})
+        e['flags'] |= set(re.findall(r'<flag name="([^"]+)"', body))
         for a in re.finditer(r'<action ([^>]*)>', body):
             at = dict(re.findall(r'(\w+)="([^"]*)"', a.group(1)))
             e['act'][(at.get('actor'), at.get('name'))] = at
@@ -315,6 +322,11 @@ class Data:
         # the code's constants spell 'room/object' as 'room_object'; rooms have
         # underscores of their own (fire_fakir, tadj_mahal, coal_area)
         self.real = {k.replace('/', '_'): k for k in self.objects}
+
+    def flags_of(self, obj):
+        """the object's objects.xml flags"""
+        e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
+        return e.get('flags') or set()
 
     def action_ticks(self, obj, name, actor='neighbor'):
         """the ticks of an action: time="N", or auto = the frames of the actor's
@@ -334,6 +346,13 @@ class Data:
             t = a.get('time', 'auto')
             if t.isdigit():
                 return int(t)
+            # auto: the action's actor's animation first (202's kid plays
+            # play_remote while the sub dives), else the object's
+            ac, aa = a.get('actor'), a.get('actoranim')
+            if ac and ac != o and aa and aa not in ('inv', 'ms'):
+                f = self.frames.get((ac, aa)) or self.gframes.get((ac, aa))
+                if f:
+                    return f
             g = e['gfx'] or o
             for an in (a.get('actoranim'), a.get('objanim')):
                 if an and an not in ('inv', 'ms'):
@@ -387,7 +406,12 @@ def station_ticks(d, ev, ctx=None):
             parts.append((names[0] if names else '?', act, d.action_ticks(names[0], act) if names else None))
         elif k == 'WAITEVENT' and isinstance(e[2], int):
             # fcn.1000e7f2: to the hideout, its `enter` (fcn.10006bd4), then the bar
-            obj = next((x for x in e[1] if d.real.get(x) or x in d.objects), None)
+            # the hideout the step has just shown, when it shows one (202's mat
+            # step swaps beachright/mat_hn for mat_hn_guarded, 0x10022d86-
+            # 0x10022db9, and the bar holds him in that one), else the named one
+            shown = [x[1] for x in ev[:ev.index(e)] if x[0] == 'SHOW' and x[1]]
+            obj = next((x for x in reversed(shown) if 'neighbor_hideout' in d.flags_of(x)), None) \
+                or next((x for x in e[1] if d.real.get(x) or x in d.objects), None)
             # (already inside — 209's curtain entered by the step — no second enter:
             # the helper's first branch makes the bar at once)
             if obj and ctx.get('inside') != obj:
@@ -728,19 +752,27 @@ PAIRS = {
     214: {'Hatch': [(None, 'hatch_open', 'use')], 'Shower': [(None, 'shipshower', 'use')],
           'Bouquet': [(None, 'bouquet', 'use')], 'CaptainDoor': [(None, 'door_closed', 'use')],
           'Pistol': [(None, 'pistol', 'use')]},
+    # per visit (a list of part lists): the mobile's two BeerMat visits are his
+    # lay-down (the prime) and the rest of the mat and the beer (the profile
+    # times the mat and the swim per clip: pc_durations_s2.py CLIPS)
+    202: {'BeerMat': [[(None, 'mat_hn_guarded', 'enter')],
+                      [(None, 'mat_hn_guarded', 'bar'), (None, 'mat_hn_guarded', 'use'),
+                       (None, 'mat_hn_guarded', 'leave')]],
+          'BridgeRail': [('bridge', 'neighbor', 'lookaround'), (None, 'bridge', 'look')]},
 }
 
 
 def code_stays(n):
-    """{mobile item: seconds} from the lap's parts by PAIRS[n]; an item whose part
-    is missing or untimed is left out"""
+    """{mobile item: seconds, or a list of seconds per visit} from the lap's parts
+    by PAIRS[n]; an item whose part is missing or untimed is left out"""
     rows, loop = lap_steps(n)
     if loop is None:
         return {}
     lap = rows[loop:] + rows[:loop]
     used = set(); out = {}
-    for item, sels in PAIRS.get(n, {}).items():
-        tot = 0; ok = True
+
+    def ticks(sels):
+        tot = 0
         for sel, osuf, act in sels:
             hit = None
             for i, cur, icon, objs, parts in lap:
@@ -753,8 +785,17 @@ def code_stays(n):
                         hit = (i, j, t); break
                 if hit: break
             if hit is None or hit[2] is None:
-                ok = False; break
+                return None
             used.add(hit[:2]); tot += hit[2]
-        if ok:
-            out[item] = round(tot / 12.0, 2)
+        return tot
+
+    for item, sels in PAIRS.get(n, {}).items():
+        if sels and isinstance(sels[0], list):
+            per = [ticks(v) for v in sels]
+            if None not in per:
+                out[item] = [round(t / 12.0, 2) for t in per]
+        else:
+            t = ticks(sels)
+            if t is not None:
+                out[item] = round(t / 12.0, 2)
     return out
