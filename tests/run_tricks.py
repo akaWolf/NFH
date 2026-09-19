@@ -484,6 +484,8 @@ class Driver(Recorder):
             tx = tx[it.pc_use_visit % len(tx)] if tx else 0
         if leaving and 'txt' in ap and it.is_tricked(self.v.level.items):
             tx = ap['txt']
+            if isinstance(tx, list):     # a two-way station's, per visit
+                tx = tx[it.pc_use_visit % len(tx)] if tx else 0
         return pc_ap_x(ap, it) + tx
 
     def pc_station_secs(self, it, p=None, frm=None):

@@ -250,7 +250,7 @@ class Item:
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
-                 'pc_done_due',
+                 'pc_done_due', 'pc_extra_due', 'pc_affect_early',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -323,6 +323,7 @@ class Item:
                  'pc_extra_coin', 'pc_extra_coin_206', 'pc_laugh', 'pc_shout',
                  'pc_credit_at', 'pc_credit_at_linked',
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
+                 'pc_hit_secs', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -655,6 +656,8 @@ class Item:
         self.pc_linked_overflow = False
         self.pc_linked_amount = None     # the ladder's linked arm, settled by the first part
         self.pc_done_due = False         # the pair's completion, booked with its last record
+        self.pc_extra_due = False        # the linked flow's extra record, paid as his parked angry resumes
+        self.pc_affect_early = False     # its co-actor set off as the tricked action started (World.pc_affect_early)
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
         # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and
@@ -915,6 +918,15 @@ class Item:
         self.pc_shout_linked = d.get('PCShoutLinked')
         self.pc_fix_secs_linked = d.get('PCFixSecondsLinked')
         self.pc_linked_pays_at = d.get('PCLinkedPaysAt')
+        # the co-actor's hit on him after the trick, by her role: the generic
+        # `fight` she plays (Olga 42 ticks, the Mother 39; PCHitSecondsLinked
+        # the co-actor's action the linked flow waits on — 207's n_lift),
+        # the part of his flow after it (PCResumeHeadSeconds: 207's billboard)
+        # and the record that pays there (PCExtraCoinLinked: 207's bill)
+        self.pc_hit_secs = dict(d.get('PCHitSeconds') or {}) or None
+        self.pc_hit_secs_linked = dict(d.get('PCHitSecondsLinked') or {}) or None
+        self.pc_resume_head_secs = d.get('PCResumeHeadSeconds')
+        self.pc_extra_coin_linked = d.get('PCExtraCoinLinked')
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)
