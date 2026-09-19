@@ -246,6 +246,8 @@ class Item:
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
+                 'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_put',
+                 'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -611,6 +613,23 @@ class Item:
         self.pc_sit_secs = float(d.get('PCSitSeconds') or 0.0)
         self.pc_sleep_secs = float(d.get('PCSleepSeconds') or 0.0)
         self.pc_getup_secs = float(d.get('PCGetUpSeconds') or 0.0)
+        # a station's clips at the PC's ticks (PCClipSeconds, the neighbour's;
+        # PCClipSecondsRole, another role's: tools/pcref/pc_durations_s2.py
+        # CLIPS, pc_durations_others.py CLIPS_ROLE) and a clip held until
+        # another role has used an item (PCWaitFor: 202's swim waits for
+        # Olga's sub); pc_put — the roles whose use of this item a held clip
+        # has yet to see
+        self.pc_clip_secs = dict(d.get('PCClipSeconds') or {})
+        self.pc_clip_secs_role = {r: dict(v) for r, v in (d.get('PCClipSecondsRole') or {}).items()}
+        self.pc_wait_for = dict(d['PCWaitFor']) if d.get('PCWaitFor') else None
+        self.pc_put = set()
+        # the tricked use's clip after which the PC's trick action has ended
+        # and paid (PCCreditAfter, pc_durations_s2.py CREDIT: 202's shark on
+        # the sea's `enter`); pc_credited — paid there, the tantrum does not
+        # pay again (World.play_angry)
+        self.pc_credit_after = d.get('PCCreditAfter')
+        self.pc_credited = False
+        self.pc_credit_overflow = False
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
         # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and

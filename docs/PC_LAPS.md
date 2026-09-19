@@ -129,20 +129,14 @@ routes and the catch by GameLogic.dll; idle runs, the lap period on the
 neighbour's first station, ~/nfh-bench/runs/idle2s2): against the code's lap
 model (tools/pcref/lap_model_s2.py) 203 99.5 s / 105, 208 82.5 / 85.5, 209
 102.7 / 104, 211 80.8 / 85, 212 125.2 / 124, 213 125.3 / 123, 214 85.3 /
-90.3 (its Mother's script and the pistol's poll carried the same night) —
-within 6 %; against the video on the levels the code does not close 204
-79.2 / 81, 205
+90.3 (its Mother's script and the pistol's poll carried the same night) and
+202 81.7 / 80.7 plus his wait at the shore for Olga's sub (its mat and swim
+carried the same night: docs/PC_FIDELITY.md "202's mat and swim"; the
+video's 70 and 90-94; 60.2 before, on the video's stays) — within 6 %;
+against the video on the levels the code does not close 204 79.2 / 81, 205
 89.3 / 102, 207 109.3 / 107, 210 86.8 / 102 (120.7 before the path finder's
-routes: the walks around the pool ring), 202 60.2 / 94 — its mat, beer and
-sea hand over to the kid's and Olga's behaviours and the `waitsea` poll,
-which the port's stays (PCUseSeconds 0.5, 0.5, 9.5, 21.0) do not hold (read
-2026-09-23: his swim step 0x10022449 goes into the sea, flag 4 on, and
-plays `waitsea`, re-run each tick, until the `sub` object shows —
-0x100224a8-0x10022563 — which Olga's script switches into the sea when she
-leaves her mat, fcn.10022ecb; then the dive and the run ashore to the
-beach sub, 0x10022078, and a 97-tick bar in the sea, 0x10021de0; the port's
-swim ends on its 9.5 s, before her OlgaPutSub). 201
-(the tutorial) and 206 (his waits on the Mother) have no free lap.
+routes: the walks around the pool ring). 201 (the tutorial) and 206 (his
+waits on the Mother) have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,

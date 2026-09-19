@@ -641,6 +641,16 @@ predicate, then the all-tricks win.
   PC's flag 4 over his neighbor_hideout station's use, `Item.pc_hideout`,
   with the level steps' sleep and wake clips); no IgnoreWoody, IsSleeping,
   blocking-animation or DonePassing term. The DelayStart gate stays.
+- **The PC profile's per-clip uses** (`Routine._pc_clip_use`,
+  `_pc_wait_tick`, `AnimPlayer.clip_pace` / `hold_clip`,
+  `World.pc_s2_credit`): a station whose PC timing is not one stay plays
+  each clip at its PC seconds (PCClipSeconds; another role's,
+  PCClipSecondsRole), holds a clip until another role has used an item
+  and then the listed seconds more (PCWaitFor: 202's swim until Olga's
+  sub), and pays a tricked use's record as the named clip ends
+  (PCCreditAfter: 202's shark on the sea's `enter`, the overflow's tick
+  counted there, the tantrum at the use's end not paying again). Only
+  items carrying those keys take the path.
 
 Standing in the open while the routine passes through your zone gets you caught;
 19 of the 28 levels do exactly that to an idle Woody within three minutes.

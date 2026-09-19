@@ -1387,6 +1387,52 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   comes up for the door, and the door, the mug, the wheel and the ammo
   right after one of his pistols, so the wheel's 80 (559 s) and the
   pistol's 40 (583) pay on one lap: 100.
+- *202's mat and swim (2026-09-23).* The neighbour's lap in GameLogic.dll:
+  the rail (0x1002168e: `lookaround`, the bridge's `look`), the mat
+  (0x10022c8d: mat_hn swapped for mat_hn_guarded, its `enter` — laydown,
+  behavior="tongue" on the kid — and fcn.1000e7f2's bar of 120 ticks), the
+  beer (0x1002299f: the `use`, getbeer 64 frames, then its `leave`, getup,
+  behavior="kid_cry" on Olga), the rake's walk-by (0x10022589) and the
+  swim (0x10022410): the walk to the shore, flag 4 on, and `waitsea`,
+  re-run each tick, until the `sub` object shows (0x100224a8-0x10022563).
+  Olga's script (fcn.10022ecb) answers `kid_cry` on her mat (0x10023601 ->
+  0x100233ed): `wakeup`, `leave`, the walk to the beach sub, its `take`
+  (takesub) and the switch that puts the sub into the sea (0x10023087),
+  then back to her mat. His dive step (0x10022046) then plays the kid's
+  dive and run ashore — 62 ticks each, the actions' `auto` their actor's
+  play_remote (the objects' own sub_dive 191 and run_ashore 8 would make
+  16.6 s, which the video's first lap does not hold) — and the bar step
+  (0x10021d68) goes into the sea (its `enter`, entersea) for 97 ticks; its
+  continuation is the rail, whose GoTo leaves the sea (leavesea). The
+  tricked sea is the shark's (0x10021fb9, 119 ticks), and its record
+  `shark` sits on the shark sea's `enter`: the coin and the rage come as
+  that action ends (the action step's end, fcn.1000140b), ten seconds
+  before the bar is over. The mobile plays the same clips — [WaitSea,
+  EnterSea, SeeSub, LeaveSea], her [BeachLayDown, TowelSleep,
+  TowelLaydown, BeachGetUp] and OlgaPutSub, frame for frame the PC's at 8
+  or 10 a second — with a fixed WaitSea, and its kid cries at his Rake
+  start (ActionManager.KidActions), which ends Olga's sleep loop at its
+  round. Carried under the profile: the mat per clip (PCClipSeconds: the
+  lay-down 0.5 s, the bar's 120 ticks over the seven sleeps, the beer
+  5.33, the get-up 0.42) and the swim per clip (EnterSea 3.08, SeeSub
+  8.08, SeeShark 9.92, LeaveSea 1.67) with WaitSea held until Olga's
+  Submarine use has ended and 10.33 s more (PCWaitFor), the shark paid as
+  EnterSea ends (PCCreditAfter, World.pc_s2_credit — the overflow's tick
+  counted there), Olga's clips at the PC's (PCClipSecondsRole: lay-down
+  0.67, wake-up 2.92, get-up 0.67, the sub's take 1.5) and her sleep loop
+  cut at once on the kid's cry (the PC's handler wakes her on the next
+  tick); the rail's stay is the code's 10.67 s. tools/pcref/lap_model_s2.py
+  closes the lap with three readings of the same day — a poll's re-run
+  takes the object it waits for as shown by the other script, another
+  actor's action lasts its actor's animation first, a bar's hideout is the
+  one the step has just shown — and times it at 80.7 s plus the wait for
+  the sub; the idle lap under the profile is 81.7 s (Olga's sub reaches the
+  sea 4.7 s after he reaches the shore), against the video's 70 (the first
+  lap, from the level's start on the mat) and 90-94. The earlier stays
+  (the video's: the mat 0.5, the swim 9.5, the rail 21) had made it 60 s.
+  202 was re-planned to it (tests/plans/pc/s2 v5): the rail pays at his
+  lap-3 rail and the mat, the rake and the shark on his lap 4 — 104, the
+  collapse, 100.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it

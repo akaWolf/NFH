@@ -155,6 +155,8 @@ class AnimPlayer:
         self.frame = 0
         self.slow_factor = None          # Owner.ShouldSlowAnimations hook
         self.time_scale = 1.0            # the PC profile's station pace (RoutineAction._pc_use_seconds)
+        self.clip_pace = None            # the profile's per-clip seconds of a use (PCClipSeconds)
+        self.hold_clip = None            # the profile's held clip (PCWaitFor): it loops until released
         self.ignore_infinite = False     # SetIgnoreInfiniteLoop
         self.ignore_infinite_once = False
         self.sound_sink = sound_sink
@@ -229,6 +231,12 @@ class AnimPlayer:
         self.mode = mode
         self._play_serial += 1
         self._second_end = False         # a new play ends the extra period
+        if self.clip_pace is not None:
+            # the PC profile's use timed per clip (PCClipSeconds): each clip at
+            # the pace that lasts its PC seconds, the others at their own
+            secs = self.clip_pace.get(name)
+            mobile = self.sequence_seconds([name]) if secs else 0.0
+            self.time_scale = mobile / secs if (secs and mobile > 0.0) else 1.0
         self._set_start()
         # InitializeCurrentAnimation -> Owner.BehaviorPlayAnimation(name)
         for h in self.on_play:
@@ -476,7 +484,8 @@ class AnimPlayer:
                 h(idx)
         if self._reached_end():
             looping = ((a.infinite and not self.ignore_infinite)
-                       or self.mode == 'looping')
+                       or self.mode == 'looping'
+                       or (self.hold_clip is not None and a.name == self.hold_clip))
             if looping:
                 self._loop_to_start()
             else:
@@ -2675,6 +2684,8 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
+        self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
+        self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
         self.pc_fire_item = None
@@ -3574,6 +3585,12 @@ class Routine:
                 mobile = self.pawn.anim.sequence_seconds(seq)
                 if mobile > 0.0:
                     self.pawn.anim.time_scale = mobile / pc
+            elif pcprofile.is_pc():
+                self._pc_clip_use(it)
+            if pcprofile.is_pc() and it.pc_credit_after \
+                    and it.pc_credit_after in seq and it.is_tricked(self.level.items):
+                # the trick's record pays as its PC action ends (PCCreditAfter)
+                self._pc_credit = {'clip': it.pc_credit_after, 'seen': False}
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
         elif pc:
             # a station the remaster only walks by is an action on the PC (the
@@ -4132,6 +4149,53 @@ class Routine:
             return it
         return self._tricked_item(it) or it
 
+    def _pc_clip_end(self):
+        """the per-clip timing, the hold and the credit watch end with the use"""
+        self.pawn.anim.clip_pace = None
+        self._pc_credit = None
+        if self._pc_wait is not None:
+            self._pc_wait = None
+            self.pawn.anim.hold_clip = None
+
+    def _pc_clip_use(self, it):
+        """a use the profile times per clip: its clips at their PC seconds
+        (PCClipSeconds for the neighbour's station, PCClipSecondsRole for
+        another role's), and a clip held until another role has used an item
+        (PCWaitFor — 202's swim step waits at the shore until the `sub`
+        Olga's Submarine use switches into the sea, GameLogic 0x100224a8-
+        0x10022563, then the kid's dive and run ashore, 0x10022046)"""
+        if it is None or not pcprofile.rule('durations'):
+            return
+        table = it.pc_clip_secs if self.role == 'Rottweiler' \
+            else it.pc_clip_secs_role.get(self.role)
+        self.pawn.anim.clip_pace = dict(table) if table else None
+        wf = it.pc_wait_for if self.role == 'Rottweiler' else None
+        if wf:
+            self._pc_wait = dict(wf, released=None)
+            self.pawn.anim.hold_clip = wf['clip']
+
+    def _pc_wait_tick(self, dt):
+        """the held clip's release (PCWaitFor): once the awaited role has used
+        the awaited item (its pc_put mark, consumed here — the one sub in the
+        sea) the clip plays on for the `then` seconds, then the sequence goes
+        on"""
+        wt = self._pc_wait
+        if wt['released'] is None:
+            src = next((i for i in self.level.items.values()
+                        if i.name == wt['item']), None)
+            if src is not None and wt['role'] in src.pc_put:
+                src.pc_put.discard(wt['role'])
+                wt['released'] = 0.0
+            return
+        wt['released'] += dt
+        if wt['released'] < float(wt['then']) - 1e-9:
+            return
+        self._pc_wait = None
+        anim = self.pawn.anim
+        anim.hold_clip = None
+        if anim.anim is not None and anim.anim.name == wt['clip']:
+            anim._stop_single()
+
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
@@ -4176,6 +4240,12 @@ class Routine:
         the owner plays the angry sequence first (RoutineActionUse.cs:
         541-553). The stop also removes spent actions (cs:415-427)."""
         self.pawn.anim.time_scale = 1.0
+        self._pc_clip_end()
+        if pcprofile.is_pc() and self.item is not None \
+                and self.state == self.USING:
+            # a held clip elsewhere waits for this role's use of this item
+            # (PCWaitFor: Olga's sub in the sea)
+            self.item.pc_put.add(self.role)
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         it = self.item
@@ -4327,6 +4397,7 @@ class Routine:
         non-mutex action releases PawnToAbortMutexOnFinish's parked mutex."""
         a = self.action
         self.pawn.anim.time_scale = 1.0
+        self._pc_clip_end()
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         if a is None or a.get('move_only'):
@@ -5616,6 +5687,20 @@ class Routine:
             # go straight to StartAction (ActionManager.cs:608-648)
             self._start_action(start_next=what in ('first', 'advance'))
             return
+        if self.state == self.USING and self._pc_wait is not None:
+            self._pc_wait_tick(dt)
+        if self.state == self.USING and self._pc_credit is not None:
+            # the credit clip has played and the next one started: the PC's
+            # trick action has ended — its record pays now (fcn.1000140b at
+            # the action step's end), the reaction still waits for the use
+            cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
+            if cur == self._pc_credit['clip']:
+                self._pc_credit['seen'] = True
+            elif self._pc_credit['seen']:
+                self._pc_credit = None
+                w = self.pawn.world
+                if w is not None and self.item is not None:
+                    w.pc_s2_credit(self.pawn, self.item)
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,
@@ -6421,6 +6506,29 @@ class World:
             overflow = True
         return overflow
 
+    def pc_s2_credit(self, pawn, item):
+        """the Season 2 trick paid as its PC action ends, before the rest of
+        the tricked use (PCCreditAfter: 202's shark on the sea's `enter`,
+        its 119-tick bar still to come): the meter's credit and the coin now,
+        the tantrum at the use's end plays without paying again
+        (play_angry)"""
+        if self.game is None or item.pc_credited:
+            return
+        item.pc_credit_overflow = self._s2_credit(pawn, item)
+        item.pc_credited = True
+        if item.pc_credit_overflow:
+            # the gauge fills as the record pays: the overflow's tick (the
+            # collapse the PC scores) and its whistle now, not at the tantrum
+            # (the level may end on this very coin)
+            pawn.angry_count_ticks += 1
+            self._hud_angry(3)
+            if self.hud is not None:
+                self.hud.play_whistle()
+        if not item.dont_get_angry:
+            self._on_trick_done(item)              # cs:785-787
+        if self.level_script is not None:
+            self.level_script.on_trick_done()      # cs:789-792
+
     def s1_fire(self, pawn, item):
         """the PC's trick fire (game.exe fcn.0047bd00, docs/PC_ROUTINES.md "The
         fire's tail"): the bonus test, the score, the rage and the face, and
@@ -6555,7 +6663,11 @@ class World:
             # reaction's start (tools/pcref/amounts.py against the bubble
             # spans of docs/PC_LAPS_DETAIL.md, 2026-09-18); tricks.xml's
             # `time` is a frame of the record's own action, not a credit tick
-            overflow = self._s2_credit(pawn, item)
+            if item.pc_credited:
+                # paid as the PC's trick action ended (pc_s2_credit)
+                overflow = item.pc_credit_overflow
+            else:
+                overflow = self._s2_credit(pawn, item)
             # cs:664 divides by Item.AngerAmount raw: a 0 gives Infinity/NaN
             # in C# float math (neither <= 1 nor <= 2), never the 20 default
             # (Item.cs:392); no shipped item serializes 0
@@ -6573,12 +6685,14 @@ class World:
                 seq = [a for a in (item.angry_easy_up, item.angry_hard) if a]
                 self._hud_angry(3)
             else:                                  # cs:684-692
-                pawn.angry_count_ticks += 1
+                ticked = item.pc_credited and item.pc_credit_overflow
+                if not ticked:                     # (counted at pc_s2_credit)
+                    pawn.angry_count_ticks += 1
                 # RandomFreakOut: Range(0,1) is always 0 — RottFreakoutHead
                 seq = ['RottFreakoutHead'] \
                     if pawn.anim.has('RottFreakoutHead') else []
                 self._hud_angry(3)
-                if self.hud is not None:
+                if self.hud is not None and not ticked:
                     if not pcprofile.is_pc():
                         # PlayStatueAchieved; the PC lights the statue with
                         # the last coin instead (_on_trick_done)
@@ -6620,10 +6734,13 @@ class World:
                 on_done()
             if item.fix_directly:                  # cs:781-784
                 self._fix(item)
-            if not item.dont_get_angry:
-                self._on_trick_done(item)          # cs:785-787
-            if self.level_script is not None:
-                self.level_script.on_trick_done()  # cs:789-792
+            if item.pc_credited:
+                item.pc_credited = False           # paid already (pc_s2_credit)
+            else:
+                if not item.dont_get_angry:
+                    self._on_trick_done(item)      # cs:785-787
+                if self.level_script is not None:
+                    self.level_script.on_trick_done()  # cs:789-792
             if rush and not fetch:
                 # the run started before the stop in the original (cs:721),
                 # so the meter latch of cs:793-796 holds through it — the
@@ -6659,10 +6776,13 @@ class World:
                         p.play_directly(oit.item_anim_when_affected)
             if item.fix_directly:                  # cs:781-784
                 self._fix(item)
-            if not item.dont_get_angry:
-                self._on_trick_done(item)          # cs:785-787
-            if self.level_script is not None:
-                self.level_script.on_trick_done()  # cs:789-792
+            if item.pc_credited:
+                item.pc_credited = False           # paid already (pc_s2_credit)
+            else:
+                if not item.dont_get_angry:
+                    self._on_trick_done(item)      # cs:785-787
+                if self.level_script is not None:
+                    self.level_script.on_trick_done()  # cs:789-792
             if not nfh2:
                 pawn.can_decrease_angry = False    # cs:793-796
             return
@@ -6683,7 +6803,9 @@ class World:
             seq.extend(fix_seq)
         if item.fix_directly:                      # cs:781-784
             self._fix(item)
-        if not fired_early and not pc_s1:
+        if item.pc_credited:
+            item.pc_credited = False               # paid already (pc_s2_credit)
+        elif not fired_early and not pc_s1:
             if not item.dont_get_angry:
                 self._on_trick_done(item)          # cs:785-787
             if self.level_script is not None:
@@ -9075,7 +9197,14 @@ class World:
             kid.kid_start_crying = False
             olga = self.pawns.get('Olga')
             if olga is not None:
+                was = olga.anim.anim.infinite
                 olga.anim.anim.infinite = False   # CurrentAnimation.InfiniteLoop
+                if pcprofile.is_pc() and was:
+                    # the PC's Olga wakes at once: her mat state's handler
+                    # of `kid_cry` (GameLogic 0x10023601 -> 0x100233ed) plays
+                    # the mat's `wakeup` on the next tick, not after the
+                    # sleep loop's round
+                    olga.anim._stop_single()
             if spec.get('kid_use_crying_sequence'):
                 seq = [a for a in spec.get('kid_crying_sequence') or ()
                        if kid.anim.has(a)]
