@@ -250,7 +250,7 @@ class Item:
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
-                 'pc_done_due', 'pc_extra_due', 'pc_affect_early',
+                 'pc_done_due', 'pc_extra_due', 'pc_affect_early', 'pc_masked',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -324,6 +324,7 @@ class Item:
                  'pc_credit_at', 'pc_credit_at_linked',
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'pc_hit_secs', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
+                 'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -658,6 +659,7 @@ class Item:
         self.pc_done_due = False         # the pair's completion, booked with its last record
         self.pc_extra_due = False        # the linked flow's extra record, paid as his parked angry resumes
         self.pc_affect_early = False     # its co-actor set off as the tricked action started (World.pc_affect_early)
+        self.pc_masked = False           # this visit plays untricked under the profile (206's pad: Level206RoutineBehavior)
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
         # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and
@@ -927,6 +929,16 @@ class Item:
         self.pc_hit_secs_linked = dict(d.get('PCHitSecondsLinked') or {}) or None
         self.pc_resume_head_secs = d.get('PCResumeHeadSeconds')
         self.pc_extra_coin_linked = d.get('PCExtraCoinLinked')
+        # 206's rabbit on the ramp (tools/pcref/lap_model_s2.py TRICKED_ARM):
+        # the visits of the pad's lap round the trick arms at and fires at
+        # (the load step 0x1002e3df's IfVariant, the shot after the harpoon's
+        # take), the linked shot's third record (rubberrabbit, the
+        # ExtraCoin206) at its own second; the harpoon's own firing visit (the
+        # take step's rubber branch 0x1002dd0a) and the one that drops it (the
+        # put step's switch back, 0x1002d578)
+        self.pc_trick_arm = list(d.get('PCTrickArm') or []) or None
+        self.pc_trick_fire = list(d.get('PCTrickFire') or []) or None
+        self.pc_extra_pays_at_linked = d.get('PCExtraPaysAtLinked')
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)
@@ -1169,7 +1181,9 @@ class Item:
             if dep is not None and dep.tricked and dep.got_tricked and \
                     (not self.use_depends_on_when_tricked or self.tricked):
                 via = True
-        return (direct or via) and not self.was_priming and not self.fucked_up
+        # (a visit the PC plays untricked reads untricked: pc_masked)
+        return (direct or via) and not self.was_priming and not self.fucked_up \
+            and not self.pc_masked
 
 
 class Door:

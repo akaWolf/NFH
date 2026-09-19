@@ -2938,6 +2938,9 @@ class Routine:
         self.pc_credit_item = None
         self.pc_credit2_timer = 0.0      # the linked trick's own record, due later in the linked step (PCLinkedPaysAt)
         self.pc_credit2_item = None
+        self.pc_credit3_timer = 0.0      # the linked shot's third record (206's ExtraCoin206, PCExtraPaysAtLinked)
+        self.pc_credit3_item = None
+        self.pc_skip_next = False        # the PC's flow passes the routine's next action (206's shoot after the rubber)
         self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
         self.started = False             # ActionManager.CurrentAction != null
@@ -3126,6 +3129,12 @@ class Routine:
         self._override = None
         self._active = None
         self.index = self._next_index(self.index)
+        if self.pc_skip_next:
+            # the PC's step hands over past the lap's next step (206: the
+            # rubber bear's shot 0x1002da29 goes on to the put 0x1002d578,
+            # past the shoot step 0x1002d948)
+            self.pc_skip_next = False
+            self.index = self._next_index(self.index)
 
     def _trick_kid_actions(self, it):
         """TrickItem.KidActions (TrickItem.cs:632-653), run from
@@ -3654,7 +3663,7 @@ class Routine:
         # ForceUseFixingItem), and with the right tool in hand the item is
         # fixed and the tool used instead
         if self.role == 'Rottweiler' and w is not None and it.tricked \
-                and it.fixing_item is not None:
+                and not it.pc_masked and it.fixing_item is not None:
             if self._fixing_dispatch(it):
                 return
             tool = self.level.items.get(it.fixing_item)
@@ -3695,7 +3704,7 @@ class Routine:
             # TrickItem.KidActions (TrickItem.cs:632-653): the sand
             # sculpture/castle uses play the kid's reaction sets
             self._trick_kid_actions(it)
-            if it.tricked:
+            if it.tricked and not it.pc_masked:
                 it.got_tricked = True
                 # UpdatePawnToAffectAnimation (Item.cs:868-882): the affected
                 # Olga plays her tricked use alongside; the Mother arms hers
@@ -3764,13 +3773,14 @@ class Routine:
                 w.set_tricked_object_hidden(hoda, True)
             dep = self.level.items.get(it.depends_on) \
                 if it.depends_on is not None else None
+            raw = it.tricked and not it.pc_masked   # (a visit the PC plays untricked)
             if it.hide_during_rott_animation:  # cs:579-593
-                if it.tricked or (dep is not None and dep.tricked):
+                if raw or (dep is not None and dep.tricked):
                     if it.tricked_object_go is not None:
                         w.set_tricked_object_hidden(it, True)
                     else:
                         w.set_object_hidden(it, True)
-                elif not it.tricked and it.name != 'ChairAssembly':
+                elif not raw and it.name != 'ChairAssembly':
                     w.set_object_hidden(it, True)
             if it.disable_collider_after_use:  # cs:594-598
                 it.clickable = False
@@ -3780,7 +3790,7 @@ class Routine:
                     it.at_home = not it.at_home
                     w.set_active_object_hidden(it, not it.at_home)
                     it.clickable = it.at_home
-            elif it.tricked:                   # cs:608-611
+            elif raw:                          # cs:608-611
                 w.check_destroy_when_tricked(it)
             if it.is_tricked(self.level.items):
                 if it.force_fuckedup_when_tricked:   # cs:612-619
@@ -3865,6 +3875,12 @@ class Routine:
                 target.pc_linked_due = True
                 self.pc_credit2_timer = float(it.pc_linked_pays_at)
                 self.pc_credit2_item = target
+            if both and it.pc_extra_pays_at_linked is not None and it.extra_coin_206 \
+                    and target is not None:
+                # the linked shot's third record at its own tick (206's
+                # rubberrabbit, the ExtraCoin206)
+                self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
+                self.pc_credit3_item = target
             if target is not None and self.pawn.world is not None:
                 self.pawn.world.pc_affect_early(self.pawn, target)
         if os.environ.get('NFH_ROUTINE_LOG'):
@@ -3953,6 +3969,12 @@ class Routine:
         # the Drawing subclass cycles its RottweilerUse set itself
         # (Drawing.cs:44-68) — handled by _drawing_use before this call
         it.current_sequence = 'RottweilerUse'      # the default stamp
+        if it.pc_masked:
+            # a visit the PC plays untricked (206: the pad's load and Fifi's
+            # take while its rabbit waits, the harpoon's take with the pad
+            # armed — Level206RoutineBehavior): the plain use
+            return list(it.use_anim.get('Rottweiler') or []), \
+                (lambda: w.play_use_item_anim(it))
         if linked is not None and linked.tricked and it.tricked \
                 and it.use_tricked_linked:            # cs:804-817
             it.current_sequence = 'RottweilerUseLinkedTricked'
@@ -4025,7 +4047,11 @@ class Routine:
             it.rott_use_exit_delta[0] = 0.0
             it.rott_use_item_exit_delta[0] = 0.0
         if it.name == 'LaunchPad' and not it.tricked \
-                and linked is not None and linked.tricked:   # cs:896-902
+                and linked is not None and linked.tricked \
+                and not pcprofile.is_pc():                   # cs:896-902
+            # (the PC's pad steps never shoot the rubber alone: the shoot
+            # step 0x1002d948 plays shootbear with no question; the rubber
+            # fires at the harpoon's take, 0x1002dd0a -> 0x1002da29)
             it.harpoon_aux = True
             return list(linked.use_tricked_anim.get('Rottweiler') or []), \
                 (lambda: w.play_tricked_item_anim(linked, self.pawn))
@@ -4048,6 +4074,8 @@ class Routine:
     def _extra_coin_206(self, it):
         """Item.ExtraCoin206Calculation (Item.cs:2411-2418)"""
         w = self.pawn.world
+        if pcprofile.is_pc() and it.pc_extra_pays_at_linked is not None:
+            return            # booked with its record (World.pc_s2_extra_credit)
         linked = self.level.items.get(it.linked_item_trick) \
             if it.linked_item_trick else None
         if w is not None and it.name == 'LaunchPad' and it.tricked \
@@ -4562,6 +4590,7 @@ class Routine:
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
+        self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
@@ -4602,6 +4631,8 @@ class Routine:
                     self._angry_target = target
                     w.play_angry(self.pawn, target, on_done=self._angry_done)
                     return
+        if it is not None and it.pc_masked:
+            it.pc_masked = False           # the untricked visit is over
         self._action_stopped()
         self._pending = 'advance'
         self._check_parked_runs()
@@ -4778,6 +4809,7 @@ class Routine:
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
+        self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
         if a is None or a.get('move_only'):
             return
         it = self.item
@@ -4940,6 +4972,7 @@ class Routine:
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
+        self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
         self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
@@ -5745,6 +5778,7 @@ class Routine:
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
+        self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
         self.pawn.anim.time_scale = 1.0
         w = self.pawn.world
         if pcprofile.is_pc() and w is not None and it.tricked \
@@ -6140,6 +6174,14 @@ class Routine:
                 w = self.pawn.world
                 if it is not None and w is not None:
                     w.pc_s2_linked_credit(self.pawn, it)
+        if self.state == self.USING and self.pc_credit3_timer > 0.0:
+            self.pc_credit3_timer -= dt
+            if self.pc_credit3_timer <= 0.0:
+                self.pc_credit3_timer = 0.0
+                it, self.pc_credit3_item = self.pc_credit3_item, None
+                w = self.pawn.world
+                if it is not None and w is not None:
+                    w.pc_s2_extra_credit(self.pawn, it)
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,
@@ -6159,6 +6201,7 @@ class Routine:
                 self.pc_fire_at = 0.0; self.pc_fire_item = None
                 self.pc_credit_timer = 0.0; self.pc_credit_item = None
                 self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
+                self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
                 cb, self.pc_hold_cb = self.pc_hold_cb, None
                 if cb is not None:
                     cb()
@@ -6944,6 +6987,18 @@ class World:
         linked = items.get(item.linked_item_trick) \
             if item.linked_item_trick else None
         aux = item if item.kind in TRICK_KINDS else None
+        if part == 'extra':
+            # 206's linked shot's third record at its own tick (the
+            # ExtraCoin206, PCExtraPaysAtLinked: rubberrabbit 50 ticks into
+            # the ramp's rubberrabbit, fcn.1000140b) — the ladder's cs:625-629
+            # arm alone
+            item.extra_coin_206 = False
+            pawn.angry_meter += self._pc_extra(item, 15.0, 'pc_extra_coin_206')
+            overflow = pawn.angry_meter > pawn.angry_max
+            if overflow:
+                pawn.angry_meter = pawn.angry_max
+                pawn.pc_rage_full = True
+            return overflow
         if part == 'linked':
             pass
         elif item.extra_coin_toilet_211:       # cs:615-619
@@ -6958,7 +7013,9 @@ class World:
             # fcn.1000140b credits each named record of the action once
             pawn.angry_meter += self._pc_extra(item, 20.0)
         elif item.tricked and linked is not None and linked.tricked \
-                and item.extra_coin_206:       # cs:625-629
+                and item.extra_coin_206 and not (pcprofile.is_pc()
+                                                 and item.pc_extra_pays_at_linked is not None):  # cs:625-629
+            # (under the profile with its own tick: the `extra` part)
             item.extra_coin_206 = False
             # 206: the PC's three records (harpoon_fifi, harpoon_rubber,
             # rubberrabbit) are the pad, the linked harpoon and one extra
@@ -7074,6 +7131,23 @@ class World:
         if item.pc_done_due:
             item.pc_done_due = False
             self._pc_trick_done(item)
+
+    def pc_s2_extra_credit(self, pawn, item):
+        """the linked shot's third record at its tick (206's rubberrabbit,
+        50 ticks into the ramp's rubberrabbit: the ExtraCoin206 the mobile
+        pays with the ladder, PCExtraPaysAtLinked): its rage, the overflow's
+        tick and whistle, and its completion (the level's done count is its
+        credited records, fcn.100522e6 — the mobile books it as the linked
+        use starts, Item.ExtraCoin206Calculation)"""
+        if self.game is None or not item.extra_coin_206:
+            return
+        was = pawn.angry_meter >= pawn.angry_max
+        if self._s2_credit(pawn, item, part='extra') and not was:
+            pawn.angry_count_ticks += 1
+            self._hud_angry(3)
+            if self.hud is not None:
+                self.hud.play_whistle()
+        self.game.trick_done(item.trick_score)
 
     def s1_fire(self, pawn, item):
         """the PC's trick fire (game.exe fcn.0047bd00, docs/PC_ROUTINES.md "The
