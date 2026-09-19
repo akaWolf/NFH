@@ -231,13 +231,26 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
-Open: the frame pacer of game.exe (the level tick at 12 Hz is measured off
-the HUD clock; the 60 Hz timer and the level's update are read, the gate
-between them is not — no binary carries 1/12, GFXEngine's 83 ms is the
-sprites' frame interval); the PC's field image (the data archive holds
-no TGA; the game's 100 px radius is carried, the PC's field measures
-77 px of its 800 x 600 screen); a two-way station's tricked move (201's
-crash_short, 120 px once). 201 runs the PC's own tutorial under the
+Open: the frame pacer of both games (the level tick at 12 Hz is measured
+off the HUD clock; game.exe's 60 Hz timer and the level's update are read,
+NFH2's frame and GameLogic's level update — the interface's slot 2 at
+0x100442b3 — too, the gate between them is not: no binary carries 1/12,
+GFXEngine's 83 ms is the sprites' frame interval); the PC's field image
+(the data archive holds no field.tga: the field is drawn at the PC's 84 px
+of its 800 x 600 screen, in whose px the game measures, the image the
+remaster's) and the thumb's and the icon's size; a two-way station's
+tricked move (201's crash_short, 120 px once); the Season 2 tricked steps
+the lap model does not time or that play no SHOUT of their own (204's
+gong and rickshaw, 205's skis, 207's shell and its sand castle over the
+hedgehog's towel, 209's hot shoe, 210's elephant, 211's sweets, 214's
+bouquet, pistol and door, 206 whole — the untricked stay and the record's
+laugh level stand in). A Season 2 tricked visit is the PC step's since
+2026-09-24: its stand, its SHOUT — the action the binary's tables give the
+level, shout2 or shout2_hard, a freakout once the gauge has overflowed —
+its repair, and each named record's credit at its own tick, the linked
+trick's variant apart (202's rail over the eels' pond: crash, electrify,
+SHOUT 2; `docs/PC_FIDELITY.md` "the tricked visits", "Season 2
+reactions"); 202 and 214 were re-planned to it and all 28 levels rate 100. 201 runs the PC's own tutorial under the
 profile since 2026-09-24 — GameLogic.dll's `aux` director with its
 messages, waypoints, markers and the lost game's relay, the neighbour's
 demo and lesson laps, the entry run, wheeze and shout after the combo

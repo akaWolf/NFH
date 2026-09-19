@@ -176,7 +176,7 @@ straight after the game (v2), and 208's rat during his lap-2 shoe
 makes it (fcn.10002cd5, the action step's vtable 0x100aa19c, its run
 0x100020c0 in slot 2) and pushes it on his list with a first run
 (fcn.10049246, [actor+0x18]), which only sets it up (state 0 -> 1) — and
-his tick runs it (fcn.100492a8, from fcn.10044234 at 0x100445f8), while
+his tick runs it (fcn.100492a8, from the actors' pass fcn.10044234 the level update 0x100442b3 calls at 0x100445f8), while
 the game's update (fcn.100508a1) comes later in the same level update, at
 0x1004482b; the game itself is made in that job pass (fcn.10041735,
 [level+0xc]), so its first update is at the end of its first tick. A
@@ -191,13 +191,22 @@ and its own behaviour, his `run`, fires as it starts — the port's Olga
 plays her Shout clip paced to the 69 frames and goes back to her
 EatChinese (PCMinigameFailedClip, DexterityState._pc_failed_clip), his
 run at the same moment; 201's reaches the tutorial's director
-("201's tutorial"). Open, with numbers: the field — the remaster's
-reference pixels (1280 x 800) stand for the PC's, whose screen is 800 x
-600 (its dialogs: the status line at 10/570 790 wide, the right bar from
-658) and whose field.tga is not on hand (on Badinfos' E01 the green
-disk measures 124 x 92 px of the 1280 x 720 stretch, 77 x 77 PC px);
-and his run keeps the mobile's moment (at once if he walks, else when
-his clip ends) where the PC's `always` may start it at once.
+("201's tutorial"). The field is the PC's since 2026-09-24: the game
+measures the thumb and pushes the mouse in px of the PC's 800 x 600 screen
+(its dialogs: mainmenu's status line at 10/570 790 wide, the in-game right
+bar from 658/473; game.exe builds its video context 0x320 x 0x258), the
+port's screen fraction taken for the PC's (pcprofile.S2_SCREEN, where the
+remaster's 1280 x 800 reference had stood in: 1.6 / 1.33 times the PC's
+reach), and the field is drawn at the PC's size round the remaster's
+middle — the green disk with its rim measures 136 x 100 px of the 1280 x
+720 stretch on Badinfos' E04 (the toy dispenser, video 759 s) and 124 x
+92 without the rim on E01 (the toolbox, 176 s): 84 PC px (S2_FIELD_PX),
+77 without; minigame.xml's gui/game/field.tga is not in the data archive,
+so its image is the remaster's. Open, with numbers: the thumb and the item
+icon keep the remaster's 80 reference px (the PC's hairpin spans ~120 x
+90 px of the stretch, ~75 PC px); his run keeps the mobile's moment (at
+once if he walks, else when his clip ends) where the PC's `always` may
+start it at once.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -859,19 +868,32 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   use (PCCoinTicks, 2026-09-17) is withdrawn on 2026-09-18: it decayed
   every coin from too early a moment.
 - *Season 2 reactions.* After a trick the PC neighbour plays one short
-  clip picked by the trick record's `laugh` level (GameLogic.dll
-  0x1000f9b5-0x1000fa9b: the level chooses a table, a seeded random the
-  entry — 0: shout2_light; 1: shout2 or shout2_hard; 2: shout2_hard and
-  two of the shout2 set; 3 and above: freakout1, freakout2 or
-  freakout3, the tables at 0x100df45c/0x100df434/0x100df450/0x100df43c),
-  2.2 s for the shouts, 7.1 for shout2_hard, 3.1/3.2/5.2 s for the
-  freakouts (generic/anims.xml's frames at 12 a second) — where the
-  mobile plays AngryEasyUp and AngryHard, ~7.6 s, after every trick. The
-  tricked bubble spans agree (213's tortilla is 11 s for a 4-s stay and a
-  3.5-s trick action). The profile paces the mobile's angry set to the PC
-  clip (PCLaugh on the item from tools/pcref/coins.py --write-laugh, the
-  level's commonest level where the pairing does not reach a record;
-  pcprofile.S2_REACTION_CLIPS, World.play_angry). This is what the PC's
+  clip, the level script's SHOUT (GameLogic.dll fcn.1000f977): its last
+  parameter picks the action from one of four tables the DLL's static
+  initializers fill (0x1007b54b-0x1007b61d) — 0 [shout2_light]
+  (0x100df45c), 1 [shout2, shout2] (0x100df434), 2 [shout2_hard] three
+  times (0x100df450), 3 [shout2_high] (0x100df41c) — and it always picks
+  one of [freakout1, freakout2, freakout3] (0x100df43c) first, which the
+  SHOUT element (vtable 0x100ab99c, update 0x1000d751) plays instead once
+  the level's status byte +0x28 is set: the trick credit fcn.1000140b sets
+  it as the rage reaches 100 000 (0x10001500) and the level tick never
+  clears it (0x10044710-0x100447f1), so every shout after the gauge's
+  first overflow is a freakout. The actions (generic/objects.xml) play the
+  neighbour's animations of their names — shout2_light the shout2 one —
+  for their frames (time="auto"): 2.17 s for shout2 and shout2_high, 7.08
+  for shout2_hard, 3.08/3.17/5.25 for the freakouts (generic/anims.xml,
+  12 a second) — where the mobile plays AngryEasyUp and AngryHard, ~7.6 s,
+  after every trick. The tricked bubble spans agree (213's tortilla is 11
+  s for a 4-s stay and a 3.5-s trick action). The profile paces the
+  mobile's angry set to the PC clip: the step's own SHOUT level where the
+  lap model reads it (PCShout, "the tricked visits" below), else the
+  trick record's `laugh` level standing in for it (PCLaugh from
+  tools/pcref/coins.py --write-laugh, the level's commonest where the
+  pairing does not reach a record) — pcprofile.s2_reaction_seconds,
+  World.play_angry, the freakout once Pawn.pc_rage_full. (Read until
+  2026-09-24 as a seeded random over mixed tables — 1: shout2 or
+  shout2_hard, 2: shout2_hard or shout2, 3: the freakouts; the static
+  initializers settle each level to one clip.) This is what the PC's
   overflows rest on: with the same coins, decay and lap the port's 7.6-s
   tantrums spread six coins ~25 s further apart than the PC's reactions,
   a tenth of the gauge in decay — 204, 211 and 213 sat at 90 for it.
@@ -1457,8 +1479,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   topleft escaped, then the neighbour out of bottomleft, then Woody at
   the toolbox again); the buffet cut, Woody down again (0x1002725b): the
   left slip, the hat, the damaged buffet (the flirt sends Olga's
-  buffet_crash, his crash 44, her fight; its SHOUT takes the actor for a
-  level, 0x10029a6c, which no case of fcn.1000f977 takes: no shout), the
+  buffet_crash, his crash 44, her fight; then 0x10029a6c's SHOUT 1 — its
+  level the ebx the step sets to 1, `xor ebx, ebx; inc ebx`), the
   repair (19), the wait at the buffet; then the combo (the chest marked
   unless he holds soap, the rail and the puddle marked; combo2 / combo3
   for the half done), combo4 and Woody down (0x10026d08): the crash_long
@@ -1483,8 +1505,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   FreezeAfterCompletion), the aftermath in Routine._finish's tricked stop
   (`pc_trick_hook`: the credit as the crash ends, the placement, the run,
   a stand for the wheeze — the remaster has no wheeze clip —, the shout);
-  the scripted shouts' levels (`pc_shout`, World.play_angry: 1 after the
-  crash_short, 2 after the wheeze, none at the buffet — the fix alone);
+  the shout after the wheeze (`pc_shout`, World.play_angry: SHOUT 2
+  where the lap's puddle step shouts 1; the other shouts are the items'
+  own, "the tricked visits" below);
   the free lap's first rail visit plays the repair (FixMid) and the look
   at their ticks with the rail shown open until then; the stays and moves
   of the free lap by code (lap_model_s2 LAP_START 201 = 0x10028f86: the hat
@@ -1501,6 +1524,101 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   11.3 s (video ~12 s); the crash_short's coin on the video ~0.9 s into
   the crash (4 fps frames 1:23.1 -> 1:24.0), the port's at its end —
   the credit moment is Season 2-wide (below, "the tricked visits").
+- *The tricked visits (2026-09-24, carried).* A Season 2 station's
+  tricked visit is its step with the trick in the scene — the combine.xml
+  combination the mobile item's inventory makes: its object shown, its
+  ingredients with remove="true" hidden (201's soap: soappuddle for the
+  waterpuddle) — and the step then plays the variant's DoActions, a SHOUT
+  (fcn.1000f977 or the builder's fcn.1000fede), often a `repair` and the
+  switch back. Four things in it were the mobile's under the profile: the
+  tricked use lasted the untricked stay (the whole use paced to
+  PCUseSeconds); the reaction clip came from the trick record's `laugh`
+  (PCLaugh), where fcn.1000f977's action is picked by the SHOUT's own
+  last parameter, the step's constant (0 shout2_light 2.17 s, 1 shout2
+  2.17, 2 shout2_hard 7.08, 3 shout2_high 2.17 — "Season 2 reactions"
+  above; no Season 2 step pushes 3) — often a register the step sets: 208's shoe machine pushes
+  the zeroed ebx, 201's buffet `xor ebx, ebx; inc ebx`, 212's bull `xor
+  edi, edi` and more, 203's toilet 2 with both its paper and its flush
+  tricked and 0 with one (`push 2; pop eax` or `xor eax, eax` by the step's
+  bytes); the repair was folded into that clip's pace; and the coin came
+  as the tricked use ended, where fcn.1000140b credits a record on the
+  level tick its `time` equals the action's elapsed count (the cmp at
+  0x10001455, from the action step's playing state at 0x1000254d) — 201's
+  crash_short pays 5 ticks in (the video: the crash from 1:23.1, the coin
+  flying at 1:24.0 on 4 fps frames of E01), not 41. Carried per item from
+  the lap model (tools/pcref/lap_model_s2.py code_stays_tricked:
+  `tricked_presence`, the station's own parts where two mobile stations
+  share a step, TRICKED_STEP / LINKED_STEP for 201's tutorial steps;
+  pc_durations_s2.py): PCUseSecondsTricked (the parts up to the SHOUT),
+  PCShout, PCFixSeconds (the repair, 0 none), PCCreditAt (the record's
+  second into the stand) — Routine._use paces the tricked use and times the
+  credit (`pc_credit_timer`, World.pc_s2_credit), World.play_angry plays the
+  mobile's angry clips at the SHOUT's pace and then its fix clips at the
+  repair's (none where the step has none). The linked trick is the same
+  step with both tricks in the scene (mobile_linked: the TrickItem's
+  LinkedItemTrick) where that changes its DoActions — 202's damaged rail
+  over the eels' pond plays crash, electrify and leave, SHOUT 2, where the
+  crash alone plays crash and leave, SHOUT 1 — or another step of the script
+  (201's crash_long, LINKED_STEP); its stand, SHOUT and repair
+  (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked), the item's own
+  record's second (PCCreditAtLinked) and the second the linked trick's own
+  record pays (PCLinkedPaysAt: the first record the item-only variant does
+  not play) — fcn.1000140b credits each named record at its own `time`,
+  so the ladder's linked arm pays apart (`pc_credit2_timer`,
+  World.pc_s2_linked_credit; `_s2_credit(part=)`, the arm's amount settled
+  by the first part, before the trick's OnTrickDone marks the pair), and
+  the pair is done with its last record: the level's done count is its
+  trick table's credited records (fcn.1000140b -> fcn.100522e6, the count
+  fcn.1005225b against the reachable fcn.10052272), so 202's level ends on
+  bridge_electrify after its rage, not on bridge_crash. Linked stand / SHOUT /
+  repair / own credit / linked credit, s: 202 bridge rail
+  8.75/2/1.58/4.25/6.08 (bridge_crash, bridge_electrify); 204 jade
+  6.58/2/1.0/1.0/4.17 (jade, vase); 210 dog basket 7.42/1/-/1.75/3.25
+  (fifi_bone, fall_water); 212 parrot ledge 10.67/0/-/-/4.17 (boat, the
+  ledge alone has no record). Two script elements the model had taken for
+  timed are done on their first update (the element returns 1 at once):
+  Ef82b hides an object (vtable 0x100ab984, update 0x1000cf2a) and Efac4
+  sets an actor's flag (vtable 0x100ab9a8, update 0x1000d037) — which
+  times 205's tricked rockets (3.08 s) and 210's linked dog basket. Stand / SHOUT / repair /
+  credit, s: 201 buffet 3.67/1/1.58/0.42, hat 8.08/1/-/4.42, puddle
+  3.42/1/-/0.42 (linked 6.25); 202 bridge rail 6.42/1/1.58/4.25; 203
+  bicycle 5.33/0/1.58/3.5, flush 5.25/0/1.58/1.5, paper 14.67/0/1.58/10.92,
+  watermelon 5.5/1/-/3.0; 204 hot dogs 9.75/1/-/9.0, jade 4.75/0/1.0/1.0,
+  karate 3.25/1/1.58/1.17; 205 sand lion 5.92/0/1.58/4.75; 207 towel
+  1.17/0/1.58/0.42, sand castle 8.25/0/-/4.25; 208 arms bowl 7.0/0/-/4.33,
+  shoe machine 4.08/0/1.58/1.42; 209 cow 9.92/1/1.58/4.92, ice cream
+  4.42/0/1.58/2.67; 210 dog basket 5.17 (no SHOUT)/1.75, turban shop
+  3.83/0/-/1.92; 211 diving gear 6.83/1/1.58/0.83, rod 3.42/1/-/1.25, life
+  jacket 5.33/1/1.58/2.08; 212 throne 6.25/0/2.0/4.0, cigars 6.0/0/-/3.58,
+  bull 6.75/1/1.58/3.67, whip 6.25/0/1.58/3.92, parrot ledge 8.67 (no
+  SHOUT), bench -/1; 213 cement bath 14.67/1/-/5.83, live bull 4.0 (a look,
+  no SHOUT), carnivore 7.75/1/-/4.92, tortilla 4.5/1/-/1.67; 214 hatch
+  10.83/0/-/0.83; 205 rockets 3.08/1/-/2.33; the other partial rows (a
+  part of unknown length: 204's rickshaw credit 2.0, 207's elephant SHOUT 1
+  credit 13.08). Open, with the items: the tricked steps the model does not
+  time or that play no SHOUT of their own (204's gong and rickshaw, 205's
+  skis — their shout is the return step's, PCTrickReturn — 207's shell,
+  210's elephant, 211's sweets, 214's bouquet, pistol and door, 206 whole)
+  keep the untricked stay for the tricked use and PCLaugh for the reaction;
+  207's sand castle with the hedgehog on the towel (the linked variant plays
+  Ef51a, the neighbour camera — its update, 0x1000d70b, takes
+  fcn.1000d31a, which returns 0 while the view's slot 0x50 answers true
+  (0x1000d34b) and then turns the camera at once, or the instant
+  fcn.1000d559: a wait on the camera's own scroll the model does not
+  time — then the hedgehog's splash, 45 ticks, and the castle's
+  fall, 22, before the next step 0x1001513f; its records splash_crayfish
+  and mat_hedgehog at ticks 51 and 88 if the camera takes none) keeps the
+  item-only variant; 209's hot shoe
+  (the model's lap row takes the coal path untricked: its default scene
+  lacks the shoe mat) keeps PCLaugh. Plans (runs/sw10s2, all 14 at 100):
+  202 v6 piles its chain within one lap, the rail over the pond last (its
+  sawfish placed while he is at the shore and in the sea, the swim step's
+  flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
+  of decay, just over the top (the rail first a lap earlier spreads it over
+  71.5 s: 99.3); 214 v4 plays the shards round a lap later from the deck
+  chair (the tricked hatch holds him in Zone02 until too late for it) and
+  its fish and bouquet in the windows of the laps after the second fall
+  (100 at 796.6 s); 204 and 211 hold at 100 as they were.
 - *214's handshake (2026-09-23).* The Mother's script (GameLogic.dll:
   fcn.1003a379, vtable 0x100b05b8, its first step 0x1003a0ae) starts her
   in the awake step 0x10039e6c — to the deck chair and in (its `enter`,
@@ -1808,7 +1926,7 @@ both games, the PC data next to the mobile's, category by category:
 | speeds | the PC neighbour walks at 8 px a frame, Woody 17 — the same 1:2 the port shows; the mobile's 1.25 units/s is the PC pace (E06: ~120 px/s) |
 | doors | the PC's enter/leave take 9-25 ticks; not compared frame by frame |
 | Season 1 anger | thermometer drain = `angrytime` (exact, applied); the tick meter and the hold are game.exe's |
-| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 100 000 long — the dialog's range, the code's flag, the bar's cap on E10 (the mobile's 100, applied); the decay is leveldata's `time` (30) per 1/12 s tick = 0.36 %/s (GameLogic fcn.10044234; PCRageDecay, applied — the mobile's 0.37 rounded it) |
+| Season 2 anger | rage = the mobile amounts but eight items (applied); the gauge is 100 000 long — the dialog's range, the code's flag, the bar's cap on E10 (the mobile's 100, applied); the decay is leveldata's `time` (30) per 1/12 s tick = 0.36 %/s (GameLogic's level update 0x100442b3, 0x100447c4; PCRageDecay, applied — the mobile's 0.37 rounded it) |
 | HUD | the PC's rating popups are yellow (240/240/0) for the score and orange (255/160/0) for the bonus, as drawn |
 
 The mobile profile's 54-plan regression after the change: 33 PERFECT, 0

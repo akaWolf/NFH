@@ -221,7 +221,7 @@ once the score reaches 100 or every reachable trick has fired, 4 = time's up bel
 a 5 as well; the jingle table at 0x440f2f (0 and 2 `jingle_failed`, 1 `jingle_caught`,
 3 `jingle_success_normal`) is indexed by the dialog's outcome, and `jingle_success_perfect`
 is never played by the code. Season 1 has no lives, a catch ends the level, where Season 2
-starts every level with three (GameLogic.dll fcn.10044234, the status copy's +0x14 = 3) and
+starts every level with three (GameLogic.dll's level update 0x100442b3 at 0x100445b7, the status copy's +0x14 = 3) and
 takes one per catch (fcn.10042471).
 
 The tick is 12 Hz — not the 20 an earlier reading of the mercury suggested. Three things
@@ -272,7 +272,7 @@ mincoins, the lives at +0x14, the rage at +0x1c — is written back and broadcas
 text, the `needmorecoins` mark when coins ≥ mincoins, the `rageometer` set to the raw rage,
 the `heart` and `rage` animations on the event's flag byte); the other three writers of that
 struct are the caught handler (fcn.10042471: lives − 1, then game over or a `woody` respawn)
-and the level's tick (fcn.10044234, second half, 0x10044712): it copies the status, counts a
+and the level's tick (the level update 0x100442b3 — the GameLogic interface's slot 2 —, its second half from 0x10044712): it copies the status, counts a
 respawn timer down (+0x18), subtracts the level record's +0x28 from the rage (+0x1c, not below
 zero), counts the time (+0x24) up by one and calls fcn.10042358 — so the HUD gets the status
 every tick. The record is the leveldata.xml entry found by the level's name (the app's parser
@@ -288,8 +288,8 @@ neighbour (pcprofile.s2_rage_tick, 12 ticks a second). The COLLAPSE! board is fc
 (+0x28) is the accounting's flag at 100 000 rage; the level end (fcn.10042471, second half)
 compares that sum with the leveldata record's `score` (+0x2c) and keeps the better. The Season 2 game.exe (`tools/pcref/exe`'s dumps cover it now) is an application
 shell whose string table holds `rage`/`quota` once each. The walk is fcn.1000e3e0(level, actor, object), a bool that is false when the walk was
-interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — a random
-`shout<n>_*` / `freakout` animation — not a walk. The Season 2 scripts are extracted below
+interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — the level
+n's `shout2*` action, or a `freakout` once the gauge has overflowed — not a walk. The Season 2 scripts are extracted below
 (2026-09-16). The `time` attribute of objects.xml's actions is a tick count of the 12 Hz level tick: the
 fiber that runs a timed action counts `[obj+0x28]` down once a tick (fcn.00474a20,
 fcn.00475850, fcn.00478120), so a door's 9–25 is 0.75–2 s and the laundry's wash 59 is 4.9 s
@@ -1032,8 +1032,9 @@ The same reading for GameLogic.dll (`tools/pcref/exe_scripts.py --gl`, the globa
 `tools/pcref/exe/nfh2_gamelogic_globals.json`, the calls in `tools/pcref/exe/nfh2_gamelogic_scripts.json`):
 `Icon` = SetIcon(actor, icon) fcn.100422a5, `GoTo` = fcn.1000e3e0(level, actor, object) — the walk,
 false when interrupted, its object often held in a local the listing does not name — `Action` =
-DoAction(actor, anim) fcn.10002cd5 with the wait fcn.1000ae19, `Shout n` = fcn.1000f977(actor, n), a
-random shout<n>/freakout animation, `If variant a of b` = fcn.1000fb6e, `If tricked` = fcn.1000ec67,
+DoAction(actor, anim) fcn.10002cd5 with the wait fcn.1000ae19, `Shout n` = fcn.1000f977(actor, n), the
+level's shout action (0 shout2_light, 1 shout2, 2 shout2_hard, 3 shout2_high; a freakout once the gauge
+has overflowed — docs/PC_FIDELITY.md "Season 2 reactions"), `If variant a of b` = fcn.1000fb6e, `If tricked` = fcn.1000ec67,
 `Room` = fcn.1000fc33, `Set n` = fcn.1000f5c9. The level of a block is the objects.xml whose
 room/object names it shares (cn_c1, Level204, matched none and its calls sit under its
 neighbours or none). Code order, as for Season 1.

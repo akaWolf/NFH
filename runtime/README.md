@@ -665,6 +665,20 @@ predicate, then the all-tricks win.
   item begins (`Item.pc_began`, marked in `Routine._use`: 210's awake
   chair until her call), and another role holds its clip likewise
   (PCWaitForRole: her wait until he stands at her chair).
+- **The PC profile's Season 2 tricked visits and reactions**
+  (`Routine._use`, `World.play_angry`, `pcprofile.s2_reaction_seconds`):
+  a tricked use lasts the PC step's stand (PCUseSecondsTricked;
+  PCUseSecondsLinked with the linked trick in the scene too), its record
+  pays so many seconds in (PCCreditAt / PCCreditAtLinked,
+  `pc_credit_timer`) and the linked trick's own record at its own second
+  (PCLinkedPaysAt, `pc_credit2_timer`, `World.pc_s2_linked_credit`,
+  `_s2_credit(part='linked')`), the pair's completion booked with that last
+  record (`Item.pc_done_due`: the PC's done count is per record); the angry set plays at the pace of the
+  SHOUT's action — shout2's 2.17 s at levels 0, 1 and 3 (shout2_light,
+  shout2, shout2_high), shout2_hard's 7.08 at 2 (PCShout / PCShoutLinked,
+  the record's PCLaugh standing in), a freakout (3.08 / 3.17 / 5.25) once
+  the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
+  fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked).
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
@@ -1129,7 +1143,10 @@ Under the PC profile the same field plays the PC original's game instead
 combine.xml startlevel / endlevel) from the levels/pc overlays, the thumb
 moved one to one by the mouse, rated 4..-40 a level tick by its distance to
 the middle and pushed by GameLogic.dll's three-sinusoid wobble; the count
-reaching `time` wins, below 0 loses.
+reaching `time` wins, below 0 loses. The distances are the PC screen's px
+(800 x 600, `pcprofile.S2_SCREEN`) and the field is drawn at the PC's 84 px
+(`S2_FIELD_PX`) round the remaster's middle; the thumb and the icon keep
+the remaster's 80 reference px (open: the PC hairpin spans ~75 PC px).
 
 ## The parity audit (docs/PARITY_AUDIT_PROMPT.md)
 
