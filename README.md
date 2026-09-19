@@ -238,19 +238,29 @@ NFH2's frame and GameLogic's level update — the interface's slot 2 at
 GFXEngine's 83 ms is the sprites' frame interval); the PC's field image
 (the data archive holds no field.tga: the field is drawn at the PC's 84 px
 of its 800 x 600 screen, in whose px the game measures, the image the
-remaster's) and the thumb's and the icon's size; a two-way station's
-tricked move (201's crash_short, 120 px once); the Season 2 tricked steps
-the lap model does not time or that play no SHOUT of their own (204's
-gong and rickshaw, 205's skis, 207's shell and its sand castle over the
-hedgehog's towel, 209's hot shoe, 210's elephant, 211's sweets, 214's
-bouquet, pistol and door, 206 whole — the untricked stay and the record's
-laugh level stand in). A Season 2 tricked visit is the PC step's since
+remaster's) and the thumb's and the icon's size; 206's rabbit on the
+launch pad (the PC fires it at the pad's shoot visit — harpoon,
+shootrabbit 81 ticks, SHOUT 1 — the port at the pad's first visit after
+the trick, with PCLaugh and the untricked stays); 211's Olga, who plays
+her `mad` (34 ticks) at the women's wc in the PC and hits him in the
+port, and the wcright record paid 13 ticks late; the mobile's amounts
+where the PC's tricked flow holds no record (212's ledge alone 15, 213's
+live bull 20, 214's door 40); the co-actor's fight, which waits for his
+action's end in the port. A Season 2 tricked visit is the PC step's since
 2026-09-24: its stand, its SHOUT — the action the binary's tables give the
 level, shout2 or shout2_hard, a freakout once the gauge has overflowed —
 its repair, and each named record's credit at its own tick, the linked
 trick's variant apart (202's rail over the eels' pond: crash, electrify,
-SHOUT 2; `docs/PC_FIDELITY.md` "the tricked visits", "Season 2
-reactions"); 202 and 214 were re-planned to it and all 28 levels rate 100. 201 runs the PC's own tutorial under the
+SHOUT 2); the flow past a step with no SHOUT of its own (204's gong,
+205's skis, 211's sweets, 214's wheel behind the door, 206's weights and
+dynamite), the co-actor's hit (Olga or the Mother runs to him and fights:
+204's rickshaw, 207's shell, 210's elephant, 214's shower, bouquet and
+pistol), the flows with no SHOUT at all (210's dog basket, 212's ledge
+alone, 213's live bull, 214's door), 207's sand castle over the hedgehog's
+towel (Olga's lift, then his billboard's coin) and 209's hot shoe from the
+lap's own scene (`docs/PC_FIDELITY.md` "the tricked visits", "Season 2
+reactions"); 202 and 214 were re-planned to it, 207 awaits its extra
+coin, and all 28 levels rate 100. 201 runs the PC's own tutorial under the
 profile since 2026-09-24 — GameLogic.dll's `aux` director with its
 messages, waypoints, markers and the lost game's relay, the neighbour's
 demo and lesson laps, the entry run, wheeze and shout after the combo

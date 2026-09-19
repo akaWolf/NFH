@@ -678,7 +678,28 @@ predicate, then the all-tricks win.
   shout2, shout2_high), shout2_hard's 7.08 at 2 (PCShout / PCShoutLinked,
   the record's PCLaugh standing in), a freakout (3.08 / 3.17 / 5.25) once
   the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
-  fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked).
+  fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
+  -1 is a flow with no SHOUT anywhere (210's dog basket, 212's ledge
+  alone, 213's live bull, 214's door): the angry set is skipped.
+- **The PC profile's co-actor hit** (PCHitSeconds, `World.pc_affect_early`,
+  `Routine._hit_begin`): the action's behavior fires as his tricked use
+  starts (GameLogic's actions fire theirs at the start), so Olga or the
+  Mother sets off for him then (her script's run, gait 2) and her hit
+  sequence plays at the generic `fight`'s pace (fcn.1000eb19: Olga 42
+  ticks, the Mother 39) once he is parked angry (`Pawn.pc_hit_parked`),
+  his SHOUT after it (204's rickshaw, 207's shell, 210's elephant, 214's
+  shower, bouquet and pistol). Open: where she arrives before his use
+  ends the PC fights at once; the port waits for his angry (the mobile's
+  hand-off).
+- **The PC profile's linked continuation** (207's sand castle over the
+  hedgehog's towel: PCHitSecondsLinked, PCResumeHeadSeconds,
+  PCExtraCoinLinked): Olga's lift paced to its ticks, then the head of
+  his resumed angry set at the billboard's (`rott_extra_angry`), whose
+  coin pays there and books its completion then (`Item.pc_extra_due`:
+  the PC's done count is its records, so the level ends at the resume).
+- **The PC profile's per-visit move**: PCApproach `txt` may be a list,
+  one move per visit (201's soaped puddle, [200, -100], the slips' two
+  sides; `Routine._pc_arrived`).
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the

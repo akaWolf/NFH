@@ -1244,11 +1244,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   hotspot per visit (`neighbor` 1020 for the slip, +80; `neighborleft`
   1130 for the left slip, -100 — PCApproach `x` and `tx` per visit,
   pc_walks_s2.VISIT_HOTSPOTS; the tutorial sets the visit by the prime
-  the mobile's toggle plays next). Open, with numbers: a tricked visit
-  of a two-way station keeps its side's move (201's crash_short, +200 px
-  where the slip's +80 applies: 120 px, 15 of his ticks, once), 203's
-  stage crash 30 and Woody's one (208's chalk on the safety line, 45 px,
-  3 of his ticks).
+  the mobile's toggle plays next). A two-way station's tricked
+  visit takes its side's tricked move (code_moves_tricked per visit, `txt`
+  per visit: 201's soaped puddle [200, -100] where the slips move [80,
+  -100]; 2026-09-24). Open, with numbers: 203's stage crash 30 and Woody's
+  one (208's chalk on the safety line, 45 px, 3 of his ticks).
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
@@ -1536,7 +1536,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCLaugh), where fcn.1000f977's action is picked by the SHOUT's own
   last parameter, the step's constant (0 shout2_light 2.17 s, 1 shout2
   2.17, 2 shout2_hard 7.08, 3 shout2_high 2.17 — "Season 2 reactions"
-  above; no Season 2 step pushes 3) — often a register the step sets: 208's shoe machine pushes
+  above; 204's gong pushes 3) — often a register the step sets: 208's shoe machine pushes
   the zeroed ebx, 201's buffet `xor ebx, ebx; inc ebx`, 212's bull `xor
   edi, edi` and more, 203's toilet 2 with both its paper and its flush
   tricked and 0 with one (`push 2; pop eax` or `xor eax, eax` by the step's
@@ -1595,23 +1595,80 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   no SHOUT), carnivore 7.75/1/-/4.92, tortilla 4.5/1/-/1.67; 214 hatch
   10.83/0/-/0.83; 205 rockets 3.08/1/-/2.33; the other partial rows (a
   part of unknown length: 204's rickshaw credit 2.0, 207's elephant SHOUT 1
-  credit 13.08). Open, with the items: the tricked steps the model does not
-  time or that play no SHOUT of their own (204's gong and rickshaw, 205's
-  skis — their shout is the return step's, PCTrickReturn — 207's shell,
-  210's elephant, 211's sweets, 214's bouquet, pistol and door, 206 whole)
-  keep the untricked stay for the tricked use and PCLaugh for the reaction;
-  207's sand castle with the hedgehog on the towel (the linked variant plays
-  Ef51a, the neighbour camera — its update, 0x1000d70b, takes
-  fcn.1000d31a, which returns 0 while the view's slot 0x50 answers true
-  (0x1000d34b) and then turns the camera at once, or the instant
-  fcn.1000d559: a wait on the camera's own scroll the model does not
-  time — then the hedgehog's splash, 45 ticks, and the castle's
-  fall, 22, before the next step 0x1001513f; its records splash_crayfish
-  and mat_hedgehog at ticks 51 and 88 if the camera takes none) keeps the
-  item-only variant; 209's hot shoe
-  (the model's lap row takes the coal path untricked: its default scene
-  lacks the shoe mat) keeps PCLaugh. Plans (runs/sw10s2, all 14 at 100):
-  202 v6 piles its chain within one lap, the rail over the pond last (its
+  credit 13.08). The rest carried on 2026-09-24 (later), the flow past the
+  station's step read where the step itself has no SHOUT
+  (lap_model_s2 TRICKED_CONT, CONT_SCENE, TRICKED_VIA, TRICKED_ROWS):
+  the model had also taken three script elements for timed — the camera
+  on the neighbour (Ef51a: the builder fcn.1000f51a sets the flag 8 only
+  for a nonzero last argument, and with it the update fcn.1000d31a waits
+  while the level's slot 0x50 answers [level+0xc] != 0, the mini-game
+  object the level update runs at 0x10044816-0x1004482b: Woody's game
+  running; else done at once), 207's pose element (E2f40 appending
+  fcn.10014c5c's, vtable 0x100ab990, update 0x1000cfaa: the actor's
+  animation set, 1 at once) and an object shown (Ef779: vtable 0x100ab978,
+  update 0x1000ce9c) — and the tricked run starts from the scene the
+  lap's walk has at the row (lap_state: 209's shoe mat holds his shoes as
+  he leaves the curtain; the opening scene had sent the model down the
+  coal path). Stand / SHOUT / repair / credit, s: 204 gong 5.0/3/1.58/3.17
+  — the elvis hits him, the action's behavior `gong` sends his script to
+  0x10032f52, whose tricked branch is the leave, SHOUT 3 (the one Season 2
+  step that pushes 3), the camera off and the repair; 205 skis
+  17.33/1/1.58/6.0 — the run back and the pant (2.83, PCTrickReturn) before
+  the SHOUT; 209 hot shoe 2.75/0/-/1.42 (with the drain open 8.83/1/-/1.42,
+  gully_open at 2.75); 207 elephant 15.5/1/-/13.08; 211 sweets
+  2.08/1/2.0/1.25 — the run to the toilet, wcright's puke (40 ticks, the
+  toilets' PCUseSeconds: ToiletWomen 3.33, ToiletMen 3.08; its record
+  wcright at 27), SHOUT 1, the sign's repair; 214 wheel 12.5/2/-/4.58, up
+  on the bridge from the opened door with the captain drugged; 206 weights
+  13.0/1/-/8.33 (the flea blanket: Olga's laugh on the manipulated
+  dumbbell) and dynamite 13.83/1/-/8.5 (the adhesive's bag taken, then
+  0x1002c550's lookaround and the reling's explode); 210's dog basket
+  alone, 212's parrot ledge alone, 213's live bull and 214's captain's
+  door play no SHOUT anywhere in their flow (PCShout -1: no reaction).
+  The co-actor's hit: 204's rickshaw 3.67/0, 207's shell 4.67/0, 214's
+  shower 4.0/1, bouquet 4.17/1 and pistol 18.33/0 (the shot and the
+  Mother's `die`), 210's elephant 9.08/1 — his action's behavior (204's
+  hurt_neighbor on Olga …) fires as it starts and her script runs her to
+  him (gait 2) and plays the generic `fight` (fcn.1000eb19: Olga 42 ticks,
+  the Mother 39; the action's behavior olga_fight / mother_fight on him),
+  his behaviour handler then sets the step with the SHOUT and no repair
+  (204 0x10032b6f, 207 0x1001596a, 210 0x1001a379, 214 0x1003ba90 /
+  0x1003b677 / 0x1003b328). Carried: PCHitSeconds (her hit sequence paced
+  to the fight), World.pc_affect_early (she sets off as his tricked use
+  starts; her hit waits for his parked angry — the port's hand-off, which
+  the PC's does not have: where she arrives before his action ends the PC
+  starts the fight on arrival). 207's sand castle with the hedgehog on the
+  towel: its linked step (lookaround, the hedgehog's splash 45, the
+  castle's fall 22 — its behavior kid_cry on Olga) hands over to
+  0x1001513f, which re-runs until the destroyed castle shows Olga's
+  `n_lift` (fcn.1004948f, the object's animation, against the global
+  n_lift; her script runs her there, 0x100175f0) and then plays his
+  billboard (`bill`'s enter, 56 ticks, the record bill at 30), SHOUT 2
+  and the camera off (LINKED_CONT): PCUseSecondsLinked 9.17,
+  PCCreditAtLinked 4.25 (splash_crayfish), PCLinkedPaysAt 7.33
+  (mat_hedgehog), PCHitSecondsLinked {Olga: 2.5} (the lift),
+  PCResumeHeadSeconds 2.17 (the billboard after it) and
+  PCExtraCoinLinked 30 (bill, paid and done at his resume: the level's
+  done count is its records, so the level ends there — 207's plan awaits
+  the count 7), PCShoutLinked 2; the castle's own amount is the PC's 20
+  (the mobile's 40 was its linked total's share). Open, with numbers:
+  206's rabbit on the launch pad fires at the pad's shoot visit in the PC
+  (the load with the manipulated ramp hands over to 0x1002e27f — the
+  harpoon, then 0x1002df9b's shootrabbit, 81 ticks, harpoon_fifi at 49,
+  then 0x1002de6a's SHOUT 1, the Mother's run to the ramp 0x1002bbd1) and
+  at the pad's first visit after the trick in the mobile (FifiFire): the
+  pad and the harpoon keep PCLaugh and the untricked stays; 211's Olga
+  plays her `mad` (34 ticks) at the women's wc while he shouts, the port's
+  hits him (the mobile's Toilet211Behavior sets her on him) before his
+  SHOUT, and the wcright record pays at the reaction, 13 ticks after the
+  PC's; the tricked flows of 212's ledge alone, 213's live bull and 214's
+  door hold no record — the mobile's amounts (15, 20, 40) are kept; 210's
+  TurbanShop 27 and 213's Tortilla 15 and PlantCarnivore 15 + PCExtraCoin
+  20 had been dropped from the overlays by the stays writer of 2026-09-12
+  (it replaced its patches' sets) and are back.
+Plans (runs/sw13s2, all 14 at 100; 207's plan awaits the count 7 — the
+  billboard's coin is paid at his resume after Olga's lift, 436.2 s; 214 at
+  792.6 s): 202 v6 piles its chain within one lap, the rail over the pond last (its
   sawfish placed while he is at the shore and in the sea, the swim step's
   flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
   of decay, just over the top (the rail first a lap earlier spreads it over
