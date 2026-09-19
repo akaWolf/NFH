@@ -790,7 +790,7 @@ class App:
                 click, woody.stored_input = woody.stored_input, None
                 v.world_click(*click)
             if w.is_dexterity_on and woody:
-                v.cam.x, v.cam.y = woody.sprite.x, woody.sprite.y
+                v.cam.x, v.cam.y = w.dexterity_focus()
         v._update_camera(dt if igm.time_scale > 0.0 else 0.0)
         v._clamp_camera()
         v._frame_dt = dt

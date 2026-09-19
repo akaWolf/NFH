@@ -263,16 +263,17 @@ def s2_rage_tick(meter, decay_per_tick):
 # then moves the mouse by the push (0x100448c6-0x100448db) and draws the
 # alarm field while the rate is negative (0x10044880).
 S2_GAME_AMPS = (20.0, 10.0, 5.0)
-# the PC's screen, in whose px the game measures the thumb and pushes the
-# mouse: 800 x 600 (nfh2 dialogs: mainmenu's status line at 10/570 790 wide,
-# the in-game right bar from 658/473; game.exe builds its context 0x320 x
-# 0x258), and the field's size on it: the green disk with its rim measures
-# 136 x 100 px of the 1280 x 720 stretch on Badinfos' E04 (video 759 s, the
-# toy dispenser) and 124 x 92 without the rim on E01 (176 s, the toolbox) —
-# 84 x 83 PC px, 77 without; minigame.xml's gui/game/field.tga itself is not
-# in the data archive
-S2_SCREEN = (800, 600)
-S2_FIELD_PX = 84
+# The field's middle is Woody's `minigame` hotspot (generic/objects.xml:
+# woody's <hotspot name="minigame" offset="0/-150"/>): the use_object step
+# (fcn.10041735) reads it as the actor's +0x2c/+0x30 plus the offset
+# (fcn.10049e01) into the game's middle (the constructor's +0xc/+0x10) and
+# the create message (vtable 0x100b1444, slot 79 of the GFX visitor: its
+# +0xc/+0x10); GFXEngine makes the field round it (0x1000aa80 -> fcn.10004b00
+# -> fcn.1000fb30: +0x24/+0x28), scrolls the camera to hold it at (400, 256),
+# the middle of the 800 x 512 scene, within the level (0x1000ab08-0x1000ab7e)
+# and puts the mouse on it. Its px are the level's (the PC draws the scene
+# 1:1), PX_PER_UNIT to the port's unit.
+S2_GAME_HOTSPOT = (0, -150)
 S2_GAME_FREQS = (0.064774, -0.14611809302325582, 0.36959282352941175)
 S2_GAME_QUARTER = 0.78538475
 S2_GAME_TWO_PI = 6.283078
@@ -290,6 +291,24 @@ def _s2_game_radius(dx, dy):
         r = math.sqrt(d2)
         return int(dx * 1000 / r), int(dy * 1000 / r)
     return dx, dy
+
+
+def s2_game_thumb(dx, dy, ticks):
+    """the pair the state message carries (the game's +4/+8, 0x10044864-0x1004486f, sent
+    before the push): each axis held, past the first three ticks the pair to the radius
+    (fcn.100508a1 writes it back at 0x1005097f / 0x1005099a)"""
+    return (dx, dy) if ticks < 4 else _s2_game_radius(dx, dy)
+
+
+def s2_thumb_corner(x, y, field, thumb):
+    """GFXEngine's thumb setter (fcn.1000fa00, from fcn.10003b90 on the state message):
+    the thumb's corner in the field, (x + 1000) x (field - thumb) / 2000 each axis,
+    truncated — the radius's reach puts the thumb's edge on the field's"""
+    def cdiv(p):
+        q = abs(p) // 2000
+        return q if p >= 0 else -q
+    return (cdiv((x + 1000) * (field[0] - thumb[0])),
+            cdiv((y + 1000) * (field[1] - thumb[1])))
 
 
 def s2_game_rate(dx, dy, progress, latched):

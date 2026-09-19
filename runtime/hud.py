@@ -1209,25 +1209,71 @@ class Hud:
         for ds in getattr(self.world, 'dex_states', {}).values():
             if not ds.enabled:
                 continue
+            if ds.pc_total and ds.pc_mid is not None:
+                self._draw_pc_game(ds)
+                continue
             bg = ds.spec['bg_wrong'] if ds.wrong else ds.spec['bg']
             self._blit(bg, tuple(ds.bg))
-            # RotateAroundPivot(180) + a group of height p: the group clips
-            # the texture's top p, and the rotation lands it — upside down —
-            # on the BOTTOM of the field
-            p = min(1.0, max(0.0, ds.percent / 100.0))
-            fill_h = ds.bg[3] * p
-            entry = self._tex(ds.spec['full'])
-            if entry is not None and fill_h > 0:
-                import sdl2 as _sdl
-                th = entry[2]
-                srcr = _sdl.SDL_Rect(0, 0, entry[1], max(1, int(th * p)))
-                dstr = _sdl.SDL_Rect(int(ds.bg[0]),
-                                     int(ds.bg[1] + ds.bg[3] - fill_h),
-                                     int(ds.bg[2]), max(1, int(fill_h)))
-                _sdl.SDL_RenderCopyEx(self.rnd, entry[0], srcr, dstr,
-                                      180.0, None, _sdl.SDL_FLIP_NONE)
+            self._draw_dexterity_fill(ds, tuple(ds.bg))
             self._blit(ds.spec['bg_item'], tuple(ds.item_rect))
-            self._blit(ds.spec['fg'], ds.thumb_rect())
+            self._blit(ds.spec['fg'], tuple(ds.fg))
+
+    def _draw_dexterity_fill(self, ds, r):
+        """the fill over the field rect r: RotateAroundPivot(180) + a group
+        of height p — the group clips the texture's top p, and the rotation
+        lands it, upside down, on the BOTTOM of the field"""
+        p = min(1.0, max(0.0, ds.percent / 100.0))
+        fill_h = r[3] * p
+        entry = self._tex(ds.spec['full'])
+        if entry is not None and fill_h > 0:
+            import sdl2 as _sdl
+            th = entry[2]
+            srcr = _sdl.SDL_Rect(0, 0, entry[1], max(1, int(th * p)))
+            dstr = _sdl.SDL_Rect(int(r[0]), int(r[1] + r[3] - fill_h),
+                                 int(r[2]), max(1, int(fill_h)))
+            _sdl.SDL_RenderCopyEx(self.rnd, entry[0], srcr, dstr,
+                                  180.0, None, _sdl.SDL_FLIP_NONE)
+
+    def _draw_pc_game(self, ds):
+        """GFXEngine's mini-game draw (fcn.1000fcf0, from the scene's render
+        fcn.10006970 while it holds one), each texture at its own size (the
+        setters fcn.1000ff70 / fcn.10010000 / fcn.10010090 / fcn.10010120
+        keep it; the remaster's textures/s2 art carries minigame/<tool>.xml's
+        gui/game names and sizes) in the level's px (DexterityState.pc_k):
+        the field — the alarm field while the state message's +0x11 is up
+        (fcn.1000f9f0) — its corner at the middle less half its size, the
+        progress bar from that corner, the icon centred in the field, the
+        thumb at the corner plus the setter's offset for the state
+        message's pair (pcprofile.s2_thumb_corner)"""
+        field = self._tex(ds.spec['bg'])
+        if field is None:
+            return
+        k = ds.pc_k
+        cx, cy = ds.middle()
+        fw, fh = field[1], field[2]
+        x0 = cx - (fw // 2) * k
+        y0 = cy - (fh // 2) * k
+        alarm = self._tex(ds.spec['bg_wrong']) if ds.wrong else None
+        if alarm is not None:
+            self._blit(ds.spec['bg_wrong'], (x0, y0, alarm[1] * k, alarm[2] * k))
+        else:
+            self._blit(ds.spec['bg'], (x0, y0, fw * k, fh * k))
+        # the bar's front (minigame/<tool>.xml: vertical,
+        # gui/ingame/minigame_progress_front.tga at 28/28 from the corner) is
+        # not in the data: the remaster's fill stands in, in the field's frame
+        self._draw_dexterity_fill(ds, (x0, y0, fw * k, fh * k))
+        icon = self._tex(ds.spec['bg_item'])
+        if icon is not None:
+            iw, ih = icon[1], icon[2]
+            self._blit(ds.spec['bg_item'], (x0 + ((fw - iw) // 2) * k,
+                                            y0 + ((fh - ih) // 2) * k,
+                                            iw * k, ih * k))
+        thumb = self._tex(ds.spec['fg'])
+        if thumb is not None:
+            tw, th = thumb[1], thumb[2]
+            ox, oy = pcprofile.s2_thumb_corner(ds.pc_thumb[0], ds.pc_thumb[1],
+                                               (fw, fh), (tw, th))
+            self._blit(ds.spec['fg'], (x0 + ox * k, y0 + oy * k, tw * k, th * k))
 
     def _draw_progress_bars(self):
         """ProgressBar.OnGUI (ProgressBar.cs:247-272): the world-anchored

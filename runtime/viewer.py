@@ -121,10 +121,14 @@ class Viewer:
         self.world.screen_size = (WIDTH, HEIGHT)
         self.world.screen_point = lambda x, y: self.cam.world_to_screen(
             x, y, WIDTH, HEIGHT)
-        def _snap():
+        def _snap(point=None):
             # SnapToWoodyImmediate parks the camera exactly on Woody
-            # (CameraMover.cs:468-471) — no viewer offset here
-            if self.woody is not None:
+            # (CameraMover.cs:468-471) — no viewer offset here; the PC's
+            # mini-game parks it on the field's middle (World.dexterity_focus)
+            if point is not None:
+                self.cam.x, self.cam.y = point
+                self._clamp_camera()
+            elif self.woody is not None:
                 self.cam.x = self.woody.sprite.x
                 self.cam.y = self.woody.sprite.y
                 self._clamp_camera()
@@ -528,8 +532,7 @@ class Viewer:
                     self.world_click(*click)
                 if self.world.is_dexterity_on and self.woody:
                     # GameCamera.Freeze + SnapToWoodyImmediate (cs:149, 171)
-                    self.cam.x = self.woody.sprite.x
-                    self.cam.y = self.woody.sprite.y
+                    self.cam.x, self.cam.y = self.world.dexterity_focus()
                 elif self.follow and self.woody:
                     self.cam.x = self.woody.sprite.x
                     self.cam.y = self.woody.sprite.y + 0.6

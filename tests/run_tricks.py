@@ -2208,8 +2208,10 @@ class Driver(Recorder):
         for ds in self.world.dex_states.values():
             if ds.enabled:
                 on = True
-                ddx = (ds.bg[0] + ds.bg[2] / 2.0) - (ds.fg[0] + ds.fg[2] / 2.0)
-                ddy = (ds.bg[1] + ds.bg[3] / 2.0) - (ds.fg[1] + ds.fg[3] / 2.0)
+                bx, by = ds.middle()
+                fx, fy = ds.pointer()
+                ddx = bx - fx
+                ddy = by - fy
                 if getattr(ds, 'pc_total', 0):
                     # the PC's thumb is the mouse (DexterityState.pc_move, one
                     # to one): half the way back a frame, as the steer below;

@@ -6297,9 +6297,11 @@ class DexterityState:
         # the PC's game (tools/pcref/pc_minigames.py): the action's `time`,
         # its elapsed count, the level tick's accumulator, the game's own
         # tick count (+0x20), its rate (+0x18), the 10 % latch (+0x50), its
-        # progress (+0x1c), the wobble's three phases (+0x28..+0x38) and the
+        # progress (+0x1c), the wobble's three phases (+0x28..+0x38), the
         # frame's mouse motion in screen px (the PC's thumb is the mouse
-        # itself)
+        # itself), the mouse, the field's middle (the level's point and its
+        # screen px), the port's screen px to the PC's px and the pair the
+        # last state message carried (the drawn thumb)
         self.pc_total = 0
         self.pc_elapsed = 0
         self.pc_acc = 0.0
@@ -6309,6 +6311,11 @@ class DexterityState:
         self.pc_progress = 0
         self.pc_phase = [0.0, 0.0, 0.0]
         self.pc_move = (0.0, 0.0)
+        self.pc_mouse = [0.0, 0.0]
+        self.pc_mid = None
+        self.pc_mid_px = (0.0, 0.0)
+        self.pc_k = 1.0
+        self.pc_thumb = (0, 0)
 
     def start(self):
         """StartDexterity (DexterityComponent.cs:137-177)"""
@@ -6336,8 +6343,22 @@ class DexterityState:
             # rand(8) quarter turns of its GetTickCount generator
             self.pc_phase = [self._rng.randrange(8) * pcprofile.S2_GAME_QUARTER
                              for _ in range(3)]
+            # the field's middle: Woody's `minigame` hotspot, in the level's
+            # px (y down) from his point (fcn.10049e01;
+            # pcprofile.S2_GAME_HOTSPOT)
+            hx, hy = pcprofile.S2_GAME_HOTSPOT
+            self.pc_mid = (w.woody.sprite.x + hx / pcprofile.PX_PER_UNIT,
+                           w.woody.sprite.y - hy / pcprofile.PX_PER_UNIT) \
+                if w.woody is not None else None
+        else:
+            self.pc_mid = None
         if w.snap_camera is not None:
-            w.snap_camera()              # SnapToWoodyImmediate (cs:149)
+            # SnapToWoodyImmediate (cs:149); the PC's scroll holds the field's
+            # middle there (GFXEngine 0x1000ab08-0x1000ab7e, dexterity_focus)
+            if self.pc_mid is not None:
+                w.snap_camera(self.pc_mid)
+            else:
+                w.snap_camera()
         W, H = w.screen_size
         sx, sy = w.screen_point(self.spec['x'], self.spec['y'])
         fa = self.spec['fg_aux']; ba = self.spec['bg_aux']
@@ -6350,14 +6371,19 @@ class DexterityState:
         bh = H * 190 // 800; bw = W * 190 // 1280
         self.bg = [sx - bw / 1.5 + ba.get('x', 0.0),
                    sy - (bh + bh / 3.0) + ba.get('y', 0.0), bw, bh]
-        if self.pc_total:
-            # the PC's field is its own size on its 800 x 600 screen
-            # (pcprofile.S2_FIELD_PX), drawn round the remaster's middle
-            sw, sh = pcprofile.S2_SCREEN
-            cx, cy = self.bg[0] + bw / 2.0, self.bg[1] + bh / 2.0
-            pw = W * pcprofile.S2_FIELD_PX / float(sw)
-            ph = H * pcprofile.S2_FIELD_PX / float(sh)
-            self.bg = [cx - pw / 2.0, cy - ph / 2.0, pw, ph]
+        if self.pc_mid is not None:
+            # the PC's field is drawn round its middle at its textures' own
+            # sizes (hud._draw_pc_game); its px are the level's, 1/96 unit
+            # (pcprofile.PX_PER_UNIT), so a PC px is the camera's screen px
+            # a unit over it; the mouse starts on the middle (0x1000ab81-
+            # 0x1000abb8: the middle's screen point to the scene's +8,
+            # slot 0x48)
+            mx, my = self.pc_mid
+            cx, cy = w.screen_point(mx, my)
+            self.pc_k = (cy - w.screen_point(mx, my + 1.0)[1]) / pcprofile.PX_PER_UNIT
+            self.pc_mid_px = (cx, cy)
+            self.pc_mouse = [cx, cy]
+            self.pc_thumb = (0, 0)
         ih = H * 80 // 800; iw = W * 80 // 1280
         self.item_rect = [sx - iw / 1.2 + ia.get('x', 0.0),
                           sy - ih * 2.5 + ia.get('y', 0.0), iw, ih]
@@ -6395,8 +6421,8 @@ class DexterityState:
             mx, my = self.pc_move
             self.pc_move = (0.0, 0.0)
             self.input = (0.0, 0.0)
-            self.fg[0] += mx
-            self.fg[1] += my
+            self.pc_mouse[0] += mx
+            self.pc_mouse[1] += my
             self._pc_tick(dt)
             return
         dx, dy = self.input
@@ -6436,41 +6462,32 @@ class DexterityState:
         else:
             self.input = (self.input[0] + xrel * 25.0, self.input[1] - yrel * 25.0)
 
+    def middle(self):
+        """the field's middle in screen px: the PC's game's (pc_mid_px), the
+        remaster's field's centre"""
+        if self.pc_total:
+            return self.pc_mid_px
+        return (self.bg[0] + self.bg[2] / 2.0, self.bg[1] + self.bg[3] / 2.0)
+
+    def pointer(self):
+        """the thumb's point in screen px: the PC's mouse, the remaster's
+        pick's centre"""
+        if self.pc_total:
+            return tuple(self.pc_mouse)
+        return (self.fg[0] + self.fg[2] / 2.0, self.fg[1] + self.fg[3] / 2.0)
+
     def _pc_offset(self):
-        """the thumb's displacement from the field's middle as the PC's game
+        """the mouse's displacement from the field's middle as the PC's game
         reads it (pcprofile.s2_game_offset: whole px, x 10, each axis held),
-        in px of the PC's 800 x 600 screen (pcprofile.S2_SCREEN): the port's
-        screen fraction for the PC's"""
-        W, H = self.world.screen_size
-        sw, sh = pcprofile.S2_SCREEN
-        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * sw / W
-        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * sh / H
+        in the level's px (pc_k)"""
+        ox = (self.pc_mouse[0] - self.pc_mid_px[0]) / self.pc_k
+        oy = (self.pc_mouse[1] - self.pc_mid_px[1]) / self.pc_k
         return pcprofile.s2_game_offset(int(ox), int(oy))
 
     def _pc_push(self, px, py):
         """the level tick moves the mouse by the game's output (whole PC px)"""
-        W, H = self.world.screen_size
-        sw, sh = pcprofile.S2_SCREEN
-        self.fg[0] += px * W / float(sw)
-        self.fg[1] += py * H / float(sh)
-
-    def thumb_rect(self):
-        """the drawn thumb: the PC draws it at the displacement held to the
-        radius of 1000 (100 px, the game's +4/+8 in the state message,
-        0x10044869), the mouse itself may be further out"""
-        if not self.pc_total:
-            return tuple(self.fg)
-        W, H = self.world.screen_size
-        sw, sh = pcprofile.S2_SCREEN
-        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * sw / W
-        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * sh / H
-        r = (ox * ox + oy * oy) ** 0.5
-        if r <= 100.0:
-            return tuple(self.fg)
-        k = 100.0 / r
-        return (self.bg[0] + self.bg[2] / 2.0 + ox * k * W / float(sw) - self.fg[2] / 2.0,
-                self.bg[1] + self.bg[3] / 2.0 + oy * k * H / float(sh) - self.fg[3] / 2.0,
-                self.fg[2], self.fg[3])
+        self.pc_mouse[0] += px * self.pc_k
+        self.pc_mouse[1] += py * self.pc_k
 
     def _pc_tick(self, dt):
         """the PC's game, once a level tick (12 a second): the DoAction step
@@ -6523,6 +6540,9 @@ class DexterityState:
         levels = getattr(self.item, 'pc_minigame_levels', None) or (0, 0)
         self.pc_ticks += 1
         dx, dy = self._pc_offset()
+        # the state message's pair, sent before the push: the drawn thumb
+        # (hud._draw_pc_game)
+        self.pc_thumb = pcprofile.s2_game_thumb(dx, dy, self.pc_ticks)
         if self.pc_ticks < 4:
             self._pc_push(int(-dx * 1000 / 10000), int(-dy * 1000 / 10000))
             self.pc_rate = 0
@@ -6957,6 +6977,17 @@ class World:
             self.menu_toggle_hook()
         else:
             self.menu_open = not self.menu_open
+
+    def dexterity_focus(self):
+        """the camera's point while a dexterity game is on: Woody
+        (GameCamera.Freeze + SnapToWoodyImmediate, DexterityComponent.cs:149,
+        171); the PC's game holds its field's middle there (GFXEngine
+        0x1000ab08-0x1000ab7e: the scroll puts it at the middle of the scene,
+        pcprofile.S2_GAME_HOTSPOT)"""
+        for ds in self.dex_states.values():
+            if ds.enabled and ds.pc_mid is not None:
+                return ds.pc_mid
+        return self.woody.sprite.x, self.woody.sprite.y
 
     def _default_screen_point(self, x, y):
         """WorldToScreenPoint with the y flip, camera on Woody — the viewer

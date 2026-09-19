@@ -288,8 +288,7 @@ class Recorder:
                 v.world_click(*click)
         v._update_camera(DT)
         if v.world.is_dexterity_on and v.woody:
-            v.cam.x = v.woody.sprite.x
-            v.cam.y = v.woody.sprite.y
+            v.cam.x, v.cam.y = v.world.dexterity_focus()
         elif v.follow and v.woody:
             v.cam.x = v.woody.sprite.x
             v.cam.y = v.woody.sprite.y + 0.6
