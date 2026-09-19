@@ -55,7 +55,19 @@ BARS = {214: {'DeckChairMother': (0x1003a0b8, 'topright_deckchair')}}
 # `neighbor` hotspot, fcn.1000e172 — `order`): no pillow pose of its own, the
 # three sleeps the 240 (the mobile's repeat, TargetSequenceIndex 2, is the
 # three alone), the look the 180; her wait for him at the call held (WAITS_ROLE)
-CLIPS_ROLE = {210: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('pool_deckchair', 'enter'),
+# 207's Mother (her script: 0x100140af to the pool — its `enter`, m_enter —
+# for a bar of 200 ticks, 0x1001447d to the deck chair — its `enter`, sitdown
+# — for 240, then the check 0x100141e0, which keeps her in the chair while he
+# is in the pool room and else sends her to the pool again, leaving the chair —
+# getup — and the pool — m_leave — on the way): the pool's two swims the 200,
+# the chair's three sleeps the 240
+CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair', 'enter'),
+                                             'MotherSleepLoop': ('bar', 0x1001447d, 3),
+                                             'MotherGetUpPillow': ('pool_deckchair', 'leave')}),
+                    'PoolLadder': ('Mother', {'MotherPoolLadderEnter': ('pool_pool', 'enter'),
+                                              'MotherPoolLadderSwim': ('bar', 0x100140af, 2),
+                                              'MotherPoolLadderLeave': ('pool_pool', 'leave')})},
+              210: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('pool_deckchair', 'enter'),
                                                    'MotherSleepPillow': ('ticks', 0),
                                                    'MotherSleepSingle': ('bar', 0x10018c0b, 3),
                                                    'MotherLookLoop': ('bar', 0x100187d8),

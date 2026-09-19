@@ -32,12 +32,9 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCClipSeconds": {
-     "SkiPut": 0.0
-    },
     "PCUseSeconds": [
      17.33,
-     0.0
+     0.58
     ]
    }
   },

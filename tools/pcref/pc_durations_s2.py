@@ -102,13 +102,17 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
               # 0x1001aecc) — the mobile's three stands there take no time
               'CallRTMother': {'Stand_Left': ('none',)}},
         # 205's table (his table step 0x100254d5: `play` on the guarded table
-        # once Olga is there) and the skis' put (`putski`, whose objanim the
-        # PC has not: no time — the ride's visit keeps its stay, KEEP_STAYS)
-        205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play')},
-              'WaterSkiis': {'SkiPut': ('none',)}}}
+        # once Olga is there)
+        205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play')}},
+        # 207's board (his board step 0x100169c5: the `dive` once the Mother
+        # sits in her deck chair, the pool's `enter`, 0 ticks, and its `leave`
+        # as the bar step walks him out; the wait before is the Mother's —
+        # Level207MotherBehavior holds his WaitWatch)
+        207: {'PoolBoard': {'PoolDive': ('pool_divingboard', 'dive'),
+                            'PoolGetOut': ('pool_pool', 'leave')}}}
 # the items whose per-visit stays stand beside their clips: the clips time a
-# visit whose stay is 0 (205's second WaterSkiis, the put)
-KEEP_STAYS = {205: {'WaterSkiis'}}
+# visit whose stay is 0
+KEEP_STAYS = {}
 # the tricked use's clip after which the PC's trick action has ended
 # (PCCreditAfter): the record's action (objects.xml) pays as it completes —
 # the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
@@ -161,7 +165,7 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (202, 203, 205, 208, 209, 210, 211, 212, 213, 214)
+CODE = (202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
 
 
 def pc_spans(n):

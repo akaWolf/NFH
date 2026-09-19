@@ -57,9 +57,10 @@ Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
 212, 213 and 214 (its hatch behind the step's own byte, its bouquet behind
 IsVariant's null test — both read since the same evening); 201 (the
 tutorial), 202, 204, 205, 207 and 210 stop at a step whose handover comes
-from another actor's script — 205 and 210 are timed from a start step round
-to that handover since 2026-09-24 (LAP_START; their handshakes are the
-runtime's, docs/PC_FIDELITY.md "205's table", "210's call"). Not modelled:
+from another actor's script — 204, 205, 207 and 210 are timed from a start
+step round to that handover since 2026-09-24 (LAP_START; their handshakes
+are the runtime's, docs/PC_FIDELITY.md "205's table", "207's board", "210's
+call"; 204's is its own gong's message). Not modelled:
 206's and 214's waits on the Mother, 213's polls on Olga's picnic and bull
 ride, 209's fakir `spit`. With
 the walks the laps come to 105 s (203), 85.5 (208), 104 (209), 85 (211), 124
@@ -306,10 +307,26 @@ def level_start(n):
 
 # -- durations (the Season 1 rule of tools/pcref/lap_model.py) ----------------------
 def _frames_of(text):
-    out = {}
-    for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', text, re.S):
-        for am in re.finditer(r'<animation name="([^"]+)"[^>]*>(.*?)</animation>', om.group(2), re.S):
-            out[(om.group(1), am.group(1))] = len(re.findall(r'<frame', am.group(2)))
+    """{(object, animation): frames} of an anims.xml, tag by tag: an empty
+    `<object … />` or `<animation … />` holds nothing (the pairing of an
+    open tag with the next close one had given 205's `putski` and 204's gong
+    and jade dummy to their neighbours)"""
+    out = {}; obj = None; anim = None
+    for m in re.finditer(r'<(/?)(object|animation|frame)\b([^>]*?)(/?)>', text):
+        close, tag, attrs, empty = m.groups()
+        if tag == 'object':
+            nm = re.search(r'name="([^"]+)"', attrs)
+            obj = nm.group(1) if (nm and not close and not empty) else None
+            anim = None
+        elif tag == 'animation':
+            nm = re.search(r'name="([^"]+)"', attrs)
+            if close:
+                anim = None
+            elif obj is not None and nm:
+                out[(obj, nm.group(1))] = 0
+                anim = None if empty else nm.group(1)
+        elif anim is not None:
+            out[(obj, anim)] += 1
     return out
 
 
@@ -399,11 +416,6 @@ class Data:
             f = self.frames.get((g, oa)) or self.frames.get((o, oa))
             if f:
                 return f
-            if aa in ('inv', 'ms', '') and t == 'auto' \
-                    and any(k[0] == g for k in self.frames):
-                # the object's gfx has no such animation and the actor plays
-                # none: the action lasts nothing (205's `putski`)
-                return 0
         return None
 
 
@@ -462,7 +474,17 @@ def station_ticks(d, ev, ctx=None):
 LAP_START = {210: 0x1001aecc,
              # 205's from his play at the table (0x100254d5 -> 0x100251eb: the
              # skis), which waits for Olga, round to the table again
-             205: 0x100251eb}
+             205: 0x100251eb,
+             # 207's from his dive (0x100169c5's continuation, the bar) round
+             # to the board again, which waits for the Mother in her chair
+             207: 0x100164ee,
+             # 204's from the gong's `leave` (his handler's `gong`, 0x10033236)
+             # round to the gong, where the idle step 0x10031b70 waits for it
+             204: 0x10032f52}
+# the switches the co-actors' scripts keep over the lap, (hidden, shown)
+# (207's Olga lies on her mat when he brings the shell: mat_guarded, whose
+# `shell` he plays, in the plain mat's place)
+LAP_PRESENT = {207: (('beachright_mat', 'beachright_mat_guarded'),)}
 # the step object's bytes at a lap's start (205's script arms its mat step's
 # `talk` in its constructor, 0x10025a9f, and the table step re-arms it)
 LAP_BYTES = {205: {'obj0xd': 1}}
@@ -473,6 +495,8 @@ def lap_steps(n):
     loop's first index (None when the walk stops)"""
     d = Data(n)
     st = LAP_START.get(n) or level_start(n); lv = Level(n)
+    for hid, shown in LAP_PRESENT.get(n, ()):
+        lv.present.discard(hid); lv.present.add(shown)
     steps, loop = walk(lv, st, bytes0=LAP_BYTES.get(n))
     out = []; ctx = {}
     for i, (cur, ev, nxt) in enumerate(steps):
@@ -819,11 +843,29 @@ PAIRS = {
           'Rockets': [(None, 'rocket', 'ignite')],
           'SandSculpture': [('sandlion', 'neighbor', 'lookaround'), (None, 'sandlion', 'kick')],
           'OlgaMatBeach': [(None, 'neighbor', 'talk'), (None, '-', 'wait')]},
+    # his lap after the dive (the bar's drink, the elephant, the shell on
+    # Olga's mat, the kid's castle, his towel's bar); the board waits for
+    # the Mother in her deck chair and is timed per clip (pc_durations_s2.py
+    # CLIPS, Level207MotherBehavior)
+    # his lap from the gong's `leave` (the hot dogs, the jade, the rickshaw
+    # Olga sits in, the headbanger, the gong the elvis figure strikes — its
+    # behavior="gong" on him sends him out of it as it starts)
+    204: {'HotDog': [('hotdogshop', 'neighbor', 'lookaround'), (None, 'hotdogshop', 'use')],
+          'JadeNecklace': [(None, 'jadedummy', 'look')],
+          'PullKart': [(None, 'rickshaw', 'use')],
+          'Karate': [(None, 'headbanging', 'use')],
+          'GongDrumstick': [(None, 'gong', 'use')]},
+    207: {'Bartender': [(None, 'keeper', 'order_drink')],
+          'Elephant': [('elefant', 'neighbor', 'lookaround'), (None, 'elefant', 'spit_at_elefant')],
+          'Shell': [(None, 'beachright_mat_guarded', 'shell')],
+          'SandCastle': [('kid', 'neighbor', 'lookaround'), (None, 'kid', 'splash')],
+          'BeachTowel': [(None, 'beachleft_mat_guarded', 'enter'), (None, 'beachleft_mat_guarded', 'bar'),
+                         (None, 'beachleft_mat_guarded', 'leave')]},
 }
 
 
 # the levels whose unclosed walk still covers every station (code_stays)
-OPEN_LAPS = (205, 210)
+OPEN_LAPS = (204, 205, 207, 210)
 
 
 def code_stays(n):
