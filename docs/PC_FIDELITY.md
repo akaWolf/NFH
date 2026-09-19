@@ -991,17 +991,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   wherever the data gives it), 202-209 and 214 included — with the coin
   ticks of their records (the "compound coins" entry). Three rules of the
   pairing: a PC bubble the port has no station for is skipped (214's
-  CaptainWheel — the door's stay is the mobile's), a port visit the PC
+  CaptainWheel — the door's stay was the mobile's until 214's became the
+  code's), a port visit the PC
   never makes keeps the mobile length as a leading 0 in the per-visit
   list (209's first shoe: the PC does the Taj before the shoes, so the
   Taj span is the Taj's alone, 10 s, and the shoe span the second
-  visit's, 2 s), and a lap that is a two-actor handshake keeps the
-  mobile pace as a whole (214: his pistol sequence fires mother_sleep,
-  the Mother's sit fires mother_sit and releases his WaitWatch at the
-  second pistol — the Level214 behaviour, cs:62-65 and 130-147; with the
-  PC stays he reaches the pistol after her sit and the two wait for each
-  other for good, and the PC's Mother script is unread — so 214 carries
-  the mobile pace whole). Under the carry 202-209 rate 100 as before
+  visit's, 2 s), and a lap that is a two-actor handshake kept the
+  mobile pace as a whole until the handshake was read (214: his pistol
+  sequence fires mother_sleep, the Mother's sit fires mother_sit and
+  releases his WaitWatch at the second pistol — the Level214 behaviour,
+  cs:62-65 and 130-147; with the PC stays he reached the pistol after her
+  sit and the two waited for each other for good — carried by code since
+  2026-09-23, "214's handshake" below). Under the carry 202-209 rate 100 as before
   (209 once the Taj/shoe pairing was the PC's order; a Taj of 3.2 s had
   him turn on Woody at the shoe).
   The overlay writers (tools/pcref/pc_durations_s2.py, coins.py,
@@ -1237,7 +1238,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   interrupts restarts whole — under the carry her Zone02 visit ran 26 s
   and caught the hand trip. 208/209's dressing room, 207/210/211's pool,
   nap and sea-view loops have no explicit time and keep the mobile clips;
-  214's handshake keeps the mobile pace whole.
+  214's Mother takes her script's (the reling's 80 ticks, her bar in the
+  chair — "214's handshake").
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier
@@ -1345,6 +1347,46 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   step (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`) is the
   registry's other generic behaviour. The catch fiber itself (0x100061dc)
   sets no gait.
+- *214's handshake (2026-09-23).* The Mother's script (GameLogic.dll:
+  fcn.1003a379, vtable 0x100b05b8, its first step 0x1003a0ae) starts her
+  in the awake step 0x10039e6c — to the deck chair and in (its `enter`,
+  sitdown, 9 frames), flag 4 off, `awake` — and waits there on her
+  handler (0x1003a2bb): `standup` sends her to the sleep step 0x1003a0b8
+  (the chair's `sleep`, flag 4 on, fcn.1000e7f2's bar of 600 ticks,
+  0x1003a1e0), whose continuation is the reling step 0x10039f34 (the
+  chair's `leave`, getup, 16 frames; the walk; the reling's `use`, 80
+  ticks) and back to the awake step; `crash` sends her running to him
+  (0x1003a21c, gait 2) and then to sleep. `standup` is the pistol's: its
+  `use` carries behavior="standup" for the mother (ship4 objects.xml),
+  fired as the use starts. His pistol step (0x1003aa93) tests her after
+  the walk — her current action the deck chair's and her flag 4 clear
+  (0x1003abc9-0x1003ac19) — and otherwise plays `wait` and re-runs each
+  tick (0x1003ad7d) until she sits awake. The mobile's Level214 pair is
+  the same shape driven by events (mother_sleep at his play's end,
+  mother_sit / mother_wake swapping the pistol's sets and releasing his
+  WaitWatch) and races: a sit while he walks to the pistol leaves his
+  WaitWatch with no release — the deadlock the PC stays had hit. Carried
+  under the profile: RottweilerMotherBehaviour polls her each tick while
+  he waits at the pistol and fires mother_sleep as PistolPlay starts
+  (the pistol's stay its `use` alone); MotherSleepBehaviour plays her
+  sit at the chair's `enter`, her sleeps at the bar's 600 ticks and the
+  get-up at the `leave` (PCSitSeconds / PCSleepSeconds / PCGetUpSeconds,
+  tools/pcref/pc_durations_others.py BARS), MotherWait at the reling's
+  6.7 s (PCUseSecondsRole); his stays are the code's (lap_model_s2, which
+  now reads the hatch step's own byte and the bouquet's IsVariant null
+  test: the hatch 5.17, the shower 3.58, the bouquet 4.17, the door 4.33,
+  the pistol 8.25). The idle lap under it is 85.3 s against the model's
+  90.3 and the video's 91 (shower to shower; the 75 of the 2026-09-06
+  table had dropped the CaptainWheel span, the door's bubble, now paired
+  in tools/pcref/laps_natural.py); her cycle is 83.4 s, so she sits back
+  in her chair about 2 s before his next pistol and he does not wait.
+  The old plan's windows were the mobile pace's; 214 was re-planned to it
+  (tests/plans/pc/s2 v2): the shards round at once after the take, out of
+  Zone02 each time through the Zone01 door while he climbs to Zone04 —
+  its only way out before her reling walk — Woody in her chair while he
+  comes up for the door, and the door, the mug, the wheel and the ammo
+  right after one of his pistols, so the wheel's 80 (559 s) and the
+  pistol's 40 (583) pay on one lap: 100.
 - *The walker's object presence and the machines (2026-09-23).* The
   lap walker (tools/pcref/routine_order.py) took isObjectPresent
   (fcn.00479ff0: the object looked up, its flag 0x20 tested) as false; it

@@ -63,7 +63,8 @@ N-th in the level's order, from 1):
     python3 tests/run_tricks.py --all [--out=/tmp/nfh-tricks] [--jobs=4]
     NFH_SEED=<n> seeds the world's random draws per level (default 0: a
     run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
-    reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends;
+    reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends,
+    NFH_MAX_RESTARTS=<n> the restarts after a catch (default 4);
     NFH_SHOT_FPS=<n> saves n PNG frames a second into the run's dir.
     --profile=mobile selects the mobile-parity runtime (the PC-experience
     profile is the default: docs/PC_FIDELITY.md §7); the mobile regression
@@ -87,7 +88,7 @@ AWAIT_TIMEOUT_S2_PC = 210.0   # Season 2 under the PC profile: his laps by code 
                               # (the door passes and station runs of GameLogic.dll), a trick
                               # armed just after his visit pays a lap and a half later
 GATE_TIMEOUT = 160.0    # a Season-2 lap is ~100 s (L210: 98 s) — the room may open only next lap
-MAX_RESTARTS = 4
+MAX_RESTARTS = int(os.environ.get('NFH_MAX_RESTARTS', 4))   # 0: a plan study keeps the first attempt's state
 
 
 def parse_plan(path):

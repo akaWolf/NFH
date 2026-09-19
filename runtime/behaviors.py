@@ -2077,11 +2077,33 @@ class MotherSleepBehaviour(Behavior):
         self.mother_item = self.item('MotherItem')
         self.target_item = self.item('TargetItem')
         self.repeat_sleep = bool(self.value('RepeatSleep', True))
+        self._pc_sleep_scale = None      # the PC bar's pace, from the sleep after a sit on
         world.subscribe('mother_sleep', self.force_sleep)    # OnEnable, cs:63-66
 
     def play_animation(self, name):
         super().play_animation(name)
         it = self.action_item('Mother')
+        if pcprofile.is_pc() and it is not None and it is self.mother_item \
+                and self.mother is not None and self.mother_item.pc_sit_secs:
+            # the PC's chair (214, GameLogic's Mother script): she enters it
+            # with its `enter` clip (the awake step 0x10039e6c: GO_ENTER, then
+            # flag 4 off and `awake`) — the mobile's sit at that clip's pace;
+            # the awake loop at its own, the sleeps after a sit at the bar's
+            # (_force_sleep_after_trick)
+            if name == self.first_animation:
+                mobile = self.mother.anim.sequence_seconds([name])
+                if mobile > 0.0:
+                    self.mother.anim.time_scale = mobile / self.mother_item.pc_sit_secs
+            elif name == self.last_animation and self.mother_item.pc_getup_secs:
+                # the chair's `leave` before her walk to the reling
+                mobile = self.mother.anim.sequence_seconds([name])
+                if mobile > 0.0:
+                    self.mother.anim.time_scale = mobile / self.mother_item.pc_getup_secs
+            elif self._pc_sleep_scale is not None:
+                self.mother.anim.time_scale = self._pc_sleep_scale
+                self._pc_sleep_scale = None
+            elif name == self.target_animation:
+                self.mother.anim.time_scale = 1.0
         if it is not None and it is self.mother_item \
                 and name != self.target_animation:    # cs:36-55
             if name == self.first_animation:
@@ -2113,6 +2135,18 @@ class MotherSleepBehaviour(Behavior):
         else:
             seq = self.mother_item.use_tricked_anim.get('Mother') or []
         seq = [a for a in seq if self.mother.anim.has(a)]
+        if seq and pcprofile.is_pc() and self.mother_item.pc_sleep_secs \
+                and self.target_item is not None and not self.target_item.tricked:
+            # the PC's sleep (214): the pistol's `standup` sends her script to
+            # its sleep step (0x1003a0b8), the bar of 600 ticks in the chair
+            # (0x1003a1e0), then the chair's `leave` before the reling step
+            # (0x10039f34) — her sleeps at the bar's pace (PCSleepSeconds),
+            # the get-up at the leave's (play_animation); her use's end puts
+            # the pace back (Routine._finish)
+            mobile = self.mother.anim.sequence_seconds(
+                [a for a in seq if a != self.last_animation])
+            if mobile > 0.0:
+                self.mother.anim.time_scale = mobile / self.mother_item.pc_sleep_secs
         if seq:
             self._resequence(seq)
 
@@ -2124,6 +2158,15 @@ class MotherSleepBehaviour(Behavior):
         self.mother_item.current_sequence = 'MotherExtraUse'       # Item.cs:979
         seq = [a for a in self.mother_item.mother_extra_use
                if self.mother.anim.has(a)]
+        if seq and pcprofile.is_pc() and self.mother_item.pc_sleep_secs:
+            # the PC after the tricked pistol: her run to him ends in the
+            # sleep step (0x1003a21c's continuation 0x1003a0b8) — the sit at
+            # the chair's pace, the sleeps at the bar's, the get-up at the
+            # leave's
+            rest = [a for a in seq if a not in (self.first_animation, self.last_animation)]
+            mobile = self.mother.anim.sequence_seconds(rest)
+            if mobile > 0.0:
+                self._pc_sleep_scale = mobile / self.mother_item.pc_sleep_secs
         if seq:
             self._resequence(seq)
 
@@ -2203,9 +2246,48 @@ class RottweilerMotherBehaviour(Behavior):
         self.hatch2 = False
         self.hatch_close = False
         self.hide_bool = False
+        if pcprofile.is_pc():
+            # the PC's pistol step (GameLogic 0x1003aa93) polls the Mother
+            # each tick instead (update): the pistol keeps its serialized
+            # [WaitWatch, PistolPlay] / [WaitWatch, PistolFire]
+            return
         world.subscribe('mother_sit', self._unfreeze)        # OnEnable, cs:130-135
         world.subscribe('mother_sit', self._delete_animation)
         world.subscribe('mother_wake', self._add_animation)
+
+    def _pc_mother_awake(self):
+        """the PC pistol step's test (0x1003abc9-0x1003ac19): the Mother's
+        current action is the deck chair's (fcn.10049190 against
+        topright_deckchair) and her flag 4 is clear (fcn.100450dc) — she sits
+        in it awake, between the awake step's `enter` and the next sleep"""
+        m = self.mother
+        chair = self.target_item_mother
+        if m is None or chair is None:
+            return False
+        r = self.routine_of(m)
+        return r is not None and r.urgent_item is None and r.item is chair \
+            and r.state == r.USING and not m.pc_flag4
+
+    def update(self, dt):
+        """the PC's pistol step: at the pistol he waits (the `wait` clip,
+        0x1003ad7d, the step re-run each tick) until the Mother sits awake in
+        her chair, then plays it at once"""
+        if not pcprofile.is_pc():
+            return
+        rott = self.rott()
+        if rott is None or rott.anim.anim is None \
+                or rott.anim.anim.name != 'WaitWatch' \
+                or self.action_item('Rottweiler') is not self.target_item:
+            return
+        if self._pc_mother_awake():
+            # the pistol's stay (PCUseSeconds) is its `use`: the rest of the
+            # sequence takes the whole of it, the wait none
+            rest = list(rott.anim.seq)
+            total = rott.anim.sequence_seconds(['WaitWatch'] + rest)
+            if rest and total > 0.0 and rott.anim.time_scale != 1.0:
+                rott.anim.time_scale *= rott.anim.sequence_seconds(rest) / total
+            rott.anim.ignore_infinite = True
+            rott.anim._stop_single()
 
     def play_animation(self, name):
         super().play_animation(name)
@@ -2221,6 +2303,12 @@ class RottweilerMotherBehaviour(Behavior):
         if name == 'PistolPlay':                      # cs:57-61
             self.hide_bool = True
             self.hide_obj(self.target_item, True)
+            if pcprofile.is_pc() and it is self.target_item:
+                # the PC pistol's `use` carries behavior="standup" for the
+                # Mother (ship4 objects.xml): the watch table fires it as the
+                # use starts, and her script's handler (0x1003a2bb) sends her
+                # to sleep — not at the play's end (cs:116-119)
+                self.world.fire_event('mother_sleep')
         if name == 'WaitWatch':                       # cs:62-65
             rott = self.rott()
             if rott is not None:
@@ -2258,8 +2346,9 @@ class RottweilerMotherBehaviour(Behavior):
 
     def on_animation_sequence_ended(self):
         it = self.action_item('Rottweiler')
-        if it is not None and it is self.target_item:  # cs:116-119
-            self.world.fire_event('mother_sleep')
+        if it is not None and it is self.target_item \
+                and not (pcprofile.is_pc() and not self.target_item.tricked):
+            self.world.fire_event('mother_sleep')     # cs:116-119
         if self.hide_bool:                            # cs:123-127
             self.hide_bool = False
             self.hide_obj(self.target_item, False)

@@ -245,7 +245,7 @@ class Item:
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
-                 'pc_minigame_failed',
+                 'pc_minigame_failed', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -605,6 +605,12 @@ class Item:
         self.pc_use_secs_role = {r: [float(x) for x in (w if isinstance(w, list) else [w])]
                                  for r, w in vr.items() if w}
         self.pc_use_visit_role = {}
+        # the Mother's chair under the profile (tools/pcref/pc_durations_others.py
+        # BARS: 214's deck chair): its `enter` clip, her script's bar there and
+        # the chair's `leave` — MotherSleepBehaviour's PC arm
+        self.pc_sit_secs = float(d.get('PCSitSeconds') or 0.0)
+        self.pc_sleep_secs = float(d.get('PCSleepSeconds') or 0.0)
+        self.pc_getup_secs = float(d.get('PCGetUpSeconds') or 0.0)
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
         # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and

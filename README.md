@@ -154,15 +154,15 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   station stays, compound coins and reaction clips are carried on every
   episode since 2026-09-18, and the Mother's PC stands on 212
   (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound coins"
-  / "Season 2 reactions" / "The other actors' stands"; 214's lap is a
-  neighbour-Mother handshake and keeps the mobile pace); a coin is
+  / "Season 2 reactions" / "The other actors' stands"); a coin is
   credited as its trick action completes, where the PC's bar jumps. Since
   2026-09-23 the Season 2 walk is GameLogic.dll's too — the door pair as
   one step (the walk to the near door's hotspot, the movement or the
   clips out of every room, the run down in the far room), the runs up
   and down to the stations' hotspots, the path finder's routes between
-  stations — and the stays on the six levels whose lap the code closes
-  are the code's (`docs/PC_FIDELITY.md` "Season 2 walks"); the plans of
+  stations — and the stays on the levels whose lap the code closes (six,
+  214 the seventh since its handshake was read) are the code's
+  (`docs/PC_FIDELITY.md` "Season 2 walks"); the plans of
   203, 206, 207, 208, 210-214 were re-timed to it (213's pile on his lap
   3, 212's on lap 5). Since 2026-09-23 the Season 2 catch is the PC's as
   well — generic/trigger.xml's room trigger for the neighbour and the
@@ -174,7 +174,12 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   212 and 213 were re-timed to them (212's pile now on his lap 6), and
   all 28 levels rate 100 again. The mini-game's level tick is the PC's
   order too: Woody's DoAction step adds the rate the game's last update
-  left, the update follows it (§2.6 of `docs/PC_FIDELITY.md`).
+  left, the update follows it (§2.6 of `docs/PC_FIDELITY.md`). And 214's
+  neighbour-Mother handshake is the PC's script under the profile (it kept
+  the mobile pace until 2026-09-23): his pistol's `standup` puts her to
+  sleep in her chair for 600 ticks, she stands at the reling for 80 and
+  sits awake until his next pistol, where he waits for her — his stays
+  are the code's, and 214 was re-planned to it ("214's handshake").
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
@@ -195,19 +200,18 @@ are the level class's DoActions (the washer's 24 s in the video is the
 walk and give, wash, get_clothes; 47 s was a tricked lap), and the Season
 1 neighbour runs where game.exe sets his gait. The Season 2 idle laps
 under the profile (2026-09-23, the lap period on the neighbour's first
-station) sit within 5 % of GameLogic's lap model on the six levels it
+station) sit within 6 % of GameLogic's lap model on the seven levels it
 closes (203 99.5 s / 105, 208 82.5 / 85.5, 209 102.7 / 104, 211 80.8 / 85,
-212 125.2 / 124, 213 125.3 / 123); against the PC video 204 (-2 %), 205
-(-12 %), 207 (+2 %) and 210 (-15 %) are close, 202 is 60 s against 94 (its
-mat, beer and sea wait on the kid's and Olga's behaviours and the
-`waitsea` poll, which the level's code hands over to their scripts) and
-214's handshake keeps the mobile pace (113 s against 75); the Season 2
-gauge is 100 000 rage long and falls by leveldata's `time` every 1/12 s
-(0.36 %/s), and the coins are the levels' tricks.xml rage values. The
-Season 1 anger rule, the result captions and the map's perfect mark are
-read from the binaries and carried (`docs/PC_ROUTINES.md`,
-`docs/PC_VERIFICATION.md`). `docs/GAMEPLAY.md` §10–§11 list what resists a
-clean reimplementation.
+212 125.2 / 124, 213 125.3 / 123, 214 85.3 / 90.3 — the video's 91 shower
+to shower); against the PC video 204 (-2 %), 205 (-12 %), 207 (+2 %) and
+210 (-15 %) are close, 202 is 60 s against 94 (its mat, beer and sea wait
+on the kid's and Olga's behaviours and the `waitsea` poll, which the
+level's code hands over to their scripts); the Season 2 gauge is 100 000
+rage long and falls by leveldata's `time` every 1/12 s (0.36 %/s), and the
+coins are the levels' tricks.xml rage values. The Season 1 anger rule, the
+result captions and the map's perfect mark are read from the binaries and
+carried (`docs/PC_ROUTINES.md`, `docs/PC_VERIFICATION.md`).
+`docs/GAMEPLAY.md` §10–§11 list what resists a clean reimplementation.
 
 ## What makes this tractable
 
