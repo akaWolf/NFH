@@ -52,7 +52,10 @@ ALIAS = {'sofatv': 'sofa', 'potterydiesel': 'dieselchair', 'puddlerail': 'waterp
          'mother': 'callrtmother', 'turban': 'turbanshop', 'bull': 'mechanicalbull', 'parrot': 'parrotledge', 'throne': 'aztecthrone',
          'rod': 'fishingrod', 'jacket': 'lifejacket', 'gear': 'divinggear', 'castle': 'sandcastle', 'shell': 'seashell', 'bar': 'beachbar',
          'board': 'surfboard', 'tennis': 'tabbletennis', 'tabletennis': 'tabbletennis', 'skis': 'waterskiis', 'waterskis': 'waterskiis', 'shoes': 'hotshoe', 'taj': 'tadjmahal', 'sink': 'sinkaftershave', 'cake': 'birthdaycake', 'meat': 'steakmeat', 'eat': 'steakchair', 'sculpture': 'sandsculpture', 'pad': 'landingpad',
-         'dog': 'dogbasket', 'basket': 'dogbasket', 'mixer': 'mixer', 'kart': 'gokart', 'necklace': 'necklace', 'toilet': 'toilet'}
+         'dog': 'dogbasket', 'basket': 'dogbasket', 'mixer': 'mixer', 'kart': 'gokart', 'necklace': 'necklace', 'toilet': 'toilet',
+         # 214: the bubble shows the wheel while he tries the captain's door
+         # (topright/door_closed `use`, GameLogic's door step 0x1003b1b9)
+         'captainwheel': 'captaindoor'}
 def match(pcname, mobname):
     a, b = norm(pcname), norm(mobname)
     a = ALIAS.get(a, a)

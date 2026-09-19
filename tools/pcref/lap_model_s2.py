@@ -54,12 +54,14 @@ horizontal tick from the stand ms1 / ms3 adds the record's `start`
 (0x10009332), at most a tick a walk, not counted.
 
 Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
-212 and 213 (214's with two empty steps, its bouquet and wheel); 201 (the
+212, 213 and 214 (its hatch behind the step's own byte, its bouquet behind
+IsVariant's null test — both read since the same evening); 201 (the
 tutorial), 202, 204, 205, 207 and 210 stop at a step whose handover comes
 from another actor's script. Not modelled: 206's and 214's waits on the
 Mother, 213's polls on Olga's picnic and bull ride, 209's fakir `spit`. With
 the walks the laps come to 105 s (203), 85.5 (208), 104 (209), 85 (211), 124
-(212) and 123 (213) against the PC video's 84-112, 86, 97, 85, 113 and 136 —
+(212), 123 (213) and 90.3 (214) against the PC video's 84-112, 86, 97, 85, 113,
+136 and 91 (214's shower to shower, docs/PC_LAPS_DETAIL.md) —
 the video's stays (pc_durations_s2.py) held the walk the port's geometry did
 not have until the door passes and the station runs were carried
 (tools/pcref/pc_walks_s2.py); code_stays hands the profile the code's.
@@ -206,9 +208,16 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0):
         m = re.match(r'cmp byte \[ebp - (0x[0-9a-f]+)\], (bl|0)$', t)
         if m:
             v = bytevars.get(m.group(1)); zf = None if v is None else (v == 0); k += 1; continue
-        m = re.match(r'cmp byte \[e(?:di|si|bx) \+ (0x[0-9a-f]+)\], (bl|0)$', t)
+        m = re.match(r'cmp byte \[e(?:di|si|bx|cx) \+ (0x[0-9a-f]+)\], (bl|0)$', t)
         if m:
+            # the step object's own byte (ecx is the step at its entry: 214's
+            # hatch test at 0x1003a513)
             zf = (bytevars.get('obj' + m.group(1)) or 0) == 0; k += 1; continue
+        m = re.match(r'cmp dword \[ebp - (0x[0-9a-f]+)\], (ebx|0)$', t)
+        if m and m.group(1) in vars_:
+            # IsVariant's out against null: set when one of its objects is
+            # present (214's bouquet at 0x1003b48f)
+            zf = vars_[m.group(1)] is None or not lv.is_present(vars_[m.group(1)]); k += 1; continue
         if re.match(r'(cmp|test|add|sub|and|or|xor|inc|dec|neg|sbb|adc|shl|shr|sar) ', t):
             zf = None
         m = re.match(r'j(e|ne|z|nz) (0x[0-9a-f]+)$', t)
@@ -713,6 +722,12 @@ PAIRS = {
           'PlantCarnivore': [('carnivore', 'neighbor', 'lookaround'), (None, 'carnivore', 'use')],
           'Tortilla': [(None, 'tortilla', 'use')], 'Pinata': [(None, 'pinata', 'use')],
           'CementBath': [('washingtub', 'neighbor', 'lookaround'), (None, 'washingtub', 'use')]},
+    # the untricked lap: the hatch looked into open (the step's byte +0xe is
+    # set only once the fish round has written it off), the shower, the
+    # bouquet shown to Olga, the captain's door tried, the pistol played
+    214: {'Hatch': [(None, 'hatch_open', 'use')], 'Shower': [(None, 'shipshower', 'use')],
+          'Bouquet': [(None, 'bouquet', 'use')], 'CaptainDoor': [(None, 'door_closed', 'use')],
+          'Pistol': [(None, 'pistol', 'use')]},
 }
 
 

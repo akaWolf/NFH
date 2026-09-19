@@ -57,13 +57,11 @@ PER_LEVEL = {
 }
 SKIP = {'Fifi', 'Mother', 'ToiletMen', 'Rake',
         'Toilet', 'Phone', 'Vacuum', 'Towel', 'Candy', 'MagnesiumBottle'}   # other actors' icons, a walk-by without a use; Season 1 stations the mobile routine has not or takes in a second
-# stations kept at the mobile pace per level: 214's lap is a neighbour-Mother
-# handshake timed as a whole (his pistol sequence fires mother_sleep, her sit
-# fires mother_sit and releases his WaitWatch at the second pistol,
-# Level214 behaviour cs:62-65/130-147): with the PC stays he reaches the pistol
-# after her sit and both wait for each other for good; the PC's Mother script
-# is unread, so the whole lap stays the mobile's
-SKIP_LEVEL = {214: {'Shower', 'Bouquet', 'CaptainWheel', 'Pistol', 'Hatch'}}
+# stations kept at the mobile pace per level (none since 2026-09-23: 214's
+# neighbour-Mother handshake is the PC's under the profile — he polls her at
+# the pistol, GameLogic 0x1003abc9-0x1003ad7d, RottweilerMotherBehaviour — and
+# its stays are the code's)
+SKIP_LEVEL = {}
 MIN_STAY = 0.5
 
 
@@ -91,7 +89,7 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (203, 208, 209, 211, 212, 213)
+CODE = (203, 208, 209, 211, 212, 213, 214)
 
 
 def pc_spans(n):

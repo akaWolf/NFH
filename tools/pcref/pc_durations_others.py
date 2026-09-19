@@ -10,8 +10,14 @@ explicit waits are carried. The mobile stands come from the profile's idle runs
 (runs/idlepc2s2, the other roles' `using` stretches — NFH_SCRATCH/
 s2_idle_others.json) and are paired by hand per level in ALIAS: a mobile stand
 that covers two PC stations in one room takes their sum less the walk between.
-Level214's lap is a neighbour-Mother handshake and keeps the mobile pace whole
-(docs/PC_FIDELITY.md "Season 2 station durations")."""
+
+A Mother's bar in her own script (BARS: 214's deck chair — GameLogic.dll's
+sleep step 0x1003a0b8 walks her to the chair and holds her there for the
+ticks it pushes to fcn.1000e7f2, 600 at 0x1003a1e0, before the reling step
+0x10039f34) is carried with the chair's clips: PCSitSeconds the chair's `enter`
+(the mobile's sit, MotherSleepBehaviour's FirstAnimation), PCSleepSeconds the
+bar's ticks (her sleeps) and PCGetUpSeconds the chair's `leave` (the get-up,
+its LastAnimation) — MotherSleepBehaviour's PC arm plays them at that pace."""
 import json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +33,25 @@ ALIAS = {
     213: {'MotherWaitZone2': ('Mother', ['bottomright/water.use'], 0.0),
           # the port's Zone05 holds the statue and the flowers: two PC stations
           'MotherWaitZone5': ('Mother', ['midright/statue_hideout.use', 'topright/flowers.use'], 2.0)},
+    # her reling step after the sleep (0x10039f34: the GoTo and the reling's use)
+    214: {'MotherWait': ('Mother', ['bottomright/reling.use'], 0.0)},
 }
+# level -> mobile item -> (the Mother script's sleep step, the chair) — the step
+# whose fcn.1000e7f2 bar holds her in the chair (lap_model_s2.run_step reads the
+# pushed ticks)
+BARS = {214: {'DeckChairMother': (0x1003a0b8, 'topright_deckchair')}}
+
+
+def bar_secs(n, step, chair):
+    """(sit, sleep, get-up) seconds: the chair's `enter`, the bar's ticks and
+    the chair's `leave`, at 12 ticks a second"""
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), step, {})
+    ticks = [e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)]
+    d = lap_model_s2.Data(n)
+    sit = d.action_ticks(chair, 'enter'); leave = d.action_ticks(chair, 'leave')
+    return round(sit / 12.0, 2), round(ticks[0] / 12.0, 2), round(leave / 12.0, 2)
 
 
 def _strip_key(patches, key):
@@ -70,7 +94,7 @@ def pc_actions(d):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or sorted(ALIAS)
+    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS))
     mob = json.load(open(os.path.join(SCRATCH, 's2_idle_others.json')))
     for n in levels:
         d = S2[n]; acts = pc_actions(d)
@@ -87,15 +111,30 @@ def main(argv):
                 item, role, secs, ' + '.join(pcs), ' - walk %.1f' % walk if walk else '',
                 ', '.join('%.1f' % x[1] for x in m) or '?'))
             per.setdefault(item, {})[role] = round(secs, 1)
+        bars = {}
+        for item, (step, chair) in BARS.get(n, {}).items():
+            sit, sleep, getup = bar_secs(n, step, chair)
+            print('   %-18s Mother  sit %.2f s, sleep %.2f s, get-up %.2f s  <- the step %#x\'s bar and %s\'s enter/leave' % (
+                item, sit, sleep, getup, step, chair))
+            bars[item] = (sit, sleep, getup)
         if write:
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
             ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
+            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds'):
+                ov['patches'] = _strip_key(ov['patches'], k)
             for item, roles in per.items():
                 _set_key(ov['patches'], item, 'PCUseSecondsRole', roles)
+            for item, (sit, sleep, getup) in bars.items():
+                _set_key(ov['patches'], item, 'PCSitSeconds', sit)
+                _set_key(ov['patches'], item, 'PCSleepSeconds', sleep)
+                _set_key(ov['patches'], item, 'PCGetUpSeconds', getup)
             note = " The other actors' stands (tools/pcref/pc_durations_others.py): the PC data's `time` ticks / 12 of the actions paired in ALIAS, as PCUseSecondsRole."
             if 'pc_durations_others' not in ov['source']:
                 ov['source'] += note
+            note2 = " The Mother's bar in her chair (tools/pcref/pc_durations_others.py BARS): PCSitSeconds the chair's enter, PCSleepSeconds the sleep step's bar ticks, PCGetUpSeconds the chair's leave, at 12 a second."
+            if bars and 'BARS' not in ov['source']:
+                ov['source'] += note2
             json.dump(ov, open(p, 'w'), indent=1, ensure_ascii=False); open(p, 'a').write('\n')
             print('   wrote', p)
 
