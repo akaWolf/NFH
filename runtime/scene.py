@@ -249,6 +249,8 @@ class Item:
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
+                 'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
+                 'pc_done_due',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -318,7 +320,9 @@ class Item:
                  'compound_extra_coin', 'plant_carnivore_extra',
                  'extra_coin_206', 'extra_coin_210', 'dog_basket_210',
                  'anger_amount', 'extra_coin_anger', 'extra_coin_toilet_211',
-                 'pc_extra_coin', 'pc_extra_coin_206', 'pc_laugh',
+                 'pc_extra_coin', 'pc_extra_coin_206', 'pc_laugh', 'pc_shout',
+                 'pc_credit_at', 'pc_credit_at_linked',
+                 'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -644,6 +648,13 @@ class Item:
         self.pc_credit_after = d.get('PCCreditAfter')
         self.pc_credited = False
         self.pc_credit_overflow = False
+        # the linked trick's own record in the linked step (PCLinkedPaysAt):
+        # due at its own tick, paid there, and whether it overflowed the meter
+        self.pc_linked_due = False
+        self.pc_linked_paid = False
+        self.pc_linked_overflow = False
+        self.pc_linked_amount = None     # the ladder's linked arm, settled by the first part
+        self.pc_done_due = False         # the pair's completion, booked with its last record
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
         # docs/PC_ROUTINES.md "The fire's tail"): the shout's index and
@@ -885,9 +896,25 @@ class Item:
         # overlays: tricks.xml's rage of the record the extra stands for)
         self.pc_extra_coin = d.get('PCExtraCoin')
         self.pc_extra_coin_206 = d.get('PCExtraCoin206')
-        # the PC record's laugh level: the neighbour's reaction clip set after
-        # this trick (pcprofile.S2_REACTION_CLIPS; tools/pcref/coins.py --write-laugh)
+        # the PC record's laugh level: the SHOUT level that stands in for the
+        # neighbour's reaction where the lap model reaches no SHOUT
+        # (pcprofile.s2_reaction_seconds; tools/pcref/coins.py --write-laugh)
         self.pc_laugh = d.get('PCLaugh')
+        # Season 2: the tricked step's own SHOUT (fcn.1000f977: its level picks
+        # the clip table; -1 none) where the lap model reads it, and the second
+        # of the tricked stand its first named trick record pays at
+        # (fcn.1000140b: the record's `time` into its action); the linked
+        # variant's — the step with both tricks in the scene or the script's
+        # other step — SHOUT, repair and its own record's second, and the
+        # second the linked trick's own record pays at (202's bridge_electrify
+        # 22 ticks after the crash's bridge_crash; tools/pcref/lap_model_s2.py
+        # code_stays_tricked)
+        self.pc_shout = d.get('PCShout')
+        self.pc_credit_at = d.get('PCCreditAt')
+        self.pc_credit_at_linked = d.get('PCCreditAtLinked')
+        self.pc_shout_linked = d.get('PCShoutLinked')
+        self.pc_fix_secs_linked = d.get('PCFixSecondsLinked')
+        self.pc_linked_pays_at = d.get('PCLinkedPaysAt')
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)
@@ -2381,7 +2408,8 @@ class Level:
                 # (pcprofile.s1_rage_percent, docs/PC_ROUTINES.md)
                 'rage_max': int(pd.get('PCAngryTime') or 0),
                 # the PC Season 2 gauge's decay per 1/12 s tick, in thousandths
-                # (leveldata.xml's `time`, GameLogic.dll fcn.10044234 — the PC
+                # (leveldata.xml's `time`, GameLogic.dll's level update 0x100442b3 at
+                # 0x100447c4 — the PC
                 # overlays carry it on the neighbour; docs/PC_ROUTINES.md)
                 'rage_decay_tick': int(pd.get('PCRageDecay') or 0),
                 'notice_near_distance': pd.get('NoticeWhenNearTrickedDistance')

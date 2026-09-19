@@ -205,23 +205,40 @@ def s1_rage_percent(current, level_angrytime):
 S2_TICK_HZ = 12
 
 
-# The Season 2 neighbour's reaction to a trick, read from GameLogic.dll
-# (0x1000f9b5-0x1000fa9b): the record's `laugh` level picks a clip table and
-# a seeded random picks the clip — 0: shout2_light; 1: shout2 or shout2_hard;
-# 2: shout2_hard and two more of the shout2 set; 3 and above: freakout1,
-# freakout2 or freakout3 — the tables at 0x100df45c, 0x100df434, 0x100df450
-# and 0x100df43c. The clips' lengths are generic/anims.xml's frames at 12 a
-# second (shout2 26 = 2.2 s, shout2_hard 85 = 7.1, freakout1 37 = 3.1,
-# freakout2 38 = 3.2, freakout3 63 = 5.2); the mobile's tantrum is its own
-# AngryEasyUp + AngryHard clips (~7.6 s), paced to the PC clip under the
-# profile (World.play_angry).
-S2_REACTION_CLIPS = {0: [2.2], 1: [2.2, 7.1], 2: [7.1, 2.2, 2.2], 3: [3.1, 3.2, 5.2]}
+# The Season 2 neighbour's reaction to a trick, read from GameLogic.dll: the
+# level script's SHOUT (fcn.1000f977) — its last parameter, the step's
+# constant (PCShout, tools/pcref/lap_model_s2.py code_stays_tricked), picks
+# the neighbour's action from one of four tables the DLL's static
+# initializers fill (0x1007b54b-0x1007b61d): 0 [shout2_light] (0x100df45c),
+# 1 [shout2, shout2] (0x100df434), 2 [shout2_hard x3] (0x100df450), 3
+# [shout2_high] (0x100df41c), any other level none; before them it always
+# picks one of [freakout1, freakout2, freakout3] (0x100df43c,
+# 0x1000f998-0x1000f9b0), which the SHOUT element (vtable 0x100ab99c, update
+# 0x1000d751) plays instead once the level's status byte +0x28 is set: the
+# trick credit fcn.1000140b sets it as the rage reaches 100 000
+# (0x10001500) and the level tick (0x10044710-0x100447f1) never clears it,
+# so every shout after the gauge's first overflow is a freakout. Each draw
+# is the level's random(n) (fcn.10040141), the freakout's first. The
+# actions (generic/objects.xml) play the neighbour's animations of their
+# names — shout2_light the shout2 one — time="auto": generic/anims.xml's
+# frames at 12 a second, shout2 26, shout2_hard 85, shout2_high 26,
+# freakout1 37, freakout2 38, freakout3 63. Where the model reaches no
+# SHOUT the trick record's `laugh` stands in for the level (PCLaugh); the
+# mobile's tantrum is its own AngryEasyUp + AngryHard clips (~7.6 s), paced
+# to the PC clip under the profile (World.play_angry).
+S2_SHOUT_FRAMES = {0: (26,), 1: (26, 26), 2: (85, 85, 85), 3: (26,)}
+S2_FREAKOUT_FRAMES = (37, 38, 63)
 
 
-def s2_reaction_seconds(laugh, rng):
-    """the seconds of the PC neighbour's reaction clip for a trick of this laugh level"""
-    table = S2_REACTION_CLIPS[min(max(int(laugh), 0), 3)]
-    return table[rng.randrange(len(table))] if len(table) > 1 else table[0]
+def s2_reaction_seconds(level, rng, full=False):
+    """the seconds of the PC neighbour's SHOUT at this level (the trick
+    record's laugh level where the model reaches no SHOUT): the level's
+    action, or, once the gauge has overflowed (`full`), the freakout the
+    SHOUT picked first"""
+    freak = S2_FREAKOUT_FRAMES[rng.randrange(len(S2_FREAKOUT_FRAMES))]
+    table = S2_SHOUT_FRAMES[min(max(int(level), 0), 3)]
+    pick = table[rng.randrange(len(table))]
+    return (freak if full else pick) / float(S2_TICK_HZ)
 
 
 def s2_rage_tick(meter, decay_per_tick):
@@ -246,6 +263,16 @@ def s2_rage_tick(meter, decay_per_tick):
 # then moves the mouse by the push (0x100448c6-0x100448db) and draws the
 # alarm field while the rate is negative (0x10044880).
 S2_GAME_AMPS = (20.0, 10.0, 5.0)
+# the PC's screen, in whose px the game measures the thumb and pushes the
+# mouse: 800 x 600 (nfh2 dialogs: mainmenu's status line at 10/570 790 wide,
+# the in-game right bar from 658/473; game.exe builds its context 0x320 x
+# 0x258), and the field's size on it: the green disk with its rim measures
+# 136 x 100 px of the 1280 x 720 stretch on Badinfos' E04 (video 759 s, the
+# toy dispenser) and 124 x 92 without the rim on E01 (176 s, the toolbox) —
+# 84 x 83 PC px, 77 without; minigame.xml's gui/game/field.tga itself is not
+# in the data archive
+S2_SCREEN = (800, 600)
+S2_FIELD_PX = 84
 S2_GAME_FREQS = (0.064774, -0.14611809302325582, 0.36959282352941175)
 S2_GAME_QUARTER = 0.78538475
 S2_GAME_TWO_PI = 6.283078

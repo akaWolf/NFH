@@ -571,6 +571,10 @@ class Pawn:
         # ticks — pcprofile.s1_rage_*); rage_max 0 means the mobile meter
         self.rage_max = spec.get('rage_max') or 0
         self.rage_decay_tick = spec.get('rage_decay_tick') or 0   # the PC Season 2 decay per tick
+        # the PC Season 2 level status's byte +0x28: set by the credit that
+        # overflows the gauge (fcn.1000140b, 0x10001500), never cleared —
+        # every SHOUT after it plays the freakout (pcprofile.s2_reaction_seconds)
+        self.pc_rage_full = False
         self.rage_current = 0
         self.rage_hold = 0
         self.rage_bonus = False          # the flag of the last trick (+0x7c)
@@ -2259,7 +2263,8 @@ class Pawn:
             self.angry_meter = float(
                 pcprofile.s1_rage_percent(self.rage_current, self.rage_max))
         elif pcprofile.is_pc() and self.rage_decay_tick > 0:
-            # the PC Season 2 gauge (GameLogic.dll fcn.10044234, 12 Hz): the
+            # the PC Season 2 gauge (GameLogic.dll's level update 0x100442b3,
+            # 0x100447c4, 12 Hz): the
             # rage falls by the level's `time` every tick, no latch
             self.rage_acc += dt
             period = 1.0 / pcprofile.S2_TICK_HZ
@@ -2923,6 +2928,10 @@ class Routine:
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
+        self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
+        self.pc_credit_item = None
+        self.pc_credit2_timer = 0.0      # the linked trick's own record, due later in the linked step (PCLinkedPaysAt)
+        self.pc_credit2_item = None
         self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
         self.started = False             # ActionManager.CurrentAction != null
@@ -3828,6 +3837,28 @@ class Routine:
                 self.pc_fire_item = ft
             elif w is not None:
                 w.s1_fire(self.pawn, ft)
+        if pcprofile.is_pc() and pcprofile.SEASON2 and self.role == 'Rottweiler' \
+                and it is not None and it.is_tricked(self.level.items):
+            # Season 2: the trick's record pays on the tick its `time`
+            # equals the action's elapsed count (fcn.1000140b, the cmp at
+            # 0x10001455), this far into the tricked stand (PCCreditAt; the
+            # linked trick's own, PCCreditAtLinked) — the paced use makes the
+            # PC seconds wall seconds
+            target = self._tricked_item(it)
+            linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
+            both = linked is not None and linked.tricked and bool(it.use_tricked_linked)
+            at = it.pc_credit_at_linked if (it.pc_credit_at_linked is not None and both) \
+                else it.pc_credit_at
+            if at is not None and target is not None and not target.pc_credited:
+                self.pc_credit_timer = float(at)
+                self.pc_credit_item = target
+            if both and it.pc_linked_pays_at is not None and target is not None:
+                # the linked trick's own record, its own tick of the linked
+                # step (fcn.1000140b credits each named record at its `time`:
+                # 202's bridge_electrify 22 ticks after bridge_crash)
+                target.pc_linked_due = True
+                self.pc_credit2_timer = float(it.pc_linked_pays_at)
+                self.pc_credit2_item = target
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -4521,6 +4552,8 @@ class Routine:
             self.item.pc_put.add(self.role)
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
+        self.pc_credit_timer = 0.0; self.pc_credit_item = None
+        self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
@@ -4735,6 +4768,8 @@ class Routine:
         self.pc_hold_cb = None
         self.pc_mutex_left = None
         self.pc_fire_at = 0.0; self.pc_fire_item = None
+        self.pc_credit_timer = 0.0; self.pc_credit_item = None
+        self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         if a is None or a.get('move_only'):
             return
         it = self.item
@@ -4895,6 +4930,8 @@ class Routine:
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
+        self.pc_credit_timer = 0.0; self.pc_credit_item = None
+        self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
@@ -5698,6 +5735,8 @@ class Routine:
         self._urgent_handler = None
         self.pc_hold = 0.0                    # a held station yields to the surprise
         self.pc_fire_at = 0.0; self.pc_fire_item = None
+        self.pc_credit_timer = 0.0; self.pc_credit_item = None
+        self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.pawn.anim.time_scale = 1.0
         w = self.pawn.world
         if pcprofile.is_pc() and w is not None and it.tricked \
@@ -6045,6 +6084,22 @@ class Routine:
                 w = self.pawn.world
                 if w is not None and self.item is not None:
                     w.pc_s2_credit(self.pawn, self.item)
+        if self.state == self.USING and self.pc_credit_timer > 0.0:
+            self.pc_credit_timer -= dt
+            if self.pc_credit_timer <= 0.0:
+                self.pc_credit_timer = 0.0
+                it, self.pc_credit_item = self.pc_credit_item, None
+                w = self.pawn.world
+                if it is not None and w is not None and not it.pc_credited:
+                    w.pc_s2_credit(self.pawn, it)
+        if self.state == self.USING and self.pc_credit2_timer > 0.0:
+            self.pc_credit2_timer -= dt
+            if self.pc_credit2_timer <= 0.0:
+                self.pc_credit2_timer = 0.0
+                it, self.pc_credit2_item = self.pc_credit2_item, None
+                w = self.pawn.world
+                if it is not None and w is not None:
+                    w.pc_s2_linked_credit(self.pawn, it)
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,
@@ -6062,6 +6117,8 @@ class Routine:
             if self.pc_hold <= 0.0:
                 self.pc_hold = 0.0
                 self.pc_fire_at = 0.0; self.pc_fire_item = None
+                self.pc_credit_timer = 0.0; self.pc_credit_item = None
+                self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
                 cb, self.pc_hold_cb = self.pc_hold_cb, None
                 if cb is not None:
                     cb()
@@ -6180,6 +6237,14 @@ class DexterityState:
         bh = H * 190 // 800; bw = W * 190 // 1280
         self.bg = [sx - bw / 1.5 + ba.get('x', 0.0),
                    sy - (bh + bh / 3.0) + ba.get('y', 0.0), bw, bh]
+        if self.pc_total:
+            # the PC's field is its own size on its 800 x 600 screen
+            # (pcprofile.S2_FIELD_PX), drawn round the remaster's middle
+            sw, sh = pcprofile.S2_SCREEN
+            cx, cy = self.bg[0] + bw / 2.0, self.bg[1] + bh / 2.0
+            pw = W * pcprofile.S2_FIELD_PX / float(sw)
+            ph = H * pcprofile.S2_FIELD_PX / float(sh)
+            self.bg = [cx - pw / 2.0, cy - ph / 2.0, pw, ph]
         ih = H * 80 // 800; iw = W * 80 // 1280
         self.item_rect = [sx - iw / 1.2 + ia.get('x', 0.0),
                           sy - ih * 2.5 + ia.get('y', 0.0), iw, ih]
@@ -6260,19 +6325,21 @@ class DexterityState:
 
     def _pc_offset(self):
         """the thumb's displacement from the field's middle as the PC's game
-        reads it (pcprofile.s2_game_offset: whole px, x 10, each axis held)
-        — the port's field is the remaster's, its reference pixels (1280 x
-        800) taken for the PC's"""
+        reads it (pcprofile.s2_game_offset: whole px, x 10, each axis held),
+        in px of the PC's 800 x 600 screen (pcprofile.S2_SCREEN): the port's
+        screen fraction for the PC's"""
         W, H = self.world.screen_size
-        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * 1280.0 / W
-        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * 800.0 / H
+        sw, sh = pcprofile.S2_SCREEN
+        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * sw / W
+        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * sh / H
         return pcprofile.s2_game_offset(int(ox), int(oy))
 
     def _pc_push(self, px, py):
         """the level tick moves the mouse by the game's output (whole PC px)"""
         W, H = self.world.screen_size
-        self.fg[0] += px * W / 1280.0
-        self.fg[1] += py * H / 800.0
+        sw, sh = pcprofile.S2_SCREEN
+        self.fg[0] += px * W / float(sw)
+        self.fg[1] += py * H / float(sh)
 
     def thumb_rect(self):
         """the drawn thumb: the PC draws it at the displacement held to the
@@ -6281,21 +6348,23 @@ class DexterityState:
         if not self.pc_total:
             return tuple(self.fg)
         W, H = self.world.screen_size
-        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * 1280.0 / W
-        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * 800.0 / H
+        sw, sh = pcprofile.S2_SCREEN
+        ox = (self.fg[0] + self.fg[2] / 2.0 - self.bg[0] - self.bg[2] / 2.0) * sw / W
+        oy = (self.fg[1] + self.fg[3] / 2.0 - self.bg[1] - self.bg[3] / 2.0) * sh / H
         r = (ox * ox + oy * oy) ** 0.5
         if r <= 100.0:
             return tuple(self.fg)
         k = 100.0 / r
-        return (self.bg[0] + self.bg[2] / 2.0 + ox * k * W / 1280.0 - self.fg[2] / 2.0,
-                self.bg[1] + self.bg[3] / 2.0 + oy * k * H / 800.0 - self.fg[3] / 2.0,
+        return (self.bg[0] + self.bg[2] / 2.0 + ox * k * W / float(sw) - self.fg[2] / 2.0,
+                self.bg[1] + self.bg[3] / 2.0 + oy * k * H / float(sh) - self.fg[3] / 2.0,
                 self.fg[2], self.fg[3])
 
     def _pc_tick(self, dt):
         """the PC's game, once a level tick (12 a second): the DoAction step
         (fcn.10001b2c) is Woody's job — the use_object step pushes it on his
         list (fcn.10049246, [actor+0x18]), his tick runs it (fcn.100492a8,
-        from fcn.10044234 at 0x100445f8) — and the game's update
+        from the actors' pass fcn.10044234 the level update 0x100442b3
+        calls at 0x100445f8) — and the game's update
         (fcn.100508a1) comes after it at 0x1004482b, so a tick adds the rate
         the last update left: the step adds it to the action's elapsed count,
         clamped at its `time`, and hands the game the progress, elapsed x 100
@@ -6822,15 +6891,22 @@ class World:
         if self.hud is not None:
             self.hud.play_rottweiler_angry(level)
 
-    def _s2_credit(self, pawn, item):
+    def _s2_credit(self, pawn, item, part=None):
         """the NFH2 ladder's meter arithmetic (Rottweiler.cs:613-663): the
         compounds' extras, the linked pair and the item's own AngerAmount;
-        returns whether the meter overflowed."""
+        returns whether the meter overflowed. Under the PC profile the linked
+        trick's own record may pay at its own tick of the linked step
+        (item.pc_linked_due, PCLinkedPaysAt): `part='linked'` pays that arm
+        alone, the rest leaves it for then — the arm's amount settled by
+        whichever part comes first (item.pc_linked_amount), before the
+        trick's OnTrickDone marks the pair (cs:785-787)."""
         items = self.level.items
         linked = items.get(item.linked_item_trick) \
             if item.linked_item_trick else None
         aux = item if item.kind in TRICK_KINDS else None
-        if item.extra_coin_toilet_211:         # cs:615-619
+        if part == 'linked':
+            pass
+        elif item.extra_coin_toilet_211:       # cs:615-619
             item.extra_coin_toilet_211 = False
             pawn.angry_meter += 20.0
         elif item.compound_extra_coin and aux is not None \
@@ -6865,21 +6941,36 @@ class World:
                 # `fall_empty` action, fall_empty 20000 in tricks.xml
                 # (the mobile's 10 is that coin halved; PCExtraCoin 20)
                 pawn.angry_meter += self._pc_extra(item, 10.0)
-        if linked is not None and linked.tricked and item.tricked:
+        if item.pc_linked_amount is not None:
+            # the arm settled by the other part: paid now if this is the
+            # linked record's tick
+            if part == 'linked':
+                pawn.angry_meter += item.pc_linked_amount
+                item.pc_linked_amount = 0.0
+        elif linked is not None and linked.tricked and item.tricked:
             # the linked-pair arm (cs:640-654)
             if not linked.already_tricked:
-                pawn.angry_meter += linked.anger_amount
+                amount = linked.anger_amount
                 if item.extra_coin_linked:
-                    pawn.angry_meter += item.extra_coin_anger
-            elif item.already_tricked and linked.already_tricked:
+                    amount += item.extra_coin_anger
+                if item.pc_linked_due and part != 'linked':
+                    item.pc_linked_amount = amount     # its record's tick pays it
+                else:
+                    pawn.angry_meter += amount
+                    if item.pc_linked_due:
+                        item.pc_linked_amount = 0.0    # paid ahead of the own part
+            elif item.already_tricked and linked.already_tricked \
+                    and part != 'linked':
                 pawn.tricked_aux = True
-        if not item.dont_get_angry and not pawn.tricked_aux \
+        if part != 'linked' and not item.dont_get_angry \
+                and not pawn.tricked_aux \
                 and not item.already_tricked:  # cs:655-658
             pawn.angry_meter += item.anger_amount
         overflow = False
         if pawn.angry_meter > pawn.angry_max:  # cs:659-663
             pawn.angry_meter = pawn.angry_max
             overflow = True
+            pawn.pc_rage_full = True
         return overflow
 
     def pc_s2_credit(self, pawn, item):
@@ -6900,10 +6991,42 @@ class World:
             self._hud_angry(3)
             if self.hud is not None:
                 self.hud.play_whistle()
+        if item.pc_linked_due and not item.pc_linked_paid:
+            # the pair is done with its last record: the level's done count
+            # is its trick table's credited records (fcn.1000140b ->
+            # fcn.100522e6, the count fcn.1005225b), so the linked record
+            # completes it after its rage (pc_s2_linked_credit)
+            item.pc_done_due = True
+            return
+        self._pc_trick_done(item)
+
+    def _pc_trick_done(self, item):
+        """the trick's completion as the mobile books it (cs:785-792)"""
         if not item.dont_get_angry:
             self._on_trick_done(item)              # cs:785-787
         if self.level_script is not None:
             self.level_script.on_trick_done()      # cs:789-792
+
+    def pc_s2_linked_credit(self, pawn, item):
+        """the linked trick's own record paid at its tick of the linked step
+        (PCLinkedPaysAt: fcn.1000140b credits each named record of a playing
+        action at its `time` — 202's bridge_electrify on the electrify's
+        fifth tick, 22 after the crash's bridge_crash): the linked arm's rage
+        now, the overflow's tick and whistle with it"""
+        if self.game is None or not item.pc_linked_due or item.pc_linked_paid:
+            return
+        item.pc_linked_paid = True
+        was = pawn.angry_meter >= pawn.angry_max
+        if self._s2_credit(pawn, item, part='linked') and not was \
+                and not (item.pc_credited and item.pc_credit_overflow):
+            item.pc_linked_overflow = True
+            pawn.angry_count_ticks += 1
+            self._hud_angry(3)
+            if self.hud is not None:
+                self.hud.play_whistle()
+        if item.pc_done_due:
+            item.pc_done_due = False
+            self._pc_trick_done(item)
 
     def s1_fire(self, pawn, item):
         """the PC's trick fire (game.exe fcn.0047bd00, docs/PC_ROUTINES.md "The
@@ -7044,6 +7167,11 @@ class World:
                 overflow = item.pc_credit_overflow
             else:
                 overflow = self._s2_credit(pawn, item)
+            if item.pc_linked_due and not item.pc_linked_paid:
+                # the linked record's tick not reached in the paced stand:
+                # it pays with the rest
+                self.pc_s2_linked_credit(pawn, item)
+            overflow = overflow or item.pc_linked_overflow
             # cs:664 divides by Item.AngerAmount raw: a 0 gives Infinity/NaN
             # in C# float math (neither <= 1 nor <= 2), never the 20 default
             # (Item.cs:392); no shipped item serializes 0
@@ -7061,8 +7189,9 @@ class World:
                 seq = [a for a in (item.angry_easy_up, item.angry_hard) if a]
                 self._hud_angry(3)
             else:                                  # cs:684-692
-                ticked = item.pc_credited and item.pc_credit_overflow
-                if not ticked:                     # (counted at pc_s2_credit)
+                ticked = (item.pc_credited and item.pc_credit_overflow) \
+                    or item.pc_linked_overflow
+                if not ticked:                     # (counted at pc_s2_credit / pc_s2_linked_credit)
                     pawn.angry_count_ticks += 1
                 # RandomFreakOut: Range(0,1) is always 0 — RottFreakoutHead
                 seq = ['RottFreakoutHead'] \
@@ -7110,6 +7239,11 @@ class World:
                 on_done()
             if item.fix_directly:                  # cs:781-784
                 self._fix(item)
+            item.pc_linked_due = item.pc_linked_paid = item.pc_linked_overflow = False
+            item.pc_linked_amount = None
+            if item.pc_done_due:               # booked at play_angry at the latest
+                item.pc_done_due = False
+                self._pc_trick_done(item)
             if item.pc_credited:
                 item.pc_credited = False           # paid already (pc_s2_credit)
             else:
@@ -7152,6 +7286,11 @@ class World:
                         p.play_directly(oit.item_anim_when_affected)
             if item.fix_directly:                  # cs:781-784
                 self._fix(item)
+            item.pc_linked_due = item.pc_linked_paid = item.pc_linked_overflow = False
+            item.pc_linked_amount = None
+            if item.pc_done_due:               # booked at play_angry at the latest
+                item.pc_done_due = False
+                self._pc_trick_done(item)
             if item.pc_credited:
                 item.pc_credited = False           # paid already (pc_s2_credit)
             else:
@@ -7179,6 +7318,11 @@ class World:
             seq.extend(fix_seq)
         if item.fix_directly:                      # cs:781-784
             self._fix(item)
+        item.pc_linked_due = item.pc_linked_paid = item.pc_linked_overflow = False
+        item.pc_linked_amount = None
+        if item.pc_done_due:               # booked at play_angry at the latest
+            item.pc_done_due = False
+            self._pc_trick_done(item)
         if item.pc_credited:
             item.pc_credited = False               # paid already (pc_s2_credit)
         elif not fired_early and not pc_s1:
@@ -7225,23 +7369,60 @@ class World:
             else:
                 play_fixes()
             return
-        shout = getattr(self.level_script, 'pc_shout', None)
-        level = shout(pawn, item) if (shout is not None and nfh2 and pcprofile.is_pc()) else None
-        if level is not None and level < 0:
-            # a scripted stop with no shout (201's buffet: its SHOUT takes the
-            # actor for the level, 0x10029a6c): the repair alone
+        level = None
+        both = linked is not None and linked.tricked and item.tricked \
+            and bool(item.use_tricked_linked)
+        if nfh2 and pcprofile.is_pc():
+            shout = getattr(self.level_script, 'pc_shout', None)
+            level = shout(pawn, item) if shout is not None else None
+            if level is None and both and getattr(item, 'pc_shout_linked', None) is not None:
+                # the linked variant's own SHOUT (PCShoutLinked: 202's
+                # electrified rail pushes 2 where the crash alone pushes 1)
+                level = item.pc_shout_linked
+            elif level is None:
+                level = getattr(item, 'pc_shout', None)
+        if level is not None and seq:
+            # the tricked step's own SHOUT and repair (fcn.1000f977: the level
+            # picks the action, pcprofile.s2_reaction_seconds — the freakout
+            # once the gauge has overflowed; -1 none — no
+            # SHOUT in the step, or 201's buffet, whose SHOUT takes the actor
+            # for the level, 0x10029a6c), then the repair at its ticks
+            # (PCFixSeconds; 0: the step has none — the mobile's fix clips go):
+            # the mobile's angry set at the pace of the shout, its fix clips
+            # at the repair's, one after the other
             fixes = [a for a in fix_seq if pawn.anim.has(a)]
-            head = [a for a in seq if a not in fixes]
-            seq = [a for a in seq if a not in head]
-        if seq:
-            laugh = level if level is not None else getattr(item, 'pc_laugh', None)
-            if nfh2 and pcprofile.is_pc() and laugh is not None and laugh >= 0:
-                # the PC neighbour's reaction to a trick is one short clip
-                # picked by the record's laugh level (pcprofile.S2_REACTION_CLIPS,
-                # GameLogic 0x1000f9b5) — or the level script's SHOUT
-                # (fcn.1000f977, the same tables): the mobile's angry set plays
-                # at the pace that lasts it — after_run restores the pace
-                pc = pcprofile.s2_reaction_seconds(laugh, random)   # the run's seeded module state
+            head = [a for a in seq if a not in fixes] if level >= 0 else []
+            fix_secs = getattr(item, 'pc_fix_secs', None)
+            if both and getattr(item, 'pc_fix_secs_linked', None) is not None:
+                fix_secs = item.pc_fix_secs_linked     # PCFixSecondsLinked
+            if fix_secs is not None and fix_secs <= 0.0:
+                fixes = []
+
+            def play_fixes_s2():
+                pawn.anim.time_scale = 1.0
+                if fixes:
+                    if fix_secs:
+                        mobile = pawn.anim.sequence_seconds(fixes)
+                        if mobile > 0.0:
+                            pawn.anim.time_scale = mobile / fix_secs
+                    pawn.anim.play_sequence(fixes, on_end=after_run)
+                else:
+                    after_run(bool(head))
+
+            if head:
+                pc = pcprofile.s2_reaction_seconds(level, random, pawn.pc_rage_full)   # the run's seeded module state
+                mobile = pawn.anim.sequence_seconds(head)
+                if mobile > 0.0 and pc > 0.0:
+                    pawn.anim.time_scale = mobile / pc
+                pawn.anim.play_sequence(head, on_end=play_fixes_s2)
+            else:
+                play_fixes_s2()
+        elif seq:
+            if nfh2 and pcprofile.is_pc() and getattr(item, 'pc_laugh', None) is not None:
+                # an item the lap model has no tricked step for: the reaction
+                # clip by the trick record's laugh level (PCLaugh) over the
+                # whole angry set
+                pc = pcprofile.s2_reaction_seconds(item.pc_laugh, random, pawn.pc_rage_full)   # the run's seeded module state
                 mobile = pawn.anim.sequence_seconds(seq)
                 if mobile > 0.0 and pc > 0.0:
                     pawn.anim.time_scale = mobile / pc

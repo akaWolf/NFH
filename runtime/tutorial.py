@@ -1599,17 +1599,13 @@ class TutorialPC201(Tutorial):
             self.world.play_item_anim(rail, rail.idle_tricked)
 
     def pc_shout(self, pawn, item):
-        """the scripted shout's level where the PC script has one in place
-        of the trick's (SHOUT, fcn.1000f977: 1 after the crash_short,
-        0x1002a1cb / 0x1002847f; 2 after the wheeze, 0x100294fc); -1 none
-        (the buffet's 0x10029a6c passes the actor as the level, which no
-        case takes); None: the item's own"""
-        if pawn is not self.rott:
-            return None
-        if item is self.wp:
-            return 2 if self.nb_phase == 'combo' else 1
-        if item is self.buffet and self.nb_phase == 'pain':
-            return -1
+        """the scripted shout's level where the tutorial's step is not the
+        lap's (SHOUT, fcn.1000f977: 2 after the wheeze, 0x100294fc, where
+        the puddle's lap step shouts 1, 0x1002847f); None: the item's own
+        (PCShout — the buffet's 0x10029a6c pushes ebx, 1 by its
+        `xor ebx, ebx; inc ebx`)"""
+        if pawn is self.rott and item is self.wp and self.nb_phase == 'combo':
+            return 2
         return None
 
     # -- the drawing -------------------------------------------------------------
