@@ -37,26 +37,32 @@ ticks, 209's curtain and 208's platform `inactive` 120 and 60, 202's mat,
 207's and 210's deck chairs `sleep` 120. `code_stays` pairs the parts with
 the mobile routine items (PAIRS).
 
-The walks are not the PC's yet: GameLogic's walk step fcn.10009215 moves
-one axis a tick along the path's points — the vertical first, at the gait's
-up/down records (0x100de870 / 0x100debe8: mg0 / mg2, 3 px), then the
-horizontal (0x100de8dc / 0x100de8b0: mg1 / mg3, 8 px, the first step with
-its `start` when +0x2c is set) — and nothing writes the stair gait 7 for the
-neighbour (the writes of +0x3c are 2 and 6, and the actions' own gait); the
-path builder (fcn.10009489) that lays the points through a door pair is not
-read, and the Geometry / walk_ticks below is a first cut, not the PC's.
+The walks (walk_ticks) are GameLogic's: the GoTo's route is the path finder
+of fcn.1000a711 -> fcn.1000a421 / fcn.1000a12d, a Dijkstra over the rooms whose
+hop costs the Manhattan distance to the near door's `<actor>` hotspot plus the
+<neighbor> record's `costs` (500 on every record), the hop into the target room
+the far door's distance to the target as well (Geometry.route); per hop the
+actor walks to the near door's `<actor>_in` and passes the pair in one step
+(vtable 0x100ab1b8: the doors' enter + leave where the near door has an enter
+action for the actor, else a movement straight to the far `<actor>_out`,
+Geometry.door_pass); a movement steps one axis a tick (fcn.10009215) at the
+gait's records — mg0 / mg2 3 px up and down, mg1 / mg3 8 px along, nothing
+writes the stair gait 7 for the neighbour — through the waypoints of
+fcn.10009177: off the floor line and off the target's x to the floor first,
+then along it, then straight to the target (Geometry.leg). The first
+horizontal tick from the stand ms1 / ms3 adds the record's `start`
+(0x10009332), at most a tick a walk, not counted.
 
 Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
 212 and 213 (214's with two empty steps, its bouquet and wheel); 201 (the
 tutorial), 202, 204, 205, 207 and 210 stop at a step whose handover comes
-from another actor's script. Not modelled: the
-waits — an event's time (212's bank `sleep`, 209's curtain `inactive`,
-208's fakir), the polls on Olga and the Mother (213's picnic and bull), the
-walks. The actions alone are shorter than the stays read off the PC video
-(pc_durations_s2.py) at most stations — 212's bull ride 5.0 s against 19.0,
-the cigars 7.25 against 14.0, 213's cement bath 9.25 against 28.5 — because
-those spans hold the waits and the walk the model does not have yet; the
-profile keeps the video's stays until the waits are read.
+from another actor's script. Not modelled: 206's and 214's waits on the
+Mother, 213's polls on Olga's picnic and bull ride, 209's fakir `spit`. With
+the walks the laps come to 105 s (203), 85.5 (208), 104 (209), 85 (211), 124
+(212) and 123 (213) against the PC video's 84-112, 86, 97, 85, 113 and 136 —
+the video's stays (pc_durations_s2.py) held the walk the port's geometry did
+not have until the door passes and the station runs were carried
+(tools/pcref/pc_walks_s2.py); code_stays hands the profile the code's.
 """
 import re, json, bisect, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -276,7 +282,7 @@ def _frames_of(text):
 def _actions_of(text):
     """{object or actor name: {'gfx': .., 'act': {(actor, name): attrs}}}"""
     out = {}
-    for om in re.finditer(r'<(object|actor) name="([^"]+)"([^>]*?)(/?)>', text):
+    for om in re.finditer(r'<(object|actor|door) name="([^"]+)"([^>]*?)(/?)>', text):
         if om.group(4):
             continue                     # a self-closing tag holds no actions
         end = text.find('</%s>' % om.group(1), om.end())
@@ -429,29 +435,34 @@ if __name__ == '__main__':
         report(n)
 
 
-# -- the walks (a first cut; the transit rule is an assumption to check) ------------
+# -- the walks (GameLogic.dll) -------------------------------------------------------
 class Geometry:
-    """the level's rooms (level.xml: the floor line path1-path2 at its y), the
-    door pairs of its <neighbor> records and the hotspots of objects.xml; the
-    neighbour's speed records of generic/objects.xml (mg1 8 px a tick along the
-    floor, mg0 3 up and down, stair0 5 on a stair)"""
+    """the level's rooms (level.xml <room>: the floor line path1-path2 at path1's y,
+    its <neighbor> records — the far room, the door pair, the `costs`), the
+    placements (an object's room is the <room> block it stands in; a hotspot is
+    relative to its object's level.xml position) and the actors' speed records
+    of generic/objects.xml"""
     def __init__(self, n):
         folder = canon.pc_level(n)['folder']
         X = '%s/nfh2/x' % canon.ROOT
         lvx = canon.read('%s/%s/level.xml' % (X, folder))
         self.ob = canon.read('%s/%s/objects.xml' % (X, folder))
         go = canon.read('%s/generic/objects.xml' % X)
-        m = re.search(r'<actor name="neighbor"[^>]*>(.*?)</actor>', go, re.S)
-        sp = {dict(re.findall(r'(\w+)="([^"]*)"', t))['name']: dict(re.findall(r'(\w+)="([^"]*)"', t))
-              for t in re.findall(r'<speed\b[^>]*/>', m.group(1))}
-        self.speed = {k: int(v['speed']) for k, v in sp.items()}
-        self.start = {k: int(v['start']) for k, v in sp.items()}
+        self.speed = {}
+        for am in re.finditer(r'<actor name="(\w+)"[^>]*>(.*?)</actor>', go, re.S):
+            recs = [dict(re.findall(r'(\w+)="([^"]*)"', t)) for t in re.findall(r'<speed\b[^>]*/>', am.group(2))]
+            if recs:
+                self.speed[am.group(1)] = {r['name']: (int(r['speed']), int(r['start'])) for r in recs}
         self.rooms = {}
+        # an object's room is the level.xml <room> it is placed in — not its
+        # name's prefix (203: 'wallleft/melons' stands in groundleft)
+        self.room = {}
         for rm in re.finditer(r'<room name="(\w+)" offset="[^"]+" path1="([^"]+)" path2="([^"]+)">(.*?)</room>', lvx, re.S):
             x1, y1 = map(int, rm.group(2).split('/')); x2, _ = map(int, rm.group(3).split('/'))
             nb = [dict(re.findall(r'(\w+)="([^"]*)"', t)) for t in re.findall(r'<neighbor ([^>]*)/>', rm.group(4))]
             self.rooms[rm.group(1)] = {'x1': min(x1, x2), 'x2': max(x1, x2), 'y': y1, 'nb': nb}
-        # the placements: a hotspot is relative to its object's level.xml position
+            for on in re.findall(r'<(?:object|actor|door) name="([^"]+)"', rm.group(4)):
+                self.room[on] = rm.group(1)
         self.pos = {}
         for m2 in re.finditer(r'<(?:object|door|actor) ([^>]*)>', lvx):
             at = dict(re.findall(r'(\w+)="([^"]*)"', m2.group(1)))
@@ -464,68 +475,159 @@ class Geometry:
             end = self.ob.find('</%s>' % om.group(1), om.end())
             body = self.ob[om.end():end]
             self.hot[om.group(2)] = {h: tuple(map(int, o.split('/'))) for h, o in re.findall(r'<hotspot name="(\w+)" offset="([^"]+)"', body)}
+        # the doors whose pass is the actor's enter + leave (fcn.10003647):
+        # {door: {actor: True}}
+        self.door_acts = {}
+        for dm in re.finditer(r'<door name="([^"]+)"[^>]*>(.*?)</door>', self.ob, re.S):
+            self.door_acts[dm.group(1)] = set(re.findall(r'<action name="enter" actor="(\w+)"', dm.group(2)))
 
     def room_of(self, obj):
-        return obj.split('/')[0] if '/' in obj else None
+        return self.room.get(obj) or (obj.split('/')[0] if '/' in obj else None)
 
-    def point(self, obj, key='neighbor'):
+    def floor(self, room):
+        return self.rooms[room]['y']
+
+    def point(self, obj, key='neighbor', exact=False):
         h = self.hot.get(obj) or {}
-        p = h.get(key) or h.get('neighbor') or h.get('woody')
+        p = h.get(key) if exact else (h.get(key) or h.get('neighbor') or h.get('woody'))
         if p is None:
             return None
         ox, oy = self.pos.get(obj, (0, 0))
         return p[0] + ox, p[1] + oy
 
-    def route(self, a, b):
-        """[(door out, door in)] from room a to room b over the <neighbor> records"""
-        if a == b: return []
-        prev = {a: None}; q = [a]
-        while q:
-            r = q.pop(0)
-            for nb in self.rooms.get(r, {}).get('nb', []):
-                far = nb['name']
-                if far in prev or far not in self.rooms: continue
-                prev[far] = (r, nb.get('doorin'), nb.get('doorout')); q.append(far)
-                if far == b:
-                    path = []; cur = b
-                    while prev[cur]:
-                        pr, din, dout = prev[cur]; path.append((din, dout)); cur = pr
-                    return path[::-1]
+    def route(self, room, pos, room2, target, actor='neighbor'):
+        """the path finder (fcn.1000a421 over fcn.1000a12d, from the GoTo's
+        fcn.1000a711): Dijkstra over the rooms. A hop out of a node costs the
+        Manhattan distance from the node's point to the near door's `<actor>`
+        hotspot (fcn.10049e01) plus the record's `costs`, and a hop into the
+        target room the far door's hotspot's distance to the target as well
+        (fcn.1000a5b7, the position mode); a room is entered at the far door's
+        hotspot; the open list is kept sorted by cost, a new node going before
+        the equal ones (fcn.1000a097), a known room re-parented only for a lower
+        cost; the goal is tested as a node is popped. The GoTo then takes, per
+        pair of rooms, the room's first <neighbor> record naming the next one
+        (fcn.1004ca13). Returns [(near door, far door)] or None."""
+        if room == room2:
+            return []
+        start = {'room': room, 'pos': pos, 'cost': 0, 'parent': None}
+        nodes = {room: start}
+        opn = [start]
+
+        def insert(nd):
+            k = 0
+            while k < len(opn) and nd['cost'] > opn[k]['cost']:
+                k += 1
+            opn.insert(k, nd)
+        while opn:
+            nd = opn.pop(0)
+            if nd['room'] == room2:
+                rooms = []
+                while nd is not None:
+                    rooms.append(nd['room']); nd = nd['parent']
+                rooms.reverse()
+                out = []
+                for ra, rb in zip(rooms, rooms[1:]):
+                    rec = next(r for r in self.rooms[ra]['nb'] if r['name'] == rb)
+                    out.append((rec['doorin'], rec['doorout']))
+                return out
+            for rec in self.rooms.get(nd['room'], {}).get('nb', []):
+                far = rec['name']
+                a = self.point(rec.get('doorin'), actor, exact=True)
+                b = self.point(rec.get('doorout'), actor, exact=True)
+                if a is None or b is None or far not in self.rooms:
+                    continue
+                c = abs(nd['pos'][1] - a[1]) + abs(nd['pos'][0] - a[0]) + int(rec.get('costs', 0))
+                if far == room2 and target is not None:
+                    c += abs(b[1] - target[1]) + abs(b[0] - target[0])
+                ex = nodes.get(far)
+                if ex is not None:
+                    if ex['cost'] > nd['cost'] + c:
+                        ex.update(cost=nd['cost'] + c, parent=nd, pos=b)
+                        if ex in opn:
+                            opn.remove(ex)
+                        insert(ex)
+                    continue
+                new = {'room': far, 'pos': b, 'cost': nd['cost'] + c, 'parent': nd}
+                nodes[far] = new
+                insert(new)
         return None
 
-    def ticks(self, dx, dy, gait='mg'):
-        """one axis a tick, as game.exe's walk (fcn.0047c7f0): the floor at <gait>1,
-        the depth at <gait>0; the first step adds its `start`"""
-        dx, dy = abs(dx), abs(dy); t = 0
-        if dx:
-            s = self.speed[gait + '1']; st = self.start[gait + '1']
-            t += max(1, -(-(dx - st) // s) + 1) if dx > st else 1
-        if dy:
-            t += -(-dy // self.speed[gait + '0'])
+    def run(self, d, s):
+        """ticks of one axis run of d px at s px a tick: the walk step
+        (fcn.10009215) moves one axis a tick, clamped at the waypoint. The
+        first horizontal tick of a walk that starts from the stand ms1/ms3
+        adds the record's `start` (0x10009332) — at most a tick a walk, not
+        counted here"""
+        d = abs(d)
+        return -(-d // s) if d else 0
+
+    def leg(self, x, y, tx, ty, fy, actor='neighbor', gait='mg'):
+        """a movement's ticks from (x, y) to (tx, ty) with floor line fy, by the
+        waypoints of fcn.10009177 (+0x31 clear): off the floor and off the
+        target's x, down or up to the floor first; along it to the target's x;
+        then straight to the target"""
+        sp = self.speed[actor]
+        v = sp[gait + '0'][0]; vd = sp[gait + '2'][0]
+        h = sp[gait + '1'][0]
+        t = 0
+        if y != fy and x != tx:
+            t += self.run(fy - y, v if fy < y else vd); y = fy
+        if x != tx:
+            t += self.run(tx - x, h); x = tx
+        t += self.run(ty - y, v if ty < y else vd)
         return t
 
+    def door_pass(self, din, dout, actor='neighbor', gait='mg', data=None):
+        """the door-pass step (vtable 0x100ab1b8, fcn.1000340b / 0x10003a19)
+        after the walk to the near door's `<actor>_in`: the near door's `enter`
+        and the far door's `leave` when the near door has an enter action for
+        the actor (fcn.10003647, fcn.10003236: the actor placed at the far
+        door's `<actor>_out` between them), else a movement straight from
+        `<actor>_in` to the far door's `<actor>_out` whose floor line is the
+        start's y (fcn.100037f8 -> fcn.100090bd). Returns (ticks, in, out)."""
+        a = self.point(din, actor + '_in', exact=True)
+        b = self.point(dout, actor + '_out', exact=True)
+        if a is None or b is None:
+            return None, a, b
+        if actor in self.door_acts.get(din, ()):
+            if data is None:
+                return None, a, b
+            t1 = data.action_ticks(din, 'enter', actor)
+            t2 = data.action_ticks(dout, 'leave', actor)
+            return (None if t1 is None or t2 is None else t1 + t2), a, b
+        return self.leg(a[0], a[1], b[0], b[1], a[1], actor, gait), a, b
 
-def walk_ticks(g, frm, to):
-    """(room, x, y) -> object: the floor walks at mg, each door pair's hotspots at
-    the stair records (the assumption)"""
+
+def walk_ticks(g, frm, to, actor='neighbor', data=None, detail=None):
+    """(room, x, y) -> an object's `<actor>` hotspot: the GoTo's route
+    (Geometry.route), per hop the walk to the near door's `<actor>_in` along
+    the room's floor (Geometry.leg) and the door pass (Geometry.door_pass),
+    then the walk to the target. `detail` collects (kind, ticks) parts:
+    'room' the in-room legs, 'pass' the door passes."""
     room, x, y = frm
-    r2 = g.room_of(to); p2 = g.point(to)
-    if p2 is None or r2 not in g.rooms:
+    r2 = g.room_of(to); p2 = g.point(to, actor)
+    if p2 is None or r2 not in g.rooms or room not in g.rooms:
         return None, frm
-    t = 0
-    rt = g.route(room, r2)
+    rt = g.route(room, (x, y), r2, p2, actor)
     if rt is None:
         return None, frm
-    for d_in, d_out in rt:
-        # d_in is the door in this room ('room/far'), d_out the far room's ('far/room')
-        a = g.point(d_in); b = g.point(d_out, 'neighbor_out') or g.point(d_out)
-        if a is None or b is None:
+    t = 0
+    for din, dout in rt:
+        a = g.point(din, actor + '_in', exact=True)
+        if a is None:
             return None, frm
-        t += g.ticks(a[0] - x, 0)
-        t += g.ticks(b[0] - a[0], b[1] - a[1], 'stair')
-        x, y = b; room = d_out.split('/')[0]
-    t += g.ticks(p2[0] - x, 0)
-    return t, (r2, p2[0], p2[1])
+        t1 = g.leg(x, y, a[0], a[1], g.floor(room), actor)
+        t2, _a, b = g.door_pass(din, dout, actor, data=data)
+        if t2 is None:
+            return None, frm
+        if detail is not None:
+            detail.append(('room', t1)); detail.append(('pass %s' % din, t2))
+        t += t1 + t2
+        x, y = b; room = g.room_of(dout)
+    t3 = g.leg(x, y, p2[0], p2[1], g.floor(room), actor)
+    if detail is not None:
+        detail.append(('room', t3))
+    return t + t3, (r2, p2[0], p2[1])
 
 
 def lap_estimate(n, verbose=False):
@@ -556,7 +658,7 @@ def lap_estimate(n, verbose=False):
                 p = g.point(real)
                 pos = (g.room_of(real), p[0], p[1]) if p else None
             else:
-                t, pos2 = walk_ticks(g, pos, real)
+                t, pos2 = walk_ticks(g, pos, real, data=d)
                 if t is None:
                     unknown.append('walk to %s' % real)
                 else:
@@ -594,6 +696,10 @@ PAIRS = {
                              (None, 'fakir', 'stop')],
           'ShoeMachine': [(None, 'shoe_cleaner', 'use')],
           'AngryElephant': [('elephant', 'neighbor', 'lookaround'), (None, 'elephant', 'fool')]},
+    209: {'Cow': [('cow', 'neighbor', 'lookaround'), (None, 'cow', 'ride')],
+          'TadjMahal': [(None, 'curtain', 'enter'), (None, 'curtain', 'bar'), (None, 'curtain', 'leave')],
+          'HotShoe': [(None, 'shoe_mat_empty', 'take')],
+          'Coal': [(None, 'coal', 'walk')], 'IceCream': [(None, 'icecream_machine', 'take')]},
     211: {'Sweets': [(None, 'dish', 'use')], 'FishingRod': [(None, 'rod', 'use')],
           'LifeBoat': [('boat', 'neighbor', 'lookaround'), (None, 'boat', 'use')],
           'LifeJacket': [(None, 'lifevest', 'use')], 'DivingGear': [(None, 'diving', 'use')]},
