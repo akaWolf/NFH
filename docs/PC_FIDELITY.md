@@ -171,19 +171,26 @@ leaves: the mobile Hatch's Dexterity set by HatchFixBehavior). The harness
 steers the thumb half the way back a frame and counts the game's length
 into its gate (use_time): 212's plate now goes before the whip, its take
 straight after the game (v2), and 208's rat during his lap-2 shoe
-(tests/plans/pc/s2). Open, with numbers: the field — the remaster's
-reference pixels (1280 x 800) stand for the PC's, the PC's field.tga is not
-on hand; the order of a tick's DoAction step against the game's update
-(0x1004482b) — whether the elapsed count takes this tick's rate or the last
-one's, one tick (0.083 s) on every game (reread 2026-09-23: the level tick
-fcn.10044234 runs its job list — [level+0x18], each job's slot 2 run and
-re-queued unless done, 0x10044430-0x100444f5 — well before the game's
-update, so a DoAction run from that list takes the previous tick's rate;
-that the actors' DoAction steps are run from that list is the link not
-read); 203's Olga shout_chinese before
-his run is not played (the port's Olga has no such clip; he starts at the
-loss), and his run keeps the mobile's moment (at once if he walks, else
-when his clip ends) where the PC's `always` may start it at once.
+(tests/plans/pc/s2). The order within a level tick is the PC's
+(2026-09-23): the DoAction step is Woody's job — the use_object step
+makes it (fcn.10002cd5, the action step's vtable 0x100aa19c, its run
+0x100020c0 in slot 2) and pushes it on his list with a first run
+(fcn.10049246, [actor+0x18]), which only sets it up (state 0 -> 1) — and
+his tick runs it (fcn.100492a8, from fcn.10044234 at 0x100445f8), while
+the game's update (fcn.100508a1) comes later in the same level update, at
+0x1004482b; the game itself is made in that job pass (fcn.10041735,
+[level+0xc]), so its first update is at the end of its first tick. A
+tick so adds the rate the last update left, and the update after it rates
+the thumb anew (DexterityState._pc_tick / _pc_update: the first update at
+the game's start). A game's length is unchanged by it (a thumb in the
+middle: 3 + time/4 ticks) — the rate is the thumb's of one tick earlier;
+the fourteen Season 2 runs are byte-identical under it. Open, with
+numbers: the field — the remaster's reference pixels (1280 x 800) stand
+for the PC's, the PC's field.tga is not on hand; 203's Olga
+shout_chinese before his run is not played (the port's Olga has no such
+clip; he starts at the loss), and his run keeps the mobile's moment (at
+once if he walks, else when his clip ends) where the PC's `always` may
+start it at once.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -1294,24 +1301,43 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   a walk (fcn.1000e3e0), and generic/objects.xml gives the neighbour, the
   Mother and Olga mr1 18 / mr0 9. Carried where the mobile has the same
   moment: 206's pillow errands (six writes 0x1002ea9b-0x1002f0c4 — the
-  mobile's Urgent DeckChair / Pillows / DeckChair), 210's run to the
-  Mother's call (0x10018dd9 — the Urgent CallRTMother), 211's run to the
-  ringing cabin phone (0x1002fd04 — the alarm, CabinPhone's PCRunTo) and
-  to the WC after the sweets (0x10030e07 — the toilet run), and the
-  co-actors' runs to him after his crash, each a gait write before
-  fcn.1000eb19's walk to "neighbor" — the mobile's hit-pawn of the trick
-  item's PawnToAffectWhenTricked, run where the item carries PCRunTo
+  mobile's Urgent DeckChair / Pillows / DeckChair); the neighbour's runs
+  to the Mother's `call` — her callneighbor action (generic/objects.xml,
+  behavior="call" on the neighbour), whose handler in his script sets the
+  gait to 2 — on 210 from his beach deck chair to hers (the handler
+  0x1001b4f6 -> 0x1001911e, the write 0x10019270; the Urgent CallRTMother)
+  and on 208 when she finds Fifi gone (0x1001e50f -> 0x1001d828, the write
+  0x1001d889: to the rake if it is tricked, where he crashes, else to the
+  blades; the Urgent MotherRott the tricked Fifi injects, the rake
+  crashing him on the way by NoticeWhenWalkNearby) — every Season 2 Urgent
+  runs under the profile (Routine: pc_run); 211's run to the ringing cabin
+  phone (0x1002fd04 — the alarm, CabinPhone's PCRunTo) and to the WC after
+  the sweets (0x10030e07 — the toilet run); and the co-actors' runs to him
+  after his crash, each a gait write before fcn.1000eb19's walk to
+  "neighbor" — the mobile's hit-pawn of the trick item's
+  PawnToAffectWhenTricked, run where the item carries PCRunTo
   (World.play_angry; pc_reactions.py RUNTO_S2): 201's Olga at the damaged
   buffet (0x1002ad27), 204's at the rickshaw (0x10033486), 205's at the
   table tennis (0x1002637e), 206's Mother to the ramp on the rabbit's crash
   (0x1002bbd1), 207's Olga to the destroyed sand castle to lift him
-  (0x10017606), 214's Olga after the shower and the bouquet (0x1003c035,
-  one handler) and its Mother after the pistol (0x1003a27f); the stairs
-  keep their records. Their other walks to him the PC walks. Open, with
-  their sites: the runs of 201's tutorial (the buffet 0x10028b74, the soap
-  puddle 0x10029797), 205's nailed water ski (0x10024fde), 208's rake
-  (0x1001d889) and 210's second (0x10019270), which the mobile has no
-  moment for. A PC mechanic the mobile lacks — the `failed` action of
+  (0x10017606), 210's Mother from her deck chair when Fifi falls off the
+  elephant the bat tricked (fifi's `fall` is behavior="crash" on the
+  mother; her script's handler, vtable 0x100aca38 slot 4, 0x10018e15 ->
+  0x10018d76, the write 0x10018dd9 — since 2026-09-23; the mobile's
+  Elephant hit on her, which had walked), 214's Olga after the shower and
+  the bouquet (0x1003c035, one handler) and its Mother after the pistol
+  (0x1003a27f); the stairs keep their records. Their other walks to him
+  the PC walks. Open, with their sites: 201's tutorial — after the soap
+  puddle's crash_long the level script runs him to the entry's
+  neighbor_shout spot to shout, and to wheeze (0x10028b74 -> 0x1002833c,
+  0x10029797 -> 0x100294fc), where the mobile tutorial walks him on
+  through his lap (CrashShort / CrashLong, the anger, the deck rail or the
+  captain's hat); and 205's nailed water ski — after the ride the script
+  runs him back to the ski (0x10024fde), he pants and repairs it there
+  (0x1002512d) before the lap goes on (0x10024929), where the mobile
+  plays the anger and the fix at the ride's end and walks back on the
+  skates to put them (SkiWalk, 8.5 s from x -5.8 to -3.7 on the 205 run).
+  A PC mechanic the mobile lacks — the `failed` action of
   every level's game object (§2.6) dispatches the neighbour's `run`
   behaviour (0x1003e278: the alarm sound, a running GoTo fcn.100080e1,
   `search`) — carried: a lost game's surprise onto the object runs

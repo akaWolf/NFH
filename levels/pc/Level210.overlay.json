@@ -14,7 +14,8 @@
    "set": {
     "AngerAmount": 30,
     "PCLaugh": 0,
-    "PCUseSeconds": 2.5
+    "PCUseSeconds": 2.5,
+    "PCRunTo": true
    }
   },
   {

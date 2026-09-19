@@ -165,12 +165,17 @@ RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
 # damaged buffet (0x1002ad27), 204's at the rickshaw (0x10033486), 205's at
 # the table tennis (0x1002637e), 206's Mother to the ramp on the rabbit's
 # crash (0x1002bbd1), 207's Olga to the destroyed sand castle to lift him
-# (0x10017606), 214's Olga after the shower and the bouquet (0x1003c035, one
-# handler) and its Mother after the pistol (0x1003a27f) — each a gait write
-# then fcn.1000eb19's walk to "neighbor"; and 211's neighbour to the ringing
-# cabin phone (0x1002fd04, the mobile's alarm)
+# (0x10017606), 210's Mother from her deck chair when Fifi falls off the
+# elephant the bat tricked (fifi's `fall`, behavior="crash" on the mother:
+# her script's handler, vtable 0x100aca38 slot 4, 0x10018e15 -> 0x10018d76,
+# the write 0x10018dd9),
+# 214's Olga after the shower and the bouquet (0x1003c035, one handler) and
+# its Mother after the pistol (0x1003a27f) — each a gait write then
+# fcn.1000eb19's walk to "neighbor"; and 211's neighbour to the ringing cabin
+# phone (0x1002fd04, the mobile's alarm)
 RUNTO_S2 = {201: ('Buffet',), 204: ('PullKart',), 205: ('TabbleTennis',), 206: ('LaunchPad',),
-            207: ('SandCastle',), 211: ('CabinPhone',), 214: ('Shower', 'Bouquet', 'Pistol')}
+            207: ('SandCastle',), 210: ('Elephant',), 211: ('CabinPhone',),
+            214: ('Shower', 'Bouquet', 'Pistol')}
 # the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
 # fire first, one fall clip, no clean, index 1) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)

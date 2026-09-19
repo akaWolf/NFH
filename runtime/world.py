@@ -3203,8 +3203,9 @@ class Routine:
             # an Urgent action is approached at a run (MoveToGoalUrgent,
             # RoutineActionMove.cs:68-75); on PC the Season 2 ones are runs of
             # the level script too (206's pillows: the gait set to 2 before
-            # each walk, GameLogic 0x1002ea9b-0x1002f0c4; 210's call of the
-            # Mother, 0x10018dd9) — Season 1 has no Urgent routine action
+            # each walk, GameLogic 0x1002ea9b-0x1002f0c4; the Mother's `call`
+            # on 210, 0x10019270, and on 208, 0x1001d889) — Season 1 has no
+            # Urgent routine action
             self.pawn.in_urgent = bool(a.get('urgent'))
             self.pawn.pc_run = bool(a.get('urgent')) and pcprofile.is_pc() \
                 and pcprofile.SEASON2
@@ -5692,13 +5693,15 @@ class DexterityState:
         self.input = (0.0, 0.0)          # the frame's touch/mouse delta
         # the PC's game (tools/pcref/pc_minigames.py): the action's `time`,
         # its elapsed count, the level tick's accumulator, the game's own
-        # tick count (+0x20), the 10 % latch (+0x50), its progress (+0x1c),
-        # the wobble's three phases (+0x28..+0x38) and the frame's mouse
-        # motion in screen px (the PC's thumb is the mouse itself)
+        # tick count (+0x20), its rate (+0x18), the 10 % latch (+0x50), its
+        # progress (+0x1c), the wobble's three phases (+0x28..+0x38) and the
+        # frame's mouse motion in screen px (the PC's thumb is the mouse
+        # itself)
         self.pc_total = 0
         self.pc_elapsed = 0
         self.pc_acc = 0.0
         self.pc_ticks = 0
+        self.pc_rate = 0
         self.pc_latch = False
         self.pc_progress = 0
         self.pc_phase = [0.0, 0.0, 0.0]
@@ -5716,6 +5719,7 @@ class DexterityState:
         self.pc_elapsed = 0
         self.pc_acc = 0.0
         self.pc_ticks = 0
+        self.pc_rate = 0
         self.pc_latch = False
         self.pc_progress = 0
         self.pc_move = (0.0, 0.0)
@@ -5751,6 +5755,13 @@ class DexterityState:
             w.woody.movement_paused = True
         if self.spec['hide_object'] and self.item is not None:
             w.set_object_hidden(self.item, True)
+        if self.pc_total:
+            # the game is made in Woody's job pass of a level tick (the
+            # use_object step, fcn.10041735: [level+0xc]) and has its first
+            # update at the end of that tick (0x1004482b); the action step
+            # made with it only sets up on its first run (0x100020c0, state
+            # 0 -> 1)
+            self._pc_update()
 
     def tick(self, dt):
         """FixedUpdate (DexterityComponent.cs:183-271), the running branch"""
@@ -5848,35 +5859,21 @@ class DexterityState:
                 self.fg[2], self.fg[3])
 
     def _pc_tick(self, dt):
-        """the PC's game, once a level tick (12 a second): GameLogic.dll's
-        game object (fcn.100508a1) puts the thumb back on the middle over its
-        first three ticks and leaves the rate at 0; after them it rates the
-        thumb by its distance to the field's middle and pushes it by the
-        wobble (pcprofile.s2_game_rate / s2_game_push, the factor from the
-        combination's levels, PCMinigameLevels). The DoAction step
-        (fcn.10001b2c) adds the rate to the action's elapsed count, clamped at
-        its `time`, and hands the game the progress, elapsed x 100 / time
-        (fcn.100507dd, latching at 10). The count at the action's time wins it
-        (the object's action), below 0 fails it (the `failed` action). Open:
-        whether the DoAction step of a tick reads this tick's rate or the
-        last one's (the actors' steps against 0x1004482b in the level tick) —
-        one tick, 0.083 s, on every game"""
+        """the PC's game, once a level tick (12 a second): the DoAction step
+        (fcn.10001b2c) is Woody's job — the use_object step pushes it on his
+        list (fcn.10049246, [actor+0x18]), his tick runs it (fcn.100492a8,
+        from fcn.10044234 at 0x100445f8) — and the game's update
+        (fcn.100508a1) comes after it at 0x1004482b, so a tick adds the rate
+        the last update left: the step adds it to the action's elapsed count,
+        clamped at its `time`, and hands the game the progress, elapsed x 100
+        / time (fcn.100507dd, latching at 10); the count at the action's time
+        wins it (the object's action), below 0 fails it (the `failed`
+        action); then the update (_pc_update)"""
         self.pc_acc += dt
         step = 1.0 / pcprofile.TICKS_PER_SECOND
-        levels = getattr(self.item, 'pc_minigame_levels', None) or (0, 0)
         while self.pc_acc >= step and self.enabled:
             self.pc_acc -= step
-            self.pc_ticks += 1
-            dx, dy = self._pc_offset()
-            if self.pc_ticks < 4:
-                self._pc_push(int(-dx * 1000 / 10000), int(-dy * 1000 / 10000))
-                rate = 0
-            else:
-                rate = pcprofile.s2_game_rate(dx, dy, self.pc_progress, self.pc_latch)
-                self._pc_push(*pcprofile.s2_game_push(dx, dy, self.pc_progress,
-                                                      levels, self.pc_phase))
-            self.wrong = rate < 0
-            self.pc_elapsed = min(self.pc_elapsed + rate, self.pc_total)
+            self.pc_elapsed = min(self.pc_elapsed + self.pc_rate, self.pc_total)
             if self.pc_elapsed < 0:
                 # the `failed` action: the PC game can always be lost (201's
                 # toolbox too, the mobile's DexterityCannotLose); its
@@ -5896,6 +5893,25 @@ class DexterityState:
             if self.pc_elapsed >= self.pc_total:
                 self._win()
                 return
+            self._pc_update()
+
+    def _pc_update(self):
+        """GameLogic.dll's game object (fcn.100508a1): it puts the thumb back
+        on the middle over its first three ticks and leaves the rate at 0;
+        after them it rates the thumb by its distance to the field's middle
+        and pushes it by the wobble (pcprofile.s2_game_rate / s2_game_push,
+        the factor from the combination's levels, PCMinigameLevels)"""
+        levels = getattr(self.item, 'pc_minigame_levels', None) or (0, 0)
+        self.pc_ticks += 1
+        dx, dy = self._pc_offset()
+        if self.pc_ticks < 4:
+            self._pc_push(int(-dx * 1000 / 10000), int(-dy * 1000 / 10000))
+            self.pc_rate = 0
+        else:
+            self.pc_rate = pcprofile.s2_game_rate(dx, dy, self.pc_progress, self.pc_latch)
+            self._pc_push(*pcprofile.s2_game_push(dx, dy, self.pc_progress,
+                                                  levels, self.pc_phase))
+        self.wrong = self.pc_rate < 0
 
     def _random_move(self):
         """UpdateRandomMovement (cs:341-359); Dificulty is 2"""
