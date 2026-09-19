@@ -1142,7 +1142,7 @@ class Door:
                  'disabled', 'description_string', 'walk_deltas',
                  'exit_door', 'woody_delta_use_height', 'use_woody_extra',
                  'can_use', 'dont_use_on', 'with_string', 'temporal_lock',
-                 'pc_pass')
+                 'pc_pass', 'pc_claim')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -1154,6 +1154,9 @@ class Door:
         # the PC profile's Season 2 pass of the door pair per pawn role
         # (levels/pc overlays, tools/pcref/pc_walks_s2.py; pcprofile.s2_pass_ticks)
         self.pc_pass = d.get('PCPass') or {}
+        # the pawn holding the pair on the PC (its door-pass step's flag 8,
+        # Pawn._pc_claim_pair)
+        self.pc_claim = None
         # enter/leave are ItemAnimationState and play on the door; ExitAnimation
         # is an AnimationState and loops on the pawn once it is through
         self.enter = _anim_name(d.get('WoodyEnterAnimation'))

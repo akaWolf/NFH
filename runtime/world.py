@@ -585,6 +585,12 @@ class Pawn:
         # door's climb or descent
         self._pc_pass = None
         self._pc_climb_pace = None
+        # (stretch, pace u/s or None for a snap) of the floor stretch being
+        # walked (_pc_floor_marks), and the PC-timed pace of the frame's movement
+        self._pc_floor = None
+        self.pc_pace = None
+        # the door pair the pawn's PC door-pass step holds (_pc_claim_pair)
+        self._pc_claimed = None
         # the PC profile's Season 2 stations (Item.pc_approach): the station
         # the pawn stands at (its PC hotspot x, height, and where the pawn
         # stood), the PC x a path leaves from when it goes to the same PC
@@ -1114,6 +1120,9 @@ class Pawn:
         return None
 
     def _route(self, dest, final_step, on_arrive):
+        # a new path aborts the one walked: its door-pass step lets its pair
+        # go (the step's cleanup, GameLogic 0x10004169 -> 0x100033d4)
+        self._pc_release()
         H = self._helpers()
         woody = self.world.woody if self.world else None
         # FindPath's head (Helpers.cs:81-85): the helper flag latches only
@@ -1187,7 +1196,8 @@ class Pawn:
         if last.get('kind') == 'point' and 'x' in last:
             last['x'] = min(max(last['x'], dest.left), dest.right)
         if pcprofile.is_pc():
-            self._pc_departure_step(steps)
+            self._pc_floor_marks(steps, self._pc_departure_step(steps))
+            self._pc_claim_marks(steps)
         H['step_index'] = len(steps)                # FindPath's StepIndex stamp
         self._move_index = -1
         self.steps = steps
@@ -1285,7 +1295,7 @@ class Pawn:
     def _next_step(self):
         self.velocity = (0.0, 0.0)       # TakeNextStep (cs:1052), TryUseItem
                                          # (cs:1795) for an item's arrival
-        self._step = None
+        prev, self._step = self._step, None
         if not self.steps:
             self.state = self.IDLE
             # OnPathFinished: the stand switch (Woody.cs:366; the base
@@ -1321,7 +1331,8 @@ class Pawn:
             self.y_pos = self.sprite.y + 0.15
             self.done_passing = False
         self._helpers()['first_step_index'] = self._move_index
-        after = self._step.get('pc_after_run') if self._step is not None else None
+        # the step just walked: a hop's transfer hands its `out` run on
+        after = prev.get('pc_after_run') if prev is not None else None
         self._step = self.steps.pop(0)
         if self._step.get('pc_hop') is None:
             self._pc_pass = None          # the PC pass pace ends with the hop
@@ -1333,6 +1344,14 @@ class Pawn:
             tx, ty = self._step_target()
             self._step['pc_len'] = ((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5
             self._pc_step_t = 0.0
+        if os.environ.get('NFH_WALK_LOG') == self.role:
+            # the walk's diagnostics (tests/run_tricks.py: NFH_WALK_LOG=<role>)
+            st = self._step
+            print('walk %s t=%.2f zone=%s at=(%.2f,%.2f) step=%s target=%s %s' % (
+                self.role, getattr(self.world, 'time', 0.0), getattr(self.zone, 'name', None),
+                self.sprite.x, self.sprite.y, st.get('kind'), self._step_target(),
+                {k: (v if not hasattr(v, 'name') else v.name) for k, v in st.items()
+                 if k.startswith('pc_') or k in ('transfer',)}), file=sys.stderr)
         self._step_sign = None
         self._step_sign_y = None
         self.state = self.WALK
@@ -1393,6 +1412,7 @@ class Pawn:
         if pcprofile.is_pc():
             vx, vy = self.velocity
             pace = self._pc_pass_pace()
+            self.pc_pace = pace          # the PC-timed pace of this frame (tests/invariants.py)
             if pace is not None:
                 n = (vx * vx + vy * vy) ** 0.5
                 if n > 0.0:
@@ -1406,18 +1426,10 @@ class Pawn:
 
     def _pc_pass_pace(self):
         """the pace (u/s) of a Season 2 door pass or station run under the
-        profile, None off one — never faster than the gait's floor record
-        (pcprofile.floor_pace): where the mobile scene's climb is longer than
-        the PC's run (205's water skis, 3 px on the PC) it takes the mobile
-        climb at the walk's pace"""
-        p = self._pc_pass_pace_raw()
-        if p is None:
-            return None
-        cap = pcprofile.floor_pace(self.role, self._pc_gait(), self.sneaking)
-        return min(p, cap) if cap else p
-
-    def _pc_pass_pace_raw(self):
-        """GameLogic.dll walks a door pair as one step (vtable 0x100ab1b8,
+        profile, None off one: the mobile scene's path over the PC's ticks,
+        whatever its length (a door's complex steps dip to the corridor and
+        back — 208's Zone02 door 3.8 u for the PC's 230 px straight, 29
+        ticks). GameLogic.dll walks a door pair as one step (vtable 0x100ab1b8,
         0x10003a19): up to the near door's `<actor>_in` in the near room
         (fcn.10003130), then out of every room (fcn.100037f8: fcn.10049467
         and fcn.10041ad0 with no room) straight on to the far door's
@@ -1441,7 +1453,8 @@ class Pawn:
             return ln / st['pc_secs'] if ln > 1e-6 and st['pc_secs'] > 0.0 else None
         near = st.get('pc_hop')
         if near is None:
-            return None
+            fl = st.get('pc_floor')
+            return self._pc_floor_pace(st, fl) if fl is not None else None
         cur = self._pc_pass
         if cur is None or cur[0] is not near:
             # the hop's straight part starts: the complex path left of it,
@@ -1463,10 +1476,97 @@ class Pawn:
             self._pc_pass = cur = (near, pace)
         return cur[1]
 
+    def _pc_claim_marks(self, steps):
+        """the PC profile's Season 2 door claim: GameLogic.dll's door-pass
+        step (vtable 0x100ab1b8) waits in its first state while its door
+        carries flag 8 (0x10003c54: fcn.100450dc), sets it on both doors of
+        the pair as it starts (0x1000339d) — before the walk to the near
+        door's `<actor>_in` — and clears it when the far room is set at
+        `<actor>_out` (fcn.10003454 -> 0x100033d4). The first step of the
+        stretch that leads to a door with a PC pass carries its door
+        (`pc_claim`, _walk_on_path)"""
+        start = 0
+        for k, st in enumerate(steps):
+            hold = st.get('pc_hold_run')
+            door = None
+            if hold is not None and hold[0] == 'in':
+                door = hold[1]
+            elif st.get('kind') == 'door' and st['door'].pc_pass.get(self.role):
+                door = st['door']
+            if door is not None and start is not None and start < len(steps):
+                steps[start]['pc_claim'] = door
+                start = None
+            if 'transfer' in st or st.get('kind') == 'door':
+                start = k + 1
+
+    def _pc_claim_pair(self, door):
+        """the door-pass step's first state: the pair taken, or False while
+        another pawn holds it (the pawn stands where it is)"""
+        other = self.level.door_by_pid(door.link_to)
+        pair = [d for d in (door, other) if d is not None]
+        for d in pair:
+            holder = d.pc_claim
+            if holder is not None and holder is not self:
+                if holder._pc_holds(d):
+                    return False
+                holder._pc_release()      # a path it has dropped (a stale hold)
+        self._pc_release()
+        for d in pair:
+            d.pc_claim = self
+        self._pc_claimed = pair
+        return True
+
+    def _pc_holds(self, door):
+        """the pawn still walks to or through the pair it holds: a step of its
+        path names a door of it, or it is inside the pair's transit — the
+        paths the port drops without a new route (a surprise, a catch) let
+        the pair go this way"""
+        pair = self._pc_claimed
+        if not pair or door not in pair:
+            return False
+        for st in ([self._step] if self._step is not None else []) + list(self.steps):
+            hold = st.get('pc_hold_run')
+            if st.get('pc_hop') in pair or (hold is not None and hold[1] in pair) \
+                    or st.get('door') in pair or st.get('pc_claim') in pair:
+                return True
+        return self.is_warping and getattr(self, '_exit_door', None) in pair
+
+    def _pc_release(self):
+        """the pair let go: the far room reached, or the path aborted"""
+        pair, self._pc_claimed = self._pc_claimed, None
+        for d in pair or ():
+            if d.pc_claim is self:
+                d.pc_claim = None
+
+    def _pc_floor_pace(self, st, fl):
+        """the pace (u/s) of a floor stretch (_pc_floor_marks): its mobile
+        length over the PC ticks of its px at the gait, taken as it starts"""
+        cur = self._pc_floor
+        if cur is None or cur[0] is not fl:
+            x, y = self.sprite.x, self.sprite.y
+            length = 0.0
+            for stp in [st] + list(self.steps):
+                if stp.get('pc_floor') is not fl:
+                    break
+                tx, ty = self._step_target(stp)
+                length += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5
+                x, y = tx, ty
+            ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'dx': fl['px']}, self.sneaking)
+            pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
+            self._pc_floor = cur = (fl, pace)
+        if cur[1] is None:
+            # no dx on the PC (two spots of the mobile scene at one PC x): the
+            # movement has no horizontal tick — each step puts the pawn at its
+            # target in a frame (the port's 60 Hz), a snap
+            self.pos_snap = True
+            tx, ty = self._step_target(st)
+            return max(((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5, 1e-6) * 60.0
+        return cur[1]
+
     def _pc_hop_steps(self, door, steps):
         """a transition's hop under the profile's Season 2 pass (Door.pc_pass):
         its complex steps and transfer marked for the straight movement's
-        pace (_pc_pass_pace_raw); the plain step that brings the pawn to the
+        pace (_pc_pass_pace); the plain step that brings the pawn to the
         near door holds at its end for the `in` run, and the step after the
         transfer holds at its start for the `out` run — the pawn in the near
         zone, then the far one, as the PC's room pointer (fcn.10003454 sets
@@ -1503,9 +1603,18 @@ class Pawn:
         return pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': ap['px']}, self.sneaking) or None
 
     def _pc_arrived(self, it):
-        """a station reached: the next walk leaves from its PC hotspot"""
+        """a station reached: the next walk leaves from its PC hotspot, or
+        where the station's actions move the actor to along the floor
+        (PCApproach `tx`, per visit: 205's skiing leaves him 400 px left of
+        the skis — the visit about to play is the item's PCUseSeconds slot)"""
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
-        self._pc_depart = (ap['x'], ap['px'], self.sprite.x, self.sprite.y, it) if ap else None
+        if ap:
+            tx = ap.get('tx', 0)
+            if isinstance(tx, list):
+                tx = tx[it.pc_use_visit % len(tx)] if tx else 0
+            self._pc_depart = (ap['x'] + tx, ap['px'], self.sprite.x, self.sprite.y, it)
+        else:
+            self._pc_depart = None
         self._pc_from_x = None
 
     def _pc_station_route(self, dest, final_step):
@@ -1570,10 +1679,14 @@ class Pawn:
         dep, self._pc_depart = self._pc_depart, None
         self._pc_from_x = None
         if dep is None or not steps or self.portal_move:
-            return
-        pcx, px, x0, y0, src = dep
-        if abs(self.sprite.x - x0) > 0.1 or abs(self.sprite.y - y0) > 0.1:
-            return                        # it has moved since the station
+            return None
+        # (the mobile clip may have moved the pawn off its use spot — the
+        # remaster's offsets, 212's bench, 205's ski ride — while the PC actor
+        # stands at the hotspot, or where the actions' translations left it:
+        # nothing but the use has run since the station was reached)
+        pcx, px, _x0, _y0, src = dep
+        if src is None or self.zone is None or src.zone != self.zone.pid:
+            return None                   # put in another room since (a use's warp)
         last = steps[-1]
         it = last.get('item') if last.get('kind') == 'item' else None
         ap = it.pc_approach.get(self.role) if it is not None else None
@@ -1590,10 +1703,10 @@ class Pawn:
                 self._arm_item_snap(it, tx)
                 self._pc_arrived(it)
                 del steps[:]              # arrived: the path finishes at once
-            return
+            return pcx
         ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': px}, self.sneaking)
         if not ticks:
-            return
+            return pcx
         secs = ticks / pcprofile.TICKS_PER_SECOND
         first = steps[0]
         if first.get('kind') == 'point' and first.get('y') is not None \
@@ -1601,6 +1714,61 @@ class Pawn:
             first['pc_secs'] = secs       # the floor step down from the station
         else:
             first['pc_prehold'] = first.get('pc_prehold', 0.0) + secs
+        return pcx
+
+    def _pc_floor_marks(self, steps, x_pc):
+        """the PC profile's Season 2 floor: a movement runs along the room's
+        floor line from x to x (fcn.10009177's middle waypoint) one axis a
+        tick at the gait's record (fcn.10009215), so a walk's stretch of floor
+        between two points the PC data places — the station it leaves or
+        goes to (Item.pc_approach `x`: its `<actor>` hotspot), a door's
+        `<actor>_in` it walks to or the far door's `<actor>_out` it comes
+        from (Door.pc_pass `xi` / `xo`) — lasts |dx| of the PC scene at the
+        record, whatever the mobile scene's length between the same two
+        points: its plain steps carry the stretch (`pc_floor`, the PC px;
+        _pc_pass_pace). `x_pc`: the PC x the path leaves from (the station,
+        _pc_departure_step), None off one — a stretch with an end the data
+        does not place keeps the floor record over the mobile length (the
+        data is Season 2's alone)"""
+        run = []
+        for st in steps:
+            hop = st.get('pc_hop')
+            if hop is not None:
+                # the hop's straight movement has its own pace; the far room's
+                # floor starts at the far door's `<actor>_out`
+                run = []
+                x_pc = (hop.pc_pass.get(self.role) or {}).get('xo') \
+                    if 'transfer' in st else None
+                continue
+            kind = st.get('kind')
+            if kind not in ('point', 'item', 'door'):
+                run = []
+                x_pc = None
+                continue
+            if 'pc_secs' in st:
+                continue                  # the run down from a station: no dx
+            run.append(st)
+            end = None
+            hold = st.get('pc_hold_run')
+            if kind == 'door':
+                # a back door's walk: to the near door's `<actor>_in`, the far
+                # room's floor from its `<actor>_out`
+                p = st['door'].pc_pass.get(self.role) or {}
+                end, after = p.get('xi'), p.get('xo')
+            elif hold is not None:
+                end = (hold[1].pc_pass.get(self.role) or {}).get('xi')
+                after = None              # the hop's steps set it
+            elif kind == 'item':
+                ap = st['item'].pc_approach.get(self.role)
+                end = after = ap.get('x') if ap else None
+            else:
+                continue                  # a waypoint: the stretch goes on
+            if x_pc is not None and end is not None:
+                mark = {'px': abs(end - x_pc)}
+                for s2 in run:
+                    s2['pc_floor'] = mark
+            run = []
+            x_pc = after
 
     def _pc_back_door_pace(self, door, key, dist):
         """a back door's climb (`in`) or descent (`out`) pace under the
@@ -1655,8 +1823,10 @@ class Pawn:
         if other is None:
             self.state = self.IDLE
             return
-        if self._wait_for_passing(door, other):
+        if not (pcprofile.is_pc() and door.pc_pass.get(self.role)) \
+                and self._wait_for_passing(door, other):
             return                        # IsOtherPawnPassing: wait standing
+                                          # (the PC's claim otherwise, _pc_claim_marks)
         self.portal_move = False          # the pre-arm is consumed
         if door.should_walk_up:
             # MoveToDoor's first call raises PortalMove and MovingUp and
@@ -1709,6 +1879,7 @@ class Pawn:
         self.portal_move = False
         self.steps = []
         self._step = None
+        self._pc_release()
         self.state = self.IDLE
         self.movement_paused = False
         self.exit_confirmation_shown = False
@@ -1853,6 +2024,8 @@ class Pawn:
             self.sprite.y = self.floor_y()
         self._warped = True
         self._warp_old = old_zone
+        if self._pc_claimed and d in self._pc_claimed:
+            self._pc_release()            # the PC placement at the far door
         return old_zone
 
     def _enter_played(self):
@@ -2016,7 +2189,11 @@ class Pawn:
                                      or link.passing_nfh2 is None):
                 cd.passing_nfh2 = self
                 link.passing_nfh2 = self
-            elif cd.passing_nfh2 is not None and cd.passing_nfh2 is not self:
+            elif cd.passing_nfh2 is not None and cd.passing_nfh2 is not self \
+                    and not (pcprofile.is_pc() and cd.pc_pass.get(self.role)):
+                # (under the PC profile a pair with a PC pass is the PC's
+                # door-pass step's to hold, from the walk to the door on:
+                # _pc_claim_marks)
                 self.velocity = (0.0, 0.0)
                 self._stand()
                 return True
@@ -2133,6 +2310,15 @@ class Pawn:
             if 'pc_prehold' in st0:
                 del st0['pc_prehold']
                 self._pc_hold_t = 0.0
+            door = st0.get('pc_claim')
+            if door is not None and not st0.get('pc_claimed'):
+                # the PC's door-pass step starts: its pair, or a stand where
+                # the pawn is while another holds it (_pc_claim_marks)
+                if not self._pc_claim_pair(door):
+                    self.velocity = (0.0, 0.0)
+                    self._stand()
+                    return
+                st0['pc_claimed'] = True
             tx, ty = self._step_target()
             dx, dy = tx - self.sprite.x, ty - self.sprite.y
             mag = (dx * dx + dy * dy) ** 0.5
@@ -2193,6 +2379,8 @@ class Pawn:
                     return
                 if s.get('transfer') is not None:
                     self._transfer_zone(s['transfer'])
+                    if s.get('pc_hop') is not None:
+                        self._pc_release()   # the far room set at `<actor>_out`
                 if s['kind'] == 'door':
                     self._begin_transit(s['door'])
                 elif s['kind'] == 'item' and s['item'].should_walk_up:

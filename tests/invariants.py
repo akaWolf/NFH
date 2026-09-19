@@ -13,7 +13,8 @@ class the port has actually shipped once:
   No level ships such a pair (verified across all 37 scenes), so any
   hit is a runtime desync.
 - teleports:      Pawn.ProcessMovement (Pawn.cs:871-879) integrates
-  position += Velocity * dt * Speed; the discontinuities the original
+  position += Velocity * dt * Speed (under the PC profile at the PC-timed
+  pace of a Season 2 pass or floor stretch); the discontinuities the original
   DOES make are enumerated and marked in the port — door transits set
   IsWarping (Pawn.cs:1174/1284), and the snap writers (MoveToItem's
   crossing snap Pawn.cs:1032-1035, the use teleports Woody.cs:520-533 /
@@ -101,6 +102,12 @@ class Invariants:
                 continue
             dist = ((p.sprite.x - px) ** 2 + (p.sprite.y - py) ** 2) ** 0.5
             allow = _pawn_vmax(p) * dt * self.CONTINUITY_SLACK + 1e-6
+            # the PC profile's timed paces (Pawn._pc_pass_pace: a Season 2
+            # pass or floor stretch lasts the PC's ticks over the mobile
+            # scene's length, whatever speed that takes)
+            pace = getattr(p, 'pc_pace', None)
+            if pace:
+                allow = max(allow, pace * dt * self.CONTINUITY_SLACK + 1e-6)
             if dist > allow:
                 self._flag(t, 'teleport', '%s@%s' % (role, self.v.level.name),
                            'moved %.3f in one frame (max legal %.3f), '

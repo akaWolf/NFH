@@ -505,16 +505,6 @@ def s2_pass_ticks(role, gait, p, sneaking=False):
     return t + run(p.get('dx', 0), h) + run(p.get('dy', 0), v)
 
 
-def floor_pace(role, gait='walk', sneaking=False):
-    """u/s of the pawn's floor record at its gait (the cap of the Season 2 pass and
-    station paces), None without a record"""
-    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
-    if rec is None:
-        return None
-    h = GAIT_PX_PER_TICK[(role, gait)][0] if (role, gait) in GAIT_PX_PER_TICK else rec[0]
-    return h * TICKS_PER_SECOND / PX_PER_UNIT
-
-
 def clip_fps(name, fps, frames=0):
     """the rate a door strip plays at: the one that lasts its PC action's ticks
     (Season 1, the neighbour and Woody), else a frame a tick"""

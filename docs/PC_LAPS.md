@@ -124,29 +124,25 @@ more.
 Slower on mobile: 101 (+25 %, the sofa), 210 (+16 %, the chair), 108 (+11 %,
 the walks); faster: 106, 113, 213, 214 (−11..−19 %); the rest within ±10 %.
 
-The Season 2 laps under the profile (2026-09-24: the walk, the stays, the
-routes and the catch by GameLogic.dll; idle runs, the lap period on the
-neighbour's first station, ~/nfh-bench/runs/idle5s2): against the code's lap
-model (tools/pcref/lap_model_s2.py) 203 99.5 s / 105, 208 82.5 / 85.5, 209
-100.8 / 105, 211 80.8 / 85, 212 119.4 / 124, 213 126.6 / 123, 214 85.3 /
-90.3 (its Mother's script and the pistol's poll carried 2026-09-23), 202
-81.7 / 80.7 plus his wait at the shore for Olga's sub (its mat and swim
-carried the same night: docs/PC_FIDELITY.md "202's mat and swim"; the
-video's 70 and 90-94; 60.2 before, on the video's stays), 210 98.7 / ~101
-(its call carried 2026-09-24, "210's call": the model's walks on the PC's
-rooms are 62.8 s where the port's are 53.4, and her checks quantize the lap;
-the video's first lap 107, 86.8 before on the video's stays), 205 101.6 /
-111.9 (its table carried 2026-09-24, "205's table": the model's walks are
-63.5 s, the video's lap 102; 116.2 before with the mobile's mat scene), 207
-100.0 / 106.0 (its board carried 2026-09-24, "207's board": the video's 107;
-109.3 before on the video's stays) and 204 84.3 / 92.8 (its stays the code's
-since the same day, "204's stays": the video's 81; 79.2 before) — within 6 %
-but 204's and 205's −9 %, whose videos sit with the port;
-209, 212 and 213 moved when the stays the walk writer had dropped since the
-routes came back (102.7, 125.2 and 125.3 before, "The overlay writers'
-shared patches"); 209's model is 105 since the anims parser gives the
-fakir his `spit` (18 ticks). 201 (the tutorial) and 206 (his waits on the
-Mother) have no free lap.
+The Season 2 laps under the profile (2026-09-24, later: the walk by
+GameLogic.dll to the floor — the passes and the stretches of floor between the
+stations and the doors at the PC's ticks, the `out` run stood, the stations
+left from their hotspots or where their actions' translations leave him, the
+door claim; idle runs, the lap period on one station, ~/nfh-bench/runs/idle13s2)
+against the code's lap model (tools/pcref/lap_model_s2.py): 203 106.7 s / 105.2,
+208 86.6 / 85.5, 209 107.4 / 106.7 (its coal walk's 190 px in the model since
+the same day), 211 85.0 / 85.3, 212 123.2 / 123.8 on a lap the Mother keeps off
+his doors (125.2 and 128.8 where he waits for her at the Zone03-Zone04 pair),
+213 132.5 / 123.1 plus his wait at the bull's controls for Olga (not modelled),
+202 87.0 / 80.7 plus his wait at the shore for Olga's sub, 205 112.5 / 111.9
+(the skiing's 400 px back to the skis in both), 207 105.5 / 106.0, 204 91.7 /
+92.8, 210 99.7 / ~101 — each walk leg within 0.3 s of the model's (a door
+wait aside); 214's lap is locked to the Mother's (his pistol waits for her).
+Before the same day's walk: 203 99.5, 208 82.5, 209 100.8, 211 80.8, 212
+119.4, 213 126.6, 214 85.3, 202 81.7, 210 98.7, 205 101.6, 207 100.0, 204 84.3
+— the mobile scene's floor at the PC's record, the passes capped at it and the
+`out` run never stood. 201 (the tutorial) and 206 (his waits on the Mother)
+have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,

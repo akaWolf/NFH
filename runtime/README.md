@@ -193,10 +193,19 @@ Under the PC profile a Season 2 hop keeps these steps and takes the PC pass's
 timing instead (`Door.pc_pass` from the overlays, `Pawn._pc_hop_steps`,
 `docs/PC_FIDELITY.md` "Season 2 walks"): the plain step to the near door
 stands out the PC's run up to its `<actor>_in`, the complex steps through the
-transfer last the straight movement's ticks (the zone flips at `<actor>_out`,
-as the PC's room pointer does), and the next step stands out the run down to
-the far floor; a back door's climb, strips and descent last the same runs and
-the doors' `enter` / `leave` clips. The routine stations and Woody's items
+transfer last the straight movement's ticks whatever the mobile path's length
+(the zone flips at `<actor>_out`, as the PC's room pointer does), and the next
+step stands out the run down to the far floor; a back door's climb, strips and
+descent last the same runs and the doors' `enter` / `leave` clips. A stretch of
+floor between two points the PC data places — a station's hotspot, or where its
+actions' `<translation>`s leave the actor (205's skis 400 px left), a door's
+`<actor>_in` or the far `<actor>_out` — lasts the PC's |dx| at the gait's record,
+whatever the mobile scene's length between the same two points
+(`Pawn._pc_floor_marks`: 205's mat to the table is 359 px, 3.75 s, where the
+mobile scene has 2.1 u). A pair is held from the moment a pawn sets off for
+it until the far room is reached (the PC door-pass step's flag 8 on both doors;
+`Pawn._pc_claim_marks`): the next pawn stands where it is, and the mobile's
+IsOtherPawnPassing waits give way to it. The routine stations and Woody's items
 add the PC's runs up or down to their hotspots (`Item.pc_approach`), and every
 walk between rooms takes the PC path finder's route (`world.pc_route` over
 `Zone.pc_room`, from the station's hotspot or the pawn's x on the floor line;

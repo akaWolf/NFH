@@ -1145,15 +1145,69 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   mobile's Helpers.GetShortestPath (1 a hop, ties to Mono's qsort) takes
   39 of the 338 legs through the other side of a ring — 210's basket to
   the shop went through the beach (24.7 s) where the PC goes through the
-  bar (17.3). No pace beats the gait's floor record (a mobile climb longer
-  than the PC's run — 205's water skis, 3 px — takes the walk's pace). The
-  port's idle laps then walk within about a second of the model per leg
-  (208: the shoe machine 26.2 / 27.9, the elephant 4.5 / 3.8, the bowl
-  10.8 / 11.8, the platform 15.3 / 15.2; 213: the plant 16.7 / 16.5, the
-  picnic 16.2 / 16.7, the cement 17.2 / 17.6), and with the code's stays
-  208's lap is 82.5 s for the model's 85.5 and the video's 86. (Woody's
-  own runs, the routes of the other walks and the detection over a pass:
-  the entries below.)
+  bar (17.3). (Woody's own runs, the routes of the other walks and the
+  detection over a pass: the entries below.)
+  2026-09-24: the `out` run had never been stood — `Pawn._next_step` read
+  the hand-over (`pc_after_run`) from the step it had already cleared —
+  and the floor between the doors and the stations was the mobile scene's
+  length at the floor record, the passes capped at that record ("no pace
+  beats the gait's floor record"); where the mobile's complex steps dip to
+  a corridor and back (208's Zone02 door: 3.8 u for the PC's 230 px, 29
+  ticks) the cap made the pass 1.4 s long. All three are the PC's now: the
+  hop stands the `out` run; the straight movement lasts its ticks whatever
+  the mobile path's length; and a stretch of floor between two points the
+  PC data places — the station the walk leaves or goes to (PCApproach
+  `x`), a door's `<actor>_in` it walks to or the far door's `<actor>_out`
+  it comes from (PCPass `xi` / `xo`) — lasts the PC's |dx| at the gait's
+  record over the mobile steps between them (`Pawn._pc_floor_marks`, the
+  PC px per stretch; 205's mat to the table is 359 px, 3.75 s, where the
+  mobile scene has 2.1 u; 208's elephant to the shoe machine 121 px for
+  1.8 u). A station is left from its hotspot, whatever the mobile clip did
+  to the pawn's spot (205's table +0.4 u, 212's bench), or from where its
+  actions' `<translation>`s leave the actor when a GoTo follows them
+  (PCApproach `tx`, lap_model_s2.code_moves: 205's skiing 400 px left of
+  the skis, 4.2 s back to put them away; 209's coal walk 190 px on — not
+  where the step's parts go on without a GoTo, nor after a `leave`). A
+  station is the object its step's GoTo goes to (pc_walks_s2.py
+  STATIONS, checked against the lap model's GoTo targets): 212's ledge
+  step walks to the parrot and plays the cliff's `enter` and `use`, the
+  water's and the water exit's from there, so both mobile ledge stations
+  are the parrot's (the same-object snap between them); 209's shoe step
+  puts the shoes on the mat and enters the curtain from it, so the Taj
+  is the shoe mat's; 204's jade step walks to the jade, not its dummy
+  (67 px).
+  The idle laps against the model's walks (walk_ticks, the translations
+  in) per leg: 203 +0.1..+0.3 s, 205 +0.1..+0.3, 208 +0.1..+0.2, 211
+  +0.1..+0.2, 212 +0.1..+0.3 — and three exceptions with their reasons:
+  209's shoe mat and curtain are one spot of the mobile scene and 52 px
+  with the runs up and down on the PC (3.1 s each way the port does not
+  walk; the lap agrees within 0.7 s all the same), 212's whip to the
+  cigars +2.5 s where he stood at the door while the Mother passed it
+  (the mobile's IsOtherPawnPassing wait — the PC's own claim below),
+  213's bull controls' poll on Olga (not modelled).
+  The door claim (read the same day): the door-pass step waits in its
+  first state while its door carries flag 8 (0x10003c54, fcn.100450dc),
+  sets flag 8 on both doors of the pair as it starts (0x1000339d) — the
+  walk to the near door's `<actor>_in` comes after — and clears it when
+  the far room is set at `<actor>_out` (fcn.10003454 -> 0x100033d4; the
+  step's cleanup 0x10004169 too). So a pair is held from the moment an
+  actor sets off for it, and the next actor stands where it is — not at
+  the door — until it is free; every actor's GoTo, Woody's included.
+  Carried (`Pawn._pc_claim_marks`, `_pc_claim_pair`, `_pc_release`;
+  `Door.pc_claim`): the first step of the stretch that leads to a door
+  with a PC pass claims its pair or stands, the transfer (a back door's
+  placement) lets it go, a new path aborts it, and a pair whose holder
+  has dropped its path is free; the mobile's IsOtherPawnPassing waits
+  (Door.PassingPawnTransitionNFH2, Door.PassingPawn) give way to it on
+  the doors with a PC pass. The harness reads the same (the floor
+  stretches in its ETAs, a held pair in its gate and its flee). The plans
+  of 207 (v8: the pile leads with the board), 209 (v2), 211, 212 (v6)
+  and 214 (v3) were re-timed to the walk; all 28 levels rate 100 again,
+  Season 1 and the mobile regression byte-identical. The laps:
+  203 106.8 s (model 105.2), 205 112.5, 208 86.6 (85.5), 209 107.4
+  (106.7), 211 85.2 (85.3), 212 127.2 (123.8), 204 92.5, 207 105.5, 210
+  99.7. Woody's actions' translations (214's swiffer at the bridge
+  controls 400 px, 208's chalk 45 px) are not carried.
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the

@@ -213,7 +213,21 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   too (its gong sends him on by its own `gong`; "204's stays"), its lap
   84 s, the video's 81. The anims.xml reader of the lap model had given
   an empty animation's or object's successor to it (205's ski put, 204's
-  gong and jade): it reads tag by tag now.
+  gong and jade): it reads tag by tag now. And the Season 2 walk to the
+  floor: the `out` run of a door pass had never been stood (the step's
+  hand-over was read after the step was cleared), the passes were capped
+  at the floor record, and the floor between the stations and the doors
+  was the mobile scene's length — now the pass lasts the PC's ticks
+  whatever the mobile path, the `out` run is stood, and each stretch of
+  floor between two points the PC data places (a station's hotspot or
+  where its actions' translations leave him, a door's `<actor>_in` /
+  `<actor>_out`) lasts the PC's |dx| at the record; 204's jade, 209's
+  curtain and 212's ledge stations are their steps' GoTo targets, and a
+  door pair is held from the moment an actor sets off for it until the far
+  room is reached — the PC door-pass step's flag 8, where the next actor
+  stands where it is ("Season 2 walks"). Each idle leg walks the lap
+  model's within 0.3 s; 207, 209, 211, 212 and 214 were re-timed to it,
+  and all 28 levels rate 100.
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
@@ -228,21 +242,18 @@ ones, 210's Mother's to him on Fifi's fall is carried; `docs/PC_FIDELITY.md`
 "Season 2's runs"); the PC's
 field image (the data archive holds no TGA; the game's 100 px radius is
 carried) and 203's Olga shout before the run (her `shout` has no clip in
-the port); and the gap between the model's walks on the PC's rooms and
-the port's on the mobile zones (204, 205: the model 10 % over the video
-and the port). 111's machines are
+the port). 111's machines are
 the level class's DoActions (the washer's 24 s in the video is the walk
 and give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. The Season 2 idle laps under
-the profile (2026-09-24, the lap period on the neighbour's first station)
-sit within 6 % of GameLogic's lap model on ten of the twelve levels it
-times (203 99.5 s / 105, 208 82.5 / 85.5, 209 100.8 / 105, 211 80.8 / 85,
-212 119.4 / 124, 213 126.6 / 123, 214 85.3 / 90.3 — the video's 91 shower
-to shower — 202 81.7 / 80.7 plus his wait for Olga's sub, the video's 70
-and 90-94, 210 98.7 / ~101 with its call, the video's first lap 107, and
-207 100.0 / 106 with its board, the video's 107), 204 and 205 at −9 %
-(84.3 / 92.8 and 101.6 / 111.9, the videos' 81 and 102: the model's walks
-on the PC's rooms are the longer); 201 and 206 have no free lap; the
+the profile (2026-09-24, the lap period on one station) walk GameLogic's
+lap model leg by leg within 0.3 s since the walk went to the PC's ticks on
+the floor too (`docs/PC_FIDELITY.md` "Season 2 walks"): 203 106.7 s /
+105.2, 208 86.6 / 85.5, 209 107.4 / 106.7, 211 85.0 / 85.3, 212 123.2 /
+123.8 (more where he waits for the Mother at a door pair she holds), 205
+112.5 / 111.9, 207 105.5 / 106, 204 91.7 / 92.8, 210 99.7 / ~101, 202 87.0 /
+80.7 and 213 132.5 / 123.1 plus their waits for Olga; 201 and 206 have no
+free lap; the
 Season 2 gauge is 100 000 rage long and falls by
 leveldata's `time` every 1/12 s (0.36 %/s), and the coins are the levels'
 tricks.xml rage values. The Season 1 anger rule, the result captions and

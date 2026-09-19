@@ -64,6 +64,8 @@ N-th in the level's order, from 1):
     NFH_SEED=<n> seeds the world's random draws per level (default 0: a
     run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
     reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends,
+    NFH_WALK_LOG=<role> that pawn's walk steps as they start (the PC
+    profile's holds, runs and floor stretches with them),
     NFH_MAX_RESTARTS=<n> the restarts after a catch (default 4);
     NFH_SHOT_FPS=<n> saves n PNG frames a second into the run's dir.
     --profile=mobile selects the mobile-parity runtime (the PC-experience
@@ -448,6 +450,38 @@ class Driver(Recorder):
             mid = secs({k: pp[k] for k in ('dx', 'dy') if k in pp})
         return secs({'in': pp.get('in', 0)}), mid, secs({'out': pp.get('out', 0)})
 
+    def _pc_held(self, door):
+        """a door of a pair another pawn holds under the PC profile (its
+        door-pass step set off for it, Pawn._pc_claim_marks) — Woody would
+        stand where he is until it is free"""
+        holder = getattr(door, 'pc_claim', None)
+        return holder is not None and holder is not self.v.woody \
+            and holder._pc_holds(door)
+
+    def pc_floor_secs(self, px, p=None, gait=None):
+        """seconds of a Season 2 floor stretch of `px` PC px at the pawn's
+        gait (Pawn._pc_floor_marks, pcprofile.s2_pass_ticks)"""
+        role = getattr(p, 'role', 'Rottweiler')
+        if gait is None:
+            gait = p._pc_gait() if p is not None and hasattr(p, '_pc_gait') else 'walk'
+        return (pcprofile.s2_pass_ticks(role, gait, {'dx': px},
+                                        bool(getattr(p, 'sneaking', False))) or 0) / 12.0
+
+    def pc_x(self, it, p=None, leaving=False):
+        """the PC x of a station for the pawn (Item.pc_approach), None off
+        the profile's Season 2 or without one; `leaving`: where its actions
+        leave the actor (`tx`, Pawn._pc_arrived) — its next visit's, as a
+        human reading the lap takes it"""
+        if not pcprofile.is_pc() or it is None or not getattr(self.v.woody, 'nfh2', False):
+            return None
+        ap = (getattr(it, 'pc_approach', None) or {}).get(getattr(p, 'role', 'Rottweiler'))
+        if not ap:
+            return None
+        tx = ap.get('tx', 0) if leaving else 0
+        if isinstance(tx, list):
+            tx = tx[it.pc_use_visit % len(tx)] if tx else 0
+        return ap['x'] + tx
+
     def pc_station_secs(self, it, p=None, frm=None):
         """seconds of the PC run between a station's hotspot and its room's
         floor at the pawn's gait (Item.pc_approach), 0 without one or from a
@@ -686,6 +720,7 @@ class Driver(Recorder):
         # the live path
         steps = ([p._step] if p._step is not None else []) + list(p.steps)
         hop_done = set()
+        floor_done = set()
         for s in steps:
             kind = s.get('kind')
             if kind in ('point', 'cpoint', 'item'):
@@ -715,6 +750,25 @@ class Driver(Recorder):
                             t += pt[1] if pt is not None else 0.0
                 elif 'pc_secs' in s:
                     t += s['pc_secs']
+                elif s.get('pc_floor') is not None:
+                    # a floor stretch of the PC profile (Pawn._pc_floor_marks):
+                    # its PC px at the gait, once for the stretch — the one
+                    # being walked at its pace over the length left
+                    fl = s['pc_floor']
+                    if id(fl) not in floor_done:
+                        floor_done.add(id(fl))
+                        cur = getattr(p, '_pc_floor', None)
+                        if s is p._step and cur is not None and cur[0] is fl and cur[1]:
+                            ln, px_, py_ = 0.0, x, y
+                            for s2 in steps:
+                                if s2.get('pc_floor') is not fl:
+                                    continue
+                                qx, qy = s2.get('x', px_), s2.get('y', py_)
+                                ln += ((qx - px_) ** 2 + (qy - py_) ** 2) ** 0.5
+                                px_, py_ = qx, qy
+                            t += ln / cur[1]
+                        else:
+                            t += self.pc_floor_secs(fl['px'], p)
                 else:
                     # a Season-2 stair step walks the diagonal (normalized
                     # velocity, Pawn.cs Move): its length is the hypotenuse —
@@ -762,8 +816,13 @@ class Driver(Recorder):
             long there. `frm`: the station the walk leaves (the PC
             profile's run down from its hotspot, pc_station_secs)"""
             sp = spd or speed
+            gait = 'run' if spd else 'walk'
             if frm is not None:
                 t += self.pc_station_secs(frm, p, it)
+            # the PC x the walk leaves from: its floor stretches between the
+            # points the PC data places last their PC px (Pawn._pc_floor_marks)
+            pcx = self.pc_x(frm, p, leaving=True)
+            role = getattr(p, 'role', 'Rottweiler')
             path = self.zone_path(p, zone, x, it.zone, it) \
                 if zone != it.zone else []
             if path is None:
@@ -772,7 +831,13 @@ class Driver(Recorder):
                 # the walk to this hop's door, then the pass; the far
                 # door is where the next stretch starts (a lap of the
                 # sofa->beer walk is 5 s of floor before the 2 s door)
-                t += abs(door.x - x) / sp + self.door_time(door, p)
+                pp = (getattr(door, 'pc_pass', None) or {}).get(role) \
+                    if pcprofile.is_pc() else None
+                if pcx is not None and pp and pp.get('xi') is not None:
+                    t += self.pc_floor_secs(pp['xi'] - pcx, p, gait)
+                else:
+                    t += abs(door.x - x) / sp
+                t += self.door_time(door, p)
                 other = self.v.level.door_by_pid(door.link_to)
                 if other is not None:
                     x = other.x
@@ -781,8 +846,13 @@ class Driver(Recorder):
                 pt = self.pc_pass_times(door, p)
                 if pt is not None:
                     t += pt[2]            # the PC run down, in the far room
+                pcx = pp.get('xo') if pp else None
             zone = it.zone
-            t += abs(it.target_x - x) / sp
+            ix = self.pc_x(it, p)
+            if pcx is not None and ix is not None:
+                t += self.pc_floor_secs(ix - pcx, p, gait)
+            else:
+                t += abs(it.target_x - x) / sp
             x = it.target_x
             if zone == zone_pid:
                 return 'hit', t, x, zone
@@ -911,6 +981,12 @@ class Driver(Recorder):
         if secs and not tricked and pcprofile.is_pc() \
                 and getattr(p, 'role', None) == 'Rottweiler':
             return float(secs[(it.pc_use_visit + ahead) % len(secs)])
+        # another actor's stand at the PC data's `time` (PCUseSecondsRole,
+        # RoutineAction._pc_use_seconds: the Mother's waits of 212-214)
+        vr = (getattr(it, 'pc_use_secs_role', None) or {}).get(role)
+        if vr and pcprofile.is_pc() and role != 'Rottweiler':
+            k = (getattr(it, 'pc_use_visit_role', None) or {}).get(role, 0)
+            return float(vr[(k + ahead) % len(vr)])
         def length(names):
             s = 0.0
             for name in names:
@@ -1097,6 +1173,13 @@ class Driver(Recorder):
         # crossing his own room to the first door takes time, and a
         # catcher walking in meanwhile catches him there
         leave = None
+        if path and pcprofile.is_pc():
+            # (a pair another pawn has set off for is its to hold: Woody would
+            # stand where he is until it is free — Pawn._pc_claim_marks)
+            first = path[0][1]
+            if any(self._pc_held(d) for d in (first, self.v.level.door_by_pid(first.link_to))
+                   if d is not None):
+                self._gate_why = 8; return False
         # Woody's arrival time in each zone of the route (his real pace:
         # the sneak crawl in Alerter rooms, the per-door pass) — he is out
         # of zone k once he has arrived in zone k+1 (the pass itself is
@@ -1938,6 +2021,11 @@ class Driver(Recorder):
             if any(p.is_warping and getattr(p, '_exit_door', None) is not None
                    and p._exit_door in (first, pair)
                    for p in self.catchers()):
+                continue
+            # (under the PC profile a pair another pawn has set off for is
+            # its to hold: Woody would stand where he is until it is free —
+            # Pawn._pc_claim_marks)
+            if any(self._pc_held(d) for d in (first, pair) if d is not None):
                 continue
             slack = self._route_slack(here, path)
             if z.pid in heading and (slack is None or slack < 10.0):
