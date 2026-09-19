@@ -63,9 +63,10 @@ are the runtime's, docs/PC_FIDELITY.md "205's table", "207's board", "210's
 call"; 204's is its own gong's message). Not modelled:
 206's and 214's waits on the Mother, 213's polls on Olga's picnic and bull
 ride, 209's fakir `spit`. With
-the walks the laps come to 105 s (203), 85.5 (208), 104 (209), 85 (211), 124
-(212), 123 (213) and 90.3 (214) against the PC video's 84-112, 86, 97, 85, 113,
-136 and 91 (214's shower to shower, docs/PC_LAPS_DETAIL.md) —
+the walks the laps come to 105 s (203), 85.5 (208), 106.7 (209: its coal walk
+leaves him 190 px on, an action's <translation>, Data.translation), 85 (211),
+124 (212), 123 (213) and 90.3 (214) against the PC video's 84-112, 86, 97, 85,
+113, 136 and 91 (214's shower to shower, docs/PC_LAPS_DETAIL.md) —
 the video's stays (pc_durations_s2.py) held the walk the port's geometry did
 not have until the door passes and the station runs were carried
 (tools/pcref/pc_walks_s2.py); code_stays hands the profile the code's.
@@ -343,6 +344,15 @@ def _actions_of(text):
         e['flags'] |= set(re.findall(r'<flag name="([^"]+)"', body))
         for a in re.finditer(r'<action ([^>]*)>', body):
             at = dict(re.findall(r'(\w+)="([^"]*)"', a.group(1)))
+            if not a.group(1).rstrip().endswith('/'):
+                # the action's <translation object="false">: the actor moved by
+                # `destination` over the action (the object's own with "true")
+                close = body.find('</action>', a.end())
+                inner = body[a.end():close if close >= 0 else len(body)]
+                tr = [tuple(int(v) for v in m.split('/')) for m in re.findall(
+                    r'<translation object="false"[^>]*destination="(-?\d+/-?\d+)"', inner)]
+                if tr:
+                    at['_tr'] = (sum(x for x, _y in tr), sum(y for _x, y in tr))
             e['act'][(at.get('actor'), at.get('name'))] = at
     return out
 
@@ -363,6 +373,15 @@ class Data:
         """the object's objects.xml flags"""
         e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
         return e.get('flags') or set()
+
+    def translation(self, obj, name, actor='neighbor'):
+        """the actor's net move over an action (its <translation object="false">
+        destinations summed, px), (0, 0) without one — 205's skiing leaves the
+        neighbour 400 px left of the skis, 209's coal walk 190 px right of the
+        coal, 212's cliff enter 175 px left of the cliff"""
+        e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
+        a = (e.get('act') or {}).get((actor, name)) or {}
+        return a.get('_tr', (0, 0))
 
     def action_ticks(self, obj, name, actor='neighbor'):
         """the ticks of an action: time="N", or auto = the frames of the actor's
@@ -767,6 +786,13 @@ def lap_estimate(n, verbose=False):
                 if verbose: print('   walk -> %-30s %5.1f s' % (real, (t or 0) / 12.0))
         if k == len(order) - 1:
             break            # the closing step: its walk ends the lap
+        if pos is not None and not any(a == 'leave' for _o, a, _t in parts):
+            # the actions' translations move the actor off the hotspot: the
+            # next walk leaves from there (a `leave` places him at another
+            # object — 212's water exit — not modelled)
+            for o, a, _t in parts:
+                tx, ty = d.translation(o, a)
+                pos = (pos[0], pos[1] + tx, pos[2] + ty)
         s = sum(t for _o, _a, t in parts if t is not None)
         unknown += ['%s.%s' % (short(o), a) for o, a, t in parts if t is None]
         stays += s
@@ -874,14 +900,56 @@ def code_stays(n):
     walk does not close (210's: his chair waits for the Mother's call, a message
     the walk does not follow) is the walk from its start (LAP_START), each of
     its stations once"""
+    out = {}
+    _lap, pairs = _paired_parts(n)
+    for item, (many, visits) in pairs.items():
+        if all(v is not None and None not in [t for _i, _j, (_o, _a, t) in v] for v in visits):
+            secs = [round(sum(t for _i, _j, (_o, _a, t) in v) / 12.0, 2) for v in visits]
+            out[item] = secs if many else secs[0]
+    return out
+
+
+def code_moves(n):
+    """{mobile item: px, or a list per visit}: where the next walk leaves from
+    along the floor, off the station's hotspot — the neighbour's net move
+    over the step whose last part is the item's (its actions' <translation>s,
+    Data.translation; 205's skiing -400, 209's coal walk +190). An item whose
+    parts do not end their step has none (212's cliff `enter`: its `use`
+    follows in the same step, no GoTo between them), nor a step with a
+    `leave` (the placement at another object: 212's water exit); items
+    without a move left out"""
+    d = Data(n)
+    lap, pairs = _paired_parts(n)
+    out = {}
+    for item, (many, visits) in pairs.items():
+        if any(v is None for v in visits):
+            continue
+        dx = []
+        for v in visits:
+            i, j = max((i, j) for i, j, _p in v)
+            parts = lap[i][4]
+            if j != len(parts) - 1 or any(a == 'leave' for _o, a, _t in parts):
+                dx.append(0)
+            else:
+                dx.append(sum(d.translation(o, a)[0] for o, a, _t in parts))
+        if any(dx):
+            out[item] = dx if many else dx[0]
+    return out
+
+
+def _paired_parts(n):
+    """(the lap's rows, {mobile item: (per visit, [its parts [(row, part
+    index, (object, action, ticks))] per visit, None where a pair is
+    missing])}) by PAIRS[n] over the lap's parts (each part paired once, in
+    the lap's order)"""
     rows, loop = lap_steps(n)
     if loop is None and n not in OPEN_LAPS:
-        return {}
+        return [], {}
     lap = rows if loop is None else rows[loop:] + rows[:loop]
     used = set(); out = {}
 
-    def ticks(sels):
-        tot = 0
+    def match(sels):
+        got = []
         for sel, osuf, act in sels:
             hit = None
             for i, cur, icon, objs, parts in lap:
@@ -891,20 +959,16 @@ def code_stays(n):
                     if (i, j) in used or a != act:
                         continue
                     if o == osuf or o.endswith('_' + osuf):
-                        hit = (i, j, t); break
+                        hit = (i, j, (o, a, t)); break
                 if hit: break
-            if hit is None or hit[2] is None:
+            if hit is None:
                 return None
-            used.add(hit[:2]); tot += hit[2]
-        return tot
+            used.add(hit[:2]); got.append((lap.index(next(r for r in lap if r[0] == hit[0])), hit[1], hit[2]))
+        return got
 
     for item, sels in PAIRS.get(n, {}).items():
         if sels and isinstance(sels[0], list):
-            per = [ticks(v) for v in sels]
-            if None not in per:
-                out[item] = [round(t / 12.0, 2) for t in per]
+            out[item] = (True, [match(v) for v in sels])
         else:
-            t = ticks(sels)
-            if t is not None:
-                out[item] = round(t / 12.0, 2)
-    return out
+            out[item] = (False, [match(sels)])
+    return lap, out

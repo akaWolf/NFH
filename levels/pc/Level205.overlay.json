@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E05 Ping-Pong Fucius: +25 the tennis (124 s), +38 the skis (154), +51 the chef (192; the eels item carries no anger of its own — the port's meter rose by the Chef's amount alone), +33 the rockets at the full bar (228), the sculpture +2 on the full bar (245). PC data (cn_b2/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes. Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit. An item's own clips while another role uses it hidden (tools/pcref/pc_durations_others.py ITEM_CLIPS): PCItemClipSeconds, the level data's actions and clips paired by hand.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E05 Ping-Pong Fucius: +25 the tennis (124 s), +38 the skis (154), +51 the chef (192; the eels item carries no anger of its own — the port's meter rose by the Chef's amount alone), +33 the rockets at the full bar (228), the sculpture +2 on the full bar (245). PC data (cn_b2/tricks.xml, rage per trick in thousandths of the gauge): the mobile AngerAmount values are the PC's for every trick this level pays — no overlay. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor (tx: the neighbour's move over the station's actions, their <translation>s); PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes. Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit. An item's own clips while another role uses it hidden (tools/pcref/pc_durations_others.py ITEM_CLIPS): PCItemClipSeconds, the level data's actions and clips paired by hand.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -86,18 +86,24 @@
      "Rottweiler": {
       "in": 60,
       "out": -80,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": 0
      },
      "Woody": {
       "in": 60,
       "out": -80,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": 0
      },
      "Olga": {
       "in": 60,
       "out": -80,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": 0
      }
@@ -113,12 +119,16 @@
      "Rottweiler": {
       "in": -80,
       "out": -30,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": -200
      },
      "Woody": {
       "in": -80,
       "out": -30,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": -200
      }
@@ -134,18 +144,24 @@
      "Rottweiler": {
       "in": 80,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 0
      },
      "Woody": {
       "in": 80,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 0
      },
      "Olga": {
       "in": 80,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 0
      }
@@ -161,12 +177,16 @@
      "Rottweiler": {
       "in": -70,
       "out": -60,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": -180
      },
      "Woody": {
       "in": -70,
       "out": -60,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": -180
      }
@@ -182,12 +202,16 @@
      "Rottweiler": {
       "in": 60,
       "out": 70,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": 180
      },
      "Woody": {
       "in": 60,
       "out": 70,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": 180
      }
@@ -203,12 +227,16 @@
      "Rottweiler": {
       "in": 70,
       "out": -50,
+      "xi": 870,
+      "xo": 660,
       "dx": -210,
       "dy": 0
      },
      "Woody": {
       "in": 70,
       "out": -50,
+      "xi": 870,
+      "xo": 660,
       "dx": -210,
       "dy": 0
      }
@@ -224,12 +252,16 @@
      "Rottweiler": {
       "in": 30,
       "out": 80,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": 200
      },
      "Woody": {
       "in": 30,
       "out": 80,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": 200
      }
@@ -245,12 +277,16 @@
      "Rottweiler": {
       "in": 50,
       "out": -70,
+      "xi": 660,
+      "xo": 890,
       "dx": 230,
       "dy": 0
      },
      "Woody": {
       "in": 50,
       "out": -70,
+      "xi": 660,
+      "xo": 890,
       "dx": 230,
       "dy": 0
      }
@@ -309,6 +345,10 @@
         "Zone02"
        ],
        "WaterSkiis": [
+        "Zone04",
+        "Zone01"
+       ],
+       "Rockets": [
         "Zone04",
         "Zone01"
        ],
@@ -390,6 +430,10 @@
         "Zone03",
         "Zone04"
        ],
+       "Rockets": [
+        "Zone02",
+        "Zone01"
+       ],
        "SandSculpture": [
         "Zone02",
         "Zone01"
@@ -447,6 +491,25 @@
    "zone": "Zone01",
    "set": {
     "PCApproach": {
+     "Rottweiler": {
+      "obj": "beachleft/firework",
+      "x": 220,
+      "px": -70,
+      "routes": {
+       "OlgaMatBeach": [
+        "Zone01",
+        "Zone02"
+       ],
+       "TabbleTennis": [
+        "Zone01",
+        "Zone02"
+       ],
+       "Chef": [
+        "Zone01",
+        "Zone04"
+       ]
+      }
+     },
      "Woody": {
       "obj": "beachleft/firework",
       "x": 270,
@@ -475,6 +538,10 @@
         "Zone02",
         "Zone01",
         "Zone04"
+       ],
+       "Rockets": [
+        "Zone02",
+        "Zone01"
        ],
        "SandSculpture": [
         "Zone02",
@@ -551,7 +618,11 @@
         "Zone01",
         "Zone04"
        ]
-      }
+      },
+      "tx": [
+       -400,
+       0
+      ]
      },
      "Woody": {
       "obj": "beachleft/waterski",

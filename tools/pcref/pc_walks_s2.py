@@ -19,6 +19,8 @@ next walk in the far room comes down to its floor from `<actor>_out`, so a
 pass is, in px of the PC scene:
 
   in   the near door's `<actor>_in` against the near room's floor line,
+  xi, xo   the x of `<actor>_in` and of the far `<actor>_out` — where the walk
+           along the near room's floor ends and the far room's begins,
   dx, dy   the straight movement from `<actor>_in` to the far `<actor>_out`,
   enter, leave   instead of dx, dy: the enter and leave actions' ticks (their
            clips) — the back doors of 211-214's fifth rooms, the mobile's Doors,
@@ -52,13 +54,13 @@ ROLES = (('neighbor', 'Rottweiler'), ('woody', 'Woody'), ('mother', 'Mother'), (
 # role — the object of the level script's GoTo / DoAction for the station
 # (lap_model_s2.walk's targets: 202's theocean, 205's beachright/mat, 206's fifi, 207's
 # kid, 213's limberwall, 214's door_closed …), else the object whose actor action the
-# station plays; stations without a PC counterpart are left out (205's rocket has no
-# hotspot, 208's and 209's Mother at Fifi and at her start, 211's and 214's Olga at
-# her stands, the kid). 210's call is her chair for both: his call step runs him to
-# pool_deckchair (0x10019270), her order step waits for him at its `neighbor`
-# hotspot (fcn.1000e172). The approach is the object's `<actor>` hotspot
-# against its room's floor line: the walk goes up or down to it from the floor and the
-# next walk comes back down (fcn.10009177).
+# station plays; stations without a PC counterpart are left out (208's and 209's
+# Mother at Fifi and at her start, 211's and 214's Olga at her stands, the kid).
+# 210's call is her chair for both: his call step runs him to pool_deckchair
+# (0x10019270), her order step waits for him at its `neighbor` hotspot
+# (fcn.1000e172). The approach is the object's `<actor>` hotspot against its
+# room's floor line: the walk goes up or down to it from the floor and the next
+# walk comes back down (fcn.10009177).
 STATIONS = {
     201: {'CaptainHat': {'Rottweiler': 'topleft/captncap'},
           'Buffet': {'Rottweiler': 'topleft/buffet', 'Olga': 'topleft/buffet'},
@@ -79,11 +81,15 @@ STATIONS = {
           'Karate': {'Rottweiler': 'groundleft/headbanging'},
           'GongDrumstick': {'Rottweiler': 'wallleft/gong'},
           'HotDog': {'Rottweiler': 'wallright/hotdogshop'},
-          'JadeNecklace': {'Rottweiler': 'groundright/jadedummy'}},
+          # the jade step's GoTo is the jade (its DoAction the dummy's)
+          'JadeNecklace': {'Rottweiler': 'groundright/jade'}},
     205: {'OlgaMatBeach': {'Rottweiler': 'beachright/mat', 'Olga': 'beachright/mat_guarded'},
           'TabbleTennis': {'Rottweiler': 'beachright/pingpong_guarded', 'Olga': 'beachright/pingpong_guarded'},
           'WaterSkiis': {'Rottweiler': 'beachleft/waterski_guarded'},
           'Chef': {'Rottweiler': 'shop/chef'},
+          # the rocket step's GoTo is the firework (0x1002450d: IsVariant of
+          # beachleft/firework and firework_rope); the rocket has no hotspot
+          'Rockets': {'Rottweiler': 'beachleft/firework'},
           'SandSculpture': {'Rottweiler': 'beachleft/sandlion'}},
     206: {'DogFifi': {'Rottweiler': 'topleft/fifi'},
           'DeckChair': {'Rottweiler': 'topleft/deckchair', 'Mother': 'topleft/deckchair'},
@@ -113,7 +119,9 @@ STATIONS = {
           'DressingRoom': {'Mother': 'bazar/dressing_room'}},
     209: {'FireFakir': {'Rottweiler': 'fire_fakir/groove'},
           'HotShoe': {'Rottweiler': 'tadj_mahal/shoe_mat'},
-          'TadjMahal': {'Rottweiler': 'tadj_mahal/curtain'},
+          # the shoe step goes to the shoe mat and enters the curtain from
+          # there, no GoTo between (the mobile's two stations are one spot)
+          'TadjMahal': {'Rottweiler': 'tadj_mahal/shoe_mat'},
           'Coal': {'Rottweiler': 'coal_area/coal'},
           'IceCream': {'Rottweiler': 'bazar/icecream_machine'},
           'Cow': {'Rottweiler': 'holy_cow/cow'},
@@ -141,7 +149,11 @@ STATIONS = {
           'CigarBox': {'Rottweiler': 'midleft/cigars'},
           'SleepBench': {'Rottweiler': 'midleft/bank'},
           'MechanicalBull': {'Rottweiler': 'bottomleft/bullride'},
-          'PreParrotLedge': {'Rottweiler': 'bottomright/cliff'},
+          # the ledge step's GoTo is the parrot (0x10035388: IsVariant of
+          # bottomright/parrot and parrot_manip), its DoActions the cliff's,
+          # the water's and the water exit's — both mobile ledge actions
+          'PreParrotLedge': {'Rottweiler': 'bottomright/parrot'},
+          'ParrotLedge': {'Rottweiler': 'bottomright/parrot'},
           'MumWaitZone4': {'Mother': 'midleft/red_bull'},
           'MumWaitZone3': {'Mother': 'midright/statue_hideout'}},
     213: {'LiveBull': {'Rottweiler': 'midleft/limberwall'},
@@ -411,9 +423,11 @@ ACTOR = {role: actor for actor, role in ROLES}
 
 
 def approaches(n):
-    """[(item, zone, component, {role: {'obj', 'x', 'px', 'routes'}})]: per
-    station the PC object's `<actor>` hotspot x, its height against the
-    room's floor and the PC's routes to the role's other stations in other
+    """[(item, zone, component, {role: {'obj', 'x', 'px', 'routes'[, 'tx']}})]:
+    per station the PC object's `<actor>` hotspot x, its height against the
+    room's floor, the neighbour's move along the floor over its actions
+    (lap_model_s2.code_moves, per visit where the item has several) and the
+    PC's routes to the role's other stations in other
     rooms — the mobile zones of the path finder's rooms (Geometry.route: the
     Dijkstra of fcn.1000a421 from this hotspot to the other's), where the
     mobile's Helpers.GetShortestPath (1 a hop, its ties to Mono's qsort)
@@ -422,6 +436,7 @@ def approaches(n):
     doors, zones = mobile_doors(n)
     zmap = room_map(n, g, doors, zones)
     raw = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))
+    moves = S.code_moves(n)
     out = []
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
@@ -446,6 +461,10 @@ def approaches(n):
                 if rt is not None:
                     routes[other] = [zmap[r]] + [zmap[g.room_of(dout)] for _din, dout in rt]
             per[role] = {'obj': obj, 'x': p[0], 'px': p[1] - g.floor(r), 'routes': routes}
+            if role == 'Rottweiler' and name in moves:
+                # the station's actions move him along the floor (their
+                # <translation>s): his next walk leaves from x + tx (per visit)
+                per[role]['tx'] = moves[name]
         obj = WOODY.get(n, {}).get(name)
         if obj is not None:
             # Woody's run up or down to the object's `woody` hotspot (his clicks
@@ -566,7 +585,9 @@ def passes(n):
             b = g.point(dout, actor + '_out', exact=True)
             if a is None or b is None:
                 continue
-            p = {'in': a[1] - g.floor(ra), 'out': g.floor(rb) - b[1]}
+            # the floor's ends as well: the walk along the near room's floor
+            # stops at `<actor>_in`'s x, the far room's starts at `<actor>_out`'s
+            p = {'in': a[1] - g.floor(ra), 'out': g.floor(rb) - b[1], 'xi': a[0], 'xo': b[0]}
             if actor in g.door_acts.get(din, ()):
                 t1 = d.action_ticks(din, 'enter', actor)
                 t2 = d.action_ticks(dout, 'leave', actor)
@@ -637,9 +658,11 @@ def main(argv):
         note = (" The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC"
                 " pass of the door pair it stands for — the near door's <actor>_in against the room's floor,"
                 " the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far"
-                " floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and"
+                " floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the"
+                " actors' stations and"
                 " Woody's items = per role the PC object's <actor> hotspot x and its height against the"
-                " room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with"
+                " room's floor (tx: the neighbour's move over the station's actions, their <translation>s);"
+                " PCRoom on each Zone = its PC room's floor line and <neighbor> records with"
                 " the doors' <actor> hotspots, for the path finder's routes.")
         src = ov.get('source', '')
         i = src.find(' The door passes (tools/pcref/pc_walks_s2.py)')

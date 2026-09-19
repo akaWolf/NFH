@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim — the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. PC data (cn_b1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Rake 20 (rake_ground), Submarine 35 (shark), EelBox 30 (bridge_electrify); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The catch (tools/pcref/pc_catch_s2.py): PCHideout on the catchers' stations = per role the span of the PC's flag 4 (the enter step to the leave step, less the level steps' clears), in which the neighbour or the Mother neither catches nor is seen. The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor; PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes. Another actor's clips at the PC's ticks (tools/pcref/pc_durations_others.py CLIPS_ROLE): PCClipSecondsRole, the level data's actions and clips paired by hand. Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit.",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E02 Covert Advance: +19 the rake (96 s), +25 the swim (105), +45 in the swim — the submarine (116), +25 the rail and +10 at the full bar its pond (148-150); the mat's coin shows no jump. PC data (cn_b1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on Rake 20 (rake_ground), Submarine 35 (shark), EelBox 30 (bridge_electrify); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The catch (tools/pcref/pc_catch_s2.py): PCHideout on the catchers' stations = per role the span of the PC's flag 4 (the enter step to the leave step, less the level steps' clears), in which the neighbour or the Mother neither catches nor is seen. The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, the x of both hotspots, in px of the PC scene; PCApproach on the actors' stations and Woody's items = per role the PC object's <actor> hotspot x and its height against the room's floor (tx: the neighbour's move over the station's actions, their <translation>s); PCRoom on each Zone = its PC room's floor line and <neighbor> records with the doors' <actor> hotspots, for the path finder's routes. Another actor's clips at the PC's ticks (tools/pcref/pc_durations_others.py CLIPS_ROLE): PCClipSecondsRole, the level data's actions and clips paired by hand. Station durations (tools/pcref/pc_durations_s2.py): GameLogic.dll's level script (tools/pcref/lap_model_s2.py code_stays: the untricked lap's actions, hideouts and bars per mobile item), the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk for the items the model leaves untimed, PCUseSeconds per visit.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -116,18 +116,24 @@
      "Rottweiler": {
       "in": 60,
       "out": 0,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": -30
      },
      "Woody": {
       "in": 60,
       "out": 0,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": -30
      },
      "Olga": {
       "in": 60,
       "out": 0,
+      "xi": 670,
+      "xo": 910,
       "dx": 240,
       "dy": -30
      }
@@ -143,12 +149,16 @@
      "Rottweiler": {
       "in": -80,
       "out": -30,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": -200
      },
      "Woody": {
       "in": -80,
       "out": -30,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": -200
      }
@@ -164,18 +174,24 @@
      "Rottweiler": {
       "in": 0,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 30
      },
      "Woody": {
       "in": 30,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 0
      },
      "Olga": {
       "in": 0,
       "out": -60,
+      "xi": 860,
+      "xo": 620,
       "dx": -240,
       "dy": 30
      }
@@ -191,12 +207,16 @@
      "Rottweiler": {
       "in": -120,
       "out": -60,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": -180
      },
      "Woody": {
       "in": -120,
       "out": -60,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": -180
      }
@@ -212,12 +232,16 @@
      "Rottweiler": {
       "in": 60,
       "out": 120,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": 180
      },
      "Woody": {
       "in": 60,
       "out": 120,
+      "xi": 1055,
+      "xo": 1055,
       "dx": 0,
       "dy": 180
      }
@@ -233,12 +257,16 @@
      "Rottweiler": {
       "in": 70,
       "out": -50,
+      "xi": 860,
+      "xo": 650,
       "dx": -210,
       "dy": 0
      },
      "Woody": {
       "in": 70,
       "out": -50,
+      "xi": 860,
+      "xo": 650,
       "dx": -210,
       "dy": 0
      }
@@ -254,12 +282,16 @@
      "Rottweiler": {
       "in": 30,
       "out": 80,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": 200
      },
      "Woody": {
       "in": 30,
       "out": 80,
+      "xi": 440,
+      "xo": 440,
       "dx": 0,
       "dy": 200
      }
@@ -275,12 +307,16 @@
      "Rottweiler": {
       "in": 50,
       "out": -70,
+      "xi": 670,
+      "xo": 890,
       "dx": 220,
       "dy": 0
      },
      "Woody": {
       "in": 50,
       "out": -70,
+      "xi": 670,
+      "xo": 890,
       "dx": 220,
       "dy": 0
      }
