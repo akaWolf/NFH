@@ -325,6 +325,7 @@ class Item:
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'pc_hit_secs', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
+                 'pc_fix_depart',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -943,6 +944,10 @@ class Item:
         # coin) this far into the wc's puke (tools/pcref/lap_model_s2.py
         # TRICKED_RUSH)
         self.pc_toilet_pays_at = d.get('PCToiletPaysAt')
+        # the repair's walk to another object (211's sign after the wc, 203's
+        # generator after the stage): the PC hotspot (x, px) his next walk
+        # leaves from (lap_model_s2._repair_walk)
+        self.pc_fix_depart = list(d.get('PCFixDepart') or []) or None
         self.extra_coin_toilet_211 = False  # Item.Toilet211Behavior's latch
         self.dog_basket_210 = ref('DogBasketBehavior210')
         # AnimationsToControl (Item.cs:2676-2738)

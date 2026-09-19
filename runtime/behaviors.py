@@ -862,7 +862,7 @@ class Level206RoutineBehavior(Behavior):
         # shot's variant decided at the harpoon's take (the harpoon is the
         # pad's LinkedItemTrick)
         self.pc_armed = False
-        self.pc_armed_linked = False
+        self.pc_rubber = False
 
     def _pc_visit(self, item):
         """the visit of the item among its entries of the neighbour's lap
@@ -876,17 +876,21 @@ class Level206RoutineBehavior(Behavior):
         return sum(1 for a in r.actions[:i + 1] if a.get('item') == item.pid), r
 
     def _pc_gate(self, item):
-        """GameLogic's 206 pad steps under the profile: the load step
-        0x1002e3df asks IfVariant ramp / ramp_manip — the rabbit on the ramp
-        at the load arms the shot, which comes after the harpoon's take (the
-        hand-over 0x1002e27f -> 0x1002df9b / 0x1002e0fd); the lap's shoot
-        step 0x1002d948 asks nothing, so the pad's other visits play plain
-        (Item.pc_masked) and a rabbit put on after the load waits for the next
-        one. The take step's IfVariant harpoon / harpoon_manip (0x1002e27f
-        armed, 0x1002dd0a not) decides the rubber: into the armed shot (the
-        take plain), or shot at once (0x1002da29, the rubber bear) and on to
-        the put 0x1002d578 past the shoot step; the put step switches a
-        manipulated harpoon back — a rubber put on after the take is gone"""
+        """GameLogic's 206 pad steps under the profile. The mobile's pad
+        toggles prime three ways (load, shoot, Fifi's take: its prime leg,
+        its use, its unprime leg) and its harpoon two (take, put), and the
+        harpoon's rubber (UseAtOtherPlace) fires through the pad's DependsOn
+        at the pad's shoot — the PC's order for the rubber alone (the take
+        step's rubber branch 0x1002dd0a -> 0x1002da29: the walk to the ramp,
+        the rubber bear, SHOUT 1, then the walk back and the put). What the
+        PC asks when: the load step 0x1002e3df's IfVariant ramp / ramp_manip
+        arms the rabbit's shot, the take step's harpoon / harpoon_manip picks
+        the rubber — shot alone, or into the armed shot (0x1002e27f) — and
+        the lap's shoot step 0x1002d948 asks nothing, while the put step
+        0x1002d578 switches a manipulated harpoon back. So the pad fires its
+        rabbit at the shoot after an armed load only, the rubber fires at the
+        shoot only if it was on at the take, and a rubber put on after the
+        take is gone at the put (Item.pc_masked: the visit reads untricked)"""
         lp = self.launch_pad
         hp = self.level.items.get(lp.linked_item_trick) if lp.linked_item_trick else None
         if item is not lp and item is not hp:
@@ -899,24 +903,26 @@ class Level206RoutineBehavior(Behavior):
             lp.pc_masked = False
             if k == arm:
                 self.pc_armed = lp.tricked
-                self.pc_armed_linked = False
-                lp.pc_masked = lp.tricked
-            elif k == fire and self.pc_armed:
-                self.pc_armed = False
-                if hp is not None and hp.tricked and not self.pc_armed_linked:
-                    self.world._fix(hp)       # decided at the take: the rubber is gone
-            else:
-                lp.pc_masked = lp.tricked
-        elif hp is not None and item is hp and hp.pc_trick_fire:
-            fire_h, drop_h = hp.pc_trick_fire[:2]
-            hp.pc_masked = False
-            if k == fire_h and hp.tricked:
+                self.pc_rubber = False
+            elif k == fire:
                 if self.pc_armed:
-                    self.pc_armed_linked = True
-                    hp.pc_masked = True       # the plain take; the rubber rides the shot
-                elif r is not None:
-                    r.pc_skip_next = True     # the rubber bear's shot goes on to the put
-            elif k == drop_h and hp.tricked:
+                    self.pc_armed = False
+                    if hp is not None and hp.tricked and not self.pc_rubber:
+                        self.world._fix(hp)   # decided at the take: the rubber is gone
+                elif lp.tricked or (hp is not None and hp.tricked and not self.pc_rubber):
+                    lp.pc_masked = True       # the shoot step asks nothing: the bear
+                self.pc_rubber = False
+        elif hp is not None and item is hp and hp.pc_trick_fire:
+            take_h, put_h = hp.pc_trick_fire[:2]
+            hp.pc_masked = False
+            if k == take_h:
+                self.pc_rubber = hp.tricked   # on at the take: shot at the shoot
+                if hp.tricked:
+                    # the take step plays harpoon_manip's take (0x1002dd0a):
+                    # the trick is used there — the mobile marks GotTricked
+                    # only at its put, a lap late for the pad's DependsOn
+                    hp.got_tricked = True
+            elif k == put_h and hp.tricked:
                 hp.pc_masked = True
                 self.world._fix(hp)           # the put step's switch back
 
