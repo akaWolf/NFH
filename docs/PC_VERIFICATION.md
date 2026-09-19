@@ -511,3 +511,10 @@ actors' job pass the update calls at 0x100445f8.
 - `tools/pcref/lap_model_s2.py`, `runtime/scene.py`, `runtime/world.py`
   (2026-09-24, later): 211's rush (the row "211's rush"). runs/sw15s2 all
   14 at 100 (211 at 262.0 s), S1 and the mobile regression unchanged.
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_walks_s2.py` (2026-09-24,
+  late): 203's microphone tricked through the generator's tights (the PC's
+  only stage trick: 13.25/1/1.58/6.92); a SHOUT with no repair in a step
+  that hands over off the lap takes the next step's repair (203's
+  generator, 212's bench, 213's washing tub: 1.58); Woody's own action
+  translation as his PCApproach `tx` (208's chalk, -45). 203 at 201.8 s,
+  208 at 279.0, 212 at 875.2, 213 at 400.3 — all 100.

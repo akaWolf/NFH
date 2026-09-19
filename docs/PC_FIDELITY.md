@@ -1247,8 +1247,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the mobile's toggle plays next). A two-way station's tricked
   visit takes its side's tricked move (code_moves_tricked per visit, `txt`
   per visit: 201's soaped puddle [200, -100] where the slips move [80,
-  -100]; 2026-09-24). Open, with numbers: 203's stage crash 30 and Woody's
-  one (208's chalk on the safety line, 45 px, 3 of his ticks).
+  -100]; 2026-09-24). 203's stage crash moves him +30/+10 inside the
+  stage, whose `leave` then places him at its hotspot as the untricked
+  speech's does: no move to carry. Woody's own: his action's
+  translation on the object, the action the inventory the mobile item
+  takes (208's chalk_sponge on the elephant's line, -45 px over its first
+  tick) — PCApproach `tx` on his side (pc_walks_s2), his next walk leaving
+  from there (`Pawn._pc_arrived`, the same departure as the neighbour's);
+  the only one the data has (201's soap and 214's swiffer had been read
+  across a self-closing object's end).
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
@@ -1624,6 +1631,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   dumbbell) and dynamite 13.83/1/-/8.5 (the adhesive's bag taken, then
   0x1002c550's lookaround and the reling's explode); 210's dog basket
   alone plays no SHOUT anywhere in its flow (PCShout -1: no reaction);
+  203's stage is broken by the generator's tights alone in the PC (cn_c2
+  combine.xml has no microphone trick; the stage step asks for
+  generator_manip, 0x1003450b) — the mobile's DieselGenerator activates
+  the Microphone's trick: the stage's crash (enter, the image's crash, the
+  stage's `crash` with its record stage at 8, leave) 13.25/1/1.58/6.92
+  (lap_model_s2 TRICKED_BY); a SHOUT with no repair after it in a step
+  that hands over off the lap takes the repair of the step it hands over
+  to (203's generator 0x100343a5, 212's bench 0x10035fdf, 213's washing
+  tub 0x1003761c: 1.58 each, 0 before);
   214's captain's door is visited tricked in neither game (the mobile's
   CaptainDoorBehavior swaps his routine's door for its ExtraItem,
   Item.cs:2606-2623; the PC's door step goes on up to the wheel) and its
@@ -1719,10 +1735,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   TurbanShop 27 and 213's Tortilla 15 and PlantCarnivore 15 + PCExtraCoin
   20 had been dropped from the overlays by the stays writer of 2026-09-12
   (it replaced its patches' sets) and are back.
-Plans (runs/sw15s2, all 14 at 100; 207's plan awaits the count 7 — the
+Plans (runs/sw16s2, all 14 at 100; 207's plan awaits the count 7 — the
   billboard's coin is paid at his resume after Olga's lift, 436.2 s; 206's
-  the count 6, 257.7 s; 211 at 262.0, 212 at 873.6, 213 at 398.7, 214 at
-  792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
+  the count 6, 257.7 s; 203 at 201.8, 211 at 262.0, 212 at 875.2, 213 at
+  400.3, 214 at 792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
   sawfish placed while he is at the shore and in the sea, the swim step's
   flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
   of decay, just over the top (the rail first a lap earlier spreads it over
