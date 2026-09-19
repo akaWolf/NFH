@@ -85,7 +85,22 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                            'BeachSleepCrab': ('bar', 0x10022c8d, 7),
                            'BeachGetBeer': ('beachright_mat_hn_guarded', 'use'),
                            'BeachCrabGetBeer': ('beachright_mat_hn_guarded_manip', 'use'),
-                           'BeachGetUp': ('beachright_mat_hn_guarded', 'leave')}}}
+                           'BeachGetUp': ('beachright_mat_hn_guarded', 'leave')}},
+        # 210's deck chair (his chair step 0x100195a4: the hideout's `enter`,
+        # the bar of 120 ticks over the mobile's four sun clips; then the
+        # chair's `wakeup` and the awake loop he waits in for the Mother's
+        # call, 0x10018f4a; the call's step leaves it, 0x1001911e)
+        210: {'DeckChair': {'ChairEnter': ('beachleft_deckchair_guarded', 'enter'),
+                            'ChairSun': ('bar', 0x100195a4, 4),
+                            'ChairWakeup': ('beachleft_deckchair_guarded', 'wakeup'),
+                            'ChairAwake': ('anim', 'beachleft/deckchair', 'awake'),
+                            'ChairLeave': ('beachleft_deckchair_guarded', 'leave')},
+              # at her chair he stands for nothing: her order step (0x10018682)
+              # polls for him at its `neighbor` hotspot (fcn.1000e172) and
+              # plays `order`, whose behavior="order" (generic objects.xml)
+              # sends him on to Fifi as it starts (his handler 0x1001b4f6 ->
+              # 0x1001aecc) — the mobile's three stands there take no time
+              'CallRTMother': {'Stand_Left': ('none',)}}}
 # the tricked use's clip after which the PC's trick action has ended
 # (PCCreditAfter): the record's action (objects.xml) pays as it completes —
 # the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
@@ -96,7 +111,14 @@ CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', '
 # (0x100224a8-0x10022563) that Olga's Submarine use switches into the sea,
 # then the dive step plays the kid's dive and run ashore (0x10022046)
 WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarine',
-                            'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}}}
+                            'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}},
+         # 210's chair: awake until her call — her `callneighbor` carries
+         # behavior="call" (generic objects.xml), fired as it starts, and his
+         # handler (0x1001b4f6) sends him out of the chair at once (0x1001911e:
+         # its `leave`, then the run to her chair); `at` start: the awaited
+         # role's use begun
+         210: {'DeckChair': {'clip': 'ChairAwake', 'role': 'Mother', 'item': 'CallRTMother',
+                             'at': 'start', 'then': []}}}
 MIN_STAY = 0.5
 
 
@@ -124,7 +146,7 @@ def _set_key(patches, item, key, value):
 # Taj before the shoes) keep the mobile length — written as a leading 0
 LEAD_MOBILE = {209: {'HotShoe': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (202, 203, 208, 209, 211, 212, 213, 214)
+CODE = (202, 203, 208, 209, 210, 211, 212, 213, 214)
 
 
 def pc_spans(n):
@@ -224,6 +246,8 @@ def clip_secs(n):
                     t = t / float(src[2])      # the bar over so many mobile clips
             elif src[0] == 'anim':
                 t = d.frames.get((src[1], src[2])) or d.gframes.get((src[1], src[2]))
+            elif src[0] == 'none':
+                t = 0                          # the PC plays nothing there
             else:
                 t = d.action_ticks(src[0], src[1])
             if t is not None:
@@ -242,6 +266,8 @@ def clip_secs(n):
         then = sum(d.action_ticks(o, a) or 0 for o, a in w['then'])
         waits[item] = {'clip': w['clip'], 'role': w['role'], 'item': w['item'],
                        'then': round(then / 12.0, 2)}
+        if w.get('at'):
+            waits[item]['at'] = w['at']
     return clips, waits
 
 
@@ -276,7 +302,9 @@ def main(argv):
         for item, cl in sorted(clips.items()):
             print('   %-26s clips %s' % (item, ', '.join('%s %s' % kv for kv in sorted(cl.items()))))
         for item, wt in sorted(waits.items()):
-            print('   %-26s holds %s until %s used %s, then %.2f s' % (item, wt['clip'], wt['role'], wt['item'], wt['then']))
+            print('   %-26s holds %s until %s %s %s, then %.2f s' % (
+                item, wt['clip'], wt['role'], 'began' if wt.get('at') == 'start' else 'used',
+                wt['item'], wt['then']))
         stays = sum(v for vals in per.values() for v in vals)
         lap = port_lap(n); walks = sum(v['walk'] for v in lap)
         print('   sum of stays %.1f + the port lap\'s walks %.1f = %.1f s' % (stays, walks, stays + walks))
@@ -306,9 +334,14 @@ def main(argv):
             src = ov['source']
             i = src.find(' Station durations (tools/pcref/pc_durations_s2.py)')
             if i >= 0:
-                j = src.find(' The ', i + 1)
-                src = src[:i] + (src[j:] if j >= 0 else '')
-            ov['source'] = src + note
+                # the note in its place (its own last words end it)
+                end = 'PCUseSeconds per visit.'
+                j = src.find(end, i)
+                j = j + len(end) if j >= 0 else src.find(' The ', i + 1)
+                src = src[:i] + note + (src[j:] if j >= 0 else '')
+            else:
+                src += note
+            ov['source'] = src
             json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
             print('   written', p)
 

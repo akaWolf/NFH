@@ -53,8 +53,10 @@ ROLES = (('neighbor', 'Rottweiler'), ('woody', 'Woody'), ('mother', 'Mother'), (
 # (lap_model_s2.walk's targets: 202's theocean, 205's beachright/mat, 206's fifi, 207's
 # kid, 213's limberwall, 214's door_closed …), else the object whose actor action the
 # station plays; stations without a PC counterpart are left out (205's rocket has no
-# hotspot, 208's and 209's Mother at Fifi and at her start, 210's call, 211's and
-# 214's Olga at her stands, the kid). The approach is the object's `<actor>` hotspot
+# hotspot, 208's and 209's Mother at Fifi and at her start, 211's and 214's Olga at
+# her stands, the kid). 210's call is her chair for both: his call step runs him to
+# pool_deckchair (0x10019270), her order step waits for him at its `neighbor`
+# hotspot (fcn.1000e172). The approach is the object's `<actor>` hotspot
 # against its room's floor line: the walk goes up or down to it from the floor and the
 # next walk comes back down (fcn.10009177).
 STATIONS = {
@@ -124,7 +126,7 @@ STATIONS = {
           'OlgaMatBeach': {'Olga': 'beachleft/mat_olga_guarded'},
           'OlgaShower': {'Olga': 'beachleft/shower_guarded'},
           'DeckChairMother': {'Mother': 'pool/deckchair'},
-          'CallRTMother': {'Mother': 'pool/deckchair'}},
+          'CallRTMother': {'Rottweiler': 'pool/deckchair', 'Mother': 'pool/deckchair'}},
     211: {'Sweets': {'Rottweiler': 'topleft/dish'},
           'FishingRod': {'Rottweiler': 'topleft/rod'},
           'LifeBoat': {'Rottweiler': 'bottomleft/boat'},
@@ -578,6 +580,34 @@ def passes(n):
     return m, out
 
 
+def _rewrite(patches, key, want):
+    """`key` set from `want` [(object, component, zone, value)]: in the patch
+    that has it for the same object, component and zone, else a new patch
+    appended; a patch whose key is not wanted any more loses it (and goes
+    when nothing else is left in it)"""
+    left = {(o, c, z): v for o, c, z, v in want}
+    out = []
+    for e in patches:
+        st = e.get('set') or {}
+        if key in st:
+            k = (e['object'], e.get('component'), e.get('zone'))
+            if k in left:
+                st[key] = left.pop(k)
+            else:
+                st.pop(key)
+                if not st:
+                    continue
+        out.append(e)
+    for o, c, z, v in want:
+        if (o, c, z) in left:
+            e = {'object': o, 'component': c}
+            if z is not None:
+                e['zone'] = z
+            e['set'] = {key: v}
+            out.append(e)
+    return out
+
+
 def main(argv):
     write = '--write' in argv
     sys.path.insert(0, os.path.join(ROOT, 'runtime'))
@@ -593,18 +623,16 @@ def main(argv):
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
         ov = json.load(open(p))
-        patches = [e for e in ov.get('patches', []) if not (e.get('component') in ('Transition', 'Door')
-                                                            and 'PCPass' in (e.get('set') or {}))]
-        for name, z, fz, comp, din, dout, per in rows:
-            patches.append({'object': name, 'component': comp, 'zone': z,
-                            'set': {'PCPass': per}})
-        patches = [e for e in patches if not ('PCApproach' in (e.get('set') or {}))]
-        for name, z, comp, per in approaches(n):
-            patches.append({'object': name, 'component': comp, 'zone': z,
-                            'set': {'PCApproach': per}})
-        patches = [e for e in patches if not ('PCRoom' in (e.get('set') or {}))]
-        for z, pr in sorted(rooms(n).items()):
-            patches.append({'object': z, 'component': 'Zone', 'set': {'PCRoom': pr}})
+        # each key rewritten in place — a patch it shares with the duration
+        # tools' keys (pc_durations_s2.py, pc_durations_others.py) keeps them
+        # — a new one appended, a gone one dropped
+        patches = list(ov.get('patches', []))
+        patches = _rewrite(patches, 'PCPass', [(name, comp, z, per)
+                                               for name, z, fz, comp, din, dout, per in rows])
+        patches = _rewrite(patches, 'PCApproach', [(name, comp, z, per)
+                                                   for name, z, comp, per in approaches(n)])
+        patches = _rewrite(patches, 'PCRoom', [(z, 'Zone', None, pr)
+                                               for z, pr in sorted(rooms(n).items())])
         ov['patches'] = patches
         note = (" The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC"
                 " pass of the door pair it stands for — the near door's <actor>_in against the room's floor,"
@@ -616,9 +644,14 @@ def main(argv):
         src = ov.get('source', '')
         i = src.find(' The door passes (tools/pcref/pc_walks_s2.py)')
         if i >= 0:
-            j = src.find(' The ', i + 1)
-            src = src[:i] + (src[j:] if j >= 0 else '')
-        ov['source'] = src + note
+            # the note in its place (its own last words end it)
+            end = "for the path finder's routes."
+            j = src.find(end, i)
+            j = j + len(end) if j >= 0 else src.find(' The ', i + 1)
+            src = src[:i] + note + (src[j:] if j >= 0 else '')
+        else:
+            src += note
+        ov['source'] = src
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
         open(p, 'a').write('\n')
     return 0

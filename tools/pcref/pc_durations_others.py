@@ -46,12 +46,36 @@ BARS = {214: {'DeckChairMother': (0x1003a0b8, 'topright_deckchair')}}
 # her mat (beachleft/mat_olga_guarded: `enter`, the `sun` loop, the `wakeup`
 # her script plays on `kid_cry`, 0x100233ed, and `leave`) and at the sub
 # (beachleft/sub's `take`, takesub; the shark's, takeshark)
-CLIPS_ROLE = {202: {'OlgaMat': ('Olga', {'BeachLayDown': ('beachleft_mat_olga_guarded', 'enter'),
+# 210's Mother (her script: 0x10018c0b sits her in pool/deckchair — its
+# `enter`, sitdown — for fcn.1000e7f2's 240-tick bar asleep, the chair's
+# `sleep`; the check 0x10018983 at its end sends her to 0x100187d8, 180 ticks
+# awake — the chair's `awake`, fcn.100185e5 — and back to the 240 while he is
+# not in his chair, else gets her up — the chair's `leave`, getup — and plays
+# `callneighbor`, then — her order step 0x10018682 polling for him at its
+# `neighbor` hotspot, fcn.1000e172 — `order`): no pillow pose of its own, the
+# three sleeps the 240 (the mobile's repeat, TargetSequenceIndex 2, is the
+# three alone), the look the 180; her wait for him at the call held (WAITS_ROLE)
+CLIPS_ROLE = {210: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('pool_deckchair', 'enter'),
+                                                   'MotherSleepPillow': ('ticks', 0),
+                                                   'MotherSleepSingle': ('bar', 0x10018c0b, 3),
+                                                   'MotherLookLoop': ('bar', 0x100187d8),
+                                                   'MotherGetUpPillow': ('pool_deckchair', 'leave')}),
+                    'CallRTMother': ('Mother', {'MotherCall': ('mother', 'callneighbor'),
+                                                'MotherOrder': ('mother', 'order')})},
+              202: {'OlgaMat': ('Olga', {'BeachLayDown': ('beachleft_mat_olga_guarded', 'enter'),
                                          'TowelSleep': ('anim', 'beachleft/mat_olga_guarded', 'sun'),
                                          'TowelLaydown': ('beachleft_mat_olga_guarded', 'wakeup'),
                                          'BeachGetUp': ('beachleft_mat_olga_guarded', 'leave')}),
                     'Submarine': ('Olga', {'OlgaPutSub': ('beachleft_sub', 'take'),
                                            'OlgaPutSubTricked': ('beachleft_shark', 'take')})}}
+
+
+# level -> mobile item -> (role, wait): another actor's clip held until a role
+# has used an item or begun to (PCWaitForRole, the runtime's PCWaitFor for that
+# role): 210's Mother waits at her chair after the call until he stands there
+# (her order step's poll) — his use of the call begun
+WAITS_ROLE = {210: {'CallRTMother': ('Mother', {'clip': 'MotherStandDownInfinite', 'role': 'Rottweiler',
+                                                'item': 'CallRTMother', 'at': 'start', 'then': 0.0})}}
 
 
 def role_clips(n):
@@ -67,6 +91,14 @@ def role_clips(n):
         for clip, src in table.items():
             if src[0] == 'anim':
                 t = d.frames.get((src[1], src[2]))
+            elif src[0] == 'ticks':
+                t = src[1]
+            elif src[0] == 'bar':
+                ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), src[1], {})
+                t = next((e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)), None)
+                if t is not None and len(src) > 2:
+                    # the bar less so many ticks, over so many mobile clips
+                    t = (t - (src[3] if len(src) > 3 else 0)) / float(src[2])
             else:
                 t = d.action_ticks(src[0], src[1], actor=role.lower())
             if t is not None:
@@ -127,7 +159,7 @@ def pc_actions(d):
 
 def main(argv):
     write = '--write' in argv
-    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE))
+    levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE))
     mob = json.load(open(os.path.join(SCRATCH, 's2_idle_others.json')))
     for n in levels:
         d = S2[n]; acts = pc_actions(d)
@@ -153,14 +185,20 @@ def main(argv):
         rclips = role_clips(n)
         for item, (role, cl) in sorted(rclips.items()):
             print('   %-18s %-7s clips %s' % (item, role, ', '.join('%s %.2f' % kv for kv in sorted(cl.items()))))
+        rwaits = WAITS_ROLE.get(n, {})
+        for item, (role, wt) in sorted(rwaits.items()):
+            print('   %-18s %-7s holds %s until %s %s %s' % (
+                item, role, wt['clip'], wt['role'], 'began' if wt.get('at') == 'start' else 'used', wt['item']))
         if write:
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
             ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
-            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole'):
+            for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole', 'PCWaitForRole'):
                 ov['patches'] = _strip_key(ov['patches'], k)
             for item, (role, cl) in rclips.items():
                 _set_key(ov['patches'], item, 'PCClipSecondsRole', {role: cl})
+            for item, (role, wt) in rwaits.items():
+                _set_key(ov['patches'], item, 'PCWaitForRole', {role: wt})
             for item, roles in per.items():
                 _set_key(ov['patches'], item, 'PCUseSecondsRole', roles)
             for item, (sit, sleep, getup) in bars.items():
@@ -168,14 +206,19 @@ def main(argv):
                 _set_key(ov['patches'], item, 'PCSleepSeconds', sleep)
                 _set_key(ov['patches'], item, 'PCGetUpSeconds', getup)
             note = " The other actors' stands (tools/pcref/pc_durations_others.py): the PC data's `time` ticks / 12 of the actions paired in ALIAS, as PCUseSecondsRole."
-            if 'pc_durations_others' not in ov['source']:
+            if per and note not in ov['source']:
                 ov['source'] += note
+            elif not per:
+                ov['source'] = ov['source'].replace(note, '')
             note2 = " The Mother's bar in her chair (tools/pcref/pc_durations_others.py BARS): PCSitSeconds the chair's enter, PCSleepSeconds the sleep step's bar ticks, PCGetUpSeconds the chair's leave, at 12 a second."
             if bars and 'BARS' not in ov['source']:
                 ov['source'] += note2
             note3 = " Another actor's clips at the PC's ticks (tools/pcref/pc_durations_others.py CLIPS_ROLE): PCClipSecondsRole, the level data's actions and clips paired by hand."
             if rclips and 'CLIPS_ROLE' not in ov['source']:
                 ov['source'] += note3
+            note4 = " Another actor's clip held (tools/pcref/pc_durations_others.py WAITS_ROLE): PCWaitForRole, until a role's use of an item has begun (at start) or ended."
+            if rwaits and 'WAITS_ROLE' not in ov['source']:
+                ov['source'] += note4
             json.dump(ov, open(p, 'w'), indent=1, ensure_ascii=False); open(p, 'a').write('\n')
             print('   wrote', p)
 

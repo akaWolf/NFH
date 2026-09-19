@@ -24,7 +24,10 @@ Flag 4 is the hideout state. The enter step (vtable 0x100ab2ec, run at
 neighbor_hideout (0x140, 0x100067d4-0x100067e9) and the leave step (vtable
 0x100ab304) clears it when its `leave` has played (0x10006ab7); the level
 steps set and clear it themselves at a few places — every call of the flag
-setter fcn.100450bf with mask 4 in GameLogic.dll is in the table below. Woody's
+setter fcn.100450bf with mask 4 in GameLogic.dll is in the table below, and
+the one flag element of mask 4 (fcn.1000fac4, whose run 0x1000d037 calls the
+setter as the sequence reaches it: 210's chair clears his after the `wakeup`,
+0x1001902c). Woody's
 own (his HideItems, the PC's `hideout` objects) are the port's hiding plus the
 leave clip; the catchers' are the stations below, per role:
 
@@ -74,7 +77,8 @@ HIDEOUTS = {
           'HotShoe': {'Rottweiler': ('tadj_mahal/shoe_mat', [0x10020d0e, 0x10020888],
                                      {'until': 'TadjMahal'})},             # set at the shoe mat, the curtain's leave clears
           'DressingRoom': {'Mother': ('bazar/dressing_room', [0x1001f62f], {})}},
-    210: {'DeckChair': {'Rottweiler': ('beachleft/deckchair_guarded', [0x10019635, 0x100190d1], {})},
+    210: {'DeckChair': {'Rottweiler': ('beachleft/deckchair_guarded', [0x10019635, 0x100190d1, 0x1001902c],
+                                       {'clear': ['ChairAwake']})},        # awake after the wakeup's flag element
           'DeckChairMother': {'Mother': ('pool/deckchair', [0x1001886c, 0x10018d60, 0x1001866f],
                                          {'clear': ['MotherLookLoop'],
                                           'set': ['MotherSleepPillow', 'MotherSleepSingle']})}},
@@ -84,8 +88,9 @@ HIDEOUTS = {
                                          {'clear': ['MotherLookLoop'],
                                           'set': ['MotherSleepSingle']})}},
 }
-# the flag setter's mask-4 calls outside the enter / leave steps, each placed above
-SCRIPT_FLAGS = {0x1001866f, 0x10018d60, 0x10020d0e, 0x1002248d, 0x10022a5b,
+# the flag setter's mask-4 calls (and the flag element's) outside the enter / leave
+# steps, each placed above
+SCRIPT_FLAGS = {0x1001866f, 0x10018d60, 0x1001902c, 0x10020d0e, 0x1002248d, 0x10022a5b,
                 0x1002b77b, 0x1002b9e3, 0x10039efa, 0x1003a1c5}
 
 
@@ -159,16 +164,35 @@ def main(argv):
     for n in range(201, 215):
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
         ov = json.load(open(p))
-        patches = [e for e in ov.get('patches', []) if 'PCHideout' not in (e.get('set') or {})]
         raw = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))
+        want = []
         for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
             d = o.get('data') or {}
             name = (d.get('m_GameObject') or {}).get('name')
             per = HIDEOUTS.get(n, {}).get(name)
             if not per or 'Zone' not in d or o['type'] in ('Transition', 'Door'):
                 continue
-            patches.append({'object': name, 'component': o['type'], 'zone': (d.get('Zone') or {}).get('name'),
-                            'set': {'PCHideout': {role: spec for role, (_o, _a, spec) in per.items()}}})
+            want.append({'object': name, 'component': o['type'], 'zone': (d.get('Zone') or {}).get('name'),
+                         'set': {'PCHideout': {role: spec for role, (_o, _a, spec) in per.items()}}})
+        # the key is rewritten in place — a patch it shares with the other
+        # tools' keys (the Mother's chair timings, pc_durations_others.py)
+        # keeps them — a station's new one appended, a gone one dropped
+        patches = []
+        for e in ov.get('patches', []):
+            s = e.get('set') or {}
+            if 'PCHideout' not in s:
+                patches.append(e)
+                continue
+            w = next((w for w in want if (w['object'], w['component'], w['zone'])
+                      == (e['object'], e.get('component'), e.get('zone'))), None)
+            if w is not None:
+                s['PCHideout'] = w['set']['PCHideout']
+                want.remove(w)
+            else:
+                s.pop('PCHideout')
+            if s:
+                patches.append(e)
+        patches += want
         ov['patches'] = patches
         note = (" The catch (tools/pcref/pc_catch_s2.py): PCHideout on the catchers' stations = per role"
                 " the span of the PC's flag 4 (the enter step to the leave step, less the level steps'"
@@ -176,9 +200,12 @@ def main(argv):
         src = ov.get('source', '')
         i = src.find(' The catch (tools/pcref/pc_catch_s2.py)')
         if i >= 0:
-            j = src.find(' The ', i + 1)
-            src = src[:i] + (src[j:] if j >= 0 else '')
-        if n in HIDEOUTS:
+            # the note in its place (its own last words end it)
+            end = 'neither catches nor is seen.'
+            j = src.find(end, i)
+            j = j + len(end) if j >= 0 else src.find(' The ', i + 1)
+            src = src[:i] + (note if n in HIDEOUTS else '') + (src[j:] if j >= 0 else '')
+        elif n in HIDEOUTS:
             src += note
         ov['source'] = src
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)

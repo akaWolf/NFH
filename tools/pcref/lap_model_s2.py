@@ -425,11 +425,17 @@ def station_ticks(d, ev, ctx=None):
     return parts
 
 
+# the step a lap starts from where it is not the level's first: 210's lap runs
+# from the Mother's `order` (his handler 0x1001b4f6 -> 0x1001aecc: the walk to
+# Fifi and her `tickle`, then the take 0x1001aac8, the level's first step)
+LAP_START = {210: 0x1001aecc}
+
+
 def lap_steps(n):
     """the untricked lap: [(index, step address, icon, objects, parts)] and the
     loop's first index (None when the walk stops)"""
     d = Data(n)
-    st = level_start(n); lv = Level(n)
+    st = LAP_START.get(n) or level_start(n); lv = Level(n)
     steps, loop = walk(lv, st)
     out = []; ctx = {}
     for i, (cur, ev, nxt) in enumerate(steps):
@@ -759,16 +765,30 @@ PAIRS = {
                       [(None, 'mat_hn_guarded', 'bar'), (None, 'mat_hn_guarded', 'use'),
                        (None, 'mat_hn_guarded', 'leave')]],
           'BridgeRail': [('bridge', 'neighbor', 'lookaround'), (None, 'bridge', 'look')]},
+    # his Fifi errands (the tickle and the take at her basket, the turban
+    # shop, the elephant, the put back); the chair is timed per clip and waits
+    # for the Mother's call (pc_durations_s2.py CLIPS, MotherWakeSleepBehavior)
+    210: {'DogBasket': [(None, 'pool_fifi_sleep', 'tickle'), (None, 'pool_fifi_sleep', 'take')],
+          'TurbanShop': [(None, 'fifi', 'put3'), (None, 'turbanshop', 'try_turban'), (None, 'fifi', 'take3')],
+          'Elephant': [(None, 'fifi', 'put1'), (None, 'fifi', 'take1')],
+          'DogBasketPut': [(None, 'pool_fifi_sleep', 'put')]},
 }
+
+
+# the levels whose unclosed walk still covers every station (code_stays)
+OPEN_LAPS = (210,)
 
 
 def code_stays(n):
     """{mobile item: seconds, or a list of seconds per visit} from the lap's parts
-    by PAIRS[n]; an item whose part is missing or untimed is left out"""
+    by PAIRS[n]; an item whose part is missing or untimed is left out. A lap the
+    walk does not close (210's: his chair waits for the Mother's call, a message
+    the walk does not follow) is the walk from its start (LAP_START), each of
+    its stations once"""
     rows, loop = lap_steps(n)
-    if loop is None:
+    if loop is None and n not in OPEN_LAPS:
         return {}
-    lap = rows[loop:] + rows[:loop]
+    lap = rows if loop is None else rows[loop:] + rows[:loop]
     used = set(); out = {}
 
     def ticks(sels):
