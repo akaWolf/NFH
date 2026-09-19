@@ -1,5 +1,5 @@
 {
- "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E04 From Whom The Gong Sounds: +25 the kart (97 s), +25 karate (116), +38 the gong (144), +25 the hot dog (171), +22 the necklace and +10 at the full bar its vase (195-198). PC data (cn_c1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on JadeNecklace 17 (jade); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running).",
+ "source": "PC NFH2, the anger gauge's jumps in Badinfos' 100 % run (tools/pcref/amounts.py: the jump per second scaled to the full bar, 92 % of the crop, labelled with the HUD bubble's activity) — a jump that hits the full bar is a lower bound and keeps the mobile value where that is higher; a jump shared by linked coins is split in the mobile proportions; an unmeasured coin keeps the mobile value. E04 From Whom The Gong Sounds: +25 the kart (97 s), +25 karate (116), +38 the gong (144), +25 the hot dog (171), +22 the necklace and +10 at the full bar its vase (195-198). PC data (cn_c1/tricks.xml, rage per trick in thousandths of the gauge): the PC differs from the mobile on JadeNecklace 17 (jade); the rest are equal. The gauge jumps read off Badinfos' video (2026-09-08) ran 10-25 %% high and are withdrawn. The gauge is 100 000 rage long — the mobile's AngryMeterMaximum 100: the PC dialog (nfh2 dialogs/*/menuleft_bar.xml) gives the rageometer range 0..100000 and GameLogic.dll flags 100000 (docs/PC_ROUTINES.md); the 80 read off the video was the bar's geometry, as the Season 1 tube's was. Its decay is the mobile's 0.37 %/s: the bar falls 41 -> 11 % over 70 trick-free seconds of E01 (tools/pcref/gauge.py, x0.8 for the crop). The decay is leveldata.xml's time=\"30\" per 1/12 s tick (GameLogic.dll fcn.10044234: rage -= the level record's +0x28, the app's leveldata parser stores `time` there; the HUD clock divides the tick count by 12) — PCRageDecay 30, 0.36 %/s against the mobile's 0.37. The reactions (tools/pcref/coins.py --write-laugh): PCLaugh = the `<trick laugh=>` level of the records the item's trick fires, which picks the PC neighbour's reaction clip (pcprofile.S2_REACTION_CLIPS). The mini-game (tools/pcref/pc_minigames.py): PCMinigameTicks = the `time` of the game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the behavioractor of its `failed` action (the actor a lost game sends running). The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC pass of the door pair it stands for — the near door's <actor>_in against the room's floor, the straight movement to the far door's <actor>_out (or the enter + leave ticks), the far floor against <actor>_out, in px of the PC scene; PCApproach on the actors' stations = per role the PC object's <actor> hotspot x and its height against the room's floor. Station durations (tools/pcref/pc_durations_s2.py): the PC video bubble spans of docs/PC_LAPS_DETAIL.md less the walk to each station where the spans touch (an unlabelled gap before a span is walk outside it), PCUseSeconds per visit.",
  "patches": [
   {
    "object": "Rottweiler2",
@@ -13,47 +13,41 @@
    "component": "TrickItem",
    "set": {
     "AngerAmount": 17,
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSeconds": 5.0
    }
   },
   {
    "object": "PullKart",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.5,
     "PCLaugh": 4,
-    "PCRunTo": true
+    "PCRunTo": true,
+    "PCUseSeconds": 1.0
    }
   },
   {
    "object": "Karate",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.7,
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSeconds": 3.2
    }
   },
   {
    "object": "GongDrumstick",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 15.0,
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCUseSeconds": 4.2
    }
   },
   {
    "object": "HotDog",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.2,
-    "PCLaugh": 3
-   }
-  },
-  {
-   "object": "JadeNecklace",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 15.2
+    "PCLaugh": 3,
+    "PCUseSeconds": 3.3
    }
   },
   {
@@ -73,6 +67,350 @@
      5
     ],
     "PCMinigameFailed": "neighbor"
+   }
+  },
+  {
+   "object": "TransitionRightComplex",
+   "component": "Transition",
+   "zone": "Zone01",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 60,
+      "out": -60,
+      "dx": 260,
+      "dy": 0
+     },
+     "Woody": {
+      "in": 60,
+      "out": -60,
+      "dx": 260,
+      "dy": 0
+     },
+     "Olga": {
+      "in": 60,
+      "out": -60,
+      "dx": 260,
+      "dy": 0
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionUpwards",
+   "component": "Transition",
+   "zone": "Zone01",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": -70,
+      "out": -110,
+      "dx": 0,
+      "dy": -260
+     },
+     "Woody": {
+      "in": -70,
+      "out": -110,
+      "dx": 0,
+      "dy": -260
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionLeftComplex",
+   "component": "Transition",
+   "zone": "Zone02",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 60,
+      "out": -60,
+      "dx": -260,
+      "dy": 0
+     },
+     "Woody": {
+      "in": 60,
+      "out": -60,
+      "dx": -260,
+      "dy": 0
+     },
+     "Olga": {
+      "in": 60,
+      "out": -60,
+      "dx": -260,
+      "dy": 0
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionUpwards",
+   "component": "Transition",
+   "zone": "Zone02",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": -70,
+      "out": -110,
+      "dx": 0,
+      "dy": -260
+     },
+     "Woody": {
+      "in": -70,
+      "out": -110,
+      "dx": 0,
+      "dy": -260
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionDownwards",
+   "component": "Transition",
+   "zone": "Zone03",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 110,
+      "out": 70,
+      "dx": 0,
+      "dy": 260
+     },
+     "Woody": {
+      "in": 110,
+      "out": 70,
+      "dx": 0,
+      "dy": 260
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionLeftComplex",
+   "component": "Transition",
+   "zone": "Zone03",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 40,
+      "out": -40,
+      "dx": -280,
+      "dy": 0
+     },
+     "Woody": {
+      "in": 40,
+      "out": -40,
+      "dx": -280,
+      "dy": 0
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionDownwards",
+   "component": "Transition",
+   "zone": "Zone04",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 110,
+      "out": 70,
+      "dx": 0,
+      "dy": 260
+     },
+     "Woody": {
+      "in": 110,
+      "out": 70,
+      "dx": 0,
+      "dy": 260
+     }
+    }
+   }
+  },
+  {
+   "object": "TransitionRightComplex",
+   "component": "Transition",
+   "zone": "Zone04",
+   "set": {
+    "PCPass": {
+     "Rottweiler": {
+      "in": 40,
+      "out": -40,
+      "dx": 280,
+      "dy": 0
+     },
+     "Woody": {
+      "in": 40,
+      "out": -40,
+      "dx": 280,
+      "dy": 0
+     }
+    }
+   }
+  },
+  {
+   "object": "Karate",
+   "component": "TrickItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Rottweiler": {
+      "obj": "groundleft/headbanging",
+      "x": 643,
+      "px": -72,
+      "routes": {
+       "GongDrumstick": [
+        "Zone01",
+        "Zone04"
+       ],
+       "HotDog": [
+        "Zone01",
+        "Zone04",
+        "Zone03"
+       ],
+       "JadeNecklace": [
+        "Zone01",
+        "Zone02"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "object": "PullKart",
+   "component": "TrickItem",
+   "zone": "Zone01",
+   "set": {
+    "PCApproach": {
+     "Rottweiler": {
+      "obj": "groundleft/rickshaw",
+      "x": 318,
+      "px": -20,
+      "routes": {
+       "GongDrumstick": [
+        "Zone01",
+        "Zone04"
+       ],
+       "HotDog": [
+        "Zone01",
+        "Zone04",
+        "Zone03"
+       ],
+       "JadeNecklace": [
+        "Zone01",
+        "Zone02"
+       ]
+      }
+     },
+     "Olga": {
+      "obj": "groundleft/rickshaw",
+      "x": 208,
+      "px": -15,
+      "routes": {}
+     }
+    }
+   }
+  },
+  {
+   "object": "JadeNecklace",
+   "component": "TrickItem",
+   "zone": "Zone02",
+   "set": {
+    "PCApproach": {
+     "Rottweiler": {
+      "obj": "groundright/jadedummy",
+      "x": 984,
+      "px": -88,
+      "routes": {
+       "PullKart": [
+        "Zone02",
+        "Zone01"
+       ],
+       "Karate": [
+        "Zone02",
+        "Zone01"
+       ],
+       "GongDrumstick": [
+        "Zone02",
+        "Zone01",
+        "Zone04"
+       ],
+       "HotDog": [
+        "Zone02",
+        "Zone03"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "object": "GongDrumstick",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCApproach": {
+     "Rottweiler": {
+      "obj": "wallleft/gong",
+      "x": 420,
+      "px": -60,
+      "routes": {
+       "PullKart": [
+        "Zone04",
+        "Zone01"
+       ],
+       "Karate": [
+        "Zone04",
+        "Zone01"
+       ],
+       "HotDog": [
+        "Zone04",
+        "Zone03"
+       ],
+       "JadeNecklace": [
+        "Zone04",
+        "Zone01",
+        "Zone02"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "object": "HotDog",
+   "component": "TrickItem",
+   "zone": "Zone03",
+   "set": {
+    "PCApproach": {
+     "Rottweiler": {
+      "obj": "wallright/hotdogshop",
+      "x": 1094,
+      "px": -30,
+      "routes": {
+       "PullKart": [
+        "Zone03",
+        "Zone04",
+        "Zone01"
+       ],
+       "Karate": [
+        "Zone03",
+        "Zone04",
+        "Zone01"
+       ],
+       "GongDrumstick": [
+        "Zone03",
+        "Zone04"
+       ],
+       "JadeNecklace": [
+        "Zone03",
+        "Zone02"
+       ]
+      }
+     }
+    }
    }
   }
  ]

@@ -83,6 +83,9 @@ from menu import GameIntroAnimation                 # noqa: E402
 LEG_TIMEOUT = 75.0      # a walk + search anywhere fits well inside this
 STATE_EVERY = 10          # state.jsonl rows per 60 Hz ticks (6 Hz)
 AWAIT_TIMEOUT = 150.0   # a routine lap is ~35 s; alarms and toilets stall it
+AWAIT_TIMEOUT_S2_PC = 210.0   # Season 2 under the PC profile: his laps by code are 80-130 s
+                              # (the door passes and station runs of GameLogic.dll), a trick
+                              # armed just after his visit pays a lap and a half later
 GATE_TIMEOUT = 160.0    # a Season-2 lap is ~100 s (L210: 98 s) — the room may open only next lap
 MAX_RESTARTS = 4
 
@@ -400,6 +403,47 @@ class Driver(Recorder):
         force = p.run_force if p.in_urgent else p.force
         return max(0.2, (force or 1.0) * (p.walk_speed_scale() or 1.0))
 
+    def pc_pass_times(self, door, p=None, role=None):
+        """(in, straight, out) seconds of a Season 2 door pass under the PC
+        profile (Door.pc_pass, pcprofile.s2_pass_ticks): the walk up to the
+        near door's hotspot in the near room, the movement or the clips out
+        of every room, the run down to the far floor in the far room; None
+        off one"""
+        if not pcprofile.is_pc() or door is None:
+            return None
+        role = role or getattr(p, 'role', 'Rottweiler')
+        pp = (getattr(door, 'pc_pass', None) or {}).get(role)
+        if not pp:
+            return None
+        gait = p._pc_gait() if p is not None and hasattr(p, '_pc_gait') else 'walk'
+        sn = bool(getattr(p, 'sneaking', False))
+
+        def secs(part):
+            return (pcprofile.s2_pass_ticks(role, gait, part, sn) or 0) / 12.0
+        if 'enter' in pp:
+            mid = (pp['enter'] + pp['leave']) / 12.0
+        else:
+            mid = secs({k: pp[k] for k in ('dx', 'dy') if k in pp})
+        return secs({'in': pp.get('in', 0)}), mid, secs({'out': pp.get('out', 0)})
+
+    def pc_station_secs(self, it, p=None, frm=None):
+        """seconds of the PC run between a station's hotspot and its room's
+        floor at the pawn's gait (Item.pc_approach), 0 without one or from a
+        station at the same PC x (`frm`)"""
+        if not pcprofile.is_pc() or it is None:
+            return 0.0
+        role = getattr(p, 'role', 'Rottweiler')
+        ap = (getattr(it, 'pc_approach', None) or {}).get(role)
+        if not ap:
+            return 0.0
+        if frm is not None:
+            fa = (getattr(frm, 'pc_approach', None) or {}).get(role)
+            if fa and fa.get('x') == ap.get('x'):
+                return 0.0
+        gait = p._pc_gait() if p is not None and hasattr(p, '_pc_gait') else 'walk'
+        return (pcprofile.s2_pass_ticks(role, gait, {'in': ap['px']},
+                                        bool(getattr(p, 'sneaking', False))) or 0) / 12.0
+
     def door_time(self, door, p=None):
         """seconds a catcher spends in a door pass: a flat door fires
         Leave and Enter at once (Pawn._begin_transit's non-sequential
@@ -409,6 +453,10 @@ class Driver(Recorder):
         started when the neighbour was already through"""
         if door is None:
             return self.HOP_TIME
+        pt = self.pc_pass_times(door, p)
+        if pt is not None:
+            # the PC profile's Season 2 pass: into the far room at <actor>_out
+            return pt[0] + pt[1]
         # Season 2: the walked transitions — a flat pair is ~1.4 units at
         # the neighbour's walk (0.875 u/s), the stairs a diagonal climb
         # at DoorForceMagnitude that the traces put at ~4 s
@@ -577,16 +625,46 @@ class Driver(Recorder):
             t += self._anim_left(p.anim)
         # the live path
         steps = ([p._step] if p._step is not None else []) + list(p.steps)
+        hop_done = set()
         for s in steps:
             kind = s.get('kind')
             if kind in ('point', 'cpoint', 'item'):
                 tx = s.get('x', x)
                 ty = s.get('y', y)
-                # a Season-2 stair step walks the diagonal (normalized
-                # velocity, Pawn.cs Move): its length is the hypotenuse —
-                # a same-x descent is not free
-                t += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5 / speed
+                # the PC profile's timed steps and holds (Pawn._pc_hop_steps,
+                # _pc_departure_step, the station approach)
+                t += s.get('pc_prehold', 0.0)
+                hop = s.get('pc_hop')
+                if hop is not None:
+                    # the straight part of a PC pass, once for the hop — the
+                    # rest of it at the pace the pawn walks it (Pawn._pc_pass)
+                    if id(hop) not in hop_done:
+                        hop_done.add(id(hop))
+                        cur = getattr(p, '_pc_pass', None)
+                        if s is p._step and cur is not None and cur[0] is hop and cur[1]:
+                            ln, px_, py_ = 0.0, x, y
+                            for s2 in steps:
+                                if s2.get('pc_hop') is not hop:
+                                    continue
+                                qx, qy = s2.get('x', px_), s2.get('y', py_)
+                                ln += ((qx - px_) ** 2 + (qy - py_) ** 2) ** 0.5
+                                px_, py_ = qx, qy
+                            t += ln / cur[1]
+                        else:
+                            pt = self.pc_pass_times(hop, p)
+                            t += pt[1] if pt is not None else 0.0
+                elif 'pc_secs' in s:
+                    t += s['pc_secs']
+                else:
+                    # a Season-2 stair step walks the diagonal (normalized
+                    # velocity, Pawn.cs Move): its length is the hypotenuse —
+                    # a same-x descent is not free
+                    t += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5 / speed
                 x, y = tx, ty
+                run = s.get('pc_hold_run')
+                if run is not None:
+                    pt = self.pc_pass_times(run[1], p)
+                    t += pt[0] if pt is not None else 0.0
                 # a Season-2 walk-through stair/flat transition: the pawn's
                 # zone flips at the 'transfer' step (Helpers.LinkNodes'
                 # TransferToZone, README "The walk-through stairs")
@@ -594,6 +672,12 @@ class Driver(Recorder):
                     zone = s['transfer']
                     if zone == zone_pid:
                         return t
+                    after = s.get('pc_after_run')
+                    if after is not None:
+                        pt = self.pc_pass_times(after[1], p)
+                        t += pt[2] if pt is not None else 0.0
+                if kind == 'item':
+                    t += self.pc_station_secs(s.get('item'), p)
             elif kind == 'door':
                 d = s['door']
                 t += abs(d.x - x) / speed + self.door_time(d, p)
@@ -609,14 +693,17 @@ class Driver(Recorder):
         if r is None:
             return None
 
-        def travel_to(it, t, x, zone, spd=None):
+        def travel_to(it, t, x, zone, spd=None, frm=None):
             """walk from (zone, x) to it's use spot; None past the target
             zone (the caller returns t then), else (t, x, zone). `spd`
             overrides the pace: an Urgent routine action is approached at
             a run (RoutineActionMove.OnActionStarted, cs:68-75 — Level206's
             DeckChair/Pillows legs), a walker's estimate reads twice too
-            long there"""
+            long there. `frm`: the station the walk leaves (the PC
+            profile's run down from its hotspot, pc_station_secs)"""
             sp = spd or speed
+            if frm is not None:
+                t += self.pc_station_secs(frm, p, it)
             path = self.v.level.find_path(zone, it.zone) \
                 if zone != it.zone else []
             if path is None:
@@ -631,11 +718,15 @@ class Driver(Recorder):
                     x = other.x
                 if zp == zone_pid:
                     return 'hit', t, x, zp
+                pt = self.pc_pass_times(door, p)
+                if pt is not None:
+                    t += pt[2]            # the PC run down, in the far room
             zone = it.zone
             t += abs(it.target_x - x) / sp
             x = it.target_x
             if zone == zone_pid:
                 return 'hit', t, x, zone
+            t += self.pc_station_secs(it, p, frm)
             return 'ok', t, x, zone
         run_speed = max(0.2, (p.run_force or p.force or 1.0)
                         * (p.walk_speed_scale() or 1.0))
@@ -699,13 +790,15 @@ class Driver(Recorder):
         # the actions ahead
         n = len(r.actions)
         visits = {}
+        prev = r.item
         for k in range(1, n + 1):
             a = r.actions[(r.index + k) % n]
             it = self.v.level.items.get(a['item'])
             if it is None:
                 continue
             hit, t, x, zone = travel_to(it, t, x, zone,
-                                        run_speed if a.get('urgent') else None)
+                                        run_speed if a.get('urgent') else None, frm=prev)
+            prev = it
             if hit is None:
                 return None
             if hit == 'hit':
@@ -789,6 +882,11 @@ class Driver(Recorder):
         climbs ~1.2 s first); under the PC profile his room changes at the far clip's
         start — after the climb and the near door's `enter` (pcprofile.door_warp_early)"""
         w = self.v.woody
+        pt = self.pc_pass_times(door, w, 'Woody')
+        if pt is not None:
+            # the PC profile's Season 2 pass: the transition's hold on the
+            # near side is the `in` run, the pair claimed after it
+            return pt[0]
         ticks = pcprofile.door_ticks('Woody', self._door_side(door),
                                      nfh2=bool(getattr(w, 'nfh2', False)))
         if ticks is not None:
@@ -802,6 +900,9 @@ class Driver(Recorder):
         transitions are walked, not warped (Helpers.LinkNodes, README "The
         walk-through stairs"): a flat pair is ~1.4 units of floor at his
         run speed, the NFH2Stairs pair a ~1-unit diagonal climb"""
+        pt = self.pc_pass_times(door, self.v.woody, 'Woody')
+        if pt is not None:
+            return pt[0] + pt[1] + pt[2]  # the PC profile's Season 2 pass
         if door.is_transition and door.complex_move:
             return 1.5 if door.nfh2_stairs else 1.0
         ticks = pcprofile.door_ticks('Woody', self._door_side(door),
@@ -1578,14 +1679,30 @@ class Driver(Recorder):
         zone = w.zone.pid if w.zone is not None else None
         sp = self.woody_speed(zone) if zone is not None else 2.0
         sneak = sp < 1.0
+        hop_done = set()
         for s in steps:
             if s.get('kind') == 'door':
+                pt = self.pc_pass_times(s['door'], w, 'Woody')
+                if pt is not None:
+                    return t + abs(s['door'].x - x) / sp + pt[0]
                 # the climb to a back door at the PC pace (half of _door_climb: the way up)
                 return t + abs(s['door'].x - x) / sp + self._door_climb(s['door'], w, sneak, part='up')
             if s.get('kind') in ('point', 'cpoint', 'item'):
                 tx = s.get('x', x)
-                t += abs(tx - x) / sp
+                hop = s.get('pc_hop')
+                if hop is not None:
+                    # the PC profile's pass: the straight part, once a hop
+                    if id(hop) not in hop_done:
+                        hop_done.add(id(hop))
+                        pt = self.pc_pass_times(hop, w, 'Woody')
+                        t += pt[1] if pt is not None else 0.0
+                else:
+                    t += abs(tx - x) / sp
                 x = tx
+                run = s.get('pc_hold_run')
+                if run is not None:
+                    pt = self.pc_pass_times(run[1], w, 'Woody')
+                    t += pt[0] if pt is not None else 0.0
                 # Season 2: the zone flips at the walk-through transition's
                 # 'transfer' step (no door warp)
                 if s.get('transfer') is not None:
@@ -2130,7 +2247,7 @@ class Driver(Recorder):
             # Level114's Pipe/Gramaphone
             self._leg_zone = None
             self._leg_item = None
-            ok = self.wait_until(lambda: it.primed, AWAIT_TIMEOUT)
+            ok = self.wait_until(lambda: it.primed, self.await_timeout())
             self._leg_zone = it.zone
             self._leg_item = it
             if not ok:
@@ -2169,7 +2286,7 @@ class Driver(Recorder):
         # an item that turns usable only on a game event (the Football's
         # collider comes with the routine's AlertNext ring once a lap,
         # TrickItem.cs:1154) is waited for on the await scale
-        done = self.wait_until(pred, AWAIT_TIMEOUT if fire else LEG_TIMEOUT,
+        done = self.wait_until(pred, self.await_timeout() if fire else LEG_TIMEOUT,
                                poke=poke, fire=fire)
         return done, None if done else 'predicate never held'
 
@@ -2400,6 +2517,13 @@ class Driver(Recorder):
             return ok, None if ok else 'no %s after the take' % first
         return True, None
 
+    def await_timeout(self):
+        """how long an await waits for its trick (AWAIT_TIMEOUT; Season 2
+        under the PC profile AWAIT_TIMEOUT_S2_PC)"""
+        if pcprofile.is_pc() and getattr(self.v.woody, 'nfh2', False):
+            return AWAIT_TIMEOUT_S2_PC
+        return AWAIT_TIMEOUT
+
     def leg_await(self, name, score=None):
         """park safe until THIS item's trick pays (step_world attributes
         the TrickDone entries per item, so a trick that already paid while
@@ -2495,7 +2619,7 @@ class Driver(Recorder):
                         self.click_zone(safe2)
                 poke()
                 self._rush = False
-            ok = self.wait_until(paid_now, AWAIT_TIMEOUT,
+            ok = self.wait_until(paid_now, self.await_timeout(),
                                  poke=poke, poke_every=4.0)
             if not ok:
                 return False, 'trick never paid' if count is None \
@@ -2529,7 +2653,7 @@ class Driver(Recorder):
         self._leg_zone = None
         self._leg_item = None
         self._leg_x = 0.0
-        deadline = self.t + AWAIT_TIMEOUT
+        deadline = self.t + self.await_timeout()
         while self.t < deadline:
             if it.active:
                 return True, None

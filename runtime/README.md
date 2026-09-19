@@ -189,6 +189,18 @@ the same flag again). `ExitAnimation` is an `AnimationState` and loops on the
 occupied by another pawn (`IsOtherPawnPassing`, either side) makes the arrival
 wait standing.
 
+Under the PC profile a Season 2 hop keeps these steps and takes the PC pass's
+timing instead (`Door.pc_pass` from the overlays, `Pawn._pc_hop_steps`,
+`docs/PC_FIDELITY.md` "Season 2 walks"): the plain step to the near door
+stands out the PC's run up to its `<actor>_in`, the complex steps through the
+transfer last the straight movement's ticks (the zone flips at `<actor>_out`,
+as the PC's room pointer does), and the next step stands out the run down to
+the far floor; a back door's climb, strips and descent last the same runs and
+the doors' `enter` / `leave` clips. The routine stations add the PC's runs up
+or down to their hotspots (`Item.pc_approach`), and a walk from one station to
+another takes the PC path finder's route. No step is added or removed, so the
+step counts the mid-stairs reroutes read stay the mobile's.
+
 `AnimPlayer` mirrors `AnimationControllerBase`: an animation ending pulls the
 next from the queue, and the queue draining fires the callback — which is what
 ends the owning action. Walk direction comes from the dominant axis of the

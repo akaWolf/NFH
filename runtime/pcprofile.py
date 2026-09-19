@@ -476,6 +476,45 @@ def door_ticks(role, side, nfh2=None):
     return DOOR_TICKS.get((role, side))
 
 
+# Season 2 (GameLogic.dll): a door pair is one step (vtable 0x100ab1b8, fcn.1000340b /
+# 0x10003a19) — the walk up to the near door's `<actor>_in`, then the near door's `enter`
+# and the far door's `leave` around the placement at `<actor>_out` when the near door has
+# an enter action for the actor (fcn.10003647, fcn.10003236), else a movement straight
+# from `<actor>_in` to `<actor>_out` (fcn.100037f8 -> fcn.100090bd); the next walk comes
+# down from `<actor>_out` to the far floor (fcn.10009177's first waypoint). A movement
+# steps one axis a tick at the gait's records (fcn.10009215), each axis run to its
+# waypoint ceil(px / record) ticks. The overlays carry each Transition's pass in px of
+# the PC scene per pawn (PCPass, tools/pcref/pc_walks_s2.py): `in` and `out` the
+# vertical runs off and back onto the floors, `dx`/`dy` the straight movement or
+# `enter`/`leave` the two clips.
+def s2_pass_ticks(role, gait, p, sneaking=False):
+    """the ticks of a Season 2 door pass `p` (a PCPass entry) for the pawn's gait"""
+    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
+    if rec is None:
+        return None
+    h, v = rec[0], rec[1]
+    if (role, gait) in GAIT_PX_PER_TICK:
+        h, v = GAIT_PX_PER_TICK[(role, gait)]
+
+    def run(d, s):
+        d = abs(d)
+        return -(-d // s) if d else 0
+    t = run(p.get('in', 0), v) + run(p.get('out', 0), v)
+    if 'enter' in p:
+        return t + p['enter'] + p['leave']
+    return t + run(p.get('dx', 0), h) + run(p.get('dy', 0), v)
+
+
+def floor_pace(role, gait='walk', sneaking=False):
+    """u/s of the pawn's floor record at its gait (the cap of the Season 2 pass and
+    station paces), None without a record"""
+    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
+    if rec is None:
+        return None
+    h = GAIT_PX_PER_TICK[(role, gait)][0] if (role, gait) in GAIT_PX_PER_TICK else rec[0]
+    return h * TICKS_PER_SECOND / PX_PER_UNIT
+
+
 def clip_fps(name, fps, frames=0):
     """the rate a door strip plays at: the one that lasts its PC action's ticks
     (Season 1, the neighbour and Woody), else a frame a tick"""

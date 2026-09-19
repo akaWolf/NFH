@@ -186,7 +186,7 @@ class Item:
                  'started',
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
-                 'delta_use_height', 'enter_zone', 'leave_zone',
+                 'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -395,6 +395,10 @@ class Item:
         # items serialize 0.0 there and an `or` would have made it 0.03
         self.use_distance = d.get('UseDistance', 0.03)
         self.should_walk_up = bool(d.get('ShouldWalkUp'))
+        # the PC profile's Season 2 station: per role the PC object's hotspot x
+        # and its height against the room's floor (levels/pc overlays,
+        # tools/pcref/pc_walks_s2.py)
+        self.pc_approach = d.get('PCApproach') or {}
         self.should_walk_down = bool(d.get('ShouldWalkDown'))
         self.item_use_height = d.get('ItemUseHeight', 0.01)
         self.delta_use_height = d.get('DeltaUseHeight') or 0.0
@@ -1090,7 +1094,8 @@ class Door:
                  'delta_exit', 'delta_mother_exit', 'passable', 'ignore_idle',
                  'disabled', 'description_string', 'walk_deltas',
                  'exit_door', 'woody_delta_use_height', 'use_woody_extra',
-                 'can_use', 'dont_use_on', 'with_string', 'temporal_lock')
+                 'can_use', 'dont_use_on', 'with_string', 'temporal_lock',
+                 'pc_pass')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -1099,6 +1104,9 @@ class Door:
         # Door.TemporalLock (Door.cs): the zone edge exists from the start,
         # the pass unlocks later — the Intro scenes' scripted doors
         self.temporal_lock = bool(d.get('TemporalLock'))
+        # the PC profile's Season 2 pass of the door pair per pawn role
+        # (levels/pc overlays, tools/pcref/pc_walks_s2.py; pcprofile.s2_pass_ticks)
+        self.pc_pass = d.get('PCPass') or {}
         # enter/leave are ItemAnimationState and play on the door; ExitAnimation
         # is an AnimationState and loops on the pawn once it is through
         self.enter = _anim_name(d.get('WoodyEnterAnimation'))

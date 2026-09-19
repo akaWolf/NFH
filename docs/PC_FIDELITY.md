@@ -1065,7 +1065,87 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   runs over the level.xml geometry through door pairs whose points the
   path builder fcn.10009489 lays and which is not read yet. The switch to
   the code's stays waits for that walk: carried alone they would shorten
-  every Season 2 lap by about a fifth.
+  every Season 2 lap by about a fifth. — Done 2026-09-23 with the walk
+  (the entry below): the profile takes the code's stays on 203, 208, 209,
+  211, 212 and 213 (pc_durations_s2.py's CODE; an item the model leaves
+  untimed — 209's fire fakir behind its untimed `spit`, 213's picnic
+  behind its polls — and the other levels keep the video's), and the
+  video's are re-derived against the port's idle laps with the PC walk,
+  so the walk they take off is the PC's. Against the code they now agree
+  within about a second where both exist: 203 bicycle 8.3 / 8.5, melon
+  3.2 / 3.6; 208 elephant 5.7 / 5.6, bowl 4.7 / 4.9; 209 coal 3.8 / 4.1,
+  ice cream 9.5 / 9.9, second shoe 2.0 / 1.8, Taj 10.0 / 11.7, cow 13.0 /
+  15.4; 211 rod 6.3 / 6.75, boat 8.5 / 8.8, jacket 5.7 / 6.6, gear 6.8 /
+  5.7; 212 throne 7.0 / 6.75, whip 5.2 / 4.9; 213 plant 7.3 / 8.2,
+  tortilla 1.3 / 1.5, pinata 5.8 / 6.8 — what is left apart is where a
+  span holds its neighbour's time (208's platform 0.5 + shoe 10.7 against
+  12.1 + 4.25, 212's bull 19.0 holding the bench's 12.5 and its own 5.0)
+  or a wait the video's lap carries (213's cement 18.8 / 9.25).
+- *Season 2 walks (2026-09-23, read in GameLogic.dll and carried).* The
+  GoTo (fcn.1000a711) routes over the rooms with the path finder
+  fcn.1000a421 / fcn.1000a12d: a Dijkstra whose hop costs the Manhattan
+  distance from the node's point to the near door's `<actor>` hotspot
+  (fcn.10049e01) plus the <neighbor> record's `costs` (500 on all 125
+  records), the hop into the target room the far door's distance to the
+  target as well; a room is entered at the far door's hotspot, the open
+  list is kept sorted with a new node before the equal ones
+  (fcn.1000a097), and the door between two rooms is the first record that
+  names the next (fcn.1004ca13). A door pair is one step (vtable
+  0x100ab1b8, 0x10003a19): the walk to the near door's `<actor>_in` in the
+  near room (fcn.10003130), then — out of every room (fcn.10049467 and
+  fcn.10041ad0 with none) — a movement straight to the far door's
+  `<actor>_out` (fcn.100037f8 → fcn.100090bd), or where the near door has
+  an `enter` action for the actor (211's cabin, 212's and 213's
+  topright/midright, 214's bridge: the mobile's back doors) its `enter`,
+  the placement and the far door's `leave` (fcn.10003647, fcn.10003236);
+  the far room is set at `<actor>_out` (fcn.10003454) and the step's last
+  movement brings the actor down to its floor. A movement steps one axis
+  a tick at the gait's records (fcn.10009215: mg0 / mg2 3 px up and down,
+  mg1 / mg3 8 px along for the neighbour, the Mother and Olga, Woody 6 /
+  17; nothing writes the stair gait 7) through the waypoints of
+  fcn.10009177: off the floor line and off the target's x down or up to
+  the floor, along it, then straight to the target — so every station
+  whose `<actor>` hotspot sits off the floor costs a run each way (213's
+  picnic 85 px, 29 ticks), and a stair pass is 285-395 px at 3 px a tick
+  (208's bazar to the Taj 132 ticks, 11 s, where the mobile's climb took
+  ~3 s). tools/pcref/lap_model_s2.py times the untricked laps with it:
+  203 105 s, 208 85.5, 209 104, 211 85, 212 124, 213 123 against the
+  video's 84-112, 86, 97, 85, 113, 136. Carried (tools/pcref/
+  pc_walks_s2.py; `Pawn._pc_pass_pace`, `_pc_hop_steps`,
+  `_pc_departure_step`, `_pc_station_route`): each Transition and back
+  door carries its pair's PC pass per pawn (PCPass: the `in` run, the
+  straight movement or the two clips, the `out` run, in px of the PC
+  scene; the room map is the geometric one the door graph confirms on all
+  14 levels), and the port's hop stands the `in` run at the near door,
+  walks its complex steps through the transfer at the pace that lasts the
+  straight movement (the zone flips there, at `<actor>_out`) and stands
+  the `out` run beyond it; a back door's climb, strips and descent last
+  the `in` run, the two clips and the `out` run. Each routine station of
+  the neighbour, the Mother and Olga carries its PC object's hotspot
+  height (PCApproach, 112 by the level scripts' GoTo / DoAction
+  targets): the mobile's climb to the item lasts the run up or down, a
+  station the mobile scene keeps on the floor stands it out before the
+  use, and the walk away takes the run down first (the floor step
+  BuildPathToTarget inserts, or a stand) — none between two stations at
+  the same PC x. A walk from one station to another takes the PC's
+  route (the Dijkstra from hotspot to hotspot, precomputed per pair): the
+  mobile's Helpers.GetShortestPath (1 a hop, ties to Mono's qsort) takes
+  39 of the 338 legs through the other side of a ring — 210's basket to
+  the shop went through the beach (24.7 s) where the PC goes through the
+  bar (17.3). No pace beats the gait's floor record (a mobile climb longer
+  than the PC's run — 205's water skis, 3 px — takes the walk's pace). The
+  port's idle laps then walk within about a second of the model per leg
+  (208: the shoe machine 26.2 / 27.9, the elephant 4.5 / 3.8, the bowl
+  10.8 / 11.8, the platform 15.3 / 15.2; 213: the plant 16.7 / 16.5, the
+  picnic 16.2 / 16.7, the cement 17.2 / 17.6), and with the code's stays
+  208's lap is 82.5 s for the model's 85.5 and the video's 86. Open: Woody's
+  own runs to his items (his `woody` hotspots at 6 px a tick) are not
+  carried — it needs his ~295 items paired with the PC objects, which the
+  nearest-object proposal leaves ambiguous on 97; a walk that does not
+  leave a station (after a trick's reaction, a run, a chase) keeps the
+  mobile's route; the detection keeps the mobile's PassingComplexMove
+  window over a pass, where the PC's actor is in no room from
+  `<actor>_in` to `<actor>_out`.
 - *The other actors' stands.* The PC level data times an actor's action in
   ticks (`<action actor="mother" … time="120">` in objects.xml, 12 per
   second) or `auto` (its clip: the enter/leave stretches of a stand, a
