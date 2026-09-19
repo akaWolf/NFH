@@ -370,7 +370,8 @@ def main(argv):
                     for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
                               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
                               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
-                              'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire'):
+                              'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
+                              'PCToiletPaysAt'):
                         ov['patches'] = _strip_key(ov['patches'], k)
                     sys.path.insert(0, HERE)
                     import lap_model_s2
@@ -415,6 +416,10 @@ def main(argv):
                             # the linked shot's third record, its own tick
                             # (206's rubberrabbit: the ExtraCoin206)
                             _set_key(ov['patches'], item, 'PCExtraPaysAtLinked', tr['linked_extra_at'])
+                        if tr.get('toilet_pays_at') is not None:
+                            # the rush's own record, its tick into the wc's
+                            # action (211's wcright, 27 of the puke's 40)
+                            _set_key(ov['patches'], item, 'PCToiletPaysAt', tr['toilet_pays_at'])
                         if tr.get('arm') and tr.get('hit'):
                             # the visits the trick arms and fires at (206's
                             # load and shoot: lap_model_s2.TRICKED_ARM)

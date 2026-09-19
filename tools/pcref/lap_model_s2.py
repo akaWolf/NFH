@@ -1196,6 +1196,17 @@ AUX_UPDATE = {212: (0x10034c0f, 0x10034e05)}
 # visit that drops it, the take's row)
 TRICKED_ARM = {206: {'LaunchPad': (2, 2, 'mother', 1, 2)}}
 TRICKED_ARM_LINKED = {206: {'Harpoon': (1, 2, 3)}}
+# a tricked flow's toilet rush and what the co-actor does on it: 211's
+# sweets — the run's puke at the women's wc (0x10030dc2) carries the
+# wcright record and the behavior `puke` on Olga, whose handler (0x100318ce)
+# queues her wc `mad` and makes her fight step 0x1003183a (fcn.1000eb19's
+# approach, the generic `fight`) her next; the fight's olga_fight sets his
+# step's latch +0xd (0x100301fb), on which 0x10030d0f plays SHOUT 1. Olga's
+# mad starts with the puke and her fight follows it at the same hotspot, so
+# his SHOUT comes mad + fight after the puke's start: the port's hit after
+# the toilet lasts that less the puke. (item: the wc object, its action, the
+# co-actor, her action at it)
+TRICKED_RUSH = {211: {'Sweets': ('topleft_wcright', 'puke', 'olga', 'mad')}}
 # a station's tricked variant where the lap's step has none and other steps of
 # the script play it, their events in order: 201's damaged buffet in the
 # tutorial (0x10029c4a: the flirt that sends Olga's buffet_crash, his crash;
@@ -1599,6 +1610,17 @@ def code_stays_tricked(n):
                      'credit': round(credit / 12.0, 2) if credit is not None else None,
                      'walk': round(walk_t / 12.0, 2) if walk_t is not None else None,
                      'arm': [fire_v, drop_v], 'rejoins': True}
+    for item, (obj, act, actor, her) in TRICKED_RUSH.get(n, {}).items():
+        if item not in out:
+            continue
+        puke = d.action_ticks(obj, act)
+        mad = d.action_ticks(obj, her, actor=actor)
+        ft = d.action_ticks('neighbor', 'fight', actor=actor)
+        recs = d.tricks(obj, act)
+        if puke is not None and recs:
+            out[item]['toilet_pays_at'] = round(recs[0][1] / 12.0, 2)
+        if None not in (puke, mad, ft):
+            out[item]['hit'] = {actor: round(max(0, mad + ft - puke) / 12.0, 2)}
     for item, (stp, tricks) in TRICKED_VIA.get(n, {}).items():
         lv2 = Level(n)
         lv2.present = set(lv.present)
