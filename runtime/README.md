@@ -713,6 +713,15 @@ predicate, then the all-tricks win.
   ExtraCoin206 — pays and books its completion at its own tick
   (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is off under the
   profile (the PC's shoot step asks nothing).
+- **The PC profile's 211 rush** (the after-toilet angry in
+  `Routine._urgent_finished`, PCToiletPaysAt): the angry after the wc is
+  the rush's own item (the sweets) under the profile — GameLogic's toilet
+  step goes on to its SHOUT (0x10030dc2 -> 0x10030d0f) where the mobile
+  reads the interrupted action's item and loses it — and the wcright
+  record (the Toilet211 extra coin and its completion) pays 2.25 s into
+  the puke (`_urgent_arrived` arms `pc_credit3_timer`, `_s2_credit`'s
+  `toilet` part); Olga's hit after the puke is her mad and fight less the
+  puke (PCHitSeconds); `pc_affect_early` leaves a rush's co-actor alone.
 - **The PC profile's per-visit move**: PCApproach `txt` may be a list,
   one move per visit (201's soaped puddle, [200, -100], the slips' two
   sides; `Routine._pc_arrived`).

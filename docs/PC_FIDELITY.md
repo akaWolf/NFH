@@ -1698,21 +1698,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   PCExtraCoinLinked 30 (bill, paid and done at his resume: the level's
   done count is its records, so the level ends there — 207's plan awaits
   the count 7), PCShoutLinked 2; the castle's own amount is the PC's 20
-  (the mobile's 40 was its linked total's share). Open, with numbers:
-  211's sweets — after the puke the PC's Olga plays her `mad` at the
-  women's wc (34 ticks, her puke handler 0x100318ce) and fights him (her
-  step 0x1003183a, 42 ticks; olga_fight sets his step's latch +0xd,
-  0x100301fb) before his SHOUT 1 (0x10030d0f) and the sign's repair; the
-  port, as the mobile, loses the after-toilet angry (StopUrgentAction reads
-  the interrupted action's item, ActionManager.cs:597 — the fishing rod by
-  then), and the wcright record pays with the sweets' own, 1.25 s into the
-  sweets' stand, not 27 ticks into the puke; 210's
+  (the mobile's 40 was its linked total's share). 211's sweets with the
+  sign swapped (lap_model_s2 TRICKED_RUSH): the puke at the women's wc
+  carries the wcright record at 27 of its 40 ticks and the behavior
+  `puke` on Olga, whose handler (0x100318ce) queues her wc `mad` (34
+  ticks) and makes her fight step 0x1003183a her next (the generic
+  `fight`, 42); its olga_fight sets his step's latch +0xd (0x100301fb),
+  on which 0x10030d0f plays SHOUT 1, then the sign's repair (the walk to
+  it, 34 ticks, and its `repair`, 24). The mobile loses the after-toilet
+  angry — StopUrgentAction reads the interrupted action's item
+  (ActionManager.cs:597), the fishing rod by then — and pays the extra
+  with the sweets' own. Carried: the after-toilet angry is the rush's own
+  item under the profile, Olga's hit after the puke lasts her mad and
+  fight less the puke (36 ticks, PCHitSeconds 3.0: the mobile's
+  HitPawnSequence OlgaWCMad, HitPawn), and the wcright record — the
+  Toilet211 extra coin and its completion — pays 2.25 s into the puke
+  (PCToiletPaysAt, World.pc_s2_extra_credit); the repair plays where he
+  stands (2.0 s) and his walk to the next station starts at the wc, the
+  sign on its way. Open, with numbers: 210's
   TurbanShop 27 and 213's Tortilla 15 and PlantCarnivore 15 + PCExtraCoin
   20 had been dropped from the overlays by the stays writer of 2026-09-12
   (it replaced its patches' sets) and are back.
-Plans (runs/sw14s2, all 14 at 100; 207's plan awaits the count 7 — the
+Plans (runs/sw15s2, all 14 at 100; 207's plan awaits the count 7 — the
   billboard's coin is paid at his resume after Olga's lift, 436.2 s; 206's
-  the count 6, 257.7 s; 212 at 873.6 s, 213 at 398.7, 214 at 792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
+  the count 6, 257.7 s; 211 at 262.0, 212 at 873.6, 213 at 398.7, 214 at
+  792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
   sawfish placed while he is at the shore and in the sea, the swim step's
   flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
   of decay, just over the top (the rail first a lap earlier spreads it over
