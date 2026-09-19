@@ -234,17 +234,18 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
 Open: the frame pacer of game.exe (the level tick at 12 Hz is measured off
 the HUD clock; the 60 Hz timer and the level's update are read, the gate
 between them is not — no binary carries 1/12, GFXEngine's 83 ms is the
-sprites' frame interval); a Season 2 run whose scene the mobile plays
-otherwise (201's tutorial runs him to the entry to shout after the soap
-puddle; 205's back to the nailed water ski to pant and repair it is
-carried since 2026-09-24, the calls' runs of 208 and 210 are the Urgent
-ones, 210's Mother's to him on Fifi's fall is carried; `docs/PC_FIDELITY.md`
-"Season 2's runs"); the PC's
-field image (the data archive holds no TGA; the game's 100 px radius is
-carried), 203's Olga shout before the run (her `shout` has no clip in
-the port) and where a trick's own clip leaves him (the tricked actions'
-`<translation>`s, 25 ticks at most, once a trick: after a trick his next
-walk leaves from the station's hotspot). 111's machines are
+sprites' frame interval); the PC's field image (the data archive holds
+no TGA; the game's 100 px radius is carried, the PC's field measures
+77 px of its 800 x 600 screen); a two-way station's tricked move (201's
+crash_short, 120 px once). 201 runs the PC's own tutorial under the
+profile since 2026-09-24 — GameLogic.dll's `aux` director with its
+messages, waypoints, markers and the lost game's relay, the neighbour's
+demo and lesson laps, the entry run, wheeze and shout after the combo
+(`docs/PC_FIDELITY.md` "201's tutorial"); 205's run back to the nailed
+water ski, the calls' runs of 208 and 210 and 210's Mother's run to him
+are carried ("Season 2's runs"), 203's Olga shouts before his run, and
+the tricked actions' `<translation>`s move him (PCApproach `txt`, a
+two-way station's per visit). 111's machines are
 the level class's DoActions (the washer's 24 s in the video is the walk
 and give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. The Season 2 idle laps under
@@ -254,8 +255,9 @@ the floor too (`docs/PC_FIDELITY.md` "Season 2 walks"): 203 106.7 s /
 105.2, 208 86.6 / 85.5, 209 107.4 / 106.7, 211 85.0 / 85.3, 212 123.2 /
 123.8 (more where he waits for the Mother at a door pair she holds), 205
 112.5 / 111.9, 207 105.5 / 106, 204 91.7 / 92.8, 210 99.7 / ~101, 202 87.0 /
-80.7 and 213 132.5 / 123.1 plus their waits for Olga; 201 and 206 have no
-free lap; the
+80.7 and 213 132.5 / 123.1 plus their waits for Olga; 201's free lap
+after the tutorial is timed by the code (the hat 9.67 s, the flirt 4.92,
+the look 4.0, the slips 0.92) and 206 has none; the
 Season 2 gauge is 100 000 rage long and falls by
 leveldata's `time` every 1/12 s (0.36 %/s), and the coins are the levels'
 tricks.xml rage values. The Season 1 anger rule, the result captions and

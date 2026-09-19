@@ -2027,9 +2027,22 @@ Two departures this layer surfaced, both fixed by code:
   only the tricked unlocks sit behind `Item != null`) — Intro103's dog
   walk is a MoveOnly step whose `ItemsToUnlock` opens the Drawer.
 
+Under the PC profile Level201 runs the PC's own tutorial instead
+(`TutorialPC201`, docs/PC_FIDELITY.md "201's tutorial"): GameLogic.dll's
+`aux` director step by step (the welcome box, the messages from
+ship1/strings.xml, the waypoint signs and marker arrows over the
+remaster's strips, the gates on Woody's position, inventory and room, the
+lost game's relay) and the neighbour's script carried on his routine by
+phase, with the entry run, wheeze and shout after the combo
+(`Routine._finish` asks `pc_trick_hook`), the scripted shouts' levels
+(`World.play_angry` asks `pc_shout`) and the rail's repair on his next
+visit; its data is the overlay's PCTutorial. The App holds the level
+while the welcome box shows; the harness clicks it away.
+
 `tests/run_tutorial.py` drives all five scenes (Intro101 start to the
 forced win; Intro102/103 through every signal kind and both cameras;
-the L201/L206 openings) — 39 checks.
+the L201/L206 openings, L201's mobile lesson under the mobile profile and
+the PC's up to the demo lap under the PC one) — 48 checks.
 
 ## Not implemented
 

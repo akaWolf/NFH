@@ -184,13 +184,20 @@ tick so adds the rate the last update left, and the update after it rates
 the thumb anew (DexterityState._pc_tick / _pc_update: the first update at
 the game's start). A game's length is unchanged by it (a thumb in the
 middle: 3 + time/4 ticks) — the rate is the thumb's of one tick earlier;
-the fourteen Season 2 runs are byte-identical under it. Open, with
-numbers: the field — the remaster's reference pixels (1280 x 800) stand
-for the PC's, the PC's field.tga is not on hand; 203's Olga
-shout_chinese before his run is not played (the port's Olga has no such
-clip; he starts at the loss), and his run keeps the mobile's moment (at
-once if he walks, else when his clip ends) where the PC's `always` may
-start it at once.
+the fourteen Season 2 runs are byte-identical under it. 203's lost game
+plays Olga's shout first since 2026-09-24: her `shout` action is
+shout_chinese (69 frames, 5.75 s) then eat_chinese (cn_c2's olga record),
+and its own behaviour, his `run`, fires as it starts — the port's Olga
+plays her Shout clip paced to the 69 frames and goes back to her
+EatChinese (PCMinigameFailedClip, DexterityState._pc_failed_clip), his
+run at the same moment; 201's reaches the tutorial's director
+("201's tutorial"). Open, with numbers: the field — the remaster's
+reference pixels (1280 x 800) stand for the PC's, whose screen is 800 x
+600 (its dialogs: the status line at 10/570 790 wide, the right bar from
+658) and whose field.tga is not on hand (on Badinfos' E01 the green
+disk measures 124 x 92 px of the 1280 x 720 stretch, 77 x 77 PC px);
+and his run keeps the mobile's moment (at once if he walks, else when
+his clip ends) where the PC's `always` may start it at once.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -1206,13 +1213,20 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 and the mobile regression byte-identical. The laps:
   203 106.8 s (model 105.2), 205 112.5, 208 86.6 (85.5), 209 107.4
   (106.7), 211 85.2 (85.3), 212 127.2 (123.8), 204 92.5, 207 105.5, 210
-  99.7. Open, with numbers: the translations of the tricked actions (201's
-  soap puddle's crash_short 200 px, its water puddle's slips +80 / -100,
-  207's crayfish splash -154, 209's hot coal walk 110 for the coal's 190
-  and the burning shoe mat 70, 214's shower crash -43 and pistol use 95,
-  203's stage crash 30) — after a trick his next walk leaves from the
-  station's hotspot, up to 25 ticks off once per trick — and Woody's one
-  (208's chalk on the safety line, 45 px, 3 of his ticks).
+  99.7. The translations of the tricked actions are carried since
+  2026-09-24 (PCApproach `txt`, lap_model_s2.code_moves_tricked: the
+  station's step run again with the tricked variants of its IsVariant
+  pairs shown): 207's crayfish splash -154, 214's manipulated pistol +95,
+  209's hot coal a placement (its walk_fuel +110 then the coal's enter
+  and leave: 0); 201's puddle, a two-way station, takes its slip's
+  hotspot per visit (`neighbor` 1020 for the slip, +80; `neighborleft`
+  1130 for the left slip, -100 — PCApproach `x` and `tx` per visit,
+  pc_walks_s2.VISIT_HOTSPOTS; the tutorial sets the visit by the prime
+  the mobile's toggle plays next). Open, with numbers: a tricked visit
+  of a two-way station keeps its side's move (201's crash_short, +200 px
+  where the slip's +80 applies: 120 px, 15 of his ticks, once), 203's
+  stage crash 30 and Woody's one (208's chalk on the safety line, 45 px,
+  3 of his ticks).
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
@@ -1388,12 +1402,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Elephant hit on her, which had walked), 214's Olga after the shower and
   the bouquet (0x1003c035, one handler) and its Mother after the pistol
   (0x1003a27f); the stairs keep their records. Their other walks to him
-  the PC walks. Open, with their sites: 201's tutorial — after the soap
-  puddle's crash_long the level script runs him to the entry's
-  neighbor_shout spot to shout, and to wheeze (0x10028b74 -> 0x1002833c,
-  0x10029797 -> 0x100294fc), where the mobile tutorial walks him on
-  through his lap (CrashShort / CrashLong, the anger, the deck rail or the
-  captain's hat). 205's nailed water ski is carried since 2026-09-24: after
+  the PC walks. 201's tutorial is the PC's own since 2026-09-24 (below,
+  "201's tutorial": after the combo's crash_long the script puts him at
+  the entry, runs him to the shout spot, wheezes and shouts). 205's
+  nailed water ski is carried since 2026-09-24: after
   the ride — whose record pays as it ends — the script runs him back to the
   ski (0x10024fde: gait 2), he pants there (`pant`, 34 ticks), shouts and
   repairs it (0x1002512d) before the lap goes on (0x10024929), where the
@@ -1408,10 +1420,87 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   every level's game object (§2.6) dispatches the neighbour's `run`
   behaviour (0x1003e278: the alarm sound, a running GoTo fcn.100080e1,
   `search`) — carried: a lost game's surprise onto the object runs
-  (Routine.pc_run_next), nobody comes on 201, 212 and 213. The `fight`
+  (Routine.pc_run_next); on 201 the `run` reaches the tutorial's
+  director, which relays it to him with the toolbox as the object
+  (0x10027407, TutorialPC201.on_behaviour / _nb_run); nobody comes on
+  212 and 213. The `fight`
   step (0x1003d8a3: gait 2, the walk to Woody, `fight_woody`) is the
   registry's other generic behaviour. The catch fiber itself (0x100061dc)
   sets no gait.
+- *201's tutorial (2026-09-24, carried).* The PC's 201 is not the
+  remaster's lesson: GameLogic.dll runs it as two scripts, the invisible
+  `aux` actor's director (steps 0x1002818c ... 0x10026640, one a level
+  tick until it stores the next) and the neighbour's (0x1002aac8 ...),
+  which hand each other the `tutorial` behaviour (fcn.1004000a) and wait
+  on it (fcn.10013269). The director opens with the welcome box
+  (fcn.1001029b: the level waits for its button), then the messages
+  (fcn.100101f3, ship1/strings.xml) and their gates: waypoint1 (bottomleft
+  450) and waypoint2 (bottomright 1000) reached — fcn.1000e2bd, the
+  actor's y the sign's and |dx| within the dword at 0x100cc814, 50 px;
+  each MSG step first waits for Woody to move, fcn.10008874 = his flag
+  0x80000, set through a movement (fcn.10009489) — the chest opened
+  (soapchest_closed hidden, 0x10027df6), the soap taken (fcn.10049cec),
+  waypoint3 (1200) reached: TUTENTRY(neighbor) — his demo lap from the
+  bridge (the entry's neighbor_entry, -150): the hat (lookaround 43 +
+  use 73 ticks), the buffet's flirt (59), the closed puddle's slip (11,
+  +80 px), the rail's look (48), the left slip (11, -100 px, from the
+  puddle's neighborleft hotspot) — its step tells the director as it
+  starts (0x1002a4ea), the trickable puddle is shown (0x10027ac5) — and to
+  the hat to wait. The soap on the puddle, then Woody in the lower deck
+  (either bottom room, 0x1002791d) sends him: the soaped puddle's
+  crash_short (41, +200 px), SHOUT 1, the rail's look, the wait there;
+  the vanity bag opens (0x10027820); the hairpin taken, waypoint4 (430)
+  reached, the toolbox marked (0x10027581), the game on (the level's slot
+  0x50), the knife (0x10027407) — or the lost game's `run`, relayed with
+  the toolbox as the object (the hurry / auweia / wait1 / wait2 / goback
+  steps: Woody and the neighbour in bottomleft is the thrashing, Woody in
+  topleft escaped, then the neighbour out of bottomleft, then Woody at
+  the toolbox again); the buffet cut, Woody down again (0x1002725b): the
+  left slip, the hat, the damaged buffet (the flirt sends Olga's
+  buffet_crash, his crash 44, her fight; its SHOUT takes the actor for a
+  level, 0x10029a6c, which no case of fcn.1000f977 takes: no shout), the
+  repair (19), the wait at the buffet; then the combo (the chest marked
+  unless he holds soap, the rail and the puddle marked; combo2 / combo3
+  for the half done), combo4 and Woody down (0x10026d08): the crash_long
+  by the open rail (75 ticks, `auweh` and `owe`), the entry
+  (0x1002968d: fcn.100418f6 at neighbor_entry, the gait 2), the run to
+  neighbor_shout (240), the wheeze (30 frames), SHOUT 2 (0x100294fc),
+  then danke (the spaghetti pot opens) and the free lap from the puddle
+  (0x100291cf -> 0x10029063: the rail still open is repaired, 19 ticks,
+  before the look). The neighbour camera (0x1000f51a on, 0x1000ebbf off)
+  follows him from each of his latches to its end. Carried under the
+  profile (runtime/tutorial.py TutorialPC201, the overlay's PCTutorial,
+  tools/pcref/pc_tutorial201.py; the plan tests/plans/pc/s2/Level201.txt):
+  the director's steps by address, its texts, markers and signs over the
+  remaster's arrow and sign strips, the welcome box; Woody starting at
+  level.xml's 300 in bottomleft (his respawn point too), the neighbour at
+  the bridge; the doors open (the remaster's stair locks are its lesson's);
+  the chest, the puddle, the vanity bag and the spaghetti pot the mobile
+  items locked until the director shows their open twins, the rail and
+  the hat open from the start; his script on the mobile routine — the same
+  five stations — by phase (`_nb_demo`, `_nb_slip`, `_nb_buffet`,
+  `_nb_combo`: the action list set, the waits as the stations'
+  FreezeAfterCompletion), the aftermath in Routine._finish's tricked stop
+  (`pc_trick_hook`: the credit as the crash ends, the placement, the run,
+  a stand for the wheeze — the remaster has no wheeze clip —, the shout);
+  the scripted shouts' levels (`pc_shout`, World.play_angry: 1 after the
+  crash_short, 2 after the wheeze, none at the buffet — the fix alone);
+  the free lap's first rail visit plays the repair (FixMid) and the look
+  at their ticks with the rail shown open until then; the stays and moves
+  of the free lap by code (lap_model_s2 LAP_START 201 = 0x10028f86: the hat
+  9.67 s, the flirt 4.92, the look 4.0, the slips 0.92 at +80 / -100 px,
+  the left slip from `neighborleft` — PCApproach `x` per visit,
+  pc_walks_s2.VISIT_HOTSPOTS), the tricked stands (code_stays_tricked:
+  crash_short 3.42, crash_long 6.25 — PCUseSecondsLinked —, the damaged
+  buffet 3.67, the sauced hat 8.08). The plan reaches every message and
+  rates 100 (4/4, 244.6 s). Against Badinfos' E01 (the level clock):
+  the demo's walk from the bridge to the hat 4.2 s from the TUTENTRY
+  (the video ~5.5 ± 0.5 s: the camera cut at 0:12, at the hook 0:17.5),
+  moveaway's TUTENTRY to the crash_short 10.9 s (video 9-12 s), moveaway2's
+  to the buffet crash 25.8 s (video ~25 s), combo4's to the crash_long
+  11.3 s (video ~12 s); the crash_short's coin on the video ~0.9 s into
+  the crash (4 fps frames 1:23.1 -> 1:24.0), the port's at its end —
+  the credit moment is Season 2-wide (below, "the tricked visits").
 - *214's handshake (2026-09-23).* The Mother's script (GameLogic.dll:
   fcn.1003a379, vtable 0x100b05b8, its first step 0x1003a0ae) starts her
   in the awake step 0x10039e6c — to the deck chair and in (its `enter`,
