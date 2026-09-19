@@ -241,11 +241,11 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
-                 'pc_minigame_failed', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
+                 'pc_minigame_failed', 'pc_minigame_failed_clip', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
@@ -660,6 +660,10 @@ class Item:
         self.pc_shout_skip = bool(d.get('PCShoutSkip'))
         self.pc_fix_secs = _f('PCFixSeconds')
         self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
+        # Season 2: the tricked stand with the linked trick too, where the
+        # script plays another step for it (201's puddle by the open rail:
+        # crash_long, 0x100297c5, where the soap alone plays crash_short)
+        self.pc_use_secs_linked = _f('PCUseSecondsLinked')
         self.pc_fire_at = _f('PCFireAt')
         self.pc_fire_before = bool(d.get('PCFireBefore'))
         self.pc_slip_secs = _f('PCSlipSeconds')
@@ -685,6 +689,9 @@ class Item:
         self.pc_minigame_levels = d.get('PCMinigameLevels')
         # and whom its `failed` action sends (the behavioractor; '' none)
         self.pc_minigame_failed = d.get('PCMinigameFailed')
+        # the clip that behaviour plays on its actor first (203's Olga shouts:
+        # {role, clip, secs, then}; tools/pcref/pc_minigames.py)
+        self.pc_minigame_failed_clip = d.get('PCMinigameFailedClip')
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')

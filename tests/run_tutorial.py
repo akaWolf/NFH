@@ -180,7 +180,10 @@ def main():
     check('103: the slip pays the level',
           wait(app, lambda: w.game.won, 90))
 
-    # -- Level201: the NFH2 camera's opening -------------------------------
+    # -- Level201: the NFH2 camera's opening (the mobile's tutorial: the
+    # PC profile runs the PC's own, checked below) ------------------------
+    profile = os.environ.get('NFH_PROFILE')
+    os.environ['NFH_PROFILE'] = 'mobile'
     app = start('Level201')
     w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
                    app.viewer.level)
@@ -205,6 +208,54 @@ def main():
     check('201: the fifth step completes the message (Moving -> Hold)',
           wait(app, lambda: cam.state == 'Hold', 90)
           and t.action_index >= 3 and not wd.frozen)
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
+
+    # -- Level201 under the PC profile: the PC's director and neighbour ----
+    os.environ['NFH_PROFILE'] = 'pc'
+    app = start('Level201')
+    w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
+                   app.viewer.level)
+    items = {it.name: it for it in L.items.values()}
+    rott = w.pawns.get('Rottweiler')
+    check('pc 201: the PC tutorial binds, no camera script',
+          type(t).__name__ == 'TutorialPC201' and app.tutorial_camera is None)
+    step(app)
+    check('pc 201: the welcome box holds the level',
+          t.modal and t.step == '8087')
+    t.dismiss()
+    check('pc 201: Woody starts in bottomleft, the chest shut',
+          wd.zone.name == 'Zone01' and items['SoapChest'].locked)
+    wps = t.pc['waypoints']
+    z, x, _y = t._pc_point(wps['waypoint1'])
+    w.woody_click(x, wd.sprite.y, None, None)
+    check('pc 201: waypoint1 -> waypoint2',
+          wait(app, lambda: t.step == '7df6', 30) and 'waypoint2' in t.signs)
+    z, x, _y = t._pc_point(wps['waypoint2'])
+    w.woody_click(x, wd.sprite.y, None, None)
+    check('pc 201: waypoint2 opens the chest',
+          wait(app, lambda: not items['SoapChest'].locked, 30))
+    chest = items['SoapChest']
+    w.woody_click(chest.x, chest.y, chest, None)
+    check('pc 201: the soap shows waypoint3',
+          wait(app, lambda: 'waypoint3' in t.signs, 30))
+    z, x, _y = t._pc_point(wps['waypoint3'])
+    w.woody_click(x, wd.sprite.y, None, None)
+    check('pc 201: waypoint3 starts his demo lap',
+          wait(app, lambda: t.nb_phase == 'demo', 30)
+          and not t.rott_routine.frozen)
+    check('pc 201: his left slip shows the puddle (soappuddle)',
+          wait(app, lambda: 'soappuddle' in t.shown, 120)
+          and not items['WaterPuddle'].locked)
+    check('pc 201: he waits at the captain\'s hat',
+          wait(app, lambda: t.nb_phase == 'cap', 60)
+          and abs(rott.sprite.x - items['CaptainHat'].x) < 0.3)
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
 
     # -- Level206: the NFH2206 camera's opening ----------------------------
     app = start('Level206')

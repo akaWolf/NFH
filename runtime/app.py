@@ -766,10 +766,17 @@ class App:
         # (HUD.CheckClick's gate, HUD.cs:1282-1285); the HUD itself stays
         # clickable while paused (the power button, HUD.cs:1302-1306), so
         # the click goes through handle_click, whose own gates sort it
+        # the PC 201 tutorial's welcome box (GameLogic fcn.1001029b): the
+        # level waits for its button, the click is the box's
+        modal = self.tutorial is not None and self.tutorial.active \
+            and getattr(self.tutorial, 'modal', False)
+        if modal and pressed:
+            self.tutorial.dismiss()
+            pressed = False
         if pressed and not igm.is_exit_confirmation_shown():
             v.handle_click(*self._mouse)
         w.menu_open = igm.enabled
-        if igm.time_scale > 0.0 and not w.menu_open:
+        if igm.time_scale > 0.0 and not w.menu_open and not modal:
             w.tick(min(dt, 0.1))
             if self.tutorial is not None and self.tutorial.active:
                 self.tutorial.tick(dt)

@@ -106,6 +106,18 @@ def pc_route(level, role, zone, pos, dest, target):
     return None
 
 
+def pc_ap_x(ap, it):
+    """a station's PC hotspot x (Item.pc_approach `x`): one value, or one
+    per visit where the GoTo takes another hotspot of the object each visit
+    (201's puddle: its `neighbor` hotspot for the slip, `neighborleft` for
+    the left slip — GameLogic 0x1002847f, 0x10028ea6) — the visit about to
+    play, the item's PCUseSeconds slot"""
+    x = ap.get('x')
+    if isinstance(x, list):
+        return x[it.pc_use_visit % len(x)] if x else None
+    return x
+
+
 def pc_target(role, zone, step):
     """the PC point a path's last step walks to: a station's hotspot
     (Item.pc_approach), else the item's or the point's x on the room's floor
@@ -116,7 +128,7 @@ def pc_target(role, zone, step):
     it = step.get('item') if step.get('kind') == 'item' else None
     ap = it.pc_approach.get(role) if it is not None else None
     if ap:
-        return (ap['x'], pr['floor'] + ap['px'])
+        return (pc_ap_x(ap, it), pr['floor'] + ap['px'])
     if it is not None:
         return (pc_room_x(zone, it.x), pr['floor'])
     if step.get('x') is not None:
@@ -1598,7 +1610,7 @@ class Pawn:
         at the vertical record), None without one or when the pawn comes from
         a station at the same PC x (fcn.10009177 goes straight there)"""
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
-        if not ap or ap.get('x') == self._pc_from_x:
+        if not ap or pc_ap_x(ap, it) == self._pc_from_x:
             return None
         return pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': ap['px']}, self.sneaking) or None
 
@@ -1606,13 +1618,20 @@ class Pawn:
         """a station reached: the next walk leaves from its PC hotspot, or
         where the station's actions move the actor to along the floor
         (PCApproach `tx`, per visit: 205's skiing leaves him 400 px left of
-        the skis — the visit about to play is the item's PCUseSeconds slot)"""
+        the skis — the visit about to play is the item's PCUseSeconds slot;
+        `txt` for a tricked visit)"""
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
         if ap:
             tx = ap.get('tx', 0)
             if isinstance(tx, list):
                 tx = tx[it.pc_use_visit % len(tx)] if tx else 0
-            self._pc_depart = (ap['x'] + tx, ap['px'], self.sprite.x, self.sprite.y, it)
+            if 'txt' in ap and self.level is not None and it.is_tricked(self.level.items):
+                # the tricked visit's own move (PCApproach `txt`: the step's
+                # tricked variants — 207's sand castle with the crayfish
+                # has him splash the kid 154 px on, 214's manipulated pistol
+                # 95, 209's hot coal places him back at it)
+                tx = ap['txt']
+            self._pc_depart = (pc_ap_x(ap, it) + tx, ap['px'], self.sprite.x, self.sprite.y, it)
         else:
             self._pc_depart = None
         self._pc_from_x = None
@@ -1690,7 +1709,7 @@ class Pawn:
         last = steps[-1]
         it = last.get('item') if last.get('kind') == 'item' else None
         ap = it.pc_approach.get(self.role) if it is not None else None
-        if ap is not None and ap.get('x') == pcx:
+        if ap is not None and pc_ap_x(ap, it) == pcx:
             self._pc_from_x = pcx
             sap = src.pc_approach.get(self.role) \
                 if (src is not None and self.role != 'Woody') else None
@@ -1760,7 +1779,7 @@ class Pawn:
                 after = None              # the hop's steps set it
             elif kind == 'item':
                 ap = st['item'].pc_approach.get(self.role)
-                end = after = ap.get('x') if ap else None
+                end = after = pc_ap_x(ap, st['item']) if ap else None
             else:
                 continue                  # a waypoint: the stretch goes on
             if x_pc is not None and end is not None:
@@ -4455,6 +4474,15 @@ class Routine:
             it.pc_use_visit_role[self.role] = k + 1
             return float(vals[k % len(vals)])
         t = self._pc_trick_item(it)
+        linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
+        if getattr(it, 'pc_use_secs_linked', None) is not None and it.tricked \
+                and linked is not None and linked.tricked and it.use_tricked_linked:
+            # the linked-tricked stand (PCUseSecondsLinked: the use the
+            # mobile plays as RottweilerUseLinkedTricked is the script's
+            # other step — 201's crash_long by the open rail); its visit slot
+            # passes as any
+            self._pc_visit_seconds(it)
+            return float(it.pc_use_secs_linked)
         if getattr(t, 'pc_use_secs_tricked', None) is not None \
                 and it.is_tricked(self.level.items):
             # the tricked stand's own seconds (PCUseSecondsTricked: game.exe
@@ -4526,6 +4554,9 @@ class Routine:
                 target = self._tricked_item(it)
                 if target is not None and self._pc_defer_angry(it, target):
                     return
+                hook = getattr(w.level_script, 'pc_trick_hook', None)
+                if target is not None and hook is not None and hook(self, it, target):
+                    return                # the PC tutorial's script goes on (201)
                 if target is not None:
                     self._angry_target = target
                     w.play_angry(self.pawn, target, on_done=self._angry_done)
@@ -6280,13 +6311,17 @@ class DexterityState:
                 # the `failed` action: the PC game can always be lost (201's
                 # toolbox too, the mobile's DexterityCannotLose); its
                 # behaviour sends the neighbour running — straight or through
-                # Olga's shout (203) — or nobody (201's `aux`, 212's spikes,
-                # 213's pinata: PCMinigameFailed)
+                # Olga's shout (203) — or reaches 201's `aux`, the tutorial's
+                # director, which relays the run (TutorialPC201.on_behaviour),
+                # or nobody (212's spikes, 213's pinata: PCMinigameFailed)
                 self.pc_elapsed = 0
                 self.pc_progress = 0
                 self.percent = 0.0
-                self._lose(alert=getattr(self.item, 'pc_minigame_failed', None)
-                           in ('neighbor', 'olga'))
+                failed = getattr(self.item, 'pc_minigame_failed', None)
+                self._lose(alert=failed in ('neighbor', 'olga'))
+                ls = self.world.level_script
+                if failed == 'aux' and getattr(ls, 'on_behaviour', None) is not None:
+                    ls.on_behaviour('run', self.item)
                 return
             self.pc_progress = self.pc_elapsed * 100 // self.pc_total
             if self.pc_progress >= 10:
@@ -6382,8 +6417,32 @@ class DexterityState:
         if w.woody is not None and w.woody.anim.has('DexterityFailed'):
             w.woody.anim.play_single('DexterityFailed')
         self.start_again = True
+        if pcprofile.is_pc():
+            self._pc_failed_clip()
         if alert:
             self.alert()
+
+    def _pc_failed_clip(self):
+        """the PC's `failed` behaviour on an actor other than the neighbour
+        plays that actor's action of the behaviour's name first — 203's Olga
+        `shout`: shout_chinese, 69 frames at 12 a second, then eat_chinese
+        (cn_c2's olga record; PCMinigameFailedClip) — and that action's own
+        behaviour, the neighbour's `run`, fires as it starts (the alert,
+        at the same moment)"""
+        fc = getattr(self.item, 'pc_minigame_failed_clip', None)
+        pawn = self.world.pawns.get(fc['role']) if fc else None
+        if pawn is None or not pawn.anim.has(fc['clip']):
+            return
+        anim = pawn.anim
+        then = fc.get('then')
+        anim.clip_pace = {fc['clip']: float(fc['secs'])}
+
+        def back():
+            anim.clip_pace = None
+            anim.time_scale = 1.0
+            if then and anim.has(then):
+                anim.play_looping(then)
+        anim.play_sequence([fc['clip']], on_end=back, as_sequence=False)
 
     def cleanup(self):
         """CleanUp (cs:390-406)"""
@@ -7166,13 +7225,23 @@ class World:
             else:
                 play_fixes()
             return
+        shout = getattr(self.level_script, 'pc_shout', None)
+        level = shout(pawn, item) if (shout is not None and nfh2 and pcprofile.is_pc()) else None
+        if level is not None and level < 0:
+            # a scripted stop with no shout (201's buffet: its SHOUT takes the
+            # actor for the level, 0x10029a6c): the repair alone
+            fixes = [a for a in fix_seq if pawn.anim.has(a)]
+            head = [a for a in seq if a not in fixes]
+            seq = [a for a in seq if a not in head]
         if seq:
-            if nfh2 and pcprofile.is_pc() and getattr(item, 'pc_laugh', None) is not None:
+            laugh = level if level is not None else getattr(item, 'pc_laugh', None)
+            if nfh2 and pcprofile.is_pc() and laugh is not None and laugh >= 0:
                 # the PC neighbour's reaction to a trick is one short clip
                 # picked by the record's laugh level (pcprofile.S2_REACTION_CLIPS,
-                # GameLogic 0x1000f9b5): the mobile's angry set plays at the
-                # pace that lasts it — after_run restores the pace
-                pc = pcprofile.s2_reaction_seconds(item.pc_laugh, random)   # the run's seeded module state
+                # GameLogic 0x1000f9b5) — or the level script's SHOUT
+                # (fcn.1000f977, the same tables): the mobile's angry set plays
+                # at the pace that lasts it — after_run restores the pace
+                pc = pcprofile.s2_reaction_seconds(laugh, random)   # the run's seeded module state
                 mobile = pawn.anim.sequence_seconds(seq)
                 if mobile > 0.0 and pc > 0.0:
                     pawn.anim.time_scale = mobile / pc

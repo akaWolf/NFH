@@ -65,7 +65,8 @@ N-th in the level's order, from 1):
     run reproduces to the frame); NFH_GATE_LOG=1 prints the gate's
     reasons, NFH_ROUTINE_LOG=1 the neighbour's urgent starts and ends,
     NFH_WALK_LOG=<role> that pawn's walk steps as they start (the PC
-    profile's holds, runs and floor stretches with them),
+    profile's holds, runs and floor stretches with them), NFH_DEX_LOSE=1
+    leaves a PC game's thumb to the wobble (the lost game's test),
     NFH_MAX_RESTARTS=<n> the restarts after a catch (default 4);
     NFH_SHOT_FPS=<n> saves n PNG frames a second into the run's dir.
     --profile=mobile selects the mobile-parity runtime (the PC-experience
@@ -79,6 +80,7 @@ sys.path.insert(0, os.path.join(ROOT, 'runtime'))
 
 from record import Recorder, DT, WIDTH, HEIGHT     # noqa: E402
 import pcprofile  # noqa: E402
+from world import pc_ap_x  # noqa: E402
 from app import App                                 # noqa: E402
 from prefs import MemoryPrefs                       # noqa: E402
 from menu import GameIntroAnimation                 # noqa: E402
@@ -480,7 +482,9 @@ class Driver(Recorder):
         tx = ap.get('tx', 0) if leaving else 0
         if isinstance(tx, list):
             tx = tx[it.pc_use_visit % len(tx)] if tx else 0
-        return ap['x'] + tx
+        if leaving and 'txt' in ap and it.is_tricked(self.v.level.items):
+            tx = ap['txt']
+        return pc_ap_x(ap, it) + tx
 
     def pc_station_secs(self, it, p=None, frm=None):
         """seconds of the PC run between a station's hotspot and its room's
@@ -494,7 +498,7 @@ class Driver(Recorder):
             return 0.0
         if frm is not None:
             fa = (getattr(frm, 'pc_approach', None) or {}).get(role)
-            if fa and fa.get('x') == ap.get('x'):
+            if fa and pc_ap_x(fa, frm) == pc_ap_x(ap, it):
                 return 0.0
         gait = p._pc_gait() if p is not None and hasattr(p, '_pc_gait') else 'walk'
         return (pcprofile.s2_pass_ticks(role, gait, {'in': ap['px']},
@@ -2206,8 +2210,11 @@ class Driver(Recorder):
                 ddy = (ds.bg[1] + ds.bg[3] / 2.0) - (ds.fg[1] + ds.fg[3] / 2.0)
                 if getattr(ds, 'pc_total', 0):
                     # the PC's thumb is the mouse (DexterityState.pc_move, one
-                    # to one): half the way back a frame, as the steer below
-                    ds.pc_move = (ddx * 0.5, ddy * 0.5)
+                    # to one): half the way back a frame, as the steer below;
+                    # NFH_DEX_LOSE=1 leaves it to the wobble (a held-still
+                    # player loses: the `failed` action's test)
+                    if not os.environ.get('NFH_DEX_LOSE'):
+                        ds.pc_move = (ddx * 0.5, ddy * 0.5)
                     continue
                 ds.input = (ddx * 30.0, -ddy * 30.0)
         return on
@@ -2569,12 +2576,22 @@ class Driver(Recorder):
         tutorial act."""
         tut = getattr(self.app, 'tutorial', None)
         cam = getattr(self.app, 'tutorial_camera', None)
-        if index == 'end':
+        if tut is not None and hasattr(tut, 'shown') and not str(index).isdigit():
+            # the PC 201 tutorial (TutorialPC201): `tutorial <message>` parks
+            # until the director has shown that message; `end` its last step
+            msg = index
+            if msg == 'end':
+                done = lambda: tut.step == '6640'
+            else:
+                done = lambda: msg in tut.shown
+            what = 'the PC director\'s %s' % msg
+            index = None
+        elif index == 'end':
             if cam is None:
                 return False, 'no tutorial camera script in the level'
             done = lambda: cam.state == 'End' or not cam.active
             what = 'the camera script\'s End'
-        else:
+        elif index is not None:
             if tut is None:
                 return False, 'no LevelScript in the level'
             i = int(index)
@@ -3026,6 +3043,10 @@ class Driver(Recorder):
             if em.dismissed is not None:
                 em.dismissed(False)
             em.hide()
+        # the PC 201 tutorial's welcome box: a human clicks its button at once
+        tut = getattr(self.app, 'tutorial', None)
+        if tut is not None and getattr(tut, 'modal', False):
+            tut.dismiss()
         v._frame_dt = DT
         if not self.paused and not v.world.menu_open:
             v.t += DT
