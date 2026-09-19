@@ -1154,6 +1154,16 @@ class Driver(Recorder):
             while self.t < deadline and w.anim.anim.name == 'Hide_In':
                 self.step_world()
             click()
+        elif r == 'climb' and pcprofile.is_pc():
+            # a click on the frame a Season 2 pass hands Woody over (the
+            # zone flips at the transfer while the complex step's Run_Up
+            # still plays) is swallowed as a climb (Woody.cs:657-667): a
+            # human clicks again once he is off the stairs — a rush leg's
+            # pokes stay gated and the click would be lost for good
+            deadline = self.t + 3.0
+            while self.t < deadline and w.anim.anim.name in ('Run_Up', 'Walk_Up'):
+                self.step_world()
+            click()
 
     def _route_clear(self, path, arrive, zone_pid):
         """every zone Woody crosses on `path` is clear while he passes it
@@ -2711,7 +2721,13 @@ class Driver(Recorder):
         self._leg_item = None
         if not self.wait_gate(z.pid, cx, None):
             return False, 'zone never clear'
-        self.click_zone(z)
+        if self.click_zone(z) == 'climb' and pcprofile.is_pc():
+            # swallowed as a climb on the frame a Season 2 pass hands
+            # Woody over (_click_via): clicked again once he is off it
+            deadline = self.t + 3.0
+            while self.t < deadline and w.anim.anim.name in ('Run_Up', 'Walk_Up'):
+                self.step_world()
+            self.click_zone(z)
         ok = self.wait_until(
             lambda: w.zone is not None and w.zone.pid == z.pid, 60.0,
             poke=lambda: self.click_zone(z))

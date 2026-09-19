@@ -1,10 +1,13 @@
 # Level214 under the PC profile: the standard plan without the wait that
 # dodges the second overflow — the PC scores the collapse however many
-# times the gauge fills (docs/PC_VS_MOBILE.md). Expected 6/6, 100.
+# times the gauge fills (docs/PC_VS_MOBILE.md). Under the Season 2 walks by
+# code (2026-09-23) the pistol goes in during the raid and the fish in the
+# bucket after it: his pistol after the raid, the bucket's shower and the
+# wheel then pay 40 + 40 + 80 within ~110 s (runs/p214g: the bouquet 522, the
+# shower 565, the wheel and the pistol 628 — the collapse). Expected 6/6, 100.
 take Carpet IT2_Carpet                 # Zone01
 take Ammo IT2_Ammo                     # Zone01
-usewith Pistol IT2_Ammo                # Zone03, before the raid: armed for his second pistol; under the PC reactions his lap-3 pistol wait (for the Mother's sit) starts after her sit and he waits for good (2026-09-18)
-usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his 71 s Hatch visit
+usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his first Hatch visit
 await Hatch 0                          # his first fall: ShowObjects runs at every angry (Rottweiler.cs:593) but the Hatch's arm needs Dexterity (Item.cs:2668-2672), which his first Fix sets (HatchFixBehavior, cs:2550-2570: the hatch turns into its dexterity round)
 take Shards IT2_Shards                 # Zone03: the hatch's DexterityUnlocker
 unlock Hatch IT2_Shards                # Zone02: the shards round on the DexterityTrickItem hatch arms it again
@@ -13,18 +16,22 @@ activated HatchFish
 take HatchFish IT2_Fish                # Zone02 (two fish)
 usewith Bouquet IT2_Fish               # Zone04 (BouquetFish; PawnToAffectWhenTricked Olga): her trick sends her to the Shower — her routine never reaches it on its own (ActionStartIndex 1, LoopFromSelectedIndex)
 activated Washbucket                   # her OlgaShipShowerSwiffer pose activates the bucket (WashbucketBehavior.cs:22-29), her Idle pose the cloth (cs:33-36)
-usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash; FixItemTrick Washbucket)
 activated Cloth
 take Cloth IT2_Swiffer                 # the glass wants the swiffer
 usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
-park Zone02                            # the hatch room, free once the Mother has walked to her chair (361 s): the raid starts the moment he leaves Zone03 for the shower (378 s), not after Woody's own way round the ring (Zone04 -> Zone01 -> Zone02 -> Zone03, 382 s) — the mug's visible window and his wheel visit are 4 s apart on the original
-take Handbag IT2_Pills                # Zone03 at the top of the Mother's nap (373 s), before the bird dies: the raid itself must be short
+park Zone02                            # the hatch room, free once the Mother has walked to her chair: the raid starts the moment he leaves Zone03 for the shower, not after Woody's own way round the ring (Zone04 -> Zone01 -> Zone02 -> Zone03)
+take Handbag IT2_Pills                # Zone03 at the top of the Mother's nap, before the bird dies: the raid itself must be short
 take Mat IT2_Code                   # Zone03, the same visit
+usewith Pistol IT2_Ammo                # Zone03, the same visit: his pistol after the raid pays 40 with the wheel's 80 (the early pistol of the mobile plan paid at 182 and was long gone)
 activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156): the key is ready long before the raid
 take BirdDead IT2_Key                  # Zone04
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
 usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
 usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash), 11 s after the mug
+park! Zone02                           # down through Zone03 while the Mother naps
+park! Zone01                           # he has left the shower for his pistol
+usewith! Washbucket IT2_Fish           # Zone01: ActivateItemTrick -> Shower (his BucketCrash; FixItemTrick Washbucket) on his shower before the wheel
+park Zone02                            # out of his way: he goes Zone01 -> Zone04 -> Zone03 -> Zone05
 await Shower 0
 await Bouquet 0
 await CaptainWheel 0                   # the wheel's 80 tops the meter: the one overflow (AngryCountTicks 1)

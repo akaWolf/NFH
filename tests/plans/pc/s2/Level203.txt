@@ -1,0 +1,23 @@
+# Level203 under the PC profile (the Season 2 walks by code: his lap is
+# ~100 s — the microphone 5-20, the toilet 30-46 (Zone04), the melon 63-66
+# and the bicycle 75-83 (Zone01), the microphone again at 105): all five
+# armed inside lap 1 for lap 2, the overflow on its bicycle (EXCELLENT =
+# 90 + 10 for one overflow of his meter). The Zone03 pieces go with the
+# generator once he has left the stage (20 s), the toilet pair once he has
+# left Zone04 (46), the Zone01 pair once he climbs out of it (83).
+unlock OlgaBag                    # SearchItem Dexterity, DexterityUnlocker IT_NONE (bare)
+take OlgaBag IT2_Tights
+usewith DieselGenerator IT2_Tights   # Zone03: ActivateItemTrick -> Microphone (TrickItem.cs:322-330)
+take CannonBall IT2_Cannonball    # Zone03, the same visit
+take OilCan IT2_Oilcan            # Zone03
+take ChiliSoup IT2_Piripiri       # Zone02
+take ToolPelt IT2_Wrench          # Zone04, after his toilet
+usewith ToiletPaper IT2_Piripiri  # action [1]
+usewith ToiletFlush IT2_Oilcan    # action [2]
+usewith Bicycle IT2_Wrench        # action [4], after he has left Zone01
+usewith Watermelon IT2_Cannonball # action [3]; DependsOn Bicycle only widens IsTricked
+await Microphone 0                # action [0] Microphone plays tricked, angry, pays
+await ToiletPaper 0
+await ToiletFlush 0
+await Watermelon 0
+await Bicycle 0                   # the overflow

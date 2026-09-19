@@ -156,9 +156,15 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   (`docs/PC_FIDELITY.md` "Season 2 station durations" / "compound coins"
   / "Season 2 reactions" / "The other actors' stands"; 214's lap is a
   neighbour-Mother handshake and keeps the mobile pace); a coin is
-  credited as its trick action completes, where the PC's bar jumps; 213
-  collapses on Badinfos' own pile (the cement, the bull, the plant, the
-  tortilla, the picnic armed while the living room is empty, the pinata).
+  credited as its trick action completes, where the PC's bar jumps. Since
+  2026-09-23 the Season 2 walk is GameLogic.dll's too — the door pair as
+  one step (the walk to the near door's hotspot, the movement or the
+  clips out of every room, the run down in the far room), the runs up
+  and down to the stations' hotspots, the path finder's routes between
+  stations — and the stays on the six levels whose lap the code closes
+  are the code's (`docs/PC_FIDELITY.md` "Season 2 walks"); the plans of
+  203, 206, 207, 208, 210-214 were re-timed to it (213's pile on his lap
+  3, 212's on lap 5).
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 
@@ -176,9 +182,12 @@ between them is not); the Season 2 runs the mobile has no moment for
 `docs/PC_FIDELITY.md` "Season 2's runs"); the minigame's order of a tick's
 elapsed count against the game's update (one tick, 0.083 s), the PC's field
 size (the remaster's reference pixels stand for it) and 203's Olga shout
-before the run; the Season 2 station stays, still the PC video's — the
-code's lap (tools/pcref/lap_model_s2.py) closes seven levels, but its
-waits on events and on Olga and the Mother are not read yet. 111's machines are the
+before the run; Woody's own runs to his Season 2 items (the PC walks
+him to each item's `woody` hotspot at 6 px a tick; the port has not
+paired his ~295 items with the PC objects yet), the routes of the
+Season 2 walks that do not leave a station, and the stays of the Season
+2 levels whose lap the code does not close (202, 204, 205, 207, 210 —
+the video's, re-derived against the PC walk). 111's machines are the
 level class's DoActions (the washer's 24 s in the video is the walk and
 give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. Two natural laps differ from

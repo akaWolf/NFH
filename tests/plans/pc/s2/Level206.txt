@@ -14,6 +14,7 @@ take FleaBlanket IT2_Fleablanket       # Zone04 in a Mother sleep
 usewith Weights IT2_Fleablanket        # Zone02: 30 at his next weights
 take DentureAdhesive IT2_Kukident      # Zone04 (a Mother sleep; the take clicks into the PC's game)
 usewith DynamiteBox IT2_Kukident       # Zone03: 20 at his next dynamite
+park Zone02                            # the way down to Zone01 round the ring: the Mother's deck chair room (Zone04) is his too at the time
 usewith Harpoon IT2_Rubber             # Zone01, last: the pair's 30 + 20 + 15 on his next pad
 usewith LaunchPad IT2_Rabbit
 await DeckChair 0
