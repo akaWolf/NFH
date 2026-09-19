@@ -128,21 +128,25 @@ The Season 2 laps under the profile (2026-09-24: the walk, the stays, the
 routes and the catch by GameLogic.dll; idle runs, the lap period on the
 neighbour's first station, ~/nfh-bench/runs/idle5s2): against the code's lap
 model (tools/pcref/lap_model_s2.py) 203 99.5 s / 105, 208 82.5 / 85.5, 209
-100.8 / 104, 211 80.8 / 85, 212 119.4 / 124, 213 126.6 / 123, 214 85.3 /
+100.8 / 105, 211 80.8 / 85, 212 119.4 / 124, 213 126.6 / 123, 214 85.3 /
 90.3 (its Mother's script and the pistol's poll carried 2026-09-23), 202
 81.7 / 80.7 plus his wait at the shore for Olga's sub (its mat and swim
 carried the same night: docs/PC_FIDELITY.md "202's mat and swim"; the
-video's 70 and 90-94; 60.2 before, on the video's stays) and 210 98.7 / ~101
+video's 70 and 90-94; 60.2 before, on the video's stays), 210 98.7 / ~101
 (its call carried 2026-09-24, "210's call": the model's walks on the PC's
 rooms are 62.8 s where the port's are 53.4, and her checks quantize the lap;
-the video's first lap 107, 86.8 before on the video's stays) and 205 101.6 /
+the video's first lap 107, 86.8 before on the video's stays), 205 101.6 /
 111.9 (its table carried 2026-09-24, "205's table": the model's walks are
-63.5 s, the video's lap 102; 116.2 before with the mobile's mat scene) —
-within 6 % but 205's −9 %;
+63.5 s, the video's lap 102; 116.2 before with the mobile's mat scene), 207
+100.0 / 106.0 (its board carried 2026-09-24, "207's board": the video's 107;
+109.3 before on the video's stays) and 204 84.3 / 92.8 (its stays the code's
+since the same day, "204's stays": the video's 81; 79.2 before) — within 6 %
+but 204's and 205's −9 %, whose videos sit with the port;
 209, 212 and 213 moved when the stays the walk writer had dropped since the
 routes came back (102.7, 125.2 and 125.3 before, "The overlay writers'
-shared patches"). Against the video on the levels the code does not close
-204 79.2 / 81, 207 109.3 / 107. 201 (the tutorial) and 206 (his waits on the Mother) have no free lap.
+shared patches"); 209's model is 105 since the anims parser gives the
+fakir his `spit` (18 ticks). 201 (the tutorial) and 206 (his waits on the
+Mother) have no free lap.
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,

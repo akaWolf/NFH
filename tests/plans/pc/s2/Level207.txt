@@ -1,11 +1,14 @@
-# Level207 under the PC profile (v6, 2026-09-23, the Season 2 walks, routes and catch by code): his lap is ~98 s — the board
-# (the pool, Zone04) 10-22, the bar and the elephant (Zone03) 22-54, the shell (Zone02) 54-72, the castle and
-# the towel (Zone01) 72-98 — and the Mother sleeps in the pool 19 s a lap (5-25, 60-79, 115-134, 169-189,
-# 224-243) and swims between. Woody waits out his lap-2 beach crossing (168-194) in the beach chair and primes
-# the bartender while he is on the board (200-221) by the beach's stairs; the awning waits for his lap-3 bar
-# visit (228-260), the tap and the elephant for his shell after it (260+). Under the PC catch the Mother
-# in her deck chair or the pool is out of sight (flag 4) for a dozen seconds at a time: the tap goes at
-# once after his lap-4 bar visit, the elephant straight after it.
+# Level207 under the PC profile (v7, 2026-09-24: the Season 2 walks, routes and catch by code
+# and 207's board by code): his lap is ~100 s — the board (the pool, Zone04: 14, the dive once
+# the Mother sits in her deck chair), the bar and the elephant (Zone03) 27-50, the shell
+# (Zone02) 60, the castle and the towel (Zone01) 78-100 — and the Mother bathes 20 s in the
+# pool and sleeps 20 in her chair, where she stays while he is in the pool room. The first
+# spring pays at his lap-2 board (122) and unlocks the awning; Woody waits in the beach chair,
+# arms the awning while he is at the bar (151), primes the bartender and takes the ice bucket
+# while he is at the shell (169-171) and fills the bucket at the tap (185); the elephant goes
+# after his lap-3 visit, the shell, the towel, the castle and the second spring after theirs:
+# the elephant (352), the shell (372), the castle with the towel and the extra coin (398) and
+# the board with the awning (442), the collapse (runs/p207b: 100 at 441.7 s).
 # Level207 — TotalTricksCount 7 (winning 5); every S2 TrickScore is 0.
 # Routine (Rottweiler2): PoolBoard (Zone04) -> Bartender, Elephant (Zone03)
 # -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); Mother on Zone04,
@@ -22,22 +25,18 @@ take Moped IT2_Spring
 usewith PoolBoard IT2_Spring      # the first tricked use unlocks the awning (lap 1)
 await PoolBoard 0
 take Moped2 IT2_Pedal             # KeepFull
-take Whisky IT2_Whiskey           # Zone01, his again from 168
-hide BeachChair                   # Zone01: he crosses the beach (168-194) on his way to the pool
-whenusing PoolBoard               # (200) he is on the board until ~221: the bar is free until 228, his beach zone until ~278
-park! Zone02                      # the way to the bar by the beach's stairs, not through the pool he stands in
+take Whisky IT2_Whiskey           # Zone01
+hide BeachChair                   # Zone01: he crosses the beach on his way to the pool
+whenzone Zone03                   # (131) his lap-2 bar visit: the awning is unlocked since the board paid
+usewith! PoolAwning IT2_Pedal     # Zone04 while the Mother is in her chair or the pool
+park! Zone01                      # (156) his beach zone is free until ~182
+whenzone Zone02                   # (161) he is at the shell: the bar is free until ~231
 prime! Bartender IT2_Whiskey      # Zone03
 take! IceBucket IT2_Bucket_empty  # Zone03
-park! Zone02                      # out of the bar before he comes (228)
-park Zone01                       # the beach, next to the pool's own stairs
-whenzone Zone03                   # (228) his lap-3 bar visit: the Mother sleeps in the pool zone 224-243, the awning is unlocked since the board paid
-usewith! PoolAwning IT2_Pedal     # Zone04 (~235): before her look (243)
-park! Zone01                      # (~240) his beach zone is free until ~278
-whenzone Zone02                   # (260) he is at the shell
-whenusing Elephant                # (~349) his lap-4 bar visit
-whenzone Zone02                   # (~371) his lap-4 shell: the bar is his again only at ~446
-prime! Tap IT2_Bucket_empty       # Zone04 at once: the Mother is in her deck chair or the pool (flag 4) a dozen seconds more
-usewith Elephant IT2_Bucket       # Zone03: action [2]
+prime Tap IT2_Bucket_empty        # Zone04 (185): the Mother in her chair or the pool, he at the castle
+whenusing Elephant                # (242) his lap-3 elephant
+whenzone Zone02                   # (261) his lap-3 shell: the bar is his again only at ~331
+usewith Elephant IT2_Bucket       # Zone03: action [2] — at his lap-4 elephant (352)
 take BBQ IT2_Bbqtongs
 unlock CrayFish IT2_Bbqtongs
 take CrayFish IT2_Crayfish

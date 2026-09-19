@@ -1493,7 +1493,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   guarded table shows, then plays `play` (51 ticks), whose behavior="sun"
   sends Olga back; then the skis (0x100251eb: `skiing`, 208 ticks, the
   ride's translations; 0x10024e37: the gait 5, skiwalk, back to the ski
-  and `putski`, which has no animation and lasts nothing), the chef
+  and `putski`, 7 ticks), the chef
   (`cut_eel`, `eat_eel`), the rocket (`ignite`), the sand lion
   (`lookaround`, `kick`; the kid's `dirt` and `build` are the kid's own
   sequences) and the mat again. Olga's script answers `pingpong` on her
@@ -1513,13 +1513,60 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   0.67, the sun loop 7.58, the wake-up 2.83), his Tennis held until her
   table use has begun and played for the `play` (PCWaitFor `at` start,
   4.25 s; `abort`: her table mutex ends as it starts), and his stays the
-  code's (the ride 17.33 and the put 0, the chef 7.25, the rocket 2.17, the
-  lion 7.08; tools/pcref/lap_model_s2.py now reads the wait element, a
+  code's (the ride 17.33 and the put 0.58, the chef 7.25, the rocket 2.17,
+  the lion 7.08; tools/pcref/lap_model_s2.py now reads the wait element, a
   step in phases — the mat's `talk`, then its wait — and a level's own
-  actor record over the generic one). The idle lap is 101.6 s against the
+  actor record over the generic one; the put's 0 of the first carry was the
+  anims parser's: an empty `<animation … />` or `<object … />` took the
+  next one's frames, which it gives back since — `putski` 7 frames, 204's
+  gong 42 and jade dummy 45, 211's ladder 51, 209's fakir `spit` 18 in the
+  model's lap). The idle lap is 101.6 s against the
   video's 102 (116.2 before; the model with the PC's walks 111.9). The v3
-  plan rates 100 under it (runs/p205a: 338.0 s, the pile on lap 3); its
+  plan rates 100 under it (runs/p2045: 337.2 s, the pile on lap 3); its
   notes were re-timed (v4).
+- *207's board (2026-09-24).* The neighbour's script (GameLogic.dll): the
+  board step 0x100169c5 walks him onto the diving board and plays `wait`,
+  re-run each tick, until the Mother's current object is her deck chair
+  (fcn.10049190 against pool_deckchair), then `dive` (54 ticks) into the
+  pool (its `enter`, 0 ticks), whose `leave` (16) the bar step's walk plays;
+  then the bar's `order_drink` (90), the elephant (`lookaround` 43,
+  `spit_at_elefant` 83), the shell on Olga's mat (`shell` on the guarded
+  mat, 68), the kid's castle (`lookaround`, his `splash` on the kid, 50)
+  and his towel (the mat's `enter`, a bar of 120, its `leave`). The
+  Mother's script bathes in the pool (0x100140af: its `enter`, m_enter 41,
+  a bar of 200) and sleeps in the chair (0x1001447d: sitdown 9, a bar of
+  240); her check 0x100141e0 at the chair bar's end keeps her there while
+  his room pointer is the pool (fcn.10040a7d, none mid-pass) and else
+  sends her to the pool again (the chair's getup 16, the pool's m_leave 50
+  on the way). The mobile's pair: Level207MotherBehavior prefixes his
+  board sets with WaitWatch as she enters the pool ladder and releases it
+  at frame 49 of her ladder leave, and her DeckChair and PoolLadder uses
+  cycle by themselves. Carried under the profile: the board's sets keep
+  their WaitWatch and it is released as she sits in the chair (her
+  DeckChair use), her chair's last sleep is held while he is in the pool
+  room (the behaviour's PC arm), her clips at the code's ticks
+  (PCClipSecondsRole: the sit 0.75, the sleeps 6.67 each, the get-up 1.33,
+  the ladder's enter 3.42, the swims 8.33, the leave 4.17), his board per
+  clip (the dive 4.5, the get-out 1.33) and his stays the code's (the bar
+  7.5, the elephant 10.5, the shell 5.67, the castle 7.75, the towel 10.92;
+  tools/pcref/lap_model_s2.py LAP_START 0x100164ee with Olga's mat shown,
+  LAP_PRESENT). The idle lap is 100.0 s (109.3 on the video's stays, whose
+  towel was 0.8 s); the model with the PC's walks 106, the video 107. 207
+  was re-planned (v7): the bartender, the ice bucket and the tap during
+  his lap-2 shell and castle, the pile on lap 4 and the board with the
+  awning on lap 5 — 100 at 441.7 s.
+- *204's stays (2026-09-24).* His script is a chain but for one message:
+  the gong step 0x10031e1d plays the gong's `use` — the elvis figure's
+  hit_gong, 42 ticks, whose behavior="gong" is on him — and waits in the
+  idle step 0x10031b70 until his handler (0x10033236) sends him on to the
+  gong's `leave` (0x10032f52); then the hot dog (`lookaround` 43, `use` 16),
+  the jade dummy's `look` (45), the rickshaw Olga sits in (`use`, pull, 70)
+  and the headbanger (`use`, 51). Olga's script only enters the rickshaw
+  and waits in it. His stays are the code's (tools/pcref/lap_model_s2.py
+  LAP_START 0x10032f52): the hot dog 4.92, the jade 3.75, the kart 5.83, the
+  karate 4.25, the gong 3.5 (the video's had the kart at 1.0); the idle lap
+  is 84.3 s, the model with the PC's walks 92.8, the video 81. The plan
+  still rates 100 (the pile on lap 4: 100 at 314.6 s).
 - *The overlay writers' shared patches (2026-09-24).* tools/pcref/
   pc_walks_s2.py rebuilt its keys (PCPass, PCApproach, PCRoom) by dropping
   every patch that carried them, pc_catch_s2.py its PCHideout likewise, and

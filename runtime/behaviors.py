@@ -879,14 +879,91 @@ class Level206RoutineBehavior(Behavior):
 class Level207MotherBehavior(Behavior):
     """Level207MotherBehavior.cs: the Mother on the pool ladder swaps the
     pool board's use sets to the WaitWatch-prefixed versions, and frame 49 of
-    her leave releases the neighbour's infinite wait and restores them."""
+    her leave releases the neighbour's infinite wait and restores them.
+
+    Under the PC profile the pair is the PC's scripts (GameLogic.dll): his
+    board step 0x100169c5 plays `wait`, re-run each tick, until the Mother's
+    current object is the deck chair (fcn.10049190 against pool_deckchair),
+    then dives — the board's sets keep their WaitWatch, released as she sits
+    in the chair; her check 0x100141e0 at the end of her chair's bar keeps her
+    in it while he is in the pool room (fcn.10040a7d against `pool`) and then
+    sends her to the pool — her last sleep held until he has left."""
 
     def __init__(self, world, d):
         super().__init__(world, d)
         self.poolboard = self.item('Poolboard')
         self.aux = False
+        self._pc_check = False           # her get-up began: the PC check runs
+        self._pc_holding = False         # she stays in the chair for him
+        if pcprofile.is_pc() and self.poolboard is not None:
+            self._wait_sets()
+
+    def _wait_sets(self):
+        """the board's WaitWatch-prefixed sets (cs:9-30)"""
+        self.poolboard.use_anim['Rottweiler'] = [
+            'WaitWatch', 'PoolDive', 'PoolGetOut']
+        self.poolboard.use_tricked_anim['Rottweiler'] = [
+            'WaitWatch', 'PoolSpring', 'PoolAwningFall', 'PoolGetOut']
+        self.poolboard.use_tricked_linked = [
+            'WaitWatch', 'PoolSpring', 'CrashMother']
+
+    def _mother(self):
+        return self.world.pawns.get('Mother')
+
+    def _chair_use(self):
+        """the Mother sits in her deck chair: her routine's use of it"""
+        m = self._mother()
+        r = self.routine_of(m) if m is not None else None
+        return r is not None and r.urgent_item is None and r.state == r.USING \
+            and r.item is not None and r.item.name == 'DeckChair'
+
+    def _in_pool_room(self):
+        """he is in the pool room: his PC room pointer the board's zone"""
+        rott = self.rott()
+        z = rott.pc_room() if rott is not None else None
+        return z is not None and self.poolboard is not None \
+            and z.pid == self.poolboard.zone
+
+    def update(self, dt):
+        if not pcprofile.is_pc() or self.poolboard is None:
+            return
+        m = self._mother()
+        if m is not None and self._pc_check:
+            self._pc_check = False
+            a = m.anim.anim
+            if a is not None and a.name == 'MotherGetUpPillow' \
+                    and self._chair_use() and self._in_pool_room():
+                # the check at the bar's end found him in the pool room: she
+                # sleeps on, the get-up queued behind the held sleep
+                m.anim.seq = ['MotherGetUpPillow']
+                m.anim.seq_index = 0
+                m.anim.hold_clip = 'MotherSleepLoop'
+                m.anim.play_single('MotherSleepLoop')
+                self._pc_holding = True
+        if m is not None and self._pc_holding:
+            a = m.anim.anim
+            if not self._chair_use() or a is None or a.name != 'MotherSleepLoop':
+                self._pc_holding = False            # cut elsewhere
+                m.anim.hold_clip = None
+            elif not self._in_pool_room():
+                self._pc_holding = False            # he has left: the pool
+                m.anim.hold_clip = None
+                m.anim._stop_single()
+        rott = self.rott()
+        if rott is not None and rott.anim.anim is not None \
+                and rott.anim.anim.name == 'WaitWatch' \
+                and self.action_item('Rottweiler') is self.poolboard \
+                and self._chair_use():
+            # his board step sees her in the chair: the dive, at once
+            rott.anim.ignore_infinite = True
+            rott.anim.ignore_infinite_once = True
+            rott.anim._stop_single()
 
     def play_animation(self, name):
+        if pcprofile.is_pc():
+            if name == 'MotherGetUpPillow':
+                self._pc_check = True
+            return
         if name == 'MotherPoolLadderEnter' and self.poolboard is not None:
             self.poolboard.use_anim['Rottweiler'] = [        # cs:9-30
                 'WaitWatch', 'PoolDive', 'PoolGetOut']
@@ -898,6 +975,8 @@ class Level207MotherBehavior(Behavior):
             self.aux = True
 
     def on_advance_frame(self, idx):
+        if pcprofile.is_pc():
+            return
         if self.aux and idx == 49:                    # cs:38-59
             self.aux = False
             rott = self.rott()

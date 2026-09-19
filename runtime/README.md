@@ -667,6 +667,11 @@ predicate, then the all-tricks win.
   (`World.play_use_item_anim`: Olga's mat). A wait with `abort` fires the
   use's PawnToAbortMutexOnFinish at its release (his play: Olga's table
   mutex ends as it starts).
+- **The PC profile's 207 board** (`Level207MotherBehavior`): the board's
+  sets keep their WaitWatch, released as the Mother sits in her deck
+  chair (her DeckChair use); at her get-up — the end of her chair's bar,
+  the PC's check — she sleeps on while he is in the pool room (his PC
+  room the board's zone), the get-up queued behind the held sleep.
 - **The PC profile's 210 check** (`MotherWakeSleepBehavior`): her look's
   start is the PC's check at her nap's end — he in his chair: the look
   held until his `pc_flag4` clears, then her get-up and call; else the

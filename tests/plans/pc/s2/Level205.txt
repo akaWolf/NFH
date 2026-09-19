@@ -10,9 +10,9 @@
 # 25, 40, 65, 87 and 99.97 at the sculpture — three hundredths short). Each trick
 # is armed after its previous visit: the skis, the rockets and the sculpture
 # during his lap-3 Zone02 stay (204-218), the egg once he has left the table, the
-# eels before his lap-3 chef — the skis pay at 249, the chef 281, the rockets
-# 298, the sculpture 312 and the tennis 338, the collapse (runs/p205a: 100 at
-# 338.0 s).
+# eels before his lap-3 chef — the skis pay at 249, the chef 280, the rockets
+# 297, the sculpture 311 and the tennis 337, the collapse (runs/p2045: 100 at
+# 337.2 s).
 unlock DuckCage                   # Dexterity, DexterityUnlocker IT_NONE
 take DuckCage IT2_Egg
 take HammerNails IT2_Tools
@@ -24,10 +24,10 @@ prime LionStatue IT2_Glasses      # -> IT2_Lionhead
 take Anchor IT2_Rope
 whenzone Zone02                   # (204) his lap-3 mat and tennis: Zone01's three
 usewith! WaterSkiis IT2_Tools     # Zone01: Primed at load, RottweilerUseTogglesPrime, no RequirePriming — 30 at 249
-usewith! Rockets IT2_Rope         # Zone01: action [5] — 30 at 298
-usewith! SandSculpture IT2_Lionhead   # Zone01: action [6] — 20 at 312
-usewith TabbleTennis IT2_Egg      # Zone02 once he has left it (218): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-4 tennis (338), the coin AFTER the sculpture
-usewith Eals IT2_Tube             # Zone04: SetTrickedOnItem -> Chef — 40 at 281
+usewith! Rockets IT2_Rope         # Zone01: action [5] — 30 at 297
+usewith! SandSculpture IT2_Lionhead   # Zone01: action [6] — 20 at 311
+usewith TabbleTennis IT2_Egg      # Zone02 once he has left it (218): action [1], PawnToAffectWhenTricked Olga — 25 at his lap-4 tennis (337), the coin AFTER the sculpture
+usewith Eals IT2_Tube             # Zone04: SetTrickedOnItem -> Chef — 40 at 280
 await TabbleTennis 0
 await WaterSkiis 0
 await Chef 0
