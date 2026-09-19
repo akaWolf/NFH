@@ -1,45 +1,56 @@
-# Level214 under the PC profile (v3, 2026-09-24: the Season 2 walk by code — the out run
-# stood, the passes and the floor at the PC's ticks, the door claim). His lap is ~92 s — the
+# Level214 under the PC profile (v4, 2026-09-24: the tricked visits by code — the hatch's
+# tricked step is the PC's fall, leave and close, 10.8 s and SHOUT 0). His lap is ~92 s — the
 # shower (Zone01), the bouquet (Zone04), the captain's door and the pistol (Zone03), the
 # hatch (Zone02) — and the Mother's is locked to his pistol: its `standup` puts her to sleep
 # in her chair (Zone03) for 50 s, then she walks to the reling (Zone02) for 6.7 s and back
-# to sit awake until his next pistol (he waits there for her). Zone03 is safe while she
-# sleeps and he is away; Zone02 is free between his hatch and her reling walk, the only way
-# out of it the Zone01 door once he is on his way up to Zone04 — Woody goes as he stands out
-# his `in` run at the stairs (107) or climbs them (202). The hatch goes twice, the fish into
-# the bouquet after the second fall; the deck chair at once while she sleeps and he showers
-# (460); the door, the mug, the wheel and the ammo at once after his next pistol, so the
-# wheel's 80 (592) and the pistol's 40 (616) pay on one lap — the collapse (runs/rp214d: 100
-# at 615.7 s).
+# to sit awake until his next pistol (he waits there for her). The tricked hatch keeps him
+# in Zone02 until ~13 s before her reling walk comes in, too short for the shards round, so
+# the round waits a lap: Woody hides in the deck chair by the Zone03 stairs (the level's one
+# hideout) and comes down once he has left Zone02 after his untricked lap-2 hatch, she
+# asleep; out into Zone01 as he climbs to Zone04. After the second fall the hatch is off his
+# round (HatchFixBehavior's second pass: RemoveActionByIndex(4)) and the fish and the bouquet
+# wait in the chair for the laps' windows — he down at the shower, she asleep after his
+# pistol; then down to the shower deck for the bucket and the cloth as he climbs to his
+# bouquet. The door, the mug, the wheel and the ammo at once after his next pistol, so the
+# wheel's 80 and the pistol's 40 pay on one lap — the collapse (runs/sw10s2: 100 at 796.6 s).
 take Carpet IT2_Carpet                 # Zone01
 take Ammo IT2_Ammo                     # Zone01
 usewith Hatch IT2_Carpet               # Zone02 (HatchCarpet; LinkedItemTrick HatchFish) — before his first Hatch visit (78)
-await Hatch 0                          # his first fall (84): his first Fix turns the hatch into its dexterity round (HatchFixBehavior, Item.cs:2550-2570)
-take Shards IT2_Shards                 # Zone03 while the Mother sleeps (~50-101) and he is at the shower (86)
-unlock! Hatch IT2_Shards               # Zone02 at once (103): he has left it, her reling walk comes at ~111
-whenanim Rottweiler Stand_Left         # (107) his `in` run at the stairs up to Zone04 ...
-park! Zone01                           # ... through the Zone01 door behind him
-await 2                                # his second fall (177): the angry's ShowObjects activates the fish, the second Fix writes the hatch off
+await Hatch 0                          # his first fall (79): his first Fix turns the hatch into its dexterity round (HatchFixBehavior, Item.cs:2550-2570)
+take Shards IT2_Shards                 # Zone03 while the Mother sleeps (~50-100) and he is at the hatch
+hide! DeckChair                        # Zone03, by the stairs down: out of sight through her waking, her reling walk, his door and his pistol
+whenusing Pistol                       # (148) his pistol: she sleeps 50 s
+whenusing Hatch                        # (176) his untricked lap-2 hatch
+whenzone Zone01                        # (187) he has left Zone02 for the shower
+unlock! Hatch IT2_Shards               # Zone02: the shards round, she asleep upstairs (204)
+park! Zone01                           # (207) out through the Zone01 door as he climbs the stairs to Zone04, before her reling walk comes into Zone02 (~209)
+await 2                                # his second fall (267): the angry's ShowObjects activates the fish, the second Fix writes the hatch off
 activated HatchFish
-take HatchFish IT2_Fish                # Zone02 once he has left it (195)
-whenanim Rottweiler Walk_Up            # (202) his climb from Zone01 to Zone04 ...
-park! Zone01                           # ... Zone02's only way out before her reling walk comes in
-usewith Bouquet IT2_Fish               # Zone04 once he has left it for the door (231): his next bouquet pays (296) and sends Olga to the shower
+hide! DeckChair                        # (in it since the fall) out of sight through her reling walk, his bouquet, door and pistol
+whenusing Pistol                       # (335) his pistol: she sleeps 50 s; the hatch is off his round now
+whenzone Zone01                        # (362) he has come down past Zone02 for the shower
+take! HatchFish IT2_Fish               # Zone02, from the chair by the stairs (371)
+hide! DeckChair                        # back in the chair while she sleeps
+whenusing Pistol                       # (414) his next pistol
+whenzone Zone01                        # (448) down for the shower again
+usewith! Bouquet IT2_Fish              # Zone04 by the Zone03 door (456): his bouquet that lap pays and sends Olga to the shower
+park! Zone02                           # down by Zone03's stairs before she wakes (~464), off his way up to the bouquet
+park! Zone01                           # (470) as he climbs to Zone04 (his hop's room none), before her reling walk comes into Zone02 (~476): the bucket and the cloth are here
 activated Washbucket                   # her OlgaShipShowerSwiffer pose activates the bucket (WashbucketBehavior.cs:22-29), her Idle pose the cloth (cs:33-36)
 activated Cloth
-take Cloth IT2_Swiffer                 # the glass wants the swiffer
-usewith Glass IT2_Swiffer              # Olga's glass: the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
-usewith Washbucket IT2_Fish            # Zone01: ActivateItemTrick -> Shower (his BucketCrash) at his next shower (453)
-take Handbag IT2_Pills                 # Zone03 while she sleeps (443)
+take Cloth IT2_Swiffer                 # the glass wants the swiffer (513)
+usewith Glass IT2_Swiffer              # Olga's glass (551): the bird flees when it is tricked (BirdMovementBehavior.cs:96-107)...
+usewith Washbucket IT2_Fish            # Zone01 (561): ActivateItemTrick -> Shower (his BucketCrash) at his next shower
+take Handbag IT2_Pills                 # Zone03 while she sleeps (627)
 take Mat IT2_Code                      # Zone03, the same visit
 activated BirdDead                     # ...and dies two seconds after its tricked flight (cs:149-156)
-take BirdDead IT2_Key                  # Zone04
-hide! DeckChair                        # Zone03 at once (460), she asleep in hers and he at the shower: he comes up through Zone04 for the door
-whenusing Pistol                       # (501) his pistol: she sleeps 50 s, he leaves Zone03 for the shower
+take BirdDead IT2_Key                  # Zone04 (637)
+hide! DeckChair                        # Zone03 at once (644), she asleep in hers and he at the shower: he comes up through Zone04 for the door
+whenusing Pistol                       # (684) his pistol: she sleeps 50 s, he leaves Zone03 for the shower
 usewith CaptainDoor IT2_Key            # Zone03: CaptainDoorBehavior (Item.cs:2606-2623) opens the two DoorBack
 usewith CaptainMug IT2_Pills           # Zone05: ActivateItemTrick Captain (the drugged captain); ActivateItemAfterUsingObject CaptainWheel
-usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash): his next door step goes up to the wheel (the 80 at 592)
-usewith Pistol IT2_Ammo                # Zone03, the same window: his pistol after the wheel (616) — 40 on the wheel's 80, the collapse
+usewith CaptainWheel IT2_Code          # Zone05 (SteeringCrash): his next door step goes up to the wheel (the 80, ~776)
+usewith Pistol IT2_Ammo                # Zone03, the same window: his pistol after the wheel (797) — 40 on the wheel's 80, the collapse
 await Shower 0
 await Bouquet 0
 await CaptainWheel 0
