@@ -679,8 +679,8 @@ predicate, then the all-tricks win.
   the record's PCLaugh standing in), a freakout (3.08 / 3.17 / 5.25) once
   the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
   fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
-  -1 is a flow with no SHOUT anywhere (210's dog basket, 212's ledge
-  alone, 213's live bull, 214's door): the angry set is skipped.
+  -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
+  set is skipped.
 - **The PC profile's co-actor hit** (PCHitSeconds, `World.pc_affect_early`,
   `Routine._hit_begin`): the action's behavior fires as his tricked use
   starts (GameLogic's actions fire theirs at the start), so Olga or the
@@ -697,6 +697,22 @@ predicate, then the all-tricks win.
   his resumed angry set at the billboard's (`rott_extra_angry`), whose
   coin pays there and books its completion then (`Item.pc_extra_due`:
   the PC's done count is its records, so the level ends at the resume).
+- **The PC profile's 206 pad** (`Level206RoutineBehavior._pc_gate`,
+  `Item.pc_masked`, `Routine.pc_skip_next`, `World.pc_s2_extra_credit`):
+  the pad's and the harpoon's visits counted in the lap round's order (the
+  mobile's LaunchPad, Harpoon, LaunchPad, Harpoon, LaunchPad = GameLogic's
+  load, take, shoot, put and Fifi's take); a rabbit on at the load arms the
+  shot (the load step's IfVariant, 0x1002e3df) and the pad fires at the
+  shoot (PCTrickArm), its other visits and the harpoon's take under an
+  armed pad playing plain — `pc_masked` makes the visit read untricked
+  (`is_tricked`, the use dispatch's early plain return, the raw reads of
+  `_use`), cleared at the visit's end; the harpoon alone fires at its
+  take (PCTrickFire) and the routine then passes the shoot (0x1002da29
+  goes on to the put); a rubber still on at the put is dropped (`_fix`,
+  the put step's switch back); the linked shot's third record — the
+  ExtraCoin206 — pays and books its completion at its own tick
+  (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is off under the
+  profile (the PC's shoot step asks nothing).
 - **The PC profile's per-visit move**: PCApproach `txt` may be a list,
   one move per visit (201's soaped puddle, [200, -100], the slips' two
   sides; `Routine._pc_arrived`).

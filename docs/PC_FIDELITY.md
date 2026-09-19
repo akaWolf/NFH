@@ -1623,8 +1623,55 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   13.0/1/-/8.33 (the flea blanket: Olga's laugh on the manipulated
   dumbbell) and dynamite 13.83/1/-/8.5 (the adhesive's bag taken, then
   0x1002c550's lookaround and the reling's explode); 210's dog basket
-  alone, 212's parrot ledge alone, 213's live bull and 214's captain's
-  door play no SHOUT anywhere in their flow (PCShout -1: no reaction).
+  alone plays no SHOUT anywhere in its flow (PCShout -1: no reaction);
+  214's captain's door is visited tricked in neither game (the mobile's
+  CaptainDoorBehavior swaps his routine's door for its ExtraItem,
+  Item.cs:2606-2623; the PC's door step goes on up to the wheel) and its
+  40 is paid nowhere. Two flows the walker had read short (later the same
+  day): 213's live bull — the limberwall step tests its own byte +0x28
+  through the step object reloaded into eax (0x10038ab1; the constructor
+  clears it, 0x10038cf4, the charge sets it, 0x10038c18), which the walker
+  had left unknown: the first visit with the flowered bull charges him into
+  the wall (the horseshoe's and the bull's `inv`, the limberwall's `crash`
+  with its record limberwall at 66, the beehive shown, SHOUT 3), 8.58/3/-/
+  5.5, the mobile's 20 the record's; 212's parrot ledge — the level's aux
+  script (me_c1's `aux`: the factory 0x10034dba registered at 0x1001265b,
+  its update 0x10034fec) has the fed parrot eat (parrot_manip's `use`,
+  actor aux) and shows its shit on the ledge (fcn.10034e05; the show
+  element built at 0x10034f09 by fcn.10014cf7, vtable 0x100ab978) before
+  his visit finds it (0x10035577): the crash on it (cliffcrash, the record
+  shit at 5), 7.75/0/-/0.42, and with the boat 9.75/2, the boat's record
+  at 3.25 (lap_model_s2 AUX_UPDATE; 208's and 210's aux updates leave the
+  tricked scenes as they are — 210's drains the pool after the valve's
+  tongs, a combination with trick="false" the mobile has no item for).
+  206's rabbit on the launch pad (lap_model_s2 TRICKED_ARM): the load step
+  0x1002e3df asks IfVariant ramp / ramp_manip — the rabbit on the ramp at
+  the load arms the shot, which follows the harpoon's take (0x1002e27f,
+  whose IfVariant harpoon / harpoon_manip picks shootrabbit, 81 ticks,
+  harpoon_fifi at 49, or with the rubber rubberrabbit, 73: harpoon_fifi
+  40, harpoon_rubber 45, rubberrabbit 50); the shot's behavior fifi_crash
+  sends the Mother to him and his being_hit step 0x1002de6a waits for her
+  fight's latch ([step+0x24], fcn.10013269) before SHOUT 1 and the ramp's
+  repair (19 ticks, 0x1002dbc4). The lap's shoot step 0x1002d948 asks
+  nothing, so a rabbit put on after the load waits for the next load;
+  without it the take step's rubber branch shoots the rubber bear at once
+  (0x1002da29: 69 ticks, harpoon_rubber at 40, SHOUT 1) and goes on to the
+  put past the shoot step, and the put step switches a manipulated harpoon
+  back (0x1002d578: a rubber put on after the take is gone). The mobile
+  fires the pad at its first visit after the trick and lets the plain pad
+  shoot the tricked harpoon (harpoonAux, TrickItem.cs:896-902). Carried:
+  Level206RoutineBehavior's PC arm counts the pad's and the harpoon's
+  visits of the lap round (the mobile's LaunchPad, Harpoon, LaunchPad,
+  Harpoon, LaunchPad are the rows load, take, shoot, put and Fifi's take)
+  and plays the pad's other visits and the harpoon's take under an armed
+  pad plain (Item.pc_masked); the pad fires at the shoot after an armed
+  load (PCTrickArm [1, 2]: 6.75/1/1.58/4.08, linked 6.08 with the records
+  at 3.33, 3.75 and 4.17 — PCExtraPaysAtLinked, the ExtraCoin206 and its
+  completion at its own tick — and the Mother's fight, PCHitSeconds 3.25),
+  the harpoon alone at its take (PCTrickFire [1, 2]: 8.75/1/-/6.33 with
+  the walk to the ramp, 20 ticks; the routine passes the shoot,
+  Routine.pc_skip_next) and a rubber still on at the put is dropped;
+  harpoonAux is off under the profile. 206's plan awaits the count 6.
   The co-actor's hit: 204's rickshaw 3.67/0, 207's shell 4.67/0, 214's
   shower 4.0/1, bouquet 4.17/1 and pistol 18.33/0 (the shot and the
   Mother's `die`), 210's elephant 9.08/1 — his action's behavior (204's
@@ -1652,23 +1699,20 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   done count is its records, so the level ends there — 207's plan awaits
   the count 7), PCShoutLinked 2; the castle's own amount is the PC's 20
   (the mobile's 40 was its linked total's share). Open, with numbers:
-  206's rabbit on the launch pad fires at the pad's shoot visit in the PC
-  (the load with the manipulated ramp hands over to 0x1002e27f — the
-  harpoon, then 0x1002df9b's shootrabbit, 81 ticks, harpoon_fifi at 49,
-  then 0x1002de6a's SHOUT 1, the Mother's run to the ramp 0x1002bbd1) and
-  at the pad's first visit after the trick in the mobile (FifiFire): the
-  pad and the harpoon keep PCLaugh and the untricked stays; 211's Olga
-  plays her `mad` (34 ticks) at the women's wc while he shouts, the port's
-  hits him (the mobile's Toilet211Behavior sets her on him) before his
-  SHOUT, and the wcright record pays at the reaction, 13 ticks after the
-  PC's; the tricked flows of 212's ledge alone, 213's live bull and 214's
-  door hold no record — the mobile's amounts (15, 20, 40) are kept; 210's
+  211's sweets — after the puke the PC's Olga plays her `mad` at the
+  women's wc (34 ticks, her puke handler 0x100318ce) and fights him (her
+  step 0x1003183a, 42 ticks; olga_fight sets his step's latch +0xd,
+  0x100301fb) before his SHOUT 1 (0x10030d0f) and the sign's repair; the
+  port, as the mobile, loses the after-toilet angry (StopUrgentAction reads
+  the interrupted action's item, ActionManager.cs:597 — the fishing rod by
+  then), and the wcright record pays with the sweets' own, 1.25 s into the
+  sweets' stand, not 27 ticks into the puke; 210's
   TurbanShop 27 and 213's Tortilla 15 and PlantCarnivore 15 + PCExtraCoin
   20 had been dropped from the overlays by the stays writer of 2026-09-12
   (it replaced its patches' sets) and are back.
-Plans (runs/sw13s2, all 14 at 100; 207's plan awaits the count 7 — the
-  billboard's coin is paid at his resume after Olga's lift, 436.2 s; 214 at
-  792.6 s): 202 v6 piles its chain within one lap, the rail over the pond last (its
+Plans (runs/sw14s2, all 14 at 100; 207's plan awaits the count 7 — the
+  billboard's coin is paid at his resume after Olga's lift, 436.2 s; 206's
+  the count 6, 257.7 s; 212 at 873.6 s, 213 at 398.7, 214 at 792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
   sawfish placed while he is at the shore and in the sea, the swim step's
   flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
   of decay, just over the top (the rail first a lap earlier spreads it over
