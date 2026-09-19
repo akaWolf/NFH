@@ -1,5 +1,6 @@
-# Level208 under the PC profile, for the one overflow the PC scores: the
-# platform pair (50) armed after his lap-2 platform (80 s), the shoe (15)
+# Level208 under the PC profile (v2, the Season 2 routes and catch by code), for
+# the one overflow the PC scores: the platform pair (50) armed after his
+# lap-2 platform (80 s), the shoe (15)
 # after his lap-2 shoe (128), the elephant (30) after 147, the bowl (20)
 # after 157, the tap on a walk-by — all on lap 3 (178-233, peak 96) — and
 # the rake with Fifi LAST: Fifi sends him to the Mother (MotherRott, 20)
@@ -25,7 +26,7 @@ prime AngryElephant IT2_Rat            # Zone01: the DoublePrimingItem arm (Item
 usewith SafetyLine IT2_Chalk_sponge    # Zone01, same visit: ActivateItemTrick -> AngryElephant.Tricked (TrickItem.cs:323-327)
 whenzone Zone03                        # his lap-3 platform (169): Zone04 is free until his bowl (237)
 take Mouse IT2_Rat                     # a second rat: AddInventoryToObject(InventoryToAdd=Mouse) refilled it after the elephant round (Item.cs:1582)
-prime Snake IT2_Rat                    # Zone02: the snake round (Item.cs:1554-1560): SnakeAux208, Snake primed, the held rat becomes IT2_Snake
+prime! Snake IT2_Rat                   # Zone02 (a rush: done before his Zone02 crossing to the shoe machine, ~200): the snake round (Item.cs:1554-1560): SnakeAux208, Snake primed, the held rat becomes IT2_Snake
 usewith ArmsBowl IT2_Snake             # Zone04
 usewith ElectricTap IT2_Cable          # Zone04, NoticeWhenWalkNearby: the ArmsBowl walk passes it, an empty use sequence still runs the stop flow
 use Rake                               # Zone02, bare hand, NoticeWhenWalkNearby — the Rottweiler only enters Zone02 for the Fifi chain below

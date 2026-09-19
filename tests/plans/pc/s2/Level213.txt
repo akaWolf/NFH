@@ -1,4 +1,4 @@
-# Level213 under the PC profile (v9, the Season 2 walks by code): Badinfos' pile on
+# Level213 under the PC profile (v10, the Season 2 walks, routes and catch by code): Badinfos' pile on
 # his lap 3 — the cement at the end of his lap 2 (~245), then the bull (~258), the
 # plant (~277), the tortilla (~288), the picnic (~305), the pinata (~333) and the
 # bull ride (~344), where the gauge tops. His lap is ~127 s and the Mother's round
@@ -9,7 +9,9 @@
 # (110-139), arms the bull and the cement (Zone04) and the plant and the tortilla
 # (Zone03) once she is back in Zone02 (182), the picnic when she has left it
 # (210), the controls when he has left the beach (241), and the wasp and the
-# pinata after the bull's coin (258).
+# pinata after the bull's coin (258). Woody's runs up and down to his items' PC
+# hotspots (the skeleton's 151 px) leave him on the beach too late for the
+# statue before her Zone03 crossing (67-71): he waits it out in Zone04.
 take CementBag IT2_Cement              # Z03, where Woody starts
 take Chili IT2_Chili                   # Z02, before the Mother (39) and him (49)
 take Jar IT2_Jar_empty                 # Z04
@@ -17,7 +19,9 @@ take Skeleton IT2_Tequila              # Z01
 prime Termite IT2_Jar_empty            # Z01
 take Piranha IT2_Piranha               # Z01
 take ChickenWings IT2_Chickenwing      # Z01
-hide StatueHidden                      # Z03 before she crosses it (98-110)
+park Zone04                            # out of Z01 before he comes (74): Z04 is free until his cement (113)
+whenin Mother Zone05                   # (71) she has crossed Z03 to her Zone05 stand
+hide StatueHidden                      # Z03 before she crosses it back (98-110)
 whenin Mother Zone02                   # (110) her Zone02 stand: Zone05 is free until 142
 take StatueHand IT2_Hand               # Z05
 take Flowers IT2_Flowers               # Z05

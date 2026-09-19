@@ -170,7 +170,8 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   the catchers' being their neighbor_hideout stations and the level
   steps' sleeps (`docs/PC_FIDELITY.md` "The Season 2 catch") — and every
   Season 2 walk routes with the PC's path finder, Woody's to his items'
-  PC hotspots included ("Season 2 routes and Woody's runs").
+  PC hotspots included ("Season 2 routes and Woody's runs"); 207, 208,
+  212 and 213 were re-timed to them, and all 28 levels rate 100 again.
   The mobile numbers do not move: the regression under
   `--profile=mobile` is byte-identical.
 

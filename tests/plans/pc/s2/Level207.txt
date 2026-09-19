@@ -1,9 +1,11 @@
-# Level207 under the PC profile (v5, 2026-09-23, the Season 2 walks by code): his lap is ~98 s — the board
+# Level207 under the PC profile (v6, 2026-09-23, the Season 2 walks, routes and catch by code): his lap is ~98 s — the board
 # (the pool, Zone04) 10-22, the bar and the elephant (Zone03) 22-54, the shell (Zone02) 54-72, the castle and
 # the towel (Zone01) 72-98 — and the Mother sleeps in the pool 19 s a lap (5-25, 60-79, 115-134, 169-189,
 # 224-243) and swims between. Woody waits out his lap-2 beach crossing (168-194) in the beach chair and primes
 # the bartender while he is on the board (200-221) by the beach's stairs; the awning waits for his lap-3 bar
-# visit (228-260), the tap and the elephant for his shell after it (260+).
+# visit (228-260), the tap and the elephant for his shell after it (260+). Under the PC catch the Mother
+# in her deck chair or the pool is out of sight (flag 4) for a dozen seconds at a time: the tap goes at
+# once after his lap-4 bar visit, the elephant straight after it.
 # Level207 — TotalTricksCount 7 (winning 5); every S2 TrickScore is 0.
 # Routine (Rottweiler2): PoolBoard (Zone04) -> Bartender, Elephant (Zone03)
 # -> Shell (Zone02) -> SandCastle, BeachTowel (Zone01); Mother on Zone04,
@@ -31,8 +33,10 @@ park Zone01                       # the beach, next to the pool's own stairs
 whenzone Zone03                   # (228) his lap-3 bar visit: the Mother sleeps in the pool zone 224-243, the awning is unlocked since the board paid
 usewith! PoolAwning IT2_Pedal     # Zone04 (~235): before her look (243)
 park! Zone01                      # (~240) his beach zone is free until ~278
-whenzone Zone02                   # (260) he is at the shell: the bar is free until ~337
-prime Tap IT2_Bucket_empty        # Zone03
+whenzone Zone02                   # (260) he is at the shell
+whenusing Elephant                # (~349) his lap-4 bar visit
+whenzone Zone02                   # (~371) his lap-4 shell: the bar is his again only at ~446
+prime! Tap IT2_Bucket_empty       # Zone04 at once: the Mother is in her deck chair or the pool (flag 4) a dozen seconds more
 usewith Elephant IT2_Bucket       # Zone03: action [2]
 take BBQ IT2_Bbqtongs
 unlock CrayFish IT2_Bbqtongs
