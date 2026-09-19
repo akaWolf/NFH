@@ -238,17 +238,16 @@ NFH2's frame and GameLogic's level update — the interface's slot 2 at
 GFXEngine's 83 ms is the sprites' frame interval); the PC's field image
 (the data archive holds no field.tga: the field is drawn at the PC's 84 px
 of its 800 x 600 screen, in whose px the game measures, the image the
-remaster's) and the thumb's and the icon's size; the co-actor's fight,
-which waits for his action's end in the port. A Season 2 tricked visit is the PC step's since
+remaster's) and the thumb's and the icon's size. A Season 2 tricked visit is the PC step's since
 2026-09-24: its stand, its SHOUT — the action the binary's tables give the
 level, shout2 or shout2_hard, a freakout once the gauge has overflowed —
 its repair, and each named record's credit at its own tick, the linked
 trick's variant apart (202's rail over the eels' pond: crash, electrify,
 SHOUT 2); the flow past a step with no SHOUT of its own (204's gong,
 205's skis, 211's sweets, 214's wheel behind the door, 206's weights and
-dynamite), the co-actor's hit (Olga or the Mother runs to him and fights:
-204's rickshaw, 207's shell, 210's elephant, 214's shower, bouquet and
-pistol), 210's dog basket alone with no SHOUT at all, 212's ledge with the
+dynamite), the co-actor's hit (Olga or the Mother runs to him and fights
+on arrival, his SHOUT alongside: 204's rickshaw, 207's shell, 210's
+elephant, 214's shower, bouquet and pistol), 210's dog basket alone with no SHOUT at all, 212's ledge with the
 parrot's shit the level's aux script leaves on it, 213's bull charging
 him into the wall (the step's own byte), 206's rabbit armed at the load
 and shot after the harpoon's take, 211's sweets on to the SHOUT after the

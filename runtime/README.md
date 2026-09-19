@@ -682,15 +682,17 @@ predicate, then the all-tricks win.
   -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
   set is skipped.
 - **The PC profile's co-actor hit** (PCHitSeconds, `World.pc_affect_early`,
-  `Routine._hit_begin`): the action's behavior fires as his tricked use
-  starts (GameLogic's actions fire theirs at the start), so Olga or the
-  Mother sets off for him then (her script's run, gait 2) and her hit
-  sequence plays at the generic `fight`'s pace (fcn.1000eb19: Olga 42
-  ticks, the Mother 39) once he is parked angry (`Pawn.pc_hit_parked`),
-  his SHOUT after it (204's rickshaw, 207's shell, 210's elephant, 214's
-  shower, bouquet and pistol). Open: where she arrives before his use
-  ends the PC fights at once; the port waits for his angry (the mobile's
-  hand-off).
+  `Routine._hit_begin`, play_angry's affect): the action's behavior fires
+  as his tricked use starts (the job's state 0, fcn.100018a6), so Olga or
+  the Mother sets off for him then (her script's run, gait 2); her hit
+  begins on arrival — the PC's job queues lock no other actor
+  (fcn.100492a8) — at the generic `fight`'s pace (fcn.1000eb19: Olga 42
+  ticks, the Mother 39), and his parked angry resumes as it begins, or at
+  his use's end if it began before (`Pawn.pc_hit_started`): the fight's
+  behavior sets his step's latch at its start and his SHOUT plays
+  alongside it. Season 2 under the profile only; the mobile keeps the hit
+  first. 214's StopOlgaInfiniteLoop, which now comes during her hit, is
+  kept for her next pose (`Routine._pc_release_pose`).
 - **The PC profile's linked continuation** (207's sand castle over the
   hedgehog's towel: PCHitSecondsLinked, PCResumeHeadSeconds,
   PCExtraCoinLinked): Olga's lift paced to its ticks, then the head of
@@ -698,21 +700,27 @@ predicate, then the all-tricks win.
   coin pays there and books its completion then (`Item.pc_extra_due`:
   the PC's done count is its records, so the level ends at the resume).
 - **The PC profile's 206 pad** (`Level206RoutineBehavior._pc_gate`,
-  `Item.pc_masked`, `Routine.pc_skip_next`, `World.pc_s2_extra_credit`):
-  the pad's and the harpoon's visits counted in the lap round's order (the
-  mobile's LaunchPad, Harpoon, LaunchPad, Harpoon, LaunchPad = GameLogic's
-  load, take, shoot, put and Fifi's take); a rabbit on at the load arms the
+  `Item.pc_masked`, `World.pc_s2_extra_credit`): the pad's and the
+  harpoon's visits counted in the lap round's order (the mobile's
+  LaunchPad, Harpoon, LaunchPad, Harpoon, LaunchPad = GameLogic's load,
+  take, shoot, put and Fifi's take — the pad's prime leg, use and unprime
+  leg, the harpoon's prime leg and use); a rabbit on at the load arms the
   shot (the load step's IfVariant, 0x1002e3df) and the pad fires at the
-  shoot (PCTrickArm), its other visits and the harpoon's take under an
-  armed pad playing plain — `pc_masked` makes the visit read untricked
-  (`is_tricked`, the use dispatch's early plain return, the raw reads of
-  `_use`), cleared at the visit's end; the harpoon alone fires at its
-  take (PCTrickFire) and the routine then passes the shoot (0x1002da29
-  goes on to the put); a rubber still on at the put is dropped (`_fix`,
-  the put step's switch back); the linked shot's third record — the
-  ExtraCoin206 — pays and books its completion at its own tick
-  (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is off under the
-  profile (the PC's shoot step asks nothing).
+  shoot (PCTrickArm), else its shoot plays plain — `pc_masked` makes the
+  visit read untricked (`is_tricked`, the use dispatch's early plain
+  return, the raw reads of `_use`), cleared at the visit's end; the
+  harpoon's rubber fires through the pad's DependsOn at the shoot when it
+  was on at the take (the take marks its GotTricked, the PC's take step
+  reading harpoon_manip), a rubber put on later leaves the shoot plain and
+  is dropped at the put (`_fix`, the put step's switch back); the linked
+  shot's third record — the ExtraCoin206 — pays and books its completion
+  at its own tick (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is
+  off under the profile (the PC's shoot step asks nothing).
+- **The PC profile's repair walk** (PCFixDepart, play_angry's `after_run`):
+  a repair at another object (211's sign after the wc, 203's generator
+  after the stage) plays where he stands for the walk and the repair
+  (PCFixSeconds) and his next walk leaves that object's hotspot
+  (`Pawn._pc_depart`).
 - **The PC profile's 211 rush** (the after-toilet angry in
   `Routine._urgent_finished`, PCToiletPaysAt): the angry after the wc is
   the rush's own item (the sweets) under the profile — GameLogic's toilet

@@ -1684,10 +1684,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   load (PCTrickArm [1, 2]: 6.75/1/1.58/4.08, linked 6.08 with the records
   at 3.33, 3.75 and 4.17 — PCExtraPaysAtLinked, the ExtraCoin206 and its
   completion at its own tick — and the Mother's fight, PCHitSeconds 3.25),
-  the harpoon alone at its take (PCTrickFire [1, 2]: 8.75/1/-/6.33 with
-  the walk to the ramp, 20 ticks; the routine passes the shoot,
-  Routine.pc_skip_next) and a rubber still on at the put is dropped;
-  harpoonAux is off under the profile. 206's plan awaits the count 6.
+  the harpoon's rubber alone at the shoot — the mobile's structure has
+  it there: the pad toggles prime three ways (load, shoot, Fifi's take:
+  its prime leg, its use, its unprime leg), the harpoon two (take, put),
+  and the harpoon's rubber (UseAtOtherPlace) fires through the pad's
+  DependsOn at the pad's use, the PC's order (the take, the walk to the
+  ramp, the rubber bear, SHOUT 1, the walk back, the put); the PC decides
+  it at the take, so the take marks the harpoon's GotTricked (the mobile
+  marks it only at the put, a lap late for the DependsOn), a rubber put
+  on after the take leaves the shoot the bear's and is dropped at the put
+  (PCTrickFire [1, 2]: the rubber bear 5.75/1/-/3.33, the walks the
+  port's own between the stations). harpoonAux is off under the profile.
+  206's plan awaits the count 6.
   The co-actor's hit: 204's rickshaw 3.67/0, 207's shell 4.67/0, 214's
   shower 4.0/1, bouquet 4.17/1 and pistol 18.33/0 (the shot and the
   Mother's `die`), 210's elephant 9.08/1 — his action's behavior (204's
@@ -1696,11 +1704,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the Mother 39; the action's behavior olga_fight / mother_fight on him),
   his behaviour handler then sets the step with the SHOUT and no repair
   (204 0x10032b6f, 207 0x1001596a, 210 0x1001a379, 214 0x1003ba90 /
-  0x1003b677 / 0x1003b328). Carried: PCHitSeconds (her hit sequence paced
-  to the fight), World.pc_affect_early (she sets off as his tricked use
-  starts; her hit waits for his parked angry — the port's hand-off, which
-  the PC's does not have: where she arrives before his action ends the PC
-  starts the fight on arrival). 207's sand castle with the hedgehog on the
+  0x1003b677 / 0x1003b328). When his SHOUT comes, read on 2026-09-24
+  (late): DoAction (fcn.10002cd5) builds a job (vtable 0x100aa19c) with its
+  participants and the caller queues it on the acting actor alone
+  (fcn.10049216); an actor's queue (fcn.100492a8) runs its head job each
+  tick and asks nothing of any other actor (only its own flag 0x100000,
+  the camera's freeze); the job (update 0x100020c0) sets its participants'
+  animations in its states 0 and 2 only (0x10002301-0x100024e9: the
+  object's `inv` once at the start, `ms2` at the end), ends by its ticks
+  (+0x28 up to +0x24, fcn.100011f2) and posts its behavior as it starts
+  (state 0, fcn.100018a6 — the job's end posts a bare notice,
+  fcn.100019f7). So her fight starts as she arrives, whatever he is doing,
+  its olga_fight / mother_fight sets his step's latch then, and his SHOUT
+  follows his action's end or her fight's start, whichever is later — and
+  plays alongside the fight. The action attribute `always` (Loader.dll
+  reads it into its action record's +0x24, 0x10009944, the default
+  "true") is true on every action the data has: it tells no action apart.
+  Carried (World.pc_affect_early, Routine._hit_begin, play_angry's
+  affect): she sets off as his tricked use starts, her hit begins on
+  arrival, and his parked angry resumes as it begins (or at once at his
+  use's end if it has begun); her hit keeps the fight's ticks
+  (PCHitSeconds) for her own round. Two mobile hand-offs lean on the old
+  order and are kept to their intent: 214's StopOlgaInfiniteLoop (his
+  fix of the tricked bouquet releases Olga's waiting pose, Item.cs:2581)
+  now comes while she still hits him — the release goes to the pose she
+  takes next. 207's sand castle with the hedgehog on the
   towel: its linked step (lookaround, the hedgehog's splash 45, the
   castle's fall 22 — its behavior kid_cry on Olga) hands over to
   0x1001513f, which re-runs until the destroyed castle shows Olga's
@@ -1710,7 +1738,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and the camera off (LINKED_CONT): PCUseSecondsLinked 9.17,
   PCCreditAtLinked 4.25 (splash_crayfish), PCLinkedPaysAt 7.33
   (mat_hedgehog), PCHitSecondsLinked {Olga: 2.5} (the lift),
-  PCResumeHeadSeconds 2.17 (the billboard after it) and
+  PCResumeHeadSeconds 2.17 (the billboard from the lift's start: the poll
+  sees her `n_lift` as it begins) and
   PCExtraCoinLinked 30 (bill, paid and done at his resume: the level's
   done count is its records, so the level ends there — 207's plan awaits
   the count 7), PCShoutLinked 2; the castle's own amount is the PC's 20
@@ -1725,20 +1754,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   angry — StopUrgentAction reads the interrupted action's item
   (ActionManager.cs:597), the fishing rod by then — and pays the extra
   with the sweets' own. Carried: the after-toilet angry is the rush's own
-  item under the profile, Olga's hit after the puke lasts her mad and
-  fight less the puke (36 ticks, PCHitSeconds 3.0: the mobile's
-  HitPawnSequence OlgaWCMad, HitPawn), and the wcright record — the
-  Toilet211 extra coin and its completion — pays 2.25 s into the puke
-  (PCToiletPaysAt, World.pc_s2_extra_credit); the repair plays where he
-  stands (2.0 s) and his walk to the next station starts at the wc, the
-  sign on its way. Open, with numbers: 210's
+  item under the profile; Olga's fight has begun by the puke's end (her
+  mad 34 ticks from its start), so his SHOUT follows the puke at once and
+  her hit keeps the rest of her mad and fight for her round (36 ticks,
+  PCHitSeconds 3.0: the mobile's HitPawnSequence OlgaWCMad, HitPawn); the
+  wcright record — the Toilet211 extra coin and its completion — pays
+  2.25 s into the puke (PCToiletPaysAt, World.pc_s2_extra_credit); the
+  repair's walk to the sign, below. Open, with numbers: 210's
   TurbanShop 27 and 213's Tortilla 15 and PlantCarnivore 15 + PCExtraCoin
   20 had been dropped from the overlays by the stays writer of 2026-09-12
-  (it replaced its patches' sets) and are back.
-Plans (runs/sw16s2, all 14 at 100; 207's plan awaits the count 7 — the
-  billboard's coin is paid at his resume after Olga's lift, 436.2 s; 206's
-  the count 6, 257.7 s; 203 at 201.8, 211 at 262.0, 212 at 875.2, 213 at
-  400.3, 214 at 792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
+  (it replaced its patches' sets) and are back. The repair's walk:
+  211's sign after the women's wc (34 ticks, then its `repair` 24: 4.83,
+  PCFixSeconds) and 203's generator after the stage (32 and 19: 4.25) —
+  the repair plays where he stands for the walk and the repair, and his
+  next walk leaves the repaired object's hotspot (PCFixDepart,
+  lap_model_s2._repair_walk); a station tricked through its DependsOn
+  pays its dependency's record at its tick (206's pad shooting the rubber
+  bear: the harpoon's PCCreditAt), and a linked variant needs the
+  station's own trick too.
+Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
+  billboard's coin is paid at his resume, 426.1 s; 206's the count 6,
+  253.5 s; 201 at 238.0, 203 at 206.5, 204 at 339.3, 210 at 277.1, 211 at
+  261.9, 212 at 875.2, 213 at 393.3, 214 at 792.6): 202 v6 piles its chain within one lap, the rail over the pond last (its
   sawfish placed while he is at the shore and in the sea, the swim step's
   flag 4) — the mat's 20 at 279 s to the electrify's 30 at 349 s, 69.4 s
   of decay, just over the top (the rail first a lap earlier spreads it over
