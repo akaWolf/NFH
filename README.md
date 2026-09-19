@@ -241,8 +241,10 @@ carried since 2026-09-24, the calls' runs of 208 and 210 are the Urgent
 ones, 210's Mother's to him on Fifi's fall is carried; `docs/PC_FIDELITY.md`
 "Season 2's runs"); the PC's
 field image (the data archive holds no TGA; the game's 100 px radius is
-carried) and 203's Olga shout before the run (her `shout` has no clip in
-the port). 111's machines are
+carried), 203's Olga shout before the run (her `shout` has no clip in
+the port) and where a trick's own clip leaves him (the tricked actions'
+`<translation>`s, 25 ticks at most, once a trick: after a trick his next
+walk leaves from the station's hotspot). 111's machines are
 the level class's DoActions (the washer's 24 s in the video is the walk
 and give, wash, get_clothes; 47 s was a tricked lap), and the Season 1
 neighbour runs where game.exe sets his gait. The Season 2 idle laps under

@@ -1206,8 +1206,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 and the mobile regression byte-identical. The laps:
   203 106.8 s (model 105.2), 205 112.5, 208 86.6 (85.5), 209 107.4
   (106.7), 211 85.2 (85.3), 212 127.2 (123.8), 204 92.5, 207 105.5, 210
-  99.7. Woody's actions' translations (214's swiffer at the bridge
-  controls 400 px, 208's chalk 45 px) are not carried.
+  99.7. Open, with numbers: the translations of the tricked actions (201's
+  soap puddle's crash_short 200 px, its water puddle's slips +80 / -100,
+  207's crayfish splash -154, 209's hot coal walk 110 for the coal's 190
+  and the burning shoe mat 70, 214's shower crash -43 and pistol use 95,
+  203's stage crash 30) — after a trick his next walk leaves from the
+  station's hotspot, up to 25 ticks off once per trick — and Woody's one
+  (208's chalk on the safety line, 45 px, 3 of his ticks).
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
