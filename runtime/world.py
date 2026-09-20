@@ -6316,6 +6316,9 @@ class DexterityState:
         self.pc_mid_px = (0.0, 0.0)
         self.pc_k = 1.0
         self.pc_thumb = (0, 0)
+        # a lost game's behaviour on its way: [seconds to the level tick
+        # that offers it, its actor] (pc_offer_tick)
+        self.pc_offer = None
 
     def start(self):
         """StartDexterity (DexterityComponent.cs:137-177)"""
@@ -6512,15 +6515,16 @@ class DexterityState:
                 # behaviour sends the neighbour running — straight or through
                 # Olga's shout (203) — or reaches 201's `aux`, the tutorial's
                 # director, which relays the run (TutorialPC201.on_behaviour),
-                # or nobody (212's spikes, 213's pinata: PCMinigameFailed)
+                # or nobody (212's spikes, 213's pinata: PCMinigameFailed);
+                # the behaviour reaches its actor on the next level tick
+                # (pc_offer_tick)
                 self.pc_elapsed = 0
                 self.pc_progress = 0
                 self.percent = 0.0
                 failed = getattr(self.item, 'pc_minigame_failed', None)
-                self._lose(alert=failed in ('neighbor', 'olga'))
-                ls = self.world.level_script
-                if failed == 'aux' and getattr(ls, 'on_behaviour', None) is not None:
-                    ls.on_behaviour('run', self.item)
+                self._lose(alert=False)
+                if failed in ('neighbor', 'olga', 'aux'):
+                    self.pc_offer = [step - self.pc_acc, failed]
                 return
             self.pc_progress = self.pc_elapsed * 100 // self.pc_total
             if self.pc_progress >= 10:
@@ -6619,8 +6623,6 @@ class DexterityState:
         if w.woody is not None and w.woody.anim.has('DexterityFailed'):
             w.woody.anim.play_single('DexterityFailed')
         self.start_again = True
-        if pcprofile.is_pc():
-            self._pc_failed_clip()
         if alert:
             self.alert()
 
@@ -6629,8 +6631,8 @@ class DexterityState:
         plays that actor's action of the behaviour's name first — 203's Olga
         `shout`: shout_chinese, 69 frames at 12 a second, then eat_chinese
         (cn_c2's olga record; PCMinigameFailedClip) — and that action's own
-        behaviour, the neighbour's `run`, fires as it starts (the alert,
-        at the same moment)"""
+        behaviour, the neighbour's `run`, is posted as it starts, for the
+        next level tick (pc_offer_tick)"""
         fc = getattr(self.item, 'pc_minigame_failed_clip', None)
         pawn = self.world.pawns.get(fc['role']) if fc else None
         if pawn is None or not pawn.anim.has(fc['clip']):
@@ -6645,6 +6647,48 @@ class DexterityState:
             if then and anim.has(then):
                 anim.play_looping(then)
         anim.play_sequence([fc['clip']], on_end=back, as_sequence=False)
+
+    def pc_offer_tick(self, dt):
+        """a lost PC game's behaviour reaching its actor: the `failed`
+        action posts it as it starts, in the actors' pass, and the level
+        update's walker (fcn.1003fc90, at 0x100445f1, before that pass)
+        makes it on the next level tick (fcn.1003e769) and offers it to the
+        actor (fcn.1004b27f -> fcn.1004abcf), again every tick until it is
+        taken. 201's `aux` relays the run (TutorialPC201.on_behaviour);
+        203's Olga plays her `shout`, whose action posts his `run` for the
+        tick after (_pc_failed_clip). The neighbour's jobs vote front to
+        back (slot 5) and a passing job whose +4 is 0 refuses the offer:
+        his level script's walks are made with 1 (fcn.1000e3e0 ->
+        fcn.10007a10, the GoTo job 0x100ab3d8 storing it at 0x10007350) and
+        its actions with 0 (fcn.1000efcd's push 0, the direct fcn.10002cd5
+        calls' zeroed ebx) — so a walk is cut at once and an action runs to
+        its end, the run then taken as his next walk begins (the mobile's
+        DexterityAlert and its deferred watcher, a level tick apart)"""
+        self.pc_offer[0] -= dt
+        if self.pc_offer[0] > 1e-9:
+            return
+        left, actor = self.pc_offer
+        self.pc_offer = None
+        w = self.world
+        step = 1.0 / pcprofile.TICKS_PER_SECOND
+        if actor == 'aux':
+            ls = w.level_script
+            if getattr(ls, 'on_behaviour', None) is not None:
+                ls.on_behaviour('run', self.item)
+            return
+        if actor == 'olga':
+            self._pc_failed_clip()
+            self.pc_offer = [step + left, 'neighbor']
+            return
+        rott = w.pawns.get('Rottweiler')
+        rt = next((r for r in w.routines if r.pawn is rott), None) \
+            if rott is not None else None
+        if rt is None or self.item is None:
+            return
+        if rott.state == rott.WALK:
+            _dex_surprise(w, rt, self.item)
+        else:
+            self.pc_offer = [step + left, 'neighbor']
 
     def cleanup(self):
         """CleanUp (cs:390-406)"""
@@ -10999,6 +11043,8 @@ class World:
         for pb in self.progress_bars:
             pb.tick(dt)
         for ds in self.dex_states.values():
+            if ds.pc_offer is not None:
+                ds.pc_offer_tick(dt)
             ds.tick(dt)
         # SearchItem/TrickItem.Update's deferred dexterity alert
         # (SearchItem.cs:245-251, TrickItem.cs:243-249)
