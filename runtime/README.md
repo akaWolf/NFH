@@ -1197,10 +1197,20 @@ Under the PC profile the same field plays the PC original's game instead
 combine.xml startlevel / endlevel) from the levels/pc overlays, the thumb
 moved one to one by the mouse, rated 4..-40 a level tick by its distance to
 the middle and pushed by GameLogic.dll's three-sinusoid wobble; the count
-reaching `time` wins, below 0 loses. The distances are the PC screen's px
-(800 x 600, `pcprofile.S2_SCREEN`) and the field is drawn at the PC's 84 px
-(`S2_FIELD_PX`) round the remaster's middle; the thumb and the icon keep
-the remaster's 80 reference px (open: the PC hairpin spans ~75 PC px).
+reaching `time` wins, below 0 loses. The field is GFXEngine.dll's
+(`hud._draw_pc_game`): its middle is Woody's `minigame` hotspot, 150 px
+above his point (generic/objects.xml, `pcprofile.S2_GAME_HOTSPOT`), which
+the camera holds as the PC's scroll does (`World.dexterity_focus`); the
+field, the alarm field, the icon and the thumb are drawn at their
+textures' own sizes — the remaster's textures/s2 art carries
+minigame/<tool>.xml's names and sizes, the field 138 x 138, the tools
+75 x 57 — in the level's px (96 a unit, `pcprofile.PX_PER_UNIT`, in which
+the game measures the mouse too), the icon centred, the thumb at the
+setter's (x + 1000) x (field - thumb) / 2000 of the last state message's
+pair (`pcprofile.s2_thumb_corner`): a picture at the level tick's rate,
+not the mouse. The PC's progress bar (minigame_progress_front.tga,
+vertical, at 28/28 from the field's corner) is not in the data; the
+remaster's fill stands in, in the field's frame.
 
 ## The parity audit (docs/PARITY_AUDIT_PROMPT.md)
 

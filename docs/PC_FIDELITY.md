@@ -156,12 +156,12 @@ behaviour (GameLogic's registry fcn.1003ef32 maps the UTF-16 `run` at
 alarm sound, runs the actor to the object (the running GoTo fcn.100080e1)
 and starts `search` there.
 
-The profile plays it on the remaster's field with the PC's rules
+The profile plays it on the PC's field with the PC's rules
 (PCMinigameTicks, PCMinigameLevels — tools/pcref/pc_minigames.py;
 pcprofile.s2_game_rate / s2_game_push; DexterityState._pc_tick): the thumb
 follows the mouse one to one with no remaster drift or margins, the first
 three ticks centre it, the push and the alarm field are the PC's, the
-drawn thumb stops at the 100 px radius (thumb_rect); a lost game sends
+drawn thumb is the state message's pair (below); a lost game sends
 the neighbour onto the object at a run where the `failed` behaviour
 reaches him (the mobile's surprise, Routine.pc_run_next) and nobody on
 201, 212 and 213 (PCMinigameFailed; 201's toolbox loses like the rest, the
@@ -191,22 +191,73 @@ and its own behaviour, his `run`, fires as it starts — the port's Olga
 plays her Shout clip paced to the 69 frames and goes back to her
 EatChinese (PCMinigameFailedClip, DexterityState._pc_failed_clip), his
 run at the same moment; 201's reaches the tutorial's director
-("201's tutorial"). The field is the PC's since 2026-09-24: the game
-measures the thumb and pushes the mouse in px of the PC's 800 x 600 screen
-(its dialogs: mainmenu's status line at 10/570 790 wide, the in-game right
-bar from 658/473; game.exe builds its video context 0x320 x 0x258), the
-port's screen fraction taken for the PC's (pcprofile.S2_SCREEN, where the
-remaster's 1280 x 800 reference had stood in: 1.6 / 1.33 times the PC's
-reach), and the field is drawn at the PC's size round the remaster's
-middle — the green disk with its rim measures 136 x 100 px of the 1280 x
-720 stretch on Badinfos' E04 (the toy dispenser, video 759 s) and 124 x
-92 without the rim on E01 (the toolbox, 176 s): 84 PC px (S2_FIELD_PX),
-77 without; minigame.xml's gui/game/field.tga is not in the data archive,
-so its image is the remaster's. Open, with numbers: the thumb and the item
-icon keep the remaster's 80 reference px (the PC's hairpin spans ~120 x
-90 px of the stretch, ~75 PC px); his run keeps the mobile's moment (at
-once if he walks, else when his clip ends) where the PC's `always` may
-start it at once.
+("201's tutorial"). The field is GFXEngine.dll's since 2026-09-24 (read that day). Its middle
+is Woody's `minigame` hotspot, `<hotspot name="minigame" offset="0/-150"/>`
+in generic/objects.xml: the use_object step (fcn.10041735) reads it as the
+actor's +0x2c/+0x30 plus the offset (fcn.10049e01) into the game's middle
+(the constructor's +0xc/+0x10, from which fcn.100508a1 measures the mouse)
+and into the create message (vtable 0x100b1444, slot 79 of the GFX
+visitor 0x10042100: the object's name at +4, the minigame file at +8, the
+point at +0xc/+0x10); GFXEngine's handler 0x1000aa80 makes the field round
+it (fcn.10004b00 -> fcn.10004540 -> fcn.1000fb30: +0x24/+0x28, the
+progress bar from createProgressBar), scrolls the camera to put it at
+(400, 256), the middle of the 800 x 512 scene, held within the level
+(0x1000ab08-0x1000ab7e), and puts the mouse there (0x1000ab81-0x1000abb8).
+The draw (fcn.1000fcf0, from the scene's render while it holds one) puts
+the field — the alarm field while the message's alarm byte is up — with its
+corner at the middle less half its size, the progress bar from that corner,
+the icon centred in the field and the thumb at the corner plus the thumb
+setter's offset (fcn.1000fa00): (x + 1000) x (field - thumb) / 2000 on
+each axis, x and y the pair of the state message (vtable 0x100b1450, slot
+78: the game's +4/+8 at 0x10044864-0x1004486f — each axis held, past the
+first three ticks the pair to the radius — the progress at +0xc, rate < 0
+at +0x11, sent before the push), so the thumb's edge meets the field's at
+the radius, a picture at the level tick's rate rather than the mouse; each
+texture keeps its own size (fcn.1000ff70 / fcn.10010000 / fcn.10010090 /
+fcn.10010120). Badinfos' E04 (759 s, the toy dispenser) shows the middle
+at (640, 305) of the 1280 x 720 stretch — (400, 254) PC px — with Woody's
+shoes 150-154 px below it, E01 (176 s, the toolbox) the same (400, 254).
+The profile carries it (hud._draw_pc_game, World.dexterity_focus,
+pcprofile.S2_GAME_HOTSPOT / s2_game_thumb / s2_thumb_corner): the middle
+150 level px above Woody's point, the camera held on it, the field, the
+alarm field, the icon and the thumb at their textures' sizes in level px
+(PX_PER_UNIT, in which the game measures the mouse as well — where the
+port's screen fraction of an 800 x 600 screen had stood in), the thumb
+from the pair. The textures are the remaster's by name and size: the PC
+data copy holds no images, and textures/s2 carries minigame/<tool>.xml's
+gui/game names — field, field_alarm, <tool>_cursor, <tool>_white, 211's
+hornhautraspel the remaster's rasp — at 138 x 138 and 75 x 57, the
+field's disk 86 px wide as on the videos. Open, with numbers: the
+progress bar's front (gui/ingame/minigame_progress_front.tga, vertical,
+at 28/28 from the corner) is not in the data — the remaster's fill stands
+in, in the field's frame, a fill that spans the 138 px frame where the PC's
+starts 28 px in (the videos fill the disk up to its ring); the port draws
+its Woody's frames off his point the remaster's way, which on 204's
+dispenser (W_play_toyomat, its frame 18 px above the point) puts the drawn
+shoes 29 px above it — the field shows 127 px above them against the
+PC's 150-154; his run keeps the mobile's moment (at once if he walks, else
+when his clip ends) — the PC's is read below ("the lost game's run").
+
+The lost game's run (read 2026-09-24). Woody's `failed` action posts its
+behaviour on its step's first run (state 0, fcn.100018a6), inside the
+actors' pass; the level update's walker (fcn.1003fc90 at 0x100445f1,
+before the actors' pass at 0x100445f8) makes the behaviour by name on the
+next tick (fcn.1003e769 over the registry) and offers it to the actor
+(fcn.1004b27f -> fcn.1004abcf). His jobs vote front to back through slot
+5: 1 passes (the DoAction step and the use_object job, 0x10034d8e), 0 takes
+it (the script runners, whose update never finishes — 0x10013f16 /
+0x1002f45d, the vote 0x10013f1b); a passing job whose +4 byte is 0 refuses
+the offer, and the walker keeps it for the next tick. A taker aborts the
+jobs in front of it through their slot 3 — the DoAction step's 0x10001d1b
+closes a counting step with its end notice fcn.100019f7, the use_object
+job's 0x100042d9 closes a game — and hands the behaviour over (slot 4,
+which runs its update: `run` pushes the running GoTo). The use_object
+job's base constructor sets its +4 to 1 (0x100042a1) and its DoAction step
+inherits it (fcn.10004353 passes it to fcn.10002cd5, fcn.10002b8d stores
+it); the co-actor's `fight` is made with 0 (fcn.1000eb19). So the
+neighbour's run starts one level tick after the loss, cutting a routine
+use or walk short, and waits out a fight; the `always` attribute plays no
+part (every record carries true). The profile keeps the mobile's moment.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
