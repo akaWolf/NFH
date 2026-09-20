@@ -6348,10 +6348,15 @@ class DexterityState:
                              for _ in range(3)]
             # the field's middle: Woody's `minigame` hotspot, in the level's
             # px (y down) from his point (fcn.10049e01;
-            # pcprofile.S2_GAME_HOTSPOT)
+            # pcprofile.S2_GAME_HOTSPOT) — the object's `woody` hotspot the
+            # use put him on, PCMinigameLift px above the room's floor line,
+            # where the port keeps his point on its walking line and the
+            # remaster's clip draws him from it (204's dispenser: 24 px up,
+            # GetToyMachineDexterity's frame raised by its offset)
             hx, hy = pcprofile.S2_GAME_HOTSPOT
+            lift = getattr(self.item, 'pc_minigame_lift', None) or 0
             self.pc_mid = (w.woody.sprite.x + hx / pcprofile.PX_PER_UNIT,
-                           w.woody.sprite.y - hy / pcprofile.PX_PER_UNIT) \
+                           w.woody.floor_y() + (lift - hy) / pcprofile.PX_PER_UNIT) \
                 if w.woody is not None else None
         else:
             self.pc_mid = None

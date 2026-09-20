@@ -245,7 +245,7 @@ class Item:
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
-                 'pc_minigame_failed', 'pc_minigame_failed_clip', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
+                 'pc_minigame_failed', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
@@ -709,6 +709,10 @@ class Item:
         # the clip that behaviour plays on its actor first (203's Olga shouts:
         # {role, clip, secs, then}; tools/pcref/pc_minigames.py)
         self.pc_minigame_failed_clip = d.get('PCMinigameFailedClip')
+        # Woody's place for the game above the room's floor line, level px:
+        # the object's `woody` hotspot (tools/pcref/pc_minigames.py), the
+        # field's middle 150 px above it
+        self.pc_minigame_lift = d.get('PCMinigameLift')
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
         self.depends_on = (d.get('DependsOn') or {}).get('path')
