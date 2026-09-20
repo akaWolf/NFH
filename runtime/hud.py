@@ -1234,6 +1234,29 @@ class Hud:
             _sdl.SDL_RenderCopyEx(self.rnd, entry[0], srcr, dstr,
                                   180.0, None, _sdl.SDL_FLIP_NONE)
 
+    def _draw_pc_game_bar(self, ds, x0, y0, k, fw, fh):
+        """the game's vertical progress bar from the field's corner
+        (pcprofile.S2_GAME_BAR): the front's rows from the bottom up to the
+        progress (the videos fill the disk from below). The PC data copy
+        holds no images: its front, gui/ingame/minigame_progress_front.tga,
+        is the field's disk inside the ring, which the remaster's full field
+        carries at the same px (its ring at 26-27 and 110-111 of 138); the
+        rows' rounding is the port's (the widget's draw not read)"""
+        entry = self._tex(ds.spec['full'])
+        if entry is None:
+            return
+        import sdl2 as _sdl
+        ox, oy = pcprofile.S2_GAME_BAR
+        bw, bh = fw - 2 * ox, fh - 2 * oy
+        p = min(1.0, max(0.0, ds.percent / 100.0))
+        rows = int(bh * p)
+        if rows <= 0 or bw <= 0:
+            return
+        srcr = _sdl.SDL_Rect(ox, oy + bh - rows, bw, rows)
+        dstr = _sdl.SDL_Rect(int(round(x0 + ox * k)), int(round(y0 + (oy + bh - rows) * k)),
+                             max(1, int(round(bw * k))), max(1, int(round(rows * k))))
+        _sdl.SDL_RenderCopy(self.rnd, entry[0], srcr, dstr)
+
     def _draw_pc_game(self, ds):
         """GFXEngine's mini-game draw (fcn.1000fcf0, from the scene's render
         fcn.10006970 while it holds one), each texture at its own size (the
@@ -1258,10 +1281,7 @@ class Hud:
             self._blit(ds.spec['bg_wrong'], (x0, y0, alarm[1] * k, alarm[2] * k))
         else:
             self._blit(ds.spec['bg'], (x0, y0, fw * k, fh * k))
-        # the bar's front (minigame/<tool>.xml: vertical,
-        # gui/ingame/minigame_progress_front.tga at 28/28 from the corner) is
-        # not in the data: the remaster's fill stands in, in the field's frame
-        self._draw_dexterity_fill(ds, (x0, y0, fw * k, fh * k))
+        self._draw_pc_game_bar(ds, x0, y0, k, fw, fh)
         icon = self._tex(ds.spec['bg_item'])
         if icon is not None:
             iw, ih = icon[1], icon[2]

@@ -274,6 +274,13 @@ S2_GAME_AMPS = (20.0, 10.0, 5.0)
 # and puts the mouse on it. Its px are the level's (the PC draws the scene
 # 1:1), PX_PER_UNIT to the port's unit.
 S2_GAME_HOTSPOT = (0, -150)
+# The game's progress bar: every minigame/<tool>.xml (all fifteen alike)
+# has <progressbar vertical="true" front="gui/ingame/minigame_progress_
+# front.tga" offset="28/28"/>, drawn from the field's corner (fcn.1000fcf0,
+# slot 9 of the game's +4): the front 28 px in on each side — the field's
+# disk inside its ring (the 138 px field's ring at 26-27 and 110-111) —
+# its rows from the bottom up to the progress.
+S2_GAME_BAR = (28, 28)
 S2_GAME_FREQS = (0.064774, -0.14611809302325582, 0.36959282352941175)
 S2_GAME_QUARTER = 0.78538475
 S2_GAME_TWO_PI = 6.283078
