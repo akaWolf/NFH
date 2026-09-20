@@ -118,8 +118,12 @@ the room GameLogic picks (fcn.10005f58: rooms with more than one door
 pair, a Woody hideout first, none with the neighbour or the Mother out of
 their hideouts, the first by name among equals — the video's beach left
 room, not his start in the shop), Woody on the middle of its floor after
-the landing's 39 ticks, then 5 s in which neither catches him while he
-is drawn outlined; the third catch ends the level (x3, x2, x1).
+the landing's 39 ticks — the PC's fall and landing, from the remaster's
+unused W_Landing sheet — then 5 s in which neither catches him while he
+is drawn outlined; the third catch ends the level (x3, x2, x1). The
+beating is the PC's `fight` a frame a tick (3.75 s for the neighbour,
+4.25 s for the Mother), where the remaster slowed the same frames to 8
+and 9 a second.
 
 ### 2.6 Dexterity mini-games (confidence: high — read in GameLogic.dll 2026-09-23)
 
