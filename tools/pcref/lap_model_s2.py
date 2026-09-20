@@ -524,96 +524,49 @@ class Data:
             a = next((v for (ac, nm), v in acts.items() if nm == name), None)
         return list((a or {}).get('_tricks') or [])
 
-    def action_ticks(self, obj, name, actor='neighbor'):
-        """the ticks of an action: time="N", or auto = the frames of the actor's
-        animation (the level's anims.xml, else generic/anims.xml), else of the
-        object's (under its gfx); None if unknown"""
+    def _record(self, obj, name, actor='neighbor'):
+        """(the owner's entry, the action record, the owner's name) of an
+        action: the actor's record in the object's (a level's own actor
+        record adds to the generic one: 205's neighbor — crash, pant, talk —
+        over lookaround, shout …), else the object's own action of that
+        name (the fakir's `play`: actor = the object; else another actor's
+        but Woody's); None if the data has none"""
         o = self.real.get(obj, obj)
         e = self.objects.get(o) or self.generic.get(obj)
         if e is None:
             return None
         g = self.generic.get(obj)
         if (actor, name) not in e['act'] and g is not None and (actor, name) in g['act']:
-            # a level's own actor record (205's neighbor: crash, pant, talk)
-            # adds to the generic one (lookaround, shout …)
             e = g
-        if (actor, name) not in e['act']:
-            # an object's own action (the fakir's `play`: actor = the object)
+        a = e['act'].get((actor, name))
+        if a is None:
             own = [v for (ac, nm), v in e['act'].items() if nm == name and ac == o] \
                 or [v for (ac, nm), v in e['act'].items() if nm == name and ac not in ('woody',)]
             if not own:
                 return None
             a = own[0]
-            t = a.get('time', 'auto')
-            if t.isdigit():
-                return int(t)
-            # auto: the action's actor's animation first (202's kid plays
-            # play_remote while the sub dives), else the object's
-            ac, aa = a.get('actor'), a.get('actoranim')
-            if ac and ac != o and aa and aa not in ('inv', 'ms'):
-                f = self.frames.get((ac, aa)) or self.gframes.get((ac, aa))
-                if f:
-                    return f
-            g = e['gfx'] or o
-            for an in (a.get('actoranim'), a.get('objanim')):
-                if an and an not in ('inv', 'ms'):
-                    f = self.frames.get((g, an)) or self.frames.get((o, an))
-                    if f:
-                        return f
-            return None
-        a = e['act'][(actor, name)]
-        t = a.get('time', 'auto')
-        if t.isdigit():
-            return int(t)
-        aa = a.get('actoranim', 'inv')
-        if aa not in ('inv', 'ms', ''):
-            f = self.frames.get((actor, aa)) or self.gframes.get((actor, aa))
-            if f:
-                return f
-        oa = a.get('objanim', '')
-        if oa not in ('', 'ms', 'inv'):
-            g = e['gfx'] or o
-            f = self.frames.get((g, oa)) or self.frames.get((o, oa))
-            if f:
-                return f
-        return None
+        return e, a, o
 
-    def loader_time(self, obj, name, actor='neighbor'):
-        """the action record's time as Loader.dll stores it (+0x28 of its
-        action record, 0x10009842): time="N" as N; auto the longer of the
-        actor's animation (the action's actor's set) and the object's (its
-        gfx's set), each the frame count of a oneshot animation — a loop or
-        a missing one counts -1 (0x10004781 with its flag 1: the anim's loop
-        byte, 0x10004812-0x10004823), "inv" not asked (0x10009730) — less
-        one, at least 0 (0x1000982b-0x10009842); None if the action is not
-        in the data"""
-        o = self.real.get(obj, obj)
-        e = self.objects.get(o) or self.generic.get(obj)
-        if e is None:
-            return None
-        acts = e['act']
-        a = acts.get((actor, name))
-        if a is None:
-            g = self.generic.get(obj)
-            a = (g or {}).get('act', {}).get((actor, name))
-            if a is not None:
-                e = g
-        if a is None:
-            a = next((v for (ac, nm), v in acts.items() if nm == name), None)
-        if a is None:
-            return None
-        t = a.get('time', 'auto')
-        if t.isdigit():
-            return int(t)
+    def _auto_frames(self, e, a, o):
+        """the longer of the action's actor's animation (the actor's set)
+        and its object's (the gfx's set) as Loader.dll counts them for
+        time="auto" (0x10009704-0x100097fc): a oneshot's frames, a loop or
+        a missing animation -1 (0x10004781 with its flag 1: the anim's
+        loop byte, 0x10004812-0x10004823), "inv" not asked (0x10009730);
+        None when the data has neither animation at all"""
+        seen = False
 
         def frames(owner, anim, *alts):
+            nonlocal seen
             for k in (owner,) + alts:
                 if (k, anim) in self.loops:
+                    seen = True
                     return -1
                 f = self.frames.get((k, anim))
                 if f is None:
                     f = self.gframes.get((k, anim))
                 if f is not None:
+                    seen = True
                     return f
             return -1
         v = 0
@@ -623,6 +576,42 @@ class Data:
         oa = a.get('objanim')
         if oa and oa != 'inv':
             v = max(v, frames(e['gfx'] or o, oa, o))
+        if not seen and ((aa and aa != 'inv') or (oa and oa != 'inv')):
+            return None
+        return v
+
+    def action_ticks(self, obj, name, actor='neighbor'):
+        """the ticks of an action: time="N", or auto the frames of its
+        governing animation — Loader.dll's time + 1 (loader_time); None if
+        unknown. Until 2026-09-25 the actor's animation came first and the
+        object's only without one, loops counted and `ms` skipped by name:
+        202's sub `dive` was the kid's play_remote (62) where the sub's
+        sub_dive (191) governs, 205's chef `cut_eel` the neighbour's `wait`
+        loop (63) where the chef's `cut` (31) does"""
+        t = self.loader_time(obj, name, actor)
+        if t is None:
+            return None
+        r = self._record(obj, name, actor)
+        if r[1].get('time', 'auto').isdigit():
+            return t
+        return t + 1
+
+    def loader_time(self, obj, name, actor='neighbor'):
+        """the action record's time as Loader.dll stores it (+0x28 of its
+        action record, 0x10009842): time="N" as N; auto the governing
+        animation's frames (_auto_frames) less one, at least 0
+        (0x1000982b-0x10009842); None if the action is not in the data or
+        its animations are not"""
+        r = self._record(obj, name, actor)
+        if r is None:
+            return None
+        e, a, o = r
+        t = a.get('time', 'auto')
+        if t.isdigit():
+            return int(t)
+        v = self._auto_frames(e, a, o)
+        if v is None:
+            return None
         return max(v - 1, 0)
 
     def job_ticks(self, obj, name, actor='neighbor'):

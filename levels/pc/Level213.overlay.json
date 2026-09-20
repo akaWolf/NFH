@@ -13,11 +13,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 3.5,
     "PCUseSecondsTricked": 8.58,
     "PCShout": 3,
     "PCFixSeconds": 0,
-    "PCCreditAt": 5.5
+    "PCCreditAt": 5.5,
+    "PCUseSeconds": 3.5
    }
   },
   {
@@ -27,11 +27,11 @@
     "PCLaugh": 3,
     "AngerAmount": 15,
     "PCExtraCoin": 20,
-    "PCUseSeconds": 8.17,
     "PCUseSecondsTricked": 7.75,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 4.92
+    "PCCreditAt": 4.92,
+    "PCUseSeconds": 8.17
    }
   },
   {
@@ -40,11 +40,11 @@
    "set": {
     "PCLaugh": 2,
     "AngerAmount": 15,
-    "PCUseSeconds": 1.5,
     "PCUseSecondsTricked": 4.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 1.67
+    "PCCreditAt": 1.67,
+    "PCUseSeconds": 1.5
    }
   },
   {
@@ -66,9 +66,9 @@
      7
     ],
     "PCMinigameFailed": "",
-    "PCUseSeconds": 6.83,
     "PCMinigameLift": -79,
-    "PCMinigameFailedTicks": 10
+    "PCMinigameFailedTicks": 10,
+    "PCUseSeconds": 6.83
    }
   },
   {
@@ -88,11 +88,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 9.25,
     "PCUseSecondsTricked": 14.67,
     "PCShout": 1,
     "PCFixSeconds": 1.58,
-    "PCCreditAt": 5.83
+    "PCCreditAt": 5.83,
+    "PCUseSeconds": 9.25
    }
   },
   {
@@ -1105,12 +1105,12 @@
       }
      }
     },
+    "PCBehaviourAtEnd": 0.17,
     "PCClipSecondsRole": {
      "Olga": {
       "BullRide": 6.75
      }
-    },
-    "PCBehaviourAtEnd": 0.17
+    }
    }
   },
   {

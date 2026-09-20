@@ -15,13 +15,13 @@
     "AngerAmount": 30,
     "PCLaugh": 0,
     "PCRunTo": true,
-    "PCUseSeconds": 1.92,
     "PCUseSecondsTricked": 9.08,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
      "Mother": 3.25
-    }
+    },
+    "PCUseSeconds": 1.92
    }
   },
   {
@@ -30,16 +30,16 @@
    "set": {
     "PCExtraCoin": 20,
     "PCLaugh": 0,
-    "PCUseSeconds": 2.5,
-    "PCUseSecondsTricked": 5.17,
-    "PCUseSecondsLinked": 7.42,
+    "PCUseSecondsTricked": 6.92,
+    "PCUseSecondsLinked": 9.17,
     "PCShout": -1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 1.75,
-    "PCCreditAtLinked": 1.75,
+    "PCCreditAt": 3.5,
+    "PCCreditAtLinked": 3.5,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 3.25
+    "PCLinkedPaysAt": 5.0,
+    "PCUseSeconds": 2.5
    }
   },
   {
@@ -48,11 +48,11 @@
    "set": {
     "PCLaugh": 0,
     "AngerAmount": 27,
-    "PCUseSeconds": 6.33,
     "PCUseSecondsTricked": 3.83,
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCCreditAt": 1.92
+    "PCCreditAt": 1.92,
+    "PCUseSeconds": 6.33
    }
   },
   {
@@ -623,6 +623,9 @@
       "routes": {}
      }
     },
+    "PCClipSeconds": {
+     "Stand_Left": 0.53
+    },
     "PCClipSecondsRole": {
      "Mother": {
       "MotherCall": 1.67,
@@ -637,9 +640,6 @@
       "at": "start",
       "then": 0.0
      }
-    },
-    "PCClipSeconds": {
-     "Stand_Left": 0.53
     }
    }
   },

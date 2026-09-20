@@ -33,7 +33,7 @@
      "clip": "WaitSea",
      "role": "Olga",
      "item": "Submarine",
-     "then": 10.33
+     "then": 0.0
     }
    },
    "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"
@@ -68,7 +68,6 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 10.67,
     "PCUseSecondsTricked": 6.42,
     "PCUseSecondsLinked": 8.75,
     "PCShout": 1,
@@ -77,7 +76,8 @@
     "PCCreditAtLinked": 4.25,
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 1.58,
-    "PCLinkedPaysAt": 6.08
+    "PCLinkedPaysAt": 6.08,
+    "PCUseSeconds": 10.67
    }
   },
   {

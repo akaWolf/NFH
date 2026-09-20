@@ -123,9 +123,14 @@ CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', '
 # a clip held until another role has used an item (PCWaitFor), then `then` —
 # the (object, action) parts after it: 202's swim step polls for the `sub`
 # (0x100224a8-0x10022563) that Olga's Submarine use switches into the sea,
-# then the dive step plays the kid's dive and run ashore (0x10022046)
+# and goes on to the dive step at once, which pushes the kid's dive, the
+# switch and his run ashore onto the KID's queue (fcn.1000aeb8's sequence,
+# fcn.10049216 on the actor fcn.1004ba02 finds for `kid`, 0x100220a1-
+# 0x100221e3) and hands over to the sea step (0x10021d68) — he waits for
+# none of it (the video: into the sea as the shark's fin shows); until
+# 2026-09-25 `then` held him for the dive and the run ashore
 WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarine',
-                            'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}},
+                            'then': []}},
          # 205's table: his step polls for the guarded table Olga's `pingpong`
          # step shows as she arrives (0x10025d76), then plays; the play's
          # behavior="sun" (cn_b2 objects.xml), posted as its job ends,
@@ -487,6 +492,46 @@ def write_tricked_keys(ov, n, clips):
             _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
 
 
+def write_code_stays(ov, n, clips):
+    """the stays the level script times (code_stays, RUSH, STAYS_CODE) into
+    the overlay dict in place of those items' — the --write path's for
+    them, the visits per item the overlay's own count (the video pairing's
+    at the last --write)"""
+    if n not in CODE:
+        return
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    lead = LEAD_MOBILE.get(n, {})
+
+    def visits(item):
+        for e in ov['patches']:
+            st = e.get('set') or {}
+            if e.get('object') == item and 'PCUseSeconds' in st:
+                v = st['PCUseSeconds']
+                return max(1, (len(v) if isinstance(v, list) else 1) - lead.get(item, 0))
+        return 1
+
+    def put(item, vals):
+        vals = [0] * lead.get(item, 0) + list(vals)
+        _strip_item_key(ov['patches'], item, 'PCUseSeconds')
+        _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
+    for item, secs in sorted(lap_model_s2.code_stays(n).items()):
+        if item in clips and item not in KEEP_STAYS.get(n, ()):
+            continue
+        put(item, list(secs) if isinstance(secs, list) else [secs] * visits(item))
+    for item, vals in stays_code(n).items():
+        if vals:
+            put(item, vals)
+        else:
+            _strip_item_key(ov['patches'], item, 'PCUseSeconds')
+    if n in RUSH:
+        d = lap_model_s2.Data(n)
+        for item, (obj, act) in RUSH[n].items():
+            t = d.action_ticks(obj, act)
+            if t is not None:
+                put(item, [round(t / 12.0, 2)])
+
+
 def write_code_keys(n):
     """the keys read from the code and the level data alone (PCClipSeconds,
     PCWaitFor, PCCreditAfter, PCBehaviourAt) into the level's overlay — the
@@ -511,10 +556,7 @@ def write_code_keys(n):
     for item, secs in behaviour_at_end(n).items():
         _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
     write_tricked_keys(ov, n, clips)
-    for item, vals in stays_code(n).items():
-        _strip_item_key(ov['patches'], item, 'PCUseSeconds')
-        if vals:
-            _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
+    write_code_stays(ov, n, clips)
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     print('   written', p)
 

@@ -28,11 +28,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 4.25,
     "PCUseSecondsTricked": 4.08,
     "PCShout": 0,
     "PCFixSeconds": 1.58,
-    "PCCreditAt": 1.42
+    "PCCreditAt": 1.42,
+    "PCUseSeconds": 4.25
    }
   },
   {
@@ -48,11 +48,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 4.92,
     "PCUseSecondsTricked": 7.0,
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCCreditAt": 4.33
+    "PCCreditAt": 4.33,
+    "PCUseSeconds": 4.92
    }
   },
   {
