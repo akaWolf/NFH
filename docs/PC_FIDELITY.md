@@ -475,7 +475,9 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   second), and the neighbour sees Woody in his room whatever he is doing
   except from inside a `neighbor_hideout` (`sees_while_busy`: 109's bed,
   where a walking Woody's noise 1 wakes him and a sneaking one's 0 does
-  not) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows
+  not; since 2026-09-25 the wake is the pig class's: he leaves the bed —
+  BedOut, a frame a tick — skips the alarm clock and catches from the
+  room after) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows
   (Season 1; Season 2 keeps the mobile's windows until GameLogic's watch
   mode bits are read). The harness's dodging reads the same paces (`_speed`, `woody_speed`,
   `door_time`, and `_door_climb` — the ~0.65 u climb to a back door, one
