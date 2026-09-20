@@ -681,18 +681,29 @@ predicate, then the all-tricks win.
   fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
   -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
   set is skipped.
-- **The PC profile's co-actor hit** (PCHitSeconds, `World.pc_affect_early`,
-  `Routine._hit_begin`, play_angry's affect): the action's behavior fires
-  as his tricked use starts (the job's state 0, fcn.100018a6), so Olga or
-  the Mother sets off for him then (her script's run, gait 2); her hit
-  begins on arrival — the PC's job queues lock no other actor
-  (fcn.100492a8) — at the generic `fight`'s pace (fcn.1000eb19: Olga 42
-  ticks, the Mother 39), and his parked angry resumes as it begins, or at
-  his use's end if it began before (`Pawn.pc_hit_started`): the fight's
-  behavior sets his step's latch at its start and his SHOUT plays
-  alongside it. Season 2 under the profile only; the mobile keeps the hit
-  first. 214's StopOlgaInfiniteLoop, which now comes during her hit, is
-  kept for her next pose (`Routine._pc_release_pose`).
+- **The PC profile's behaviours** (GameLogic's DoActions job, update
+  0x100020c0): an action's behavior= is posted as its job ends (state 2,
+  fcn.1004000a at 0x10002708) — the Loader's time + 2 ticks after the
+  job's first update (`tools/pcref/lap_model_s2.Data.job_ticks`) — and
+  offered on the next level tick; the job's start sends only a text
+  (fcn.100018a6). Carried where the answer is timed: the lost game's run
+  (`DexterityState.pc_offer`, PCMinigameFailedTicks: 13 ticks after the
+  loss), 203's shout (PCMinigameFailedClip `ticks`), a behaviour posted
+  early in a stay (PCBehaviourAt: 205's `talk`, 213's `bull`) or after
+  another actor's use (PCBehaviourAtEnd: 213's ride) cutting the other's
+  waiting loop at once (`Routine._pc_behaviour_cut`, the stop-infinite
+  and once-loop targets), 210's call (PCWaitFor `then`) and order (the
+  Stand_Left clips), 214's `standup` at his play's end (the mobile's
+  moment).
+- **The PC profile's co-actor hit** (PCHitSeconds, `Routine._hit_begin` /
+  `_hit_pawn_done`, play_angry's affect): the mobile's order — his
+  tricked action's behavior is posted as it ends, Olga or the Mother
+  sets off for him then (her script's run, gait 2, PCRunTo), her hit
+  hides him (the `fight`'s object is he: `inv`, then `ms2`) at the generic
+  `fight`'s pace (fcn.1000eb19: Olga 42 ticks, the Mother 39), and his
+  parked angry resumes as it ends (its olga_fight / mother_fight sets his
+  step's latch). The early set-off of 2026-09-24 (the start reading) is
+  gone.
 - **The PC profile's linked continuation** (207's sand castle over the
   hedgehog's towel: PCHitSecondsLinked, PCResumeHeadSeconds,
   PCExtraCoinLinked): Olga's lift paced to its ticks, then the head of
@@ -728,8 +739,8 @@ predicate, then the all-tricks win.
   reads the interrupted action's item and loses it — and the wcright
   record (the Toilet211 extra coin and its completion) pays 2.25 s into
   the puke (`_urgent_arrived` arms `pc_credit3_timer`, `_s2_credit`'s
-  `toilet` part); Olga's hit after the puke is her mad and fight less the
-  puke (PCHitSeconds); `pc_affect_early` leaves a rush's co-actor alone.
+  `toilet` part); Olga's hit after the puke is her mad and fight
+  (PCHitSeconds 6.33: `puke` is posted as the puke's job ends).
 - **The PC profile's per-visit move**: PCApproach `txt` may be a list,
   one move per visit (201's soaped puddle, [200, -100], the slips' two
   sides; `Routine._pc_arrived`).
@@ -737,13 +748,14 @@ predicate, then the all-tricks win.
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
   `talk` and the 72-tick wait. ItemToStopInfiniteAnimation cuts the
-  item's loop at once (the `talk`'s behavior="pingpong" answered on the
-  next tick); an item not in its loop yet passes its next use at once
+  item's loop PCBehaviourAt into the stay (the `talk`'s behavior=
+  "pingpong", posted as its 3-tick job ends and answered on the next
+  tick: 0.33 s); an item not in its loop yet passes its next use at once
   (`Item.pc_cut_pending`, every clip skipped). An item's own use clips
   run at PCItemClipSeconds while another role uses it hidden
-  (`World.play_use_item_anim`: Olga's mat). A wait with `abort` fires the
-  use's PawnToAbortMutexOnFinish at its release (his play: Olga's table
-  mutex ends as it starts).
+  (`World.play_use_item_anim`: Olga's mat). Her table mutex ends with his
+  play (the use's PawnToAbortMutexOnFinish: `sun` is posted as the play's
+  job ends).
 - **The PC profile's return to a tricked station** (PCTrickReturn,
   `Routine._pc_defer_angry` / `_pc_return_use`): the tricked use pays as
   it ends and its angry set waits for the station's next visit, reached

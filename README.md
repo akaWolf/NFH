@@ -202,8 +202,9 @@ NFH_TEXTURES=textures python3 runtime/viewer.py levels/s1/Level101.json
   `talk` at Olga's mat calls her to the table and he waits 72 ticks, then
   plays once she is there, and her mat's wake-up and get-up and the table's
   play run at the code's ticks — a timed mutex for his mat, her mat's loop
-  cut at his arrival, the mat's own clips at the PC's (PCItemClipSeconds),
-  his play held for her and her release as it starts ("205's table"); his
+  cut on his talk's behaviour, the mat's own clips at the PC's
+  (PCItemClipSeconds), his play held for her and her release as it ends
+  ("205's table"); his
   lap is 102 s, the video's 102, and the v3 plan still rates 100. And
   207's board: he dives only once the Mother sits in her deck chair, and
   she stays in it while he is in the pool room — her pool and chair and
@@ -242,18 +243,20 @@ is drawn as GFXEngine draws it since 2026-09-24: its middle Woody's
 the icon and the thumb at their textures' own sizes in the level's px, the
 thumb at the setter's offset for the state message's pair; the images are
 the remaster's by name and size (the PC data copy has none), and the
-progress bar's front is missing from both; a lost game's run comes a
-level tick later, cutting the neighbour's walk and waiting out his
-action. A Season 2 tricked visit is the PC step's since
+progress bar's front is missing from both; a lost game's run comes
+thirteen level ticks later — Woody's `failed` action posts it as its job
+ends — cutting the neighbour's walk and waiting out his action. A Season 2 tricked visit is the PC step's since
 2026-09-24: its stand, its SHOUT — the action the binary's tables give the
 level, shout2 or shout2_hard, a freakout once the gauge has overflowed —
 its repair, and each named record's credit at its own tick, the linked
 trick's variant apart (202's rail over the eels' pond: crash, electrify,
 SHOUT 2); the flow past a step with no SHOUT of its own (204's gong,
 205's skis, 211's sweets, 214's wheel behind the door, 206's weights and
-dynamite), the co-actor's hit (Olga or the Mother runs to him and fights
-on arrival, his SHOUT alongside: 204's rickshaw, 207's shell, 210's
-elephant, 214's shower, bouquet and pistol), 210's dog basket alone with no SHOUT at all, 212's ledge with the
+dynamite), the co-actor's hit (Olga or the Mother runs to him once his
+action has ended and fights him, his SHOUT after it: 204's rickshaw,
+207's shell, 210's elephant, 214's shower, bouquet and pistol — an
+action's behaviour is posted as its job ends, docs/PC_VERIFICATION.md
+"an action's behaviour", 2026-09-25), 210's dog basket alone with no SHOUT at all, 212's ledge with the
 parrot's shit the level's aux script leaves on it, 213's bull charging
 him into the wall (the step's own byte), 206's rabbit armed at the load
 and shot after the harpoon's take, 211's sweets on to the SHOUT after the

@@ -163,8 +163,9 @@ follows the mouse one to one with no remaster drift or margins, the first
 three ticks centre it, the push and the alarm field are the PC's, the
 drawn thumb is the state message's pair (below); a lost game sends
 the neighbour onto the object at a run where the `failed` behaviour
-reaches him (the mobile's surprise, Routine.pc_run_next — a level tick
-after the loss, DexterityState.pc_offer_tick) and nobody on
+reaches him (the mobile's surprise, Routine.pc_run_next — thirteen level
+ticks after the loss, the `failed` job's end and the offer,
+DexterityState.pc_offer_tick; "The lost game's run" below) and nobody on
 201, 212 and 213 (PCMinigameFailed; 201's toolbox loses like the rest, the
 mobile's DexterityCannotLose aside). 214's game is the
 hatch's shards round (bottomright/hatch_closed, the phase his first fall
@@ -188,10 +189,11 @@ middle: 3 + time/4 ticks) — the rate is the thumb's of one tick earlier;
 the fourteen Season 2 runs are byte-identical under it. 203's lost game
 plays Olga's shout first since 2026-09-24: her `shout` action is
 shout_chinese (69 frames, 5.75 s) then eat_chinese (cn_c2's olga record),
-and its own behaviour, his `run`, fires as it starts — the port's Olga
-plays her Shout clip paced to the 69 frames and goes back to her
+and its own behaviour, his `run`, is posted as its job ends — the port's
+Olga plays her Shout clip paced to the 69 frames and goes back to her
 EatChinese (PCMinigameFailedClip, DexterityState._pc_failed_clip), his
-run at the same moment; 201's reaches the tutorial's director
+run offered 71 ticks after her shout begins (its job's 70, the Loader's
+time 68 + 2, and the offer's tick); 201's reaches the tutorial's director
 ("201's tutorial"). The field is GFXEngine.dll's since 2026-09-24 (read that day). Its middle
 is Woody's `minigame` hotspot, `<hotspot name="minigame" offset="0/-150"/>`
 in generic/objects.xml: the use_object step (fcn.10041735) reads it as the
@@ -247,34 +249,48 @@ the walking line plus the lift (2026-09-24, later): the field of 204 shows
 point. The moment of his run is the PC's (below, "the lost game's
 run").
 
-The lost game's run (read 2026-09-24). Woody's `failed` action posts its
-behaviour on its step's first run (state 0, fcn.100018a6), inside the
-actors' pass; the level update's walker (fcn.1003fc90 at 0x100445f1,
-before the actors' pass at 0x100445f8) makes the behaviour by name on the
-next tick (fcn.1003e769 over the registry) and offers it to the actor
-(fcn.1004b27f -> fcn.1004abcf), again every tick until it is taken. His
-jobs vote front to back through slot 5 — 1 passes (the walk and action
-steps, 0x10034d8e), 0 takes it (a runner under them: the classes with
-the never-finishing update 0x10013f16 / 0x1002f45d vote 0x10013f1b) — and
-a passing job whose +4 byte is 0 refuses the offer. A taker aborts the
-jobs in front of it through their slot 3 and hands the behaviour over
-(slot 4, which runs its update: `run` pushes the running GoTo). The level
-scripts make the neighbour's walks with +4 = 1 (fcn.1000e3e0 ->
-fcn.10007a10 -> the GoTo job, vtable 0x100ab3d8, whose base constructor
-stores the flag at 0x10007350) and his actions with 0 (the builder
-fcn.1000efcd pushes 0, and 229 of fcn.10002cd5's 287 call sites push two
-zeros, 203 of them a zeroed ebx; the use_object job, whose base
-constructor sets 1 at 0x100042a1, is Woody's use); the co-actor's `fight`
-is made with 0 as well (fcn.1000eb19). So the run cuts a walk a tick after
-the loss and waits out an action, taken as his next walk begins — the
-mobile's DexterityAlert and its deferred watcher, a level tick later; the
-`always` attribute plays no part (every record carries true). The profile
-carries the tick (DexterityState.pc_offer_tick): the offer a level tick
-after the loss and every tick after it until he walks, 203's Olga
-shouting on that tick (her eat_chinese is her actions' next animation,
-no job) and his run offered from the next, 201's `aux` latched a tick
-later. On the twelve levels whose lost game sends him (the plans run
-with NFH_DEX_LOSE) his run starts 0-0.1 s later than the mobile moment.
+The lost game's run (read 2026-09-24, corrected 2026-09-25). The game's
+DoActions job ends on the tick after its count drops below 0 (fcn.10001b2c
+returns done at once, the job's state 2 a tick later); the use_object step
+behind it (fcn.10004526) then reads the game's result (fcn.100507f0 not
+100) and pushes the object's `failed` job in front of itself
+(fcn.10002cd5 and fcn.10049216, whose insert is the queue's front,
+0x100082fe; 0x10004d51-0x10004d69), returning 0, so the job's first
+update is on the tick after. The job posts the action's behaviour as it
+ends (state 2, fcn.1004000a at 0x10002708): Woody's game_failed is 9
+frames, the Loader's time 8 (time="auto": the longer of the actor's and
+the object's oneshot animation less one — 205's duck cage `ms`, a
+179-frame loop, counts for nothing), the job's end 10 ticks after its
+first update (PCMinigameFailedTicks, tools/pcref/pc_minigames.py). The
+level update's walker (fcn.1003fc90 at 0x100445f1, before the actors'
+pass at 0x100445f8) makes the behaviour by name on the next tick
+(fcn.1003e769 over the registry) and offers it to the actor
+(fcn.1004b27f -> fcn.1004abcf), again every tick until it is taken — the
+offer thirteen ticks after the loss. His jobs vote front to back through
+slot 5 — 1 passes (the walk and action steps, 0x10034d8e), 0 takes it (a
+runner under them: the classes with the never-finishing update
+0x10013f16 / 0x1002f45d vote 0x10013f1b) — and a passing job whose +4
+byte is 0 refuses the offer. A taker aborts the jobs in front of it
+through their slot 3 and hands the behaviour over (slot 4, which runs its
+update: `run` pushes the running GoTo). The level scripts make the
+neighbour's walks with +4 = 1 (fcn.1000e3e0 -> fcn.10007a10 -> the GoTo
+job, vtable 0x100ab3d8, whose base constructor stores the flag at
+0x10007350) and his actions with 0 (the builder fcn.1000efcd pushes 0,
+and 229 of fcn.10002cd5's 287 call sites push two zeros, 203 of them a
+zeroed ebx; the use_object job, whose base constructor sets 1 at
+0x100042a1, is Woody's use); the co-actor's `fight` is made with 0 as
+well (fcn.1000eb19). So the run cuts a walk on the offer and waits out an
+action, taken as his next walk begins. The profile carries the ticks
+(DexterityState.pc_offer_tick): the offer thirteen level ticks after the
+loss and every tick after it until he walks, 203's Olga shouting on that
+tick (her eat_chinese is her actions' next animation, no job; her
+handler's update pushes the shout, whose job starts in that tick's pass)
+and his run offered 71 ticks later, 201's `aux` latched on the offer. On
+the twelve levels whose lost game sends him (the plans run with
+NFH_DEX_LOSE) his run starts about a second after the mobile moment — the
+reading of 2026-09-24 had the behaviour posted at the job's start
+(fcn.100018a6, which carries a text, "Behaviours are posted as the action
+ends") and the offer a tick after the loss.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 
@@ -816,11 +832,17 @@ the overlays give the sofa one SitRemote fewer and one SitLoop more
 (12.6 s of sitting, 15 with the walk) and the album eighteen 0.54 s
 PhotoAlbumLoop entries instead of five (a 9.7 s read, 19 with the
 walk); the idle laps under the profile come to +11 % (101) and −6 %
-(106), no activity off by five seconds. The other three stay open: 111
-(−17 %) is a routine of three washer and three drier visits against the
-PC's one long visit each (47 s and 26 s), 213 (−17 %) a cement bath
-whose PC spell is twice the mobile's two animations, 210 (+16 %) a deck
-chair he leaves on the Mother's call — none is a loop count. (Tried
+(106), no activity off by five seconds. The other three were open then
+and are the code's since: 111 (−17 %) is a routine of three washer and
+three drier visits against the PC's one long visit each (47 s and 26 s)
+— one station each in the level class, its DoActions timed (the
+laundry's give, wash, get_clothes; give, dry, take — "111's washer and
+drier" below); 213 (−17 %) a cement bath whose PC spell is twice the
+mobile's two animations — the level script's stay, 9.25 s, the video's
+spell holding a wait (tools/pcref/lap_model_s2.py, "Season 2 station
+durations"); 210 (+16 %) a deck chair he leaves on the Mother's call —
+her cycle and her call's behaviour ("210's call"). None was a loop count.
+(Tried
 anyway on 2026-09-09: with her nap cut to one MotherSleepSingle his
 spell fell only from 54 to 45 s — his ChairAwake runs 27 s after her
 call, so the wait is not her nap alone — and both levels' plans, tuned
@@ -1767,36 +1789,36 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   The co-actor's hit: 204's rickshaw 3.67/0, 207's shell 4.67/0, 214's
   shower 4.0/1, bouquet 4.17/1 and pistol 18.33/0 (the shot and the
   Mother's `die`), 210's elephant 9.08/1 — his action's behavior (204's
-  hurt_neighbor on Olga …) fires as it starts and her script runs her to
-  him (gait 2) and plays the generic `fight` (fcn.1000eb19: Olga 42 ticks,
+  hurt_neighbor on Olga …) is posted as its job ends and her script runs
+  her to him (gait 2) and plays the generic `fight` (fcn.1000eb19: Olga 42 ticks,
   the Mother 39; the action's behavior olga_fight / mother_fight on him),
   his behaviour handler then sets the step with the SHOUT and no repair
   (204 0x10032b6f, 207 0x1001596a, 210 0x1001a379, 214 0x1003ba90 /
   0x1003b677 / 0x1003b328). When his SHOUT comes, read on 2026-09-24
-  (late): DoAction (fcn.10002cd5) builds a job (vtable 0x100aa19c) with its
-  participants and the caller queues it on the acting actor alone
-  (fcn.10049216); an actor's queue (fcn.100492a8) runs its head job each
-  tick and asks nothing of any other actor (only its own flag 0x100000,
-  the camera's freeze); the job (update 0x100020c0) sets its participants'
-  animations in its states 0 and 2 only (0x10002301-0x100024e9: the
-  object's `inv` once at the start, `ms2` at the end), ends by its ticks
-  (+0x28 up to +0x24, fcn.100011f2) and posts its behavior as it starts
-  (state 0, fcn.100018a6 — the job's end posts a bare notice,
-  fcn.100019f7). So her fight starts as she arrives, whatever he is doing,
-  its olga_fight / mother_fight sets his step's latch then, and his SHOUT
-  follows his action's end or her fight's start, whichever is later — and
-  plays alongside the fight. The action attribute `always` (Loader.dll
-  reads it into its action record's +0x24, 0x10009944, the default
-  "true") is true on every action the data has: it tells no action apart.
-  Carried (World.pc_affect_early, Routine._hit_begin, play_angry's
-  affect): she sets off as his tricked use starts, her hit begins on
-  arrival, and his parked angry resumes as it begins (or at once at his
-  use's end if it has begun); her hit keeps the fight's ticks
-  (PCHitSeconds) for her own round. Two mobile hand-offs lean on the old
-  order and are kept to their intent: 214's StopOlgaInfiniteLoop (his
-  fix of the tricked bouquet releases Olga's waiting pose, Item.cs:2581)
-  now comes while she still hits him — the release goes to the pose she
-  takes next. 207's sand castle with the hedgehog on the
+  (late) and corrected on 2026-09-25: DoAction (fcn.10002cd5) builds a job
+  (vtable 0x100aa19c) with its participants and the caller queues it on
+  the acting actor alone (fcn.10049216); an actor's queue (fcn.100492a8)
+  runs its head job each tick and asks nothing of any other actor (only
+  its own flag 0x100000, the camera's freeze); the job (update
+  0x100020c0) sets its participants' animations in its states 0 and 2
+  only (0x10002301-0x100024e9: the object's `inv` once at the start, `ms2`
+  at the end), ends by its ticks (+0x28 up to +0x24, fcn.100011f2) and
+  posts its behavior as it ends — state 2, fcn.1004000a at 0x10002708
+  with the action record's +0x1c / +0x20, the behavior and its actor (the
+  start's message, fcn.100018a6, carries the job's +0x14 / +0x18, a text
+  the GFX shows: "string" / "alreadyininv" of fcn.10002d71's callers;
+  "Behaviours are posted as the action ends" below). So he waits in his
+  fear pose through his action's end and her walk, is `inv` through her
+  fight (its object is he), shows `ms2` as it ends, and its olga_fight /
+  mother_fight sets his step's latch on the tick after: his SHOUT follows
+  her fight — the mobile's order (RoutineActionHitPawn: the target hidden,
+  its parked angry resumed at the hit's end). Carried since 2026-09-25
+  (Routine._hit_begin / _hit_pawn_done, play_angry's affect, the mobile's
+  flow): she sets off as his tricked use ends, her hit hides him and lasts
+  the fight's ticks (PCHitSeconds), his angry resumes at its end; the
+  early set-off of 2026-09-24 (World.pc_affect_early) and its two kept
+  hand-offs (214's StopOlgaInfiniteLoop sent to her next pose, 207's
+  linked lift) are gone with the reading. 207's sand castle with the hedgehog on the
   towel: its linked step (lookaround, the hedgehog's splash 45, the
   castle's fall 22 — its behavior kid_cry on Olga) hands over to
   0x1001513f, which re-runs until the destroyed castle shows Olga's
@@ -1822,10 +1844,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   angry — StopUrgentAction reads the interrupted action's item
   (ActionManager.cs:597), the fishing rod by then — and pays the extra
   with the sweets' own. Carried: the after-toilet angry is the rush's own
-  item under the profile; Olga's fight has begun by the puke's end (her
-  mad 34 ticks from its start), so his SHOUT follows the puke at once and
-  her hit keeps the rest of her mad and fight for her round (36 ticks,
-  PCHitSeconds 3.0: the mobile's HitPawnSequence OlgaWCMad, HitPawn); the
+  item under the profile; the puke's job posts `puke` as it ends, her mad
+  starts on the offer and her fight follows it, so his SHOUT follows the
+  puke by her mad and fight (76 ticks, PCHitSeconds 6.33: the mobile's
+  HitPawnSequence OlgaWCMad, HitPawn — 3.0 until 2026-09-25, the mad and
+  fight less the puke under the start reading); the
   wcright record — the Toilet211 extra coin and its completion — pays
   2.25 s into the puke (PCToiletPaysAt, World.pc_s2_extra_credit); the
   repair's walk to the sign, below. Open, with numbers: 210's
@@ -1862,7 +1885,7 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   ticks) and back to the awake step; `crash` sends her running to him
   (0x1003a21c, gait 2) and then to sleep. `standup` is the pistol's: its
   `use` carries behavior="standup" for the mother (ship4 objects.xml),
-  fired as the use starts. His pistol step (0x1003aa93) tests her after
+  posted as the use's job ends. His pistol step (0x1003aa93) tests her after
   the walk — her current action the deck chair's and her flag 4 clear
   (0x1003abc9-0x1003ac19) — and otherwise plays `wait` and re-runs each
   tick (0x1003ad7d) until she sits awake. The mobile's Level214 pair is
@@ -1871,8 +1894,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   WaitWatch) and races: a sit while he walks to the pistol leaves his
   WaitWatch with no release — the deadlock the PC stays had hit. Carried
   under the profile: RottweilerMotherBehaviour polls her each tick while
-  he waits at the pistol and fires mother_sleep as PistolPlay starts
-  (the pistol's stay its `use` alone); MotherSleepBehaviour plays her
+  he waits at the pistol and fires mother_sleep as his play ends — the
+  mobile's moment, cs:116-119; as PistolPlay started until 2026-09-25,
+  the start reading (the pistol's stay its `use` alone); MotherSleepBehaviour plays her
   sit at the chair's `enter`, her sleeps at the bar's 600 ticks and the
   get-up at the `leave` (PCSitSeconds / PCSleepSeconds / PCGetUpSeconds,
   tools/pcref/pc_durations_others.py BARS), MotherWait at the reling's
@@ -1947,12 +1971,14 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   with his flag 4 on: she stays awake and the step re-runs each tick. The
   chair with his flag 4 off: her sequence is the chair's `leave` (getup,
   16 frames) and `callneighbor`, whose behavior="call" (generic/
-  objects.xml, fired as it starts) his handler 0x1001b4f6 answers at once
-  — his call step 0x1001911e plays his chair's `leave` (17 frames), swaps
+  objects.xml, posted as its job ends, 21 ticks) his handler 0x1001b4f6
+  answers on the offer — his call step 0x1001911e plays his chair's
+  `leave` (17 frames), swaps
   the guarded chair for the plain one and runs him (the gait write
   0x10019270) to her chair's `neighbor` hotspot, where her order step
   0x10018682 polls for him (fcn.1000e172) and plays `order`: its
-  behavior="order" sends him on (0x1001aecc: the walk to Fifi, her
+  behavior="order", posted as its job ends (18 ticks), sends him on on the
+  tick after (0x1001aecc: the walk to Fifi, her
   `tickle`, 19 frames, then the take 0x1001aac8) and her back to the sleep
   step. Her call, her wait and her order stand where she got up (the
   chair's `mother` and `mother_out` hotspots are one point). His chair
@@ -1972,9 +1998,12 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   (MotherWakeSleepBehavior: he away — the look and the sleeps again; he
   in his chair — the look held until his flag 4 is off, then the get-up);
   his chair per clip (the enter 0.58, the sun 2.5 × 4, the wakeup 0.33)
-  with the awake loop held until her call begins (PCWaitFor `at` start)
-  and his flag 4 off from it (PCHideout, tools/pcref/pc_catch_s2.py with
-  the flag element); his stands at her chair none and her wait held
+  with the awake loop held until her call begins and 1.83 s more — her
+  call's job and the offer's tick (PCWaitFor `at` start and `then`; at
+  once until 2026-09-25, the start reading) — and his flag 4 off from it
+  (PCHideout, tools/pcref/pc_catch_s2.py with the flag element); his three
+  stands at her chair her order's job and the offer's tick, 0.53 s each
+  (PCClipSeconds Stand_Left; none until 2026-09-25) and her wait held
   until he has come (PCWaitForRole); a station of the same PC object
   reached with no walk (`Pawn._pc_departure_step`: her call spot and her
   chair; the routine actors only); his stays the code's from her order on
@@ -1986,16 +2015,21 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   port walks 53.4 on the mobile rooms — comes to ~101, the video's first
   lap to 107 (the stays before, the video's, had it at 86.8). The v23
   plan rates 100 under it (runs/call210s2c: 262.7 s); its notes were
-  re-timed (v24).
+  re-timed (v24). With the behaviours at the actions' ends (2026-09-25)
+  his lap is 3.4 s longer at the call (the call's job and offer before he
+  leaves his chair, her order's before he goes on) and her naps later
+  with it: the v25 plan takes the fishing net on her first nap on its way
+  round to Zone03 (the v24's, on her second, had her wake on Woody) —
+  100 at 296.0 s.
 - *205's table (2026-09-24).* The neighbour's script (GameLogic.dll:
   its constructor 0x10025a88 starts him at the mat step and arms the
   step's `talk`, byte +0xd) walks him to Olga's mat (0x100258fd) and
-  plays `talk` — behavior="pingpong" on Olga (cn_b2 objects.xml, fired as
-  it starts) — then a wait element of 72 ticks (fcn.1000ca24, vtable
+  plays `talk` — behavior="pingpong" on Olga (cn_b2 objects.xml, posted
+  as its job ends: 2 frames, 3 ticks) — then a wait element of 72 ticks (fcn.1000ca24, vtable
   0x100ab804: its run 0x1000c9de counts them down), and goes to the table
   (0x100254d5), where he waits, the step re-run each tick, until the
-  guarded table shows, then plays `play` (51 ticks), whose behavior="sun"
-  sends Olga back; then the skis (0x100251eb: `skiing`, 208 ticks, the
+  guarded table shows, then plays `play` (51 ticks), whose behavior="sun",
+  posted as its job ends, sends Olga back; then the skis (0x100251eb: `skiing`, 208 ticks, the
   ride's translations; 0x10024e37: the gait 5, skiwalk, back to the ski
   and `putski`, 7 ticks), the chef
   (`cut_eel`, `eat_eel`), the rocket (`ignite`), the sand lion
@@ -2010,13 +2044,17 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   wake-up and get-up at 8 a second — and plays Tennis at the table at
   once, she parks there until his Tennis ends. Carried under the profile:
   his mat a timed mutex (PCUseSeconds 6.17 — the talk and the wait; her
-  abort of it ignored), her mat's loop cut at his arrival
-  (ItemToStopInfiniteAnimation at once; not on the mat yet, her next mat
-  use passes at once — `Item.pc_cut_pending`), the mat's clips at the
+  abort of it ignored), her mat's loop cut on the talk's offer, 0.33 s
+  into his stay (PCBehaviourAt: the talk's job and the offer's tick,
+  tools/pcref/pc_durations_s2.py BEHAVIOUR_AT; at his arrival until
+  2026-09-25) — ItemToStopInfiniteAnimation at once; not on the mat yet,
+  her next mat use passes at once, `Item.pc_cut_pending` — the mat's clips at the
   PC's ticks under her (PCItemClipSeconds: the lie-down and the get-up
   0.67, the sun loop 7.58, the wake-up 2.83), his Tennis held until her
   table use has begun and played for the `play` (PCWaitFor `at` start,
-  4.25 s; `abort`: her table mutex ends as it starts), and his stays the
+  4.25 s; her table mutex ends with his use, the mobile's
+  PawnToAbortMutexOnFinish — at the play's start until 2026-09-25, the
+  start reading's `abort`), and his stays the
   code's (the ride 17.33 and the put 0.58, the chef 7.25, the rocket 2.17,
   the lion 7.08; tools/pcref/lap_model_s2.py now reads the wait element, a
   step in phases — the mat's `talk`, then its wait — and a level's own
@@ -2071,6 +2109,71 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   karate 4.25, the gong 3.5 (the video's had the kart at 1.0); the idle lap
   is 84.3 s, the model with the PC's walks 92.8, the video 81. The plan
   still rates 100 (the pile on lap 4: 100 at 314.6 s).
+- *Behaviours are posted as the action ends (2026-09-25).* GameLogic's
+  DoActions job (the update 0x100020c0 of the vtables 0x100aa184 /
+  0x100aa19c) walks its action list in three states: state 0 sets each
+  participant's animation (the object's objanim, the actor's actoranim),
+  makes the engine's watch entry for an action whose `noise` is above 0
+  (fcn.1004008d, 0x10002478 / 0x100024af) and sends the start message
+  (fcn.100018a6 — the job's +0x14 / +0x18, a text for the GFX's visitor
+  slot 48, 0x1000a220: fcn.10002d71's callers pass "string" and
+  "alreadyininv"), the job's count to the longest action's time (+0x24);
+  state 1 counts +0x28 up past it (fcn.100011f2); state 2 sets the next
+  animations (objnextanim, actornextanim), posts each action record's
+  behavior (+0x1c) to its behavioractor (+0x20) — fcn.1004000a at
+  0x10002708, the watch registry's record the level update's walker
+  (fcn.1003fc90) offers on the next tick — and ends the job (the end
+  message fcn.100019f7). The abort slot (0x10001d1b) sets the next
+  animations and posts the behaviour too when the record's byte +0x24 is
+  set (0x10002009-0x1000203f) — the `always` attribute, Loader.dll's
+  default "true". Loader.dll stores the record's time at +0x28:
+  time="N" as N, time="auto" as the longer of the actor's animation (the
+  action's actor's set) and the object's (its gfx's set) less one, at
+  least 0 — a oneshot's frame count, a loop or a missing animation -1
+  (0x10004781 with its flag 1: the anim's loop byte), "inv" not asked
+  (0x10009704-0x10009842). So an action's behaviour reaches its actor
+  the Loader's time + 3 ticks after the job's first update, as the
+  action ends; the reading of 2026-09-24 (posted as it starts, from the
+  start message) is withdrawn, and with it the start carries: the lost
+  game's run, 203's shout, the co-actor's fight, 205's talk and play,
+  210's call and order, 211's puke and 214's pistol (the sections above,
+  corrected), and 213's bull (below). tools/pcref/lap_model_s2.py
+  `Data.loader_time` / `job_ticks` give the numbers; the lap model's
+  stays still count an auto action by its frames (the job lasts one tick
+  more, two for a time="N" one — within the model's ±15 % of the videos,
+  open as a model refinement). 204's gong already waited for the strike's
+  end (its stay the strike's 42 ticks) and 202's `kid_cry` rides the
+  mobile's crying at his next station, the mat's `leave` over. Under it
+  210 and 211 were re-planned (210 v25: the fishing net on the Mother's
+  first nap, 100 at 296.0 s; 211: the child and the phone from Zone02
+  once she is back asleep after her lap-3 visit to the child, the
+  overflow at 259.6 s), and all fourteen Season 2 plans rate 100
+  (runs/end2s2); Season 1 and the mobile regression are byte-identical
+  (end1s1, end1mob).
+- *213's bull (2026-09-25).* His controls step (0x10037e80) walks him to
+  bottomleft/bullride_controls and re-runs each tick until Olga stands at
+  the bull's hotspot (fcn.1000e172 on bottomleft/bullride_olga), then
+  posts `bull` to her (fcn.1004000a, 0x10037f5e — the step's own post, as
+  he arrives) and plays the controls' `use` (activate, 11 frames); his
+  next step waits for `leave` (the latch +0x20) and passes on the tick it
+  is set. Olga's bull step (0x10039078) walks her to the bull and waits
+  for her `bull` latch, then plays bottomleft/bullride_olga's `use` (the
+  `ride`, 81 frames — `crash` with the manipulated controls shown),
+  whose job posts `leave` to him as it ends (82 ticks). The PC's span
+  from his walk to the controls to his going on: the walk (57 ticks) and
+  the ride from the tick after his arrival to the offer of its `leave`
+  (84) — 141 ticks, 11.75 s, against the video's 12.0 (the port's had
+  been 17.2: the controls 0.3 + 0.4 and a 6.4 s wait split off the video,
+  and his wait released at the round of his loop after her mobile 10.1 s
+  ride). Carried: the controls' stays the code's (PCUseSeconds 0.92, the
+  `use`, and 0.08, the latch step's pass; `STAYS_CODE`), no stay on the
+  wait (MechanicalBullControlsWait's loop ends on her `leave`), her
+  ride's clip at its frames (PCClipSecondsRole BullRide 6.75), her
+  waiting loop cut 0.08 s into his controls (PCBehaviourAt: the `bull`
+  offer; the mobile's once-loop flag at his use's start) and his cut
+  0.17 s after her ride (PCBehaviourAtEnd: the job's tick past the frames
+  and the offer; the mobile's once-on-end flag) — `Routine.
+  _pc_behaviour_cut`.
 - *The overlay writers' shared patches (2026-09-24).* tools/pcref/
   pc_walks_s2.py rebuilt its keys (PCPass, PCApproach, PCRoom) by dropping
   every patch that carried them, pc_catch_s2.py its PCHideout likewise, and
