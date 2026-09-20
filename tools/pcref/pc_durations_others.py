@@ -79,7 +79,12 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                                          'TowelLaydown': ('beachleft_mat_olga_guarded', 'wakeup'),
                                          'BeachGetUp': ('beachleft_mat_olga_guarded', 'leave')}),
                     'Submarine': ('Olga', {'OlgaPutSub': ('beachleft_sub', 'take'),
-                                           'OlgaPutSubTricked': ('beachleft_shark', 'take')})}}
+                                           'OlgaPutSubTricked': ('beachleft_shark', 'take')})},
+              # 213's Olga on the bull (her step 0x10039078: the walk to it, the
+              # latch her `bull` handler sets — his controls step posts it as
+              # he arrives, 0x10037f5e — and bottomleft/bullride_olga's `use`,
+              # ride, whose job posts `leave` to him as it ends)
+              213: {'MechanicalBull': ('Olga', {'BullRide': ('bottomleft_bullride_olga', 'use')})}}
 
 
 # level -> mobile item -> {the item's clip: the PC's part} — an item's own
@@ -187,7 +192,9 @@ def main(argv):
     write = '--write' in argv
     levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE)
                                                              | set(ITEM_CLIPS))
-    mob = json.load(open(os.path.join(SCRATCH, 's2_idle_others.json')))
+    # the profile's idle runs, for the printed comparison only
+    mp = os.path.join(SCRATCH, 's2_idle_others.json')
+    mob = json.load(open(mp)) if os.path.exists(mp) else {}
     for n in levels:
         d = S2[n]; acts = pc_actions(d)
         byname = {}

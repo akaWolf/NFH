@@ -440,6 +440,21 @@ def _frames_of(text):
     return out
 
 
+def _loops_of(text):
+    """{(object, animation)} of an anims.xml's type="loop" animations"""
+    out = set(); obj = None
+    for m in re.finditer(r'<(/?)(object|animation)\b([^>]*?)(/?)>', text):
+        close, tag, attrs, empty = m.groups()
+        if tag == 'object':
+            nm = re.search(r'name="([^"]+)"', attrs)
+            obj = nm.group(1) if (nm and not close and not empty) else None
+        elif not close and obj is not None and re.search(r'\btype="loop"', attrs):
+            nm = re.search(r'name="([^"]+)"', attrs)
+            if nm:
+                out.add((obj, nm.group(1)))
+    return out
+
+
 def _actions_of(text):
     """{object or actor name: {'gfx': .., 'act': {(actor, name): attrs}}}"""
     out = {}
@@ -479,6 +494,8 @@ class Data:
         self.generic = _actions_of(canon.read('%s/generic/objects.xml' % X))
         self.frames = _frames_of(canon.read('%s/%s/anims.xml' % (X, folder)))
         self.gframes = _frames_of(canon.read('%s/generic/anims.xml' % X))
+        self.loops = _loops_of(canon.read('%s/%s/anims.xml' % (X, folder))) \
+            | _loops_of(canon.read('%s/generic/anims.xml' % X))
         # the code's constants spell 'room/object' as 'room_object'; rooms have
         # underscores of their own (fire_fakir, tadj_mahal, coal_area)
         self.real = {k.replace('/', '_'): k for k in self.objects}
@@ -560,6 +577,62 @@ class Data:
             if f:
                 return f
         return None
+
+    def loader_time(self, obj, name, actor='neighbor'):
+        """the action record's time as Loader.dll stores it (+0x28 of its
+        action record, 0x10009842): time="N" as N; auto the longer of the
+        actor's animation (the action's actor's set) and the object's (its
+        gfx's set), each the frame count of a oneshot animation — a loop or
+        a missing one counts -1 (0x10004781 with its flag 1: the anim's loop
+        byte, 0x10004812-0x10004823), "inv" not asked (0x10009730) — less
+        one, at least 0 (0x1000982b-0x10009842); None if the action is not
+        in the data"""
+        o = self.real.get(obj, obj)
+        e = self.objects.get(o) or self.generic.get(obj)
+        if e is None:
+            return None
+        acts = e['act']
+        a = acts.get((actor, name))
+        if a is None:
+            g = self.generic.get(obj)
+            a = (g or {}).get('act', {}).get((actor, name))
+            if a is not None:
+                e = g
+        if a is None:
+            a = next((v for (ac, nm), v in acts.items() if nm == name), None)
+        if a is None:
+            return None
+        t = a.get('time', 'auto')
+        if t.isdigit():
+            return int(t)
+
+        def frames(owner, anim, *alts):
+            for k in (owner,) + alts:
+                if (k, anim) in self.loops:
+                    return -1
+                f = self.frames.get((k, anim))
+                if f is None:
+                    f = self.gframes.get((k, anim))
+                if f is not None:
+                    return f
+            return -1
+        v = 0
+        ac, aa = a.get('actor'), a.get('actoranim')
+        if ac and aa and aa != 'inv':
+            v = frames(ac, aa)
+        oa = a.get('objanim')
+        if oa and oa != 'inv':
+            v = max(v, frames(e['gfx'] or o, oa, o))
+        return max(v - 1, 0)
+
+    def job_ticks(self, obj, name, actor='neighbor'):
+        """the ticks of the action's DoActions job from its first update to
+        its last — the state 0 update, a count up to the record's time
+        (fcn.100011f2: +0x28 past +0x24), the state 2 update that sets the
+        next animations and posts the action's behavior (fcn.1004000a,
+        0x10002708) and ends the job: the Loader's time + 2"""
+        t = self.loader_time(obj, name, actor)
+        return None if t is None else t + 2
 
 
 # the elements done on their first update (the sequence's element returns 1 at
@@ -1038,7 +1111,8 @@ PAIRS = {
     # CLIPS, Level207MotherBehavior)
     # his lap from the gong's `leave` (the hot dogs, the jade, the rickshaw
     # Olga sits in, the headbanger, the gong the elvis figure strikes — its
-    # behavior="gong" on him sends him out of it as it starts)
+    # behavior="gong" on him, posted as the strike's job ends, sends him out
+    # of it)
     204: {'HotDog': [('hotdogshop', 'neighbor', 'lookaround'), (None, 'hotdogshop', 'use')],
           'JadeNecklace': [(None, 'jadedummy', 'look')],
           'PullKart': [(None, 'rickshaw', 'use')],
@@ -1208,11 +1282,12 @@ TRICKED_ARM_LINKED = {206: {'Harpoon': (1, 2, 3)}}
 # wcright record and the behavior `puke` on Olga, whose handler (0x100318ce)
 # queues her wc `mad` and makes her fight step 0x1003183a (fcn.1000eb19's
 # approach, the generic `fight`) her next; the fight's olga_fight sets his
-# step's latch +0xd (0x100301fb), on which 0x10030d0f plays SHOUT 1. Olga's
-# mad starts with the puke and her fight follows it at the same hotspot, so
-# his SHOUT comes mad + fight after the puke's start: the port's hit after
-# the toilet lasts that less the puke. (item: the wc object, its action, the
-# co-actor, her action at it)
+# step's latch +0xd (0x100301fb), on which 0x10030d0f plays SHOUT 1. The
+# puke's job posts `puke` as it ends (state 2, fcn.1004000a at 0x10002708),
+# Olga's mad starts on the offer and her fight follows it at the same
+# hotspot, so his SHOUT comes mad + fight after the puke's end: the port's
+# hit after the toilet. (item: the wc object, its action, the co-actor, her
+# action at it)
 TRICKED_RUSH = {211: {'Sweets': ('topleft_wcright', 'puke', 'olga', 'mad')}}
 # a station's tricked variant where the lap's step has none and other steps of
 # the script play it, their events in order: 201's damaged buffet in the
@@ -1666,8 +1741,8 @@ def code_stays_tricked(n):
         recs = d.tricks(obj, act)
         if puke is not None and recs:
             out[item]['toilet_pays_at'] = round(recs[0][1] / 12.0, 2)
-        if None not in (puke, mad, ft):
-            out[item]['hit'] = {actor: round(max(0, mad + ft - puke) / 12.0, 2)}
+        if None not in (mad, ft):
+            out[item]['hit'] = {actor: round((mad + ft) / 12.0, 2)}
     for item, (stp, tricks) in TRICKED_VIA.get(n, {}).items():
         lv2 = Level(n)
         lv2.present = set(lv.present)

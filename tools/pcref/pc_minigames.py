@@ -40,6 +40,12 @@ the port's Olga plays her Shout for the clip's 69 frames, then her
 EatChinese); on 201's tutorial
 toolbox `run` on `aux`, the level's invisible dummy at 0/0 (ship1/level.xml),
 and on 212's spikes and 213's pinata no behaviour at all — nobody comes.
+The use_object step pushes the `failed` DoActions job in front of itself
+(fcn.10002cd5 and fcn.10049216's push_front, 0x10004d51-0x10004d69) on the
+tick after the game's end, and the job posts its behaviour as it ends
+(state 2, fcn.1004000a at 0x10002708): Woody's game_failed, 9 frames, the
+Loader's time 8, the post 10 ticks after the job's first update
+(PCMinigameFailedTicks); Olga's shout likewise 70 ticks after hers.
 
 Woody plays the game where the use put him: the object's `woody` hotspot
 (its level.xml position plus the hotspot offset), which is off the room's
@@ -108,8 +114,9 @@ def failed_clip(n, obj):
     """the clip a lost game's behaviour plays on its actor when that is not
     the neighbour's own `run`: the actor's level record's action named after
     the behaviour — 203's olga `shout`: shout_chinese, 69 frames at 12 a
-    second, then eat_chinese; its own behaviour, the neighbour's `run`, fires
-    as it starts — as {role, clip, secs, then}, None elsewhere"""
+    second, then eat_chinese; its own behaviour, the neighbour's `run`, is
+    posted as its job ends, `ticks` after its first update — as {role, clip,
+    secs, then, ticks}, None elsewhere"""
     folder = canon.pc_level(n)['folder']
     s = canon.read('%s/nfh2/x/%s/objects.xml' % (canon.ROOT, folder))
     m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), s, re.S)
@@ -131,7 +138,18 @@ def failed_clip(n, obj):
     role = {'olga': 'Olga', 'mother': 'Mother'}[actor]
     return {'role': role, 'clip': CLIPS[(actor, ba['actoranim'])],
             'secs': round(frames / 12.0, 4),
-            'then': CLIPS.get((actor, ba.get('actornextanim')))}
+            'then': CLIPS.get((actor, ba.get('actornextanim'))),
+            'ticks': lap_model_s2.Data(n).job_ticks(actor, beh, actor)}
+
+
+def failed_ticks(n, obj):
+    """the ticks of the object's `failed` action as GameLogic.dll runs it:
+    its DoActions job from its first update to the one that posts its
+    behaviour (lap_model_s2.Data.job_ticks: the Loader's time + 2) — Woody's
+    game_failed, 9 frames, on all fourteen (205's duck cage's `ms` is a
+    loop, 179 frames, and counts for nothing)"""
+    import lap_model_s2
+    return lap_model_s2.Data(n).job_ticks(obj, 'failed', 'woody')
 
 
 def failed_actor(n, obj):
@@ -196,11 +214,13 @@ def main(argv):
         lo, hi = game_levels(n, obj)
         fa = failed_actor(n, obj)
         fc = failed_clip(n, obj)
+        ft = failed_ticks(n, obj)
         kind = item_kind(n, item)
         lift = game_lift(n, obj)
-        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s%s, lift %d' % (
-            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, fa,
-            (' (%s %s %.2f s)' % (fc['role'], fc['clip'], fc['secs'])) if fc else '', lift))
+        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed %d ticks -> %s%s, lift %d' % (
+            n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, ft, fa,
+            (' (%s %s %.2f s, %d ticks)' % (fc['role'], fc['clip'], fc['secs'], fc['ticks'])) if fc else '',
+            lift))
         if not write or kind is None:
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
@@ -220,6 +240,7 @@ def main(argv):
         e['set']['PCMinigameTicks'] = t
         e['set']['PCMinigameLevels'] = [lo, hi]
         e['set']['PCMinigameFailed'] = fa
+        e['set']['PCMinigameFailedTicks'] = ft
         e['set']['PCMinigameLift'] = lift
         if fc:
             e['set']['PCMinigameFailedClip'] = fc
@@ -228,8 +249,11 @@ def main(argv):
                 " game object's Woody action in objects.xml, PCMinigameLevels = the startlevel and"
                 " endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the"
                 " behavioractor of its `failed` action (the actor a lost game sends running),"
+                " PCMinigameFailedTicks = that action's ticks from its job's first update to the one that"
+                " posts its behaviour (the Loader's time + 2),"
                 " PCMinigameFailedClip = the clip that actor's behaviour plays first when it is not the"
-                " neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour is his run),"
+                " neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour, his run, is"
+                " posted as her shout's job ends, its `ticks`),"
                 " PCMinigameLift = the height in level px of Woody's place for the game (the object's"
                 " `woody` hotspot) above its room's floor line, the field's middle 150 px above it.")
         src = ov.get('source', '')

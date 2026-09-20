@@ -95,12 +95,14 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                             'ChairWakeup': ('beachleft_deckchair_guarded', 'wakeup'),
                             'ChairAwake': ('anim', 'beachleft/deckchair', 'awake'),
                             'ChairLeave': ('beachleft_deckchair_guarded', 'leave')},
-              # at her chair he stands for nothing: her order step (0x10018682)
-              # polls for him at its `neighbor` hotspot (fcn.1000e172) and
-              # plays `order`, whose behavior="order" (generic objects.xml)
-              # sends him on to Fifi as it starts (his handler 0x1001b4f6 ->
-              # 0x1001aecc) — the mobile's three stands there take no time
-              'CallRTMother': {'Stand_Left': ('none',)}},
+              # at her chair he stands for her order: her order step
+              # (0x10018682) polls for him at its `neighbor` hotspot
+              # (fcn.1000e172) and plays `order`, whose behavior="order"
+              # (generic objects.xml), posted as its job ends (state 2,
+              # fcn.1004000a at 0x10002708), sends him on to Fifi on the tick
+              # after (his handler 0x1001b4f6 -> 0x1001aecc) — the order's job
+              # and the offer's tick over the mobile's three stands
+              'CallRTMother': {'Stand_Left': ('job', 'mother', 'order', 'mother', 3)}},
         # 205's table (his table step 0x100254d5: `play` on the guarded table
         # once Olga is there)
         205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play')}},
@@ -126,18 +128,41 @@ WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarin
                             'then': [('sub', 'dive'), ('beachleft_sub', 'run_ashore')]}},
          # 205's table: his step polls for the guarded table Olga's `pingpong`
          # step shows as she arrives (0x10025d76), then plays; the play's
-         # behavior="sun" (cn_b2 objects.xml, fired as it starts) sends her
-         # back to her mat at once (her step 0x1002621c) — `abort`: the use's
-         # PawnToAbortMutexOnFinish at the release
+         # behavior="sun" (cn_b2 objects.xml), posted as its job ends,
+         # sends her back to her mat (her step 0x1002621c) — his use's end,
+         # the use's PawnToAbortMutexOnFinish
          205: {'TabbleTennis': {'clip': 'Tennis', 'role': 'Olga', 'item': 'TabbleTennis', 'at': 'start',
-                                'then': [('beachright_pingpong_guarded', 'play')], 'abort': True}},
+                                'then': [('beachright_pingpong_guarded', 'play')]}},
          # 210's chair: awake until her call — her `callneighbor` carries
-         # behavior="call" (generic objects.xml), fired as it starts, and his
-         # handler (0x1001b4f6) sends him out of the chair at once (0x1001911e:
-         # its `leave`, then the run to her chair); `at` start: the awaited
-         # role's use begun
+         # behavior="call" (generic objects.xml), posted as its job ends,
+         # and on the tick after his handler (0x1001b4f6) sends him out of the
+         # chair (0x1001911e: its `leave`, then the run to her chair); `at`
+         # start: the awaited role's use begun, `then` her call's job and the
+         # offer's tick (an (object, action, actor) part)
          210: {'DeckChair': {'clip': 'ChairAwake', 'role': 'Mother', 'item': 'CallRTMother',
-                             'at': 'start', 'then': []}}}
+                             'at': 'start', 'then': [('mother', 'callneighbor', 'mother')]}}}
+# the stations whose action posts a behaviour another actor's script answers
+# early in the stay: the seconds from the use's start to the offer — the
+# parts' jobs up to the posting one and the offer's tick (PCBehaviourAt):
+# 205's mat, whose `talk` (2 frames) carries behavior="pingpong" for Olga
+# (her step 0x10025b2a gets her off the mat); 213's controls, whose step posts
+# `bull` to Olga as he arrives, before the controls' `use` (0x10037f5e): the
+# offer's tick alone
+BEHAVIOUR_AT = {205: {'OlgaMatBeach': [('neighbor', 'talk', 'neighbor')]},
+                213: {'MechanicalBullControls': []}}
+# another actor's use whose action posts a behaviour as its job ends: the
+# seconds from the use's end (its clip paced to the action's frames) to the
+# offer — the job's ticks past the frames and the offer's tick
+# (PCBehaviourAtEnd): 213's ride, `leave` to the neighbour, whose controls
+# step waits for it (the latch +0x20)
+BEHAVIOUR_AT_END = {213: {'MechanicalBull': ('bottomleft_bullride_olga', 'use', 'olga')}}
+# stays read from the level script where the video's pairing had split a
+# span: {item: [the parts of each visit] or None (no stay of its own)} —
+# 213's bull (the controls step 0x10037e80: the controls' `use`, activate;
+# then the step that waits for Olga's `leave`, a one-tick pass once it is
+# set; the mobile's wait between them ends on her ride's end, no stay)
+STAYS_CODE = {213: {'MechanicalBullControls': [[('bottomleft_bullride_controls', 'use')], [('ticks', 1)]],
+                    'MechanicalBullControlsWait': None}}
 MIN_STAY = 0.5
 
 
@@ -153,6 +178,20 @@ def _strip_key(patches, key):
             e = dict(e); e['set'] = st
         out.append(e)
     return out
+
+
+def _strip_item_key(patches, item, key):
+    """drop `key` from the item's patches; a patch left empty goes"""
+    out = []
+    for e in patches:
+        st = e.get('set')
+        if e.get('object') == item and isinstance(st, dict) and key in st:
+            st = dict(st); del st[key]
+            if not st:
+                continue
+            e = dict(e); e['set'] = st
+        out.append(e)
+    patches[:] = out
 
 
 def _set_key(patches, item, key, value):
@@ -278,6 +317,12 @@ def clip_secs(n):
                 t = d.frames.get((src[1], src[2])) or d.gframes.get((src[1], src[2]))
             elif src[0] == 'none':
                 t = 0                          # the PC plays nothing there
+            elif src[0] == 'job':
+                # another actor's action whose job posts the behaviour the
+                # stand waits for, and the offer's tick, over so many clips
+                t = d.job_ticks(src[1], src[2], src[3])
+                if t is not None:
+                    t = (t + 1) / float(src[4])
             else:
                 t = d.action_ticks(src[0], src[1])
             if t is not None:
@@ -292,8 +337,15 @@ def clip_secs(n):
         assert am and 'name="%s"' % rec in am.group(1), (obj, act, rec)
         clips.setdefault(item, {})['@credit'] = clip
     waits = {}
+
+    def part(p):
+        # (object, action): the action's ticks; (object, action, actor): an
+        # action whose job posts a behaviour, to its offer's tick
+        if len(p) == 3:
+            return (d.job_ticks(*p) or 0) + 1
+        return d.action_ticks(*p) or 0
     for item, w in WAITS.get(n, {}).items():
-        then = sum(d.action_ticks(o, a) or 0 for o, a in w['then'])
+        then = sum(part(p) for p in w['then'])
         waits[item] = {'clip': w['clip'], 'role': w['role'], 'item': w['item'],
                        'then': round(then / 12.0, 2)}
         for k in ('at', 'abort'):
@@ -302,8 +354,177 @@ def clip_secs(n):
     return clips, waits
 
 
+def behaviour_at(n):
+    """{item: seconds} of BEHAVIOUR_AT, read from the level data"""
+    if n not in BEHAVIOUR_AT:
+        return {}
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    out = {}
+    for item, parts in BEHAVIOUR_AT[n].items():
+        t = [d.job_ticks(*p) for p in parts]
+        if None not in t:
+            out[item] = round((sum(t) + 1) / 12.0, 2)
+    return out
+
+
+def behaviour_at_end(n):
+    """{item: seconds} of BEHAVIOUR_AT_END, read from the level data"""
+    if n not in BEHAVIOUR_AT_END:
+        return {}
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    out = {}
+    for item, (obj, act, actor) in BEHAVIOUR_AT_END[n].items():
+        j, f = d.job_ticks(obj, act, actor), d.action_ticks(obj, act, actor)
+        if None not in (j, f):
+            out[item] = round((j - f + 1) / 12.0, 2)
+    return out
+
+
+def stays_code(n):
+    """{item: [seconds per visit] or None} of STAYS_CODE, read from the level data"""
+    if n not in STAYS_CODE:
+        return {}
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    out = {}
+    for item, visits in STAYS_CODE[n].items():
+        if visits is None:
+            out[item] = None
+            continue
+        vals = []
+        for parts in visits:
+            t = 0
+            for p in parts:
+                t += p[1] if p[0] == 'ticks' else (d.action_ticks(*p) or 0)
+            vals.append(round(t / 12.0, 2))
+        out[item] = vals
+    return out
+
+
+def write_tricked_keys(ov, n, clips):
+    """the tricked visits' keys (lap_model_s2.code_stays_tricked) into the
+    overlay dict — the --write path's and --code-keys'"""
+    if n not in TRICKED:
+        return
+    # the tricked visit (lap_model_s2.code_stays_tricked: the
+    # station's step with the item's trick in the scene): its
+    # stand up to the SHOUT, the SHOUT's level with the
+    # repair after it (0: none) where the step has a SHOUT of a
+    # level the walker reads, and the second its first named
+    # record pays at (fcn.1000140b) where no clip carries it;
+    # the same for the linked variant (both tricks in the
+    # scene, or the script's other step) with the second the
+    # linked trick's own record pays at (PCLinkedPaysAt)
+    for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
+              'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
+              'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
+              'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
+              'PCToiletPaysAt', 'PCFixDepart'):
+        ov['patches'] = _strip_key(ov['patches'], k)
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    rage = lap_model_s2.trick_rage(n)
+    for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
+        if item in clips:
+            continue      # timed per clip (CLIPS)
+        if tr['tricked'] is not None and (tr['tricked'] > 0 or tr['credit'] is not None):
+            # (a variant with no action of its own — 214's
+            # captain's door on the bridge — plays nothing to time)
+            _set_key(ov['patches'], item, 'PCUseSecondsTricked', tr['tricked'])
+        if tr.get('linked') is not None:
+            _set_key(ov['patches'], item, 'PCUseSecondsLinked', tr['linked'])
+        if tr['shout'] is not None and tr['shout'] >= 0:
+            _set_key(ov['patches'], item, 'PCShout', tr['shout'])
+            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+        elif tr['shout'] == -1 and (tr.get('rejoins') or 'cont' in tr):
+            # no SHOUT in the tricked flow at all: no reaction
+            _set_key(ov['patches'], item, 'PCShout', -1)
+            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+        if tr.get('hit'):
+            # the co-actor's `fight` (the generic action's ticks)
+            _set_key(ov['patches'], item, 'PCHitSeconds',
+                     {ROLE[a]: v for a, v in tr['hit'].items() if v is not None})
+        if tr['credit'] is not None and item not in CREDIT.get(n, {}):
+            _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
+        if tr.get('linked_credit') is not None:
+            _set_key(ov['patches'], item, 'PCCreditAtLinked', tr['linked_credit'])
+        if tr.get('linked_shout') is not None and tr['linked_shout'] >= 0:
+            _set_key(ov['patches'], item, 'PCShoutLinked', tr['linked_shout'])
+            _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
+        if tr.get('linked_pays') is not None:
+            _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
+        if tr.get('linked_hit') is not None and tr.get('linked_extra_at') == tr['linked_hit']:
+            # the co-actor's action the linked flow waits on,
+            # the rest of the flow's parts after it, and the
+            # record they pay — at the action's end
+            _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
+            _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
+            _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))
+        elif tr.get('linked_extra_at') is not None:
+            # the linked shot's third record, its own tick
+            # (206's rubberrabbit: the ExtraCoin206)
+            _set_key(ov['patches'], item, 'PCExtraPaysAtLinked', tr['linked_extra_at'])
+        if tr.get('fix_depart') is not None:
+            # the repair's walk leaves him at the repaired
+            # object: his next walk from its hotspot (x, px)
+            _set_key(ov['patches'], item, 'PCFixDepart', list(tr['fix_depart']))
+        if tr.get('toilet_pays_at') is not None:
+            # the rush's own record, its tick into the wc's
+            # action (211's wcright, 27 of the puke's 40)
+            _set_key(ov['patches'], item, 'PCToiletPaysAt', tr['toilet_pays_at'])
+        if tr.get('arm') and tr.get('hit'):
+            # the visits the trick arms and fires at (206's
+            # load and shoot: lap_model_s2.TRICKED_ARM)
+            _set_key(ov['patches'], item, 'PCTrickArm', tr['arm'])
+        elif tr.get('arm'):
+            # the linked item's own firing visit and the visit
+            # that drops it (206's harpoon: the take, the put)
+            _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
+
+
+def write_code_keys(n):
+    """the keys read from the code and the level data alone (PCClipSeconds,
+    PCWaitFor, PCCreditAfter, PCBehaviourAt) into the level's overlay — the
+    --write path's, without the video pairing's idle visits"""
+    p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
+    ov = json.load(open(p))
+    clips, waits = clip_secs(n)
+    for k in ('PCClipSeconds', 'PCWaitFor', 'PCCreditAfter', 'PCBehaviourAt'):
+        ov['patches'] = _strip_key(ov['patches'], k)
+    for item, cl in clips.items():
+        cl = dict(cl)
+        credit = cl.pop('@credit', None)
+        if cl:
+            _set_key(ov['patches'], item, 'PCClipSeconds', cl)
+        if credit:
+            _set_key(ov['patches'], item, 'PCCreditAfter', credit)
+    for item, wt in waits.items():
+        _set_key(ov['patches'], item, 'PCWaitFor', wt)
+    for item, secs in behaviour_at(n).items():
+        _set_key(ov['patches'], item, 'PCBehaviourAt', secs)
+    ov['patches'] = _strip_key(ov['patches'], 'PCBehaviourAtEnd')
+    for item, secs in behaviour_at_end(n).items():
+        _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
+    write_tricked_keys(ov, n, clips)
+    for item, vals in stays_code(n).items():
+        _strip_item_key(ov['patches'], item, 'PCUseSeconds')
+        if vals:
+            _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
+    json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
+    print('   written', p)
+
+
 def main(argv):
     write = '--write' in argv
+    if '--code-keys' in argv:
+        for n in [int(a) for a in argv if a.isdigit()]:
+            write_code_keys(n)
+        return
     levels = [int(a) for a in argv if a.isdigit()] or list(range(201, 215))   # or 101-114 with the Season 1 idle visits
     for n in levels:
         rows = pair(n)
@@ -327,6 +548,13 @@ def main(argv):
                 k = len(per.get(item, [])) or 1
                 print('   %-26s code %5.2f s (video %s)' % (item, secs, per.get(item)))
                 per[item] = [secs] * k
+        for item, vals in stays_code(n).items():
+            # the level script's stays over the video's split
+            print('   %-26s code %s s per visit (video %s)' % (item, vals, per.get(item)))
+            if vals:
+                per[item] = list(vals)
+            else:
+                per.pop(item, None)
         clips, waits = clip_secs(n)
         for item in clips:
             if item not in KEEP_STAYS.get(n, ()):
@@ -357,81 +585,13 @@ def main(argv):
                         _set_key(ov['patches'], item, 'PCCreditAfter', credit)
                 for item, wt in waits.items():
                     _set_key(ov['patches'], item, 'PCWaitFor', wt)
-                if n in TRICKED:
-                    # the tricked visit (lap_model_s2.code_stays_tricked: the
-                    # station's step with the item's trick in the scene): its
-                    # stand up to the SHOUT, the SHOUT's level with the
-                    # repair after it (0: none) where the step has a SHOUT of a
-                    # level the walker reads, and the second its first named
-                    # record pays at (fcn.1000140b) where no clip carries it;
-                    # the same for the linked variant (both tricks in the
-                    # scene, or the script's other step) with the second the
-                    # linked trick's own record pays at (PCLinkedPaysAt)
-                    for k in ('PCUseSecondsTricked', 'PCUseSecondsLinked', 'PCShout', 'PCFixSeconds',
-                              'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
-                              'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
-                              'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-                              'PCToiletPaysAt', 'PCFixDepart'):
-                        ov['patches'] = _strip_key(ov['patches'], k)
-                    sys.path.insert(0, HERE)
-                    import lap_model_s2
-                    rage = lap_model_s2.trick_rage(n)
-                    for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
-                        if item in clips:
-                            continue      # timed per clip (CLIPS)
-                        if tr['tricked'] is not None and (tr['tricked'] > 0 or tr['credit'] is not None):
-                            # (a variant with no action of its own — 214's
-                            # captain's door on the bridge — plays nothing to time)
-                            _set_key(ov['patches'], item, 'PCUseSecondsTricked', tr['tricked'])
-                        if tr.get('linked') is not None:
-                            _set_key(ov['patches'], item, 'PCUseSecondsLinked', tr['linked'])
-                        if tr['shout'] is not None and tr['shout'] >= 0:
-                            _set_key(ov['patches'], item, 'PCShout', tr['shout'])
-                            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
-                        elif tr['shout'] == -1 and (tr.get('rejoins') or 'cont' in tr):
-                            # no SHOUT in the tricked flow at all: no reaction
-                            _set_key(ov['patches'], item, 'PCShout', -1)
-                            _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
-                        if tr.get('hit'):
-                            # the co-actor's `fight` (the generic action's ticks)
-                            _set_key(ov['patches'], item, 'PCHitSeconds',
-                                     {ROLE[a]: v for a, v in tr['hit'].items() if v is not None})
-                        if tr['credit'] is not None and item not in CREDIT.get(n, {}):
-                            _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
-                        if tr.get('linked_credit') is not None:
-                            _set_key(ov['patches'], item, 'PCCreditAtLinked', tr['linked_credit'])
-                        if tr.get('linked_shout') is not None and tr['linked_shout'] >= 0:
-                            _set_key(ov['patches'], item, 'PCShoutLinked', tr['linked_shout'])
-                            _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
-                        if tr.get('linked_pays') is not None:
-                            _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
-                        if tr.get('linked_hit') is not None and tr.get('linked_extra_at') == tr['linked_hit']:
-                            # the co-actor's action the linked flow waits on,
-                            # the rest of the flow's parts after it, and the
-                            # record they pay — at the action's end
-                            _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
-                            _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
-                            _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))
-                        elif tr.get('linked_extra_at') is not None:
-                            # the linked shot's third record, its own tick
-                            # (206's rubberrabbit: the ExtraCoin206)
-                            _set_key(ov['patches'], item, 'PCExtraPaysAtLinked', tr['linked_extra_at'])
-                        if tr.get('fix_depart') is not None:
-                            # the repair's walk leaves him at the repaired
-                            # object: his next walk from its hotspot (x, px)
-                            _set_key(ov['patches'], item, 'PCFixDepart', list(tr['fix_depart']))
-                        if tr.get('toilet_pays_at') is not None:
-                            # the rush's own record, its tick into the wc's
-                            # action (211's wcright, 27 of the puke's 40)
-                            _set_key(ov['patches'], item, 'PCToiletPaysAt', tr['toilet_pays_at'])
-                        if tr.get('arm') and tr.get('hit'):
-                            # the visits the trick arms and fires at (206's
-                            # load and shoot: lap_model_s2.TRICKED_ARM)
-                            _set_key(ov['patches'], item, 'PCTrickArm', tr['arm'])
-                        elif tr.get('arm'):
-                            # the linked item's own firing visit and the visit
-                            # that drops it (206's harpoon: the take, the put)
-                            _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
+                ov['patches'] = _strip_key(ov['patches'], 'PCBehaviourAt')
+                for item, secs in behaviour_at(n).items():
+                    _set_key(ov['patches'], item, 'PCBehaviourAt', secs)
+                ov['patches'] = _strip_key(ov['patches'], 'PCBehaviourAtEnd')
+                for item, secs in behaviour_at_end(n).items():
+                    _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
+                write_tricked_keys(ov, n, clips)
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
