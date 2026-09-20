@@ -290,9 +290,11 @@ compares that sum with the leveldata record's `score` (+0x2c) and keeps the bett
 shell whose string table holds `rage`/`quota` once each. The walk is fcn.1000e3e0(level, actor, object), a bool that is false when the walk was
 interrupted, followed by the wait fcn.1000aeb8; fcn.1000f977(actor, n) is a shout — the level
 n's `shout2*` action, or a `freakout` once the gauge has overflowed — not a walk. The Season 2 scripts are extracted below
-(2026-09-16). The `time` attribute of objects.xml's actions is a tick count of the 12 Hz level tick: the
-fiber that runs a timed action counts `[obj+0x28]` down once a tick (fcn.00474a20,
-fcn.00475850, fcn.00478120), so a door's 9–25 is 0.75–2 s and the laundry's wash 59 is 4.9 s
+(2026-09-16). The `time` attribute of objects.xml's actions is a tick count of the 12 Hz level tick
+(the code that counts it is not located: the `dec [obj+0x28]` once read as the countdown,
+fcn.00474ab0 / fcn.00475900 / fcn.00478210, is the step objects' reference count, and
+fcn.00474a20 / fcn.00475850 / fcn.00478120 the factories that build them — corrected
+2026-09-25), so a door's 9–25 is 0.75–2 s and the laundry's wash 59 is 4.9 s
 a visit (the video's ~24 s at the washer are its three visits, its iron 71 the two of 5.9 s);
 `time="auto"` is the longer of the actor's and the object's oneshot animation less one, at
 least 0, as NFH1's Loader.dll stores the record's time (0x1000a865-0x1000aa05; a loop or a
