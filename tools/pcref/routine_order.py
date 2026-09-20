@@ -55,10 +55,14 @@ def at(a):
 def ins(k):
     t = L[k].strip(); m = re.match(r'(0x[0-9a-f]{8})\s+[0-9a-f.]+\s+(.*)', t)
     return (int(m.group(1), 16), m.group(2)) if m else (None, None)
-LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00444ad0': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2'}
+LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2'}
 PRED = ('fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.0047c6c0', 'fcn.00413780')
 ALLPRED = os.environ.get('ALLPRED') == '1'
 NATFALSE_FN = {'fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.00413780', 'fcn.0047ac20', 'fcn.0047ad20', 'fcn.0047a0b0', 'fcn.00422c40'}
+# a level class's own presence test: Level_Bath::isBathFilled (fcn.0046bc90, its
+# assert names it) looks toi/tub up and answers its flag 0x20 clear — the full tub
+# case 8's SWITCH shows: true once the walk's presence holds toi/tub
+PRESENCE_FN = {'fcn.0046bc90': 'toi/tub'}
 NATTRUE = {'fcn.0047c640', 'fcn.0047c6c0', 'fcn.004766e0', 'fcn.00476770', 'fcn.00444d30', 'fcn.0044bb80', 'fcn.0047c320', 'fcn.0047ae70'}
 def strings_before(k, n=8):
     out = []
@@ -148,6 +152,8 @@ def run_level(sw):
                     # GoTo/DoAction calls belong to the case that calls it
                     labels.extend(simulate(int(fn[4:], 16), objflags, False, depth + 1, present)[0])
                 pred = False; lastcall = fn
+                if present is not None and fn in PRESENCE_FN:
+                    lastcall = ('flag', 'true' if PRESENCE_FN[fn] in present else 'false')
                 if present is not None and fn in ('fcn.00479ff0', 'fcn.00451de0'):
                     ss = [x for x in strings_since_call(k) if '/' in x]
                     if fn == 'fcn.00479ff0' and ss:

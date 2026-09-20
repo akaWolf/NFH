@@ -34,6 +34,10 @@ import canon  # noqa: E402
 
 X = os.path.expanduser('~/nfh-bench/pcref/pc/nfh1/x')
 TICK = 12.0
+# the laps of a routine's cycle, where the case order alternates: 106's tub is
+# filled on one lap (case 8's give) and bathed in on the next (cases 14-15:
+# Level_Bath::isBathFilled, fcn.0046bc90) — the video's lap is the whole cycle
+CYCLE = {106: 2}
 
 
 def xy(s):
@@ -74,6 +78,7 @@ class Level:
         # rooms, their paths and doors
         self.rooms = {}
         self.start = None
+        self.placed = {}        # the actors level.xml places: room, position
         for rm in re.finditer(r'<room name="(\w+)" offset="([^"]+)" path1="([^"]+)" path2="([^"]+)">(.*?)</room>', lv, re.S):
             name = rm.group(1)
             x1, y = xy(rm.group(3)); x2, _ = xy(rm.group(4))
@@ -84,6 +89,8 @@ class Level:
             self.rooms[name] = {'x1': min(x1, x2), 'x2': max(x1, x2), 'y': y, 'doors': doors}
             for am in re.finditer(r'<actor name="neighbor"[^>]*position="([^"]+)"', rm.group(5)):
                 self.start = (name,) + xy(am.group(1))
+            for am in re.finditer(r'<actor name="([^"]+)"[^>]*position="([^"]+)"', rm.group(5)):
+                self.placed[am.group(1)] = (name,) + xy(am.group(2))
         # doors and objects of objects.xml: hotspots and the neighbour's action times
         self.doors = {}
         for dm in re.finditer(r'<door name="([^"]+)"([^>]*)>(.*?)</door>', ob, re.S):
@@ -91,6 +98,12 @@ class Level:
         self.objects = {}
         for om in re.finditer(r'<object name="([^"]+)"([^>]*)>(.*?)</object>', ob, re.S):
             self.objects[om.group(1)] = self._entry(om.group(2), om.group(3))
+        # the actors' own action records of the level (the neighbour's `eat`,
+        # `skip_rope`, `smokepipe` …, the parrot's `eat` of 109): an ACTION whose
+        # object is an actor, or none, looks them up there
+        self.actors = {}
+        for am in re.finditer(r'<actor name="([^"]+)"([^>]*)>(.*?)</actor>', ob, re.S):
+            self.actors[am.group(1)] = self._entry(am.group(2), am.group(3))
 
     def _entry(self, head, body):
         e = {'gfx': attrs(head).get('gfx'), 'hot': {}, 'act': {}}
@@ -106,7 +119,9 @@ class Level:
         """the ticks of an action: time="N", or auto = the frames of the actor's animation
         (the level's anims.xml `neighbor` entry, else generic/anims.xml), else of the object's
         animation (the level's anims.xml under the object's name or gfx); None if unknown"""
-        e = self.objects.get(obj) or self.doors.get(obj)
+        e = self.objects.get(obj) or self.doors.get(obj) or self.actors.get(obj)
+        if e and (actor, name) not in e['act'] and (obj, name) in e['act']:
+            actor = obj         # the object's own action (105's football flies in)
         if e and (actor, name) in e['act']:
             a = e['act'][(actor, name)]
             t = a.get('time', 'auto')
@@ -122,17 +137,30 @@ class Level:
             return None
         return self.frames.get((actor, name)) or self.generic.get((actor, name))
 
+    def has_action(self, obj, name, actor='neighbor'):
+        """the object (or actor block) has an action record of that name"""
+        e = self.objects.get(obj) or self.doors.get(obj) or self.actors.get(obj)
+        return bool(e and ((actor, name) in e['act'] or (obj, name) in e['act']))
+
     def has_enter_leave(self, obj):
         e = self.objects.get(obj)
         return bool(e and 'neighbor_out' in e['hot'] and ('neighbor', 'enter') in e['act'] and ('neighbor', 'leave') in e['act'])
 
     # -- geometry -------------------------------------------------------------
     def object_point(self, obj):
+        """an entity's hotspot = its position + the hotspot's offset (fcn.00445aa0:
+        [+0x28/+0x2c] + the map entry's [+0x10/+0x14], else the position); objects
+        sit at 0/0 of their room, an actor where level.xml places it (109's parrot),
+        else at 0/0 of the room of its name (105's football, made by the script)"""
         e = self.objects.get(obj)
+        base = (obj.split('/')[0], 0, 0)
+        if not e and obj in self.actors and obj != 'neighbor':
+            e = self.actors[obj]
+            base = self.placed.get(obj) or base
         if not e: return None
         p = e['hot'].get('neighbor') or e['hot'].get('woody')
         if not p: return None
-        return obj.split('/')[0], p[0], p[1]
+        return base[0], base[1] + p[0], base[2] + p[1]
 
     def door_point(self, door, out=False):
         """the standing point of a door in its room: the type's neighbour hotspot (`neighbor_out` when the
@@ -175,8 +203,10 @@ class Level:
         return t
 
 
-def tokens_of(levels, cache):
-    """{level: [tokens of lap 1]} from the walker"""
+def tokens_of(levels, cache, laps=None):
+    """{level: [tokens of lap 1]} from the walker; `laps` {level: k} joins a
+    level's first k laps (106's cycle: the tub filled on one lap, the bath on
+    the next — Level_Bath::isBathFilled, tools/pcref/routine_order.py)"""
     if cache and os.path.exists(cache):
         text = open(cache).read()
     else:
@@ -184,12 +214,15 @@ def tokens_of(levels, cache):
         text = subprocess.run([sys.executable, os.path.join(HERE, 'routine_order.py')], env=env, capture_output=True, text=True).stdout
         if cache: open(cache, 'w').write(text)
     out = {}
-    for m in re.finditer(r'^LAP (\d+) 1: (.*)$', text, re.M):
+    for m in re.finditer(r'^LAP (\d+) (\d+): (.*)$', text, re.M):
+        n, k = int(m.group(1)), int(m.group(2))
+        if k > (laps or {}).get(n, 1):
+            continue
         toks = []
-        for t in m.group(2).split(' | '):
+        for t in m.group(3).split(' | '):
             kind, _, rest = t.partition(' ')
             toks.append((kind, rest.split(' + ') if rest else []))
-        out[int(m.group(1))] = toks
+        out.setdefault(n, []).extend(toks)
     return out
 
 
@@ -226,11 +259,18 @@ def model(L, toks, verbose=False):
             room, x, y = d_in.split('/')[0], xi, yi
         t = L.walk_ticks(x2 - x, y2 - y); legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
 
-    def leave(obj=None):
+    def leave(obj=None, implicit=False):
+        """the object's leave; the one a walk makes (the neighbour still in the
+        object when the next GOTO starts) plays there before the walk, so it
+        closes the station he sits in: it goes before the next station's icon"""
         nonlocal occupied
         obj = obj or occupied
         if obj:
-            t = L.action_ticks(obj, 'leave') or 0; legs.append(('action', '%s leave' % obj, t)); occupied = None
+            t = L.action_ticks(obj, 'leave') or 0
+            i = len(legs)
+            while implicit and i > 0 and legs[i - 1][0] == 'icon':
+                i -= 1
+            legs.insert(i, ('action', '%s leave' % obj, t)); occupied = None
 
     def enter(obj):
         nonlocal occupied
@@ -244,13 +284,15 @@ def model(L, toks, verbose=False):
         if first:
             legs.append(('intro', 'start %s %d/%d -> %s' % (room, x, y, obj), 0)); room, x, y = r2, x2, y2; first = False
         else:
-            if occupied and occupied != obj: leave()
+            if occupied and occupied != obj: leave(implicit=True)
             walk_to(r2, x2, y2, obj)
         current = obj
         return True
 
     for kind, strs in toks:
         objs = [s for s in strs if '/' in s]
+        if not objs and kind in ('GOTO', 'GOTOENTER'):     # an actor target (109's parrot)
+            objs = [s for s in strs if s in L.actors and s != 'neighbor' and L.object_point(s)]
         if kind == 'ICON':
             legs.append(('icon', ' '.join(strs), 0)); continue
         if kind == 'TRICK': continue
@@ -262,28 +304,40 @@ def model(L, toks, verbose=False):
                 continue
             if kind == 'ENTER' and current == obj and occupied == obj: continue
             if goto(obj) and kind != 'GOTO' and L.action_ticks(obj, 'enter') is not None and occupied != obj:
-                if not (len(legs) == 1 and legs[0][0] == 'intro'): enter(obj)
+                # the intro's enter is the previous lap's: the lap's wrap (the
+                # same tokens again) plays it — the stations would count it twice
+                if legs[-1][0] != 'intro': enter(obj)
                 else: occupied = obj
         elif kind == 'LEAVE':
             leave(base_of(objs))
         elif kind == 'GOTO2':
             r2 = strs[-1] if strs else None
             if r2 in L.rooms:
-                if occupied: leave()
+                if occupied: leave(implicit=True)
                 rt = L.route(room, r2)
                 if rt: walk_to(r2, *L.door_point(rt[-1][1], out=True), 'room ' + r2)
             else:
                 legs.append(('?', 'GOTO2 %s' % ' + '.join(strs), 0))
         elif kind == 'ACTION':
+            # the walker's pushes around the call: the action's name is the
+            # string that names an action record of one of the objects (a room
+            # name or an icon may precede it), the object the one that has it —
+            # a pushed actor (109's parrot), the last GOTO's, or the neighbour
+            # himself (his own records: `eat`, `skip_rope` …)
             acts = [s for s in strs if '/' not in s and s not in ('neighbor', 'woody', 'inv')]
             if not acts: continue
-            name = acts[0]
             b = base_of(objs)
-            cands = ([b] if b else []) + [o for o in objs if o != b] + ([current] if current else [])
-            t = None; used = None
-            for o in cands:
-                t = L.action_ticks(o, name)
-                if t is not None: used = o; break
+            actors = [s for s in strs if s in L.actors and s != 'neighbor']
+            cands = ([b] if b else []) + [o for o in objs if o != b] + actors \
+                + ([current] if current else []) + ['neighbor']
+            hit = next(((o, nm) for nm in acts for o in cands if L.has_action(o, nm)), None)
+            if hit:
+                used, name = hit
+                t = L.action_ticks(used, name)
+            else:               # no record: the neighbour's animation of the first name
+                name = acts[0]
+                used = next((o for o in cands if L.action_ticks(o, name) is not None), None)
+                t = L.action_ticks(used, name) if used else None
             if t is None:
                 legs.append(('?', 'ACTION %s on %s: no time' % (name, ' + '.join(objs) or current), 0))
             else:
@@ -310,7 +364,7 @@ def main(argv):
     args = [a for a in argv[1:] if not a.startswith('-')]
     levels = [int(a) for a in args] or list(range(101, 115))
     cache = os.environ.get('LAP_TOKENS')
-    toks = tokens_of(levels, cache)
+    toks = tokens_of(levels, cache, CYCLE)
     video = video_laps()
     for n in levels:
         if n not in toks:
