@@ -237,7 +237,8 @@ NFH2's frame and GameLogic's level update — the interface's slot 2 at
 0x100442b3 — too, the gate between them is not: no binary carries 1/12,
 GFXEngine's 83 ms is the sprites' frame interval). The Season 2 mini-game
 is drawn as GFXEngine draws it since 2026-09-24: its middle Woody's
-`minigame` hotspot (150 px above him, the camera held on it), the field,
+`minigame` hotspot (150 px above his place for the game, the object's
+`woody` hotspot off the floor line, the camera held on it), the field,
 the icon and the thumb at their textures' own sizes in the level's px, the
 thumb at the setter's offset for the state message's pair; the images are
 the remaster's by name and size (the PC data copy has none), and the

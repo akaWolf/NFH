@@ -232,11 +232,19 @@ field's disk 86 px wide as on the videos. Open, with numbers: the
 progress bar's front (gui/ingame/minigame_progress_front.tga, vertical,
 at 28/28 from the corner) is not in the data — the remaster's fill stands
 in, in the field's frame, a fill that spans the 138 px frame where the PC's
-starts 28 px in (the videos fill the disk up to its ring); the port draws
-its Woody's frames off his point the remaster's way, which on 204's
-dispenser (W_play_toyomat, its frame 18 px above the point) puts the drawn
-shoes 29 px above it — the field shows 127 px above them against the
-PC's 150-154. The moment of his run is the PC's (below, "the lost game's
+starts 28 px in (the videos fill the disk up to its ring). Woody plays
+the game where the use put him — the object's `woody` hotspot, its
+level.xml position plus the offset — which lies off the room's floor line
+on thirteen levels: 24 px above it at 204's dispenser (whose `use` hides
+him, actoranim `inv`, and draws him in the object's play_toyomat), 84 at
+214's hatch, 92 below it at 211's boat, level with it only at 209's coal
+(PCMinigameLift, tools/pcref/pc_minigames.py). The middle is 150 px above
+that place. The port keeps Woody's point on its walking line or the
+remaster's use height and draws him from it by the clip's offset
+(204's GetToyMachineDexterity raised 37 px), so the middle is taken from
+the walking line plus the lift (2026-09-24, later): the field of 204 shows
+150 px above the drawn shoes as on the video, 127 px while it stood on his
+point. The moment of his run is the PC's (below, "the lost game's
 run").
 
 The lost game's run (read 2026-09-24). Woody's `failed` action posts its

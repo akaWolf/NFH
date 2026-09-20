@@ -1199,8 +1199,10 @@ moved one to one by the mouse, rated 4..-40 a level tick by its distance to
 the middle and pushed by GameLogic.dll's three-sinusoid wobble; the count
 reaching `time` wins, below 0 loses. The field is GFXEngine.dll's
 (`hud._draw_pc_game`): its middle is Woody's `minigame` hotspot, 150 px
-above his point (generic/objects.xml, `pcprofile.S2_GAME_HOTSPOT`), which
-the camera holds as the PC's scroll does (`World.dexterity_focus`); the
+above his place for the game (generic/objects.xml,
+`pcprofile.S2_GAME_HOTSPOT`) — the object's `woody` hotspot, `PCMinigameLift`
+px above the floor line, taken from his walking line — which the camera
+holds as the PC's scroll does (`World.dexterity_focus`); the
 field, the alarm field, the icon and the thumb are drawn at their
 textures' own sizes — the remaster's textures/s2 art carries
 minigame/<tool>.xml's names and sizes, the field 138 x 138, the tools
