@@ -161,6 +161,27 @@ isObjectPresent over level.xml and the switches — 113's valve switched off
 and on at 0.33 s where the false branch had two 2-s surprises, 114's third
 phonograph visit). The model is the check of the walking rule read from the binary
 (docs/PC_VERIFICATION.md, "the walking speed" and "the lap's timing").
+2026-09-25: the model has no unknown step left — the actions of the
+actors' own records (objects.xml `<actor>` blocks: the neighbour's `eat`,
+`skip_rope`, `smokepipe`, `shoot_klick`, `takehat`, `wearmedals`; the
+parrot's `eat`; the football's `fly_into_kitchen`) and an action's name as
+the string that names a record of one of its objects (104's
+`put_apple_pie`, not the `applepie` pushed before it); an actor's hotspot
+at its level.xml position plus the offset (fcn.00445aa0: the entity's
++0x28/+0x2c plus the map entry's +0x10/+0x14 — 109's parrot at lir
+290/405 + 25/15); fcn.00444ad0 is the actor's occupied-object getter
+(+0x30), not a GOTO; fcn.00479e30 is the second GOTO+ENTER builder;
+Level_Bath::isBathFilled (fcn.0046bc90, toi/tub's flag 0x20 clear) makes
+106 a two-lap cycle, the tub filled on one lap (case 8's give) and bathed
+in on the next (the shower's `enter`, 34 ticks; cases 14-15: take_towel,
+dry, take_towel) — the video's laps by the album 57 and 60 s, the model's
+59.8 and 65.0; an ACTION none of whose objects has that record pushes no
+job (the step's start, fcn.004772f0, walks the step's object entries:
+fcn.00445d30 false on each, the loop ends with no DoAction job), so
+107's ENTER of the stool (kit/stool has no `enter`) plays nothing; a leave the walk makes closes the
+station left (the lap's timing is unchanged, the stations' split is), and
+the intro's enter is the previous lap's (101 33.5 s, 102 28.2). 109 is
+112.1 s (video 113) with the walk to the parrot.
 
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in

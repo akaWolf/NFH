@@ -504,9 +504,15 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   use plays the mobile clips at the pace that lasts it
   (`RoutineAction._pc_use_seconds`, `AnimPlayer.time_scale`), or holds a
   walk-by stand for it where the remaster only passes (the shout at
-  105's window, 112's yoga). 111's machines, 106's bath and 104's shaving
-  chain keep the mobile's (the PC neighbour waits on the object there —
-  docs/PC_VERIFICATION.md).
+  105's window, 112's yoga). 111's machines are split by the case's
+  actions (2026-09-23), and since 2026-09-25 every routine item has its
+  PC seconds: 104's shaving chain (the basin's two takes, shave,
+  grease_hair, two gives) and the pie's second visit (the neighbour's own
+  `eat` after the cream), 106's two-lap cycle (the tub's fill, the bath —
+  the shower's `enter` — and the towel), 107's drawing, 113's Ladder (the
+  climb) and LadderDrill (drill, touch, climb_down), 114's Hat (take and
+  takehat; putbackhat and give) and MedalBox (wearmedals), 112's mixer by
+  its two actions (mix, drink) — docs/PC_VERIFICATION.md.
 - The plans under the door rule (2026-09-17, tests/plans/pc): the catch
   reads the room pointer, door clips included, so a Woody still in his near
   clip is caught by a neighbour who is (or wakes) in that room, and a walk
