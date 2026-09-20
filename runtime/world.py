@@ -2568,19 +2568,29 @@ class AlerterFSM:
         self._hear_delay = None          # CoRoutineRottweilerHearAlerter
         # the PC profile's awake timer, seconds (pcprofile.s1_pets)
         self.pc_timer = 0.0
+        self.pc_busy = False             # a bark or a whine holds the PC class's step
+        self.pc_idle = False             # the PC class's idle: the timer counts, it may sleep
         if self.player is not None:
             self._play(item.sleep_sequence, chain=True)
 
     # -- helpers -----------------------------------------------------------
-    def _play(self, names, chain=False):
+    def _play(self, names, chain=False, ticks=None, on_end=None):
+        """the sequence; under the profile an action's `ticks` pace it
+        (the remaster's clips at the rate that lasts the PC action)"""
         if self.player is None:
             return
         names = [n for n in names if n and self.player.has(n)]
+        done = on_end or (self._sequence_done if chain else None)
         if names:
-            self.player.play_sequence(
-                names, on_end=self._sequence_done if chain else None)
-        elif chain:
-            self._sequence_done()
+            scale = 1.0
+            if ticks:
+                mobile = self.player.sequence_seconds(names)
+                if mobile > 0.0:
+                    scale = mobile / (ticks / float(pcprofile.S1_TICK_HZ))
+            self.player.time_scale = scale
+            self.player.play_sequence(names, on_end=done)
+        elif done is not None:
+            done()
 
     def _woody(self):
         return self.world.woody
@@ -2619,14 +2629,22 @@ class AlerterFSM:
         w = self._woody()
         if w is None:
             return
-        if self._pc() and self.awake and not self.alert and self.pc_timer > 0.0:
+        if self._pc() and self.awake and not self.alert and not self.pc_busy \
+                and self.pc_timer > 0.0:
             # the PC class's idle branch: neither Woody in the room unhidden
-            # nor the neighbour — the only place the awake timer counts
+            # nor the neighbour, no bark or whine in hand — the only place
+            # the awake timer counts; at 0 it falls asleep there and then
             woody_in = w.zone is not None and w.zone.pid == self.item.zone \
                 and not w.hiding
             if not woody_in and not self._pc_rott_in():
                 self.pc_timer = max(0.0, self.pc_timer - dt)
-        if self.can_see_woody() and self._woody_moving() and not self.alert:
+                if self.pc_timer <= 0.0 and self.pc_idle:
+                    self._pc_fall_asleep()
+        if self._pc() and self.pc_busy:
+            # a bark or a whine holds the class's step: state 4 looks at
+            # Woody again as it ends (_pc_step_done)
+            pass
+        elif self.can_see_woody() and self._woody_moving() and not self.alert:
             self.animation_type = 1
             self.triggered_by_woody = True
             self.on_notice_woody()
@@ -2697,9 +2715,23 @@ class AlerterFSM:
             # start), past the `wakeup` action when the pet slept
             self._hear_delay = self._pc_first_bark()
             self._hear_hold = 0
-        if self._pc() and not self.awake:
-            # state 3: the `wakeup` action and the awake timer (0x45c153)
-            self.pc_timer = pcprofile.S1_PET_AWAKE_TICKS / float(pcprofile.S1_TICK_HZ)
+            asleep = not self.awake
+            if asleep:
+                # state 3: the `wakeup` action and the awake timer (0x45c153)
+                self.pc_timer = pcprofile.S1_PET_AWAKE_TICKS / float(pcprofile.S1_TICK_HZ)
+            self.awake = True
+            self.alert = True
+            self.pc_idle = False
+            if asleep and self.item.alert_start:
+                # the `wakeup` action (the remaster's AlertSequenceStart at
+                # its ticks), then the first bark
+                self.pc_busy = True
+                self._play([self.item.alert_start],
+                           ticks=pcprofile.S1_PET_WAKEUP_TICKS.get(self.item.name),
+                           on_end=lambda: self._pc_bark(first=True))
+            else:
+                self._pc_bark(first=True)
+            return
         self.awake = True
         self.alert = True
         if self.animation_type == 1:
@@ -2708,24 +2740,84 @@ class AlerterFSM:
             seq = self._alert_pair()
         self._play(seq, chain=True)
 
+    def _pc_bark(self, first):
+        """one bark (bark1/bark3, pcprofile.S1_PET_BARK): the remaster's
+        alert clips at its ticks; every bark after the first is noise 2 again,
+        the neighbour's `alarm` (the first one's is the wake-up's _hear_delay)"""
+        self.pc_busy = True
+        self.pc_idle = False
+        if not first:
+            self.world.rott_hear_alerter(self, self.triggered_by_woody)
+        ticks, n = pcprofile.S1_PET_BARK.get(self.item.name, (None, 2))
+        self._play(self._alert_pair()[:1] * n, chain=True, ticks=ticks)
+
+    def _pc_whine(self):
+        """one whine (whine1/whine3, pcprofile.S1_PET_WHINE): the
+        remaster's PoorSequence clips at its ticks"""
+        self.pc_busy = True
+        self.pc_idle = False
+        ticks, n = pcprofile.S1_PET_WHINE.get(self.item.name, (None, 1))
+        self._play((self.item.poor_sequence or [])[:n], chain=True, ticks=ticks)
+
+    def _pc_fall_asleep(self):
+        """state 1: `fallasleep`, then the sleep (0x45c45a-0x45c46f)"""
+        self.awake = False
+        self.alert = False
+        self.pc_busy = False
+        self.pc_idle = False
+        self._play(self.item.sleep_sequence, chain=True)
+
+    def _pc_step_done(self):
+        """the PC class's state 4 as a bark, a whine or the idle ends: a bark
+        at an unhidden Woody in the room, else a whine at the neighbour in
+        it, else the idle while the timer lasts, else asleep (fcn.0045bfa0)"""
+        self.pc_busy = False
+        self.pc_idle = False
+        if not self.awake:
+            return
+        w = self._woody()
+        if w is not None and w.zone is not None and w.zone.pid == self.item.zone \
+                and not w.hiding and not w.is_warping:
+            if self.alert:
+                self._pc_bark(first=False)
+            else:
+                self.animation_type = 0
+                self.triggered_by_woody = True
+                self.on_notice_woody()
+            return
+        self.alert = False
+        if self._pc_rott_in():
+            self._pc_whine()
+        elif self.pc_timer > 0.0:
+            self.pc_idle = True
+            self._play(self.item.wake_sequence, chain=True)
+        else:
+            self._pc_fall_asleep()
+
     def on_rottweiler_enter(self):
         if self._pc():
             # the PC class whines at the neighbour only awake and with no
-            # Woody to bark at (state 4's third branch); asleep it goes on
-            # sleeping — the neighbour's gaits make no noise
-            if self.awake and not self.alert:
-                self._play(self.item.poor_sequence, chain=True)
+            # Woody to bark at (state 4's third branch), as its step is free;
+            # asleep it goes on sleeping — the neighbour's gaits make no noise
+            if self.awake and not self.alert and not self.pc_busy:
+                self._pc_whine()
             return
         self.awake = True
         self._play(self.item.poor_sequence)      # no completion chain
 
     def on_rottweiler_leave(self):
+        if self._pc():
+            # the whine or bark in hand runs to its end; state 4 decides then
+            return
         if self.awake:
             self._play(self.item.wake_sequence, chain=True)
             self.alert = False
 
     def _sequence_done(self):
         """Alerter.OnAnimationSequenceCompleted"""
+        if self._pc():
+            self._pc_step_done()
+            return
         w = self._woody()
         rott = self.world.pawns.get('Rottweiler')
         if self.alert:
@@ -2736,18 +2828,6 @@ class AlerterFSM:
             else:
                 self.alert = False
                 self._play(self.item.wake_sequence, chain=True)
-        elif self.awake and self._pc():
-            # the PC class's state 4 without Woody: the whine while the
-            # neighbour is in the room, else the idle until the awake
-            # timer runs out, then `fallasleep` (state 1) and the sleep
-            if self._pc_rott_in():
-                self._play(self.item.poor_sequence, chain=True)
-            elif self.pc_timer > 0.0:
-                self._play(self.item.wake_sequence, chain=True)
-            else:
-                self.awake = False
-                self.alert = False
-                self._play(self.item.sleep_sequence, chain=True)
         elif self.awake:
             if (rott is None or rott.zone is None
                     or rott.zone.pid != self.item.zone) \

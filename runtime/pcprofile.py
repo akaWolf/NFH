@@ -644,6 +644,18 @@ S1_PET_AWAKE_TICKS = 72
 # bark — its noise 2 the neighbour's `alarm`, the `startle_woody` it posts —
 # comes as it ends (state 3 pushes it, state 4 barks on the next free tick)
 S1_PET_WAKEUP_TICKS = {'Dog': 8, 'Chili': 11}
+# a bark and a whine (generic/objects.xml: the dog's bark1/bark3 time 35
+# noise 2 and whine1/whine3 time 23, the parrot's 22 and 29): actions on the
+# pet's queue, each holding the class's step to its end — every bark's
+# noise 2 the neighbour's `alarm` again, the whine a pose while he is in the
+# room; state 4 decides again only as one ends (fcn.0045bfa0). Each is
+# (ticks, the remaster's clips it spans): generic/anims.xml's dog bark1 runs
+# its 18-frame bark twice in the 35 ticks and poor1 its 12-frame whine twice
+# (the remaster's clips are one motion each: the alert pair, two PoorSequence
+# clips); the parrot's bark1 is one 22-frame scream (one AlertLeft/Right
+# clip), its whine one clip of the remaster's PoorSequence (its idle)
+S1_PET_BARK = {'Dog': (35, 2), 'Chili': (22, 1)}
+S1_PET_WHINE = {'Dog': (23, 2), 'Chili': (29, 1)}
 
 
 def s1_pets(nfh2=False):
