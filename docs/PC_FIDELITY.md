@@ -1926,11 +1926,16 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   Olga's script (fcn.10022ecb) answers `kid_cry` on her mat (0x10023601 ->
   0x100233ed): `wakeup`, `leave`, the walk to the beach sub, its `take`
   (takesub) and the switch that puts the sub into the sea (0x10023087),
-  then back to her mat. His dive step (0x10022046) then plays the kid's
-  dive and run ashore — 62 ticks each, the actions' `auto` their actor's
-  play_remote (the objects' own sub_dive 191 and run_ashore 8 would make
-  16.6 s, which the video's first lap does not hold) — and the bar step
-  (0x10021d68) goes into the sea (its `enter`, entersea) for 97 ticks; its
+  then back to her mat. His dive step (0x10022046) pushes the kid's dive
+  (sub_dive, 191 frames; the shark's 223), the switch to the beach sub and
+  its run ashore onto the kid's own queue (fcn.1000aeb8's sequence,
+  fcn.10049216 on the actor fcn.1004ba02 finds for `kid`, 0x100220a1-
+  0x100221e3) and hands over to the bar step (0x10021d68) at once, which
+  goes into the sea (its `enter`, entersea) for 97 ticks — he waits for
+  none of the kid's actions (the video's second lap: 4 s at the shore,
+  into the sea as the shark's fin shows, pc_nfh2_all_720 at 459-461 s;
+  read on 2026-09-25 — until then the dive and the run ashore were held
+  as his, 62 ticks each by the kid's play_remote loop); its
   continuation is the rail, whose GoTo leaves the sea (leavesea). The
   tricked sea is the shark's (0x10021fb9, 119 ticks), and its record
   `shark` sits on the shark sea's `enter`: the coin and the rage come as
@@ -1944,7 +1949,8 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   lay-down 0.5 s, the bar's 120 ticks over the seven sleeps, the beer
   5.33, the get-up 0.42) and the swim per clip (EnterSea 3.08, SeeSub
   8.08, SeeShark 9.92, LeaveSea 1.67) with WaitSea held until Olga's
-  Submarine use has ended and 10.33 s more (PCWaitFor), the shark paid as
+  Submarine use has ended (PCWaitFor; and 10.33 s more until 2026-09-25,
+  the kid's dive read as his), the shark paid as
   EnterSea ends (PCCreditAfter, World.pc_s2_credit — the overflow's tick
   counted there), Olga's clips at the PC's (PCClipSecondsRole: lay-down
   0.67, wake-up 2.92, get-up 0.67, the sub's take 1.5) and her sleep loop
@@ -1952,15 +1958,18 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   tick); the rail's stay is the code's 10.67 s. tools/pcref/lap_model_s2.py
   closes the lap with three readings of the same day — a poll's re-run
   takes the object it waits for as shown by the other script, another
-  actor's action lasts its actor's animation first, a bar's hideout is the
-  one the step has just shown — and times it at 80.7 s plus the wait for
-  the sub; the idle lap under the profile is 81.7 s (Olga's sub reaches the
-  sea 4.7 s after he reaches the shore), against the video's 70 (the first
-  lap, from the level's start on the mat) and 90-94. The earlier stays
-  (the video's: the mat 0.5, the swim 9.5, the rail 21) had made it 60 s.
-  202 was re-planned to it (tests/plans/pc/s2 v5): the rail pays at his
-  lap-3 rail and the mat, the rake and the shark on his lap 4 — 104, the
-  collapse, 100.
+  actor's action lasts its actor's animation first (Loader.dll's rule
+  since 2026-09-25: the longer oneshot of the actor's and the object's),
+  a bar's hideout is the one the step has just shown — and times it at
+  80.7 s plus the wait for the sub; the idle lap under the profile was
+  81.7 s (Olga's sub reaches the sea 4.7 s after he reaches the shore),
+  and is ~77 s mat to mat without the kid's dive (2026-09-25), against the
+  video's 70 (the first lap, from the level's start on the mat) and
+  90-94. The earlier stays (the video's: the mat 0.5, the swim 9.5, the
+  rail 21) had made it 60 s. 202 was re-planned to it (tests/plans/pc/s2
+  v5): the rail pays at his lap-3 rail and the mat, the rake and the
+  shark on his lap 4 — 104, the collapse, 100; v7 (2026-09-25) the same
+  chain a lap-length earlier, 100 at 307.6 s.
 - *210's call (2026-09-24).* The Mother's script (GameLogic.dll): her
   sleep step 0x10018c0b walks her into pool/deckchair (its `enter`,
   sitdown, 9 frames) for fcn.1000e7f2's bar of 240 ticks, the chair's
@@ -1978,8 +1987,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   0x10019270) to her chair's `neighbor` hotspot, where her order step
   0x10018682 polls for him (fcn.1000e172) and plays `order`: its
   behavior="order", posted as its job ends (18 ticks), sends him on on the
-  tick after (0x1001aecc: the walk to Fifi, her
-  `tickle`, 19 frames, then the take 0x1001aac8) and her back to the sleep
+  tick after (0x1001aecc: the walk to Fifi, the
+  `tickle`, 40 frames by the bone's bark — 19, the tickle_fifi of his, until
+  2026-09-25 — then the take 0x1001aac8) and her back to the sleep
   step. Her call, her wait and her order stand where she got up (the
   chair's `mother` and `mother_out` hotspots are one point). His chair
   step 0x100195a4 is the chair's `enter`, a bar of 120 ticks and the
@@ -2055,7 +2065,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   4.25 s; her table mutex ends with his use, the mobile's
   PawnToAbortMutexOnFinish — at the play's start until 2026-09-25, the
   start reading's `abort`), and his stays the
-  code's (the ride 17.33 and the put 0.58, the chef 7.25, the rocket 2.17,
+  code's (the ride 17.33 and the put 0.58, the chef 4.58, the rocket 2.5 —
+  7.25 and 2.17 until 2026-09-25, the chef's `cut_eel` by the neighbour's
+  `wait` loop, the rocket's by his start_rocket alone —,
   the lion 7.08; tools/pcref/lap_model_s2.py now reads the wait element, a
   step in phases — the mat's `talk`, then its wait — and a level's own
   actor record over the generic one; the put's 0 of the first carry was the
@@ -2090,7 +2102,8 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   (PCClipSecondsRole: the sit 0.75, the sleeps 6.67 each, the get-up 1.33,
   the ladder's enter 3.42, the swims 8.33, the leave 4.17), his board per
   clip (the dive 4.5, the get-out 1.33) and his stays the code's (the bar
-  7.5, the elephant 10.5, the shell 5.67, the castle 7.75, the towel 10.92;
+  7.83 — 7.5 until 2026-09-25, the keeper's `order_drink` by his own
+  animation alone —, the elephant 10.5, the shell 5.67, the castle 7.75, the towel 10.92;
   tools/pcref/lap_model_s2.py LAP_START 0x100164ee with Olga's mat shown,
   LAP_PRESENT). The idle lap is 100.0 s (109.3 on the video's stays, whose
   towel was 0.8 s); the model with the PC's walks 106, the video 107. 207
@@ -2138,10 +2151,21 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   game's run, 203's shout, the co-actor's fight, 205's talk and play,
   210's call and order, 211's puke and 214's pistol (the sections above,
   corrected), and 213's bull (below). tools/pcref/lap_model_s2.py
-  `Data.loader_time` / `job_ticks` give the numbers; the lap model's
-  stays still count an auto action by its frames (the job lasts one tick
-  more, two for a time="N" one — within the model's ±15 % of the videos,
-  open as a model refinement). 204's gong already waited for the strike's
+  `Data.loader_time` / `job_ticks` give the numbers, and its
+  `action_ticks` follows the same rule since the same day: an auto
+  action lasts its governing animation's frames — the longer oneshot of
+  the actor's and the object's, not the actor's first with loops counted
+  (205's chef `cut_eel` by the chef's cut, 31, not the neighbour's `wait`
+  loop, 63: the chef's stay 4.58 s, 7.25 before; the rocket's `ignite`
+  30, 2.5 s; 207's bar `order_drink` 94, 7.83 s; 210's Fifi `tickle` by
+  the bone's bark, 40: the tricked basket 1.75 s longer). Each DoActions
+  job still lasts a tick more than those frames (two for a time="N"
+  action), and an element done on its first update takes its tick: the
+  sequence (vtable 0x100ab6c0, update 0x1000ad52) pushes each element
+  with a first run (fcn.10049246) and returns 0, and the queue runner
+  goes on only past a job that is done — 0.5-1.7 s a lap on the twelve
+  laps the model closes (5-11 jobs, 0-9 instant elements), open as a
+  model refinement. 204's gong already waited for the strike's
   end (its stay the strike's 42 ticks) and 202's `kid_cry` rides the
   mobile's crying at his next station, the mat's `leave` over. Under it
   210 and 211 were re-planned (210 v25: the fishing net on the Mother's

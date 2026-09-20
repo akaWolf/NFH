@@ -579,3 +579,16 @@ actors' job pass the update calls at 0x100445f8.
   296.0 s), 211 (the child and the phone after her lap-3 visit, the
   overflow at 259.6 s); runs/end2s2 all 14 at 100, S1 (end1s1) and the
   mobile regression (end1mob) byte-identical.
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
+  `levels/pc/Level202/205/207/210.overlay.json`,
+  `tests/plans/pc/s2/Level202.txt` (2026-09-25, later): the lap model's
+  action ticks by Loader.dll's time="auto" rule (the longer oneshot of the
+  actor's and the object's animation, a loop not counted: 205's chef 4.58
+  s and rocket 2.5, 207's bartender 7.83, 210's tricked basket 1.75 s
+  longer by the bone's 40-frame bark); 202's kid dives on his own queue
+  (the dive step pushes the dive, the switch and the run ashore onto the
+  kid, 0x100220a1-0x100221e3, and goes on to the sea step): the swim holds
+  WaitSea only until Olga's sub is in the sea (the 10.33 s after it
+  withdrawn), his lap ~77 s; 202 v7 (the same chain, 100 at 307.6 s).
+  `pc_durations_s2.py --code-keys` writes the code's stays too
+  (`write_code_stays`: code_stays, STAYS_CODE, RUSH). runs/end4s2.
