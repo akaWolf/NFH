@@ -639,6 +639,11 @@ def sees_while_busy(nfh2=False):
 # and at 0 it falls asleep (1: `fallasleep`, then 2). An action on its queue
 # holds the class's step, so the bark and the whine count nothing.
 S1_PET_AWAKE_TICKS = 72
+# the `wakeup` action of each pet (generic/objects.xml: time auto over
+# generic/anims.xml's `wakeup`, 8 frames the dog, 11 the parrot): the first
+# bark — its noise 2 the neighbour's `alarm`, the `startle_woody` it posts —
+# comes as it ends (state 3 pushes it, state 4 barks on the next free tick)
+S1_PET_WAKEUP_TICKS = {'Dog': 8, 'Chili': 11}
 
 
 def s1_pets(nfh2=False):

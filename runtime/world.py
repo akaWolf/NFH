@@ -2669,14 +2669,34 @@ class AlerterFSM:
                     self._hear_delay = None
                     self.world.rott_hear_alerter(self, self.triggered_by_woody)
 
+    def _pc_first_bark(self):
+        """seconds to the PC pet's first bark: the `wakeup` action from
+        asleep (pcprofile.S1_PET_WAKEUP_TICKS), none when already awake"""
+        if self.awake:
+            return 0.0
+        return pcprofile.S1_PET_WAKEUP_TICKS.get(self.item.name, 0) \
+            / float(pcprofile.S1_TICK_HZ)
+
     def on_notice_woody(self):
+        pc_delay = self._pc_first_bark() if self._pc() else None
         self.wake_up()
+        if pc_delay is not None:
+            # the PC's `startle_woody` goes out with the first bark
+            # (0x45c259, once per entry)
+            self._see_delay = pc_delay
+            self._see_hold = 0
+            return
         self._see_delay = self.item.alerter_delay
         self._see_hold = 3
 
     def wake_up(self):
         self._hear_delay = self.item.alerter_delay
         self._hear_hold = 3
+        if self._pc():
+            # the neighbour hears the first bark's noise 2 (its action's
+            # start), past the `wakeup` action when the pet slept
+            self._hear_delay = self._pc_first_bark()
+            self._hear_hold = 0
         if self._pc() and not self.awake:
             # state 3: the `wakeup` action and the awake timer (0x45c153)
             self.pc_timer = pcprofile.S1_PET_AWAKE_TICKS / float(pcprofile.S1_TICK_HZ)
