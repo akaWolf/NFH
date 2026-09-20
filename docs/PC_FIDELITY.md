@@ -230,11 +230,17 @@ from the pair. The textures are the remaster's by name and size: the PC
 data copy holds no images, and textures/s2 carries minigame/<tool>.xml's
 gui/game names — field, field_alarm, <tool>_cursor, <tool>_white, 211's
 hornhautraspel the remaster's rasp — at 138 x 138 and 75 x 57, the
-field's disk 86 px wide as on the videos. Open, with numbers: the
-progress bar's front (gui/ingame/minigame_progress_front.tga, vertical,
-at 28/28 from the corner) is not in the data — the remaster's fill stands
-in, in the field's frame, a fill that spans the 138 px frame where the PC's
-starts 28 px in (the videos fill the disk up to its ring). Woody plays
+field's disk 86 px wide as on the videos. The progress bar (every
+minigame/<tool>.xml: vertical="true", front="gui/ingame/
+minigame_progress_front.tga", offset="28/28"), drawn from the field's
+corner (fcn.1000fcf0, slot 9 of the game's +4), is the field's disk
+inside its ring: the ring of the 138 px field lies at 26-27 and 110-111,
+so the front's 82 px are the disk's own; the PC data copy holds no
+images and the remaster's full field carries that disk at those px — the
+port draws its rows from the bottom up to the progress, 28 px in
+(pcprofile.S2_GAME_BAR, Hud._draw_pc_game_bar; the videos fill the disk
+from below up to the ring; since 2026-09-25 — the remaster's whole
+138 px fill stood in before). The rows' rounding is the port's. Woody plays
 the game where the use put him — the object's `woody` hotspot, its
 level.xml position plus the offset — which lies off the room's floor line
 on thirteen levels: 24 px above it at 204's dispenser (whose `use` hides
@@ -2153,22 +2159,33 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   corrected), and 213's bull (below). tools/pcref/lap_model_s2.py
   `Data.loader_time` / `job_ticks` give the numbers, and its
   `action_ticks` follows the same rule since the same day: an auto
-  action lasts its governing animation's frames — the longer oneshot of
+  action's time is its governing animation's — the longer oneshot of
   the actor's and the object's, not the actor's first with loops counted
   (205's chef `cut_eel` by the chef's cut, 31, not the neighbour's `wait`
-  loop, 63: the chef's stay 4.58 s, 7.25 before; the rocket's `ignite`
-  30, 2.5 s; 207's bar `order_drink` 94, 7.83 s; 210's Fifi `tickle` by
-  the bone's bark, 40: the tricked basket 1.75 s longer). Each DoActions
-  job still lasts a tick more than those frames (two for a time="N"
-  action), an element done on its first update takes its tick — the
-  sequence (vtable 0x100ab6c0, update 0x1000ad52) pushes each element
-  with a first run (fcn.10049246) and returns 0, and the queue runner
-  goes on only past a job that is done — and so does each step: the
-  script's job (213's neighbour: update 0x10037726 -> fcn.1000e131) runs
-  the step, which pushes its sequence in front (fcn.10049216, no first
-  run), and returns 0. 0.9-2.4 s a lap on the twelve laps the model
-  closes (4-9 steps, 5-11 jobs, 0-9 instant elements; 212 the most),
-  open as a model refinement. 204's gong already waited for the strike's
+  loop, 63; the rocket's `ignite` 30; 207's bar `order_drink` 94; 210's
+  Fifi `tickle` by the bone's bark, 40). The elements' own ticks are
+  carried too (2026-09-25, later): an action counts its whole job, the
+  Loader's time + 2 (`action_ticks` = `job_ticks`); an element done on
+  its first update takes its tick — the sequence (vtable 0x100ab6c0,
+  update 0x1000ad52) pushes each element with a first run (fcn.10049246)
+  and returns 0, and the queue runner (fcn.100492a8) goes on only past a
+  job that is done; the bars (fcn.1000b154's counter, 0x1000b3a7-
+  0x1000b3b3) and the wait element (0x1000c9de) last their ticks
+  exactly; and a step takes its own — the script's job (213's neighbour:
+  update 0x10037726 -> fcn.1000e131) runs the step and returns 0, the
+  step's sequence pushed without a first run (fcn.10049216) starting on
+  the tick after, and a step that walks has the GoTo's first tick before
+  the walk (the GoTo job, fcn.1000e3e0 -> fcn.10007a10, pushed the same
+  way) and its done tick after the arrival (the job sets +0x14 as the
+  actor arrives and returns 1 on its next update, 0x10007670 /
+  0x10007409): 3 ticks a walking step, 1 a step at the place of the
+  last (`step_ticks`, with the step's first timed part). The laps the
+  model closes grow by 0.9-2.4 s (202 88.8, 203 106.8, 208 87.3, 209
+  109.3, 211 87.1, 212 127.3, 213 125.8, 214 92.2 s), each stay by
+  0.1-0.5 s; 208's plan parks through Zone05 at once after the rat
+  (`park!`, the gate had held Woody there a lap) and 211's waits for the
+  Mother's sleep before her lap-3 visit to the child — all fourteen at
+  100 (runs/end6s2). 204's gong already waited for the strike's
   end (its stay the strike's 42 ticks) and 202's `kid_cry` rides the
   mobile's crying at his next station, the mat's `leave` over. Under it
   210 and 211 were re-planned (210 v25: the fishing net on the Mother's
