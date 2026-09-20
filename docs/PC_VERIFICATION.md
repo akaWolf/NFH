@@ -235,9 +235,9 @@ actors' job pass the update calls at 0x100445f8.
 |---|---|---|---|
 | the level completes when every trick is done | `all_done` (completed == total) | fcn.10041086: status +0xc == +0x10 (done == `reachable`) → the actors are stopped (fcn.1004ba02 → fcn.100450bf), the board | agrees; `reachable` 4/5/5/6/5/6/7/7/7/8/8/9/9/6 is the port's `total` (data) |
 | the pass mark | `won` at WinningTricksCount | leveldata `mincoins`, checked when a flagged request comes in (byte +0x6f, set by the virtual at 0x1004717f — the menu's exit-level path, `mm_exitlevel`; coins ≥ mincoins passes) | agrees in effect: `mincoins` equals the mobile's WinningTricksCount on 13 levels and the 211 overlay carries the PC's 5 (data); the PC lets a player leave a level early through the menu, the port's menus do not model that |
-| the catch | `_catch`: fear, the beating, `_respawn` | the catch fiber (vtable 0x100ab258 slot 10, entry 0x100061dc): Woody's `fear1`/`fear3` facing the catcher (0x10006510), the catcher's `fight` action (objects.xml: `fight_woody` with `fly_away_neighbor` / `fly_away_mother` on Woody, who becomes invisible), then case 4 places Woody 900 px above the respawn spot (0x10006336: y = top − 900, x = the midpoint) and plays the `respawn` action (the fall), case 5 takes a life (fcn.10042471) | agrees: the spot is the level's start area on video (docs/PC_FIDELITY.md §2.5) and the port's entrance location |
-| the respawn timer | Woody is controllable as soon as he reappears | the catch (fcn.10042471 at 0x100424b6) copies leveldata's `respawntime="60"` into status +0x18, the level update counts it down (0x10044725), and while it runs the action runner fcn.1003cc45 drops the actions whose actor is `woody` (0x1003ce61, 0x1003ceae: the timer read fcn.10040123) | read: 5 s without Woody's actions after the respawn; open whether a walk command is among them, so not carried |
-| lives out | game over | fcn.10042471: lives − 1, below zero → the failed path (0x100424d8) | agrees |
+| the catch | `_catch`: fear, the beating, `_respawn` | the catch fiber (vtable 0x100ab258 slot 10, entry 0x100061dc) on Woody's queue: Woody's `fear1`/`fear3` facing the catcher (0x10006510), the catcher's `fight` action (generic/objects.xml: `fight_woody` with `fly_away_neighbor` / `fly_away_mother` on Woody — invisible, then 900 px up over the action's ticks 36-44 / 41-49, its `<translation>` — and `inv` after it), then case 4 (0x100062cc) picks the room, fcn.10005f58: every room of the level in its map's order (the names': the iterator fcn.1004018d, the UTF-16 compare fcn.10058390) scores 50 with more than one `<neighbor>` record and 0 with one (0x1000610c), 101 more with an object flagged `hideout` in it (0x100060b7), 50 less with a `bad` actor in it in his hideout (flag 4, 0x100060a0) and 10000 less with one out of it (0x10006139) — an actor counts in the room its pointer names (fcn.10040a7d) — and the first room above 0 and above every earlier one is taken (0x1000613f; none: the assert "Kein leerer Raum!!!"); Woody goes 900 px above the middle of its path (0x10006330-0x1000634a: x the two ends' mean, y path1's less 900; fcn.10041ad0 the room, fcn.100418f6 the point) and his `respawn` action goes in front of the fiber (fcn.10049246 without a first run): the fall back over its ticks 0-5 (translation 0/900) and the landing (generic/anims.xml `respawn`, 38 frames: 37 by the Loader's rule, a job of 39 ticks); case 5 (0x10006274), the job done, clears the catch's flag 0x10000 off Woody and takes the life (fcn.10042471) | carried since 2026-09-25 (`World._pc_respawn_zone`, `_respawn`, `_pc_respawn_landed`; PCRoom `hideout` from tools/pcref/pc_walks_s2.py): the room, Woody on the middle of its floor, standing through the landing's 39 ticks (the remaster has no landing sheet), his input held from the catch to case 5 (the fiber heads his queue; whether the PC keeps or drops a click meanwhile is not read — the port keeps it, StoreBlockedInput). Before, the level entrance; the let's play's respawns (5:04, 6:05) land in the beach's left room — by Olga's mat, then at the foot of the gate's stairs, x 360 of its path 100-620 — the first room of that map, not Woody's start (the shop) |
+| the respawn timer | none: a catch could follow at once | case 5 (fcn.10042471 at 0x100424b6) sets status +0x18 to leveldata.xml's `respawntime="60"`, the level update counts it down after its watch walker (0x10044725 past 0x100445f1), and while it runs the `fight` and `die` behaviours of generic/trigger.xml refuse Woody: their predicates (slot 4 of the vtables 0x100b0eec / 0x100b0e8c, fcn.1003d526 / fcn.1003cd8e) read it with Woody either party (0x1003d5f9, 0x1003d646 / 0x1003ce61, 0x1003ceae — fcn.1003cc45 there is the actor's name, not an action runner), beside the catch's flag 0x10000 on the behaviour's actor (set by both behaviours' starts, 0x1003d4bf / 0x1003cd27; refused at 0x1003d6b5 / 0x1003cf1d) and the scenes' flag 0x100000 on either (fcn.1000885f); the same span GFXEngine outlines Woody (the message of vtable 0x100b145c from 0x10042515 on / 0x10044765 off, visitor slot 80 0x1000ac00 → his sprite's +0x39, which draw slot 10 at 0x10011c50 turns into the frame in black at x±1 and y±1 under it; ship1's tutorial: "As long as Woody's image flashes, the neighbour is unable to see him") | carried since 2026-09-25 (`World._pc_catch_barred`, `pc_outlined`, render.draw_sprite's `outline`): no catch from the catch through the landing and 60 ticks (5 s) after it, the outline one PC px wide |
+| lives out | game over | fcn.10042471 on the last life — status +0x14 at 1 before the decrement (fcn.1004012a, 0x10042483) — ends the level (slot 13 with 0, 0x100424d8-0x100424dc), case 4 having skipped the fall (0x1000634d): three attempts, x3, x2, x1 | differed: the port respawned on the last life as well, a fourth attempt; carried since 2026-09-25 (`_catch`: a respawn above one life) |
 | the gauge, the decay, the board, the clock | `pcprofile.s2_rage_tick`, `calculate_score` | the level update 0x100442b3 (its status tick 0x10044710-0x100447f1), fcn.10040226 | agrees (docs/PC_ROUTINES.md) |
 | the reaction to a trick | `pcprofile.s2_reaction_seconds`, `World.play_angry`: the mobile's angry set paced to the SHOUT's action | fcn.1000f977: the step's last parameter picks [shout2_light] / [shout2, shout2] / [shout2_hard] x3 / [shout2_high] — the static initializers 0x1007b54b-0x1007b61d fill 0x100df45c / 0x100df434 / 0x100df450 / 0x100df41c — after a first pick of [freakout1, freakout2, freakout3] (0x100df43c), which the SHOUT element (vtable 0x100ab99c, update 0x1000d751) plays instead once the status byte +0x28 is set: the credit sets it as the rage reaches 100 000 (0x10001500) and nothing clears it; the actions' animations (generic/objects.xml, anims.xml) 26 / 26 / 85 / 26 frames, the freakouts 37 / 38 / 63 | **fixed 2026-09-24**: the tables had been read as mixed (1: shout2 or shout2_hard, 2: shout2_hard or shout2, 3: the freakouts) and the freakout after the overflow was missing (`Pawn.pc_rage_full`) |
 | a tricked visit's credit | `Routine.pc_credit_timer` / `pc_credit2_timer`, `World.pc_s2_credit` / `pc_s2_linked_credit` | fcn.1000140b credits each named record of a playing action on the tick its `time` equals the action's count (0x10001455), from the action step's playing state (0x1000254d) and its end (0x100025bf): 202's rail over the eels' pond pays bridge_crash 8 ticks into the crash and bridge_electrify 5 into the electrify, 22 ticks apart | **carried 2026-09-24**: PCCreditAt / PCCreditAtLinked for the item's own record, PCLinkedPaysAt for the linked trick's (the ladder's linked arm paid apart, `_s2_credit(part=)`); the done count is the trick table's credited records (fcn.100522e6, fcn.1005225b), so the pair's completion is booked with its last record (`Item.pc_done_due`) |
@@ -298,7 +298,12 @@ actors' job pass the update calls at 0x100445f8.
   two or three side by side — where the port's one zone may be coarser
   than the PC's strips (open, and not where 106, 110 and 111 lose
   their tricks: those rooms have one floor).
-- Season 2: what the respawn timer gates.
+- Season 2, the catch's input: the catch fiber heads Woody's queue from
+  the fear to its case 5 (the rows "the catch" and "the respawn
+  timer"); whether the PC keeps a click made meanwhile for after or
+  drops it is not read — the port keeps it (StoreBlockedInput). The
+  landing (`respawn`: landing.tga …) has no sheet in the remaster, the
+  port's Woody stands through its 39 ticks.
 - The jingle table's index (0..3) is the dialog's outcome, not the level
   state; which outcome maps to which index was not traced beyond the
   table itself.
@@ -381,7 +386,13 @@ actors' job pass the update calls at 0x100445f8.
   string globals in GameLogic, Loader.dll and game.exe but no code maps
   them to bits by name — the mask is numbered upstream (the level
   compiler or game.exe's message builder, `createMsgList`), so which
-  name is bit 2 stays unread. What bit 2 does is read: the actor tick
+  name is bit 2 stays unread (reread on 2026-09-25: Loader.dll's
+  `<flag>` parser, 0x10009c80-0x1000a04d, compares the name with its
+  wide-string globals and stores the mask — container 0x10, hideout
+  0x40, singleuse 0x80, neighbor_hideout 0x100, doorup 0x200, doordown
+  0x400, doorleft 0x800, doorright 0x1000, remove 0x2000, autotake
+  0x4000, bad 0x8000, game 0x20000; none is 2, bit 2 is a state). What
+  bit 2 does is read: the actor tick
   fcn.10004f3d (from fcn.10005370) tests 0x40, 0x10 and 2 on the actor;
   under 2 it resolves a name (fcn.1003cc45 → fcn.10040a7d), finds the
   entry of that name in a list (fcn.1004ca80, strcmp) and starts a
@@ -610,3 +621,17 @@ actors' job pass the update calls at 0x100445f8.
   from the bottom up. 208 (`park!` through Zone05 after the rat) and 211
   (the Mother's sleep before her lap-3 visit) re-timed: runs/end6s2 all 14
   at 100; S1 end6s1 and the mobile regression end6mob byte-identical.
+- `runtime/world.py`, `runtime/pcprofile.py`, `runtime/render.py`,
+  `runtime/viewer.py`, `tools/pcref/pc_walks_s2.py`,
+  `levels/pc/Level2*.overlay.json` (2026-09-25, night): the Season 2
+  respawn by the catch fiber — the room of fcn.10005f58 (PCRoom
+  `hideout`, the names' order, the `bad` actors' rooms and flag 4),
+  Woody on the middle of its floor, held through the `respawn` action's
+  39 ticks, the life taken at its end, then the respawn timer's 60 ticks
+  without a catch (both behaviours' predicates) and the outline; the
+  last life ends the level (a fourth attempt before). Loader.dll's flag
+  names read (0x10009c80-0x1000a04d): container 0x10, hideout 0x40,
+  singleuse 0x80, neighbor_hideout 0x100, doorup 0x200, doordown 0x400,
+  doorleft 0x800, doorright 0x1000, remove 0x2000, autotake 0x4000, bad
+  0x8000, game 0x20000. The row's misreading withdrawn: fcn.1003cc45 is
+  the actor's name, the timer is read by the behaviours' predicates.

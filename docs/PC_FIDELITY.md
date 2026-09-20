@@ -111,8 +111,15 @@ PC game (youtube awWiuFm9llc, 5:03-5:10 and 6:05, the counter x3 → x2 →
 x1 found with tools/pcref/lives2.py): the neighbour beats Woody for ~4 s,
 Woody reappears in the level's start area with his inventory, the anger
 gauge and the tricks stay as they were, the neighbour walks back into his
-routine and the clock never stops. The profile's `_respawn` does exactly
-that (the entrance location, the routine unfrozen, nothing reset).
+routine and the clock never stops. The profile's `_respawn` did that
+with the entrance location; since 2026-09-25 it is the catch fiber's
+(docs/PC_VERIFICATION.md "the catch", "the respawn timer", "lives out"):
+the room GameLogic picks (fcn.10005f58: rooms with more than one door
+pair, a Woody hideout first, none with the neighbour or the Mother out of
+their hideouts, the first by name among equals — the video's beach left
+room, not his start in the shop), Woody on the middle of its floor after
+the landing's 39 ticks, then 5 s in which neither catches him while he
+is drawn outlined; the third catch ends the level (x3, x2, x1).
 
 ### 2.6 Dexterity mini-games (confidence: high — read in GameLogic.dll 2026-09-23)
 
@@ -430,7 +437,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   played, counting up, in the TimeRect the mobile data carries but its
   DrawTime never uses on NFH2; the Season 2 bonus for ANY overflow, three lives on Season 2
   levels (`_catch` → `_respawn`: the beating plays, Woody reappears at the
-  level entrance, the neighbour resumes his routine), no dexterity
+  level entrance — since 2026-09-25 in the room of the catch fiber's case 4,
+  §2.5 —, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the
   first click), `World.blow_whistle()` — the targetless inventory use
   that wakes every alerter (the W key in the viewer, the `whistle` plan
@@ -447,8 +455,8 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   `s2_result`),
   the catch's per-tick rule and cutscene, the Season 2 completion check
   (fcn.10041086: every reachable trick, or coins ≥ mincoins on the
-  menu's exit), the catch fiber with its respawn 900 px above the start
-  spot, and the data (time limits, minquota, reachable/mincoins, trick
+  menu's exit), the catch fiber with its respawn 900 px above the middle
+  of the room fcn.10005f58 picks (§2.5), and the data (time limits, minquota, reachable/mincoins, trick
   values, angrytime) — the open items are listed there.
 - The walk, the doors and the sight (2026-09-17, from the binaries and
   the data — docs/PC_VERIFICATION.md "the walking speed", "door
@@ -856,7 +864,8 @@ to the mobile laps, lost; the overlays were withdrawn. The PC original's
 own data, `data/gamedata.bnd` — a plain ZIP of the levels' XML,
 tools/pcref/gamedata.py — is the way to settle these three and the tick
 window alike, once a copy is at hand.) A catch under the profile puts
-Woody back at the entrance in one frame; the respawn now marks that
+Woody back at the entrance in one frame (since 2026-09-25 in the room
+of the catch fiber, §2.5); the respawn now marks that
 frame as a snap for the continuity invariant (`pos_snap`), which had
 flagged it as a teleport.
 
@@ -1598,7 +1607,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tools/pcref/pc_tutorial201.py; the plan tests/plans/pc/s2/Level201.txt):
   the director's steps by address, its texts, markers and signs over the
   remaster's arrow and sign strips, the welcome box; Woody starting at
-  level.xml's 300 in bottomleft (his respawn point too), the neighbour at
+  level.xml's 300 in bottomleft (the respawn's point until 2026-09-25; the
+  PC's is topleft, the virtual hideout's room, §2.5), the neighbour at
   the bridge; the doors open (the remaster's stair locks are its lesson's);
   the chest, the puddle, the vanity bag and the spaghetti pot the mobile
   items locked until the director shows their open twins, the rail and
