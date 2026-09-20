@@ -553,4 +553,5 @@ actors' job pass the update calls at 0x100445f8.
   `woody` hotspot, PCMinigameLift px above the room's floor line (201 55,
   202 -7, 203 60, 204 24, 205 13, 206 38, 207 -2, 208 76, 209 0, 210 11,
   211 -92, 212 20, 213 -79, 214 84) — taken from the walking line: 204's
-  field 150 px above the drawn shoes as on E04 (127 before).
+  field 150 px above the drawn shoes as on E04 (127 before). runs/sw21s2
+  byte-identical to sw20s2, S1 and the mobile regression unchanged.
