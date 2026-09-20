@@ -26,13 +26,25 @@ def overlay_path(level_path):
 
 def apply_overlay(level):
     """patch level.objs in place. An entry matches components by type
-    (`component`), the GameObject's name (`object`) and optionally the item's
-    zone (`zone`); `set` updates fields, `append` extends list fields, `anim`
-    + `anim_set` retunes one animation of an ItemAnimationController by
-    Name. Returns the number of components touched."""
+    (`component`), the GameObject's name (`object`) or the component's own
+    fields (`match`), and optionally the item's zone (`zone`); `set` updates
+    fields, `append` extends list fields, `anim` + `anim_set` retunes one
+    animation of an ItemAnimationController by Name. A Season 2 level takes
+    levels/pc/Season2.overlay.json's patches first (tools/pcref/
+    pc_respawn_s2.py: Woody's landing). Returns the number of components
+    touched."""
     global SEASON2
     SEASON2 = os.path.basename(level.path or '').startswith('Level2')
+    n = 0
+    if SEASON2:
+        n += _apply_file(level, os.path.join(ROOT, 'levels', 'pc', 'Season2.overlay.json'))
     p = overlay_path(level.path)
+    if not os.path.exists(p):
+        return n
+    return n + _apply_file(level, p)
+
+
+def _apply_file(level, p):
     if not os.path.exists(p):
         return 0
     ov = json.load(open(p, encoding='utf-8'))
@@ -43,7 +55,10 @@ def apply_overlay(level):
             if o.get('type') != op.get('component'):
                 continue
             d = o.get('data') or {}
-            if 'owner' in op:
+            if 'match' in op:
+                if any(d.get(k) != v for k, v in op['match'].items()):
+                    continue
+            elif 'owner' in op:
                 # an ActionManager is addressed by its Owner pawn
                 if (d.get('Owner') or {}).get('name') != op['owner']:
                     continue
@@ -95,7 +110,7 @@ def apply_overlay(level):
             # (the Season 2 neighbour's GameObject is "Rottweiler2", not
             # "Rottweiler"): say so, per patch, instead of applying silently
             print('pcprofile: overlay %s: patch %s matched nothing' % (
-                os.path.basename(p), json.dumps({k: op[k] for k in ('object', 'component', 'owner', 'zone') if k in op})), file=sys.stderr)
+                os.path.basename(p), json.dumps({k: op[k] for k in ('object', 'component', 'owner', 'zone', 'match') if k in op})), file=sys.stderr)
     if n == 0:
         import sys
         print('pcprofile: overlay %s matched nothing' % os.path.basename(p), file=sys.stderr)
@@ -644,6 +659,17 @@ def s2_sight(nfh2=False):
 # (slot 13 with 0, 0x100424dc).
 S2_RESPAWN_ACTION_TICKS = 39
 S2_RESPAWN_TICKS = 60
+# the `respawn` action's <translation object="true" starttime="0" endtime="5"
+# destination="0/900"/> (generic/objects.xml): (start, end, px down), applied by
+# the DoActions job on every tick of its count (fcn.100015c4, World._pc_landing_tick)
+S2_RESPAWN_FALL = (0, 5, 900)
+# the catchers' `fight` on Woody (generic/objects.xml, under Woody's actor): time auto over
+# the longer of fight_woody and fly_away_neighbor / fly_away_mother (41 / 44 and 50 / 50
+# frames: 43 and 49 by the Loader's rule), a DoActions job of that plus 2 ticks — the
+# catch fiber's cases 2-3 wait it out on Woody's fly_away (0x1000647c, 0x10006420) and
+# case 4 follows. The animations are the remaster's FightWoody / MotherHitWoody frame
+# for frame, a frame a tick (levels/pc/Season2.overlay.json, tools/pcref/pc_respawn_s2.py)
+S2_FIGHT_TICKS = {'Rottweiler': 45, 'Mother': 51}
 
 
 def s2_respawn(nfh2=False):

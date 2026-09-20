@@ -1,0 +1,122 @@
+{
+ "source": "GameLogic.dll fcn.100061dc case 4 (the respawn) and fcn.100015c4 (the translation); generic/anims.xml `respawn`, generic/gfxdata.xml, generic/objects.xml; textures/s2/W_Landing.png; tools/pcref/pc_respawn_s2.py",
+ "patches": [
+  {
+   "component": "PawnAnimationController",
+   "match": {
+    "BaseAnimationPath": "Textures/NFH2/Characters/Woody/"
+   },
+   "append": {
+    "Animations": [
+     {
+      "Name": "PCRespawn",
+      "SheetTexture": "W_Landing",
+      "TextureFileName": "W_Landing",
+      "SheetColumns": 4,
+      "SheetRows": 4,
+      "StartFrame": 0,
+      "EndFrame": 14,
+      "FrameRate": 12.0,
+      "OriginalWidth": 660.0,
+      "OriginalHeight": 972.0,
+      "DeltaLocation": {
+       "x": -18.5,
+       "y": -76.0
+      },
+      "Type": "Single",
+      "InfiniteLoop": false,
+      "HoldOnLastFrame": false,
+      "Blocking": false,
+      "UsePattern": true,
+      "Pattern": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       5,
+       5,
+       6,
+       7,
+       8,
+       9,
+       7,
+       8,
+       9,
+       7,
+       8,
+       9,
+       7,
+       8,
+       9,
+       7,
+       8,
+       9,
+       7,
+       8,
+       9,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14
+      ],
+      "Sounds": [
+       {
+        "Frame": 0,
+        "FileName": "wod_swish2"
+       },
+       {
+        "Frame": 6,
+        "FileName": "obj_hit1"
+       },
+       {
+        "Frame": 7,
+        "FileName": "wod_au1"
+       },
+       {
+        "Frame": 14,
+        "FileName": "obj2_birdies1"
+       },
+       {
+        "Frame": 17,
+        "FileName": "wod_eh1"
+       },
+       {
+        "Frame": 24,
+        "FileName": "obj2_birdies2"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "component": "PawnAnimationController",
+   "match": {
+    "BaseAnimationPath": "Textures/NFH2/Characters/Rottweiler/"
+   },
+   "anim": "FightWoody",
+   "anim_set": {
+    "FrameRate": 12.0
+   }
+  },
+  {
+   "component": "PawnAnimationController",
+   "match": {
+    "BaseAnimationPath": "Textures/NFH2/Characters/Mother/"
+   },
+   "anim": "MotherHitWoody",
+   "anim_set": {
+    "FrameRate": 12.0
+   }
+  }
+ ]
+}

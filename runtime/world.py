@@ -6965,6 +6965,7 @@ class World:
         # and the seconds left on the respawn timer after it
         self._pc_catch_seq = False
         self._pc_respawn_left = 0.0
+        self._pc_landing = None          # the `respawn` action's run (_pc_landing_tick)
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         self._entrance_timer = None      # Woody's walk-in countdown
         self.time = 0.0                  # Time.time for the alarm intervals
@@ -10561,8 +10562,15 @@ class World:
                 num = random.randrange(0, 100)
                 pick = 0 if num <= 25 else 1 if num <= 50 else \
                     2 if num <= 75 else 3
+                fight = pcprofile.S2_FIGHT_TICKS.get(catcher.role) \
+                    if pcprofile.s2_respawn(woody.nfh2) else None
                 catcher.anim.play_sequence(seqs[min(pick, len(seqs) - 1)],
-                                           on_end=self._after_hit)
+                                           on_end=None if fight else self._after_hit)
+                if fight:
+                    # the PC's `fight` is one DoActions job (the catch
+                    # fiber's cases 2-3 wait on Woody's fly_away): its end
+                    # is the fiber's case 4 (pcprofile.S2_FIGHT_TICKS)
+                    self.call_later(fight / float(pcprofile.S2_TICK_HZ), self._after_hit)
             else:
                 self._after_hit()
         # HitWoodyAction serializes Urgent=false — the catcher walks over
@@ -10627,7 +10635,8 @@ class World:
         path — x the two ends' mean, 0x10006330-0x1000634a — where the
         `respawn` action lands him from 900 px up (its translation, ticks
         0-5), and the action's job holds his queue until case 5
-        (_pc_respawn_landed); without a room, the level entrance"""
+        (_pc_landing_tick, _pc_respawn_landed); without a room, the level
+        entrance"""
         self._respawning = False
         w = self.woody
         catcher = getattr(self, '_last_catcher', None)
@@ -10646,9 +10655,14 @@ class World:
                 x_pc = (pr['x1'] + pr['x2']) // 2
                 w.sprite.x = z_pc.left + (x_pc - pr['x1']) * (z_pc.right - z_pc.left) \
                     / float((pr['x2'] - pr['x1']) or 1)
-                w.sprite.y = w.floor_y(z_pc)
                 w.pos_snap = True
                 w.zone = z_pc
+                # 900 px above the path (0x10006336) and unseen on the tick
+                # of case 4 — the fight left him `inv` (objnextanim)
+                w.sprite.y = w.floor_y(z_pc) + pcprofile.S2_RESPAWN_FALL[2] \
+                    / pcprofile.PX_PER_UNIT
+                w.sprite.hidden = True
+                self._pc_landing = {'t': 0.0, 'base': w.floor_y(z_pc), 'started': False}
             else:
                 loc = self.level.entrance_location
                 if loc:
@@ -10657,10 +10671,11 @@ class World:
                     z = self.level.zone_at(loc[0], loc[1])
                     if z is not None:
                         w.zone = z
-            for name in ('switch_to_stand', 'stand'):
-                if hasattr(w.anim, name):
-                    getattr(w.anim, name)()
-                    break
+            if z_pc is None:
+                for name in ('switch_to_stand', 'stand'):
+                    if hasattr(w.anim, name):
+                        getattr(w.anim, name)()
+                        break
         if catcher is not None:
             catcher.movement_paused = False
             catcher.state = catcher.IDLE
@@ -10670,11 +10685,41 @@ class World:
                 if r.pawn is catcher:
                     r.unfreeze()
         self.game.got_caught = False
-        if z_pc is not None:
-            # the remaster has no landing sheet: he stands through the job
-            self.call_later(pcprofile.S2_RESPAWN_ACTION_TICKS
-                            / float(pcprofile.S2_TICK_HZ), self._pc_respawn_landed)
-        elif self._pc_catch_seq:
+        if z_pc is None and self._pc_catch_seq:
+            self._pc_respawn_landed()
+
+    def _pc_landing_tick(self, dt):
+        """the `respawn` action's job on Woody's queue, from the catch
+        fiber's case 4 (tick 0) to case 5: its first update the tick after
+        the push (fcn.10049246 without a first run) sets the animation
+        (`PCRespawn`, tools/pcref/pc_respawn_s2.py: generic/anims.xml's
+        38 frames on the remaster's W_Landing sheet, a frame a tick), each
+        tick of its count the translation (fcn.100015c4: the base plus
+        destination * (count - start) / (end - start), integer division,
+        for a count in (start, end] — S2_RESPAWN_FALL), and the job done
+        (S2_RESPAWN_ACTION_TICKS) the fiber's case 5 runs"""
+        ld = self._pc_landing
+        w = self.woody
+        if ld is None or w is None:
+            return
+        ld['t'] += dt
+        k = int(ld['t'] * pcprofile.S2_TICK_HZ + 1e-6)
+        if k >= 1 and not ld['started']:
+            ld['started'] = True
+            w.sprite.hidden = False
+            if w.anim.has('PCRespawn'):
+                w.anim.play_single('PCRespawn')
+        start, end, dest = pcprofile.S2_RESPAWN_FALL
+        count = max(0, k - 1)
+        moved = dest if count > end else (dest * (count - start)) // (end - start) \
+            if count > start else 0
+        y = ld['base'] + (dest - moved) / pcprofile.PX_PER_UNIT
+        if y != w.sprite.y:
+            w.sprite.y = y
+            w.pos_snap = True      # the translation's step, not a walk
+        if k >= pcprofile.S2_RESPAWN_ACTION_TICKS:
+            self._pc_landing = None
+            w.sprite.y = ld['base']
             self._pc_respawn_landed()
 
     def _pc_respawn_zone(self):
@@ -10981,6 +11026,8 @@ class World:
             if entry[0] <= 0.0:
                 self._delayed.remove(entry)
                 entry[1]()
+        if self._pc_landing is not None:
+            self._pc_landing_tick(dt)
         # the entrance walk (Woody.cs:223-229): the timer runs down, he walks
         # to Level.EntranceLocation, and arrival unlocks the input
         # (OnFinishedEntrance)
