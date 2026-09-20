@@ -46,17 +46,24 @@ the success flag picks `perfect` when the viewer rating (`[esp+0x70]`) is at
 least 90 (0x1000e201) and `success` below, the time's-up flag picks
 `timeover`, everything else `failed`; `generic/strings.xml` spells them
 BRILLIANT!, SUCCESS!, TIME'S UP!, FAILED! (category `gameover`, with
-VIEWER RATING: and TRICKS:). The jingle table at 0x440f2f (0 and 2
-`jingle_failed`, 1 `jingle_caught`, 3 `jingle_success_normal`) is indexed
-by the dialog's outcome; `jingle_success_perfect` is in the string tables
-and never played by the code.
+VIEWER RATING: and TRICKS:). The jingles (read 2026-09-25): the handler
+fcn.00437de0 posts a message (vtable 0x4e09d4) on every change of the
+state to 2..5 (the tick, 0x439dd6-0x439df3: not for 0 and 1) and the
+level classes' slot 43 (0x440d40, vtables 0x4e07b8 / 0x4e1638) plays the
+jingle of the table at 0x440fbc indexed by the state less 2
+(0x440f23-0x440f34): 2 and 4 `jingle_failed`, 3 `jingle_caught`, 5
+`jingle_success_normal`; `jingle_success_perfect` is in the string tables
+and never played by the code. A catch plays two: the caught one on state
+3, then the failed or the success one when the beating's state 1 turns 2
+or 5.
 
 | rule | port | binary | verdict |
 |---|---|---|---|
 | the level ends when every trick has fired | `GameState.all_done` (completed == total) | state 5 on fired == `reachable` | agrees; `reachable` equals the port's `total` on all 14 levels (data) |
 | the level ends when the rating reaches 100 | not modelled | state 5 on score ≥ 100 after the reaction | equivalent on every level: the sum of the trick scores is 76–91, so 100 needs the last trick and the ticks together (data, docs/PC_LAPS.md) |
 | time's up: success at or above minquota | `calculate_score`: won = rating ≥ `pc_min_rating` | state 5 / 4 by `minquota` | agrees |
-| a catch with the quota reached is still a success | `_catch` → `_finish_game` → `calculate_score` (won by the quota) | state 5 from state 1 when score ≥ minquota | agrees (the port's caught jingle plays either way, as the PC's index-1 jingle does) |
+| a catch with the quota reached is still a success | `_catch` → `_finish_game` → `calculate_score` (won by the quota) | state 5 from state 1 when score ≥ minquota | agrees |
+| the jingles | the mobile's: caught at a catch and nothing after, success or perfect by the rating, perfect for all the tricks | the table by the state less 2 (above): caught on the catch's state 3, then failed or success on 2 / 5; failed on time's up; success (never perfect) on 5 | **fixed 2026-09-25**: `pcprofile.S1_JINGLES` under the profile (`_after_hit`, `finish_game_on_hud_click`, `_win`) |
 | the result captions | the mobile's EXCELLENT / GOOD / PASSED / FAILED / TIME UP | BRILLIANT! from 90, SUCCESS!, TIME'S UP!, FAILED! | **fixed 2026-09-16**: `pcprofile.s1_result` under the profile |
 | the map's perfect episode | rating ≥ 100 | rating ≥ 90 (leveldata state 4) | **fixed 2026-09-16**: `pcprofile.s1_perfect` under the profile (`app.py`'s score save) |
 | the minimum ratings | `pcprofile.S1_MIN_RATING` | leveldata.xml `minquota` 50/55/60/65/70/75, 60/65/70/75, 60/65/70/75 | agrees (data) |
@@ -88,12 +95,12 @@ coordinates (fcn.00444690: +0x28/+0x2c) meet Woody's — the chase's arrival.
 
 | rule | port (the mobile's, docs/GAMEPLAY.md §2) | binary | verdict |
 |---|---|---|---|
-| detection is zone containment, no line of sight | `CanRottweilerSeeWoody`: same Zone | same position object | agrees in kind; whether the PC's object is the room or the floor strip is open — the walk code treats it as the walk target's identity |
+| detection is zone containment, no line of sight | `CanRottweilerSeeWoody`: same Zone | same position object | agrees: the object is the room — it is set by name (fcn.00437970 → fcn.00448d70 → fcn.00444b30) and the walk compares it with its route's next room by name (0x475ebb-0x475f00), while level.xml's `<floor>` strips carry no name; the hall's (`anc`) two or three strips are one room, the port's one zone |
 | a hidden Woody is safe | `Hiding` | flag 4 | agrees |
 | a busy neighbour | `IsSleeping`, `IgnoreWoody`, the blocking-animation clause | the +0x78 byte is zero from the actor's constructor (fcn.00448320, 0x44848d) and changes only in the level's slot-49 handler (0x440c7f–0x440c87: `sete` — a toggle), which only the script interface's slot-207 stub (0x405f10 → 0x405f3d) reaches; no compiled code calls that slot (no `[vtable+0x33c]` call in game.exe), so the byte stays zero in every level and the catch on sight is never suspended | differs in kind: the PC neighbour has no busy or sleeping window — the mobile's `IgnoreWoody`/`IsSleeping` clauses are the remaster's; carried since 2026-09-17: `pcprofile.sees_while_busy` — the catch is the room and the hideout flag alone; 109's neighbour asleep in his `neighbor_hideout` bed sees a walking Woody (noise 1) and not a sneaking one |
 | doorways are safe transit | `IsPassingDoor`, `IsMovingToAdjacentZone` | not read | open |
 | the Bed special case | movement is fatal while he is in bed | not read | open |
-| the beating, then the level ends | `_catch`: the fear pose, `_finish_game`, the caught jingle | fcn.00474510, state 1, then state 5 or 2 by the quota | agrees |
+| the beating, then the level ends | `_catch`: the fear pose, `_finish_game`, the caught jingle (and under the profile the outcome's after the beating) | fcn.00474510, state 1, then state 5 or 2 by the quota | agrees |
 
 ### The anger, the score, the tricks
 
@@ -292,21 +299,16 @@ actors' job pass the update calls at 0x100445f8.
   the event class 0x4e7984 built by the script command `pause_neighbor`
   (fcn.00408210) and by PauseActorMsg (fcn.004509e0)) — and no Season 1
   level file uses either, so the neighbour is never busy during play: no
-  busy window, as carried. The position object is the room for every
-  room but the hall: the level files give each room one walkable
-  `<floor>` (the rest are `wall="true"` strips) except `anc`, which has
-  two or three side by side — where the port's one zone may be coarser
-  than the PC's strips (open, and not where 106, 110 and 111 lose
-  their tricks: those rooms have one floor).
+  busy window, as carried. The position object is the room, the hall
+  too (settled 2026-09-25: set by name through fcn.00448d70 and compared
+  with the walk route's rooms by name, 0x475ebb-0x475f00; `anc`'s two or
+  three walkable `<floor>` strips carry no name), as the port's zone.
 - Season 2, the catch's input: the catch fiber heads Woody's queue from
   the fear to its case 5 (the rows "the catch" and "the respawn
   timer"); whether the PC keeps a click made meanwhile for after or
   drops it is not read — the port keeps it (StoreBlockedInput). The
   landing (`respawn`: landing.tga …) has no sheet in the remaster, the
   port's Woody stands through its 39 ticks.
-- The jingle table's index (0..3) is the dialog's outcome, not the level
-  state; which outcome maps to which index was not traced beyond the
-  table itself.
 
 ## What this pass changed
 
@@ -635,3 +637,11 @@ actors' job pass the update calls at 0x100445f8.
   doorleft 0x800, doorright 0x1000, remove 0x2000, autotake 0x4000, bad
   0x8000, game 0x20000. The row's misreading withdrawn: fcn.1003cc45 is
   the actor's name, the timer is read by the behaviours' predicates.
+- `runtime/pcprofile.py`, `runtime/world.py` (2026-09-25, night): the
+  Season 1 jingles by the level state less 2 (game.exe 0x440f23-0x440f34,
+  the message fcn.00437de0 posts on each change to 2..5): under the
+  profile a catch's beating ends on the failed or the success jingle by
+  the quota, time's up plays failed or success, every success the normal
+  one (`S1_JINGLES`, `s1_jingles`). The hall's position object settled
+  as the room (the `<floor>` strips have no name; the walk compares its
+  route's rooms by name).
