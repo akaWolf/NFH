@@ -50,11 +50,12 @@ def attrs(tag):
 
 
 def frames_of(text):
-    """{(object, animation): frames} of an anims.xml"""
+    """{(object, animation): (frames, type)} of an anims.xml — type oneshot or loop"""
     out = {}
     for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', text, re.S):
-        for am in re.finditer(r'<animation name="([^"]+)"[^>]*>(.*?)</animation>', om.group(2), re.S):
-            out[(om.group(1), am.group(1))] = len(re.findall(r'<frame', am.group(2)))
+        for am in re.finditer(r'<animation name="([^"]+)"([^>]*)>(.*?)</animation>', om.group(2), re.S):
+            out[(om.group(1), am.group(1))] = (len(re.findall(r'<frame', am.group(3))),
+                                               attrs(am.group(2)).get('type', 'oneshot'))
     return out
 
 
@@ -104,6 +105,11 @@ class Level:
         self.actors = {}
         for am in re.finditer(r'<actor name="([^"]+)"([^>]*)>(.*?)</actor>', ob, re.S):
             self.actors[am.group(1)] = self._entry(am.group(2), am.group(3))
+        # the actors' records every level shares (generic/objects.xml: the
+        # neighbour's surprise, shouts, take_low, search …; the pets')
+        self.gen_actors = {}
+        for am in re.finditer(r'<actor name="([^"]+)"([^>]*)>(.*?)</actor>', gen_ob, re.S):
+            self.gen_actors[am.group(1)] = self._entry(am.group(2), am.group(3))
 
     def _entry(self, head, body):
         e = {'gfx': attrs(head).get('gfx'), 'hot': {}, 'act': {}}
@@ -115,32 +121,59 @@ class Level:
         return e
 
     # -- durations ------------------------------------------------------------
-    def action_ticks(self, obj, name, actor='neighbor'):
-        """the ticks of an action: time="N", or auto = the frames of the actor's animation
-        (the level's anims.xml `neighbor` entry, else generic/anims.xml), else of the object's
-        animation (the level's anims.xml under the object's name or gfx); None if unknown"""
-        e = self.objects.get(obj) or self.doors.get(obj) or self.actors.get(obj)
-        if e and (actor, name) not in e['act'] and (obj, name) in e['act']:
-            actor = obj         # the object's own action (105's football flies in)
+    def _record(self, obj, name, actor='neighbor'):
+        """(record, its owner's gfx, the acting actor) of an action, as the ACTION
+        step finds it (fcn.004772f0): the object's record for the actor, or the
+        object's own (105's football flies in), else — the object has none —
+        the actor's own (the level's `<actor>` block, then generic/objects.xml's);
+        None when nobody has it (the step pushes no job)"""
+        e = self.objects.get(obj) or self.doors.get(obj) or self.actors.get(obj) \
+            or self.gen_actors.get(obj)
         if e and (actor, name) in e['act']:
-            a = e['act'][(actor, name)]
-            t = a.get('time', 'auto')
-            if t.isdigit(): return int(t)
-            aa = a.get('actoranim', 'inv')
-            if aa not in ('inv', 'ms', ''):
-                f = self.frames.get((actor, aa)) or self.generic.get((actor, aa))
-                if f: return f
-            oa = a.get('objanim', '')
-            if oa not in ('', 'ms', 'inv'):
-                f = self.frames.get((obj, oa)) or self.frames.get((e['gfx'] or obj, oa))
-                if f: return f
+            return e['act'][(actor, name)], e['gfx'] or obj, actor
+        if e and (obj, name) in e['act']:
+            return e['act'][(obj, name)], e['gfx'] or obj, obj
+        for blk in (self.actors.get(actor), self.gen_actors.get(actor)):
+            if blk and (actor, name) in blk['act']:
+                return blk['act'][(actor, name)], blk['gfx'] or actor, actor
+        return None
+
+    def _oneshot(self, gfx, anim):
+        """an animation's frames as Loader.dll's lookup with its flag 1 gives them
+        (0x10005340: the level's anims.xml, then generic/anims.xml): a oneshot's
+        frame count, a loop or a missing one -1"""
+        v = self.frames.get((gfx, anim)) or self.generic.get((gfx, anim))
+        return v[0] if v and v[1] == 'oneshot' else -1
+
+    def action_ticks(self, obj, name, actor='neighbor'):
+        """the ticks of an action as Loader.dll stores its record's time (+0x28):
+        time="N" as N; time="auto" as the longer of the actor's animation (its
+        gfx's set) and the object's (the owner's gfx) less one, at least 0 —
+        `inv` not asked, a loop or a missing animation -1 (NFH1's Loader.dll
+        0x1000a865-0x1000aa05, the rule of NFH2's 0x10009704-0x10009842); None
+        when no record has it"""
+        r = self._record(obj, name, actor)
+        if r is None:
             return None
-        return self.frames.get((actor, name)) or self.generic.get((actor, name))
+        a, owner_gfx, actor = r
+        t = a.get('time', 'auto')
+        if t.isdigit():
+            return int(t)
+        blk = self.actors.get(actor) or self.gen_actors.get(actor)
+        agfx = (blk and blk['gfx']) or (owner_gfx if actor == obj else actor)
+        aa, oa = a.get('actoranim', ''), a.get('objanim', '')
+        va = self._oneshot(agfx, aa) if aa and aa != 'inv' else -1
+        vo = self._oneshot(owner_gfx, oa) if oa and oa != 'inv' else -1
+        return max(max(va, vo) - 1, 0)
 
     def has_action(self, obj, name, actor='neighbor'):
-        """the object (or actor block) has an action record of that name"""
-        e = self.objects.get(obj) or self.doors.get(obj) or self.actors.get(obj)
-        return bool(e and ((actor, name) in e['act'] or (obj, name) in e['act']))
+        """the object (or the actor's blocks, the level's and the generic) has an
+        action record of that name"""
+        for e in (self.objects.get(obj) or self.doors.get(obj),
+                  self.actors.get(obj), self.gen_actors.get(obj)):
+            if e and ((actor, name) in e['act'] or (obj, name) in e['act']):
+                return True
+        return False
 
     def has_enter_leave(self, obj):
         e = self.objects.get(obj)

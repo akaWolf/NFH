@@ -48,12 +48,14 @@ parse = FS.parse
 
 
 def _frames(text):
-    """{(object, animation): frames} of an anims.xml (the actors are objects
-    of it too: neighbor, woody, chili, dog)"""
+    """{(object, animation): (frames, type)} of an anims.xml (the actors are
+    objects of it too: neighbor, woody, chili, dog) — type oneshot or loop"""
     out = {}
     for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', text, re.S):
-        for am in re.finditer(r'<animation name="([^"]+)"[^>]*>(.*?)</animation>', om.group(2), re.S):
-            out[(om.group(1), am.group(1))] = len(re.findall(r'<frame\b', am.group(2)))
+        for am in re.finditer(r'<animation name="([^"]+)"([^>]*)>(.*?)</animation>', om.group(2), re.S):
+            at = dict(re.findall(r'(\w+)="([^"]*)"', am.group(2)))
+            out[(om.group(1), am.group(1))] = (len(re.findall(r'<frame\b', am.group(3))),
+                                               at.get('type', 'oneshot'))
     return out
 
 
@@ -75,9 +77,19 @@ class Level(object):
                     if at.get('gfx'):
                         self.gfx[at['name']] = at['gfx']
 
-    def frames(self, obj, anim):
+    def _anim(self, obj, anim):
         return self.fr.get((obj, anim)) or self.generic.get((obj, anim)) \
-            or self.fr.get((self.gfx.get(obj, obj), anim)) or self.generic.get((self.gfx.get(obj, obj), anim)) or 0
+            or self.fr.get((self.gfx.get(obj, obj), anim)) or self.generic.get((self.gfx.get(obj, obj), anim))
+
+    def frames(self, obj, anim):
+        v = self._anim(obj, anim)
+        return v[0] if v else 0
+
+    def oneshot(self, obj, anim):
+        """Loader.dll's lookup with its flag 1 (0x10005340): a oneshot's
+        frames, a loop or a missing animation -1"""
+        v = self._anim(obj, anim)
+        return v[0] if v and v[1] == 'oneshot' else -1
 
     def blocks(self, obj):
         """the object's or actor's blocks: the level's file first, then generic's
@@ -93,10 +105,11 @@ class Level(object):
         return b[0] if b else None
 
     def action(self, obj, name):
-        """seconds of the action `name` of the PC object or actor, or None:
-        objects.xml's `time` ticks, else the actor's animation's frames (the
-        level's anims.xml entry of the actor, else generic's), else the object's
-        animation's frames under its name or gfx (lap_model.action_ticks)"""
+        """seconds of the action `name` of the PC object or actor, or None: the
+        record's time as Loader.dll stores it — time="N" as N, time="auto" as
+        the longer of the actor's and the object's oneshot animation less one,
+        at least 0 (`inv` not asked; NFH1's Loader.dll 0x1000a865-0x1000aa05,
+        lap_model.action_ticks) — at 12 ticks a second"""
         for b in self.blocks(obj):
             for a in re.finditer(r'<action\b([^>]*)/?>', b):
                 at = dict(re.findall(r'(\w+)="([^"]*)"', a.group(1)))
@@ -106,17 +119,10 @@ class Level(object):
                 if tm.isdigit():
                     return int(tm) / FPS
                 actor = at.get('actor', 'neighbor')
-                aa = at.get('actoranim', 'inv')
-                if aa not in ('inv', 'ms', ''):
-                    n = self.frames(actor, aa)
-                    if n:
-                        return n / FPS
-                oa = at.get('objanim', '')
-                if oa not in ('', 'ms', 'inv'):
-                    n = self.frames(obj, oa)
-                    if n:
-                        return n / FPS
-                return None
+                aa, oa = at.get('actoranim', ''), at.get('objanim', '')
+                va = self.oneshot(actor, aa) if aa and aa != 'inv' else -1
+                vo = self.oneshot(obj, oa) if oa and oa != 'inv' else -1
+                return max(max(va, vo) - 1, 0) / FPS
         return None
 
     def clip(self, name, actor='neighbor'):
