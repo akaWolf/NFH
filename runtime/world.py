@@ -620,6 +620,12 @@ class Pawn:
         # flag 4 (Item.pc_hideout) with the use it belongs to, whether it
         # outlives that use, the clip last read; Woody's hideout leave clip
         self.pc_flag4 = False
+        # the PC profile's Season 1 neighbour in 109's bed, its one
+        # neighbor_hideout (level_pig's objects.xml): flag 4 from the enter
+        # (fcn.004737a0, 0x473965) to the leave (fcn.00473a60), and the
+        # noise wake's leave running (RoutineState.pc_wake_from_bed)
+        self.pc_bed = False
+        self.pc_bed_waking = False
         self._pc_use = None
         self._pc_keep = False
         self._pc_clip = None
@@ -3128,6 +3134,41 @@ class Routine:
         self._override = None
         self._active = None
         self.index = self._next_index(self.index)
+        skip = getattr(self, '_pc_skip_item', None)
+        if skip is not None:
+            # the noise wake's next case is 10, past the alarm clock's 9
+            # (the pig class, 0x468be3-0x468beb)
+            self._pc_skip_item = None
+            a = self.actions[self.index] if self.actions else None
+            it = self.level.items.get(a['item']) if a else None
+            if it is not None and it.name == skip:
+                self.index = self._next_index(self.index)
+
+    def pc_wake_from_bed(self):
+        """the pig level class's `wakeup` (level_pig's trigger.xml: noise 1 in
+        the room, accepted in the bed's cases 7 and 8 — fcn.00468580 via the
+        accept slot 0x468650): the sleep's job stopped (fcn.00476770), the
+        bed left (fcn.00468700 bed_bed_sleep -> bed_bed; the remaster's
+        BedOut, a frame a tick) and case 10 next (fcn.0045c600, 0x468beb) —
+        the alarm clock's case 9 skipped"""
+        self._pc_skip_item = 'AlarmClock'
+        self.pawn.pc_bed_waking = True
+        anim = self.pawn.anim
+        frames = 0
+        if anim.has('BedOut'):
+            ba = self.pawn.sprite.anims[anim.by_name['BedOut']]
+            frames = len(ba.pattern) if ba.pattern else (ba.end - ba.start + 1)
+        anim.time_scale = (frames / (ba.fps or 10.0)) / (frames / pcprofile.TICKS_PER_SECOND) \
+            if frames else 1.0
+
+        def left():
+            self.pawn.pc_bed = False
+            self.pawn.pc_bed_waking = False
+            self._finish()
+        if frames:
+            anim.play_sequence(['BedOut'], on_end=left)
+        else:
+            left()
 
     def _trick_kid_actions(self, it):
         """TrickItem.KidActions (TrickItem.cs:632-653), run from
@@ -3505,6 +3546,14 @@ class Routine:
             # (PCWaitFor `at` start: the behavior= message an action fires as
             # it starts, a poll on the actor's arrival)
             it.pc_began.add(self.role)
+        if pcprofile.is_pc() and self.role == 'Rottweiler' \
+                and pcprofile.sees_while_busy(self.pawn.nfh2):
+            # 109's bed: the hideout enter (case 7) sets flag 4, the alarm
+            # clock's leave (case 9) or the noise wake's clears it
+            if it.name == 'Bed' and not it.is_tricked(self.level.items):
+                self.pawn.pc_bed = True
+            elif it.name != 'AlarmClock':
+                self.pawn.pc_bed = False
         if a.get('mutex'):
             # MutexAction parks on its looping animation until another action's
             # PawnToAbortMutexOnFinish releases it (RoutineActionUse.cs:172-179)
@@ -4572,6 +4621,8 @@ class Routine:
         541-553). The stop also removes spent actions (cs:415-427)."""
         self.pawn.anim.time_scale = 1.0
         self._pc_clip_end()
+        if self.pawn.pc_bed and self.item is not None and self.item.name == 'AlarmClock':
+            self.pawn.pc_bed = False      # the alarm clock's BedOut: the leave
         if pcprofile.is_pc() and self.item is not None \
                 and self.state == self.USING:
             # a held clip elsewhere waits for this role's use of this item
@@ -10334,6 +10385,26 @@ class World:
                 and (not catcher.anim.blocking or not woody.sneaking)
                 and not woody.anim.blocking)
 
+    def _pc_bed_noise(self):
+        """109's neighbour asleep in his bed (Pawn.pc_bed) wakes on a noise of
+        1 in the room (level_pig's trigger.xml `wakeup`, type always): a
+        walking Woody's gait record carries it on every tick of the walk,
+        a sneaking one's 0 (generic/objects.xml `mg…` / `sn…`, the walk
+        step's tail 0x47ced5-0x47cf36) — the pig class takes it in the
+        bed's cases 7 and 8, the sleep, not in the alarm clock's 9"""
+        rott = self.pawns.get('Rottweiler')
+        w = self.woody
+        if rott is None or not rott.pc_bed or rott.pc_bed_waking or w.zone is None:
+            return
+        routine = next((r for r in self.routines if r.pawn is rott), None)
+        it = routine.item if routine is not None else None
+        if it is None or it.name != 'Bed' or routine.state != routine.USING:
+            return
+        if w.zone.pid != it.zone or w.hiding or w.sneaking:
+            return
+        if w.state in (w.WALK, w.DOOR_CLIMB, w.DESCEND, w.ITEM_CLIMB):
+            routine.pc_wake_from_bed()
+
     def _pc_flag4_tick(self):
         """the catchers' flag 4 under the profile's Season 2 catch (Item.
         pc_hideout, tools/pcref/pc_catch_s2.py): the enter step of a station
@@ -10423,11 +10494,10 @@ class World:
             # inside his hideout: 109's bed carries `neighbor_hideout`, and a
             # walking Woody's noise 1 wakes him there while a sneaking one's 0
             # does not (pcprofile.sees_while_busy())
-            if it is not None and it.name == 'Bed':
-                moving = woody.state in (woody.WALK, woody.DOOR_CLIMB,
-                                         woody.DESCEND, woody.ITEM_CLIMB)
-                return moving and not woody.sneaking
-            return True
+            # (the bed is flag 4 — the neighbour in it is out of the
+            # catch, fcn.00436bb0 via fcn.0043c2b0 — and a walking Woody's
+            # noise wakes him out of it: World._pc_bed_noise)
+            return not rott.pc_bed
         # Rottweiler.CanSeeWoody defers to the primary behavior
         # (Rottweiler.cs:1218-1221)
         if rott.behaviors and not rott.behaviors[0].can_see_woody():
@@ -11207,6 +11277,9 @@ class World:
         if pcprofile.is_pc() and self.woody is not None \
                 and pcprofile.s2_sight(self.woody.nfh2):
             self._pc_flag4_tick()
+        if pcprofile.is_pc() and self.woody is not None \
+                and pcprofile.sees_while_busy(self.woody.nfh2):
+            self._pc_bed_noise()
         # the WinGameAnimations coroutine (GameInfo.cs:298-302): armed by
         # WinGameOnCompleteAllTricks, it runs on its own clock outside
         # Update's GameEnding gate and fires PlayWinAnimations after 2.5 s
