@@ -630,6 +630,23 @@ def sees_while_busy(nfh2=False):
     return SEES_WHILE_BUSY and not nfh2 and rule('sight')
 
 
+# The Season 1 pets (the dog and the parrot share game.exe's class, vtable
+# 0x4e3004; its tick fcn.0045bfa0, docs/PC_VERIFICATION.md "The alerters"):
+# asleep (2) until a noise of 1 in the room or the whistle wakes it (3: the
+# `wakeup` action, the timer set to 72 ticks at 0x45c153), then awake (4): it
+# barks while Woody is in its room unhidden, else whines while the
+# neighbour is, else idles — the timer counts only there (0x45c45a-0x45c46f)
+# and at 0 it falls asleep (1: `fallasleep`, then 2). An action on its queue
+# holds the class's step, so the bark and the whine count nothing.
+S1_PET_AWAKE_TICKS = 72
+
+
+def s1_pets(nfh2=False):
+    """Season 1's pets under the profile: the PC class's awake timer and its
+    whine at the neighbour (AlerterFSM's PC terms)"""
+    return is_pc() and not nfh2 and rule('pets')
+
+
 # -- the Season 2 catch (docs/PC_VERIFICATION.md "detection", tools/pcref/pc_catch_s2.py) ----
 # generic/trigger.xml: the neighbour's and the Mother's `fight` on Woody, position="room"
 # type="always" — Loader.dll's trigger parser (0x1000a869-0x1000a936: room 1, nearobj 2,
