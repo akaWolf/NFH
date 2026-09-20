@@ -18,6 +18,7 @@ from audio_out import SoundBank
 from render import (Camera, TextureCache, draw_sprite, draw_quad,
                     draw_zone_overlay, draw_fence, draw_item_tip)
 from hud import Hud
+import pcprofile
 
 WIDTH, HEIGHT = 800, 600
 
@@ -393,13 +394,22 @@ class Viewer:
                 if it.tip_icon and it.clickable
                 and (not (it.sprite is not None and it.sprite.hidden)
                      or it.always_show_tip)]
+        # the PC profile's respawned Woody is outlined one PC px wide — the
+        # PC draws its scene 1:1, a px 1/96 of the port's unit
+        wd = self.world.woody
+        ol = 0
+        if wd is not None and self.world.pc_outlined():
+            y0 = self.cam.world_to_screen(0.0, 0.0, WIDTH, HEIGHT)[1]
+            y1 = self.cam.world_to_screen(0.0, 1.0, WIDTH, HEIGHT)[1]
+            ol = max(1, int(round(abs(y1 - y0) / pcprofile.PX_PER_UNIT)))
         for depth, kind, obj in sorted(draw_list, key=lambda t: -t[0]):
             if kind == 'sprite':
                 # current None: a controller with no CurrentAnimation yet
                 # (AnimationControllerBase.cs:179-185) — draw_sprite skips it
                 a = obj.anims[obj.current] if obj.current is not None else None
                 if draw_sprite(self.rnd, self.cache, self.cam, obj, a, self.t,
-                               WIDTH, HEIGHT):
+                               WIDTH, HEIGHT,
+                               outline=ol if wd is not None and obj is wd.sprite else 0):
                     drawn += 1
             elif kind == 'fence':
                 draw_fence(self.rnd, self.cache, self.cam, obj, WIDTH, HEIGHT)

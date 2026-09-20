@@ -2227,7 +2227,8 @@ class Pawn:
                 return True
         w = self.world
         if self.role == 'Woody' and w is not None:
-            if w.can_rottweiler_see_woody() and not w.game.got_caught:
+            if w.can_rottweiler_see_woody() and not w.game.got_caught \
+                    and not w._pc_catch_barred():
                 w._catch()
                 return True
         self.passing_complex = True
@@ -6959,6 +6960,11 @@ class World:
             if it.notice_near:
                 self.near_items.setdefault(it.zone, []).append(it)
         self._delayed = []               # (seconds left, fn) Invoke timers
+        # the PC profile's Season 2 respawn (pcprofile.s2_respawn): the catch
+        # fiber's span on Woody's queue up to its case 5 (the flag 0x10000),
+        # and the seconds left on the respawn timer after it
+        self._pc_catch_seq = False
+        self._pc_respawn_left = 0.0
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         self._entrance_timer = None      # Woody's walk-in countdown
         self.time = 0.0                  # Time.time for the alarm intervals
@@ -8880,7 +8886,8 @@ class World:
             # (_pc_s2_sees): the crossing check reads it as well
             for role in ('Rottweiler', 'Mother'):
                 p = self.pawns.get(role)
-                if p is not None and self._pc_s2_sees(p):
+                if p is not None and self._pc_s2_sees(p) \
+                        and not self._pc_catch_barred():
                     self._catch(p)
                     return True
             return False
@@ -10478,13 +10485,25 @@ class World:
         self.game.caught_by = catcher.role if catcher is not None else 'Rottweiler'
         self.game.won = False             # GameInfo.cs:325/335
         self._respawning = False
-        if pcprofile.is_pc() and self.game.lives > 0:
-            # the PC profile's lives: the beating plays, then Woody is back
-            # at the entrance and the neighbour resumes (docs/PC_FIDELITY.md 2.5)
-            self.game.lives -= 1
+        if pcprofile.is_pc() and self.game.lives > 1:
+            # the PC profile's lives: the beating plays, then Woody respawns
+            # and the neighbour resumes (docs/PC_FIDELITY.md 2.5); the last
+            # life has no respawn — the catch fiber's case 4 skips the fall
+            # on status +0x14 at 1 (fcn.1004012a, 0x1000634d) and case 5
+            # ends the level (fcn.10042471, 0x100424dc)
             self._respawning = True
             self._last_catcher = catcher
+            if pcprofile.s2_respawn(self.woody.nfh2):
+                # the fiber heads Woody's queue up to its case 5, and the
+                # catch's flag 0x10000 bars both behaviours meanwhile
+                # (_pc_catch_barred); the life goes at the landing's end
+                self._pc_catch_seq = True
+                self.woody.input_locked = True
+            else:
+                self.game.lives -= 1
         else:
+            if pcprofile.is_pc() and self.game.lives > 0:
+                self.game.lives -= 1          # fcn.10042471 on the last life
             self._finish_game()               # FinishGame (cs:326/336)
             self._play_jingle('caught')       # PlayCaughtMusic (cs:329/339)
         woody = self.woody
@@ -10597,28 +10616,43 @@ class World:
             self._finish_animation_ended()
 
     def _respawn(self):
-        """PC profile only (docs/PC_FIDELITY.md 2.5): Woody reappears at the
-        level entrance, the catcher goes back to his routine, the clock and
-        the tricks stay as they are"""
+        """PC profile only (docs/PC_FIDELITY.md 2.5): Woody reappears, the
+        catcher goes back to his routine, the clock and the tricks stay as
+        they are. Season 2 (pcprofile.s2_respawn) is the catch fiber's case
+        4: the room of fcn.10005f58 (_pc_respawn_zone), the middle of its
+        path — x the two ends' mean, 0x10006330-0x1000634a — where the
+        `respawn` action lands him from 900 px up (its translation, ticks
+        0-5), and the action's job holds his queue until case 5
+        (_pc_respawn_landed); without a room, the level entrance"""
         self._respawning = False
         w = self.woody
         catcher = getattr(self, '_last_catcher', None)
+        z_pc = self._pc_respawn_zone() if self._pc_catch_seq else None
         if w is not None:
             w.sprite.hidden = False
             w.frozen = False
             w.movement_paused = False
-            w.input_locked = False
+            w.input_locked = z_pc is not None
             w.steps = []
             w.on_arrive = None
             w.state = w.IDLE
             w.hiding = False
-            loc = self.level.entrance_location
-            if loc:
-                w.sprite.x, w.sprite.y = loc
-                w.pos_snap = True      # a legal snap for the continuity invariant
-                z = self.level.zone_at(loc[0], loc[1])
-                if z is not None:
-                    w.zone = z
+            if z_pc is not None:
+                pr = z_pc.pc_room
+                x_pc = (pr['x1'] + pr['x2']) // 2
+                w.sprite.x = z_pc.left + (x_pc - pr['x1']) * (z_pc.right - z_pc.left) \
+                    / float((pr['x2'] - pr['x1']) or 1)
+                w.sprite.y = w.floor_y(z_pc)
+                w.pos_snap = True
+                w.zone = z_pc
+            else:
+                loc = self.level.entrance_location
+                if loc:
+                    w.sprite.x, w.sprite.y = loc
+                    w.pos_snap = True      # a legal snap for the continuity invariant
+                    z = self.level.zone_at(loc[0], loc[1])
+                    if z is not None:
+                        w.zone = z
             for name in ('switch_to_stand', 'stand'):
                 if hasattr(w.anim, name):
                     getattr(w.anim, name)()
@@ -10632,6 +10666,72 @@ class World:
                 if r.pawn is catcher:
                     r.unfreeze()
         self.game.got_caught = False
+        if z_pc is not None:
+            # the remaster has no landing sheet: he stands through the job
+            self.call_later(pcprofile.S2_RESPAWN_ACTION_TICKS
+                            / float(pcprofile.S2_TICK_HZ), self._pc_respawn_landed)
+        elif self._pc_catch_seq:
+            self._pc_respawn_landed()
+
+    def _pc_respawn_zone(self):
+        """fcn.10005f58, the room the catch fiber's case 4 drops Woody into:
+        every room of the level in the order of its map (the names' — the
+        iterator fcn.1004018d, the UTF-16 compare fcn.10058390) scores 50
+        with more than one <neighbor> record (0x1000610c: 0 with one), 101
+        more with an object flagged `hideout` in it (0x100060b7; Loader.dll
+        maps the name to 0x40 at 0x10009e4e — PCRoom `hideout`), 50 less
+        with a `bad` actor (0x8000, 0x10009ff2: the neighbour's and the
+        Mother's generic record) in the room and in his hideout (flag 4,
+        0x100060a0) and 10000 less with one out of it (0x10006139); the
+        first room scoring above 0 and above every earlier one is taken
+        (0x1000613f). An actor counts in the room its pointer names
+        (fcn.10040a7d, Pawn.pc_room)"""
+        best, score = None, 0
+        bad = [p for p in (self.pawns.get('Rottweiler'), self.pawns.get('Mother'))
+               if p is not None]
+        for z in sorted((z for z in self.level.zones if z.pc_room is not None),
+                        key=lambda z: z.pc_room['room']):
+            pr = z.pc_room
+            s = 50 if len(pr.get('nb') or ()) > 1 else 0
+            if pr.get('hideout'):
+                s += 101
+            there = [p for p in bad if p.pc_room() is z]
+            if any(p.pc_flag4 for p in there):
+                s -= 50
+            if any(not p.pc_flag4 for p in there):
+                s -= 10000
+            if s > score:
+                best, score = z, s
+        return best
+
+    def _pc_respawn_landed(self):
+        """the catch fiber's case 5 (0x10006274-0x100062c7), the respawn
+        job done: the catch's flag 0x10000 off Woody and fcn.10042471 — the
+        life taken, the respawn timer at respawntime (0x100424b6), the
+        outline on (0x10042515)"""
+        self._pc_catch_seq = False
+        self.game.lives -= 1
+        self._pc_respawn_left = pcprofile.S2_RESPAWN_TICKS / float(pcprofile.S2_TICK_HZ)
+        w = self.woody
+        if w is not None:
+            w.input_locked = False
+
+    def _pc_catch_barred(self):
+        """the Season 2 catch is the catchers' `fight` behaviour on Woody and
+        Woody's `die` on them (generic/trigger.xml); both predicates (slot 4
+        of the vtables 0x100b0eec / 0x100b0e8c, fcn.1003d526 / fcn.1003cd8e)
+        refuse while the catch's flag 0x10000 is on the behaviour's actor
+        (0x1003d6b5 / 0x1003cf1d: set by both behaviours' starts,
+        0x1003d4bf / 0x1003cd27, cleared off Woody by the fiber's case 5)
+        and while the respawn timer runs with Woody a party (0x1003d5f9,
+        0x1003d646 / 0x1003ce61, 0x1003ceae)"""
+        return self._pc_catch_seq or self._pc_respawn_left > 0.0
+
+    def pc_outlined(self):
+        """GFXEngine's flag +0x39 on Woody's sprite: on at case 5
+        (0x10042515), off when the level update's countdown reaches 0
+        (0x10044765) — the respawn timer's span"""
+        return self._pc_respawn_left > 0.0
 
     def blow_whistle(self):
         """PC profile only (docs/PC_FIDELITY.md 2.1): the dog whistle, an
@@ -11053,11 +11153,17 @@ class World:
         # the neighbour's catch, the Mother's, the all-tricks win, the clock
         if self.game.ending or self.game.ended:
             return
+        # (the PC's Season 2 respawn timer: the level update counts it down
+        # after the watch walker has fired, 0x10044725 past 0x100445f1)
+        barred = self._pc_catch_barred()
+        if self._pc_respawn_left > 0.0:
+            self._pc_respawn_left = max(0.0, self._pc_respawn_left - dt)
         if self.can_rottweiler_see_woody():
-            if not self.game.got_caught:
+            if not self.game.got_caught and not barred:
                 self._catch()             # cs:214-221
         elif self.can_mother_see_woody():
-            self._catch(self.pawns.get('Mother'))   # cs:222-225, no gotCaught guard
+            if not barred:
+                self._catch(self.pawns.get('Mother'))   # cs:222-225, no gotCaught guard
         elif self.game.all_done():
             # cs:226-236: WinGameOnCompleteAllTricks sets GameEnding at once
             # and starts the 2.5 s coroutine (cs:292-302) — the clock, the

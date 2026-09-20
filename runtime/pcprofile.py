@@ -611,6 +611,31 @@ def s2_sight(nfh2=False):
     return nfh2 and rule('sight')
 
 
+# The Season 2 respawn (docs/PC_VERIFICATION.md "the catch", "the respawn timer"): the catch
+# fiber (vtable 0x100ab278, fcn.100061dc) runs on Woody's queue. Case 4 picks the room
+# (fcn.10005f58, World._pc_respawn_zone), puts Woody 900 px above the middle of its path
+# (0x10006336) and pushes his `respawn` action in front of the fiber (generic/objects.xml: the
+# fall of 900 px over its ticks 0-5 and the landing; time auto over the 38 frames of
+# generic/anims.xml's `respawn`, 37 by the Loader's rule, a DoActions job of 39 ticks). Case 5,
+# once that job is done, clears the catch's flag 0x10000 on Woody and takes the life
+# (fcn.10042471): the status' respawn timer gets leveldata.xml's respawntime, 60 ticks
+# (0x100424b6), the level update counts it down (0x10044725), and while it runs the `fight`
+# and `die` behaviours of generic/trigger.xml refuse Woody (their predicates fcn.1003d526 /
+# fcn.1003cd8e read it through fcn.10040123) and GFXEngine draws him outlined (the message of
+# 0x10042515 / 0x10044765, visitor slot 80 0x1000ac00: the flag +0x39 of his sprite, which
+# draw slot 10 (0x10011c50) turns into four black copies one px off under the frame). On the
+# last life (status +0x14 at 1, fcn.1004012a) case 4 skips the fall and case 5 ends the level
+# (slot 13 with 0, 0x100424dc).
+S2_RESPAWN_ACTION_TICKS = 39
+S2_RESPAWN_TICKS = 60
+
+
+def s2_respawn(nfh2=False):
+    """Season 2's respawn is the catch fiber's: the room of fcn.10005f58, the landing, the
+    respawn timer"""
+    return nfh2 and rule('sight')
+
+
 def s2_routes(nfh2=False):
     """Season 2's walks between rooms take the PC path finder's route (world.pc_route, the
     GoTo's Dijkstra over the rooms' door hotspots, fcn.1000a421) from wherever they start"""

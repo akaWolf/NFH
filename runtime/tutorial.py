@@ -943,11 +943,11 @@ class TutorialPC201(Tutorial):
 
     # -- the level as the PC starts it ---------------------------------------
     def _setup(self):
-        """the PC's start: level.xml's woody in bottomleft (also where the
-        profile's respawn puts him), the neighbour at the bridge (the
-        entry's neighbor_entry), the doors open, the closed objects' mobile
-        items locked, the others Woody may use at once unlocked (the rail,
-        the hat: no closed twin on the PC)"""
+        """the PC's start: level.xml's woody in bottomleft (the entrance —
+        the respawn's room is topleft, World._pc_respawn_zone), the
+        neighbour at the bridge (the entry's neighbor_entry), the doors
+        open, the closed objects' mobile items locked, the others Woody may
+        use at once unlocked (the rail, the hat: no closed twin on the PC)"""
         w = self.world
         woody = w.woody
         z, x, _y = self._pc_point(self.pc.get('woody'))

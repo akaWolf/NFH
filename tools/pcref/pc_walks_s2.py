@@ -567,10 +567,15 @@ def rooms(n):
     record's `costs` and per pawn role the near and the far door's `<actor>`
     hotspot — a hop costs the Manhattan distance from the node's point to the
     near one plus the costs, into the target room the far one's distance to
-    the target as well, and the far room is entered at the far one"""
+    the target as well, and the far room is entered at the far one; and
+    `hideout` on a room with an object of objects.xml's `hideout` flag
+    placed in it — the respawn's +101 (GameLogic fcn.10005f58, the flag 0x40
+    of Loader.dll 0x10009e4e; World._pc_respawn_zone)"""
     g = S.Geometry(n)
+    d = S.Data(n)
     doors, zones = mobile_doors(n)
     m = room_map(n, g, doors, zones)
+    hides = {g.room.get(o) for o in g.room if 'hideout' in d.flags_of(o)}
     out = {}
     for r, z in m.items():
         v = g.rooms[r]
@@ -589,6 +594,8 @@ def rooms(n):
                 far_h[role] = [b[0], b[1]]
             nb.append({'zone': m[far], 'costs': int(rec.get('costs', 0)), 'near': near_h, 'far': far_h})
         out[z] = {'room': r, 'x1': v['x1'], 'x2': v['x2'], 'floor': v['y'], 'nb': nb}
+        if r in hides:
+            out[z]['hideout'] = True
     return out
 
 

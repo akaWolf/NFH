@@ -143,8 +143,12 @@ class TextureCache:
         return sorted(self._missing)
 
 
-def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h):
-    """One blit, following AnimationControllerBase.DrawAnimation."""
+def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h, outline=0):
+    """One blit, following AnimationControllerBase.DrawAnimation. `outline`
+    (screen px, the PC profile's respawned Woody, World.pc_outlined): the
+    frame first drawn black that far left, right, up and down — GFXEngine's
+    draw slot 10 under its flag +0x39 (0x10011d80-0x100121e9: the black copy
+    +0x2c at x-1, x+1, y-1, y+1, then the frame)."""
     # OnGUI (AnimationControllerBase.cs:177-188): nothing while Hidden, and
     # nothing for a controller with no CurrentAnimation (sprite.current None)
     if getattr(sprite, 'hidden', False) or sprite.current is None or anim is None:
@@ -197,6 +201,12 @@ def draw_sprite(rnd, cache, cam, sprite, anim, t, w, h):
                         max(1, int(round(tw / anim.cols))), src_h)
     dst = sdl2.SDL_Rect(int(round(dx)), int(round(dy)),
                         max(1, int(round(fw))), max(1, int(round(fh))))
+    if outline:
+        sdl2.SDL_SetTextureColorMod(tex, 0, 0, 0)
+        for ox, oy in ((-outline, 0), (outline, 0), (0, -outline), (0, outline)):
+            d = sdl2.SDL_Rect(dst.x + ox, dst.y + oy, dst.w, dst.h)
+            sdl2.SDL_RenderCopy(rnd, tex, ctypes.byref(src), ctypes.byref(d))
+        sdl2.SDL_SetTextureColorMod(tex, 255, 255, 255)
     sdl2.SDL_RenderCopy(rnd, tex, ctypes.byref(src), ctypes.byref(dst))
     return True
 
