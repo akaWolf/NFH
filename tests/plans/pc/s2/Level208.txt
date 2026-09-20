@@ -19,7 +19,7 @@ usewith IndianMagician IT2_Balloon     # Zone03: ActivateItemTrick -> IndianPlat
 usewith SeeSaw IT2_Shovel              # Zone03: LinkedItemTrick of IndianPlatform
 whenusing ShoeMachine                # his lap-2 shoe machine (125 s)
 take Mouse IT2_Rat                     # Zone04 while he shoes and stands at the elephant (Zone01, 125-138): the PC's game (altar/rat's use, time 360: 7.75 s, PCMinigameTicks), then the take — dexterity search (unlocker IT_NONE, TakeItemCount 20)
-park Zone02                            # out of Zone04 before he climbs to the bowl (the stairs from Zone01, 11 s under the PC pass)
+park! Zone02                           # out of Zone04 before he climbs to the bowl (the stairs from Zone01, 11 s under the PC pass), through Zone05 while he is at the bowl
 whenzone Zone04                        # his lap-2 bowl (149): Zone01 is his again at 209
 usewith ShoeMachine IT2_Blades         # Zone01
 prime AngryElephant IT2_Rat            # Zone01: the DoublePrimingItem arm (Item.cs:1573-1589) primes the elephant, eats the rat, unlocks+primes SafetyLine (ObjectToPrimeWhenPrimed+UnlockObjectToPrime, Item.WoodyPrime)

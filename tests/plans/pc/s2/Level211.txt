@@ -8,8 +8,9 @@
 # after the sweets' puke is her mad and fight, 6.3 s, and his lap runs 6 s
 # later from there): the child and the phone go in from Zone02 through the
 # Mother's room once she is back asleep after her lap-3 visit to the child
-# (235), so the phone's 30 lands 26 s after the boat's 20 — the overflow at
-# 259.6 s (100).
+# (~238; with the elements' own ticks her lap-2 visit ends as Woody parks, so
+# her sleep after it is awaited first), so the phone's 30 lands soon after
+# the boat's 20 — the overflow at 261.8 s (100).
 take FireExtinguisher IT2_Extinguisher # Zone03 in the Mother's first sleep, from the start zone next door
 take Urinal IT2_Pissballs              # Zone02
 take ChestDrawer IT2_Coin              # Zone05 (KeepFull)
@@ -26,8 +27,9 @@ usewith Sweets IT2_Pissballs           # Zone04: RushToToilet; with the sign tri
 take CompressedAir IT2_Pressuretank    # Zone01 again (KeepFull)
 unlock LifeBoat IT2_Rasp               # Zone01, before his lap-3 boat (218 s under the PC walks): the dexterity trick item (DexterityTrickItem, unlocker IT2_Rasp, DexterityKeepItem) — the done-pass falls out of CanWoodyUse's chain and the boat is tricked (Item.cs:1475-1507; RemoveFromRoutineAfterUseTricked)
 park Zone02                            # off his way to the boat (Zone01) and the Mother's to the child (Zone04)
-whenanim Mother MotherBawlLeft         # (225) her lap-3 visit to the child
-whenanim Mother MotherSleepSingle      # (235) back asleep in her chair, he at the boat's reaction
+whenanim Mother MotherSleepSingle      # (~198) asleep in her chair after her lap-2 visit to the child
+whenanim Mother MotherBawlLeft         # (~229) her lap-3 visit to the child
+whenanim Mother MotherSleepSingle      # (~238) back asleep in her chair, he at the boat's reaction
 usewith! OlgaChild IT2_Pressuretank    # Zone04 through her room (the Mother's action; LinkedItemTrick of the CabinPhone)
 usewith! PayPhone IT2_Coin             # Zone04: ActivateItemTrick -> CabinPhone (Zone05) + AlarmItem/CauseAlarm: the phone rings and he runs to answer it (AnswerPhoneNFH2) — 30 on the boat's 20 before they decay
 await LifeJacket 0
