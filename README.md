@@ -241,7 +241,9 @@ is drawn as GFXEngine draws it since 2026-09-24: its middle Woody's
 the icon and the thumb at their textures' own sizes in the level's px, the
 thumb at the setter's offset for the state message's pair; the images are
 the remaster's by name and size (the PC data copy has none), and the
-progress bar's front is missing from both. A Season 2 tricked visit is the PC step's since
+progress bar's front is missing from both; a lost game's run comes a
+level tick later, cutting the neighbour's walk and waiting out his
+action. A Season 2 tricked visit is the PC step's since
 2026-09-24: its stand, its SHOUT — the action the binary's tables give the
 level, shout2 or shout2_hard, a freakout once the gauge has overflowed —
 its repair, and each named record's credit at its own tick, the linked

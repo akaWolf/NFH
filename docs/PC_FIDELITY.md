@@ -163,7 +163,8 @@ follows the mouse one to one with no remaster drift or margins, the first
 three ticks centre it, the push and the alarm field are the PC's, the
 drawn thumb is the state message's pair (below); a lost game sends
 the neighbour onto the object at a run where the `failed` behaviour
-reaches him (the mobile's surprise, Routine.pc_run_next) and nobody on
+reaches him (the mobile's surprise, Routine.pc_run_next — a level tick
+after the loss, DexterityState.pc_offer_tick) and nobody on
 201, 212 and 213 (PCMinigameFailed; 201's toolbox loses like the rest, the
 mobile's DexterityCannotLose aside). 214's game is the
 hatch's shards round (bottomright/hatch_closed, the phase his first fall
@@ -235,29 +236,37 @@ starts 28 px in (the videos fill the disk up to its ring); the port draws
 its Woody's frames off his point the remaster's way, which on 204's
 dispenser (W_play_toyomat, its frame 18 px above the point) puts the drawn
 shoes 29 px above it — the field shows 127 px above them against the
-PC's 150-154; his run keeps the mobile's moment (at once if he walks, else
-when his clip ends) — the PC's is read below ("the lost game's run").
+PC's 150-154. The moment of his run is the PC's (below, "the lost game's
+run").
 
 The lost game's run (read 2026-09-24). Woody's `failed` action posts its
 behaviour on its step's first run (state 0, fcn.100018a6), inside the
 actors' pass; the level update's walker (fcn.1003fc90 at 0x100445f1,
 before the actors' pass at 0x100445f8) makes the behaviour by name on the
 next tick (fcn.1003e769 over the registry) and offers it to the actor
-(fcn.1004b27f -> fcn.1004abcf). His jobs vote front to back through slot
-5: 1 passes (the DoAction step and the use_object job, 0x10034d8e), 0 takes
-it (the script runners, whose update never finishes — 0x10013f16 /
-0x1002f45d, the vote 0x10013f1b); a passing job whose +4 byte is 0 refuses
-the offer, and the walker keeps it for the next tick. A taker aborts the
-jobs in front of it through their slot 3 — the DoAction step's 0x10001d1b
-closes a counting step with its end notice fcn.100019f7, the use_object
-job's 0x100042d9 closes a game — and hands the behaviour over (slot 4,
-which runs its update: `run` pushes the running GoTo). The use_object
-job's base constructor sets its +4 to 1 (0x100042a1) and its DoAction step
-inherits it (fcn.10004353 passes it to fcn.10002cd5, fcn.10002b8d stores
-it); the co-actor's `fight` is made with 0 (fcn.1000eb19). So the
-neighbour's run starts one level tick after the loss, cutting a routine
-use or walk short, and waits out a fight; the `always` attribute plays no
-part (every record carries true). The profile keeps the mobile's moment.
+(fcn.1004b27f -> fcn.1004abcf), again every tick until it is taken. His
+jobs vote front to back through slot 5 — 1 passes (the walk and action
+steps, 0x10034d8e), 0 takes it (a runner under them: the classes with
+the never-finishing update 0x10013f16 / 0x1002f45d vote 0x10013f1b) — and
+a passing job whose +4 byte is 0 refuses the offer. A taker aborts the
+jobs in front of it through their slot 3 and hands the behaviour over
+(slot 4, which runs its update: `run` pushes the running GoTo). The level
+scripts make the neighbour's walks with +4 = 1 (fcn.1000e3e0 ->
+fcn.10007a10 -> the GoTo job, vtable 0x100ab3d8, whose base constructor
+stores the flag at 0x10007350) and his actions with 0 (the builder
+fcn.1000efcd pushes 0, and 229 of fcn.10002cd5's 287 call sites push two
+zeros, 203 of them a zeroed ebx; the use_object job, whose base
+constructor sets 1 at 0x100042a1, is Woody's use); the co-actor's `fight`
+is made with 0 as well (fcn.1000eb19). So the run cuts a walk a tick after
+the loss and waits out an action, taken as his next walk begins — the
+mobile's DexterityAlert and its deferred watcher, a level tick later; the
+`always` attribute plays no part (every record carries true). The profile
+carries the tick (DexterityState.pc_offer_tick): the offer a level tick
+after the loss and every tick after it until he walks, 203's Olga
+shouting on that tick (her eat_chinese is her actions' next animation,
+no job) and his run offered from the next, 201's `aux` latched a tick
+later. On the twelve levels whose lost game sends him (the plans run
+with NFH_DEX_LOSE) his run starts 0-0.1 s later than the mobile moment.
 
 ### 2.7 Routines and timings (confidence: high — MEASURED, docs/PC_LAPS.md)
 

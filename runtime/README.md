@@ -1210,7 +1210,11 @@ setter's (x + 1000) x (field - thumb) / 2000 of the last state message's
 pair (`pcprofile.s2_thumb_corner`): a picture at the level tick's rate,
 not the mouse. The PC's progress bar (minigame_progress_front.tga,
 vertical, at 28/28 from the field's corner) is not in the data; the
-remaster's fill stands in, in the field's frame.
+remaster's fill stands in, in the field's frame. A lost game's behaviour
+reaches its actor a level tick later and every tick after it until taken
+(`DexterityState.pc_offer_tick`): the neighbour's walk is cut, his
+action is waited out (the level scripts make his walks interruptible and
+his actions not), 203's Olga shouts first.
 
 ## The parity audit (docs/PARITY_AUDIT_PROMPT.md)
 
