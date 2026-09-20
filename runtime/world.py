@@ -10613,6 +10613,10 @@ class World:
         if getattr(self, '_respawning', False):
             self._respawn()
         else:
+            if self.woody is not None and pcprofile.s1_jingles(self.woody.nfh2):
+                # the PC's second jingle of a catch: the beating's state 1
+                # turns 2, or 5 with the quota reached (pcprofile.S1_JINGLES)
+                self._play_jingle(pcprofile.S1_JINGLES[5 if self.game.won else 2])
             self._finish_animation_ended()
 
     def _respawn(self):
@@ -10851,7 +10855,10 @@ class World:
             p = self.pawns.get(role)      # cs:377-381
             if p is not None:
                 self._freeze_pawn(p)
-        if g.won:                         # cs:382-389
+        if self.woody is not None and pcprofile.s1_jingles(self.woody.nfh2):
+            # the PC's table: 5 success, 4 time's up (pcprofile.S1_JINGLES)
+            self._play_jingle(pcprofile.S1_JINGLES[5 if g.won else 4])
+        elif g.won:                       # cs:382-389
             self._play_jingle('success_perfect'
                               if g.final_viewer_rating >= 100 else 'success')
         else:
@@ -10908,7 +10915,10 @@ class World:
         rott = self.pawns.get('Rottweiler')
         if rott is not None:
             self._freeze_pawn(rott)       # Rottweiler.Freeze, cs:308-311
-        self._play_jingle('success_perfect')   # cs:312
+        if self.woody is not None and pcprofile.s1_jingles(self.woody.nfh2):
+            self._play_jingle(pcprofile.S1_JINGLES[5])   # the PC's state 5
+        else:
+            self._play_jingle('success_perfect')   # cs:312
 
     def start_music(self, elapsed, clap=True, music_on=True, audio_on=True):
         """IntroAnimation.StartGame's sound side (cs:309-312 ->

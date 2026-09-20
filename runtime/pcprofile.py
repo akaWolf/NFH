@@ -389,6 +389,22 @@ def s1_result(won, time_up, rating):
     return S1_RESULT['timeover' if time_up else 'failed']
 
 
+# The Season 1 jingles: fcn.00437de0 posts its message on every change of
+# the level state to 2..5 (the tick, 0x439dd6-0x439df3), and the level
+# classes' slot 43 (0x440d40, vtables 0x4e07b8 / 0x4e1638) plays the jingle
+# of the table at 0x440fbc by the state less 2 (0x440f23-0x440f34): 2 caught
+# after the beating and 4 time's up `jingle_failed`, 3 the catch on sight
+# `jingle_caught`, 5 success `jingle_success_normal` — the perfect one is
+# never played. A catch plays two: the caught one as it happens, then the
+# failed or the success one when the beating's state 1 turns 2 or 5.
+S1_JINGLES = {2: 'failed', 3: 'caught', 4: 'failed', 5: 'success'}
+
+
+def s1_jingles(nfh2=False):
+    """Season 1 under the profile: the PC's jingle table"""
+    return is_pc() and not nfh2
+
+
 # The Season 2 result screen (docs/PC_VERIFICATION.md "Season 2"): the
 # GameLogic level end hands GUIEngine the status struct (eleven dwords) and
 # a failed flag, and the dialog fill at GUIEngine 0x10001536-0x10001652
