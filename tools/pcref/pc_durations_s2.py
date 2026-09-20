@@ -463,10 +463,12 @@ def write_tricked_keys(ov, n, clips):
             _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
         if tr.get('linked_pays') is not None:
             _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
-        if tr.get('linked_hit') is not None and tr.get('linked_extra_at') == tr['linked_hit']:
+        if tr.get('linked_hit') is not None:
             # the co-actor's action the linked flow waits on,
             # the rest of the flow's parts after it, and the
-            # record they pay — at the action's end
+            # record they pay — at his resume, the action's end
+            # (207's bill: 30 ticks from the lift's start, the
+            # lift's job 31)
             _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
             _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
             _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))

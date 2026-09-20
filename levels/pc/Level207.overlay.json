@@ -14,8 +14,8 @@
    "set": {
     "PCLaugh": 0,
     "PCClipSeconds": {
-     "PoolDive": 4.5,
-     "PoolGetOut": 1.33
+     "PoolDive": 4.58,
+     "PoolGetOut": 1.42
     }
    }
   },
@@ -24,11 +24,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 15.5,
+    "PCUseSecondsTricked": 16.17,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 13.08,
-    "PCUseSeconds": 10.5
+    "PCCreditAt": 13.5,
+    "PCUseSeconds": 10.92
    }
   },
   {
@@ -36,14 +36,14 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 4.67,
+    "PCUseSecondsTricked": 4.83,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
-     "Olga": 3.5
+     "Olga": 3.58
     },
     "PCCreditAt": 3.83,
-    "PCUseSeconds": 5.67
+    "PCUseSeconds": 6.17
    }
   },
   {
@@ -53,21 +53,21 @@
     "PCLaugh": 0,
     "PCRunTo": true,
     "AngerAmount": 20,
-    "PCUseSecondsTricked": 8.25,
-    "PCUseSecondsLinked": 9.17,
+    "PCUseSecondsTricked": 8.58,
+    "PCUseSecondsLinked": 9.75,
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCCreditAt": 4.25,
-    "PCCreditAtLinked": 4.25,
+    "PCCreditAt": 4.42,
+    "PCCreditAtLinked": 4.42,
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 7.33,
+    "PCLinkedPaysAt": 7.75,
     "PCHitSecondsLinked": {
-     "Olga": 2.5
+     "Olga": 2.58
     },
-    "PCResumeHeadSeconds": 2.17,
+    "PCResumeHeadSeconds": 2.5,
     "PCExtraCoinLinked": 30,
-    "PCUseSeconds": 7.75
+    "PCUseSeconds": 8.17
    }
   },
   {
@@ -75,11 +75,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 1.17,
+    "PCUseSecondsTricked": 1.33,
     "PCShout": 0,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 1.75,
     "PCCreditAt": 0.42,
-    "PCUseSeconds": 10.92
+    "PCUseSeconds": 11.5
    }
   },
   {
@@ -123,9 +123,9 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherPoolLadderEnter": 3.42,
+      "MotherPoolLadderEnter": 3.5,
       "MotherPoolLadderSwim": 8.33,
-      "MotherPoolLadderLeave": 4.17
+      "MotherPoolLadderLeave": 4.25
      }
     }
    }
@@ -140,9 +140,9 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherSitPillow": 0.75,
+      "MotherSitPillow": 0.83,
       "MotherSleepLoop": 6.67,
-      "MotherGetUpPillow": 1.33
+      "MotherGetUpPillow": 1.42
      }
     }
    }
@@ -809,7 +809,7 @@
       "routes": {}
      }
     },
-    "PCUseSeconds": 7.83
+    "PCUseSeconds": 8.17
    }
   },
   {

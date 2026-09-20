@@ -581,20 +581,15 @@ class Data:
         return v
 
     def action_ticks(self, obj, name, actor='neighbor'):
-        """the ticks of an action: time="N", or auto the frames of its
-        governing animation — Loader.dll's time + 1 (loader_time); None if
-        unknown. Until 2026-09-25 the actor's animation came first and the
-        object's only without one, loops counted and `ms` skipped by name:
+        """the ticks an action takes in its actor's queue: its DoActions
+        job's (job_ticks, the Loader's time + 2 — an auto action its
+        governing animation's frames and one, a time="N" one N + 2); None
+        if unknown. Until 2026-09-25 an auto action counted its actor's
+        animation's frames first, loops included, and a time="N" one N:
         202's sub `dive` was the kid's play_remote (62) where the sub's
         sub_dive (191) governs, 205's chef `cut_eel` the neighbour's `wait`
         loop (63) where the chef's `cut` (31) does"""
-        t = self.loader_time(obj, name, actor)
-        if t is None:
-            return None
-        r = self._record(obj, name, actor)
-        if r[1].get('time', 'auto').isdigit():
-            return t
-        return t + 1
+        return self.job_ticks(obj, name, actor)
 
     def loader_time(self, obj, name, actor='neighbor'):
         """the action record's time as Loader.dll stores it (+0x28 of its
@@ -631,12 +626,52 @@ class Data:
 INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET', 'Ef82b', 'Efac4', 'Ef779'}
 
 
+# the elements a sequence finishes on their first update: each takes its
+# tick (the sequence, vtable 0x100ab6c0, update 0x1000ad52, pushes an
+# element with a first run, fcn.10049246, and returns 0, so the queue's
+# runner, fcn.100492a8, goes on no further that tick)
+TICK_ELEMENTS = INSTANT | {'Eebbf', 'Ef51a'}
+
+
+def step_ticks(ev, ctx):
+    """the step's own ticks besides its parts: its instant elements' (a tick
+    each) and the script's — the script's job (213's neighbour: update
+    0x10037726 -> fcn.1000e131) runs the step and returns 0, the step's
+    sequence pushed without a first run (fcn.10049216) starting on the
+    tick after; a step that walks (its GoTo, fcn.1000e3e0 -> fcn.10007a10,
+    pushed the same way) has the GoTo's first tick before the walk and,
+    after the arrival, its done tick (the GoTo job sets +0x14 as the actor
+    arrives and returns 1 on its next update, 0x10007409 / 0x10007670) —
+    3 ticks, 1 for a step at the place of the last (ctx['go'])"""
+    n = sum(1 for e in ev if e[0] in TICK_ELEMENTS
+            or (e[0] == 'E2f40' and len(e) > 3 and e[3] == 'instant'))
+    go = next((e[1] for e in ev if e[0] == 'GO'), None)
+    walks = go is not None and go != ctx.get('go')
+    if go is not None:
+        ctx['go'] = go
+    return n + (3 if walks else 1)
+
+
 def station_ticks(d, ev, ctx=None):
     """the step's parts [(object, action, ticks)] — DoActions, the enter/leave of
     E6bd4/E6c2e, a bar's enter and ticks (action 'bar'); the message elements
     instant; the rest unknown (ticks None). `ctx` carries the last hideout
-    across steps (a leave whose object is a local of an earlier step)"""
+    across steps (a leave whose object is a local of an earlier step). The
+    step's own ticks (step_ticks) go with its first timed part, or with the
+    next step's where it has none (a walk-by: 202's rake)"""
     ctx = {} if ctx is None else ctx
+    parts = _station_parts(d, ev, ctx)
+    extra = step_ticks(ev, ctx) + ctx.pop('carry', 0)
+    k = next((i for i, p in enumerate(parts) if p[2] is not None), None)
+    if k is None:
+        ctx['carry'] = extra
+    else:
+        o, a, t = parts[k]
+        parts[k] = (o, a, t + extra)
+    return parts
+
+
+def _station_parts(d, ev, ctx):
     parts = []
     for e in ev:
         k = e[0]

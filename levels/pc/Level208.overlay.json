@@ -20,7 +20,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 12.08
+    "PCUseSeconds": 12.75
    }
   },
   {
@@ -28,11 +28,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 4.08,
+    "PCUseSecondsTricked": 4.25,
     "PCShout": 0,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 1.75,
     "PCCreditAt": 1.42,
-    "PCUseSeconds": 4.25
+    "PCUseSeconds": 4.58
    }
   },
   {
@@ -40,7 +40,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 5.58
+    "PCUseSeconds": 6.0
    }
   },
   {
@@ -48,11 +48,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 7.0,
+    "PCUseSecondsTricked": 7.33,
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCCreditAt": 4.33,
-    "PCUseSeconds": 4.92
+    "PCCreditAt": 4.5,
+    "PCUseSeconds": 5.33
    }
   },
   {

@@ -13,11 +13,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.25,
+    "PCUseSecondsTricked": 6.42,
     "PCShout": 0,
-    "PCFixSeconds": 2.0,
+    "PCFixSeconds": 2.17,
     "PCCreditAt": 4.0,
-    "PCUseSeconds": 6.75
+    "PCUseSeconds": 6.83
    }
   },
   {
@@ -25,11 +25,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 4,
-    "PCUseSecondsTricked": 6.25,
+    "PCUseSecondsTricked": 6.42,
     "PCShout": 0,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 1.75,
     "PCCreditAt": 3.92,
-    "PCUseSeconds": 4.92
+    "PCUseSeconds": 5.08
    }
   },
   {
@@ -37,11 +37,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.0,
+    "PCUseSecondsTricked": 6.17,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCCreditAt": 3.58,
-    "PCUseSeconds": 7.25
+    "PCUseSeconds": 7.42
    }
   },
   {
@@ -49,11 +49,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.75,
+    "PCUseSecondsTricked": 6.92,
     "PCShout": 1,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 1.75,
     "PCCreditAt": 3.67,
-    "PCUseSeconds": 5.0
+    "PCUseSeconds": 5.33
    }
   },
   {
@@ -61,16 +61,16 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 7.75,
-    "PCUseSecondsLinked": 9.75,
+    "PCUseSecondsTricked": 8.58,
+    "PCUseSecondsLinked": 10.58,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCCreditAt": 0.42,
     "PCCreditAtLinked": 0.42,
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 3.25,
-    "PCUseSeconds": 8.67
+    "PCLinkedPaysAt": 3.5,
+    "PCUseSeconds": 9.0
    }
   },
   {
@@ -93,8 +93,8 @@
    "set": {
     "PCLaugh": 3,
     "PCShout": 1,
-    "PCFixSeconds": 1.58,
-    "PCUseSeconds": 12.5
+    "PCFixSeconds": 2.0,
+    "PCUseSeconds": 13.17
    }
   },
   {
@@ -264,16 +264,16 @@
       "out": 80,
       "xi": 1030,
       "xo": 1000,
-      "enter": 15,
-      "leave": 15
+      "enter": 16,
+      "leave": 16
      },
      "Woody": {
       "in": -40,
       "out": 80,
       "xi": 1030,
       "xo": 1000,
-      "enter": 12,
-      "leave": 12
+      "enter": 13,
+      "leave": 13
      }
     }
    }
@@ -421,16 +421,16 @@
       "out": 40,
       "xi": 1000,
       "xo": 1030,
-      "enter": 15,
-      "leave": 15
+      "enter": 16,
+      "leave": 16
      },
      "Woody": {
       "in": -80,
       "out": 40,
       "xi": 1000,
       "xo": 1030,
-      "enter": 12,
-      "leave": 12
+      "enter": 13,
+      "leave": 13
      }
     }
    }
@@ -696,7 +696,7 @@
       }
      }
     },
-    "PCUseSeconds": 3.58
+    "PCUseSeconds": 3.92
    }
   },
   {
@@ -861,7 +861,7 @@
       }
      }
     },
-    "PCUseSeconds": 1.92
+    "PCUseSeconds": 2.92
    }
   },
   {

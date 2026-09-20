@@ -21,18 +21,18 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 2.75,
-    "PCUseSecondsLinked": 8.83,
+    "PCUseSecondsTricked": 3.17,
+    "PCUseSecondsLinked": 9.25,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCCreditAt": 1.42,
     "PCCreditAtLinked": 1.42,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 2.75,
+    "PCLinkedPaysAt": 3.0,
     "PCUseSeconds": [
      0,
-     1.83
+     1.92
     ]
    }
   },
@@ -49,7 +49,7 @@
     "PCMinigameFailed": "neighbor",
     "PCMinigameLift": 0,
     "PCMinigameFailedTicks": 10,
-    "PCUseSeconds": 4.08
+    "PCUseSeconds": 4.58
    }
   },
   {
@@ -57,11 +57,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 4.42,
+    "PCUseSecondsTricked": 4.58,
     "PCShout": 0,
-    "PCFixSeconds": 1.58,
+    "PCFixSeconds": 1.75,
     "PCCreditAt": 2.67,
-    "PCUseSeconds": 9.92
+    "PCUseSeconds": 10.25
    }
   },
   {
@@ -69,11 +69,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 9.92,
+    "PCUseSecondsTricked": 10.25,
     "PCShout": 1,
-    "PCFixSeconds": 1.58,
-    "PCCreditAt": 4.92,
-    "PCUseSeconds": 15.42
+    "PCFixSeconds": 1.75,
+    "PCCreditAt": 5.08,
+    "PCUseSeconds": 15.83
    }
   },
   {
@@ -108,7 +108,7 @@
     "PCHideout": {
      "Rottweiler": {}
     },
-    "PCUseSeconds": 11.67
+    "PCUseSeconds": 12.08
    }
   },
   {

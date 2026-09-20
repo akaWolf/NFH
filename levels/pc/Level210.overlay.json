@@ -15,13 +15,13 @@
     "AngerAmount": 30,
     "PCLaugh": 0,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 9.08,
+    "PCUseSecondsTricked": 9.42,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
-     "Mother": 3.25
+     "Mother": 3.33
     },
-    "PCUseSeconds": 1.92
+    "PCUseSeconds": 2.75
    }
   },
   {
@@ -30,16 +30,16 @@
    "set": {
     "PCExtraCoin": 20,
     "PCLaugh": 0,
-    "PCUseSecondsTricked": 6.92,
-    "PCUseSecondsLinked": 9.17,
+    "PCUseSecondsTricked": 7.25,
+    "PCUseSecondsLinked": 9.92,
     "PCShout": -1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 3.5,
-    "PCCreditAtLinked": 3.5,
+    "PCCreditAt": 3.67,
+    "PCCreditAtLinked": 3.67,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
-    "PCLinkedPaysAt": 5.0,
-    "PCUseSeconds": 2.5
+    "PCLinkedPaysAt": 5.17,
+    "PCUseSeconds": 3.17
    }
   },
   {
@@ -48,11 +48,11 @@
    "set": {
     "PCLaugh": 0,
     "AngerAmount": 27,
-    "PCUseSecondsTricked": 3.83,
+    "PCUseSecondsTricked": 4.17,
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCCreditAt": 1.92,
-    "PCUseSeconds": 6.33
+    "PCCreditAt": 2.08,
+    "PCUseSeconds": 6.92
    }
   },
   {
@@ -61,11 +61,11 @@
    "set": {
     "PCLaugh": 4,
     "PCClipSeconds": {
-     "ChairEnter": 0.58,
+     "ChairEnter": 0.67,
      "ChairSun": 2.5,
-     "ChairWakeup": 0.33,
+     "ChairWakeup": 0.42,
      "ChairAwake": 6.0,
-     "ChairLeave": 1.42
+     "ChairLeave": 1.5
     },
     "PCWaitFor": {
      "clip": "ChairAwake",
@@ -122,11 +122,11 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherSitPillow": 0.75,
+      "MotherSitPillow": 0.83,
       "MotherSleepPillow": 0.0,
       "MotherSleepSingle": 6.67,
       "MotherLookLoop": 15.0,
-      "MotherGetUpPillow": 1.33
+      "MotherGetUpPillow": 1.42
      }
     }
    }
@@ -527,7 +527,7 @@
       }
      }
     },
-    "PCUseSeconds": 1.0
+    "PCUseSeconds": 1.33
    }
   },
   {
@@ -628,8 +628,8 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherCall": 1.67,
-      "MotherOrder": 1.42
+      "MotherCall": 1.75,
+      "MotherOrder": 1.5
      }
     },
     "PCWaitForRole": {

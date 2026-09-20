@@ -14,14 +14,14 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 4.0,
+    "PCUseSecondsTricked": 4.17,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
-     "Olga": 3.5
+     "Olga": 3.58
     },
     "PCCreditAt": 2.5,
-    "PCUseSeconds": 3.58
+    "PCUseSeconds": 3.92
    }
   },
   {
@@ -30,14 +30,14 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 18.33,
+    "PCUseSecondsTricked": 18.67,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
-     "Mother": 3.25
+     "Mother": 3.33
     },
     "PCCreditAt": 5.42,
-    "PCUseSeconds": 8.25
+    "PCUseSeconds": 8.58
    }
   },
   {
@@ -46,14 +46,14 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 4.17,
+    "PCUseSecondsTricked": 4.33,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCHitSeconds": {
-     "Olga": 3.5
+     "Olga": 3.58
     },
     "PCCreditAt": 2.5,
-    "PCUseSeconds": 4.17
+    "PCUseSeconds": 4.67
    }
   },
   {
@@ -69,11 +69,11 @@
     "PCMinigameFailed": "neighbor",
     "PCMinigameLift": 84,
     "PCMinigameFailedTicks": 10,
-    "PCUseSecondsTricked": 10.83,
+    "PCUseSecondsTricked": 11.33,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCCreditAt": 0.83,
-    "PCUseSeconds": 5.17
+    "PCUseSeconds": 5.5
    }
   },
   {
@@ -81,7 +81,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 12.5,
+    "PCUseSecondsTricked": 12.67,
     "PCShout": 2,
     "PCFixSeconds": 0,
     "PCCreditAt": 4.58
@@ -102,9 +102,9 @@
       ]
      }
     },
-    "PCSitSeconds": 0.75,
+    "PCSitSeconds": 0.83,
     "PCSleepSeconds": 50.0,
-    "PCGetUpSeconds": 1.33
+    "PCGetUpSeconds": 1.42
    }
   },
   {
@@ -258,16 +258,16 @@
       "out": 30,
       "xi": 960,
       "xo": 800,
-      "enter": 15,
-      "leave": 15
+      "enter": 16,
+      "leave": 16
      },
      "Woody": {
       "in": -67,
       "out": 30,
       "xi": 960,
       "xo": 800,
-      "enter": 12,
-      "leave": 12
+      "enter": 13,
+      "leave": 13
      }
     }
    }
@@ -423,16 +423,16 @@
       "out": 67,
       "xi": 800,
       "xo": 960,
-      "enter": 15,
-      "leave": 15
+      "enter": 16,
+      "leave": 16
      },
      "Woody": {
       "in": -30,
       "out": 67,
       "xi": 800,
       "xo": 960,
-      "enter": 12,
-      "leave": 12
+      "enter": 13,
+      "leave": 13
      }
     }
    }
@@ -487,7 +487,7 @@
     },
     "PCShout": -1,
     "PCFixSeconds": 0,
-    "PCUseSeconds": 4.33
+    "PCUseSeconds": 4.67
    }
   },
   {

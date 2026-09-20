@@ -23,10 +23,10 @@
     "AngerAmount": 35,
     "PCClipSeconds": {
      "WaitSea": 6.17,
-     "EnterSea": 3.08,
+     "EnterSea": 3.17,
      "SeeSub": 8.08,
      "SeeShark": 9.92,
-     "LeaveSea": 1.67
+     "LeaveSea": 1.75
     },
     "PCCreditAfter": "EnterSea",
     "PCWaitFor": {
@@ -52,13 +52,13 @@
     "AngerAmount": 20,
     "PCLaugh": 3,
     "PCClipSeconds": {
-     "BeachLayDown": 0.5,
-     "BeachPinLayDown": 0.5,
+     "BeachLayDown": 0.58,
+     "BeachPinLayDown": 0.58,
      "BeachSleep": 1.43,
      "BeachSleepCrab": 1.43,
-     "BeachGetBeer": 5.33,
-     "BeachCrabGetBeer": 3.08,
-     "BeachGetUp": 0.42
+     "BeachGetBeer": 5.42,
+     "BeachCrabGetBeer": 3.17,
+     "BeachGetUp": 0.5
     }
    },
    "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
@@ -68,16 +68,16 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.42,
-    "PCUseSecondsLinked": 8.75,
+    "PCUseSecondsTricked": 6.92,
+    "PCUseSecondsLinked": 9.42,
     "PCShout": 1,
-    "PCFixSeconds": 1.58,
-    "PCCreditAt": 4.25,
-    "PCCreditAtLinked": 4.25,
+    "PCFixSeconds": 1.75,
+    "PCCreditAt": 4.42,
+    "PCCreditAtLinked": 4.42,
     "PCShoutLinked": 2,
-    "PCFixSecondsLinked": 1.58,
-    "PCLinkedPaysAt": 6.08,
-    "PCUseSeconds": 10.67
+    "PCFixSecondsLinked": 1.75,
+    "PCLinkedPaysAt": 6.42,
+    "PCUseSeconds": 11.08
    }
   },
   {
@@ -519,10 +519,10 @@
     },
     "PCClipSecondsRole": {
      "Olga": {
-      "BeachLayDown": 0.67,
+      "BeachLayDown": 0.75,
       "TowelSleep": 7.58,
-      "TowelLaydown": 2.92,
-      "BeachGetUp": 0.67
+      "TowelLaydown": 3.0,
+      "BeachGetUp": 0.75
      }
     }
    }
@@ -548,8 +548,8 @@
     },
     "PCClipSecondsRole": {
      "Olga": {
-      "OlgaPutSub": 1.5,
-      "OlgaPutSubTricked": 1.5
+      "OlgaPutSub": 1.58,
+      "OlgaPutSubTricked": 1.58
      }
     }
    }
