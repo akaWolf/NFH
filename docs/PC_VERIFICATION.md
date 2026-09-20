@@ -590,5 +590,7 @@ actors' job pass the update calls at 0x100445f8.
   kid, 0x100220a1-0x100221e3, and goes on to the sea step): the swim holds
   WaitSea only until Olga's sub is in the sea (the 10.33 s after it
   withdrawn), his lap ~77 s; 202 v7 (the same chain, 100 at 307.6 s).
+  Open with numbers: the elements' own ticks (a job a tick past its
+  frames, an instant element and each step a tick: 0.9-2.4 s a lap).
   `pc_durations_s2.py --code-keys` writes the code's stays too
   (`write_code_stays`: code_stays, STAYS_CODE, RUSH). runs/end4s2.

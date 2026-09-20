@@ -2160,12 +2160,15 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   30, 2.5 s; 207's bar `order_drink` 94, 7.83 s; 210's Fifi `tickle` by
   the bone's bark, 40: the tricked basket 1.75 s longer). Each DoActions
   job still lasts a tick more than those frames (two for a time="N"
-  action), and an element done on its first update takes its tick: the
+  action), an element done on its first update takes its tick — the
   sequence (vtable 0x100ab6c0, update 0x1000ad52) pushes each element
   with a first run (fcn.10049246) and returns 0, and the queue runner
-  goes on only past a job that is done — 0.5-1.7 s a lap on the twelve
-  laps the model closes (5-11 jobs, 0-9 instant elements), open as a
-  model refinement. 204's gong already waited for the strike's
+  goes on only past a job that is done — and so does each step: the
+  script's job (213's neighbour: update 0x10037726 -> fcn.1000e131) runs
+  the step, which pushes its sequence in front (fcn.10049216, no first
+  run), and returns 0. 0.9-2.4 s a lap on the twelve laps the model
+  closes (4-9 steps, 5-11 jobs, 0-9 instant elements; 212 the most),
+  open as a model refinement. 204's gong already waited for the strike's
   end (its stay the strike's 42 ticks) and 202's `kid_cry` rides the
   mobile's crying at his next station, the mat's `leave` over. Under it
   210 and 211 were re-planned (210 v25: the fishing net on the Mother's
