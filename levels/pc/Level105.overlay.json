@@ -43,11 +43,11 @@
    "object": "Piano",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 7.5,
+    "PCUseSeconds": 8.92,
     "PCFixSeconds": 1.917,
     "PCUseSecondsTricked": 3.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 7.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 8.9 s"
   },
   {
    "object": "Football",

@@ -36,12 +36,12 @@
    "object": "Binoculars",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.5,
+    "PCUseSeconds": 6.0,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 7.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.0 s"
   },
   {
    "object": "Microwave",

@@ -92,6 +92,14 @@
     "PCUseSecondsTricked": 0.0,
     "PCFireAt": 0
    }
+  },
+  {
+   "object": "Drawing",
+   "component": "Drawing",
+   "set": {
+    "PCUseSeconds": 3.42
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.4 s"
   }
  ]
 }

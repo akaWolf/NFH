@@ -121,11 +121,11 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     2.08,
-     2.08
+     1.92,
+     2.25
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Mixer <- mixer#0 4.2 s /2"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Mixer <- mixer#0 mix 1.92 s, drink 2.25 s"
   },
   {
    "object": "ChestExpander",
@@ -150,13 +150,13 @@
    "object": "Rope",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.33,
+    "PCUseSeconds": 5.25,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 4.833,
     "PCFireAt": 4.167
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 5.2 s"
   }
  ]
 }

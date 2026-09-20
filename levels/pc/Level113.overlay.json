@@ -107,11 +107,11 @@
    "object": "Ladder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.0,
+    "PCUseSeconds": 1.42,
     "PCFixSeconds": 0.917,
     "PCUseSecondsTricked": 1.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 5.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.42 s"
   },
   {
    "object": "ValveHot",
@@ -144,6 +144,14 @@
     "PCUseSecondsTricked": 7.25,
     "PCFireAt": 4.583
    }
+  },
+  {
+   "object": "LadderDrill",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.58
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 3.58 s"
   }
  ]
 }

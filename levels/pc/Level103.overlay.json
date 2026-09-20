@@ -12,12 +12,12 @@
    "object": "Candle",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.58,
+    "PCUseSeconds": 1.33,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.3 s"
   },
   {
    "object": "BirthdayCake",
@@ -37,13 +37,13 @@
    "object": "LetterBox",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.33,
+    "PCUseSeconds": 5.58,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.0,
     "PCFireAt": 1.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 5.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 5.6 s"
   },
   {
    "object": "MumPicture",

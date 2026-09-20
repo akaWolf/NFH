@@ -128,12 +128,12 @@
    "object": "Chili",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.75,
+    "PCUseSeconds": 5.08,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 7.167,
     "PCFireAt": 4.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Chili <- parrot#1 2.8 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Chili <- parrot#1 5.1 s"
   }
  ]
 }

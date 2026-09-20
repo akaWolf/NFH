@@ -24,12 +24,12 @@
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.83,
+    "PCUseSeconds": 1.33,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.167
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.8 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.3 s"
   },
   {
    "object": "Microwave",
