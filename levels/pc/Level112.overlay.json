@@ -14,7 +14,7 @@
    "set": {
     "TrickScore": 8,
     "PCShoutSkip": true,
-    "PCSurpriseSeconds": 2.917,
+    "PCSurpriseSeconds": 2.833,
     "PCFixSeconds": 0
    }
   },
@@ -25,7 +25,7 @@
     "PCAngryTime": 264,
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.083,
+    "PCSurpriseSeconds": 5.0,
     "PCFixSeconds": 1.917
    }
   },
@@ -46,7 +46,7 @@
    "set": {
     "PCAngryTime": 288,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 3.5
+    "PCUseSecondsTricked": 3.417
    }
   },
   {
@@ -55,7 +55,7 @@
    "set": {
     "PCAngryTime": 264,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 6.833
+    "PCUseSecondsTricked": 6.75
    }
   },
   {
@@ -70,33 +70,33 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.33,
-     1.33
+     1.25,
+     1.25
     ],
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.75
+    "PCUseSecondsTricked": 5.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): YogaBook <- book#0 1.3 s; YogaBook <- book#1 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): YogaBook <- book#0 1.2 s; YogaBook <- book#1 1.2 s"
   },
   {
    "object": "FishTank",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.42,
+    "PCUseSeconds": 2.33,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.25
+    "PCUseSecondsTricked": 5.167
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.3 s"
   },
   {
    "object": "Yoga",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 9.0,
+    "PCUseSeconds": 8.92,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.75
+    "PCUseSecondsTricked": 5.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Yoga <- yoga_mat#0 9.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Yoga <- yoga_mat#0 8.9 s"
   },
   {
    "object": "Trampoline",
@@ -104,7 +104,7 @@
    "set": {
     "PCUseSeconds": 5.92,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 6.0
+    "PCUseSecondsTricked": 5.917
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Trampoline <- trampoline#0 5.9 s"
   },
@@ -122,41 +122,41 @@
    "set": {
     "PCUseSeconds": [
      1.92,
-     2.25
+     2.17
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Mixer <- mixer#0 mix 1.92 s, drink 2.25 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Mixer <- mixer#0 mix 1.92 s, drink 2.17 s"
   },
   {
    "object": "ChestExpander",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.33,
+    "PCUseSeconds": 6.25,
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 2.917
+    "PCUseSecondsTricked": 2.833
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChestExpander <- expander#0 6.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChestExpander <- expander#0 6.2 s"
   },
   {
    "object": "Weights",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 10.67
+    "PCUseSeconds": 10.58
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Weights <- barbell#0 10.7 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Weights <- barbell#0 10.6 s"
   },
   {
    "object": "Rope",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.25,
+    "PCUseSeconds": 5.08,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.833,
-    "PCFireAt": 4.167
+    "PCUseSecondsTricked": 4.583,
+    "PCFireAt": 4.0
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 5.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 5.1 s"
   }
  ]
 }

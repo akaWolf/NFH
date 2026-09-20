@@ -36,7 +36,7 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 3.917
+    "PCUseSecondsTricked": 3.833
    }
   },
   {
@@ -46,7 +46,7 @@
     "PCAngryTime": 240,
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 3.167
+    "PCUseSecondsTricked": 3.083
    }
   },
   {
@@ -56,8 +56,8 @@
     "PCAngryTime": 216,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.167,
-    "PCFireAt": 1.833
+    "PCUseSecondsTricked": 4.833,
+    "PCFireAt": 1.667
    }
   },
   {
@@ -76,11 +76,49 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     8.0,
-     8.0
+     7.92,
+     7.92
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pudding <- milk_bottle#0 8.0 s; Pudding <- milk_bottle#1 8.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pudding <- milk_bottle#0 7.9 s; Pudding <- milk_bottle#1 7.9 s"
+  },
+  {
+   "object": "Candy",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.75,
+     0.75
+    ],
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 2.25,
+    "PCFireAt": 0.75
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candy <- candy#0 0.8 s; Candy <- candy#1 0.8 s"
+  },
+  {
+   "object": "BathTub",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.25,
+     2.75
+    ],
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 7.25,
+    "PCFireAt": 2.75
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BathTub <- bath#0 0.2 s; BathTub <- bath#1 2.8 s"
+  },
+  {
+   "object": "Towel",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 2.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Towel <- towel#0 2.3 s"
   },
   {
    "object": "Ground",
@@ -101,21 +139,11 @@
    }
   },
   {
-   "object": "Candy",
-   "component": "TrickItem",
-   "set": {
-    "PCShoutSkip": true,
-    "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.417,
-    "PCFireAt": 0.833
-   }
-  },
-  {
    "object": "MumPicture",
    "component": "TrickItem",
    "set": {
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.0
+    "PCFixSeconds": 1.917
    }
   },
   {
@@ -125,46 +153,6 @@
     "PCSurpriseSeconds": 1.25,
     "PCFixSeconds": 1.917
    }
-  },
-  {
-   "object": "BathTub",
-   "component": "TrickItem",
-   "set": {
-    "PCShoutSkip": true,
-    "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.417,
-    "PCFireAt": 2.833
-   }
-  },
-  {
-   "object": "Candy",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": [
-     0.83,
-     0.83
-    ]
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candy <- candy#0 0.8 s; Candy <- candy#1 0.8 s"
-  },
-  {
-   "object": "BathTub",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": [
-     0.25,
-     2.83
-    ]
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BathTub <- bath#0 0.2 s; BathTub <- bath#1 2.8 s"
-  },
-  {
-   "object": "Towel",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 2.67
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Towel <- towel#0 2.7 s"
   }
  ]
 }

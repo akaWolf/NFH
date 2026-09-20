@@ -34,84 +34,92 @@
    "object": "ChairAssembly",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.33,
+    "PCUseSeconds": 6.17,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 7.25,
-    "PCFireAt": 4.583
+    "PCUseSecondsTricked": 7.083,
+    "PCFireAt": 4.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.2 s"
   },
   {
    "object": "AngleGrinder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.5,
+    "PCUseSeconds": 6.25,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 7.333,
-    "PCFireAt": 6.667
+    "PCUseSecondsTricked": 7.083,
+    "PCFireAt": 6.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.2 s"
   },
   {
    "object": "ValveMain",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.33,
-     0.33
+     0.25,
+     0.25
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.083,
+    "PCUseSecondsTricked": 5.0,
     "PCRunTo": true,
-    "PCGrabSeconds": 0.333,
+    "PCGrabSeconds": 0.25,
     "PCToolUseSeconds": 0.0,
     "PCReturnSeconds": 0.0
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.3 s; ValveMain <- valve#1 0.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.2 s; ValveMain <- valve#1 0.2 s"
   },
   {
    "object": "Radiator",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.5
+    "PCUseSeconds": 4.42
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.4 s"
   },
   {
    "object": "Sink",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.42,
+    "PCUseSeconds": 3.33,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.083
+    "PCUseSecondsTricked": 5.0
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.3 s"
   },
   {
    "object": "FuseBox",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.33,
-     0.33
+     0.25,
+     0.25
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 8.167
+    "PCUseSecondsTricked": 7.833
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.3 s; FuseBox <- fuse#1 0.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.2 s; FuseBox <- fuse#1 0.2 s"
   },
   {
    "object": "Ladder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.42,
+    "PCUseSeconds": 1.33,
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 1.417
+    "PCUseSecondsTricked": 1.333
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.42 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.33 s"
+  },
+  {
+   "object": "LadderDrill",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.33
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 3.33 s"
   },
   {
    "object": "ValveHot",
@@ -119,9 +127,9 @@
    "set": {
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.167,
+    "PCUseSecondsTricked": 3.083,
     "PCRunTo": true,
-    "PCGrabSeconds": 0.333,
+    "PCGrabSeconds": 0.25,
     "PCToolUseSeconds": 0.0,
     "PCReturnSeconds": 0.0
    }
@@ -132,7 +140,7 @@
    "set": {
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.0,
+    "PCSurpriseSeconds": 4.917,
     "PCFixSeconds": 1.917
    }
   },
@@ -141,17 +149,9 @@
    "component": "TrickItem",
    "set": {
     "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 7.25,
-    "PCFireAt": 4.583
+    "PCUseSecondsTricked": 7.083,
+    "PCFireAt": 4.5
    }
-  },
-  {
-   "object": "LadderDrill",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 3.58
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 3.58 s"
   }
  ]
 }

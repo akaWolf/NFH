@@ -12,24 +12,24 @@
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.67,
+    "PCUseSeconds": 3.42,
     "PCShoutSkip": true,
     "PCFixSeconds": 3.917,
-    "PCUseSecondsTricked": 7.083,
-    "PCFireAt": 0.5
+    "PCUseSecondsTricked": 6.917,
+    "PCFireAt": 0.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.4 s"
   },
   {
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.33,
+    "PCUseSeconds": 1.25,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.167
+    "PCUseSecondsTricked": 2.833
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.2 s"
   },
   {
    "object": "Microwave",

@@ -21,27 +21,27 @@
      "SitUp"
     ],
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.5
+    "PCUseSecondsTricked": 4.25
    }
   },
   {
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.67
+    "PCUseSeconds": 3.42
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.4 s"
   },
   {
    "object": "Binoculars",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.0,
+    "PCUseSeconds": 5.92,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.417
+    "PCUseSecondsTricked": 7.333
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 5.9 s"
   },
   {
    "object": "Microwave",
