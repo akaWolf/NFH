@@ -2486,12 +2486,6 @@ class RottweilerMotherBehaviour(Behavior):
         if name == 'PistolPlay':                      # cs:57-61
             self.hide_bool = True
             self.hide_obj(self.target_item, True)
-            if pcprofile.is_pc() and it is self.target_item:
-                # the PC pistol's `use` carries behavior="standup" for the
-                # Mother (ship4 objects.xml): the watch table fires it as the
-                # use starts, and her script's handler (0x1003a2bb) sends her
-                # to sleep — not at the play's end (cs:116-119)
-                self.world.fire_event('mother_sleep')
         if name == 'WaitWatch':                       # cs:62-65
             rott = self.rott()
             if rott is not None:
@@ -2529,9 +2523,13 @@ class RottweilerMotherBehaviour(Behavior):
 
     def on_animation_sequence_ended(self):
         it = self.action_item('Rottweiler')
-        if it is not None and it is self.target_item \
-                and not (pcprofile.is_pc() and not self.target_item.tricked):
-            self.world.fire_event('mother_sleep')     # cs:116-119
+        if it is not None and it is self.target_item:
+            # cs:116-119 — the PC's alike: the pistol's `use` carries
+            # behavior="standup" for the Mother (ship4 objects.xml), posted
+            # as its job ends (state 2, GameLogic fcn.1004000a at
+            # 0x10002708), and her script's handler (0x1003a2bb) sends her
+            # to sleep
+            self.world.fire_event('mother_sleep')
         if self.hide_bool:                            # cs:123-127
             self.hide_bool = False
             self.hide_obj(self.target_item, False)

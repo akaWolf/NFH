@@ -245,12 +245,12 @@ class Item:
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
-                 'pc_minigame_failed', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
+                 'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
                  'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
-                 'pc_done_due', 'pc_extra_due', 'pc_affect_early', 'pc_masked',
+                 'pc_done_due', 'pc_extra_due', 'pc_masked',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -659,7 +659,6 @@ class Item:
         self.pc_linked_amount = None     # the ladder's linked arm, settled by the first part
         self.pc_done_due = False         # the pair's completion, booked with its last record
         self.pc_extra_due = False        # the linked flow's extra record, paid as his parked angry resumes
-        self.pc_affect_early = False     # its co-actor set off as the tricked action started (World.pc_affect_early)
         self.pc_masked = False           # this visit plays untricked under the profile (206's pad: Level206RoutineBehavior)
         # the Season 1 trick step's own data under the profile (levels/pc
         # overlays from tools/pcref/pc_reactions.py; game.exe's fire step,
@@ -704,10 +703,21 @@ class Item:
         # and its combination's startlevel / endlevel (combine.xml): the
         # range the game's wobble factor grows through (fcn.100508a1)
         self.pc_minigame_levels = d.get('PCMinigameLevels')
-        # and whom its `failed` action sends (the behavioractor; '' none)
+        # and whom its `failed` action sends (the behavioractor; '' none),
+        # and that action's ticks from its job's first update to the one
+        # that posts the behaviour (the Loader's time + 2)
         self.pc_minigame_failed = d.get('PCMinigameFailed')
+        self.pc_minigame_failed_ticks = d.get('PCMinigameFailedTicks')
+        # the seconds into the neighbour's stay at which its action's
+        # behaviour reaches the other actor: the parts' jobs up to the one
+        # that posts it and the offer's tick (205's mat: the `talk`'s
+        # pingpong; tools/pcref/pc_durations_s2.py BEHAVIOUR_AT)
+        self.pc_behaviour_at = d.get('PCBehaviourAt')
+        # and after its use's end, the action's job end and the offer's tick
+        # (213's ride: `leave` to the neighbour; PCBehaviourAtEnd)
+        self.pc_behaviour_at_end = d.get('PCBehaviourAtEnd')
         # the clip that behaviour plays on its actor first (203's Olga shouts:
-        # {role, clip, secs, then}; tools/pcref/pc_minigames.py)
+        # {role, clip, secs, then, ticks}; tools/pcref/pc_minigames.py)
         self.pc_minigame_failed_clip = d.get('PCMinigameFailedClip')
         # Woody's place for the game above the room's floor line, level px:
         # the object's `woody` hotspot (tools/pcref/pc_minigames.py), the

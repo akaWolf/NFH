@@ -576,8 +576,6 @@ class Pawn:
         # every SHOUT after it plays the freakout (pcprofile.s2_reaction_seconds)
         self.pc_rage_full = False
         self.pc_hit_secs = None          # the PC's seconds for this pawn's hit on him (the trick item's PCHitSeconds)
-        self.pc_hit_parked = False       # his angry parked for a co-actor who set off early (World.pc_affect_early)
-        self.pc_hit_started = False      # her fight began before his action ended (the PC fights on arrival)
         self.rage_current = 0
         self.rage_hold = 0
         self.rage_bonus = False          # the flag of the last trick (+0x7c)
@@ -3878,8 +3876,6 @@ class Routine:
                 # rubberrabbit, the ExtraCoin206)
                 self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
                 self.pc_credit3_item = target
-            if target is not None and self.pawn.world is not None:
-                self.pawn.world.pc_affect_early(self.pawn, target)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -3898,12 +3894,6 @@ class Routine:
                 # the trick's record pays as its PC action ends (PCCreditAfter)
                 self._pc_credit = {'clip': it.pc_credit_after, 'seen': False}
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
-            if getattr(self, '_pc_release_pose', False) and self.pawn.anim.anim is not None \
-                    and self.pawn.anim.anim.infinite:
-                # the bouquet's release held through her hit: this pose
-                # (World._stop_olga_infinite_loop)
-                self._pc_release_pose = False
-                self.pawn.anim.anim.infinite = False
         elif pc:
             # a station the remaster only walks by is an action on the PC (the
             # shout at the window, the yoga): the stand holds for its ticks,
@@ -4517,11 +4507,6 @@ class Routine:
             if marks is not None and wt['role'] in marks:
                 marks.discard(wt['role'])
                 wt['released'] = 0.0
-                if wt.get('abort') and self.action is not None:
-                    # the released clip is the PC's action whose behavior=
-                    # message sends the other off as it starts (205's `play`:
-                    # "sun" on Olga): her mutex ends now, not at the use's end
-                    self._abort_parked_mutex(self.action.get('abort_mutex_pawn'))
             return
         wt['released'] += dt
         if wt['released'] < float(wt['then']) - 1e-9:
@@ -4773,18 +4758,26 @@ class Routine:
         if t is not None:
             t.ignore_infinite = True
             if pcprofile.is_pc():
-                # the PC's action fires its behavior= message as it starts and
-                # the other script answers on the next tick (205's `talk`:
-                # behavior="pingpong" on Olga, whose step 0x10025b2a gets her
-                # off the mat — `wakeup`, `leave`): the loop ends at once;
-                # not on the mat yet, she goes straight to the table — her
-                # next use of it passes at once (World.play_use_item_anim)
-                if t.anim is not None and t.anim.infinite:
-                    t._stop_single()
-                else:
-                    stop_it = self.level.items.get(a.get('stop_inf_item'))
-                    if stop_it is not None:
+                # the PC's action posts its behavior= message as its job ends
+                # and the other script answers on the tick after (205's
+                # `talk`: behavior="pingpong" on Olga, whose step 0x10025b2a
+                # gets her off the mat — `wakeup`, `leave`), PCBehaviourAt
+                # into the stay: the loop ends then; not on the mat yet, she
+                # goes straight to the table — her next use of it passes at
+                # once (World.play_use_item_anim)
+                stop_it = self.level.items.get(a.get('stop_inf_item'))
+
+                def cut(t=t, stop_it=stop_it):
+                    if t.anim is not None and t.anim.infinite:
+                        t._stop_single()
+                    elif stop_it is not None:
                         stop_it.pc_cut_pending = True
+                at = getattr(it, 'pc_behaviour_at', None)
+                w = self.pawn.world
+                if at and w is not None:
+                    w.call_later(float(at), cut)
+                else:
+                    cut()
         if it.tricked:
             t = self._anim_by_pid(a.get('stop_inf_pawn_tricked'))
             if t is not None:
@@ -4799,6 +4792,26 @@ class Routine:
             t = self._anim_by_pid(a.get('once_pawn_not_tricked'))
             if t is not None:
                 t.ignore_infinite = t.ignore_infinite_once = True
+                self._pc_behaviour_cut(t, getattr(it, 'pc_behaviour_at', None))
+
+    def _pc_behaviour_cut(self, t, at):
+        """the PC's answer to the stay's behaviour: the other actor's script
+        takes it on the offer's tick, PCBehaviourAt into the stay or
+        PCBehaviourAtEnd after it (213's controls: his step posts `bull` to
+        Olga as he arrives, 0x10037f5e, before the controls' `use`; her ride
+        posts `leave` to him as its job ends) — her waiting loop the mobile
+        ends at its round ends then"""
+        if at is None or not pcprofile.is_pc():
+            return
+        w = self.pawn.world
+
+        def cut():
+            if t.anim is not None and t.anim.infinite:
+                t._stop_single()
+        if at and w is not None:
+            w.call_later(float(at), cut)
+        else:
+            cut()
 
     def _action_stopped(self):
         """RoutineActionUse.OnActionStopped (RoutineActionUse.cs:319-353):
@@ -4831,6 +4844,8 @@ class Routine:
         t = self._anim_by_pid(a.get('once_pawn_on_end'))
         if t is not None:
             t.ignore_infinite = t.ignore_infinite_once = True
+            if it is not None:
+                self._pc_behaviour_cut(t, getattr(it, 'pc_behaviour_at_end', None))
         if a.get('hide_owner'):
             self.pawn.set_hidden(False)   # cs:481-484
         if a.get('mutex'):
@@ -5946,21 +5961,12 @@ class Routine:
         if target is None or w is None:
             self._urgent_finished()
             return
-        pc2 = pcprofile.is_pc() and pcprofile.SEASON2
-        self._hit_resumed = False
-        if not pc2:
-            target.sprite.hidden = True   # Target.AnimController.Hidden
-        elif target.item_to_ignore_next_time is not None:
-            # the PC: the fight's start posts its behavior (olga_fight /
-            # mother_fight: the job's first run, fcn.100018a6) and his step
-            # waiting for it goes on at once — his SHOUT plays alongside her
-            # fight, which set his sprite `inv` at its start only (the job
-            # sets animations in its states 0 and 2, 0x10002301-0x100024e9)
-            self._hit_resumed = True
-            w.continue_angry_animation(target)
-        else:
-            # her fight before his action's end: his angry will not wait
-            target.pc_hit_started = True
+        # Target.AnimController.Hidden — the PC's `fight` alike: its job
+        # sets the neighbour `inv` in its state 0 and `ms2` in its state 2
+        # (generic objects.xml: objanim / objnextanim on him, 0x10002301-
+        # 0x100024e9), and posts olga_fight / mother_fight as it ends
+        # (fcn.1004000a, 0x10002708), on which his step's SHOUT goes on
+        target.sprite.hidden = True
         oit = self.item
         if oit is not None and oit.show_item_when_affected:
             w.set_object_hidden(oit, False)    # cs:32-36
@@ -5988,11 +5994,9 @@ class Routine:
             self.pawn.anim.time_scale = 1.0
             self.pawn.pc_hit_secs = None
         if target is not None:
-            target.pc_hit_parked = False
             target.sprite.hidden = False
-            if w is not None and not (pcprofile.is_pc() and pcprofile.SEASON2):
+            if w is not None:
                 w.continue_angry_animation(target)   # Target.ContinueAngryAnimation
-        self._hit_resumed = False
         self._urgent_finished()
 
     def move_to_toilet(self, feel_sick):
@@ -6520,16 +6524,22 @@ class DexterityState:
                 # behaviour sends the neighbour running — straight or through
                 # Olga's shout (203) — or reaches 201's `aux`, the tutorial's
                 # director, which relays the run (TutorialPC201.on_behaviour),
-                # or nobody (212's spikes, 213's pinata: PCMinigameFailed);
-                # the behaviour reaches its actor on the next level tick
+                # or nobody (212's spikes, 213's pinata: PCMinigameFailed).
+                # The game's job ends on the next tick (its state 2) and the
+                # use_object step behind it pushes the `failed` job in front
+                # of itself (0x10004d51-0x10004d69), whose first update is a
+                # tick later; the job posts the behaviour as it ends, its
+                # PCMinigameFailedTicks after that (fcn.1004000a,
+                # 0x10002708), and it is offered on the tick after the post
                 # (pc_offer_tick)
                 self.pc_elapsed = 0
                 self.pc_progress = 0
                 self.percent = 0.0
                 failed = getattr(self.item, 'pc_minigame_failed', None)
+                ft = getattr(self.item, 'pc_minigame_failed_ticks', None) or 0
                 self._lose(alert=False)
                 if failed in ('neighbor', 'olga', 'aux'):
-                    self.pc_offer = [step - self.pc_acc, failed]
+                    self.pc_offer = [(ft + 3) * step - self.pc_acc, failed]
                 return
             self.pc_progress = self.pc_elapsed * 100 // self.pc_total
             if self.pc_progress >= 10:
@@ -6636,8 +6646,8 @@ class DexterityState:
         plays that actor's action of the behaviour's name first — 203's Olga
         `shout`: shout_chinese, 69 frames at 12 a second, then eat_chinese
         (cn_c2's olga record; PCMinigameFailedClip) — and that action's own
-        behaviour, the neighbour's `run`, is posted as it starts, for the
-        next level tick (pc_offer_tick)"""
+        behaviour, the neighbour's `run`, is posted as its job ends, the
+        clip's `ticks` after its first update (pc_offer_tick)"""
         fc = getattr(self.item, 'pc_minigame_failed_clip', None)
         pawn = self.world.pawns.get(fc['role']) if fc else None
         if pawn is None or not pawn.anim.has(fc['clip']):
@@ -6655,13 +6665,15 @@ class DexterityState:
 
     def pc_offer_tick(self, dt):
         """a lost PC game's behaviour reaching its actor: the `failed`
-        action posts it as it starts, in the actors' pass, and the level
-        update's walker (fcn.1003fc90, at 0x100445f1, before that pass)
-        makes it on the next level tick (fcn.1003e769) and offers it to the
-        actor (fcn.1004b27f -> fcn.1004abcf), again every tick until it is
-        taken. 201's `aux` relays the run (TutorialPC201.on_behaviour);
-        203's Olga plays her `shout`, whose action posts his `run` for the
-        tick after (_pc_failed_clip). The neighbour's jobs vote front to
+        action's job posts it as it ends (state 2, fcn.1004000a), in the
+        actors' pass, and the level update's walker (fcn.1003fc90, at
+        0x100445f1, before that pass) makes it on the next level tick
+        (fcn.1003e769) and offers it to the actor (fcn.1004b27f ->
+        fcn.1004abcf), again every tick until it is taken. 201's `aux`
+        relays the run (TutorialPC201.on_behaviour); 203's Olga takes her
+        `shout` at once — her handler's update pushes the action, whose job
+        starts in that tick's pass — and its job posts his `run` as it ends
+        (_pc_failed_clip). The neighbour's jobs vote front to
         back (slot 5) and a passing job whose +4 is 0 refuses the offer:
         his level script's walks are made with 1 (fcn.1000e3e0 ->
         fcn.10007a10, the GoTo job 0x100ab3d8 storing it at 0x10007350) and
@@ -6683,7 +6695,8 @@ class DexterityState:
             return
         if actor == 'olga':
             self._pc_failed_clip()
-            self.pc_offer = [step + left, 'neighbor']
+            fc = getattr(self.item, 'pc_minigame_failed_clip', None) or {}
+            self.pc_offer = [(int(fc.get('ticks') or 0) + 1) * step + left, 'neighbor']
             return
         rott = w.pawns.get('Rottweiler')
         rt = next((r for r in w.routines if r.pawn is rott), None) \
@@ -7312,44 +7325,6 @@ class World:
             self.level_script.on_trick_done()      # cs:789-792
         item.pc_fired = True
 
-    def pc_affect_early(self, pawn, item):
-        """the PC's co-actor sets off as his tricked action starts: the
-        action's behavior (204's hurt_neighbor on Olga, 207's kid_cry, 210's
-        crash on the Mother ...) fires at its start and her script runs her
-        to him (gait 2, fcn.1000eb19) while he plays it; her fight begins on
-        arrival and his SHOUT follows it from its start or his action's end,
-        whichever is later (Routine._hit_begin, play_angry's affect). PC
-        only, the items the lap model gives a hit (PCHitSeconds /
-        PCHitSecondsLinked)"""
-        if not pcprofile.is_pc() or self.game is None or item.pawn_to_affect is None:
-            return
-        if item.play_angry_after_toilet:
-            return        # the co-actor answers the wc's puke (211: Olga's handler 0x100318ce)
-        items = self.level.items
-        linked = items.get(item.linked_item_trick) if item.linked_item_trick else None
-        both = linked is not None and linked.tricked and item.tricked \
-            and bool(item.use_tricked_linked)
-        hs = item.pc_hit_secs_linked if (both and item.pc_hit_secs_linked) else item.pc_hit_secs
-        if not hs or item is pawn.item_to_ignore_next_time:
-            return
-        if item.pawn_to_affect_only_linked and not (linked is not None and linked.tricked):
-            return
-        affected = self.pawn_by_pid(item.pawn_to_affect)
-        afr = next((r for r in self.routines if r.pawn is affected), None) \
-            if affected is not None else None
-        if afr is None or afr.frozen:
-            return
-        affected.pc_run_hit = bool(getattr(item, 'pc_run_to', False))
-        affected.pc_hit_secs = hs.get(affected.role)
-        item.pc_affect_early = True
-        afr.run_to_hit_pawn(pawn)
-        oit = afr.item                     # (as play_angry's affect does)
-        if oit is not None and oit.change_item_anim_when_affected \
-                and oit.item_anim_when_affected:
-            p = self.players.get(id(oit.sprite)) if oit.sprite else None
-            if p is not None and p.has(oit.item_anim_when_affected):
-                p.play_directly(oit.item_anim_when_affected)
-
     def play_angry(self, pawn, item, on_done=None):
         """Rottweiler.PlayAngryAnimation (Rottweiler.cs:552-797), the
         GameMode.Classic branch, with the name-hack heads, the extra-angry
@@ -7589,20 +7564,10 @@ class World:
             and (not item.pawn_to_affect_only_linked
                  or (linked is not None and linked.tricked))
         if affect_live:                            # cs:737-753
-            resume_now = False
             pawn.item_to_ignore_next_time = item
             self._start_wait_in_fear(pawn, on_done)
             afr = next((r for r in self.routines if r.pawn is affected), None)
-            if afr is not None and getattr(item, 'pc_affect_early', False):
-                # she set off as his action started (pc_affect_early): her
-                # fight began on arrival — his angry goes on now if it has
-                # (the PC's latch is set by then), else as it begins
-                item.pc_affect_early = False
-                pawn.pc_hit_parked = True
-                if pawn.pc_hit_started:
-                    pawn.pc_hit_started = False
-                    resume_now = True
-            elif afr is not None:
+            if afr is not None:
                 # on PC the co-actor's walk to him is her script's run where
                 # it sets her gait to 2 first (the item's PCRunTo:
                 # pc_reactions.py RUNTO_S2)
@@ -7638,10 +7603,6 @@ class World:
                     self.level_script.on_trick_done()  # cs:789-792
             if not nfh2:
                 pawn.can_decrease_angry = False    # cs:793-796
-            if resume_now:
-                # her fight had begun: his step's latch is set, his SHOUT
-                # follows his action at once (the PC)
-                self.continue_angry_animation(pawn)
             return
         # the extra-angry insert, gated for the sand castle (cs:754-766)
         if item.sand_castle_flag:
@@ -8185,15 +8146,7 @@ class World:
         rt = next((r for r in self.routines if r.role == 'Rottweiler'), None)
         ort = next((r for r in self.routines if r.role == 'Olga'), None)
         if olga is not None:
-            if pcprofile.is_pc() and pcprofile.SEASON2 and ort is not None \
-                    and ort._urgent_action is not None \
-                    and ort._urgent_action.get('kind') == 'hit_pawn':
-                # the PC's SHOUT and repair run alongside her fight (the
-                # co-actor hit), so his fix comes while she still hits him:
-                # the release goes to the pose she takes next (Routine._use)
-                ort._pc_release_pose = True
-            else:
-                olga.anim.anim.infinite = False
+            olga.anim.anim.infinite = False
             if olga.hit_pawn_action.get('sequence') is not None:
                 olga.hit_pawn_action['sequence'] = \
                     ['OlgaShipShowerAngry', 'HitPawn']
