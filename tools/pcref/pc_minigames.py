@@ -41,6 +41,16 @@ EatChinese); on 201's tutorial
 toolbox `run` on `aux`, the level's invisible dummy at 0/0 (ship1/level.xml),
 and on 212's spikes and 213's pinata no behaviour at all — nobody comes.
 
+Woody plays the game where the use put him: the object's `woody` hotspot
+(its level.xml position plus the hotspot offset), which is off the room's
+floor line on thirteen of the fourteen levels — 24 px above it on 204's
+dispenser — and the field's middle is 150 px above that point (the
+`minigame` hotspot of generic/objects.xml, read into the game's middle and
+the create message by fcn.10049e01 from the actor's +0x2c/+0x30).
+PCMinigameLift is that point's height above the floor line (the room's
+path1 y), which the port adds to its walking line: the remaster keeps
+Woody's point on the line and draws him up by the clip's offset.
+
 The pairing mobile dexterity item -> PC game object is by hand (the items'
 DexterityUnlocker against the objects' actions). 214's shards round is the
 PC's bottomright/hatch_closed — the hatch his first fall leaves closed — and
@@ -135,6 +145,28 @@ def failed_actor(n, obj):
     return b.group(1) if b else ''
 
 
+def game_lift(n, obj):
+    """the height in level px of Woody's place for the game — the object's
+    `woody` hotspot, its level.xml position plus the offset — above the
+    floor line (path1's y) of the room it stands in"""
+    folder = canon.pc_level(n)['folder']
+    X = '%s/nfh2/x/%s' % (canon.ROOT, folder)
+    ob = canon.read(X + '/objects.xml')
+    lv = canon.read(X + '/level.xml')
+    m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), ob, re.S)
+    h = re.search(r'<hotspot name="woody" offset="(-?\d+)/(-?\d+)"', m.group(1))
+    for rm in re.finditer(r'<room name="\w+" offset="([^"]+)" path1="([^"]+)" path2="[^"]+">(.*?)</room>',
+                          lv, re.S):
+        p = re.search(r'<object name="%s"[^>]*position="(-?\d+)/(-?\d+)"' % re.escape(obj), rm.group(3))
+        if p is None:
+            continue
+        if rm.group(1) != '0/0':
+            raise KeyError('%d: room offset %s' % (n, rm.group(1)))
+        floor = int(rm.group(2).split('/')[1])
+        return floor - (int(p.group(2)) + int(h.group(2)))
+    raise KeyError('%d: %s placed in no room' % (n, obj))
+
+
 def game_levels(n, obj):
     """the startlevel / endlevel of the combination that plays obj's game"""
     folder = canon.pc_level(n)['folder']
@@ -165,9 +197,10 @@ def main(argv):
         fa = failed_actor(n, obj)
         fc = failed_clip(n, obj)
         kind = item_kind(n, item)
-        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s%s' % (
+        lift = game_lift(n, obj)
+        print('%d %-16s %-12s <- %s.%s time %d: %d ticks held, levels %d..%d, failed -> %s%s, lift %d' % (
             n, item, kind, obj, act, t, 3 + -(-t // 4), lo, hi, fa,
-            (' (%s %s %.2f s)' % (fc['role'], fc['clip'], fc['secs'])) if fc else ''))
+            (' (%s %s %.2f s)' % (fc['role'], fc['clip'], fc['secs'])) if fc else '', lift))
         if not write or kind is None:
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
@@ -187,6 +220,7 @@ def main(argv):
         e['set']['PCMinigameTicks'] = t
         e['set']['PCMinigameLevels'] = [lo, hi]
         e['set']['PCMinigameFailed'] = fa
+        e['set']['PCMinigameLift'] = lift
         if fc:
             e['set']['PCMinigameFailedClip'] = fc
         ov['patches'] = patches
@@ -195,7 +229,9 @@ def main(argv):
                 " endlevel of its combine.xml combination (the wobble's range), PCMinigameFailed = the"
                 " behavioractor of its `failed` action (the actor a lost game sends running),"
                 " PCMinigameFailedClip = the clip that actor's behaviour plays first when it is not the"
-                " neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour is his run).")
+                " neighbour (203's Olga shouts, 69 frames, and her shout's own behaviour is his run),"
+                " PCMinigameLift = the height in level px of Woody's place for the game (the object's"
+                " `woody` hotspot) above its room's floor line, the field's middle 150 px above it.")
         src = ov.get('source', '')
         i = src.find(' The mini-game (tools/pcref/pc_minigames.py)')
         if i >= 0:
