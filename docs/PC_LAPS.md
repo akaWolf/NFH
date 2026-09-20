@@ -183,7 +183,17 @@ port's DieselChair visit under the profile (PCUseSeconds [0.0]: no clip,
 the mobile's 0.4 s DieselStart dropped, the generator's use at once); a leave the walk makes closes the
 station left (the lap's timing is unchanged, the stations' split is), and
 the intro's enter is the previous lap's (101 33.5 s, 102 28.2). 109 is
-112.1 s (video 113) with the walk to the parrot.
+112.1 s (video 113) with the walk to the parrot. The same night, later:
+`time="auto"` as NFH1's Loader.dll stores it (0x1000a865-0x1000aa05: the
+longer of the actor's and the object's oneshot animation less one, at
+least 0; a loop or a missing animation -1, `inv` not asked — the other
+levels' explicit door times are that figure), which the model had counted
+a tick long and 107's `auto` doors as nothing: 101 33.2 s, 102 27.8, 103
+27.4, 104 72.5, 105 45.4, 106 124.0, 107 48.4 (video 54; its doors 12.2
+s), 108 89.8, 109 110.7, 110 59.9, 111 112.9, 112 146.6, 113 165.9, 114
+167.3. The job's own ticks around an action's time (NFH2's DoActions job
+is its time + 2, docs/PC_VERIFICATION.md "an action's behaviour") are not
+read for game.exe and not in the model.
 
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in

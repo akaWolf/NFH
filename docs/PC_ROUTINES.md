@@ -294,8 +294,11 @@ n's `shout2*` action, or a `freakout` once the gauge has overflowed — not a wa
 fiber that runs a timed action counts `[obj+0x28]` down once a tick (fcn.00474a20,
 fcn.00475850, fcn.00478120), so a door's 9–25 is 0.75–2 s and the laundry's wash 59 is 4.9 s
 a visit (the video's ~24 s at the washer are its three visits, its iron 71 the two of 5.9 s);
-`time="auto"` runs the animation to its end at one frame a tick, and GFXEngine keeps no
-sprite timer of its own (its only 83 ms constant is a button's auto-repeat). The earlier
+`time="auto"` is the longer of the actor's and the object's oneshot animation less one, at
+least 0, as NFH1's Loader.dll stores the record's time (0x1000a865-0x1000aa05; a loop or a
+missing animation counts -1, `inv` is not asked — the explicit times of the doors, 19 for
+their 20 frames, are that figure), and GFXEngine keeps no sprite timer of its own (its
+only 83 ms constant is a button's auto-repeat). The earlier
 "not a clock unit" here came from the 20 fps misreading of the tick; corrected 2026-09-16.
 The port runs the mobile routines.
 
