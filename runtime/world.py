@@ -10511,7 +10511,17 @@ class World:
         # Woody.PlayFearAnimation(catcher): face whoever caught him
         fear = woody.fear_left if catcher.sprite.x < woody.sprite.x \
             else woody.fear_right
-        if woody.anim.has(fear):
+        pc_fear = 'PCFear1' if catcher.sprite.x > woody.sprite.x else 'PCFear3'
+        if pcprofile.s2_respawn(woody.nfh2) and woody.anim.has(pc_fear):
+            # the catch fiber's case 1 (0x100064fe-0x1000651e): fear1 when
+            # the catcher's x is the greater, else fear3 — the action's
+            # frames, then its actornextanim loop until the fight hides him
+            # (tools/pcref/pc_respawn_s2.py fear_anims)
+            def fear_loop(name=pc_fear + 'Loop'):
+                if not woody.sprite.hidden and woody.anim.has(name):
+                    woody.anim.play_looping(name)
+            woody.anim.play_sequence([pc_fear], on_end=fear_loop, as_sequence=False)
+        elif woody.anim.has(fear):
             woody.anim.play_single(fear)
         woody.steps = []
         woody.state = woody.IDLE

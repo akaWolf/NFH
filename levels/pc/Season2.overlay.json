@@ -94,6 +94,150 @@
         "FileName": "obj2_birdies2"
        }
       ]
+     },
+     {
+      "Name": "PCFear1",
+      "SheetTexture": "W_Fear",
+      "TextureFileName": "W_Fear",
+      "SheetColumns": 5,
+      "SheetRows": 4,
+      "StartFrame": 11,
+      "EndFrame": 16,
+      "FrameRate": 12.0,
+      "OriginalWidth": 810.0,
+      "OriginalHeight": 735.0,
+      "DeltaLocation": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "Type": "Single",
+      "InfiniteLoop": false,
+      "HoldOnLastFrame": false,
+      "Blocking": false,
+      "UsePattern": true,
+      "Pattern": [
+       11,
+       12,
+       13,
+       14,
+       15,
+       16
+      ],
+      "Sounds": [
+       {
+        "Frame": 0,
+        "FileName": "wod_fear1"
+       },
+       {
+        "Frame": 3,
+        "FileName": "wod_step1a"
+       }
+      ]
+     },
+     {
+      "Name": "PCFear1Loop",
+      "SheetTexture": "W_Fear",
+      "TextureFileName": "W_Fear",
+      "SheetColumns": 5,
+      "SheetRows": 4,
+      "StartFrame": 15,
+      "EndFrame": 18,
+      "FrameRate": 12.0,
+      "OriginalWidth": 810.0,
+      "OriginalHeight": 735.0,
+      "DeltaLocation": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "Type": "Looping",
+      "InfiniteLoop": false,
+      "HoldOnLastFrame": false,
+      "Blocking": false,
+      "UsePattern": true,
+      "Pattern": [
+       15,
+       16,
+       17,
+       18
+      ],
+      "Sounds": [
+       {
+        "Frame": 0,
+        "FileName": "wod2_shaking4"
+       }
+      ]
+     },
+     {
+      "Name": "PCFear3",
+      "SheetTexture": "W_Fear",
+      "TextureFileName": "W_Fear",
+      "SheetColumns": 5,
+      "SheetRows": 4,
+      "StartFrame": 1,
+      "EndFrame": 6,
+      "FrameRate": 12.0,
+      "OriginalWidth": 810.0,
+      "OriginalHeight": 735.0,
+      "DeltaLocation": {
+       "x": -25.700000762939453,
+       "y": -31.5
+      },
+      "Type": "Single",
+      "InfiniteLoop": false,
+      "HoldOnLastFrame": false,
+      "Blocking": false,
+      "UsePattern": true,
+      "Pattern": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6
+      ],
+      "Sounds": [
+       {
+        "Frame": 0,
+        "FileName": "wod_fear1"
+       },
+       {
+        "Frame": 3,
+        "FileName": "wod_step1a"
+       }
+      ]
+     },
+     {
+      "Name": "PCFear3Loop",
+      "SheetTexture": "W_Fear",
+      "TextureFileName": "W_Fear",
+      "SheetColumns": 5,
+      "SheetRows": 4,
+      "StartFrame": 5,
+      "EndFrame": 8,
+      "FrameRate": 12.0,
+      "OriginalWidth": 810.0,
+      "OriginalHeight": 735.0,
+      "DeltaLocation": {
+       "x": -25.700000762939453,
+       "y": -31.5
+      },
+      "Type": "Looping",
+      "InfiniteLoop": false,
+      "HoldOnLastFrame": false,
+      "Blocking": false,
+      "UsePattern": true,
+      "Pattern": [
+       5,
+       6,
+       7,
+       8
+      ],
+      "Sounds": [
+       {
+        "Frame": 0,
+        "FileName": "wod2_shaking4"
+       }
+      ]
      }
     ]
    }

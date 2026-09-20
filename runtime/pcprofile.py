@@ -37,14 +37,16 @@ def apply_overlay(level):
     SEASON2 = os.path.basename(level.path or '').startswith('Level2')
     n = 0
     if SEASON2:
-        n += _apply_file(level, os.path.join(ROOT, 'levels', 'pc', 'Season2.overlay.json'))
+        # (a level without a Mother leaves her patch unmatched: no warnings)
+        n += _apply_file(level, os.path.join(ROOT, 'levels', 'pc', 'Season2.overlay.json'),
+                         warn=False)
     p = overlay_path(level.path)
     if not os.path.exists(p):
         return n
     return n + _apply_file(level, p)
 
 
-def _apply_file(level, p):
+def _apply_file(level, p, warn=True):
     if not os.path.exists(p):
         return 0
     ov = json.load(open(p, encoding='utf-8'))
@@ -104,14 +106,14 @@ def _apply_file(level, p):
                         new.append(by_name[nm])
                 if new:
                     d['Actions'] = new; n += 1; hit += 1
-        if hit == 0:
+        if hit == 0 and warn:
             import sys
             # a patch that touched nothing is a wrong object/component name
             # (the Season 2 neighbour's GameObject is "Rottweiler2", not
             # "Rottweiler"): say so, per patch, instead of applying silently
             print('pcprofile: overlay %s: patch %s matched nothing' % (
                 os.path.basename(p), json.dumps({k: op[k] for k in ('object', 'component', 'owner', 'zone', 'match') if k in op})), file=sys.stderr)
-    if n == 0:
+    if n == 0 and warn:
         import sys
         print('pcprofile: overlay %s matched nothing' % os.path.basename(p), file=sys.stderr)
     return n

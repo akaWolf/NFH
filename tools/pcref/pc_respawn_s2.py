@@ -179,8 +179,47 @@ def fight_ops():
     return ops, ck
 
 
+def fear_anims():
+    """Woody's fear1 / fear3 and their loops (generic/anims.xml; the catch fiber's case 1
+    picks fear1 when the catcher's x is the greater, 0x100064fe-0x1000651e) over the
+    remaster's W_Fear: its ten cells a side are the PC's fear3_0000-0009 (the FearLeft
+    half) and fear1_0000-0009 (FearRight) — each half's cells against the gfxdata offsets
+    hold one x origin within 8-11 px, the other assignment 21-31 — but the halves were
+    cropped apart and the loop frames 0005-0009 sit 6 px off frames 0000-0004 in both, so
+    no one DeltaLocation places them as the PC does: the frames and their order are the
+    PC's, the placement the remaster's own FearLeft / FearRight DeltaLocation"""
+    wa = woody_anims()
+    lv = json.load(open(os.path.join(ROOT, 'levels', 's2', 'Level201.json')))
+    dl = {}
+    for o in lv['objects'].values():
+        d = o.get('data') or {}
+        if o.get('type') == 'PawnAnimationController' and \
+                d.get('BaseAnimationPath') == 'Textures/NFH2/Characters/Woody/':
+            for a in d['Animations']:
+                if a['Name'] in ('FearLeft', 'FearRight'):
+                    dl[a['Name']] = a['DeltaLocation']
+    out = []
+    for side, base, half in (('fear1', 10, 'FearRight'), ('fear3', 0, 'FearLeft')):
+        for nm, typ in ((side, 'Single'), (side + '_loop', 'Looping')):
+            fr = [dict(re.findall(r'(\w+)="([^"]*)"', f)) for f in
+                  re.findall(r'<frame ([^>]*)/>', _block(wa, 'animation', nm))]
+            pat = [base + int(re.search(r'_(\d{4})\.tga', f['gfx']).group(1)) for f in fr]
+            snd = [{'Frame': k, 'FileName': os.path.splitext(os.path.basename(f['sfx']))[0]}
+                   for k, f in enumerate(fr) if f.get('sfx')]
+            out.append({
+                'Name': 'PC' + side.capitalize() + ('Loop' if typ == 'Looping' else ''), 'SheetTexture': 'W_Fear',
+                'TextureFileName': 'W_Fear', 'SheetColumns': 5, 'SheetRows': 4, 'StartFrame': min(pat),
+                'EndFrame': max(pat), 'FrameRate': 12.0, 'OriginalWidth': 810.0, 'OriginalHeight': 735.0,
+                'DeltaLocation': dict(dl[half]), 'Type': typ, 'InfiniteLoop': False,
+                'HoldOnLastFrame': False, 'Blocking': False, 'UsePattern': True, 'Pattern': pat,
+                'Sounds': snd})
+    return out
+
+
 def main(argv):
     anim, ck = build()
+    fears = fear_anims()
+    print('fear:', [(a['Name'], a['Pattern'], a['DeltaLocation'], a['Sounds']) for a in fears])
     fops, fck = fight_ops()
     print('fight_woody against the remaster:', fck)
     print('respawn: %d frames, action %s, translation %s' % (ck['frames'], ck['action'], ck['translation']))
@@ -194,7 +233,7 @@ def main(argv):
                         'generic/objects.xml; textures/s2/W_Landing.png; tools/pcref/pc_respawn_s2.py',
               'patches': [{'component': 'PawnAnimationController',
                            'match': {'BaseAnimationPath': 'Textures/NFH2/Characters/Woody/'},
-                           'append': {'Animations': [anim]}}] + fops}
+                           'append': {'Animations': [anim] + fears}}] + fops}
         with open(OUT, 'w', encoding='utf-8') as f:
             json.dump(ov, f, indent=1, ensure_ascii=False)
             f.write('\n')
