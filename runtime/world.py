@@ -2993,6 +2993,7 @@ class Routine:
         self.state = self.IDLE
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
+        self.pc_zero_visit = False       # this visit's PCUseSeconds is 0: the PC plays nothing
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
@@ -3926,6 +3927,12 @@ class Routine:
         self.log.append((it.name, tricked))
         if self.on_use:
             self.on_use(it, tricked)
+        pc = self._pc_use_seconds(it)
+        if self.pc_zero_visit:
+            # the PC plays nothing at this visit (_pc_use_seconds): no pose,
+            # no clip — the stand ends at once, StopAction's side effects kept
+            seq = None
+            item_play = None
         # the item plays its own use pose alongside the pawn's sequence
         # (TrickItem.PlayUseAnimation / PlayTrickedAnimation, cs:947-994)
         if w is not None and item_play is not None:
@@ -3940,7 +3947,6 @@ class Routine:
                 oseq = [x for x in oseq if olga.anim.has(x)]
                 if oseq:
                     olga.anim.play_sequence(oseq)
-        pc = self._pc_use_seconds(it)
         ft = self._pc_trick_item(it)
         if pcprofile.is_pc() and self.role == 'Rottweiler' and it is not None \
                 and getattr(ft, 'pc_fire_at', None) is not None \
@@ -4630,6 +4636,7 @@ class Routine:
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
+        self.pc_zero_visit = False
         if it is None or not pcprofile.is_pc() or not pcprofile.rule('durations'):
             return 0.0
         if self.role != 'Rottweiler':
@@ -4663,7 +4670,12 @@ class Routine:
             # branch, then the chain's next case — so its slot passes
             self._pc_visit_seconds(it)
             return float(t.pc_use_secs_tricked)
-        return self._pc_visit_seconds(it)
+        v = self._pc_visit_seconds(it)
+        # a visit the PC plays no action at: its value 0 (PCUseSeconds [0.0] —
+        # 107's stool, whose ENTER pushes an `enter` the object has no record
+        # of: the ACTION step's start, fcn.004772f0, finds none and pushes no job)
+        self.pc_zero_visit = bool(it.pc_use_secs) and v == 0.0
+        return v
 
     def _pc_visit_seconds(self, it):
         """the item's PCUseSeconds for this visit: one value, or one per

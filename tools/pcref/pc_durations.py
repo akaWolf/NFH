@@ -55,7 +55,8 @@ PAIRS = {
           ('PhotoAlbum', 'photo_album', 1), ('Candy', 'candy', 1), ('Pudding', 'milk_bottle', 1), ('BathTub', 'bath', 1),
           ('Towel', 'towel', 0)],
     107: [('Drawing', 'painting', 1), ('Camera', 'camera', 0), ('MagnesiumBottle', 'magnesium', 0), ('Camera', 'camera', 1),
-          ('DieselGenerator', 'potterswheel', 0), ('MumStatueFootStool', 'statue', 1)],
+          ('DieselChair', 'potterswheel', 0, ('enter',)), ('DieselGenerator', 'potterswheel', 0, ('potter',)),
+          ('MumStatueFootStool', 'statue', 1)],
     108: [('ToothBrush', 'toothbrush', 0), ('CoffeeMaker', 'coffee', 0), ('Shezlong', 'foldingchair', 0),
           ('WateringCan', 'ewer', 1), ('Plant', 'flower', 0), ('WateringCan', 'ewer', 2)],
     109: [('Teeth', 'teeth', 0), ('Bed', 'sleep', 0), ('AlarmClock', 'alarm_clock', 0), ('Teeth', 'teeth', 1),
@@ -178,7 +179,9 @@ def main(argv):
             src = ("the PC station's DoActions at 12 ticks a second (level_%s's objects.xml and anims.xml through "
                    "tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): %s"
                    % (canon.pc_level(n)['folder'][6:], '; '.join(x for x in notes if x.startswith(item + ' <-'))))
-            v = vals if len(vals) > 1 else vals[0]
+            # a visit the PC plays no action at stays a list ([0.0]): a bare 0
+            # reads as no PC seconds (runtime/scene.py)
+            v = vals if len(vals) > 1 or not vals[0] else vals[0]
             e = next((e for e in ov['patches'] if e.get('object') == item and e.get('component') == kind
                       and 'PCUseSeconds' in (e.get('set') or {})), None)
             if e is not None:

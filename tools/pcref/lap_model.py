@@ -303,7 +303,10 @@ def model(L, toks, verbose=False):
                 elif current: enter(current)
                 continue
             if kind == 'ENTER' and current == obj and occupied == obj: continue
-            if goto(obj) and kind != 'GOTO' and L.action_ticks(obj, 'enter') is not None and occupied != obj:
+            # the ENTER step sets the occupied object (fcn.00444a70 in its start,
+            # fcn.00473830) and pushes an ACTION `enter`, which plays nothing on
+            # an object without the record (107's stool: a step of 0 ticks)
+            if goto(obj) and kind != 'GOTO' and occupied != obj:
                 # the intro's enter is the previous lap's: the lap's wrap (the
                 # same tokens again) plays it — the stations would count it twice
                 if legs[-1][0] != 'intro': enter(obj)

@@ -178,7 +178,9 @@ dry, take_towel) — the video's laps by the album 57 and 60 s, the model's
 59.8 and 65.0; an ACTION none of whose objects has that record pushes no
 job (the step's start, fcn.004772f0, walks the step's object entries:
 fcn.00445d30 false on each, the loop ends with no DoAction job), so
-107's ENTER of the stool (kit/stool has no `enter`) plays nothing; a leave the walk makes closes the
+107's ENTER of the stool (kit/stool has no `enter`) plays nothing — the
+port's DieselChair visit under the profile (PCUseSeconds [0.0]: no clip,
+the mobile's 0.4 s DieselStart dropped, the generator's use at once); a leave the walk makes closes the
 station left (the lap's timing is unchanged, the stations' split is), and
 the intro's enter is the previous lap's (101 33.5 s, 102 28.2). 109 is
 112.1 s (video 113) with the walk to the parrot.

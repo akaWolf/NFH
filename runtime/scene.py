@@ -604,7 +604,8 @@ class Item:
         self.pc_angry_time = int(d.get('PCAngryTime') or 0)
         # the PC station's seconds per visit (levels/pc overlays, PCUseSeconds — the level
         # class's DoActions at 12 ticks a second, tools/pcref/pc_durations.py); one value
-        # or one per visit, cycling — RoutineAction._pc_use_seconds
+        # or one per visit, cycling — RoutineAction._pc_use_seconds; a 0 in a list is a
+        # visit the PC plays no action at (107's stool: its ENTER finds no `enter`)
         v = d.get('PCUseSeconds')
         self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         self.pc_use_visit = 0

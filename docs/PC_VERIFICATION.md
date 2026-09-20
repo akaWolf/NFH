@@ -666,3 +666,10 @@ actors' job pass the update calls at 0x100445f8.
   shaving chain and second pie visit, 106's fill, bath and towel, 107's
   drawing, 113's Ladder / LadderDrill, 114's Hat / MedalBox / Hat, 112's
   mixer. runs/dur1s1 all 14 at 100.
+- `runtime/world.py`, `runtime/scene.py`, `tools/pcref/lap_model.py`,
+  `levels/pc/Level107.overlay.json` (the same night): a visit the PC
+  plays no action at — 107's ENTER of the stool, whose `enter` the
+  object has no record of (the ACTION step's start fcn.004772f0 pushes
+  no job) — is PCUseSeconds [0.0]: no pose, no clip, the stand ends at
+  once (`RoutineAction.pc_zero_visit`); the mobile's DieselStart (0.4 s)
+  is gone from the lap.
