@@ -268,9 +268,17 @@ actors' job pass the update calls at 0x100445f8.
 - The Season 1 action's own ticks: Loader.dll stores the record's time
   (above, "the action durations"), but the code that counts it in game.exe
   is not located (the ACTION step, vtable 0x4e546c: slot 2 the start
-  fcn.004772f0 — the record found, the DoAction job pushed —, slot 3 the
-  stop fcn.00476f50 setting the next animations, slot 8 a message handler
-  0x478ca0; the `dec [+0x28]` of its slot 1 is the reference count), so
+  fcn.004772f0 — each entry's record found (fcn.00445ba0), the
+  animations set (fcn.004377f0), the noise posted (fcn.004729c0), the
+  longest time less the step's +0x20 kept, and on the first start, when
+  the step's +0x18 is set, a 0x14-byte message (vtable 0x4e5448,
+  fcn.00476bb0) whose dispatch (0x476960) calls its receiver's slot 55
+  (`[+0xdc]`): a stub in every visitor vtable of game.exe (0x401000), in
+  GFXEngine.dll the sprite lookup 0x10028ac0 of the visitor at
+  0x100a1c10 — no countdown found on either side —;
+  slot 3 the stop fcn.00476f50 setting the next animations, slot 8 a
+  message handler 0x478ca0; the `dec [+0x28]` of its slot 1 is the
+  reference count), so
   the ticks the job takes around the time — NFH2's DoActions job is its
   time + 2 (a state-0 update, the count, a state-2 update) — are not read;
   the lap model and the stations' `PCUseSeconds` carry the time alone (a
