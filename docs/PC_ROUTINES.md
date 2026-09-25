@@ -77,9 +77,11 @@ fcn.0047c320(object, animation, actor, index, flags) (fcn.0047bca0 / fcn.0047baf
 step carrying a DoAction of that animation at +0x18. When the step runs: the record lookup; no
 points → nothing but the fired flag; else the bonus test, the score, the rage (fcn.00438b90),
 the face, the jingle (music/jingle_joke.mp3), THEN the +0x18 animation if any (waited on), THEN
-the shout as a DoAction on `neighbor` — `shout2_extra` (92 frames, 7.67 s) when the trick was
-a bonus, else by the points: ≤ 5 shout0_light (25 frames, 2.08 s) or shout2 (26, 2.17 s),
-≤ 10 shout0_medium (45, 3.75 s) or shout2, > 10 shout0 (26, 2.17 s) or shout2 — the second
+the shout as a DoAction on `neighbor` (an ACTION step, 0x47bf7d over fcn.00477f60, the record's
+time the Loader's: the oneshot's frames less one) — `shout2_extra` (92 frames, 91 ticks, 7.58 s)
+when the trick was a bonus, else by the points: ≤ 5 shout0_light (25 frames, 24 ticks, 2.0 s) or
+shout2 (26, 25 ticks, 2.08 s), ≤ 10 shout0_medium (45, 44 ticks, 3.67 s) or shout2, > 10 shout0
+(26, 25 ticks, 2.08 s) or shout2 — the second
 of each pair at index 1 (the tables 0x51b584, 0x51b590, 0x51b598, 0x51b5a0) — unless flag 2
 is set; then a sync step (fcn.0047bc90 sets +0x8a) unless flag 1, fcn.00444d30 on the object,
 the fired flag +0x1c. The script functions only queue: fcn.004766e0 appends a step to the
@@ -159,7 +161,7 @@ in world") is a SwitchObjects job on bed/bed_sleep. None of the three plays an a
 the neighbour or takes time: the face icons, a sound, an object swap. Badinfos' E06 agrees to the second: the tub's hair fires 7.0 s before the towel
 and the towel 18.0 s before the album (no shout at either), the cold microwave (7 points:
 shout0_medium 3.75 + clean 1.9 + the walk + make_foampudding 3.17) 15.0 s before the pudding,
-and every bonus trick is followed by the 7.67 s shout2_extra.
+and every bonus trick is followed by the 7.58 s shout2_extra (91 ticks, the Loader's time).
 
 **The stands, read per level (2026-09-22).** What surrounds each fire in the level
 classes comes out of tools/pcref/trick_branches.py: the class's `run` is a switch of

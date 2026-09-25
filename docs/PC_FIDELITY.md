@@ -997,10 +997,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   clears it (0x10044710-0x100447f1), so every shout after the gauge's
   first overflow is a freakout. The actions (generic/objects.xml) play the
   neighbour's animations of their names — shout2_light the shout2 one —
-  for their frames (time="auto"): 2.17 s for shout2 and shout2_high, 7.08
-  for shout2_hard, 3.08/3.17/5.25 for the freakouts (generic/anims.xml,
-  12 a second) — where the mobile plays AngryEasyUp and AngryHard, ~7.6 s,
-  after every trick. The tricked bubble spans agree (213's tortilla is 11
+  for their frames (time="auto", which the Loader stores less one), and
+  the SHOUT element lasts the action's DoActions job — the time + 2 — and
+  its own two updates (2026-09-25): 2.42 s for shout2 and shout2_high,
+  7.33 for shout2_hard, 3.33/3.42/5.5 for the freakouts (the frames at 12
+  a second before: 2.17, 7.08, 3.08/3.17/5.25) — where the mobile plays
+  AngryEasyUp and AngryHard, ~7.6 s, after every trick. The tricked bubble spans agree (213's tortilla is 11
   s for a 4-s stay and a 3.5-s trick action). The profile paces the
   mobile's angry set to the PC clip: the step's own SHOUT level where the
   lap model reads it (PCShout, "the tricked visits" below), else the
@@ -1022,9 +1024,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   8.0 and 9.42 s), after the doubletake for a walk-by, or BEFORE its own
   clip at the five-argument sites (the soap slip: the fire, then slip1
   2.58 s; the tub's hair after the 2.83 s shower clip, the dirty towel), then
-  plays a shout whose length hangs on the bonus — shout2_extra 7.67 s after
-  a bonus trick, 2.08–3.75 s after a cold one (shout2 2.17 at the index-1
-  sites) and none where the step carries flag 2 (the tub's hair, the dirty
+  plays a shout whose length hangs on the bonus — shout2_extra 7.58 s after
+  a bonus trick, 2.0–3.67 s after a cold one (shout2 2.08 at the index-1
+  sites; the Loader's times, the frames less one, since 2026-09-25 — 7.67,
+  2.08–3.75 and 2.17 before) and none where the step carries flag 2 (the tub's hair, the dirty
   towel and the bath candy at flags 3, 110's fuel beer, the laxative beer,
   the coffee soil, the broken sofa, the cactus clock) — where the port
   played AngryHard, 6.8 s, after every trick; and the repair is the tricked
