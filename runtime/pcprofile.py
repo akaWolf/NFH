@@ -162,12 +162,16 @@ S1_RAGE_HOLD_TICKS = 60
 # more shout0 or shout2, the second of each pair at index 1 (the tables at
 # 0x51b584, 0x51b590, 0x51b598, 0x51b5a0); a step carrying flag 2 plays
 # none (the tub's hair, the dirty towel, the bath candy, the fuel beer …).
-# The lengths are generic/anims.xml's frames at 12 a second. The mobile's
-# AngryHard plays at the pace that lasts the PC clip (World.play_angry);
-# the profile carries the index and the flag per item as PCShoutIndex and
-# PCShoutSkip (tools/pcref/pc_reactions.py from tools/pcref/fire_sites.py).
-S1_SHOUT_FRAMES = {'shout2_extra': 92, 'shout0_light': 25, 'shout0_medium': 45,
-                   'shout0': 26, 'shout2': 26}
+# The fire plays it as an ACTION step on the neighbour (0x47bf7d over
+# fcn.00477f60, the name from those tables), so it lasts the action record's
+# time as Loader.dll stores it: time="auto" over generic/anims.xml's oneshot
+# (92, 25, 45, 26 and 26 frames) less one (0x1000a9e6-0x1000aa05), at 12 a
+# second. The mobile's AngryHard plays at the pace that lasts the PC clip
+# (World.play_angry); the profile carries the index and the flag per item as
+# PCShoutIndex and PCShoutSkip (tools/pcref/pc_reactions.py from
+# tools/pcref/fire_sites.py).
+S1_SHOUT_TICKS = {'shout2_extra': 91, 'shout0_light': 24, 'shout0_medium': 44,
+                  'shout0': 25, 'shout2': 25}
 
 
 def s1_shout_clip(points, bonus, index=0, skip=False):
@@ -188,7 +192,7 @@ def s1_shout_clip(points, bonus, index=0, skip=False):
 def s1_shout_seconds(points, bonus, index=0, skip=False):
     """the PC shout's seconds after a trick, 0 when the step plays none"""
     clip = s1_shout_clip(points, bonus, index, skip)
-    return S1_SHOUT_FRAMES[clip] / float(S1_TICK_HZ) if clip else 0.0
+    return S1_SHOUT_TICKS[clip] / float(S1_TICK_HZ) if clip else 0.0
 
 
 def s1_rage_fire(current, amount):
@@ -237,14 +241,20 @@ S2_TICK_HZ = 12
 # so every shout after the gauge's first overflow is a freakout. Each draw
 # is the level's random(n) (fcn.10040141), the freakout's first. The
 # actions (generic/objects.xml) play the neighbour's animations of their
-# names — shout2_light the shout2 one — time="auto": generic/anims.xml's
-# frames at 12 a second, shout2 26, shout2_hard 85, shout2_high 26,
-# freakout1 37, freakout2 38, freakout3 63. Where the model reaches no
+# names — shout2_light the shout2 one — time="auto" over generic/anims.xml's
+# oneshots (shout2 26 frames, shout2_hard 85, shout2_high 26, freakout1 37,
+# freakout2 38, freakout3 63), which Loader.dll stores less one. The SHOUT
+# element's first update pushes the action's DoActions job in front of
+# itself (fcn.10049216) and returns 0 (0x1000d8a2), the job runs the
+# Loader's time + 2 ticks from the tick after, and the element's next update
+# returns 1 (0x1000d8a6): the reaction lasts the time + 4 — shout2 29,
+# shout2_hard 88, shout2_high 29, freakout1 40, freakout2 41, freakout3 66
+# (the element ticks of tools/pcref/lap_model_s2.py). Where the model reaches no
 # SHOUT the trick record's `laugh` stands in for the level (PCLaugh); the
 # mobile's tantrum is its own AngryEasyUp + AngryHard clips (~7.6 s), paced
 # to the PC clip under the profile (World.play_angry).
-S2_SHOUT_FRAMES = {0: (26,), 1: (26, 26), 2: (85, 85, 85), 3: (26,)}
-S2_FREAKOUT_FRAMES = (37, 38, 63)
+S2_SHOUT_TICKS = {0: (29,), 1: (29, 29), 2: (88, 88, 88), 3: (29,)}
+S2_FREAKOUT_TICKS = (40, 41, 66)
 
 
 def s2_reaction_seconds(level, rng, full=False):
@@ -252,8 +262,8 @@ def s2_reaction_seconds(level, rng, full=False):
     record's laugh level where the model reaches no SHOUT): the level's
     action, or, once the gauge has overflowed (`full`), the freakout the
     SHOUT picked first"""
-    freak = S2_FREAKOUT_FRAMES[rng.randrange(len(S2_FREAKOUT_FRAMES))]
-    table = S2_SHOUT_FRAMES[min(max(int(level), 0), 3)]
+    freak = S2_FREAKOUT_TICKS[rng.randrange(len(S2_FREAKOUT_TICKS))]
+    table = S2_SHOUT_TICKS[min(max(int(level), 0), 3)]
     pick = table[rng.randrange(len(table))]
     return (freak if full else pick) / float(S2_TICK_HZ)
 
@@ -640,10 +650,11 @@ def sees_while_busy(nfh2=False):
 # holds the class's step, so the bark and the whine count nothing.
 S1_PET_AWAKE_TICKS = 72
 # the `wakeup` action of each pet (generic/objects.xml: time auto over
-# generic/anims.xml's `wakeup`, 8 frames the dog, 11 the parrot): the first
-# bark — its noise 2 the neighbour's `alarm`, the `startle_woody` it posts —
+# generic/anims.xml's `wakeup`, a oneshot of 8 frames the dog, 11 the parrot,
+# which Loader.dll stores less one — 0x1000a9e6-0x1000aa05): the first bark
+# — its noise 2 the neighbour's `alarm`, the `startle_woody` it posts —
 # comes as it ends (state 3 pushes it, state 4 barks on the next free tick)
-S1_PET_WAKEUP_TICKS = {'Dog': 8, 'Chili': 11}
+S1_PET_WAKEUP_TICKS = {'Dog': 7, 'Chili': 10}
 # a bark and a whine (generic/objects.xml: the dog's bark1/bark3 time 35
 # noise 2 and whine1/whine3 time 23, the parrot's 22 and 29): actions on the
 # pet's queue, each holding the class's step to its end — every bark's
