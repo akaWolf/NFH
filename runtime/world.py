@@ -166,6 +166,7 @@ class AnimPlayer:
         self.pat_idx = 0
         self.frame = 0
         self.slow_factor = None          # Owner.ShouldSlowAnimations hook
+        self._refreshing = False         # inside a Refresh's advance (its tail resets the time)
         self.time_scale = 1.0            # the PC profile's station pace (RoutineAction._pc_use_seconds)
         self.clip_pace = None            # the profile's per-clip seconds of a use (PCClipSeconds)
         self.skip_clip = False           # the profile's clip of 0 seconds: ended on the next tick
@@ -222,6 +223,19 @@ class AnimPlayer:
         else:
             self.frame = a.pattern[0] if a.pattern else a.start
         self.acc = 0.0
+        if pcprofile.is_pc() and not self._refreshing:
+            # a clip the profile paces to a PC action's ticks (time_scale, or a
+            # door strip at clip_fps), started outside a Refresh: its first
+            # frame lasts a frame's time as the others do, so the clip lasts
+            # the action — the next Refresh would advance on its first call,
+            # leaving the clip an app frame and N - 1 frame times long. A clip
+            # a Refresh starts (the sequence's next) gets its frame time from
+            # that Refresh's tail (ResetAnimationTime) already.
+            fps = a.fps or 10.0
+            frames = len(a.pattern) if a.pattern else (a.end - a.start + 1)
+            eff = pcprofile.clip_fps(a.name, fps, frames)
+            if self.time_scale != 1.0 or eff != fps:
+                self.acc = _f32(1.0 / _f32(eff))
         self.sprite.cur_frame = self.frame
 
     def current_index(self):
@@ -495,6 +509,7 @@ class AnimPlayer:
             for frame, name in a.sounds:
                 if frame == idx:
                     self.sound_sink(name)
+        self._refreshing = True
         self._advance()
         # Refresh: Owner.BehaviorOnAdvanceFrame(CurrentAnimation.CurrentIndex),
         # right after AdvanceFrame and before the end check
@@ -529,6 +544,7 @@ class AnimPlayer:
         self.acc = _f32(self.acc + _f32(1.0 / _f32(fps)))
         if self.slow_factor:
             self.acc = _f32(self.acc * _f32(self.slow_factor))
+        self._refreshing = False
 
 
 class Pawn:
@@ -3288,10 +3304,13 @@ class Routine:
     def pc_wake_from_bed(self):
         """the pig level class's `wakeup` (level_pig's trigger.xml: noise 1 in
         the room, accepted in the bed's cases 7 and 8 — fcn.00468580 via the
-        accept slot 0x468650): the sleep's job stopped (fcn.00476770), the
-        bed left (fcn.00468700 bed_bed_sleep -> bed_bed; the remaster's
-        BedOut, a frame a tick) and case 10 next (fcn.0045c600, 0x468beb) —
-        the alarm clock's case 9 skipped"""
+        accept slot 0x468650): the sleep's job stopped (fcn.00476770), a new
+        list of the LEAVE of bed/bed_sleep (fcn.00473ea0 at 0x468aff, its
+        `leave` action — the remaster's BedOut at the pace that lasts the
+        Loader's time, PCLeaveSeconds, else a frame a tick) and the switch
+        back to bed/bed (fcn.00468700, a SwitchObjects job callback,
+        instant), and case 10 next (fcn.0045c600, 0x468beb) — the alarm
+        clock's case 9 skipped"""
         self._pc_skip_item = 'AlarmClock'
         self.pawn.pc_bed_waking = True
         anim = self.pawn.anim
@@ -3299,8 +3318,10 @@ class Routine:
         if anim.has('BedOut'):
             ba = self.pawn.sprite.anims[anim.by_name['BedOut']]
             frames = len(ba.pattern) if ba.pattern else (ba.end - ba.start + 1)
-        anim.time_scale = (frames / (ba.fps or 10.0)) / (frames / pcprofile.TICKS_PER_SECOND) \
-            if frames else 1.0
+        secs = getattr(self.item, 'pc_leave_secs', None) if self.item is not None else None
+        if not secs:
+            secs = frames / pcprofile.TICKS_PER_SECOND
+        anim.time_scale = (frames / (ba.fps or 10.0)) / secs if frames else 1.0
 
         def left():
             self.pawn.pc_bed = False

@@ -134,6 +134,14 @@
     "PCFireAt": 4.417
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Chili <- parrot#1 4.9 s"
+  },
+  {
+   "object": "Bed",
+   "component": "TrickItem",
+   "set": {
+    "PCLeaveSeconds": 1.333
+   },
+   "source": "the PC hideout's `leave` (level_pig's objects.xml bed/bed_sleep, the Loader's time 16 ticks at 12 a second, tools/pcref/pc_durations.py LEAVES)"
   }
  ]
 }

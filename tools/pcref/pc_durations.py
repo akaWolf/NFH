@@ -81,6 +81,12 @@ PAIRS = {
 }
 
 
+# a hideout the neighbour may leave off his lap: the object's `leave` (the
+# Loader's time) as PCLeaveSeconds — 109's bed, left on a noise (the pig
+# class's `wakeup`: the LEAVE of bed/bed_sleep at 0x468aff)
+LEAVES = {109: [('Bed', 'bed/bed_sleep')]}
+
+
 def pc_stations(n, toks):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]"""
     L = lap_model.Level(n)
@@ -172,6 +178,21 @@ def main(argv):
                 e = dict(e, set=st)
             patches.append(e)
         ov['patches'] = patches
+        for item, obj in LEAVES.get(n, ()):
+            t = lap_model.Level(n).action_ticks(obj, 'leave')
+            if t is None:
+                print('%d: no leave of %s for %s' % (n, obj, item)); continue
+            v = round(t / lap_model.TICK, 3)
+            src = ("the PC hideout's `leave` (level_%s's objects.xml %s, the Loader's time %d ticks at 12 a "
+                   "second, tools/pcref/pc_durations.py LEAVES)" % (canon.pc_level(n)['folder'][6:], obj, t))
+            e = next((e for e in ov['patches'] if e.get('object') == item
+                      and 'PCLeaveSeconds' in (e.get('set') or {})), None)
+            if e is not None:
+                e['set']['PCLeaveSeconds'] = v
+                e['source'] = src
+            else:
+                ov['patches'].append({'object': item, 'component': item_kind(n, item),
+                                      'set': {'PCLeaveSeconds': v}, 'source': src})
         for item, vals in secs.items():
             kind = item_kind(n, item)
             if kind is None:

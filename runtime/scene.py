@@ -241,7 +241,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_leave_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -677,6 +677,9 @@ class Item:
         self.pc_shout_skip = bool(d.get('PCShoutSkip'))
         self.pc_fix_secs = _f('PCFixSeconds')
         self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
+        # the hideout's `leave` under the profile (PCLeaveSeconds: 109's
+        # bed/bed_sleep left on a noise, the Loader's time of its `leave`)
+        self.pc_leave_secs = _f('PCLeaveSeconds')
         # Season 2: the tricked stand with the linked trick too, where the
         # script plays another step for it (201's puddle by the open rail:
         # crash_long, 0x100297c5, where the soap alone plays crash_short)
