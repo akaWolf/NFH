@@ -7,18 +7,23 @@
 # walk (45), the laxative at the sit after it (57 -> the loo run); the sofa is
 # sawn while he is on the loo, and the television switched once he sits on the
 # sawn sofa and goes for the next beer.
+# v5 (2026-09-26): Woody's tricks at the PC's times (the microwave's egg 1.92 s, the
+# remaster's 1.2 before) — the toilet paper and the toilet moved from his first beer walk
+# to the one after the microwave pays (he is in the kitchen, the hall and the bathroom
+# free), so the egg run of his second sit starts 0.8 s sooner.
 # v4 (2026-09-17): the television armed on the loo trip with the saw (it paid 46 s after the sofa in v3, cold); v3: the egg and the laxative on separate sits — the kitchen window
 # (16 s) holds one trip from the hall, not the walk from the bathroom.
 take Drawer IT_Saw                # Zone01 (the hall) while he sits (0-13)
 take FirstAid IT_Laxative         # Zone04
-take ToiletPaper IT_Wcpaper       # TrickAfterWoodyUse + GetTrickedAtOnce: the holder is tricked
-usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
 park! Zone01                      # the hall, off his lap, next to the living room's door
 whenzone Zone02                   # (24.5) his second sit: the kitchen is free until 40
 take! Fridge IT_Egg               # Zone03
 usewith! Microwave IT_Egg         # Zone03: NoticeWhenWalkNearby, 10 — his beer walk (45) passes it
 park! Zone01                      # out through the living room before he comes for the beer (40)
 await Microwave 10                # the beer walk: surprise near, angry, fix
+take ToiletPaper IT_Wcpaper       # Zone04 while he is in the kitchen: TrickAfterWoodyUse + GetTrickedAtOnce, the holder is tricked
+usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
+park! Zone01
 whenzone Zone02                   # his next sit (~67 with the anger): the kitchen again
 usewith! Beer IT_Laxative         # Zone03: UseAtOtherPlace, drunk at the sofa (Sofa.DependsOn -> Beer), 18
 park! Zone01                      # out before his beer walk
