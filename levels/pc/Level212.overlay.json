@@ -1636,6 +1636,28 @@
     }
    },
    "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midright/resin take, the job 16 ticks"
+  },
+  {
+   "object": "Lorry",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.083,
+     "leave": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- bottomleft/lorry the job 13 ticks; leave <- bottomleft/lorry the job 13 ticks"
+  },
+  {
+   "object": "StatueHidden",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.833,
+     "leave": 0.833
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- midright/statue_hideout the job 10 ticks; leave <- midright/statue_hideout the job 10 ticks"
   }
  ]
 }

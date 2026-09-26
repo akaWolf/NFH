@@ -1211,6 +1211,17 @@
     }
    },
    "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- topright/handbag take, the job 16 ticks"
+  },
+  {
+   "object": "DeckChair",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.917,
+     "leave": 0.833
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- bottomleft/deckchair_woody the job 11 ticks; leave <- bottomleft/deckchair_woody the job 10 ticks"
   }
  ]
 }

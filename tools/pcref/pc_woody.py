@@ -220,6 +220,30 @@ def woody_seconds_s2(n):
         t = ticks.pop()
         out[nm] = ('SearchItem', {'use': round(t / lap_model.TICK, 3)},
                    ['use <- %s take, the job %d ticks' % ('/'.join(sorted(cands)), t)])
+    # the hideouts: the PC objects with the hideout flag and Woody's enter and
+    # leave, each paired with the level's HideItem — the one of each, else the
+    # one whose name shares a word with the object's (lorry, statue)
+    hides = []
+    for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', ob, re.S):
+        if '<flag name="hideout"' in om.group(2):
+            e = D.job_ticks(om.group(1), 'enter', actor='woody')
+            l = D.job_ticks(om.group(1), 'leave', actor='woody')
+            if e is not None and l is not None:
+                hides.append((om.group(1), e, l))
+    items = [((o.get('data') or {}).get('m_GameObject') or {}).get('name') for o in mob.values()
+             if o.get('type') == 'HideItem']
+    items = [i for i in items if i]
+    for nm in sorted(set(items)):
+        if nm in out:
+            continue
+        low = nm.lower()
+        match = [h for h in hides if len(hides) == 1 and len(set(items)) == 1
+                 or any(w in h[0].split('/')[-1] for w in re.findall(r'[a-z]{4,}', re.sub(r'([A-Z])', r' \1', nm).lower()))]
+        if len(match) != 1:
+            continue
+        obj, e, l = match[0]
+        out[nm] = ('HideItem', {'enter': round(e / lap_model.TICK, 3), 'leave': round(l / lap_model.TICK, 3)},
+                   ['enter <- %s the job %d ticks' % (obj, e), 'leave <- %s the job %d ticks' % (obj, l)])
     return out
 
 

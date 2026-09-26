@@ -1116,6 +1116,17 @@
     }
    },
    "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bazar/sponge take, the job 16 ticks"
+  },
+  {
+   "object": "Basket",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.083,
+     "leave": 0.917
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- elephant/basket the job 13 ticks; leave <- elephant/basket the job 11 ticks"
   }
  ]
 }

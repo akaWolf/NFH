@@ -1842,6 +1842,17 @@
     }
    },
    "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midright/hand take, the job 16 ticks"
+  },
+  {
+   "object": "StatueHidden",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.833,
+     "leave": 0.833
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- midright/statue_hideout the job 10 ticks; leave <- midright/statue_hideout the job 10 ticks"
   }
  ]
 }

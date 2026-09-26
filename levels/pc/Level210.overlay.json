@@ -1276,6 +1276,17 @@
     }
    },
    "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/bra take, the job 15 ticks"
+  },
+  {
+   "object": "Bin",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.917,
+     "leave": 0.917
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- bar/basket the job 11 ticks; leave <- bar/basket the job 11 ticks"
   }
  ]
 }

@@ -1241,6 +1241,17 @@
     }
    },
    "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bar/moped take, the job 16 ticks"
+  },
+  {
+   "object": "BeachChair",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.667,
+     "leave": 0.667
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- beachleft/beachchair the job 8 ticks; leave <- beachleft/beachchair the job 8 ticks"
   }
  ]
 }

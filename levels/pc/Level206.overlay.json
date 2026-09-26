@@ -1337,6 +1337,17 @@
     }
    },
    "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "Pipe",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.083,
+     "leave": 1.0
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- topright/ventpipe the job 13 ticks; leave <- topright/ventpipe the job 12 ticks"
   }
  ]
 }
