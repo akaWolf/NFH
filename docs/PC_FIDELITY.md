@@ -1385,6 +1385,60 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   from there (`Pawn._pc_arrived`, the same departure as the neighbour's);
   the only one the data has (201's soap and 214's swiffer had been read
   across a self-closing object's end).
+- *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
+  step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
+  0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
+  leaves the object the actor stands at first and then, over the room list
+  of the path (fcn.00475b30), for each next room pushes a mover to the
+  near door's standing point — the door's entity position plus the door
+  type's `neighbor` hotspot (fcn.00445aa0) — and the door step (vtable
+  0x4e5370, update 0x474590: the near door's `enter` and the far door's
+  `leave` as one step list, fcn.004741e0 over fcn.00478030, the pair
+  claimed by its flag 8, the actor placed at the far door's point), and at
+  the end a mover to the target's hotspot, each with the run-now flag 1: a
+  leg's first move falls in the tick the one before it ends (0x4760ad). A
+  mover (vtable 0x4e59e8, update 0x47cb50) moves one axis a tick — x
+  before y — at the facing's speed record, its first move the record's
+  `start` px longer (the neighbour's mg1 8 + 8 facing right, mg3 8 + 10
+  facing left, mg0 / mg2 3 up and down with none; the runs' mr records 18
+  / 9), clamped at the target, and finds the target in the update of its
+  last move (0x47cf7f-0x47cfac); the GOTO's next update ends it a tick
+  after the last move (0x44aab0) — three ticks with no move, the walk job
+  done inside the GOTO's first update and the arrival read on its second.
+  The PC's walk is so straight lines between those points, along x at the
+  height it starts from and then up or down to the target's: the room's
+  path1/path2 bound the room, no floor line is followed, where the mobile
+  scene's paths take a back door's climb, the floor and an item's climb.
+  tools/pcref/lap_model.py times the laps with it (the steady lap, the
+  steps at time + 2, the walker's arguments read along its path — the
+  entry "The walker's arguments" below): 101 34.2 s (video 32), 102 28.9
+  (28), 103 29.7 (42), 104 75.1, 105 47.2 (40), 106 127.5, 107 66.4 (54),
+  108 98.8 (94), 109 111.8 (113), 110 63.8 (59), 111 117.0 (122), 112
+  150.8 (155), 113 171.2 (191), 114 181.2 (168). Carried for the neighbour
+  (tools/pcref/pc_walks_s1.py; `Pawn._pc1_marks`, `_pc1_close`,
+  `_pc1_leg`, `_pc1_here`, `_pc1_map`, `_pc1_item_point`, `_pc1_arrived`):
+  each zone carries its PC room (PCWalkRoom: the room, its path's x range
+  and floor line — the zones mapped onto the rooms geometrically, the
+  house at 96 px a unit), each door its pair's two standing points
+  (PCWalkDoor: the near door's, the far door's), each station item the
+  hotspot its station's GOTO walks to (PCWalkPoint: the last GOTO before
+  the paired actions in the lap model's first lap of the station
+  tools/pcref/pc_durations.py pairs with the item — a list where the
+  visits walk to different objects, 107's camera). A walk of the port is
+  cut into the PC's legs at its door steps and its item; each leg lasts
+  the mover's ticks between the PC's points (`pcprofile.s1_leg_ticks`; a
+  leg after a door a tick less, the last one a tick more, three with no
+  move) and its mobile steps — the floor, a back door's climb and the
+  descent after it, an item's climb — run at the one pace that lasts it,
+  from the PC point the pawn stood at (the station it came to, the door it
+  came through) or its place mapped into the room. A walk through the
+  front door keeps the mobile's pace: the porch is the PC's `fro`, the
+  street's whole path, and anc/fro has no `neighbor` hotspot. The port's
+  idle laps (the neighbour alone, runs/idlewalk3, 108 with Woody in the
+  wardrobe): 101 33.7 s, 102 28.8, 103 29.5, 104 76.2, 105 47.2, 106
+  128.0, 107 65.0, 108 99.2, 109 112.5, 110 62.7, 111 117.5, 112 151.2,
+  113 172.2, 114 182.5 — within 1.4 s of the model on every level. Woody's
+  walk keeps the mobile scene's paths at the PC's records.
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
@@ -2292,6 +2346,39 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   tricked, the skipped unprime included (`Routine._pc_use_seconds`,
   `_end_pc_station`: a tricked Teeth, Airer, Polish or phonograph visit no
   longer shifts the next visit's stay onto the wrong PC station).
+- *The walker's arguments (2026-09-26).* The walker had read a call's
+  string arguments back up the listing to the previous labelled call, and
+  where a branch lay between it took the other branch's strings: 109's
+  teeth after the alarm and the parrot's cookies carried the tabasco's
+  and the hot cookies' `spit_fire` (34 and 31 ticks), where case 11 takes
+  the teeth when bed/teeth_tabasco is not present (`take`, 5 ticks, and
+  the switch to bed/teeth_empty) and case 26 gives the parrot its cookies
+  (`give`, 17); 108's coffee had lost the `make_coffee` (49 ticks) case 4
+  loads before its IFVARIANT and plays on both branches, the soiled box's
+  and the clean one's. It reads them along its own path now (an
+  IFVARIANT's strings go on to the call its pick feeds: 107's ENTER of the
+  stool or its pinned twin). Two GoTo builders were missing from its
+  table — fcn.0047a960 and fcn.0047a4a0 (their asserts: CreateGoToObjectJob,
+  CreateGoToObjXJob) — and 114's case 7 walks the first smoke to
+  lir/tabacbox with the first (the neighbour's own `give` there, 5 ticks),
+  where the walker had stood him at the kitchen's polish: the port's walk
+  to the living room's pipe was the PC's (E14's bubble: the pipe 54-63,
+  ten seconds of walk). pc_durations.py rewrote 108's coffee 2.3 → 6.4 s,
+  109's second teeth 2.8 → 0.4 and its parrot 5.2 → 4.1, 114's first
+  smoke 1.4 → 0.4 s, and pc_walks_s1.py the pipe's walk point
+  (lir/tabacbox on both visits). The same day's rerun of the Season 1
+  writers put back the pets' search (the Alerters' PCSurpriseSeconds, 26
+  ticks: 107, 109, 111-114): tools/pcref/pc_reactions.py stripped its
+  keys from every patch and PCSurpriseSeconds is one of them, so its run
+  on 2026-09-26 at 15:00 had dropped pc_durations.py's alerter patches
+  and the port played the remaster's Search (2.5 s) since; it strips its
+  own TrickItem patches only now, and the writers run in any order
+  reproduce the overlays. Open against the videos: E08's coffee — 29.8 s
+  in the model from the balcony's ewer, the icon at 121 and his drink at
+  145-146 (gone at 147) in the video, ~26 s — and E14's kitchen and
+  workshop: the cups' span 19-20 s and the polish's 18-19 against the
+  model's 24.3 and 23.6 (kit, lir, bed, wor: the only route, two side
+  doors and a back door), which carries most of 114's 181.2 against 168.
 - *The tick rule, in the canon's own words.* The Season 1 manual
   (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
   the victim of a trick, his anger indicator rises to the maximum value.

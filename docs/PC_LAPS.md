@@ -225,6 +225,30 @@ the PC's hotspots (113: the angle grinder, the main valve and the fuse box
 legs; docs/PC_VERIFICATION.md "Not verified"); Season 1's walk still runs
 on the mobile's layout at the PC's speeds.
 
+The walk read and carried the same evening (docs/PC_FIDELITY.md "Season 1
+walks"): the model's movers as game.exe's — the first move `start` px longer
+(8 facing right, 10 facing left, none up or down), the arrival in the update
+of the last move, a leg after a door a tick short (its first move in the far
+door's last tick), the GOTO's end a tick after the last move, three ticks
+with no move — and the walker's arguments read along its own path, with the
+two GoTo builders it lacked (docs/PC_FIDELITY.md "The walker's arguments":
+108's `make_coffee`, 109's untricked teeth and parrot, 114's first smoke at
+the tobacco box). The model: 101 34.2 s (video 32), 102 28.9 (28), 103 29.7
+(42), 104 75.1, 105 47.2 (40), 106 127.5, 107 66.4 (54), 108 98.8 (94), 109
+111.8 (113), 110 63.8 (59), 111 117.0 (122), 112 150.8 (155), 113 171.2
+(191), 114 181.2 (168). The port's idle laps with the neighbour on the PC's
+legs (runs/idlewalk3, 108 with Woody in the wardrobe): 101 33.7 s, 102 28.8,
+103 29.5, 104 76.2, 105 47.2, 106 128.0, 107 65.0, 108 99.2, 109 112.5, 110
+62.7, 111 117.5, 112 151.2, 113 172.2, 114 182.5 — within 1.4 s of the model
+on every level. Against E13's bubbles the model's stations pair up where its
+split does not (the icon changes at the case's ICON, the model gives a
+station its walk): the grinder and the main valve 50.1 s against the
+bubbles' 49-50, the radiator and the basin 40.7 against 39-40, the second
+valve and the fuse box 21.7 against 23-24, the chair 16.6 against 16-17;
+E14's kitchen-workshop walks stand 4-5 s a way over the bubbles (the cups
+24.3 against 19-20, the polish back 23.6 against 18-19), and E08's coffee ~4
+s (29.8 against ~26).
+
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in
 turn at their ticks), the catch on sight and the stations' durations
