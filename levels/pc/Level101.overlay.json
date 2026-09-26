@@ -21,116 +21,104 @@
      "SitUp"
     ],
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.25
+    "PCUseSecondsTricked": 4.5
    }
   },
   {
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.42
+    "PCUseSeconds": 3.67
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
   },
   {
    "object": "Binoculars",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.92,
+    "PCUseSeconds": 6.0,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.333
+    "PCUseSecondsTricked": 7.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 5.9 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.0 s"
   },
   {
    "object": "Microwave",
    "component": "TrickItem",
    "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 2.0
+    },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 1.917
-   }
+    "PCFixSeconds": 2.0
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 24 ticks"
   },
   {
    "object": "Television",
    "component": "TrickItem",
    "set": {
-    "PCFixSeconds": 1.917,
+    "PCWoodySeconds": {
+     "use": 1.0
+    },
+    "PCFixSeconds": 2.0,
     "PCUseSecondsTricked": 0.0,
     "PCFireAt": 0,
     "PCRunTo": true
-   }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 12 ticks"
   },
   {
    "object": "Binoculars",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Superglue": 1.917
+     "IT_Superglue": 2.0
     }
    },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- kit/binoculars superglue 23 ticks"
-  },
-  {
-   "object": "Microwave",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Egg": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 23 ticks"
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- kit/binoculars superglue 24 ticks"
   },
   {
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Fartbag": 0.917
+     "IT_Fartbag": 1.0
     }
    },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fartbag <- lir/sofa fartbag 11 ticks"
-  },
-  {
-   "object": "Television",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 0.917
-    }
-   },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 11 ticks"
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fartbag <- lir/sofa fartbag 12 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.583,
-     "leave": 1.583
+     "enter": 1.667,
+     "leave": 1.667
     }
    },
-   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
   }
  ]
 }

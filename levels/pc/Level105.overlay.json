@@ -26,7 +26,7 @@
    "set": {
     "PCAngryTime": 276,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.583
+    "PCUseSecondsTricked": 2.667
    }
   },
   {
@@ -36,200 +36,182 @@
     "PCAngryTime": 288,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.25
+    "PCUseSecondsTricked": 3.333
    }
   },
   {
    "object": "Piano",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 8.75,
-    "PCFixSeconds": 1.917,
-    "PCUseSecondsTricked": 3.333
+    "PCUseSeconds": 9.0,
+    "PCFixSeconds": 2.0,
+    "PCUseSecondsTricked": 3.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 8.8 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.0 s"
   },
   {
    "object": "Football",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.25
+    "PCUseSeconds": 1.33
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.3 s"
   },
   {
    "object": "Window",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.0
+    "PCUseSeconds": 3.08
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.1 s"
   },
   {
    "object": "PlantStink",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.75,
+    "PCUseSeconds": 3.83,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.25
+    "PCUseSecondsTricked": 2.333
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PlantStink <- flower#0 3.8 s"
-  },
-  {
-   "object": "Toilet",
-   "component": "TrickItem",
-   "set": {
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 3.917
-   }
-  },
-  {
-   "object": "MumPicture",
-   "component": "TrickItem",
-   "set": {
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 1.917
-   }
   },
   {
    "object": "Microwave",
    "component": "TrickItem",
    "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 2.083
+    },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 1.917
-   }
+    "PCFixSeconds": 2.0
+   },
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
+  },
+  {
+   "object": "MumPicture",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marker": 2.0
+    },
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 2.0
+   },
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 24 ticks"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wcpaper": 2.0
+    },
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 4.0
+   },
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 24 ticks"
   },
   {
    "object": "Football",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Bowling": 0.917
+     "IT_Bowling": 1.0
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Bowling <- kit/football bowling 11 ticks"
-  },
-  {
-   "object": "Microwave",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Egg": 2.0
-    }
-   },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 24 ticks"
-  },
-  {
-   "object": "MumPicture",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Marker": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 23 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Bowling <- kit/football bowling 12 ticks"
   },
   {
    "object": "Piano",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Marker": 1.917
+     "IT_Marker": 2.0
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- lir/score marker 23 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- lir/score marker 24 ticks"
   },
   {
    "object": "PlantStink",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Cheese": 1.917
+     "IT_Cheese": 2.0
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cheese <- anc/flower cheese 23 ticks"
-  },
-  {
-   "object": "Toilet",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Wcpaper": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 23 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cheese <- anc/flower cheese 24 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
   },
   {
    "object": "Mobile",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/handyholder take 18 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/handyholder take 19 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
   },
   {
    "object": "BowlingBag",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 0.917
+     "use": 1.0
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/bowlingbag take 11 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/bowlingbag take 12 ticks"
   },
   {
    "object": "SoapDish",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/soapbracket take 18 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/soapbracket take 19 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.583,
-     "leave": 1.583
+     "enter": 1.667,
+     "leave": 1.667
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
   },
   {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Soap": 0.25
+     "IT_Soap": 0.333
     }
    },
-   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 3 ticks"
+   "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 4 ticks"
   }
  ]
 }

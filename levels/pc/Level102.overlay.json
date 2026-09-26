@@ -12,141 +12,123 @@
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.42,
+    "PCUseSeconds": 3.67,
     "PCShoutSkip": true,
-    "PCFixSeconds": 3.917,
-    "PCUseSecondsTricked": 6.917,
-    "PCFireAt": 0.417
+    "PCFixSeconds": 4.0,
+    "PCUseSecondsTricked": 7.083,
+    "PCFireAt": 0.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.7 s"
   },
   {
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.25,
+    "PCUseSeconds": 1.33,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.833
+    "PCUseSecondsTricked": 3.167
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.3 s"
   },
   {
    "object": "Microwave",
    "component": "TrickItem",
    "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 2.0
+    },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 1.917
-   }
-  },
-  {
-   "object": "Toilet",
-   "component": "TrickItem",
-   "set": {
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 3.917
-   }
+    "PCFixSeconds": 2.0
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 24 ticks"
   },
   {
    "object": "Television",
    "component": "TrickItem",
    "set": {
-    "PCFixSeconds": 1.917,
+    "PCWoodySeconds": {
+     "use": 2.0
+    },
+    "PCFixSeconds": 2.0,
     "PCUseSecondsTricked": 0.0,
     "PCFireAt": 0,
     "PCRunTo": true
-   }
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 24 ticks"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wcpaper": 2.0
+    },
+    "PCSurpriseSeconds": 1.25,
+    "PCFixSeconds": 4.0
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 24 ticks"
   },
   {
    "object": "Beer",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Laxative": 1.917
+     "IT_Laxative": 2.0
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Laxative <- kit/beer laxative 23 ticks"
-  },
-  {
-   "object": "Microwave",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Egg": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 23 ticks"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Laxative <- kit/beer laxative 24 ticks"
   },
   {
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Saw": 15.0
+     "IT_Saw": 15.083
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Saw <- lir/sofa saw 180 ticks"
-  },
-  {
-   "object": "Television",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 23 ticks"
-  },
-  {
-   "object": "Toilet",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Wcpaper": 1.917
-    }
-   },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 23 ticks"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Saw <- lir/sofa saw 181 ticks"
   },
   {
    "object": "FirstAid",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.167
+     "use": 1.25
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 15 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.583,
-     "leave": 1.583
+     "enter": 1.667,
+     "leave": 1.667
     }
    },
-   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
   }
  ]
 }

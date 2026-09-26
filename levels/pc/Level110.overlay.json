@@ -23,41 +23,41 @@
    "object": "SteakMeat",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.25
+    "PCUseSeconds": 1.33
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakMeat <- meatbowl#0 1.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakMeat <- meatbowl#0 1.3 s"
   },
   {
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.58
+    "PCUseSeconds": 0.67
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 0.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 0.7 s"
   },
   {
    "object": "BBQ",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.67,
-     1.17
+     1.75,
+     1.33
     ],
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.333
+    "PCUseSecondsTricked": 2.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.7 s; BBQ <- bbq#1 1.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.8 s; BBQ <- bbq#1 1.3 s"
   },
   {
    "object": "CarnivorPlantSpray",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.17,
+    "PCUseSeconds": 3.25,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.417,
-    "PCFireAt": 3.917
+    "PCUseSecondsTricked": 6.667,
+    "PCFireAt": 4.083
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CarnivorPlantSpray <- plant#0 3.2 s"
   },
@@ -65,19 +65,19 @@
    "object": "SteakChair",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.08,
-    "PCFixSeconds": 0.917,
-    "PCUseSecondsTricked": 2.25
+    "PCUseSeconds": 6.42,
+    "PCFixSeconds": 1.0,
+    "PCUseSecondsTricked": 2.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.4 s"
   },
   {
    "object": "SteakWine",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.17,
+    "PCUseSeconds": 1.25,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.75
+    "PCUseSecondsTricked": 2.833
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakWine <- wine#0 1.2 s"
   },
@@ -85,137 +85,131 @@
    "object": "FireExtinguisher",
    "component": "TrickItem",
    "set": {
-    "PCGrabSeconds": 0.25,
-    "PCUseSecondsTricked": 7.417,
-    "PCFireAt": 7.417,
-    "PCFixSeconds": 1.917,
+    "PCWoodySeconds": {
+     "use": 1.0
+    },
+    "PCGrabSeconds": 0.333,
+    "PCUseSecondsTricked": 7.667,
+    "PCFireAt": 7.667,
+    "PCFixSeconds": 2.0,
     "PCFixUseSeconds": 0,
-    "PCToolUseSeconds": 3.167,
+    "PCToolUseSeconds": 3.25,
     "PCReturnSeconds": 0.0,
     "PCRunTo": true
-   }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/extinguisher 12 ticks"
   },
   {
    "object": "BBQ",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Cork": 1.917
+     "IT_Cork": 2.0
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cork <- bal/beer fuel 23 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cork <- bal/beer fuel 24 ticks"
   },
   {
    "object": "CarnivorPlantSpray",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Growthliquid": 1.917
+     "IT_Growthliquid": 2.0
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Growthliquid <- bal/spray growthliquid 23 ticks"
-  },
-  {
-   "object": "FireExtinguisher",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 0.917
-    }
-   },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/extinguisher 11 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Growthliquid <- bal/spray growthliquid 24 ticks"
   },
   {
    "object": "SteakChair",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Pins": 1.917
+     "IT_Pins": 2.0
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- lir/chair pins 23 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- lir/chair pins 24 ticks"
   },
   {
    "object": "SteakWine",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Vinegar": 1.917
+     "IT_Vinegar": 2.0
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Vinegar <- lir/wine vinegar 23 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Vinegar <- lir/wine vinegar 24 ticks"
   },
   {
    "object": "PinsBoard",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 18 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 19 ticks"
   },
   {
    "object": "FirstAid",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.167
+     "use": 1.25
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 15 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.5
+     "use": 1.583
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
   },
   {
    "object": "RubbishBinBanana2",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 0.917
+     "use": 1.0
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 12 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.583,
-     "leave": 1.583
+     "enter": 1.667,
+     "leave": 1.667
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
   },
   {
    "object": "Bed",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 0.333,
-     "leave": 0.333
+     "enter": 0.417,
+     "leave": 0.417
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.333; leave <- bed/bed 0.333"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.417; leave <- bed/bed 0.417"
   },
   {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Banana": 0.25
+     "IT_Banana": 0.333
     }
    },
-   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 3 ticks"
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 4 ticks"
   }
  ]
 }
