@@ -185,7 +185,7 @@ def main(argv):
         ov['patches'] = patches
         if n in ALERTERS:
             L = lap_model.Level(n)
-            t = L.action_ticks('neighbor', 'search')
+            t = L.job_ticks('neighbor', 'search')
             mob = json.load(open('%s/levels/s1/Level%d.json' % (ROOT, n)))['objects']
             pets = sorted({((o.get('data') or {}).get('m_GameObject') or {}).get('name')
                            for o in mob.values() if o.get('type') == 'Alerter'} - {None})
@@ -203,7 +203,7 @@ def main(argv):
                     ov['patches'].append({'object': pet, 'component': 'Alerter',
                                           'set': {'PCSurpriseSeconds': v}, 'source': src})
         for item, obj in LEAVES.get(n, ()):
-            t = lap_model.Level(n).action_ticks(obj, 'leave')
+            t = lap_model.Level(n).job_ticks(obj, 'leave')
             if t is None:
                 print('%d: no leave of %s for %s' % (n, obj, item)); continue
             v = round(t / lap_model.TICK, 3)

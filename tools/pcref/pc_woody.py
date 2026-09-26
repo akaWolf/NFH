@@ -8,9 +8,10 @@ A Season 1 trick is a combination of combine.xml — the object and the
 inventory item it takes (`<ingredient>`s), the tricked object its name — and
 Woody plays it as the object's action of his named after the inventory item
 (lir/sofa's `fartbag`, kit/binoculars' `superglue`), or `use` where the trick
-takes no item (lir/tv's twisted antenna); the action's time is the record's
-as Loader.dll stores it (lap_model.Level.action_ticks: time="N", or the longer
-oneshot animation less one). The mobile item of each trick is
+takes no item (lir/tv's twisted antenna); the action lasts the ACTION step's
+job (lap_model.Level.job_ticks: the record's time as Loader.dll stores it —
+time="N", or the longer oneshot animation less one — plus the timer's last
+update). The mobile item of each trick is
 tools/pcref/pc_reactions.py's TABLE (its PC tricked object); the overlay entry
 PCWoodySeconds maps the mobile inventory type Woody holds (RequiredInventory,
 SecondRequiredInventory) — or `use` — to the seconds, and World.woody_use
@@ -84,15 +85,15 @@ def woody_seconds(n):
             name = canon.norm(t)
             cands = [name] + [i for i in invs if i != name]
             for nm in cands:
-                v = L.action_ticks(base, nm, actor='woody')
+                v = L.job_ticks(base, nm, actor='woody')
                 if v is not None:
                     vals[t] = round(v / lap_model.TICK, 3)
                     notes.append('%s <- %s %s %d ticks' % (t, base, nm, v))
                     break
         if not req:
-            v = L.action_ticks(base, 'use', actor='woody')
+            v = L.job_ticks(base, 'use', actor='woody')
             if v is None and invs:
-                v = L.action_ticks(base, invs[0], actor='woody')
+                v = L.job_ticks(base, invs[0], actor='woody')
             if v is not None:
                 vals['use'] = round(v / lap_model.TICK, 3)
                 notes.append('use <- %s %d ticks' % (base, v))
@@ -119,7 +120,7 @@ def woody_seconds(n):
         if not invs:
             continue
         cands = [obj for obj, cs in contents.items() if invs & cs]
-        ticks = {L.action_ticks(obj, 'take', actor='woody') for obj in cands}
+        ticks = {L.job_ticks(obj, 'take', actor='woody') for obj in cands}
         ticks.discard(None)
         if len(ticks) != 1:
             continue
@@ -139,14 +140,14 @@ def woody_seconds(n):
                                ob, re.S)]
         vals = {}
         for act in ('enter', 'leave'):
-            ts = {L.action_ticks(obj, act, actor='woody') for obj in cands}
+            ts = {L.job_ticks(obj, act, actor='woody') for obj in cands}
             ts.discard(None)
             if len(ts) == 1:
                 vals[act] = round(ts.pop() / lap_model.TICK, 3)
         if vals:
             out[nm] = ('HideItem', vals, ['%s <- %s %s' % (k, '/'.join(sorted(cands)), v) for k, v in vals.items()])
     # the floor drops: Woody's `laydown` for every item the remaster lays with TakeGround
-    lay = L.action_ticks('woody', 'laydown', actor='woody')
+    lay = L.job_ticks('woody', 'laydown', actor='woody')
     for item, (kind, req, clip) in sorted(items.items()):
         if item in out or clip != 'TakeGround' or lay is None or not req:
             continue
@@ -256,15 +257,33 @@ def main(argv):
             continue
         p = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
         ov = json.load(open(p))
-        ov['patches'] = [e for e in ov['patches'] if not ('PCWoodySeconds' in (e.get('set') or {})
-                                                          and len(e['set']) == 1)]
+        # the key set in place: the first patch of the item's component that
+        # holds it takes the new value and source (tools/pcref/pc_reactions.py
+        # merges its keys into that patch), a second one loses it, a patch
+        # left empty goes, a new item gets its own patch
+        seen = set()
+        for e in ov['patches']:
+            st = e.get('set') or {}
+            if 'PCWoodySeconds' not in st:
+                continue
+            key = (e.get('object'), e.get('component'))
+            if key in seen or e.get('object') not in res or res[e['object']][0] != e.get('component'):
+                st.pop('PCWoodySeconds')
+            seen.add(key)
+        ov['patches'] = [e for e in ov['patches'] if e.get('set') != {}]
         for item, (kind, vals, notes) in res.items():
             where = ("level_%s's objects.xml, the Loader's time" % canon.pc_level(n)['folder'][6:]) if n < 200 \
                 else ("%s's objects.xml, the DoActions job: the Loader's time + 2" % canon.S2[n])
             src = ("Woody's trick action (%s at 12 a second, tools/pcref/pc_woody.py): %s"
                    % (where, '; '.join(notes)))
-            ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWoodySeconds': vals},
-                                  'source': src})
+            e = next((e for e in ov['patches'] if e.get('object') == item and e.get('component') == kind
+                      and 'PCWoodySeconds' in (e.get('set') or {})), None)
+            if e is None:
+                ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWoodySeconds': vals},
+                                      'source': src})
+            else:
+                e['set']['PCWoodySeconds'] = vals
+                e['source'] = src
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
         open(p, 'a').write('\n')
     return 0

@@ -108,8 +108,9 @@ class Level(object):
         """seconds of the action `name` of the PC object or actor, or None: the
         record's time as Loader.dll stores it — time="N" as N, time="auto" as
         the longer of the actor's and the object's oneshot animation less one,
-        at least 0 (`inv` not asked; NFH1's Loader.dll 0x1000a865-0x1000aa05,
-        lap_model.action_ticks) — at 12 ticks a second"""
+        at least 0 (`inv` not asked; NFH1's Loader.dll 0x1000a865-0x1000aa05)
+        — as the ACTION step's job, the time + 1 ticks (lap_model.job_ticks),
+        at 12 a second"""
         for b in self.blocks(obj):
             for a in re.finditer(r'<action\b([^>]*)/?>', b):
                 at = dict(re.findall(r'(\w+)="([^"]*)"', a.group(1)))
@@ -117,12 +118,16 @@ class Level(object):
                     continue
                 tm = at.get('time', 'auto')
                 if tm.isdigit():
-                    return int(tm) / FPS
-                actor = at.get('actor', 'neighbor')
-                aa, oa = at.get('actoranim', ''), at.get('objanim', '')
-                va = self.oneshot(actor, aa) if aa and aa != 'inv' else -1
-                vo = self.oneshot(obj, oa) if oa and oa != 'inv' else -1
-                return max(max(va, vo) - 1, 0) / FPS
+                    t = int(tm)
+                else:
+                    actor = at.get('actor', 'neighbor')
+                    aa, oa = at.get('actoranim', ''), at.get('objanim', '')
+                    va = self.oneshot(actor, aa) if aa and aa != 'inv' else -1
+                    vo = self.oneshot(obj, oa) if oa and oa != 'inv' else -1
+                    t = max(max(va, vo) - 1, 0)
+                # the ACTION step's job: the timer's time + 1 updates
+                # (lap_model.Level.job_ticks)
+                return (t + 1 if t > 0 else 0) / FPS
         return None
 
     def clip(self, name, actor='neighbor'):

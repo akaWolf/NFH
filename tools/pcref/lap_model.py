@@ -166,6 +166,21 @@ class Level:
         vo = self._oneshot(owner_gfx, oa) if oa and oa != 'inv' else -1
         return max(max(va, vo) - 1, 0)
 
+    def job_ticks(self, obj, name, actor='neighbor'):
+        """the ticks an ACTION step of the action takes, from its start to the
+        next step's: the step's start pushes a timer job of the record's time
+        on the actor's queue with its run-now flag 0 (fcn.004772f0 at
+        0x477a46-0x477a62, fcn.00444d30), whose update (0x47e500) counts it
+        down and returns done on its (time + 1)th call, the first on the tick
+        after; the actor's tick then pops it and, in the same tick, updates
+        the step list below it (0x444db0: 0x444e05-0x444e7c), which starts the
+        next step — time + 1; a time of 0 makes no timer (0x477975), the step
+        passing at once. None when no record has it"""
+        t = self.action_ticks(obj, name, actor)
+        if t is None:
+            return None
+        return t + 1 if t > 0 else 0
+
     def has_action(self, obj, name, actor='neighbor'):
         """the object (or the actor's blocks, the level's and the generic) has an
         action record of that name"""
@@ -287,7 +302,7 @@ def model(L, toks, verbose=False):
         for d_out, d_in in r:
             xo, yo = L.door_point(d_out); xi, yi = L.door_point(d_in, out=True)
             t = L.walk_ticks(xo - x, yo - y); legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
-            t_out = L.action_ticks(d_out, 'enter') or 0; t_in = L.action_ticks(d_in, 'leave') or 0
+            t_out = L.job_ticks(d_out, 'enter') or 0; t_in = L.job_ticks(d_in, 'leave') or 0
             legs.append(('door', '%s enter %d + %s leave %d' % (d_out, t_out, d_in, t_in), t_out + t_in))
             room, x, y = d_in.split('/')[0], xi, yi
         t = L.walk_ticks(x2 - x, y2 - y); legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
@@ -299,7 +314,7 @@ def model(L, toks, verbose=False):
         nonlocal occupied
         obj = obj or occupied
         if obj:
-            t = L.action_ticks(obj, 'leave') or 0
+            t = L.job_ticks(obj, 'leave') or 0
             i = len(legs)
             while implicit and i > 0 and legs[i - 1][0] == 'icon':
                 i -= 1
@@ -307,7 +322,7 @@ def model(L, toks, verbose=False):
 
     def enter(obj):
         nonlocal occupied
-        t = L.action_ticks(obj, 'enter') or 0; legs.append(('action', '%s enter' % obj, t)); occupied = obj
+        t = L.job_ticks(obj, 'enter') or 0; legs.append(('action', '%s enter' % obj, t)); occupied = obj
 
     def goto(obj):
         nonlocal room, x, y, current, first
@@ -369,11 +384,11 @@ def model(L, toks, verbose=False):
             hit = next(((o, nm) for nm in acts for o in cands if L.has_action(o, nm)), None)
             if hit:
                 used, name = hit
-                t = L.action_ticks(used, name)
+                t = L.job_ticks(used, name)
             else:               # no record: the neighbour's animation of the first name
                 name = acts[0]
                 used = next((o for o in cands if L.action_ticks(o, name) is not None), None)
-                t = L.action_ticks(used, name) if used else None
+                t = L.job_ticks(used, name) if used else None
             if t is None:
                 legs.append(('?', 'ACTION %s on %s: no time' % (name, ' + '.join(objs) or current), 0))
             else:
