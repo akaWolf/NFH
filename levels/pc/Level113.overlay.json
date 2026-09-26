@@ -247,6 +247,14 @@
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.00 s"
   },
   {
+   "object": "Dog",
+   "component": "Alerter",
+   "set": {
+    "PCSurpriseSeconds": 2.167
+   },
+   "source": "the pet's alarm: the level class's `noise` case, then the neighbour's `search` (fcn.0047a690; generic/objects.xml, the Loader's time 26 ticks at 12 a second, tools/pcref/pc_durations.py ALERTERS)"
+  },
+  {
    "object": "ValveHot",
    "component": "TrickItem",
    "set": {

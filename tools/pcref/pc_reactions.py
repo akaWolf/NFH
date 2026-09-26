@@ -342,10 +342,12 @@ def specs(n):
 
 
 def _strip_key(patches, key):
+    """drop `key` from this writer's own patches, the TrickItem ones (_set_key's):
+    an Alerter's PCSurpriseSeconds is tools/pcref/pc_durations.py's (ALERTERS)"""
     out = []
     for e in patches:
         st = e.get('set')
-        if isinstance(st, dict) and key in st:
+        if e.get('component') == 'TrickItem' and isinstance(st, dict) and key in st:
             st = dict(st); del st[key]
             if not st:
                 continue

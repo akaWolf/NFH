@@ -23,13 +23,13 @@
    "object": "CoffeeMaker",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.33,
+    "PCUseSeconds": 6.42,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 8.0,
     "PCFireAt": 6.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 2.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 6.4 s"
   },
   {
    "object": "Shezlong",
