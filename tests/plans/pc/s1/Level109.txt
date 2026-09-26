@@ -1,38 +1,33 @@
-# Level109 under the PC profile (2026-09-23): Badinfos' E09 order (the HUD of
-# pc_s1_all_720.mp4 — 100 %, 7/7, four bonuses): the pig out and the nitro bottle at one
-# pig visit (the PC's case 18 catches the pig and case 20 feeds it: +10 cold, +20 hot),
-# the chips at his chili (+15 cold), the bedroom banana on his way to the key board
+# Level109 under the PC profile: Badinfos' E09 order (pc_s1_all_720.mp4, 100 %, 7/7, four
+# bonuses): the pins, the banana, the tabasco, the nitro and the chips while he sleeps
+# (0-38), the cactus while he is in the kitchen and at the pig (64-72) and the balcony
+# until his lap-2 sleep, the key off its board by the balcony door in that sleep (~132),
+# the chips and the nitro in the kitchen and the key to the pig before he comes down
+# (150-168), the pins, the cactus and the banana while he is in the kitchen and at the pig
+# (184-194), the tabasco in the dentures' glass in the sleep after the pins' jump (~298). The PC's case 18 catches the pig and case 20 feeds it (+10 cold,
+# +20 hot), the chips at his chili (+15 cold), the banana on his way to the key board
 # (+7 hot), the pins at his lie-down (+8 hot), the cactus alarm (+13 cold) and the
-# tabasco a second later (+15 hot): 88 + 12. Laps 1-2 arm it, laps 3-4 play it
-# (run 2026-09-23: 281.5 pig, 291.1 milk, 324.5 chips, 339.4 banana, 354.6 pins,
-# 393.2 alarm, 394.2 teeth) inside the 7 minutes.
-take! PinsBoard IT_Pins              # Z01 on the way in
-take! ChemicalSet IT_Nitro           # Z02 (he sleeps in the bedroom until ~31)
+# tabasco a second later (+15 hot): 88 + 12.
+take! PinsBoard IT_Pins              # Z01 on the way in (he sleeps in the bedroom until ~31)
+take! ChemicalSet IT_Nitro           # Z02
 take! SpicyChips IT_Chips            # Z02 (tiptoe past the parrot)
 take! RubbishBinBanana2 IT_Banana    # Z03
 take! Fridge IT_Tabasco              # Z03
-park! Zone04                         # the bathroom, off his lap, while he is downstairs
-whenzone Zone06                      # (~98) he climbs to the bedroom
-park! Zone02                         # the living room below him
-whenanim Rottweiler BedSleep         # (~112) his lap-2 sleep: the key hangs on its board
-take! PigKeys IT_Pigkey              # Z06, tiptoe past the sleeper
-take! Cactus IT_Cactus               # Z07: the balcony, off his lap
-whenzone Zone03                      # (~160) his lap-2 kitchen: down to the living room
-park! Zone02
-whenusing Pig                        # (~173) his lap-2 pig
-whenzone Zone03                      # (~183) his second kitchen: the hall is free
-usewith! Pig IT_Pigkey               # Z01: the pig out for his lap-3 visit
-hide! Wardrobe                       # Z01: he crosses the living room and climbs
-whenzone Zone06                      # (~207) he is upstairs: the kitchen is free
-usewith! PigMilk IT_Nitro            # Z03: explodes at his lap-3 feeding, after the catch
-usewith! CornChips IT_Chips          # Z03: at his lap-3 chili
-hide! Wardrobe                       # Z01: he comes down and feeds the pig (~275)
-whenzone Zone03                      # (~267) his lap-3 kitchen: up behind him
-usewith! Ground@Zone06 IT_Banana     # Z06 x 1.90: his lap-4 walk to the key board
-usewith! Bed IT_Pins                 # Z06: his lap-4 lie-down
-usewith! AlarmClock IT_Cactus        # Z06: his lap-4 alarm
+walk -2.6 -3.4                       # the hall by the living-room stairs, off his way down (~45)
+whenzone Zone03                      # (~51) his lap-1 kitchen: up behind him
+take! Cactus IT_Cactus               # Z07 through the living room and the bedroom
+park! Zone07                         # the balcony: he comes up (~109), hangs the key, lies down
+whenanim Rottweiler BedSleep         # (~121) his lap-2 sleep: the key hangs on its board
+take! PigKeys IT_Pigkey              # Z06 by the balcony door, tiptoe past the sleeper
+usewith! CornChips IT_Chips          # Z03 (he wakes at ~147, leaves the bedroom at ~158)
+usewith! PigMilk IT_Nitro            # Z03
+usewith! Pig IT_Pigkey               # Z01: the pig out for his lap-2 visit (~185)
+whenzone Zone03                      # (~168) his lap-2 kitchen: up behind him
+usewith Bed IT_Pins                  # Z06
+usewith AlarmClock IT_Cactus         # Z06
+usewith Ground@Zone06 IT_Banana      # Z06 x 1.90: his walk to the key board
 park! Zone07                         # the balcony
-whenanim Rottweiler BedSleep         # his lap-4 sleep, after the pins' jump
+whenanim Rottweiler BedSleep         # his lap-3 sleep, after the pins' jump
 usewith! Teeth IT_Tabasco            # Z06, tiptoe past the sleeper
 park! Zone07
 await Pig 10
