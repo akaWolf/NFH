@@ -168,18 +168,23 @@ class Level:
 
     def job_ticks(self, obj, name, actor='neighbor'):
         """the ticks an ACTION step of the action takes, from its start to the
-        next step's: the step's start pushes a timer job of the record's time
-        on the actor's queue with its run-now flag 0 (fcn.004772f0 at
-        0x477a46-0x477a62, fcn.00444d30), whose update (0x47e500) counts it
-        down and returns done on its (time + 1)th call, the first on the tick
-        after; the actor's tick then pops it and, in the same tick, updates
-        the step list below it (0x444db0: 0x444e05-0x444e7c), which starts the
-        next step — time + 1; a time of 0 makes no timer (0x477975), the step
-        passing at once. None when no record has it"""
+        next step's: the step's update (fcn.004772f0, slot 2 of vtable
+        0x4e546c) starts it on its first call — the animations, the noise, a
+        timer job of the longest record time pushed on the actor's queue with
+        the run-now flag 0 (0x477a46-0x477a62, fcn.00444d30) — and returns
+        not done (0x477ad6); the timer's update (0x47e500) counts it down and
+        is done on its (time + 1)th call, the first on the tick after; the
+        actor's tick then pops it and updates the step again in the same tick
+        (0x444db0: 0x444e05-0x444e7c), which ends it (the started flag +0x24:
+        the stop fcn.00476da0, done 0x477b3b), and the sequence or the level
+        class below pushes the next step with the run-now flag 0 (0x4765d4,
+        the classes' cases), so it starts on the next tick — time + 2; no
+        timer when the longest time is 0 (0x477975), the step's two updates
+        still two ticks. None when no record has it"""
         t = self.action_ticks(obj, name, actor)
         if t is None:
             return None
-        return t + 1 if t > 0 else 0
+        return t + 2
 
     def has_action(self, obj, name, actor='neighbor'):
         """the object (or the actor's blocks, the level's and the generic) has an
@@ -282,18 +287,20 @@ def video_laps():
     return out
 
 
-def model(L, toks, verbose=False):
+def model(L, toks, verbose=False, steady=True):
     """the legs of one lap: (kind, text, ticks) — kinds walk / door / action / intro / ?.
     Where the walker marks the case the lap's last `next` re-enters (WRAP),
     the steady lap is the tokens from there, walked from where lap 1 ends
     (107's painting walk, case 16, opens every lap; 108's toothbrush is the
-    first lap's only); else lap 1 from the level's start, its first walk the
-    intro"""
-    if any(k == 'WRAP' for k, _ in toks):
+    first lap's only); else, or with `steady` off (the stations' pairing,
+    tools/pcref/pc_durations.py: every visit of lap 1), lap 1 from the
+    level's start, its first walk the intro"""
+    plain = [t for t in toks if t[0] != 'WRAP']
+    if steady and len(plain) != len(toks):
         i = next(j for j, (k, _) in enumerate(toks) if k == 'WRAP')
-        _, end = _lap(L, [t for t in toks if t[0] != 'WRAP'], None)
+        _, end = _lap(L, plain, None)
         return _lap(L, toks[i + 1:], end)[0]
-    return _lap(L, toks, None)[0]
+    return _lap(L, plain, None)[0]
 
 
 def _lap(L, toks, start):
@@ -330,7 +337,9 @@ def _lap(L, toks, start):
         nonlocal occupied
         obj = obj or occupied
         if obj:
-            t = L.job_ticks(obj, 'leave') or 0
+            # the LEAVE step's ACTION `leave`: two updates without a record
+            t = L.job_ticks(obj, 'leave')
+            t = 2 if t is None else t
             i = len(legs)
             while implicit and i > 0 and legs[i - 1][0] == 'icon':
                 i -= 1
@@ -338,7 +347,10 @@ def _lap(L, toks, start):
 
     def enter(obj):
         nonlocal occupied
-        t = L.job_ticks(obj, 'enter') or 0; legs.append(('action', '%s enter' % obj, t)); occupied = obj
+        # the ENTER step's ACTION `enter`: two updates without a record (107's stool)
+        t = L.job_ticks(obj, 'enter')
+        t = 2 if t is None else t
+        legs.append(('action', '%s enter' % obj, t)); occupied = obj
 
     def goto(obj):
         nonlocal room, x, y, current, first
@@ -414,14 +426,22 @@ def _lap(L, toks, start):
 
 
 def stations(legs):
-    """the lap by ICON: [(icon, action ticks, walk+door ticks)]"""
-    out = []; cur = None
+    """the lap by ICON: [(icon, action ticks, walk+door ticks)]. A steady lap
+    (model's WRAP) opens inside its first station — the actions or the walk
+    before the first ICON — and closes on that station's ICON and walk: the
+    two halves are the first station, put first"""
+    out = []; cur = None; lead = [0, 0]
     for kind, text, t in legs:
         if kind == 'icon':
             cur = [text, 0, 0]; out.append(cur); continue
-        if cur is None: continue
-        if kind == 'action': cur[1] += t
-        elif kind in ('walk', 'door'): cur[2] += t
+        tgt = cur if cur is not None else [None] + lead
+        if kind == 'action': tgt[1] += t
+        elif kind in ('walk', 'door'): tgt[2] += t
+        if cur is None: lead = tgt[1:]
+    if out and (lead[0] or lead[1]):
+        last = out.pop()
+        last[1] += lead[0]; last[2] += lead[1]
+        out.insert(0, last)
     return out
 
 

@@ -95,14 +95,17 @@ ALERTERS = (107, 109, 111, 112, 113, 114)
 def pc_stations(n, toks):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]"""
     L = lap_model.Level(n)
-    legs = lap_model.model(L, toks[n])
+    legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
-    acts = []
+    acts = []; lead = []
     for kind, text, t in legs:
         if kind == 'icon':
             acts.append([])
-        elif kind == 'action' and acts:
-            acts[-1].append((text.split()[-1], t / lap_model.TICK))
+        elif kind == 'action':
+            (acts[-1] if acts else lead).append((text.split()[-1], t / lap_model.TICK))
+    if lead and acts:
+        # a steady lap opens inside its first station (lap_model.stations)
+        acts.insert(0, acts.pop() + lead)
     if len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
         st[0][1] += st[-1][1]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]

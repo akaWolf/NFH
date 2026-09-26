@@ -9,9 +9,9 @@ inventory item it takes (`<ingredient>`s), the tricked object its name — and
 Woody plays it as the object's action of his named after the inventory item
 (lir/sofa's `fartbag`, kit/binoculars' `superglue`), or `use` where the trick
 takes no item (lir/tv's twisted antenna); the action lasts the ACTION step's
-job (lap_model.Level.job_ticks: the record's time as Loader.dll stores it —
-time="N", or the longer oneshot animation less one — plus the timer's last
-update). The mobile item of each trick is
+step (lap_model.Level.job_ticks: the record's time as Loader.dll stores it —
+time="N", or the longer oneshot animation less one — plus the step's start and
+the timer's last update). The mobile item of each trick is
 tools/pcref/pc_reactions.py's TABLE (its PC tricked object); the overlay entry
 PCWoodySeconds maps the mobile inventory type Woody holds (RequiredInventory,
 SecondRequiredInventory) — or `use` — to the seconds, and World.woody_use
