@@ -995,6 +995,46 @@
     }
    },
    "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tools <- beachleft/waterski tools, the job 14 ticks"
+  },
+  {
+   "object": "Anchor",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachright/anchor take, the job 16 ticks"
+  },
+  {
+   "object": "BicycleTubeBox",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- pond/box_open take, the job 16 ticks"
+  },
+  {
+   "object": "Banger",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/bangers take, the job 16 ticks"
+  },
+  {
+   "object": "Glasses",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- shop/glasses take, the job 16 ticks"
   }
  ]
 }

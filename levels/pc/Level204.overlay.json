@@ -952,6 +952,46 @@
     }
    },
    "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Confetti <- wallright/hotdogshop confetti, the job 13 ticks"
+  },
+  {
+   "object": "RiceBowl",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- groundright/ricebowl take, the job 16 ticks"
+  },
+  {
+   "object": "Bricks",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- wallright/bricks take, the job 16 ticks"
+  },
+  {
+   "object": "UmbrellaStand",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- groundleft/shadesocket take, the job 16 ticks"
+  },
+  {
+   "object": "BonsaiScissors",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- wallright/scissors take, the job 16 ticks"
   }
  ]
 }

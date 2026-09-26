@@ -923,6 +923,46 @@
     }
    },
    "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sawfish <- pond/bridge sawfish, the job 13 ticks"
+  },
+  {
+   "object": "RubbishBin",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- shop/waste take, the job 16 ticks"
+  },
+  {
+   "object": "Reed",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachright/reed take, the job 16 ticks"
+  },
+  {
+   "object": "SawFish",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.25
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/sign take, the job 15 ticks"
+  },
+  {
+   "object": "Weed",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/weed take, the job 16 ticks"
   }
  ]
 }

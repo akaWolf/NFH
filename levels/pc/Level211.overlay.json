@@ -1141,6 +1141,76 @@
    "set": {
     "PCUseSeconds": 3.17
    }
+  },
+  {
+   "object": "ChestDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- cabin/chest take, the job 16 ticks"
+  },
+  {
+   "object": "Plate",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- cabin/plate take, the job 16 ticks"
+  },
+  {
+   "object": "MumPicture",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.25
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- cabin/picture take, the job 15 ticks"
+  },
+  {
+   "object": "Urinal",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomright/pissoir take, the job 16 ticks"
+  },
+  {
+   "object": "FireExtinguisher",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- topright/extinguisher take, the job 16 ticks"
+  },
+  {
+   "object": "CompressedAir",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/gasbottles take, the job 16 ticks"
+  },
+  {
+   "object": "Handbag",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- topright/handbag take, the job 16 ticks"
   }
  ]
 }

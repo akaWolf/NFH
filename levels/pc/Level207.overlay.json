@@ -1181,6 +1181,66 @@
     }
    },
    "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bucket <- bar/elefant bucket, the job 10 ticks"
+  },
+  {
+   "object": "Moped",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/spring/pool/spring take, the job 16 ticks"
+  },
+  {
+   "object": "MopedPool",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/spring/pool/spring take, the job 16 ticks"
+  },
+  {
+   "object": "IceBucket",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bar/bucket_bar take, the job 16 ticks"
+  },
+  {
+   "object": "BBQ",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bar/barbecue take, the job 16 ticks"
+  },
+  {
+   "object": "SeaUrchin",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachright/hedgehog take, the job 16 ticks"
+  },
+  {
+   "object": "Moped2",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bar/moped take, the job 16 ticks"
   }
  ]
 }

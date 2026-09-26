@@ -149,11 +149,16 @@ def woody_seconds_s2(n):
             combos.append(re.findall(r'<ingredient name="([^"]+)"', m.group(3)))
     D = lap_model_s2.Data(n)
     mob = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))['objects']
+    # the level's mini-game item (PCMinigameTicks, tools/pcref/pc_minigames.py)
+    # is left to the game
+    ovp = '%s/levels/pc/Level%d.overlay.json' % (ROOT, n)
+    games = {e.get('object') for e in json.load(open(ovp)).get('patches', [])
+             if 'PCMinigameTicks' in (e.get('set') or {})} if os.path.exists(ovp) else set()
     out = {}
     for o in mob.values():
         dd = o.get('data') or {}
         nm = (dd.get('m_GameObject') or {}).get('name')
-        if o.get('type') != 'TrickItem' or not nm:
+        if o.get('type') != 'TrickItem' or not nm or nm in games:
             continue
         req = [x for x in (dd.get('RequiredInventory'), dd.get('SecondRequiredInventory'))
                if x and x not in ('IT_NONE', 'IT2_NONE')]
@@ -172,6 +177,30 @@ def woody_seconds_s2(n):
                     break
         if vals:
             out[nm] = (o['type'], vals, notes)
+    # the containers: Woody's `take` of the PC object whose contents are the
+    # SearchItem's inventory, as a job (16 ticks on most)
+    ob = canon.read(os.path.join(d, 'objects.xml'))
+    contents = {}
+    for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', ob, re.S):
+        cs = set(re.findall(r'<content name="([^"]+)"', om.group(2)))
+        # a container that is a mini-game (flag `game`) is left to the game
+        if cs and '<flag name="game"' not in om.group(2):
+            contents[om.group(1)] = cs
+    for o in mob.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if o.get('type') != 'SearchItem' or not nm or nm in out or nm in games:
+            continue
+        invs = {canon.norm(i.get('Type')) for i in (dd.get('InventoryItems') or [])
+                if isinstance(i, dict) and i.get('Type')}
+        cands = [obj for obj, cs in contents.items() if invs & cs]
+        ticks = {D.job_ticks(obj, 'take', actor='woody') for obj in cands}
+        ticks.discard(None)
+        if len(ticks) != 1:
+            continue
+        t = ticks.pop()
+        out[nm] = ('SearchItem', {'use': round(t / lap_model.TICK, 3)},
+                   ['use <- %s take, the job %d ticks' % ('/'.join(sorted(cands)), t)])
     return out
 
 

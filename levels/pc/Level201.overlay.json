@@ -848,6 +848,36 @@
     }
    },
    "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Spaghetti <- topleft/captncap spaghetti, the job 13 ticks"
+  },
+  {
+   "object": "VanityBag",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/beautycase take, the job 16 ticks"
+  },
+  {
+   "object": "SpaghettiCar",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- topleft/spaghetticar take, the job 16 ticks"
+  },
+  {
+   "object": "SoapChest",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/soapchest take, the job 16 ticks"
   }
  ]
 }

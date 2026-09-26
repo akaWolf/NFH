@@ -1257,6 +1257,86 @@
      ]
     }
    }
+  },
+  {
+   "object": "FleaBlanket",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "FifiHarpoon",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "SportsBag",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomright/rubberbag take, the job 16 ticks"
+  },
+  {
+   "object": "FifiWeights",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "FifiWeightsDrop",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "ToyBox",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/toybox take, the job 16 ticks"
+  },
+  {
+   "object": "Rabbit",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
+  },
+  {
+   "object": "FifiWeightsGrab",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (ship2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/rabbit/topleft/fleablanket take, the job 16 ticks"
   }
  ]
 }

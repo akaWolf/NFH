@@ -1546,6 +1546,96 @@
     }
    },
    "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Paint <- midleft/bank paint, the job 13 ticks"
+  },
+  {
+   "object": "MechanicalBullCoins",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/coins take, the job 16 ticks"
+  },
+  {
+   "object": "PaintPot",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midleft/paint take, the job 16 ticks"
+  },
+  {
+   "object": "Crowbar",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- topright/crowbar take, the job 16 ticks"
+  },
+  {
+   "object": "ClosedMine",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/mine_open take, the job 16 ticks"
+  },
+  {
+   "object": "RubyThrone",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midright/spikes_open/topright/ruby take, the job 16 ticks"
+  },
+  {
+   "object": "Corn",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.25
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midleft/corn take, the job 15 ticks"
+  },
+  {
+   "object": "Skeleton",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bottomleft/skeleton take, the job 16 ticks"
+  },
+  {
+   "object": "ParrotNest",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midright/spikes_open/topright/ruby take, the job 16 ticks"
+  },
+  {
+   "object": "Resin",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- midright/resin take, the job 16 ticks"
   }
  ]
 }

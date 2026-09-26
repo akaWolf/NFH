@@ -885,6 +885,46 @@
     }
    },
    "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Oilcan <- groundleft/ricechute oilcan, the job 13 ticks"
+  },
+  {
+   "object": "ToolPelt",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- wallleft/wrench take, the job 16 ticks"
+  },
+  {
+   "object": "CannonBall",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- wallleft/cannonballs take, the job 16 ticks"
+  },
+  {
+   "object": "ChiliSoup",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- groundright/piripiri take, the job 16 ticks"
+  },
+  {
+   "object": "OilCan",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- wallright/oilcan take, the job 16 ticks"
   }
  ]
 }

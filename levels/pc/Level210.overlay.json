@@ -1246,6 +1246,36 @@
     }
    },
    "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hedgehog <- beachleft/deckchair hedgehog, the job 13 ticks"
+  },
+  {
+   "object": "AlmsBowl",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- bar/statue take, the job 16 ticks"
+  },
+  {
+   "object": "SuntanOil",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/sunoil take, the job 16 ticks"
+  },
+  {
+   "object": "OlgaBra",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.25
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): use <- beachleft/bra take, the job 15 ticks"
   }
  ]
 }
