@@ -75,7 +75,8 @@ class Level:
         sp = {attrs(t)['name']: attrs(t) for t in re.findall(r'<speed\b[^>]*/>', m.group(1))}
         self.speed = int(sp['mg1']['speed'])    # px a tick along the floor (facing left/right)
         self.vspeed = int(sp['mg0']['speed'])   # px a tick up and down the room (facing 0/2)
-        self.start_px = int(sp['mg1']['start'])  # the first step off the standing animation
+        self.start_px = int(sp['mg1']['start'])  # the first move's extra px, facing right
+        self.start_px_left = int(sp['mg3']['start'])  # and facing left
         # rooms, their paths and doors
         self.rooms = {}
         self.start = None
@@ -246,13 +247,17 @@ class Level:
         return None
 
     def walk_ticks(self, dx, dy=0):
-        """one axis a tick (fcn.0047c7f0's four facing branches): the floor at `speed`, the depth at `vspeed`;
-        the first step off the standing animation adds `start` px"""
-        dx, dy = abs(dx), abs(dy)
-        if dx == 0 and dy == 0: return 0
+        """a mover's ticks (vtable 0x4e59e8, update 0x47cb50): one axis a tick, x
+        before y, the floor at `speed`, the depth at `vspeed`, its first move
+        `start` px longer (mg1's facing right, mg3's left; the vertical records'
+        0), clamped at the target, found in the update of its last move"""
         t = 0
-        if dx: t += max(1, -(-(dx - self.start_px) // self.speed) + 1) if dx > self.start_px else 1
-        if dy: t += -(-dy // self.vspeed)
+        if dx:
+            a = abs(dx)
+            start = self.start_px if dx > 0 else self.start_px_left
+            t += 1 + (-(-(a - self.speed - start) // self.speed) if a > self.speed + start else 0)
+        if dy:
+            t += -(-abs(dy) // self.vspeed)
         return t
 
 
@@ -322,13 +327,21 @@ def _lap(L, toks, start):
         r = L.route(room, room2)
         if r is None:
             legs.append(('?', 'no route %s -> %s (%s)' % (room, room2, what), 0)); room, x, y = room2, x2, y2; return
+        after = False
         for d_out, d_in in r:
             xo, yo = L.door_point(d_out); xi, yi = L.door_point(d_in, out=True)
-            t = L.walk_ticks(xo - x, yo - y); legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
+            t = L.walk_ticks(xo - x, yo - y)
+            if after and t:
+                t -= 1                # its first move in the leave's last tick (0x4760ad, run-now 1)
+            legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
             t_out = L.job_ticks(d_out, 'enter') or 0; t_in = L.job_ticks(d_in, 'leave') or 0
             legs.append(('door', '%s enter %d + %s leave %d' % (d_out, t_out, d_in, t_in), t_out + t_in))
             room, x, y = d_in.split('/')[0], xi, yi
-        t = L.walk_ticks(x2 - x, y2 - y); legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
+            after = True
+        t = L.walk_ticks(x2 - x, y2 - y)
+        if after and t:
+            t -= 1
+        legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
 
     def leave(obj=None, implicit=False):
         """the object's leave; the one a walk makes (the neighbour still in the
@@ -361,7 +374,12 @@ def _lap(L, toks, start):
             legs.append(('intro', 'start %s %d/%d -> %s' % (room, x, y, obj), 0)); room, x, y = r2, x2, y2; first = False
         else:
             if occupied and occupied != obj: leave(implicit=True)
+            moved = (r2, x2, y2) != (room, x, y)
             walk_to(r2, x2, y2, obj)
+            # the GOTO's next update ends it a tick after the last move
+            # (0x44aab0); with no move the walk job ends inside its first
+            # update and the arrival is read on the second: three ticks
+            legs.append(('goto', 'the GOTO ends', 1 if moved else 3))
         current = obj
         return True
 
@@ -436,7 +454,7 @@ def stations(legs):
             cur = [text, 0, 0]; out.append(cur); continue
         tgt = cur if cur is not None else [None] + lead
         if kind == 'action': tgt[1] += t
-        elif kind in ('walk', 'door'): tgt[2] += t
+        elif kind in ('walk', 'door', 'goto'): tgt[2] += t
         if cur is None: lead = tgt[1:]
     if out and (lead[0] or lead[1]):
         last = out.pop()
@@ -466,7 +484,7 @@ def main(argv):
         delta = ('%+d %%' % round(100.0 * (secs - v) / v)) if v else 'n/a'
         unknown = sum(1 for k, _, _ in legs if k == '?')
         print('%d %-14s lap %6.1f s = walk %5.1f + doors %5.1f + actions %5.1f | video %s | %s%s' % (
-            n, L.folder, secs, by.get('walk', 0) / TICK, by.get('door', 0) / TICK, by.get('action', 0) / TICK,
+            n, L.folder, secs, (by.get('walk', 0) + by.get('goto', 0)) / TICK, by.get('door', 0) / TICK, by.get('action', 0) / TICK,
             '%d s' % v if v else '-', delta, ('  (%d unknown)' % unknown) if unknown else ''))
         if verbose:
             for kind, text, t in legs:
