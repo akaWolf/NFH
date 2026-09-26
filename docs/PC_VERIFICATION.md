@@ -287,9 +287,15 @@ actors' job pass the update calls at 0x100445f8.
   the model walks straight along their line, y 370; the bedroom's back door
   climb 32 px where the PC's is 52). The walk step's waypoints (the walk
   fiber fcn.00475b30, the path builders fcn.00475940 / fcn.00475a40 over
-  fcn.00448060) are not read, so the model's straight legs are not either;
-  Season 2's walk was carried the same way (docs/PC_FIDELITY.md "Season 2
-  walks") once GameLogic's was.
+  fcn.00448060) are not read, so the model's straight legs are not either —
+  and E13's bubbles side with the port on six of 113's eight legs (the
+  station's icon span, walk and use: the main valve 29-30 s, the port 30.3,
+  the model 26.9; the radiator 19-20, 18.8, 17.5; the basin 19-20, 21.8,
+  23.2; the fuse box 8-9, 7.5, 6.0; the grinder 19-20, 21.7, 23.0; the
+  ladder 24-25, 25.0, 23.2), the model nearer on the second valve (14-15,
+  16.1, 15.6); a layout carry waits for the walk step's reading. Season 2's
+  walk was carried once GameLogic's was (docs/PC_FIDELITY.md "Season 2
+  walks").
 - The Season 1 chains against Badinfos' runs (2026-09-26): E04 pays its
   seven 18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan
   18.3, 11.7, 18.5, 11.6, 18.5 and 21.8 — the toilet to the aftershave
