@@ -246,18 +246,27 @@ class Level:
                     return path[::-1]
         return None
 
-    def walk_ticks(self, dx, dy=0):
-        """a mover's ticks (vtable 0x4e59e8, update 0x47cb50): one axis a tick, x
-        before y, the floor at `speed`, the depth at `vspeed`, its first move
-        `start` px longer (mg1's facing right, mg3's left; the vertical records'
-        0), clamped at the target, found in the update of its last move"""
+    def walk_ticks(self, x0, y0, x1, y1, floor):
+        """a mover's ticks (vtable 0x4e59e8, update 0x47cb50), one axis a tick:
+        while x is off the target's, y goes to the room's floor line first (the
+        room's point, fcn.0044bac0 on the actor's room: its path's y; the up and
+        down records, 0x47cbc6-0x47cc9d), then x at `speed` — its first move
+        `start` px longer when it leaves the standing animation (the mover's
+        +0x14 and the `ms` test, 0x47ccc6-0x47cd27: mg1's facing right, mg3's
+        left) — and once x is the target's, y goes to the target's at `vspeed`;
+        clamped at the target, found in the update of its last move"""
         t = 0
-        if dx:
-            a = abs(dx)
-            start = self.start_px if dx > 0 else self.start_px_left
+        standing = True
+        if x1 != x0:
+            if y0 != floor:
+                t += -(-abs(floor - y0) // self.vspeed)
+                y0 = floor
+                standing = False
+            a = abs(x1 - x0)
+            start = (self.start_px if x1 > x0 else self.start_px_left) if standing else 0
             t += 1 + (-(-(a - self.speed - start) // self.speed) if a > self.speed + start else 0)
-        if dy:
-            t += -(-abs(dy) // self.vspeed)
+        if y1 != y0:
+            t += -(-abs(y1 - y0) // self.vspeed)
         return t
 
 
@@ -330,7 +339,7 @@ def _lap(L, toks, start):
         after = False
         for d_out, d_in in r:
             xo, yo = L.door_point(d_out); xi, yi = L.door_point(d_in, out=True)
-            t = L.walk_ticks(xo - x, yo - y)
+            t = L.walk_ticks(x, y, xo, yo, L.rooms.get(room, {}).get('y', y))
             if after and t:
                 t -= 1                # its first move in the leave's last tick (0x4760ad, run-now 1)
             legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
@@ -340,7 +349,7 @@ def _lap(L, toks, start):
             legs.append(('door', '%s enter %d | %s leave %d' % (d_out, t_out, d_in, t_in), max(t_out, t_in)))
             room, x, y = d_in.split('/')[0], xi, yi
             after = True
-        t = L.walk_ticks(x2 - x, y2 - y)
+        t = L.walk_ticks(x, y, x2, y2, L.rooms.get(room, {}).get('y', y))
         if after and t:
             t -= 1
         legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
