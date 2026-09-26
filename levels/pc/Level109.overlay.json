@@ -214,6 +214,76 @@
    "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tabasco <- bed/teeth tabasco 11 ticks"
   },
   {
+   "object": "ChemicalSet",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/chemicalkit take 11 ticks"
+  },
+  {
+   "object": "SpicyChips",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/chips take 11 ticks"
+  },
+  {
+   "object": "RubbishBinBanana2",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
+   "object": "Fridge",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+  },
+  {
+   "object": "PinsBoard",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 18 ticks"
+  },
+  {
+   "object": "Cactus",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/cactus take 18 ticks"
+  },
+  {
+   "object": "PigKeys",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/keyboard take 18 ticks"
+  },
+  {
    "object": "Ground",
    "component": "TrickItem",
    "set": {

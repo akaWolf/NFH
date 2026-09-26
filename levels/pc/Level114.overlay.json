@@ -252,6 +252,76 @@
    "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Munition <- bas/gun munition 23 ticks"
   },
   {
+   "object": "MouseHole",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/rat take 11 ticks"
+  },
+  {
+   "object": "ShotgunShells",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/munition take 18 ticks"
+  },
+  {
+   "object": "RubbishBinCable",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+  },
+  {
+   "object": "BedDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 18 ticks"
+  },
+  {
+   "object": "BasementDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 18 ticks"
+  },
+  {
+   "object": "DeskDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 18 ticks"
+  },
+  {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {

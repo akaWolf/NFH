@@ -146,6 +146,56 @@
    "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/footstool 11 ticks"
   },
   {
+   "object": "FirstAid",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.167
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+  },
+  {
+   "object": "RubbishBinBanana",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
+   "object": "PinsBoard",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 18 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+  },
+  {
+   "object": "MagnesiumBottle",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/magnesiumbottle take 18 ticks"
+  },
+  {
    "object": "Ground",
    "component": "TrickItem",
    "set": {

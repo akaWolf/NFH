@@ -146,6 +146,46 @@
    "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Vinegar <- lir/wine vinegar 23 ticks"
   },
   {
+   "object": "PinsBoard",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 18 ticks"
+  },
+  {
+   "object": "FirstAid",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.167
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+  },
+  {
+   "object": "Fridge",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+  },
+  {
+   "object": "RubbishBinBanana2",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
    "object": "Ground",
    "component": "TrickItem",
    "set": {

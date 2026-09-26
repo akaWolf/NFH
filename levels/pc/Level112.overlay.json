@@ -239,6 +239,86 @@
    "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Knotbook <- wor/book knotbook 11 ticks"
   },
   {
+   "object": "BasementSpring",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/carstuff take 11 ticks"
+  },
+  {
+   "object": "FirstAid",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.167
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+  },
+  {
+   "object": "BasementDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 18 ticks"
+  },
+  {
+   "object": "SportsBag",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/bag take 11 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+  },
+  {
+   "object": "TableSaw",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/saw take 18 ticks"
+  },
+  {
+   "object": "RubbishBinCable",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
+   "object": "BedDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 18 ticks"
+  },
+  {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {

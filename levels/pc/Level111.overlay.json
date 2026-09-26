@@ -208,6 +208,86 @@
    "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Winebottle <- bas/washingmachine winebottle 23 ticks"
   },
   {
+   "object": "BasementDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 18 ticks"
+  },
+  {
+   "object": "Detergent",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/detergent take 18 ticks"
+  },
+  {
+   "object": "TableShovel",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/shovel take 18 ticks"
+  },
+  {
+   "object": "RubbishBinCable",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+  },
+  {
+   "object": "WineCellar",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/wine take 11 ticks"
+  },
+  {
+   "object": "DeskDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 18 ticks"
+  },
+  {
+   "object": "Perch",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/birdpole take 11 ticks"
+  },
+  {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {

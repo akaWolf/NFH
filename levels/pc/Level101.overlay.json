@@ -100,6 +100,26 @@
     }
    },
    "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 11 ticks"
+  },
+  {
+   "object": "Fridge",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
   }
  ]
 }

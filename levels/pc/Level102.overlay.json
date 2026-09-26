@@ -106,6 +106,36 @@
     }
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 23 ticks"
+  },
+  {
+   "object": "FirstAid",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.167
+    }
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 14 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 18 ticks"
+  },
+  {
+   "object": "Fridge",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.5
+    }
+   },
+   "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 18 ticks"
   }
  ]
 }

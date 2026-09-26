@@ -10055,15 +10055,23 @@ class World:
         self.woody.anim.time_scale = 1.0
         pcw = getattr(item, 'pc_woody_secs', None) \
             if pcprofile.is_pc() and pcprofile.rule('durations') else None
+        searching = item.kind == 'SearchItem'
         if pcw and seq:
             key = (item_used_inventory or {}).get('type') or 'use'
             secs = pcw.get(key, pcw.get('use'))
-            mobile = self.woody.anim.sequence_seconds(seq)
+            # a search is its pick-up and the take after it (the
+            # SearchingItem branch, _woody_search_step): the PC's `take` is
+            # the whole of it
+            clips = list(seq)
+            if searching and item.inventory_items:
+                take = list(item.take_sequence) if item.use_take_sequence \
+                    else ([item.take_animation] if item.take_animation else [])
+                clips += [a for a in take if self.woody.anim.has(a)]
+            mobile = self.woody.anim.sequence_seconds(clips)
             if secs and mobile > 0.0:
                 self.woody.anim.clip_pace = {
                     nm: secs * self.woody.anim.sequence_seconds([nm]) / mobile
-                    for nm in seq}
-        searching = item.kind == 'SearchItem'
+                    for nm in clips}
         # only a TrickItem defers its use to the animation's end
         # (ShouldUseAfterAnimationFinishes: TrickItem.cs:263-266,
         # SearchItem.cs:121-124); every other kind — the L109 parrot is the
@@ -10080,8 +10088,9 @@ class World:
             self.woody.stored_input = None
 
         def anim_ended():
-            self.woody.anim.clip_pace = None
-            self.woody.anim.time_scale = 1.0
+            if not searching:
+                self.woody.anim.clip_pace = None
+                self.woody.anim.time_scale = 1.0
             if searching:
                 self._woody_search_step(item)
             elif deferred:
@@ -10349,6 +10358,10 @@ class World:
         Item.UseItem — Used, the SearchItem.InternalUse hand-over and
         emptying — then the empty pose through SearchItem.PlayItemAnimation
         (its own twin: no Animating gate, the Looping flag, the NONE hide)."""
+        if self.woody is not None:
+            # the profile's paced search is over (World.woody_use)
+            self.woody.anim.clip_pace = None
+            self.woody.anim.time_scale = 1.0
         self._use_item(item)                             # cs:117
         self.search_play(item, item.empty_animation)     # cs:118
 
