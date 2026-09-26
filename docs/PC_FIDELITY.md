@@ -251,7 +251,11 @@ images and the remaster's full field carries that disk at those px — the
 port draws its rows from the bottom up to the progress, 28 px in
 (pcprofile.S2_GAME_BAR, Hud._draw_pc_game_bar; the videos fill the disk
 from below up to the ring; since 2026-09-25 — the remaster's whole
-138 px fill stood in before). The rows' rounding is the port's. Woody plays
+138 px fill stood in before). The rows are GFXEngine's progress widget's
+(vtable 0x100422b8, made by fcn.100103f0 into the game's +4 with its
+maximum 100): its draw (slot 9, 0x10010e90) fills the vertical bar from
+the bottom by value x height / maximum in unsigned integers
+(0x10010f13-0x10010f1e), the port the same since 2026-09-26. Woody plays
 the game where the use put him — the object's `woody` hotspot, its
 level.xml position plus the offset — which lies off the room's floor line
 on thirteen levels: 24 px above it at 204's dispenser (whose `use` hides
