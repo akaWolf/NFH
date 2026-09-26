@@ -6065,10 +6065,16 @@ class Routine:
         self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
         self.pawn.anim.time_scale = 1.0
         w = self.pawn.world
-        if pcprofile.is_pc() and w is not None and it.tricked \
-                and getattr(it, 'pc_fire_before', False) and not it.pc_fired:
+        # a station the mobile makes a walk-by: 111's rack, whose case 14
+        # fires its OBJ2 bal/clothes_food on his arrival (PCFireAt 0), then
+        # the repair and the take — no doubletake (tools/pcref/
+        # trick_branches.py)
+        station = pcprofile.is_pc() and getattr(it, 'pc_fire_at', None) == 0.0
+        if pcprofile.is_pc() and w is not None and it.tricked and not it.pc_fired \
+                and (getattr(it, 'pc_fire_before', False) or station):
             # the soap and marbles slips: game.exe's five-argument step
-            # scores first and plays the fall inside it (PCFireBefore)
+            # scores first and plays the fall inside it (PCFireBefore); the
+            # station fires on arrival
             w.s1_fire(self.pawn, it)
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
         # arm (Rottweiler.cs:1049-1052)
@@ -6085,10 +6091,12 @@ class Routine:
         self.state = self.USING
         seq = [a for a in seq if self.pawn.anim.has(a)]
         if seq:
-            pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)) \
+            pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
+                  or (it.pc_use_secs_tricked if station else None)) \
                 if pcprofile.is_pc() else None
             if pc:
-                # the PC fall (slip1/slip3, 31 frames) or doubletake3 (15):
+                # the PC fall (slip1/slip3, 31 frames) or doubletake3 (15),
+                # or the station's tricked stand (the rack's take, 0.33 s):
                 # the mobile clip at the pace that lasts it
                 mobile = self.pawn.anim.sequence_seconds(seq)
                 if mobile > 0.0:
