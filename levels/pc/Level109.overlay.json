@@ -284,6 +284,17 @@
    "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/keyboard take 18 ticks"
   },
   {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.583,
+     "leave": 1.583
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+  },
+  {
    "object": "Ground",
    "component": "TrickItem",
    "set": {

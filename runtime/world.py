@@ -1077,6 +1077,14 @@ class Pawn:
             # which a forced Single would run past its sheet after a second
             p.play_directly(item.hide_idle)
         if item.leave_animation and self.anim.has(item.leave_animation):
+            # the PC hideout's `leave` of Woody's (PCWoodySeconds `leave`); its
+            # LEAVE step clears flag 4 as it starts (game.exe 0x473ccc), so the
+            # Season 1 catch reads him from the clip's start
+            pcw = getattr(item, 'pc_woody_secs', None) \
+                if pcprofile.is_pc() and pcprofile.rule('durations') else None
+            self.anim.clip_pace = {item.leave_animation: pcw['leave']} \
+                if pcw and pcw.get('leave') else None
+            self.anim.time_scale = 1.0
             self.anim.play_single(item.leave_animation)
             # the PC's leave step clears flag 4 once its `leave` has played
             # (GameLogic.dll 0x10006ab7): hidden to the Season 2 catch for
@@ -10042,6 +10050,13 @@ class World:
             if self.hud is not None:
                 self.hud.colored_tooltip = False         # Item.cs:1916
             if item.animation and self.woody.anim.has(item.animation):
+                # the PC hideout's `enter` of Woody's (PCWoodySeconds
+                # `enter`: the wardrobe 19 ticks, the bed 4)
+                pcw = getattr(item, 'pc_woody_secs', None) \
+                    if pcprofile.is_pc() and pcprofile.rule('durations') else None
+                self.woody.anim.clip_pace = {item.animation: pcw['enter']} \
+                    if pcw and pcw.get('enter') else None
+                self.woody.anim.time_scale = 1.0
                 self.woody.anim.play_single(item.animation)
             return
         seq = list(item.animation_sequence) if item.use_woody_sequence \

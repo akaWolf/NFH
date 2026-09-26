@@ -186,6 +186,28 @@
    "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 11 ticks"
   },
   {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.583,
+     "leave": 1.583
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.583; leave <- anc/wardrobe 1.583"
+  },
+  {
+   "object": "Bed",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.333,
+     "leave": 0.333
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.333; leave <- bed/bed 0.333"
+  },
+  {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
