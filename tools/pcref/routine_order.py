@@ -55,7 +55,9 @@ def at(a):
 def ins(k):
     t = L[k].strip(); m = re.match(r'(0x[0-9a-f]{8})\s+[0-9a-f.]+\s+(.*)', t)
     return (int(m.group(1), 16), m.group(2)) if m else (None, None)
-LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2'}
+LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2', 'fcn.0047a960': 'GOTO', 'fcn.0047a4a0': 'GOTO'}
+# fcn.0047a960 and fcn.0047a4a0 are GoTo builders too (their asserts: CreateGoToObjectJob,
+# CreateGoToObjXJob — the object in the actor's room): 114's case 7 walks to lir/tabacbox
 PRED = ('fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.0047c6c0', 'fcn.00413780')
 ALLPRED = os.environ.get('ALLPRED') == '1'
 NATFALSE_FN = {'fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.00413780', 'fcn.0047ac20', 'fcn.0047ad20', 'fcn.0047a0b0', 'fcn.00422c40'}
@@ -71,8 +73,13 @@ def strings_before(k, n=8):
             nm = G.get('0x' + m.group(1))
             if nm: out.append(str(nm))
     return out
+def line_strings(k):
+    """the string globals line k refers to"""
+    return [str(G['0x' + m.group(1)]) for m in re.finditer(r'0x(5[01][0-9a-f]{4})', L[k]) if G.get('0x' + m.group(1))]
 def strings_since_call(k, n=60):
-    """the string globals loaded since the previous labelled call — the arguments of the call at k"""
+    """the string globals loaded since the previous labelled call in the listing's
+    order — the arguments of the call at k where no branch lies between (the case
+    walk reads them off its own path: simulate's `pstr`)"""
     j0 = max(0, k - n)
     for j in range(k - 1, j0, -1):
         tt = ins(j)[1] or ''
@@ -133,10 +140,17 @@ def run_level(sw):
         objflags = {} if objflags is None else objflags
         labels = []; k = at(start_a); seen = set(); pred = False; regs = {}; lastcall = None; flags = {}; inverted = False
         trace = TRACE and int(TRACE, 16) == start_a
+        # the string globals on the path since the last labelled call: a call's
+        # arguments (the listing's order would cross into the branch not taken —
+        # 109's case 11 takes its teeth, where the tabasco branch above it spits fire)
+        pstr = []
         for _ in range(600):
             if k in seen: return labels, 'loop'
             seen.add(k); a, t = ins(k)
             if t is None: k += 1; continue
+            m = re.match(r'call (fcn\.[0-9a-f]+)', t)
+            if not (m and m.group(1) in LABEL):
+                pstr += line_strings(k)
             if trace and re.search(r'call|j[a-z]+ 0x|push|test', t): print('      trace %x %s pred=%s' % (a, t[:50], pred))
             if (mm := re.match(r'mov (e[a-z]x|e[sd]i|ebp), (0x[0-9a-f]+|[0-9]+)$', t)): regs[mm.group(1)] = int(mm.group(2), 0)
             elif (mm := re.match(r'xor (e[a-z]x|e[sd]i|ebp), \1$', t)): regs[mm.group(1)] = 0
@@ -146,7 +160,7 @@ def run_level(sw):
             m = re.match(r'call (fcn\.[0-9a-f]+)', t)
             if m:
                 fn = m.group(1)
-                if fn in LABEL: labels.append((LABEL[fn], strings_since_call(k)[-4:]))
+                if fn in LABEL: labels.append((LABEL[fn], pstr[-4:]))
                 elif depth < 1 and lo - 0x2000 <= int(fn[4:], 16) < hi + 0x2000 and fn not in NATTRUE and fn not in NATFALSE_FN and not re.search(r'fcn\.(0045c600|004706a0|0045e640|0047f740)', fn):
                     # a helper of the class (the sofa's sit/sit_remo picker, fcn.004707e0): its own
                     # GoTo/DoAction calls belong to the case that calls it
@@ -155,11 +169,15 @@ def run_level(sw):
                 if present is not None and fn in PRESENCE_FN:
                     lastcall = ('flag', 'true' if PRESENCE_FN[fn] in present else 'false')
                 if present is not None and fn in ('fcn.00479ff0', 'fcn.00451de0'):
-                    ss = [x for x in strings_since_call(k) if '/' in x]
+                    ss = [x for x in pstr if '/' in x]
                     if fn == 'fcn.00479ff0' and ss:
                         lastcall = ('flag', 'true' if ss[-1] in present else 'false')
                     elif fn == 'fcn.00451de0' and len(ss) >= 2:
                         present.discard(ss[-1]); present.add(ss[-2])
+                if fn in LABEL and LABEL[fn] != 'IFVARIANT':
+                    # an IFVARIANT's pick is the next call's object (107's ENTER of
+                    # the stool or its pinned twin)
+                    pstr = []
                 k += 1; continue
             if t == 'test al, al':
                 if lastcall is None: pred = 'false'
