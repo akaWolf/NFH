@@ -491,16 +491,21 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   same windows
   (`_asleep_safe`, `_ignoring_safe`); `NFH_PC_RULES=walk,doors,sight`
   keeps a subset for bisecting a plan.
-- The door pass (2026-09-17, `pcprofile.door_ticks` / `doors_sequential` /
-  `door_warp_early`, docs/PC_VERIFICATION.md "door transit"): the PC runs
-  the near door's `enter` and the far door's `leave` one after the other
-  through every door (the mobile fires a flat door's two strips at once),
-  each `time` ticks long — the neighbour 19 + 19 by a side door and
-  11 + 22 by a back door, Woody 15 + 23 / 18 + 24 / 9 + 25 — so the mobile
-  strips play at the rate that lasts those ticks; and the far door places
-  the pawn, zone and all, at its clip's start, where the PC's room pointer
-  changes (the mobile warps at the clip's end). Season 2's doors are not
-  `<door>` objects and keep the mobile's pass at a frame a tick.
+- The door pass (2026-09-17, `pcprofile.door_ticks` / `door_warp_early`,
+  docs/PC_VERIFICATION.md "door transit"): the near door's `enter` and the
+  far door's `leave`, each `time` ticks long — the neighbour 19 + 19 by a
+  side door and 11 + 22 by a back door, Woody 15 + 23 / 18 + 24 / 9 + 25 —
+  so the mobile strips play at the rate that lasts those ticks; and the
+  door step places the pawn at the far door, zone and all, as the pass
+  starts, where the PC's room pointer changes (the mobile warps at the
+  clip's end). The two ran one after the other through every door from
+  that day's reading of E10 until 2026-09-26, when game.exe's door step
+  was read to its ACTION (one step of two entries, started together, the
+  longer timing it — docs/PC_VERIFICATION.md "door transit") and E14's
+  frames confirmed it: they run together (`pcprofile.doors_concurrent`), a
+  walk-up door's too, the pass as long as the far door's `leave`. Season
+  2's doors are not `<door>` objects and keep the mobile's pass at a frame
+  a tick.
 - The stations' durations (2026-09-17, `tools/pcref/pc_durations.py`):
   every Season 1 overlay carries `PCUseSeconds` per routine item — the
   PC station's DoActions at 12 ticks a second, from the lap model's
@@ -1392,40 +1397,42 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   of the path (fcn.00475b30), for each next room pushes a mover to the
   near door's standing point — the door's entity position plus the door
   type's `neighbor` hotspot (fcn.00445aa0) — and the door step (vtable
-  0x4e5370, update 0x474590: the near door's `enter` and the far door's
-  `leave` as one step list, fcn.004741e0 over fcn.00478030, the pair
-  claimed by its flag 8, the actor placed at the far door's point), and at
-  the end a mover to the target's hotspot, each with the run-now flag 1: a
-  leg's first move falls in the tick the one before it ends (0x4760ad). A
-  mover (vtable 0x4e59e8, update 0x47cb50) moves one axis a tick — x
-  before y — at the facing's speed record, its first move the record's
-  `start` px longer (the neighbour's mg1 8 + 8 facing right, mg3 8 + 10
-  facing left, mg0 / mg2 3 up and down with none; the runs' mr records 18
-  / 9), clamped at the target, and finds the target in the update of its
-  last move (0x47cf7f-0x47cfac); the GOTO's next update ends it a tick
-  after the last move (0x44aab0) — three ticks with no move, the walk job
-  done inside the GOTO's first update and the arrival read on its second.
-  The PC's walk is so straight lines between those points, along x at the
+  0x4e5370, update 0x474590: the pair claimed by its flag 8, the actor
+  placed at the far door's point, and one ACTION step of the near door's
+  `enter` and the far door's `leave` started together, the longer timing
+  it — fcn.004741e0 over fcn.00478030), and at the end a mover to the
+  target's hotspot, each with the run-now flag 1: a leg's first move falls
+  in the tick the one before it ends (0x4760ad). A mover (vtable 0x4e59e8,
+  update 0x47cb50) moves one axis a tick — x before y — at the facing's
+  speed record, its first move the record's `start` px longer (the
+  neighbour's mg1 8 + 8 facing right, mg3 8 + 10 facing left, mg0 / mg2 3
+  up and down with none; the runs' mr records 18 / 9), clamped at the
+  target, and finds the target in the update of its last move
+  (0x47cf7f-0x47cfac); the GOTO's next update ends it a tick after the
+  last move (0x44aab0) — three ticks with no move, the walk job done
+  inside the GOTO's first update and the arrival read on its second. The
+  PC's walk is so straight lines between those points, along x at the
   height it starts from and then up or down to the target's: the room's
   path1/path2 bound the room, no floor line is followed, where the mobile
   scene's paths take a back door's climb, the floor and an item's climb.
   tools/pcref/lap_model.py times the laps with it (the steady lap, the
   steps at time + 2, the walker's arguments read along its path — the
-  entry "The walker's arguments" below): 101 34.2 s (video 32), 102 28.9
-  (28), 103 29.7 (42), 104 75.1, 105 47.2 (40), 106 127.5, 107 66.4 (54),
-  108 98.8 (94), 109 111.8 (113), 110 63.8 (59), 111 117.0 (122), 112
-  150.8 (155), 113 171.2 (191), 114 181.2 (168). Carried for the neighbour
-  (tools/pcref/pc_walks_s1.py; `Pawn._pc1_marks`, `_pc1_close`,
-  `_pc1_leg`, `_pc1_here`, `_pc1_map`, `_pc1_item_point`, `_pc1_arrived`):
-  each zone carries its PC room (PCWalkRoom: the room, its path's x range
-  and floor line — the zones mapped onto the rooms geometrically, the
-  house at 96 px a unit), each door its pair's two standing points
-  (PCWalkDoor: the near door's, the far door's), each station item the
-  hotspot its station's GOTO walks to (PCWalkPoint: the last GOTO before
-  the paired actions in the lap model's first lap of the station
-  tools/pcref/pc_durations.py pairs with the item — a list where the
-  visits walk to different objects, 107's camera). A walk of the port is
-  cut into the PC's legs at its door steps and its item; each leg lasts
+  entry "The walker's arguments" below — and the door pass as one step of
+  its two clips, docs/PC_VERIFICATION.md "door transit"): 101 30.8 s
+  (video 32), 102 25.4 (28), 103 27.5 (42), 104 69.4, 105 43.3 (40), 106
+  112.7, 107 57.2 (54), 108 81.8 (94), 109 104.0 (113), 110 54.6 (59), 111
+  98.2 (122), 112 133.4 (155), 113 145.6 (191), 114 158.5 (168). Carried
+  for the neighbour (tools/pcref/pc_walks_s1.py; `Pawn._pc1_marks`,
+  `_pc1_close`, `_pc1_leg`, `_pc1_here`, `_pc1_map`, `_pc1_item_point`,
+  `_pc1_arrived`): each zone carries its PC room (PCWalkRoom: the room,
+  its path's x range and floor line — the zones mapped onto the rooms
+  geometrically, the house at 96 px a unit), each door its pair's two
+  standing points (PCWalkDoor: the near door's, the far door's), each
+  station item the hotspot its station's GOTO walks to (PCWalkPoint: the
+  last GOTO before the paired actions in the lap model's first lap of the
+  station tools/pcref/pc_durations.py pairs with the item — a list where
+  the visits walk to different objects, 107's camera). A walk of the port
+  is cut into the PC's legs at its door steps and its item; each leg lasts
   the mover's ticks between the PC's points (`pcprofile.s1_leg_ticks`; a
   leg after a door a tick less, the last one a tick more, three with no
   move) and its mobile steps — the floor, a back door's climb and the
@@ -1434,11 +1441,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   came through) or its place mapped into the room. A walk through the
   front door keeps the mobile's pace: the porch is the PC's `fro`, the
   street's whole path, and anc/fro has no `neighbor` hotspot. The port's
-  idle laps (the neighbour alone, runs/idlewalk3, 108 with Woody in the
-  wardrobe): 101 33.7 s, 102 28.8, 103 29.5, 104 76.2, 105 47.2, 106
-  128.0, 107 65.0, 108 99.2, 109 112.5, 110 62.7, 111 117.5, 112 151.2,
-  113 172.2, 114 182.5 — within 1.4 s of the model on every level. Woody's
-  walk keeps the mobile scene's paths at the PC's records.
+  idle laps (the neighbour alone, runs/idledoor1, 108 with Woody in the
+  wardrobe): 101 30.3 s, 102 25.3, 103 27.3, 104 70.5, 105 43.3, 106
+  113.2, 107 55.8, 108 82.3, 109 104.7, 110 53.8, 111 98.8, 112 133.8, 113
+  146.5, 114 159.8 — within 1.4 s of the model on every level
+  (runs/idlewalk3 before the doors' change: 33.7-182.5 s, the same
+  margin). Woody's walk keeps the mobile scene's paths at the PC's
+  records.
 - *Season 2 routes and Woody's runs (2026-09-23, carried).* Every GoTo
   routes with the path finder (fcn.1000a711 -> fcn.1000a421), not only the
   walks between two stations: `world.pc_route` runs the Dijkstra at the
@@ -2349,36 +2358,41 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
 - *The walker's arguments (2026-09-26).* The walker had read a call's
   string arguments back up the listing to the previous labelled call, and
   where a branch lay between it took the other branch's strings: 109's
-  teeth after the alarm and the parrot's cookies carried the tabasco's
-  and the hot cookies' `spit_fire` (34 and 31 ticks), where case 11 takes
-  the teeth when bed/teeth_tabasco is not present (`take`, 5 ticks, and
-  the switch to bed/teeth_empty) and case 26 gives the parrot its cookies
+  teeth after the alarm and the parrot's cookies carried the tabasco's and
+  the hot cookies' `spit_fire` (34 and 31 ticks), where case 11 takes the
+  teeth when bed/teeth_tabasco is not present (`take`, 5 ticks, and the
+  switch to bed/teeth_empty) and case 26 gives the parrot its cookies
   (`give`, 17); 108's coffee had lost the `make_coffee` (49 ticks) case 4
   loads before its IFVARIANT and plays on both branches, the soiled box's
   and the clean one's. It reads them along its own path now (an
   IFVARIANT's strings go on to the call its pick feeds: 107's ENTER of the
-  stool or its pinned twin). Two GoTo builders were missing from its
-  table — fcn.0047a960 and fcn.0047a4a0 (their asserts: CreateGoToObjectJob,
+  stool or its pinned twin). Two GoTo builders were missing from its table
+  — fcn.0047a960 and fcn.0047a4a0 (their asserts: CreateGoToObjectJob,
   CreateGoToObjXJob) — and 114's case 7 walks the first smoke to
   lir/tabacbox with the first (the neighbour's own `give` there, 5 ticks),
   where the walker had stood him at the kitchen's polish: the port's walk
   to the living room's pipe was the PC's (E14's bubble: the pipe 54-63,
   ten seconds of walk). pc_durations.py rewrote 108's coffee 2.3 → 6.4 s,
-  109's second teeth 2.8 → 0.4 and its parrot 5.2 → 4.1, 114's first
-  smoke 1.4 → 0.4 s, and pc_walks_s1.py the pipe's walk point
-  (lir/tabacbox on both visits). The same day's rerun of the Season 1
-  writers put back the pets' search (the Alerters' PCSurpriseSeconds, 26
-  ticks: 107, 109, 111-114): tools/pcref/pc_reactions.py stripped its
-  keys from every patch and PCSurpriseSeconds is one of them, so its run
-  on 2026-09-26 at 15:00 had dropped pc_durations.py's alerter patches
-  and the port played the remaster's Search (2.5 s) since; it strips its
-  own TrickItem patches only now, and the writers run in any order
-  reproduce the overlays. Open against the videos: E08's coffee — 29.8 s
-  in the model from the balcony's ewer, the icon at 121 and his drink at
-  145-146 (gone at 147) in the video, ~26 s — and E14's kitchen and
-  workshop: the cups' span 19-20 s and the polish's 18-19 against the
-  model's 24.3 and 23.6 (kit, lir, bed, wor: the only route, two side
-  doors and a back door), which carries most of 114's 181.2 against 168.
+  109's second teeth 2.8 → 0.4 and its parrot 5.2 → 4.1, 114's first smoke
+  1.4 → 0.4 s, and pc_walks_s1.py the pipe's walk point (lir/tabacbox on
+  both visits). The same day's rerun of the Season 1 writers put back the
+  pets' search (the Alerters' PCSurpriseSeconds, 26 ticks: 107, 109,
+  111-114): tools/pcref/pc_reactions.py stripped its keys from every patch
+  and PCSurpriseSeconds is one of them, so its run on 2026-09-26 at 15:00
+  had dropped pc_durations.py's alerter patches and the port played the
+  remaster's Search (2.5 s) since; it strips its own TrickItem patches
+  only now, and the writers run in any order reproduce the overlays.
+  Against the videos, with the door pass as one step of its two clips
+  (docs/PC_VERIFICATION.md "door transit", read the same night): E08's
+  coffee 25.2 s from the balcony's ewer against the video's ~26 (the icon
+  at 121, his drink at 145-146, gone at 147), E14's cups 19.7 and polish
+  19.0 against the bubbles' 19-20 and 18-19, the first smoke 10.3 against
+  9-10, the horn 12.7 against 12-13 (29.8, 24.3, 23.6 with the clips one
+  after the other); E14's gun and hat stand 6 and 9 s under the bubbles
+  (18.7 against 24-25, 25.7 against 34-35) and E13's stations 2-8 s (the
+  main valve 21.9 against 29-30, the radiator 15.4 against 19-20, the fuse
+  box 5.0 against 8-9, the ladder 19.7 against 24-25; the grinder 20.4 and
+  the basin 20.2 against 19-20) — open.
 - *The tick rule, in the canon's own words.* The Season 1 manual
   (Docs/Manual.pdf, "Anger indicator"): "As soon as the neighbour becomes
   the victim of a trick, his anger indicator rises to the maximum value.
