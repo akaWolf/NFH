@@ -818,6 +818,36 @@
      "rail_repair": 20
     }
    }
+  },
+  {
+   "object": "Buffet",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- topleft/buffet knife, the job 13 ticks"
+  },
+  {
+   "object": "WaterPuddle",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Soap": 1.167
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Soap <- topright/waterpuddle soap, the job 14 ticks"
+  },
+  {
+   "object": "CaptainHat",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Spaghetti": 1.083
+    }
+   },
+   "source": "Woody's trick action (ship1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Spaghetti <- topleft/captncap spaghetti, the job 13 ticks"
   }
  ]
 }

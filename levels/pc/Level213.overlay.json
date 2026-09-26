@@ -1682,6 +1682,86 @@
      ]
     }
    }
+  },
+  {
+   "object": "LiveBull",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Flowers": 1.0
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Flowers <- midleft/bull flowers, the job 12 ticks"
+  },
+  {
+   "object": "Tortilla",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Chili": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Chili <- bottomright/tortilla chili, the job 13 ticks"
+  },
+  {
+   "object": "PlantCarnivore",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Chickenwing": 0.917
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Chickenwing <- topright/carnivore chickenwing, the job 11 ticks"
+  },
+  {
+   "object": "MechanicalBullControls",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Hand": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hand <- bottomleft/bullride_controls hand, the job 13 ticks"
+  },
+  {
+   "object": "BoatPicnic",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Termites": 1.0
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Termites <- bottomright/picnic termites, the job 12 ticks"
+  },
+  {
+   "object": "OlgaTowelWipe",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Cement": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Cement <- midleft/washingtub cement, the job 13 ticks"
+  },
+  {
+   "object": "CementBath",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Cement": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Cement <- midleft/washingtub cement, the job 13 ticks"
+  },
+  {
+   "object": "LiveBullFeed",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Flowers": 1.0
+    }
+   },
+   "source": "Woody's trick action (me_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Flowers <- midleft/bull flowers, the job 12 ticks"
   }
  ]
 }

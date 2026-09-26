@@ -1091,6 +1091,96 @@
      ]
     }
    }
+  },
+  {
+   "object": "PoolBoard",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Spring": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Spring <- pool/divingboard spring, the job 13 ticks"
+  },
+  {
+   "object": "BeachTowel",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Hedgehog": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hedgehog <- beachleft/mat hedgehog, the job 12 ticks"
+  },
+  {
+   "object": "Shell",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Crayfish": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Crayfish <- beachleft/sandcastle crayfish, the job 12 ticks"
+  },
+  {
+   "object": "PoolAwning",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Pedal": 1.167
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Pedal <- pool/awning_pole pedal, the job 14 ticks"
+  },
+  {
+   "object": "Pole",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Pedal": 1.167
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Pedal <- pool/awning_pole pedal, the job 14 ticks"
+  },
+  {
+   "object": "SandCastle",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Crayfish": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Crayfish <- beachleft/sandcastle crayfish, the job 12 ticks"
+  },
+  {
+   "object": "ShellLaydown",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Hedgehog": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hedgehog <- beachleft/mat hedgehog, the job 12 ticks"
+  },
+  {
+   "object": "Elephant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bucket": 0.833
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bucket <- bar/elefant bucket, the job 10 ticks"
+  },
+  {
+   "object": "ElephantBucket",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bucket": 0.833
+    }
+   },
+   "source": "Woody's trick action (in_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bucket <- bar/elefant bucket, the job 10 ticks"
   }
  ]
 }

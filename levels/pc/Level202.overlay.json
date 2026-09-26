@@ -873,6 +873,56 @@
      ]
     }
    }
+  },
+  {
+   "object": "BridgeRail",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Sawfish": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sawfish <- pond/bridge sawfish, the job 13 ticks"
+  },
+  {
+   "object": "BeerMat",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Crayfish": 1.0
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Crayfish <- beachright/mat_hn crayfish, the job 12 ticks"
+  },
+  {
+   "object": "OlgaMat",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Crayfish": 1.0
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Crayfish <- beachright/mat_hn crayfish, the job 12 ticks"
+  },
+  {
+   "object": "Submarine",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Fin": 1.0
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Fin <- beachleft/sub fin, the job 12 ticks"
+  },
+  {
+   "object": "BridgeRailFront",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Sawfish": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sawfish <- pond/bridge sawfish, the job 13 ticks"
   }
  ]
 }

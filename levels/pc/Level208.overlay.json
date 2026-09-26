@@ -1006,6 +1006,76 @@
      "hideout": true
     }
    }
+  },
+  {
+   "object": "ArmsBowl",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Snake": 1.167
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Snake <- altar/statue snake, the job 14 ticks"
+  },
+  {
+   "object": "SafetyLine",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Chalk_sponge": 2.083
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Chalk_sponge <- elephant/elephant_gone chalk_sponge, the job 25 ticks"
+  },
+  {
+   "object": "SeeSaw",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Shovel": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Shovel <- amusement/seesaw shovel, the job 13 ticks"
+  },
+  {
+   "object": "IndianMagician",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Balloon": 1.167
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Balloon <- amusement/fakir balloon, the job 14 ticks"
+  },
+  {
+   "object": "ShoeMachine",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Blades": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Blades <- tadj_mahal/shoe_cleaner blades, the job 13 ticks"
+  },
+  {
+   "object": "AngryElephant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Cable": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT_Cable <- elephant/tap cable, the job 13 ticks"
+  },
+  {
+   "object": "ElectricTap",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Cable": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Cable <- elephant/tap cable, the job 13 ticks"
   }
  ]
 }

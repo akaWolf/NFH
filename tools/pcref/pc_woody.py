@@ -18,7 +18,11 @@ plays the remaster's use clip at the pace that lasts them. A trick laid on a
 room's floor (the combination of the room and the banana or the marbles:
 kit/groundbanana <- kit + banana) is Woody's own `laydown` (generic/objects.xml,
 the ACTION step game.exe builds at 0x44b109-0x44b141), the remaster's
-TakeGround items.
+TakeGround items. Season 2 (GameLogic.dll) plays the same records as a
+DoActions job on Woody's queue, the Loader's time + 2 ticks
+(lap_model_s2.Data.job_ticks); its tricks are paired by the inventory the
+mobile item takes (the trick combination holding it, as tools/pcref/coins.py
+does), a combination with a mini-game left to the game (PCMinigameTicks).
 """
 import json
 import os
@@ -104,10 +108,49 @@ def woody_seconds(n):
     return out
 
 
+def woody_seconds_s2(n):
+    """Season 2: {item: (component, {type: seconds}, notes)} — the trick
+    combination holding the inventory type the item takes, the base object's
+    action of Woody named after it, the job's ticks"""
+    import lap_model_s2
+    d = os.path.join(canon.ROOT, 'nfh2', 'x', canon.S2[n])
+    cb = canon.read(os.path.join(d, 'combine.xml'))
+    combos = []
+    for m in re.finditer(r'<combination name="([^"]+)"([^>]*)>(.*?)</combination>', cb, re.S):
+        if 'trick="true"' in m.group(2) and 'game=' not in m.group(2):
+            combos.append(re.findall(r'<ingredient name="([^"]+)"', m.group(3)))
+    D = lap_model_s2.Data(n)
+    mob = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))['objects']
+    out = {}
+    for o in mob.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if o.get('type') != 'TrickItem' or not nm:
+            continue
+        req = [x for x in (dd.get('RequiredInventory'), dd.get('SecondRequiredInventory'))
+               if x and x not in ('IT_NONE', 'IT2_NONE')]
+        vals = {}
+        notes = []
+        for t in req:
+            inv = canon.norm(t)
+            for ing in combos:
+                base = next((i for i in ing if '/' in i), None)
+                if inv not in ing or base is None:
+                    continue
+                jt = D.job_ticks(base, inv, actor='woody')
+                if jt is not None:
+                    vals[t] = round(jt / lap_model.TICK, 3)
+                    notes.append('%s <- %s %s, the job %d ticks' % (t, base, inv, jt))
+                    break
+        if vals:
+            out[nm] = (o['type'], vals, notes)
+    return out
+
+
 def main(argv):
     show = '--show' in argv
-    for n in range(101, 115):
-        res = woody_seconds(n)
+    for n in list(range(101, 115)) + list(range(201, 215)):
+        res = woody_seconds(n) if n < 200 else woody_seconds_s2(n)
         print('%d: %s' % (n, '; '.join('%s %s' % (it, v[1]) for it, v in res.items())))
         if show:
             continue
@@ -116,8 +159,10 @@ def main(argv):
         ov['patches'] = [e for e in ov['patches'] if not ('PCWoodySeconds' in (e.get('set') or {})
                                                           and len(e['set']) == 1)]
         for item, (kind, vals, notes) in res.items():
-            src = ("Woody's trick action (level_%s's objects.xml, the Loader's time at 12 a second, "
-                   "tools/pcref/pc_woody.py): %s" % (canon.pc_level(n)['folder'][6:], '; '.join(notes)))
+            where = ("level_%s's objects.xml, the Loader's time" % canon.pc_level(n)['folder'][6:]) if n < 200 \
+                else ("%s's objects.xml, the DoActions job: the Loader's time + 2" % canon.S2[n])
+            src = ("Woody's trick action (%s at 12 a second, tools/pcref/pc_woody.py): %s"
+                   % (where, '; '.join(notes)))
             ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWoodySeconds': vals},
                                   'source': src})
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)

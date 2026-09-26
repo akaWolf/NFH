@@ -1466,6 +1466,86 @@
      ]
     }
    }
+  },
+  {
+   "object": "BoatCoinSlot",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Coin": 1.167
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Coin <- bottomright/rent_a_boat coin, the job 14 ticks"
+  },
+  {
+   "object": "MechanicalBull",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Resin": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Resin <- bottomleft/bullride resin, the job 13 ticks"
+  },
+  {
+   "object": "AztecThrone",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Ruby": 1.25
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Ruby <- topright/throne_empty ruby, the job 15 ticks"
+  },
+  {
+   "object": "CigarBox",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Tnt": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tnt <- midleft/cigars tnt, the job 13 ticks"
+  },
+  {
+   "object": "AztecThrone2",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Ruby": 1.25
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Ruby <- topright/throne_empty ruby, the job 15 ticks"
+  },
+  {
+   "object": "Whip",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Dagger": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Dagger <- midright/whip dagger, the job 13 ticks"
+  },
+  {
+   "object": "ParrotLedge",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Corn": 0.833
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Corn <- bottomright/parrot corn, the job 10 ticks"
+  },
+  {
+   "object": "SleepBench",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Paint": 1.083
+    }
+   },
+   "source": "Woody's trick action (me_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Paint <- midleft/bank paint, the job 13 ticks"
   }
  ]
 }

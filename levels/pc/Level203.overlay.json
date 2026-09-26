@@ -835,6 +835,56 @@
      ]
     }
    }
+  },
+  {
+   "object": "Watermelon",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Cannonball": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Cannonball <- wallleft/melons cannonball, the job 13 ticks"
+  },
+  {
+   "object": "DieselGenerator",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Tights": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tights <- wallright/generator tights, the job 13 ticks"
+  },
+  {
+   "object": "Bicycle",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Wrench": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Wrench <- groundleft/bike wrench, the job 13 ticks"
+  },
+  {
+   "object": "ToiletPaper",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Piripiri": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Piripiri <- groundleft/toiletpaper piripiri, the job 13 ticks"
+  },
+  {
+   "object": "ToiletFlush",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Oilcan": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Oilcan <- groundleft/ricechute oilcan, the job 13 ticks"
   }
  ]
 }

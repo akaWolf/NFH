@@ -925,6 +925,76 @@
      ]
     }
    }
+  },
+  {
+   "object": "WaterSkiisAux",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Tools": 1.167
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tools <- beachleft/waterski tools, the job 14 ticks"
+  },
+  {
+   "object": "SandSculpture",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Lionhead": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Lionhead <- beachleft/sandlion lionhead, the job 13 ticks"
+  },
+  {
+   "object": "TabbleTennis",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Egg": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Egg <- beachright/pingpong egg, the job 13 ticks"
+  },
+  {
+   "object": "Eals",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Tube": 0.833
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tube <- shop/eelbasket tube, the job 10 ticks"
+  },
+  {
+   "object": "RocketsBackground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Rope": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Rope <- beachleft/firework rope, the job 13 ticks"
+  },
+  {
+   "object": "Rockets",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Rope": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Rope <- beachleft/firework rope, the job 13 ticks"
+  },
+  {
+   "object": "WaterSkiis",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Tools": 1.167
+    }
+   },
+   "source": "Woody's trick action (cn_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Tools <- beachleft/waterski tools, the job 14 ticks"
   }
  ]
 }

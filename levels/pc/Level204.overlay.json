@@ -892,6 +892,66 @@
      ]
     }
    }
+  },
+  {
+   "object": "Vase",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Rice_full": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Rice_full <- groundleft/rickshaw rice_full, the job 13 ticks"
+  },
+  {
+   "object": "Karate",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Brick": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Brick <- groundleft/headbanging brick, the job 13 ticks"
+  },
+  {
+   "object": "PullKart",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Rice_full": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Rice_full <- groundleft/rickshaw rice_full, the job 13 ticks"
+  },
+  {
+   "object": "JadeNecklace",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Scissors": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Scissors <- groundright/jade scissors, the job 13 ticks"
+  },
+  {
+   "object": "GongDrumstick",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Sunshade": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sunshade <- wallleft/gong sunshade, the job 13 ticks"
+  },
+  {
+   "object": "HotDog",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Confetti": 1.083
+    }
+   },
+   "source": "Woody's trick action (cn_c1's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Confetti <- wallright/hotdogshop confetti, the job 13 ticks"
   }
  ]
 }

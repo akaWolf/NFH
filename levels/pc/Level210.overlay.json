@@ -1146,6 +1146,106 @@
      ]
     }
    }
+  },
+  {
+   "object": "Pylon",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bra_sling": 2.417
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bra_sling <- beachleft/pole bra_sling, the job 29 ticks"
+  },
+  {
+   "object": "DivingBoard",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Sunoil": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sunoil <- pool/divingboard sunoil, the job 13 ticks"
+  },
+  {
+   "object": "DogBasket",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bone": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bone <- pool/fifi_sleep bone, the job 12 ticks"
+  },
+  {
+   "object": "Elephant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bat": 0.833
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bat <- bar/elefant bat, the job 10 ticks"
+  },
+  {
+   "object": "WaterMelons",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bat": 0.833
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bat <- bar/elefant bat, the job 10 ticks"
+  },
+  {
+   "object": "DogBasketPut",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bone": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bone <- pool/fifi_sleep bone, the job 12 ticks"
+  },
+  {
+   "object": "FifiTurban",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Bone": 1.0
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Bone <- pool/fifi_sleep bone, the job 12 ticks"
+  },
+  {
+   "object": "FifiElephant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Sunoil": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Sunoil <- pool/divingboard sunoil, the job 13 ticks"
+  },
+  {
+   "object": "TurbanShop",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Hedgehog": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hedgehog <- beachleft/deckchair hedgehog, the job 13 ticks"
+  },
+  {
+   "object": "DeckChair",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Hedgehog": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_b2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Hedgehog <- beachleft/deckchair hedgehog, the job 13 ticks"
   }
  ]
 }

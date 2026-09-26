@@ -1090,6 +1090,106 @@
      "hideout": true
     }
    }
+  },
+  {
+   "object": "FireChannel",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Fuel": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Fuel <- coal_area/trough fuel, the job 13 ticks"
+  },
+  {
+   "object": "IceCream",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Crap": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Crap <- bazar/icecream_machine crap, the job 13 ticks"
+  },
+  {
+   "object": "Fence2",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- holy_cow/cow knife, the job 13 ticks"
+  },
+  {
+   "object": "Fence1",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- holy_cow/cow knife, the job 13 ticks"
+  },
+  {
+   "object": "Fence3",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- holy_cow/cow knife, the job 13 ticks"
+  },
+  {
+   "object": "Drain",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Match": 1.583
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Match <- tadj_mahal/gully match, the job 19 ticks"
+  },
+  {
+   "object": "HotShoe",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Pants_coal": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Pants_coal <- tadj_mahal/shoe_mat pants_coal, the job 13 ticks"
+  },
+  {
+   "object": "Flowers",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- holy_cow/cow knife, the job 13 ticks"
+  },
+  {
+   "object": "Trough",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Fuel": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Fuel <- coal_area/trough fuel, the job 13 ticks"
+  },
+  {
+   "object": "Cow",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT2_Knife": 1.083
+    }
+   },
+   "source": "Woody's trick action (in_c2's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): IT2_Knife <- holy_cow/cow knife, the job 13 ticks"
   }
  ]
 }
