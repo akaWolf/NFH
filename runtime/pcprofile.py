@@ -544,21 +544,28 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False, gait='walk'
 # `enter` on the near door, `leave` on the far one, each `time` ticks long, the same figures
 # on every door of a type across the 14 levels — the neighbour 19 + 19 through a side door
 # and 11 + 22 through a back door, Woody 15 + 23 (right), 18 + 24 (left), 9 + 25 (back).
-# game.exe composes the pair as one step list (fcn.00478030 over fcn.00477ed0: the near
-# door's `enter`, then the far door's `leave`), and the PC video of 110 measures the
-# bedroom-to-living-room back door at ~3 s from the neighbour's arrival at the door to his
-# step out below — the sum — so the two clips run one after the other through a flat door
-# too, where the mobile fires both at once (Door.cs, Pawn._begin_transit). The actor is
-# placed at the far door's hotspot for the `leave` and its room pointer follows the
-# placement (fcn.00448d70), so the room changes at the far clip's START; the mobile warps
-# at its end. The mobile strips keep their frames (the neighbour's far back-door strip has
-# 13 where the PC's has 23) and play at the rate that lasts the PC's ticks; in Season 2,
-# whose doors are not <door> objects, they run a frame a tick as before.
+# game.exe's door step (vtable 0x4e5370, update 0x474590 -> fcn.004741e0) places the actor
+# at the far door's hotspot — its room pointer follows the placement (fcn.00448d70) — and
+# pushes ONE ACTION step (fcn.00478030 over fcn.00477ed0, vtable 0x4e546c) of two entries,
+# the near door's `enter` and the far door's `leave`; the ACTION update starts every entry
+# in its one pass over them (the loop 0x477391-0x47793c) and times the step by the longest
+# (the running max at 0x477785-0x4777ab, less the step's +0x20, which the door step leaves
+# at 0): the two clips run at once, the pass lasting the longer, the far `leave` on every
+# door — its time + 2 (E14's frames at 197.9-199.4 s and 202.6-204.5 s: the kitchen's side
+# door 17-18 ticks, the living room's back door ~23; E10's "~3 s" from the neighbour's
+# arrival at the bedroom's back door is the climb to its hotspot, 50 px at 3 a tick, and
+# the pass). So a walk-up door's two strips play at once too, where the mobile runs them
+# one after the other (Door.cs, Pawn._begin_transit), and the pawn is placed at the far
+# door as the pass starts (the mobile warps at its end). The mobile strips keep their
+# frames (the neighbour's far back-door strip has 13 where the PC's has 22) and play at the
+# rate that lasts the PC's ticks; in Season 2, whose doors are not <door> objects, they
+# run a frame a tick as before.
 DOOR_CLIP_FPS = 12.0
 DOOR_CLIP = re.compile(r'^(Woody|Rottweiler|Mother|Olga|Kid)Door(Left|Right|Back)(Enter|Leave)$')
 # each clip lasts its ACTION step, the action's time + 2 (its start and its
 # timer's time + 1 updates; tools/pcref/lap_model.py job_ticks)
-DOOR_TICKS = {                    # (the near door's `enter`, the far door's `leave`)
+DOOR_TICKS = {                    # (the near door's `enter`, the far door's `leave`): the
+                                  # pass lasts the longer, the far door's on every door
     ('Rottweiler', 'Back'): (13, 24), ('Rottweiler', 'Left'): (21, 21), ('Rottweiler', 'Right'): (21, 21),
     ('Woody', 'Back'): (11, 27), ('Woody', 'Left'): (20, 26), ('Woody', 'Right'): (17, 25),
 }
@@ -644,13 +651,16 @@ def clip_fps(name, fps, frames=0):
     return frames * TICKS_PER_SECOND / t[0 if m.group(3) == 'Leave' else 1]
 
 
-def doors_sequential(nfh2=False):
-    """a flat door's Leave -> Enter run one after the other, as the walk-up's do"""
-    return rule('doors') and not nfh2
+def doors_concurrent(nfh2=None):
+    """the near door's `enter` and the far door's `leave` start together, a
+    walk-up door's too: one ACTION step of two entries (fcn.004741e0) — Season
+    1's (the level's season: the Season 2 pawns but Woody carry no NFH2Path)"""
+    return rule('doors') and not (SEASON2 if nfh2 is None else nfh2)
 
 
 def door_warp_early(nfh2=False):
-    """the far door places the pawn — and flips its zone — at its clip's start"""
+    """the door step places the pawn at the far door — and flips its zone — as
+    the pass starts, before its ACTION step (fcn.004741e0)"""
     return rule('doors') and not nfh2
 
 

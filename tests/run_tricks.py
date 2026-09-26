@@ -539,10 +539,10 @@ class Driver(Recorder):
                 getattr(p, 'role', 'Rottweiler') if p is not None else 'Rottweiler',
                 self._door_side(door), nfh2=bool(getattr(self.v.woody, 'nfh2', False)))
             if ticks is not None:
-                # Season 1: the near door's `enter` (11 ticks back, 19 side), then
-                # the placement at the far door — the room flips there, before the
-                # far clip (pcprofile.door_warp_early)
-                return ticks[0] / 12.0 + self._door_climb(door, p, part='up')
+                # Season 1: the door step places him at the far door as the pass
+                # starts — the room flips there, after the climb (pcprofile.
+                # door_warp_early)
+                return self._door_climb(door, p, part='up')
             t = (13 if back else 20) / 12.0 + (20 / 12.0 if door.should_walk_up else 0.0)
             return t + self._door_climb(door, p, part='up')
         if door.should_walk_up:
@@ -1021,8 +1021,9 @@ class Driver(Recorder):
     def _out_of_zone_delay(self, door):
         """seconds after Woody reaches `door` until he is out of the zone he leaves:
         the mobile's pass is IsPassingDoor-safe from its first frame (a walk-up door
-        climbs ~1.2 s first); under the PC profile his room changes at the far clip's
-        start — after the climb and the near door's `enter` (pcprofile.door_warp_early)"""
+        climbs ~1.2 s first); under the PC profile his room changes as the pass
+        starts, after the climb — the door step places him at the far door before its
+        two clips (pcprofile.door_warp_early, doors_concurrent)"""
         w = self.v.woody
         pt = self.pc_pass_times(door, w, 'Woody')
         if pt is not None:
@@ -1032,7 +1033,7 @@ class Driver(Recorder):
         ticks = pcprofile.door_ticks('Woody', self._door_side(door),
                                      nfh2=bool(getattr(w, 'nfh2', False)))
         if ticks is not None:
-            return ticks[0] / 12.0 + self._door_climb(door, w, getattr(w, 'sneaking', False), part='up')
+            return self._door_climb(door, w, getattr(w, 'sneaking', False), part='up')
         return 1.2 if door.should_walk_up else 0.0
 
     def woody_door_time(self, door):
@@ -1051,10 +1052,11 @@ class Driver(Recorder):
                                      nfh2=bool(getattr(self.v.woody, 'nfh2', False)))
         if ticks is not None:
             # Season 1 under the profile: his `enter` and the far door's `leave`
-            # one after the other (15 + 23 right, 18 + 24 left, 9 + 25 back) plus
-            # the climb and the descent of a back door
+            # at once, the longer (the far one's: 25, 26 and 27 ticks right, left
+            # and back — pcprofile.doors_concurrent), plus the climb and the
+            # descent of a back door
             w = self.v.woody
-            return (ticks[0] + ticks[1]) / 12.0 + self._door_climb(door, w, getattr(w, 'sneaking', False))
+            return max(ticks) / 12.0 + self._door_climb(door, w, getattr(w, 'sneaking', False))
         return 4.4 if door.should_walk_up else 2.5
 
     def use_time(self, item):

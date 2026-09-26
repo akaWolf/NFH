@@ -219,9 +219,9 @@ class Doors(unittest.TestCase):
         try:
             pcprofile.SEASON2 = True
             self.assertEqual(pcprofile.clip_fps('RottweilerDoorBackEnter', 10.0, 13), 12.0)
-            self.assertFalse(pcprofile.doors_sequential(True))
+            self.assertFalse(pcprofile.doors_concurrent(True))
             self.assertFalse(pcprofile.door_warp_early(True))
         finally:
             pcprofile.SEASON2 = old
-        self.assertTrue(pcprofile.doors_sequential(False))
+        self.assertTrue(pcprofile.doors_concurrent(False))
         self.assertTrue(pcprofile.door_warp_early(False))

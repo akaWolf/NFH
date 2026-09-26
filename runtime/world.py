@@ -2102,11 +2102,9 @@ class Pawn:
             self.world.show_exit_confirmation(self)
             return
         self.use_door_at_once = False     # Pawn.cs:1393
-        # the PC runs the near door's `enter` and the far door's `leave` one
-        # after the other through a flat door too (pcprofile.doors_sequential)
-        self._transit_animations(
-            door, other,
-            sequential=pcprofile.is_pc() and pcprofile.doors_sequential(self.nfh2))
+        # a flat door fires both strips at once, the PC's door step its two
+        # ACTION entries (pcprofile.doors_concurrent)
+        self._transit_animations(door, other, sequential=False)
 
     def continue_exit(self):
         """Pawn.ContinueExit (Pawn.cs:1510-1515): ContinueMovement, the
@@ -2196,6 +2194,12 @@ class Pawn:
                     as_sequence=False)
             else:
                 door.passing = None
+            if pcprofile.is_pc() and pcprofile.doors_concurrent():
+                # the PC's door step places the pawn at the far door before
+                # its ACTION step and the room pointer follows the placement:
+                # the zone flips as the pass starts (pcprofile.door_warp_early);
+                # the zone-change hooks still run at its end, in _enter_played
+                self._warp_through(other)
             self._play_enter(other, enter_anim)
 
     def _pc_clip_pace(self, player, name, ticks):
@@ -2707,7 +2711,12 @@ class Pawn:
                              else self.door_force)
             if self.at_use_location(d) or self.use_door_at_once:
                 self.use_door_at_once = False           # Pawn.cs:1414
-                self._transit_animations(d, other, sequential=True)
+                # the mobile runs a walk-up door's strips one after the
+                # other; the PC's door step starts its two ACTION entries
+                # together (pcprofile.doors_concurrent)
+                self._transit_animations(
+                    d, other, sequential=not (pcprofile.is_pc()
+                                              and pcprofile.doors_concurrent()))
                 return
         elif self.state == self.DESCEND:
             # WalkOnPath's else-branch runs MoveToItem before MoveToDoor on
