@@ -1240,16 +1240,18 @@ class Hud:
         progress (the videos fill the disk from below). The PC data copy
         holds no images: its front, gui/ingame/minigame_progress_front.tga,
         is the field's disk inside the ring, which the remaster's full field
-        carries at the same px (its ring at 26-27 and 110-111 of 138); the
-        rows' rounding is the port's (the widget's draw not read)"""
+        carries at the same px (its ring at 26-27 and 110-111 of 138). The
+        rows are GFXEngine's progress widget's (vtable 0x100422b8, made by
+        fcn.100103f0 into the game's +4 with its maximum 100; its draw, slot 9
+        0x10010e90, fills a vertical bar from the bottom by value x height /
+        maximum in unsigned integers, 0x10010f13-0x10010f1e)"""
         entry = self._tex(ds.spec['full'])
         if entry is None:
             return
         import sdl2 as _sdl
         ox, oy = pcprofile.S2_GAME_BAR
         bw, bh = fw - 2 * ox, fh - 2 * oy
-        p = min(1.0, max(0.0, ds.percent / 100.0))
-        rows = int(bh * p)
+        rows = bh * min(100, max(0, int(ds.percent))) // 100
         if rows <= 0 or bw <= 0:
             return
         srcr = _sdl.SDL_Rect(ox, oy + bh - rows, bw, rows)
