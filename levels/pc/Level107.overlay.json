@@ -14,8 +14,8 @@
    "set": {
     "PCAngryTime": 204,
     "PCShoutIndex": 1,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 6.0
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 6.167
    }
   },
   {
@@ -30,75 +30,185 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     3.5,
-     0.33
+     3.58,
+     0.42
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.917
+    "PCUseSecondsTricked": 4.0
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.5 s; Camera <- camera#1 0.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.6 s; Camera <- camera#1 0.4 s"
   },
   {
    "object": "MagnesiumBottle",
    "component": "SearchItem",
    "set": {
-    "PCUseSeconds": 0.33
+    "PCUseSeconds": 0.42
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MagnesiumBottle <- magnesium#0 0.3 s"
-  },
-  {
-   "object": "DieselGenerator",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 4.67
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter 4.67 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MagnesiumBottle <- magnesium#0 0.4 s"
   },
   {
    "object": "MumStatueFootStool",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.33,
+    "PCUseSeconds": 5.42,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.583
+    "PCUseSecondsTricked": 3.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.3 s"
-  },
-  {
-   "object": "Drawing",
-   "component": "Drawing",
-   "set": {
-    "PCUseSeconds": 3.42
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.4 s"
-  },
-  {
-   "object": "DieselChair",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": [
-     0.0
-    ],
-    "PCShoutIndex": 1,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 1.75
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.00 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.4 s"
   },
   {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Banana": 0.333
+     "IT_Banana": 0.417
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 4 ticks"
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 5 ticks"
+  },
+  {
+   "object": "Camera",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Magnesium": 1.083
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- bed/camera magnesium 13 ticks"
+  },
+  {
+   "object": "DieselChair",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Pins": 1.083
+    },
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 2.0
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- kit/stool pins 13 ticks"
+  },
+  {
+   "object": "DieselGenerator",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wrench": 1.083
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wrench <- kit/potterswheel wrench 13 ticks"
+  },
+  {
+   "object": "MumStatueFootStool",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.083
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/footstool 13 ticks"
+  },
+  {
+   "object": "FirstAid",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.333
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 16 ticks"
+  },
+  {
+   "object": "RubbishBinBanana",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.083
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 13 ticks"
+  },
+  {
+   "object": "PinsBoard",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 20 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 20 ticks"
+  },
+  {
+   "object": "MagnesiumBottle",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/magnesiumbottle take 20 ticks"
+  },
+  {
+   "object": "Bed",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.5,
+     "leave": 0.5
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.5; leave <- bed/bed 0.5"
+  },
+  {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.75,
+     "leave": 1.75
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.75; leave <- anc/wardrobe 1.75"
+  },
+  {
+   "object": "Drawing",
+   "component": "Drawing",
+   "set": {
+    "PCUseSeconds": 3.5
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.5 s"
+  },
+  {
+   "object": "DieselChair",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 0.17
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.17 s"
+  },
+  {
+   "object": "DieselGenerator",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 4.75
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter 4.75 s"
   },
   {
    "object": "Dove",
@@ -108,118 +218,6 @@
     "PCUseSecondsTricked": 0.0,
     "PCFireAt": 0
    }
-  },
-  {
-   "object": "Camera",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Magnesium": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- bed/camera magnesium 12 ticks"
-  },
-  {
-   "object": "DieselChair",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Pins": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- kit/stool pins 12 ticks"
-  },
-  {
-   "object": "DieselGenerator",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Wrench": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wrench <- kit/potterswheel wrench 12 ticks"
-  },
-  {
-   "object": "MumStatueFootStool",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/footstool 12 ticks"
-  },
-  {
-   "object": "FirstAid",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.25
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/firstaid take 15 ticks"
-  },
-  {
-   "object": "RubbishBinBanana",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 12 ticks"
-  },
-  {
-   "object": "PinsBoard",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 19 ticks"
-  },
-  {
-   "object": "Drawer",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
-  },
-  {
-   "object": "MagnesiumBottle",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/magnesiumbottle take 19 ticks"
-  },
-  {
-   "object": "Bed",
-   "component": "HideItem",
-   "set": {
-    "PCWoodySeconds": {
-     "enter": 0.417,
-     "leave": 0.417
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.417; leave <- bed/bed 0.417"
-  },
-  {
-   "object": "Wardrobe",
-   "component": "HideItem",
-   "set": {
-    "PCWoodySeconds": {
-     "enter": 1.667,
-     "leave": 1.667
-    }
-   },
-   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
   }
  ]
 }

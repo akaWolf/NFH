@@ -11,7 +11,8 @@
 # two laps: the shovel on his first kitchen, the paperknife on his second, the
 # machines and the trap while he is upstairs, the carpet, the vacuum, the tank and
 # the bedroom marbles on his third descent.
-# v18 (2026-09-26, the action's timer job): each action a tick longer puts
+# v18 (2026-09-26, the action's timer job): each action a tick longer (two by the
+# later reading, time + 2) puts
 # the vacuum 27.6 s after the drier, past its 27.5 s window; E11 bridges it
 # with a run — Woody walks into the living room after the drier fires, the
 # dog wakes and barks (noise 2), and the alarm runs him up from the basement

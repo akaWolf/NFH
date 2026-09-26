@@ -20,36 +20,24 @@
    }
   },
   {
-   "object": "ToothBrush",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 3.83,
-    "PCShoutIndex": 1,
-    "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.583,
-    "PCFireAt": 1.917
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 3.8 s"
-  },
-  {
    "object": "CoffeeMaker",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.25,
+    "PCUseSeconds": 2.33,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.833,
-    "PCFireAt": 6.25
+    "PCUseSecondsTricked": 8.0,
+    "PCFireAt": 6.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 2.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 2.3 s"
   },
   {
    "object": "Shezlong",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.17,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 1.5
+    "PCUseSeconds": 2.25,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 1.667
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.2 s"
   },
@@ -58,19 +46,19 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.67,
-     0.67
+     0.75,
+     0.75
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.7 s; WateringCan <- ewer#2 0.7 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.8 s; WateringCan <- ewer#2 0.8 s"
   },
   {
    "object": "Plant",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.17,
+    "PCUseSeconds": 2.25,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.167
+    "PCUseSecondsTricked": 2.25
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.2 s"
   },
@@ -79,125 +67,137 @@
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Honey": 2.0
+     "IT_Honey": 2.083
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.583
+    "PCUseSecondsTricked": 7.833
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- bal/suncream honey 24 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- bal/suncream honey 25 ticks"
   },
   {
    "object": "CoffeeMaker",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Soil_only": 2.0
+     "IT_Soil_only": 2.083
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soil_only <- kit/coffeebox soil 24 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soil_only <- kit/coffeebox soil 25 ticks"
   },
   {
    "object": "Shezlong",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Pins": 1.0
+     "IT_Pins": 1.083
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- bal/foldingchair pins 12 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- bal/foldingchair pins 13 ticks"
   },
   {
    "object": "ToothBrush",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Brush": 2.0
-    }
+     "IT_Brush": 2.083
+    },
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0,
+    "PCUseSecondsTricked": 6.75,
+    "PCFireAt": 2.083
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Brush <- toi/toothbrushset brush 24 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Brush <- toi/toothbrushset brush 25 ticks"
   },
   {
    "object": "PinsBoard",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 19 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/pinboard take 20 ticks"
   },
   {
    "object": "RubbishBinBanana2",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.0
+     "use": 1.083
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 12 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 13 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 20 ticks"
   },
   {
    "object": "BedDrawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 19 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 20 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 20 ticks"
   },
   {
    "object": "Bed",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 0.417,
-     "leave": 0.417
+     "enter": 0.5,
+     "leave": 0.5
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.417; leave <- bed/bed 0.417"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.5; leave <- bed/bed 0.5"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.667,
-     "leave": 1.667
+     "enter": 1.75,
+     "leave": 1.75
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.75; leave <- anc/wardrobe 1.75"
   },
   {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Banana": 0.333
+     "IT_Banana": 0.417
     }
    },
-   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 4 ticks"
+   "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 5 ticks"
+  },
+  {
+   "object": "ToothBrush",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 4.08
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 4.1 s"
   }
  ]
 }

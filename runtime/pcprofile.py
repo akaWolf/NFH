@@ -143,12 +143,13 @@ S1_RAGE_HOLD_TICKS = 60
 # (World.play_angry); the profile carries the index and the flag per item as
 # PCShoutIndex and PCShoutSkip (tools/pcref/pc_reactions.py from
 # tools/pcref/fire_sites.py).
-# The ACTION step's job lasts the time + 1: its timer counts the time down
-# and is done on its (time + 1)th update, the first on the tick after the
-# push (0x47e500, fcn.00444d30's run-now flag 0; tools/pcref/lap_model.py
-# job_ticks).
-S1_SHOUT_TICKS = {'shout2_extra': 92, 'shout0_light': 25, 'shout0_medium': 45,
-                  'shout0': 26, 'shout2': 26}
+# The ACTION step lasts the time + 2: its start (fcn.004772f0 returns not
+# done, 0x477ad6), its timer's time + 1 updates (0x47e500, the first on the
+# tick after the push), the step ended in the timer's last tick and the next
+# one pushed with the run-now flag 0, starting on the tick after
+# (tools/pcref/lap_model.py job_ticks).
+S1_SHOUT_TICKS = {'shout2_extra': 93, 'shout0_light': 26, 'shout0_medium': 46,
+                  'shout0': 27, 'shout2': 27}
 
 
 def s1_shout_clip(points, bonus, index=0, skip=False):
@@ -534,11 +535,11 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False, gait='walk'
 # whose doors are not <door> objects, they run a frame a tick as before.
 DOOR_CLIP_FPS = 12.0
 DOOR_CLIP = re.compile(r'^(Woody|Rottweiler|Mother|Olga|Kid)Door(Left|Right|Back)(Enter|Leave)$')
-# each clip lasts its ACTION step's job, the action's time + 1 (its timer's
-# last update: 0x47e500; tools/pcref/lap_model.py job_ticks)
+# each clip lasts its ACTION step, the action's time + 2 (its start and its
+# timer's time + 1 updates; tools/pcref/lap_model.py job_ticks)
 DOOR_TICKS = {                    # (the near door's `enter`, the far door's `leave`)
-    ('Rottweiler', 'Back'): (12, 23), ('Rottweiler', 'Left'): (20, 20), ('Rottweiler', 'Right'): (20, 20),
-    ('Woody', 'Back'): (10, 26), ('Woody', 'Left'): (19, 25), ('Woody', 'Right'): (16, 24),
+    ('Rottweiler', 'Back'): (13, 24), ('Rottweiler', 'Left'): (21, 21), ('Rottweiler', 'Right'): (21, 21),
+    ('Woody', 'Back'): (11, 27), ('Woody', 'Left'): (20, 26), ('Woody', 'Right'): (17, 25),
 }
 SEASON2 = False                   # apply_overlay sets it from the level's name
 
@@ -631,10 +632,10 @@ S1_PET_AWAKE_TICKS = 72
 # the `wakeup` action of each pet (generic/objects.xml: time auto over
 # generic/anims.xml's `wakeup`, a oneshot of 8 frames the dog, 11 the parrot,
 # which Loader.dll stores less one — 0x1000a9e6-0x1000aa05 — and its ACTION
-# step's job lasts one more): the first bark — its noise 2 the neighbour's
+# step lasts two more): the first bark — its noise 2 the neighbour's
 # `alarm`, the `startle_woody` it posts — comes as it ends (state 3 pushes
 # it, state 4 barks on the next free tick)
-S1_PET_WAKEUP_TICKS = {'Dog': 8, 'Chili': 11}
+S1_PET_WAKEUP_TICKS = {'Dog': 9, 'Chili': 12}
 # a bark and a whine (generic/objects.xml: the dog's bark1/bark3 time 35
 # noise 2 and whine1/whine3 time 23, the parrot's 22 and 29): actions on the
 # pet's queue, each holding the class's step to its end — every bark's
@@ -645,8 +646,8 @@ S1_PET_WAKEUP_TICKS = {'Dog': 8, 'Chili': 11}
 # (the remaster's clips are one motion each: the alert pair, two PoorSequence
 # clips); the parrot's bark1 is one 22-frame scream (one AlertLeft/Right
 # clip), its whine one clip of the remaster's PoorSequence (its idle)
-S1_PET_BARK = {'Dog': (36, 2), 'Chili': (23, 1)}      # the jobs: the time + 1
-S1_PET_WHINE = {'Dog': (24, 2), 'Chili': (30, 1)}
+S1_PET_BARK = {'Dog': (37, 2), 'Chili': (24, 1)}      # the steps: the time + 2
+S1_PET_WHINE = {'Dog': (25, 2), 'Chili': (31, 1)}
 
 
 def s1_pets(nfh2=False):

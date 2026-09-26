@@ -12,159 +12,159 @@
    "object": "Candle",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.33,
+    "PCUseSeconds": 1.42,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.417
+    "PCUseSecondsTricked": 3.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.4 s"
   },
   {
    "object": "BirthdayCake",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     2.88,
-     2.88
+     3.04,
+     3.04
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.417
+    "PCUseSecondsTricked": 3.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BirthdayCake <- cake#0 5.8 s /2"
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BirthdayCake <- cake#0 6.1 s /2"
   },
   {
    "object": "LetterBox",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.58,
+    "PCUseSeconds": 6.0,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.0,
-    "PCFireAt": 1.5
+    "PCUseSecondsTricked": 3.25,
+    "PCFireAt": 1.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 5.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 6.0 s"
   },
   {
    "object": "Microwave",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Egg": 2.0
+     "IT_Egg": 2.083
     },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.0
+    "PCFixSeconds": 2.083
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 24 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
   },
   {
    "object": "MumPicture",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Marker": 2.0
+     "IT_Marker": 2.083
     },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.0
+    "PCFixSeconds": 2.083
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 24 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
   {
    "object": "Toilet",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Wcpaper": 2.0
+     "IT_Wcpaper": 2.083
     },
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.0
+    "PCFixSeconds": 4.083
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 24 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
   {
    "object": "Ground",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Soap": 0.333
+     "IT_Soap": 0.417
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 4 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 5 ticks"
   },
   {
    "object": "BirthdayCake",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Magnesium": 1.0
+     "IT_Magnesium": 1.083
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- kit/candlebox boom 12 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- kit/candlebox boom 13 ticks"
   },
   {
    "object": "Candle",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Boom": 1.0
+     "IT_Boom": 1.083
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Boom <- kit/candlebox boom 12 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Boom <- kit/candlebox boom 13 ticks"
   },
   {
    "object": "LetterBox",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Mousetrap": 1.417
+     "IT_Mousetrap": 1.5
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Mousetrap <- anc/mailbox mousetrap 17 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Mousetrap <- anc/mailbox mousetrap 18 ticks"
   },
   {
    "object": "Fridge",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 19 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/fridge take 20 ticks"
   },
   {
    "object": "SoapDish",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/soapbracket take 19 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- toi/soapbracket take 20 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 20 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.667,
-     "leave": 1.667
+     "enter": 1.75,
+     "leave": 1.75
     }
    },
-   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.75; leave <- anc/wardrobe 1.75"
   }
  ]
 }

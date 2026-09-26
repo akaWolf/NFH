@@ -20,7 +20,7 @@
 # and the kitchen pair follows — v5 read the shelf four hot, then the kitchen
 # 30 s later (cold) and the microwave 24 s after the kitchen slip (cold).
 # v7 (2026-09-26, the action's timer job): the Season 1 action lasting its
-# time + 1 ticks puts the cream's pay 27.3 s after the picture's, past the
+# time + 1 ticks (+ 2 by the later reading) puts the cream's pay 27.3 s after the picture's, past the
 # picture's 27 s window (60 + 264 ticks) — v6's picture > cream link breaks.
 # v8 (2026-09-26, the PC lap): v1-v7 ran the overlay's lap with the microwave
 # after the eat, read off E04's thermometer as "the cream followed by the

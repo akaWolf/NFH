@@ -34,105 +34,217 @@
    "object": "ChairAssembly",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.33,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 7.25,
-    "PCFireAt": 4.583
+    "PCUseSeconds": 6.5,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 7.417,
+    "PCFireAt": 4.667
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.5 s"
   },
   {
    "object": "AngleGrinder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.5,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 7.333,
-    "PCFireAt": 6.667
+    "PCUseSeconds": 6.75,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 7.583,
+    "PCFireAt": 6.833
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.8 s"
   },
   {
    "object": "ValveMain",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.33,
-     0.33
+     0.42,
+     0.42
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.083,
+    "PCUseSecondsTricked": 5.167,
     "PCRunTo": true,
-    "PCGrabSeconds": 0.333,
+    "PCGrabSeconds": 0.417,
     "PCToolUseSeconds": 0.0,
     "PCReturnSeconds": 0.0
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.3 s; ValveMain <- valve#1 0.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.4 s; ValveMain <- valve#1 0.4 s"
   },
   {
    "object": "Radiator",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.5
+    "PCUseSeconds": 4.58
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.6 s"
   },
   {
    "object": "Sink",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.42,
+    "PCUseSeconds": 3.5,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.083
+    "PCUseSecondsTricked": 5.167
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.5 s"
   },
   {
    "object": "FuseBox",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.33,
-     0.33
+     0.42,
+     0.42
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 8.167
+    "PCUseSecondsTricked": 8.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.3 s; FuseBox <- fuse#1 0.3 s"
-  },
-  {
-   "object": "Ladder",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 1.42,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 1.417
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.42 s"
-  },
-  {
-   "object": "LadderDrill",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 3.58
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 3.58 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.4 s; FuseBox <- fuse#1 0.4 s"
   },
   {
    "object": "ChairAssemblyBook",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Painbook": 2.0
+     "IT_Painbook": 2.083
     },
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 7.25,
-    "PCFireAt": 4.583
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 7.417,
+    "PCFireAt": 4.667
    },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 24 ticks"
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 25 ticks"
+  },
+  {
+   "object": "AngleGrinder",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 2.083
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/anglegrinder 25 ticks"
+  },
+  {
+   "object": "ChairAssembly",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Honey": 2.083
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- lir/stoolkit painbook 25 ticks"
+  },
+  {
+   "object": "FuseBox",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Fuse": 2.083
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fuse <- anc/no_fuse fuse 25 ticks"
+  },
+  {
+   "object": "Ladder",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Tongs": 2.083
+    },
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 1.5
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 25 ticks"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 20 ticks"
+  },
+  {
+   "object": "BasementDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 20 ticks"
+  },
+  {
+   "object": "BedDrawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.667
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 20 ticks"
+  },
+  {
+   "object": "RubbishBinCable",
+   "component": "SearchItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.083
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 13 ticks"
+  },
+  {
+   "object": "Bed",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 0.5,
+     "leave": 0.5
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.5; leave <- bed/bed 0.5"
+  },
+  {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWoodySeconds": {
+     "enter": 1.75,
+     "leave": 1.75
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.75; leave <- anc/wardrobe 1.75"
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marbles": 0.417
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 5 ticks"
+  },
+  {
+   "object": "Ladder",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 1.5
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.50 s"
+  },
+  {
+   "object": "LadderDrill",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 4.0
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.00 s"
   },
   {
    "object": "ValveHot",
@@ -140,9 +252,9 @@
    "set": {
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.167,
+    "PCUseSecondsTricked": 3.25,
     "PCRunTo": true,
-    "PCGrabSeconds": 0.333,
+    "PCGrabSeconds": 0.417,
     "PCToolUseSeconds": 0.0,
     "PCReturnSeconds": 0.0
    }
@@ -153,121 +265,9 @@
    "set": {
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.0,
-    "PCFixSeconds": 2.0
+    "PCSurpriseSeconds": 5.083,
+    "PCFixSeconds": 2.083
    }
-  },
-  {
-   "object": "AngleGrinder",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 2.0
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/anglegrinder 24 ticks"
-  },
-  {
-   "object": "ChairAssembly",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Honey": 2.0
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- lir/stoolkit painbook 24 ticks"
-  },
-  {
-   "object": "FuseBox",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Fuse": 2.0
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fuse <- anc/no_fuse fuse 24 ticks"
-  },
-  {
-   "object": "Ladder",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Tongs": 2.0
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 24 ticks"
-  },
-  {
-   "object": "Drawer",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
-  },
-  {
-   "object": "BasementDrawer",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 19 ticks"
-  },
-  {
-   "object": "BedDrawer",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.583
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/bedbox take 19 ticks"
-  },
-  {
-   "object": "RubbishBinCable",
-   "component": "SearchItem",
-   "set": {
-    "PCWoodySeconds": {
-     "use": 1.0
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 12 ticks"
-  },
-  {
-   "object": "Bed",
-   "component": "HideItem",
-   "set": {
-    "PCWoodySeconds": {
-     "enter": 0.417,
-     "leave": 0.417
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.417; leave <- bed/bed 0.417"
-  },
-  {
-   "object": "Wardrobe",
-   "component": "HideItem",
-   "set": {
-    "PCWoodySeconds": {
-     "enter": 1.667,
-     "leave": 1.667
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
-  },
-  {
-   "object": "GroundMarbles",
-   "component": "TrickItem",
-   "set": {
-    "PCWoodySeconds": {
-     "IT_Marbles": 0.333
-    }
-   },
-   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 4 ticks"
   }
  ]
 }

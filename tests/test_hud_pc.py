@@ -187,16 +187,16 @@ class Doors(unittest.TestCase):
         self.assertEqual(pcprofile.clip_fps(None, 10.0), 10.0)
 
     def test_door_strips_last_the_pc_action_ticks(self):
-        # the neighbour's far back-door strip: 13 frames over the PC's 23
-        # ticks (the Loader's 22, its job the time + 1)
-        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorBackEnter', 10.0, 13), 13 * 12.0 / 23)
-        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorBackLeave', 10.0, 12), 12 * 12.0 / 12)
-        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorLeftEnter', 10.0, 20), 20 * 12.0 / 20)
-        self.assertAlmostEqual(pcprofile.clip_fps('WoodyDoorRightLeave', 10.0, 13), 13 * 12.0 / 16)
-        self.assertAlmostEqual(pcprofile.clip_fps('WoodyDoorBackEnter', 10.0, 16), 16 * 12.0 / 26)
+        # the neighbour's far back-door strip: 13 frames over the PC's 24
+        # ticks (the Loader's 22, its ACTION step the time + 2)
+        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorBackEnter', 10.0, 13), 13 * 12.0 / 24)
+        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorBackLeave', 10.0, 12), 12 * 12.0 / 13)
+        self.assertAlmostEqual(pcprofile.clip_fps('RottweilerDoorLeftEnter', 10.0, 20), 20 * 12.0 / 21)
+        self.assertAlmostEqual(pcprofile.clip_fps('WoodyDoorRightLeave', 10.0, 13), 13 * 12.0 / 17)
+        self.assertAlmostEqual(pcprofile.clip_fps('WoodyDoorBackEnter', 10.0, 16), 16 * 12.0 / 27)
         self.assertEqual(pcprofile.clip_fps('MotherDoorBackEnter', 10.0, 1), 12.0)
-        self.assertEqual(pcprofile.door_ticks('Rottweiler', 'Back'), (12, 23))
-        self.assertEqual(pcprofile.door_ticks('Woody', 'Left'), (19, 25))
+        self.assertEqual(pcprofile.door_ticks('Rottweiler', 'Back'), (13, 24))
+        self.assertEqual(pcprofile.door_ticks('Woody', 'Left'), (20, 26))
         self.assertIsNone(pcprofile.door_ticks('Olga', 'Left'))
         self.assertIsNone(pcprofile.door_ticks('Rottweiler', 'Back', nfh2=True))
         old = pcprofile.SEASON2

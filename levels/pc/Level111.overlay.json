@@ -14,13 +14,13 @@
    "set": {
     "TrickScore": 13,
     "PCShoutIndex": 1,
-    "PCGrabSeconds": 0.333,
-    "PCUseSecondsTricked": 5.5,
-    "PCFireAt": 2.917,
-    "PCFixSeconds": 1.0,
-    "PCFixUseSeconds": 2.917,
-    "PCToolUseSeconds": 2.917,
-    "PCReturnSeconds": 0.333
+    "PCGrabSeconds": 0.417,
+    "PCUseSecondsTricked": 5.667,
+    "PCFireAt": 3.0,
+    "PCFixSeconds": 1.083,
+    "PCFixUseSeconds": 3.0,
+    "PCToolUseSeconds": 3.0,
+    "PCReturnSeconds": 0.417
    }
   },
   {
@@ -28,8 +28,8 @@
    "component": "TrickItem",
    "set": {
     "TrickScore": 12,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 0.333,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 0.417,
     "PCFireAt": 0
    }
   },
@@ -40,8 +40,8 @@
     "TrickScore": 7,
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.083,
-    "PCFixSeconds": 2.0
+    "PCSurpriseSeconds": 5.167,
+    "PCFixSeconds": 2.083
    }
   },
   {
@@ -68,256 +68,256 @@
    "set": {
     "PCAngryTime": 270,
     "PCStationEndsOnTrick": true,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 3.333
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 3.417
    }
   },
   {
    "object": "Detergent",
    "component": "SearchItem",
    "set": {
-    "PCUseSeconds": 1.33
+    "PCUseSeconds": 1.42
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Detergent <- detergent#0 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Detergent <- detergent#0 1.4 s"
   },
   {
    "object": "Iron",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.33,
-     6.0
+     0.42,
+     6.08
     ],
     "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.417
+    "PCFixSeconds": 4.583
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.3 s; Iron <- ironing#1 6.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.4 s; Iron <- ironing#1 6.1 s"
   },
   {
    "object": "Airer",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.58,
-     0.33
+     1.67,
+     0.42
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Airer <- laundry_rack#0 1.6 s; Airer <- laundry_rack#1 0.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Airer <- laundry_rack#0 1.7 s; Airer <- laundry_rack#1 0.4 s"
   },
   {
    "object": "FishTank",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.92,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 3.5
+    "PCUseSeconds": 2.0,
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 3.583
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 1.9 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.0 s"
   },
   {
    "object": "WashingMachine",
    "component": "TrickItem",
    "set": {
     "PCStationEndsOnTrick": true,
-    "PCFixSeconds": 1.0,
-    "PCUseSecondsTricked": 9.583
+    "PCFixSeconds": 1.083,
+    "PCUseSecondsTricked": 9.75
    }
-  },
-  {
-   "object": "WashingMachine",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": [
-     0.33,
-     5.0,
-     2.0
-    ]
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WashingMachine <- washing_machine#0 give 0.33 s, wash 5.00 s, get_clothes 2.00 s"
-  },
-  {
-   "object": "Drier",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": [
-     0.33,
-     2.5,
-     0.33
-    ]
-   },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.33 s, dry 2.50 s, take 0.33 s"
   },
   {
    "object": "Airer",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Birdfood": 2.0
+     "IT_Birdfood": 2.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Birdfood <- bal/clothes birdfood 24 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Birdfood <- bal/clothes birdfood 25 ticks"
   },
   {
    "object": "Drier",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Tongs": 2.0
+     "IT_Tongs": 2.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- bas/tumbledrier tongs 24 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- bas/tumbledrier tongs 25 ticks"
   },
   {
    "object": "FishTank",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Detergent": 2.0
+     "IT_Detergent": 2.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Detergent <- wor/fishfood detergent 24 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Detergent <- wor/fishfood detergent 25 ticks"
   },
   {
    "object": "Iron",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.0
+     "use": 1.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/ironingboard_clothes 12 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/ironingboard_clothes 13 ticks"
   },
   {
    "object": "Vacuum",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Paperknife": 2.0
+     "IT_Paperknife": 2.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Paperknife <- lir/vacuum paperknife 24 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Paperknife <- lir/vacuum paperknife 25 ticks"
   },
   {
    "object": "WashingMachine",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Winebottle": 2.0
+     "IT_Winebottle": 2.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Winebottle <- bas/washingmachine winebottle 24 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Winebottle <- bas/washingmachine winebottle 25 ticks"
   },
   {
    "object": "BasementDrawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 19 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/workbench take 20 ticks"
   },
   {
    "object": "Detergent",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/detergent take 19 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/detergent take 20 ticks"
   },
   {
    "object": "TableShovel",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/shovel take 19 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/shovel take 20 ticks"
   },
   {
    "object": "RubbishBinCable",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.0
+     "use": 1.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 12 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/trashcan take 13 ticks"
   },
   {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 19 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/ark take 20 ticks"
   },
   {
    "object": "WineCellar",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.0
+     "use": 1.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/wine take 12 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bas/wine take 13 ticks"
   },
   {
    "object": "DeskDrawer",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.583
+     "use": 1.667
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 19 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 20 ticks"
   },
   {
    "object": "Perch",
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.0
+     "use": 1.083
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/birdpole take 12 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/birdpole take 13 ticks"
   },
   {
    "object": "Wardrobe",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 1.667,
-     "leave": 1.667
+     "enter": 1.75,
+     "leave": 1.75
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.667; leave <- anc/wardrobe 1.667"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- anc/wardrobe 1.75; leave <- anc/wardrobe 1.75"
   },
   {
    "object": "Bed",
    "component": "HideItem",
    "set": {
     "PCWoodySeconds": {
-     "enter": 0.417,
-     "leave": 0.417
+     "enter": 0.5,
+     "leave": 0.5
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.417; leave <- bed/bed 0.417"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): enter <- bed/bed 0.5; leave <- bed/bed 0.5"
   },
   {
    "object": "GroundMarbles",
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Marbles": 0.333
+     "IT_Marbles": 0.417
     }
    },
-   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 4 ticks"
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 5 ticks"
+  },
+  {
+   "object": "WashingMachine",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.42,
+     5.08,
+     2.08
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WashingMachine <- washing_machine#0 give 0.42 s, wash 5.08 s, get_clothes 2.08 s"
+  },
+  {
+   "object": "Drier",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": [
+     0.42,
+     2.58,
+     0.42
+    ]
+   },
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.42 s, dry 2.58 s, take 0.42 s"
   }
  ]
 }
