@@ -1086,8 +1086,8 @@ class Pawn:
             p.play_directly(item.hide_idle)
         if item.leave_animation and self.anim.has(item.leave_animation):
             # the PC hideout's `leave` of Woody's (PCWoodySeconds `leave`); its
-            # LEAVE step clears flag 4 as it starts (game.exe 0x473ccc), so the
-            # Season 1 catch reads him from the clip's start
+            # LEAVE step clears flag 4 once the clip has played (game.exe: the
+            # step's second update, 0x473ccc — Pawn.pc_leaving_hideout)
             pcw = getattr(item, 'pc_woody_secs', None) \
                 if pcprofile.is_pc() and pcprofile.rule('durations') else None
             self.anim.clip_pace = {item.leave_animation: pcw['leave']} \
@@ -1098,6 +1098,16 @@ class Pawn:
             # (GameLogic.dll 0x10006ab7): hidden to the Season 2 catch for
             # the clip (World._pc_s2_sees)
             self._pc_leave_anim = item.leave_animation
+
+    def pc_leaving_hideout(self):
+        """Woody in his hideout's `leave` clip, still flag 4 to the PC's catch:
+        game.exe's LEAVE step (vtable 0x4e5334, update 0x473ae0) frees the
+        object, pushes the `leave` ACTION and clears flag 4 on its next update,
+        the tick that ACTION ends (the not-occupied branch 0x473b2b ->
+        0x473ccc); GameLogic.dll's likewise once the `leave` has played
+        (0x10006ab7)"""
+        la = self._pc_leave_anim
+        return la is not None and self.anim.anim is not None and self.anim.anim.name == la
 
     def _capture_click(self, dest):
         """GetMoveDestination's GoZone / y-threshold bookkeeping, common to
@@ -10829,8 +10839,8 @@ class World:
                 # its placement put it in (pcprofile.door_warp_early)
                 return (woody.zone is not None and catcher.zone is not None
                         and woody.zone.pid == catcher.zone.pid
-                        and not woody.hiding)
-            return same_room
+                        and not woody.hiding and not woody.pc_leaving_hideout())
+            return same_room and not woody.pc_leaving_hideout()
         return (same_room and not catcher.ignore_woody
                 and (not catcher.anim.blocking or not woody.sneaking)
                 and not woody.anim.blocking)
@@ -10911,10 +10921,7 @@ class World:
         rw, rc = woody.pc_room(), catcher.pc_room()
         if rw is None or rc is None or rw.pid != rc.pid:
             return False
-        if woody.hiding:
-            return False
-        la = woody._pc_leave_anim
-        if la is not None and woody.anim.anim is not None and woody.anim.anim.name == la:
+        if woody.hiding or woody.pc_leaving_hideout():
             return False
         return not catcher.pc_flag4
 
