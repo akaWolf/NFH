@@ -286,9 +286,15 @@ actors' job pass the update calls at 0x100445f8.
   the ticks around it — the step's start and the hand-offs of the
   actor's queue; NFH2's DoActions job is its time + 2 (a state-0 update,
   the count, a state-2 update), which the start plus the timer's time + 1
-  would match — are not read, and the video laps do not tell (the lap
-  model's mean deviation 8.6 % with the time alone, 8.7 % with 2 ticks
-  more an action);
+  would match — are not read in full: the actor's tick (0x444db0) updates
+  the front job of its queue and, while one returns done, pops it and
+  updates the next in the same tick (0x444e05-0x444e7c), and the step's
+  PUSH of the timer (fcn.00444d30 with its run-now flag 0) leaves the
+  first update to a later pass — so the action spans N + 1 ticks give or
+  take the one the order of the level's script and the actors' pass
+  decides, which is unread; the lap model fits the videos best at N + 1
+  (5.4 % mean deviation without 103 and 106, 5.7 % at N, 5.9 % at N + 2),
+  not enough to carry a tick on every action;
   the lap model and the stations' `PCUseSeconds` carry the time alone (a
   station of n actions would be 2n ticks longer at NFH2's figure: 114's
   hat, five actions, 0.83 s).
