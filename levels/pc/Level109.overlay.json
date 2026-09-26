@@ -303,6 +303,14 @@
     }
    },
    "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 3 ticks"
+  },
+  {
+   "object": "Chili",
+   "component": "Alerter",
+   "set": {
+    "PCSurpriseSeconds": 2.0
+   },
+   "source": "the pet's alarm: the level class's `noise` case, then the neighbour's `search` (fcn.0047a690; generic/objects.xml, the Loader's time 24 ticks at 12 a second, tools/pcref/pc_durations.py ALERTERS)"
   }
  ]
 }

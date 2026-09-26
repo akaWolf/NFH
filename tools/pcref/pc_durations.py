@@ -85,6 +85,11 @@ PAIRS = {
 # Loader's time) as PCLeaveSeconds — 109's bed, left on a noise (the pig
 # class's `wakeup`: the LEAVE of bed/bed_sleep at 0x468aff)
 LEAVES = {109: [('Bed', 'bed/bed_sleep')]}
+# a pet's alarm: the level class's `noise` case runs him to the pet's room, the
+# next case plays the neighbour's `search` (fcn.0047a690: the ACTION `search` on
+# `neighbor` — e.g. 112's cases 21 and 22, 0x46504a-0x465120) — the Alerter's
+# PCSurpriseSeconds, the remaster's Search played at its pace
+ALERTERS = (107, 109, 111, 112, 113, 114)
 
 
 def pc_stations(n, toks):
@@ -178,6 +183,25 @@ def main(argv):
                 e = dict(e, set=st)
             patches.append(e)
         ov['patches'] = patches
+        if n in ALERTERS:
+            L = lap_model.Level(n)
+            t = L.action_ticks('neighbor', 'search')
+            mob = json.load(open('%s/levels/s1/Level%d.json' % (ROOT, n)))['objects']
+            pets = sorted({((o.get('data') or {}).get('m_GameObject') or {}).get('name')
+                           for o in mob.values() if o.get('type') == 'Alerter'} - {None})
+            for pet in pets:
+                v = round(t / lap_model.TICK, 3)
+                src = ("the pet's alarm: the level class's `noise` case, then the neighbour's `search` "
+                       "(fcn.0047a690; generic/objects.xml, the Loader's time %d ticks at 12 a second, "
+                       "tools/pcref/pc_durations.py ALERTERS)" % t)
+                e = next((e for e in ov['patches'] if e.get('object') == pet
+                          and 'PCSurpriseSeconds' in (e.get('set') or {}) and e.get('component') == 'Alerter'), None)
+                if e is not None:
+                    e['set']['PCSurpriseSeconds'] = v
+                    e['source'] = src
+                else:
+                    ov['patches'].append({'object': pet, 'component': 'Alerter',
+                                          'set': {'PCSurpriseSeconds': v}, 'source': src})
         for item, obj in LEAVES.get(n, ()):
             t = lap_model.Level(n).action_ticks(obj, 'leave')
             if t is None:

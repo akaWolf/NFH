@@ -5452,6 +5452,19 @@ class Routine:
         elif it.kind == 'Alerter' or it.rott_surprise:
             seq = [a for a in it.rott_surprise if self.pawn.anim.has(a)]
             self.state = self.USING
+            secs = getattr(it, 'pc_surprise_secs', None) \
+                if it.kind == 'Alerter' and pcprofile.is_pc() else None
+            if seq and secs:
+                # the PC's alarm: the `search` of the case after the pet's
+                # `noise` run (fcn.0047a690) — the remaster's Search at its pace
+                mobile = self.pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0:
+                    self.pawn.anim.time_scale = mobile / secs
+                    searched = done
+
+                    def done():
+                        self.pawn.anim.time_scale = 1.0
+                        searched()
             if seq:
                 self.pawn.anim.play_sequence(seq, on_end=done)
             else:
