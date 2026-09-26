@@ -279,9 +279,16 @@ actors' job pass the update calls at 0x100445f8.
   0x100a1c10 — no countdown found on either side —;
   slot 3 the stop fcn.00476f50 setting the next animations, slot 8 a
   message handler 0x478ca0; the `dec [+0x28]` of its slot 1 is the
-  reference count), so
-  the ticks the job takes around the time — NFH2's DoActions job is its
-  time + 2 (a state-0 update, the count, a state-2 update) — are not read;
+  reference count; read further the same night: after the loop the start
+  makes a timer job of the longest time — fcn.0047e520 or fcn.0047f660,
+  vtable 0x4e5bcc, pushed on the actor — whose update (0x47e500) counts
+  the time down and returns done on its (time + 1)th call), so
+  the ticks around it — the step's start and the hand-offs of the
+  actor's queue; NFH2's DoActions job is its time + 2 (a state-0 update,
+  the count, a state-2 update), which the start plus the timer's time + 1
+  would match — are not read, and the video laps do not tell (the lap
+  model's mean deviation 8.6 % with the time alone, 8.7 % with 2 ticks
+  more an action);
   the lap model and the stations' `PCUseSeconds` carry the time alone (a
   station of n actions would be 2n ticks longer at NFH2's figure: 114's
   hat, five actions, 0.83 s).
