@@ -713,7 +713,7 @@ margin, so her room is entered by rushes timed to those windows.
 | 101 | 4/4 | 100 (3 ticks) | 201 | 4/4 | 100 |
 | 102 | 6/6 | 100 (7) | 202 | 5/5 | 100 (the mat armed after his lap-2 visit) |
 | 103 | 6/6 | 100 (5) | 203 | 5/5 | 100 |
-| 104 | 7/7 | 100 (6: the PC lap order — the microwave after the pie — and no second use after the egg, levels/pc/Level104.overlay.json) | 204 | 6/6 | 100 |
+| 104 | 7/7 | 100 (6: E04's chain — the cream's eat, the bathroom four, the picture, the dirty oven on the next lap) | 204 | 6/6 | 100 |
 | 105 | 8/8 | 100 (7) | 205 | 5/5 | 100 (the PC amounts: tennis, skis, chef, rockets on one lap) |
 | 106 | 9/9 | 100 (8: the whole set on [2]-[8] of one lap, Woody in the hall's wardrobe between the raids) | 206 | 6/6 | 100 (the PC payment order: weights, dynamite, then the pad) |
 | 107 | 7/7 | 100 (6: armed behind him, the lap pays all seven) | 207 | 7/7 | 100 |
@@ -732,12 +732,17 @@ not counting). The plans in tests/plans/pc/s1 arm everything for ONE lap,
 each item right after his previous visit, timed by `whenusing`/`whenzone`
 landmarks and rushes where the gate's escape margin would wait a window
 out (108, 110, 106). Where the mobile routine itself stood in the way, the profile copies
-the PC's (levels/pc, each overlay with its source): 104's lap is put in
-the PC order (the microwave after the pie, `actions_by_index`) and the
-oven is not used a second time after the egg (ReuseAfterFix off), so the
-cream, the egg, the slip and the bathroom chain as on E04; 109 pays the
+the PC's (levels/pc, each overlay with its source): 109 pays the
 PC's scores (the milk 10, the chips 15 — the mobile routes the chili's
 15 through a CornChips whose score is 0) and needs four ticks, not six.
+104's lap had been put in an order read off E04's thermometer (the
+microwave after the eat, no second use of the oven after the egg) until
+2026-09-26: game.exe's level_pie runs the mobile's order — the pie, the
+oven (put_apple_pie, cook, take_apple_pie, after the dirty oven's trick
+step as well), the cream and the eat, the basin — and E04's frames pay
+the cream's eat first (114.6 s, cold), the bathroom soap, toilet,
+aftershave and deodorant, the picture on his walk back and the dirty
+oven on that lap's visit last (225.7), which the plan now arms.
 One rule of the mobile ActionManager looked like the next obstacle:
 after an urgent action it skips the interrupted routine action when that
 item's GotTricked is set (ActionManager.cs:614-619 — the marbles'
@@ -1470,10 +1475,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier
   195.5, the glued vacuum 221.8 — his vacuum icon from 215 — the marbles
-  249.4 on his walk from the bedroom to the balcony, the fish tank 278.8,
-  the ironing board 301.3 as he passes it between the tank and the
-  balcony, the airer 322.2), every gap 16-29 s, seven ticks: the PC data's
-  79 points make the 100. The PC rules the port had to take from game.exe
+  249.4 by the bed on his walk from the board to the balcony, the ironing
+  board 278.8 as he passes it on his way to the tank, the fish tank 301.3,
+  the airer 322.2 on his arrival at the rack — the order read off the
+  frames on 2026-09-26, the earlier reading had the tank and the board
+  swapped), every gap 16-29 s, seven ticks: the PC data's 79 points make
+  the 100. The drier-to-vacuum link is a run: Woody walks through the
+  living room, the dog wakes and barks, and the `noise` alarm — the `?!`
+  bubble from 205, 9.5 s after the drier's fire, as its shout and repair
+  end — runs him up from the basement into the carpet's room (26.3 s;
+  his walk there takes the port 27.6, past the drier's 27.5 s window). The PC rules the port had to take from game.exe
   and the data: the dirty carpet is a room trigger
   (`level_laundry/trigger.xml`: `position="room" type="always"`; the
   mobile's OnChangeZone skips the carpet, Rottweiler.cs:188, and only the
@@ -2327,7 +2338,7 @@ both games, the PC data next to the mobile's, category by category:
 | trick sets and values | equal but 109 (milk 20 / pig 10), 111 (13/12/7), 112 (skates 8) — overlays; the mobile's extra rated items (103's cake, 112's Yoga, the 104/113 pairs, Season 2's fence and hook items) are not on the PC and not on the PC routes |
 | recipes (combine.xml vs RequiredInventory) | equal on every trick the PC has; the mobile adds recipes of its own (108's balloon, the Season 2 knives) |
 | containers and their contents | equal (the PC marks unlimited stock with count 99, the mobile with UseCount 0) |
-| walk-by tricks (nearobj triggers vs NoticeWhenWalkNearby) | equal, 111's ironing board included |
+| walk-by tricks (nearobj triggers vs NoticeWhenWalkNearby) | equal, 111's ironing board included; 111's rack is a walk-by on the mobile and a station on the PC (case 14 fires on his arrival) — fired on arrival under the profile since 2026-09-26 |
 | rooms and doors | equal room graphs (the PC's extra "fro" is the entrance hall; the mobile numbers its zones) |
 | the neighbour's routine | read out of game.exe (docs/PC_ROUTINES.md, tools/pcref/exe_scripts.py): one compiled class per level, its `run` a script of Icon / GoTo / Action / branch / SwitchObjects calls on the level's object names; the actions and repeats are there (the laundry's washer and drier one station each — give, wash, get_clothes; give, dry, take — the mobile's three-phase machine; their tricked branch ends the station), the lap order still from the video where the compiler laid branches out of line |
 | action lengths | the PC's `time`/frames at 20 per second are of the mobile's order (album 5.7 vs 3.3 s, pudding 4.8 vs 0.8, sofa 4.4 vs 11.8, microwave 9.4 vs 15) — the laps are walks and structure, see docs/PC_LAPS.md |

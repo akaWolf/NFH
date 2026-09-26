@@ -191,9 +191,17 @@ levels' explicit door times are that figure), which the model had counted
 a tick long and 107's `auto` doors as nothing: 101 33.2 s, 102 27.8, 103
 27.4, 104 72.5, 105 45.4, 106 124.0, 107 48.4 (video 54; its doors 12.2
 s), 108 89.8, 109 110.7, 110 59.9, 111 112.9, 112 146.6, 113 165.9, 114
-167.3. The job's own ticks around an action's time (NFH2's DoActions job
-is its time + 2, docs/PC_VERIFICATION.md "an action's behaviour") are not
-read for game.exe and not in the model.
+167.3. The job's own ticks around an action's time, read for game.exe on
+2026-09-26 (docs/PC_VERIFICATION.md "the action durations"): the ACTION
+step makes a timer job of the longest time, done on its (time + 1)th
+update, the first a tick after the push — every action, door clip, shout
+and pet clip lasts its time + 1 (`job_ticks`; NFH2's DoActions job is its
+time + 2), and a time of 0 makes no job. The model with it: 101 33.8 s
+(video 32), 102 28.5 (28), 103 28.6 (42), 104 74.2, 105 46.4 (40), 106
+126.7, 107 49.6 (54), 108 92.2 (94), 109 113.2 (113), 110 61.8 (59), 111
+116.1 (122), 112 149.8 (155), 113 170.5 (191), 114 171.8 (168) — the fit
+over the videos best at time + 1 (5.4 % mean deviation without 103 and
+106, 5.7 % at the time alone, 5.9 % at time + 2).
 
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in
