@@ -334,8 +334,10 @@ def _lap(L, toks, start):
             if after and t:
                 t -= 1                # its first move in the leave's last tick (0x4760ad, run-now 1)
             legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
+            # the door step's one ACTION of two entries (fcn.004741e0 -> fcn.00478030):
+            # the near `enter` and the far `leave` start together, the longer times it
             t_out = L.job_ticks(d_out, 'enter') or 0; t_in = L.job_ticks(d_in, 'leave') or 0
-            legs.append(('door', '%s enter %d + %s leave %d' % (d_out, t_out, d_in, t_in), t_out + t_in))
+            legs.append(('door', '%s enter %d | %s leave %d' % (d_out, t_out, d_in, t_in), max(t_out, t_in)))
             room, x, y = d_in.split('/')[0], xi, yi
             after = True
         t = L.walk_ticks(x2 - x, y2 - y)
