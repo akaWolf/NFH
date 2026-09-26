@@ -1,17 +1,13 @@
 # Level104 under the PC profile: the PC's viewer rating pays each trick's
 # score plus 3 per angry tick (docs/PC_VS_MOBILE.md), so the 82 of these
 # seven tricks needs six ticks — every trick after the first landing while
-# he is still hot (23.6 s of decay from the last angry, the angries
-# themselves not counting). The PC run chains six: its lap is Sink > Pie >
-# Microwave > Deodorant, the cream at the pie's end followed by the
-# microwave at once. The mobile lap (Pie > Microwave > Cream > Pie > the
-# bathroom) leaves 40 s between the microwave and the cream, so
-# levels/pc/Level104.overlay.json moves the microwave after the eat as
-# on PC. Armed for one lap — the kitchen while he is in the bathroom, the
-# hall and the bathroom while he is in the kitchen — the lap pays the
-# cream at the pie's end > the microwave > the soap slip on his way out >
-# the picture on the hall transit > the toilet walk-by > the aftershave
-# and the deodorant at the sink.
+# he is still hot (the rage held 60 ticks, then counted down from the
+# trick's angrytime: 22 s after the level's 204, 24 s after the toilet's
+# 228, 27 s after the picture's 264 — docs/PC_ROUTINES.md "The anger and
+# the bonus"). Armed for one lap, the lap pays E04's chain: the cream's eat
+# > the soap on his bathroom walk-in > the toilet walk-by > the aftershave
+# and the deodorant at the sink > the picture on his walk back > the dirty
+# oven on his next oven visit (v8 below).
 # v5 (2026-09-17): the hall's wardrobe is the perch — the entrance zone is the
 # exit door's, unreachable for a park. The bathroom shelf, the toilet and the
 # picture on his first kitchen stay (70-100), the kitchen trip on his bathroom
@@ -23,27 +19,42 @@
 # armed while he is in the bathroom and pays on his walk out to the kitchen,
 # and the kitchen pair follows — v5 read the shelf four hot, then the kitchen
 # 30 s later (cold) and the microwave 24 s after the kitchen slip (cold).
-take FirstAid IT_Shavingfoam      # Zone04 (13-18): Shavingfoam + Hairrestorer, while he eats in the kitchen (0-29)
+# v7 (2026-09-26, the action's timer job): the Season 1 action lasting its
+# time + 1 ticks puts the cream's pay 27.3 s after the picture's, past the
+# picture's 27 s window (60 + 264 ticks) — v6's picture > cream link breaks.
+# v8 (2026-09-26, the PC lap): v1-v7 ran the overlay's lap with the microwave
+# after the eat, read off E04's thermometer as "the cream followed by the
+# microwave at once"; game.exe's level_pie (class 46198c) runs the mobile's
+# order — the pie, the oven (the cook after the dirty oven's trick step
+# too), the cream and the eat, the basin — and E04's frames pay the cream's
+# eat first (cold), the bathroom four, the picture on his walk back and the
+# dirty oven on that lap's oven visit last. The plan arms that chain: the
+# cream while he is in the bathroom (Woody out through the living room,
+# Zone02), the bathroom four while he is in the kitchen, the oven and the
+# picture while he is in the bathroom after it.
+take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer, while he is in the kitchen
 take ToiletPaper IT_Wcpaper
 take SoapDish IT_Soap             # the one soap
-take! Drawer IT_Superglue         # Zone01 (~24): Superglue + Marker, before he crosses the hall (29.6)
-hide! Wardrobe                    # Zone01 by ~28: he crosses the hall 30-40 and 60-70
-whenusing WhippedCream            # (~74) his first kitchen stay (70-100): the bathroom shelf, the toilet, the soap
+take! Drawer IT_Superglue         # Zone01: Superglue + Marker, before he crosses the hall
+hide! Wardrobe                    # Zone01: he crosses the hall to the bathroom
+whenzone Zone04                   # his first bathroom stay: the cream
+take! Fridge IT_Egg               # Zone03
+usewith! WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at the cream action, pays at the eat, 15
+park Zone02                       # the living room, never his: out of the kitchen before he is back
+whenzone Zone03                   # his second kitchen stay: the bathroom four
 usewith! Deodrant IT_Hairrestorer # on the shelf (Primed); pays at SinkDeodrant, score 15
 usewith! AfterShave IT_Superglue  # on the shelf (Primed); pays at SinkAftershave, score 20
 usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by (0.1), score 8
-usewith! Ground@Zone04 IT_Soap    # CauseSlip on his bathroom walk, 8 — with the shelf
-hide! Wardrobe                    # by ~95, before he comes down (100)
-whenzone Zone04                   # (~111) his bathroom stay, longer by the shelf's anger: the kitchen
-take! Fridge IT_Egg               # Zone03
-usewith! WhippedCream IT_Shavingfoam   # UseAtOtherPlace: ShavingCream at the cream action, pays at the pie's eat, 15
-usewith! Microwave IT_Egg         # the microwave after the eat (the overlay), 8
-usewith! MumPicture IT_Marker     # Zone01 on the way back: pays on his walk out of the bathroom to the kitchen, score 8
+usewith! Ground@Zone04 IT_Soap    # CauseSlip on his bathroom walk-in, 8
+hide! Wardrobe                    # before he leaves the kitchen
+whenzone Zone04                   # his second bathroom stay: the oven and the picture
+usewith! Microwave IT_Egg         # the dirty oven: fires on his next oven visit, 8
+usewith! MumPicture IT_Marker     # Zone01: pays on his walk out of the bathroom, score 8
 hide! Wardrobe
+await WhippedCream 15
+await Ground@Zone04 8
 await Toilet 8
 await AfterShave 20
 await Deodrant 15
-await Ground@Zone04 8
 await MumPicture 8
-await WhippedCream 15
 await Microwave 8
