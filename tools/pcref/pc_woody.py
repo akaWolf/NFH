@@ -98,6 +98,34 @@ def woody_seconds(n):
                 notes.append('use <- %s %d ticks' % (base, v))
         if vals:
             out[item] = (kind, vals, notes)
+    # the containers: Woody's `take` from the PC object whose `<content>`s are the
+    # remaster's SearchItem's inventory (open and close are 0 ticks for him: a
+    # one-frame oneshot of his and none of the object's) — take0/1/3 18 ticks,
+    # take_low0 11, take_high 14
+    d = json.load(open('%s/levels/s1/Level%d.json' % (ROOT, n)))['objects']
+    ob = canon.read(os.path.join(lap_model.X, L.folder, 'objects.xml'))
+    contents = {}
+    for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', ob, re.S):
+        cs = set(re.findall(r'<content name="([^"]+)"', om.group(2)))
+        if cs:
+            contents[om.group(1)] = cs
+    for o in d.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if o.get('type') != 'SearchItem' or not nm or nm in out:
+            continue
+        invs = {canon.norm(i.get('Type')) for i in (dd.get('InventoryItems') or [])
+                if isinstance(i, dict) and i.get('Type')}
+        if not invs:
+            continue
+        cands = [obj for obj, cs in contents.items() if invs & cs]
+        ticks = {L.action_ticks(obj, 'take', actor='woody') for obj in cands}
+        ticks.discard(None)
+        if len(ticks) != 1:
+            continue
+        t = ticks.pop()
+        out[nm] = ('SearchItem', {'use': round(t / lap_model.TICK, 3)},
+                   ['use <- %s take %d ticks' % ('/'.join(sorted(cands)), t)])
     # the floor drops: Woody's `laydown` for every item the remaster lays with TakeGround
     lay = L.action_ticks('woody', 'laydown', actor='woody')
     for item, (kind, req, clip) in sorted(items.items()):
