@@ -20,7 +20,7 @@
   },
   {
    "object": "Drawing",
-   "component": "TrickItem",
+   "component": "Drawing",
    "set": {
     "PCAngryTime": 204
    }
