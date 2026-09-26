@@ -126,6 +126,25 @@ def woody_seconds(n):
         t = ticks.pop()
         out[nm] = ('SearchItem', {'use': round(t / lap_model.TICK, 3)},
                    ['use <- %s take %d ticks' % ('/'.join(sorted(cands)), t)])
+    # the hideouts: Woody's `enter` and `leave` of the PC object carrying the
+    # hideout flag and the HideItem's name (the wardrobe 19 and 19 ticks, the
+    # bed 4 and 4) — the remaster's hide clip and its leave clip paced to them
+    for o in d.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if o.get('type') != 'HideItem' or not nm or nm in out:
+            continue
+        cands = [obj for obj in L.objects if obj.split('/')[-1] == nm.lower()
+                 and re.search(r'<object name="%s"[^>]*>(?:(?!</object>).)*<flag name="hideout"' % re.escape(obj),
+                               ob, re.S)]
+        vals = {}
+        for act in ('enter', 'leave'):
+            ts = {L.action_ticks(obj, act, actor='woody') for obj in cands}
+            ts.discard(None)
+            if len(ts) == 1:
+                vals[act] = round(ts.pop() / lap_model.TICK, 3)
+        if vals:
+            out[nm] = ('HideItem', vals, ['%s <- %s %s' % (k, '/'.join(sorted(cands)), v) for k, v in vals.items()])
     # the floor drops: Woody's `laydown` for every item the remaster lays with TakeGround
     lay = L.action_ticks('woody', 'laydown', actor='woody')
     for item, (kind, req, clip) in sorted(items.items()):
