@@ -146,6 +146,76 @@
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.25 s, dry 2.42 s, take 0.25 s"
+  },
+  {
+   "object": "Airer",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Birdfood": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Birdfood <- bal/clothes birdfood 23 ticks"
+  },
+  {
+   "object": "Drier",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Tongs": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- bas/tumbledrier tongs 23 ticks"
+  },
+  {
+   "object": "FishTank",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Detergent": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Detergent <- wor/fishfood detergent 23 ticks"
+  },
+  {
+   "object": "Iron",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/ironingboard_clothes 11 ticks"
+  },
+  {
+   "object": "Vacuum",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Paperknife": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Paperknife <- lir/vacuum paperknife 23 ticks"
+  },
+  {
+   "object": "WashingMachine",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Winebottle": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Winebottle <- bas/washingmachine winebottle 23 ticks"
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marbles": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_laundry's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 3 ticks"
   }
  ]
 }

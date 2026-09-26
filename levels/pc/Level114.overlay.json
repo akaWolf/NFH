@@ -180,6 +180,86 @@
     "PCFireAt": 4.333
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MedalBox <- hat#0 wearmedals 4.33 s"
+  },
+  {
+   "object": "Gramaphone",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Nail": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Nail <- lir/phono_open nail 23 ticks"
+  },
+  {
+   "object": "Hat",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Superglue": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- bed/hat superglue 23 ticks"
+  },
+  {
+   "object": "Horn",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Balloon": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Balloon <- bal/woodhorn balloon 23 ticks"
+  },
+  {
+   "object": "MedalBox",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Rat": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Rat <- bed/medalbox rat 23 ticks"
+  },
+  {
+   "object": "Pipe",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Gunpowder": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Gunpowder <- lir/tabacbox gunpowder 23 ticks"
+  },
+  {
+   "object": "Polish",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Shoepolish": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Shoepolish <- kit/polish shoepolish 23 ticks"
+  },
+  {
+   "object": "Shotgun",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Munition": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Munition <- bas/gun munition 23 ticks"
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marbles": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 3 ticks"
   }
  ]
 }

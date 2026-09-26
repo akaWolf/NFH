@@ -141,6 +141,96 @@
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    }
+  },
+  {
+   "object": "AfterShave",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Superglue": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- toi/aftershave superglue 11 ticks"
+  },
+  {
+   "object": "Deodrant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Hairrestorer": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Hairrestorer <- toi/grease hairrestorer 11 ticks"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 2.0
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 24 ticks"
+  },
+  {
+   "object": "MumPicture",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marker": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 23 ticks"
+  },
+  {
+   "object": "SinkAftershave",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Magnesium": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/aftershave superglue 11 ticks"
+  },
+  {
+   "object": "SinkDeodrant",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Magnesium": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/grease hairrestorer 11 ticks"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wcpaper": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 23 ticks"
+  },
+  {
+   "object": "WhippedCream",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Shavingfoam": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Shavingfoam <- kit/whippedcream shavingfoam 11 ticks"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Soap": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 3 ticks"
   }
  ]
 }

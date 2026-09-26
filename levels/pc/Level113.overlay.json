@@ -152,6 +152,66 @@
     "PCUseSecondsTricked": 7.083,
     "PCFireAt": 4.5
    }
+  },
+  {
+   "object": "AngleGrinder",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bal/anglegrinder 23 ticks"
+  },
+  {
+   "object": "ChairAssembly",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Honey": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- lir/stoolkit painbook 23 ticks"
+  },
+  {
+   "object": "ChairAssemblyBook",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Painbook": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 23 ticks"
+  },
+  {
+   "object": "FuseBox",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Fuse": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fuse <- anc/no_fuse fuse 23 ticks"
+  },
+  {
+   "object": "Ladder",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Tongs": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 23 ticks"
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marbles": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 3 ticks"
   }
  ]
 }

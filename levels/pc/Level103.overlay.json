@@ -78,6 +78,76 @@
     "PCSurpriseSeconds": 1.25,
     "PCFixSeconds": 1.917
    }
+  },
+  {
+   "object": "BirthdayCake",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Magnesium": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- kit/candlebox boom 11 ticks"
+  },
+  {
+   "object": "Candle",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Boom": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Boom <- kit/candlebox boom 11 ticks"
+  },
+  {
+   "object": "LetterBox",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Mousetrap": 1.333
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Mousetrap <- anc/mailbox mousetrap 16 ticks"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 23 ticks"
+  },
+  {
+   "object": "MumPicture",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marker": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 23 ticks"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wcpaper": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 23 ticks"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Soap": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 3 ticks"
   }
  ]
 }

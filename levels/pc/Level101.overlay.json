@@ -60,6 +60,46 @@
     "PCFireAt": 0,
     "PCRunTo": true
    }
+  },
+  {
+   "object": "Binoculars",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Superglue": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- kit/binoculars superglue 23 ticks"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Egg": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 23 ticks"
+  },
+  {
+   "object": "Sofa",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Fartbag": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Fartbag <- lir/sofa fartbag 11 ticks"
+  },
+  {
+   "object": "Television",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 11 ticks"
   }
  ]
 }

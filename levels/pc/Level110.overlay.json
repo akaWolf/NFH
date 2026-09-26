@@ -94,6 +94,66 @@
     "PCReturnSeconds": 0.0,
     "PCRunTo": true
    }
+  },
+  {
+   "object": "BBQ",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Cork": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cork <- bal/beer fuel 23 ticks"
+  },
+  {
+   "object": "CarnivorPlantSpray",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Growthliquid": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Growthliquid <- bal/spray growthliquid 23 ticks"
+  },
+  {
+   "object": "FireExtinguisher",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/extinguisher 11 ticks"
+  },
+  {
+   "object": "SteakChair",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Pins": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- lir/chair pins 23 ticks"
+  },
+  {
+   "object": "SteakWine",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Vinegar": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Vinegar <- lir/wine vinegar 23 ticks"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Banana": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 3 ticks"
   }
  ]
 }

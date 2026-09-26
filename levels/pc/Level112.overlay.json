@@ -157,6 +157,106 @@
     "PCFireAt": 4.0
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 5.1 s"
+  },
+  {
+   "object": "Bicycle",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Tongs": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- lir/hometrainer tongs 11 ticks"
+  },
+  {
+   "object": "ChestExpander",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Rubberrope": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Rubberrope <- bas/expander rubberrope 23 ticks"
+  },
+  {
+   "object": "FishTank",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Steroids": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Steroids <- wor/fishfood steroids 11 ticks"
+  },
+  {
+   "object": "Rope",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- anc/skippingrope 11 ticks"
+  },
+  {
+   "object": "Trampoline",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Spring": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Spring <- bed/trampoline spring 11 ticks"
+  },
+  {
+   "object": "Weights",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Metalsaw": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Metalsaw <- bas/barbell metalsaw 23 ticks"
+  },
+  {
+   "object": "Yoga",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Football": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Football <- wor/book knotbook 11 ticks"
+  },
+  {
+   "object": "YogaBook",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Knotbook": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Knotbook <- wor/book knotbook 11 ticks"
+  },
+  {
+   "object": "GroundMarbles",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Marbles": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marbles <- woody laydown 3 ticks"
+  },
+  {
+   "object": "GroundSkates",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Skate": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_fitness's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Skate <- woody laydown 3 ticks"
   }
  ]
 }

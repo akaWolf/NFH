@@ -10047,6 +10047,22 @@ class World:
         seq = list(item.animation_sequence) if item.use_woody_sequence \
             else ([item.animation] if item.animation else [])
         seq = [a for a in seq if self.woody.anim.has(a)]
+        # the PC's trick action of Woody's (PCWoodySeconds: the object's action
+        # named after the inventory item he holds, or `use`, at the Loader's
+        # time — tools/pcref/pc_woody.py): the remaster's clips at the pace that
+        # lasts it; any other use at the clips' own
+        self.woody.anim.clip_pace = None
+        self.woody.anim.time_scale = 1.0
+        pcw = getattr(item, 'pc_woody_secs', None) \
+            if pcprofile.is_pc() and pcprofile.rule('durations') else None
+        if pcw and seq:
+            key = (item_used_inventory or {}).get('type') or 'use'
+            secs = pcw.get(key, pcw.get('use'))
+            mobile = self.woody.anim.sequence_seconds(seq)
+            if secs and mobile > 0.0:
+                self.woody.anim.clip_pace = {
+                    nm: secs * self.woody.anim.sequence_seconds([nm]) / mobile
+                    for nm in seq}
         searching = item.kind == 'SearchItem'
         # only a TrickItem defers its use to the animation's end
         # (ShouldUseAfterAnimationFinishes: TrickItem.cs:263-266,
@@ -10064,6 +10080,8 @@ class World:
             self.woody.stored_input = None
 
         def anim_ended():
+            self.woody.anim.clip_pace = None
+            self.woody.anim.time_scale = 1.0
             if searching:
                 self._woody_search_step(item)
             elif deferred:

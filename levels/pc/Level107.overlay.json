@@ -104,6 +104,56 @@
     "PCUseSecondsTricked": 0.0,
     "PCFireAt": 0
    }
+  },
+  {
+   "object": "Camera",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Magnesium": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- bed/camera magnesium 11 ticks"
+  },
+  {
+   "object": "DieselChair",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Pins": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- kit/stool pins 11 ticks"
+  },
+  {
+   "object": "DieselGenerator",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Wrench": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wrench <- kit/potterswheel wrench 11 ticks"
+  },
+  {
+   "object": "MumStatueFootStool",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/footstool 11 ticks"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Banana": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 3 ticks"
   }
  ]
 }

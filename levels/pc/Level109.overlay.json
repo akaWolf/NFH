@@ -142,6 +142,86 @@
     "PCLeaveSeconds": 1.333
    },
    "source": "the PC hideout's `leave` (level_pig's objects.xml bed/bed_sleep, the Loader's time 16 ticks at 12 a second, tools/pcref/pc_durations.py LEAVES)"
+  },
+  {
+   "object": "AlarmClock",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Cactus": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Cactus <- bed/alarmclock cactus 11 ticks"
+  },
+  {
+   "object": "Bed",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Pins": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- bed/bed pins 11 ticks"
+  },
+  {
+   "object": "Chili",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "use": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- kit/cookiebox 23 ticks"
+  },
+  {
+   "object": "CornChips",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Chips": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Chips <- kit/cookiebox chips 23 ticks"
+  },
+  {
+   "object": "Pig",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Pigkey": 1.333
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pigkey <- anc/pig pigkey 16 ticks"
+  },
+  {
+   "object": "PigMilk",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Nitro": 1.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Nitro <- kit/babybottle nitro 23 ticks"
+  },
+  {
+   "object": "Teeth",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Tabasco": 0.917
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tabasco <- bed/teeth tabasco 11 ticks"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCWoodySeconds": {
+     "IT_Banana": 0.25
+    }
+   },
+   "source": "Woody's trick action (level_pig's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 3 ticks"
   }
  ]
 }
