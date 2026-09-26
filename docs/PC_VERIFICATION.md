@@ -275,6 +275,21 @@ actors' job pass the update calls at 0x100445f8.
   fcn.00476bb0, dispatched 0x476960 to its receiver's slot 55, a stub in
   game.exe's visitors and GFXEngine's sprite lookup 0x10028ac0) carries
   no time.
+- The Season 1 walk's layout: the port walks the mobile scene's paths —
+  its item positions and depth offsets, its door standing points, a climb
+  to every back door and a descent from its twin — at the PC's records;
+  the PC walks from hotspot to hotspot through the door types' standing
+  points (tools/pcref/lap_model.py: one axis a tick, 8 px along, 3 up or
+  down). The idle laps agree with the model to 0.3-7.7 s (docs/PC_LAPS.md:
+  113 178.2 against 170.5, 106 120.3 against 126.7), a leg off by 1-3 s
+  (113's angle grinder to the main valve 30.0 against 26.6: the port goes
+  down to the living room's floor and up again between its two back doors,
+  the model walks straight along their line, y 370; the bedroom's back door
+  climb 32 px where the PC's is 52). The walk step's waypoints (the walk
+  fiber fcn.00475b30, the path builders fcn.00475940 / fcn.00475a40 over
+  fcn.00448060) are not read, so the model's straight legs are not either;
+  Season 2's walk was carried the same way (docs/PC_FIDELITY.md "Season 2
+  walks") once GameLogic's was.
 - The Season 1 chains against Badinfos' runs (2026-09-26): E04 pays its
   seven 18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan
   18.3, 11.7, 18.5, 11.6, 18.5 and 21.8 — the toilet to the aftershave
