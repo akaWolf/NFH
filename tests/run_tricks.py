@@ -1091,6 +1091,12 @@ class Driver(Recorder):
         ticks = getattr(item, 'pc_minigame_ticks', None)
         game = (3 + -(-int(ticks) // 4)) / pcprofile.TICKS_PER_SECOND \
             if ticks else 0.0
+        # the profile's Woody action (PCWoodySeconds: the PC trick's or take's
+        # time, which the paced clips last in wall seconds) — the longest of
+        # the item's, with the laugh/take tail at the sheet's rate
+        pcw = getattr(item, 'pc_woody_secs', None)
+        if pcw and pcprofile.is_pc() and pcprofile.rule('durations'):
+            return max(2.0, max(pcw.values()) + 1.5 / self.anim_rate(w)) + game + 2.0 * run
         if t <= 0.0:
             return self.USE_TIME + game + 2.0 * run
         # no cap: Level102's saw is SawSofa x3 = 14.3 s at 13 fps and the
