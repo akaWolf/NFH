@@ -637,6 +637,9 @@ class Pawn:
         self._pc_from_x = None
         self._pc_step_t = 0.0
         self._pc_hold_t = 0.0
+        # the PC profile's Season 1 walk (Pawn._pc1_marks): the PC point the
+        # pawn stands at with where it stood when it got there (zone pid, x, y)
+        self._pc1_at = None
         # the PC profile's Season 2 catch (World._pc_s2_sees): the catcher's
         # flag 4 (Item.pc_hideout) with the use it belongs to, whether it
         # outlives that use, the clip last read; Woody's hideout leave clip
@@ -1249,6 +1252,8 @@ class Pawn:
             last['x'] = min(max(last['x'], dest.left), dest.right)
         if pcprofile.is_pc():
             self._pc_floor_marks(steps, self._pc_departure_step(steps))
+            if not self.nfh2 and self.role == 'Rottweiler':
+                self._pc1_marks(steps)
             self._pc_claim_marks(steps)
         H['step_index'] = len(steps)                # FindPath's StepIndex stamp
         self._move_index = -1
@@ -1473,6 +1478,18 @@ class Pawn:
                                      climbing=self.state in (self.DOOR_CLIMB, self.DESCEND),
                                      stairs=bool(self.nfh2), gait=self._pc_gait())
             if s is not None:
+                leg = self._pc1_leg()
+                if leg is not None:
+                    if leg.get('scale') is None:
+                        # no move of the PC's in this leg: a snap (_pc_floor_pace's)
+                        self.pos_snap = True
+                        tx, ty = self._step_target()
+                        n = (vx * vx + vy * vy) ** 0.5
+                        d = max(((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5, 1e-6)
+                        return d * 60.0 / n if n > 0.0 else s
+                    # the leg's PC-timed pace (tests/invariants.py)
+                    self.pc_pace = (vx * vx + vy * vy) ** 0.5 * s * leg['scale']
+                    return s * leg['scale']
                 return s
         return self.speed_sneaking if self.sneaking else self.speed
 
@@ -1832,6 +1849,172 @@ class Pawn:
                     s2['pc_floor'] = mark
             run = []
             x_pc = after
+
+    def _pc1_marks(self, steps):
+        """the PC profile's Season 1 walk (tools/pcref/pc_walks_s1.py): game.exe's
+        GOTO walks legs between the points its walk job gives its movers — the
+        near door's standing point, the far door's after the door step, the
+        station's hotspot (PCWalkDoor, PCWalkPoint) — each a mover's ticks
+        (pcprofile.s1_leg_ticks: one axis a tick, x before y, straight, no floor
+        line on the way), and the mobile scene's steps of a leg — its floor, a
+        back door's climb and the descent after it, an item's climb — run at one
+        pace that lasts the leg (`pc1` on a step, `pc1_out` on a door step for
+        the descent). A leg after a door starts in the far door's `leave`'s last
+        tick (the walk job pushes the next mover with the run-now flag 1,
+        0x4760ad), the GOTO ends a tick after its last move (its next update,
+        0x44aab0), three ticks with no move at all (the walk job done inside
+        the GOTO's first update, the arrival read on its second)"""
+        z = self.zone
+        if z is None or getattr(z, 'pc_walk_room', None) is None:
+            return
+        start = self._pc1_here()
+        if start is None:
+            return
+        gait = self._pc_gait()
+        v_floor = pcprofile.walk_speed(self.role, self.sneaking, 1.0, 0.0, gait=gait)
+        v_vert = pcprofile.walk_speed(self.role, self.sneaking, 0.0, 1.0, climbing=True, gait=gait)
+        if not v_floor or not v_vert:
+            return
+        x, y = self.sprite.x, self.sprite.y
+        zone = z
+        leg = {'from': start, 'nat': 0.0, 'after': False}
+        legs = [leg]
+        n = len(steps)
+        for i, st in enumerate(steps):
+            kind = st.get('kind')
+            last = i == n - 1
+            if kind == 'point':
+                tx, ty = st['x'], st.get('y', self.floor_y(zone))
+                leg['nat'] += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5 / v_floor
+                x, y = tx, ty
+                st['pc1'] = leg
+                if last:
+                    end = self._pc1_map(zone, tx, ty)
+                    if end is None:
+                        self._pc1_unmark(steps)
+                        return
+                    self._pc1_close(leg, end, gait, True)
+            elif kind == 'door':
+                d = st['door']
+                other = self.level.door_by_pid(d.link_to)
+                floor = self.floor_y(zone)
+                leg['nat'] += abs(d.x + d.dx - x) / v_floor
+                if d.should_walk_up:
+                    thr = self.item_threshold + d.delta_use_height
+                    leg['nat'] += max(0.0, abs(d.y - floor) - thr) / v_vert
+                pw = d.pc_walk.get(self.role)
+                if not pw or other is None:
+                    # a pass the PC data has no standing points for (the front
+                    # door: the neighbour's `neighbor` hotspots are missing on
+                    # anc/fro and fro/anc): the path keeps the mobile pace
+                    self._pc1_unmark(steps)
+                    return
+                st['pc1'] = leg
+                near = pw['near']
+                self._pc1_close(leg, near, gait, False)
+                zone = self.level.zone_by_pid(other.zone) or zone
+                far = pw['far']
+                leg = {'from': far, 'nat': 0.0, 'after': True}
+                legs.append(leg)
+                # the far door's placement (_warp_through)
+                x, y = other.x + self.door_delta[0], other.y + self.door_delta[1]
+                if d.should_walk_up:
+                    ffloor = self.floor_y(zone)
+                    leg['nat'] += max(0.0, (y - ffloor) - self.zone_threshold) / v_vert
+                    y = ffloor
+                st['pc1_out'] = leg
+                if last:
+                    self._pc1_close(leg, far, gait, True)
+            elif kind == 'item':
+                it = st['item']
+                floor = self.floor_y(zone)
+                leg['nat'] += abs(st['x'] - x) / v_floor
+                x, y = st['x'], floor
+                if it.should_walk_up:
+                    thr = self.item_threshold + it.delta_use_height
+                    leg['nat'] += max(0.0, abs(it.y - floor) - thr) / v_floor
+                st['pc1'] = leg
+                end = self._pc1_item_point(it)
+                if end is None:
+                    end = self._pc1_map(zone, st['x'], floor)
+                if end is None:
+                    self._pc1_unmark(steps)
+                    return
+                self._pc1_close(leg, end, gait, last)
+            else:
+                self._pc1_unmark(steps)
+                return
+
+    @staticmethod
+    def _pc1_unmark(steps):
+        for st in steps:
+            st.pop('pc1', None)
+            st.pop('pc1_out', None)
+
+    def _pc1_close(self, leg, end, gait, last):
+        """a leg's PC seconds and the pace factor of its mobile steps"""
+        fx, fy = leg['from']
+        t = pcprofile.s1_leg_ticks(self.role, gait, end[0] - fx, end[1] - fy) or 0
+        if leg['after'] and t > 0:
+            t -= 1                        # its first move in the leave's last tick
+        if last:
+            t += 3 if (t == 0 and not leg['after']) else 1
+        leg['to'] = tuple(end)
+        leg['secs'] = t / pcprofile.TICKS_PER_SECOND
+        leg['scale'] = leg['nat'] / leg['secs'] if leg['secs'] > 0.0 and leg['nat'] > 0.0 \
+            else (None if leg['nat'] > 0.0 else 1.0)
+
+    def _pc1_leg(self):
+        """the Season 1 leg the pawn's movement belongs to (Pawn._pc1_marks)"""
+        st = self._step
+        if st is None or not pcprofile.is_pc():
+            return None
+        if self.state == self.DESCEND:
+            return st.get('pc1_out')
+        return st.get('pc1')
+
+    def _pc1_here(self):
+        """the PC point the pawn stands at: the station it came to, as long as
+        it stands where it got there, else its place mapped into the PC room"""
+        at = self._pc1_at
+        if at is not None and self.zone is not None and at[1] == self.zone.pid \
+                and abs(self.sprite.x - at[2]) < 0.15 and abs(self.sprite.y - at[3]) < 0.4:
+            return at[0]
+        return self._pc1_map(self.zone, self.sprite.x, self.sprite.y)
+
+    def _pc1_map(self, zone, x, y):
+        """a place of the mobile scene in its PC room (PCWalkRoom): the zone's
+        walking span onto the room's path, the height above the floor at 96 px a
+        unit"""
+        r = getattr(zone, 'pc_walk_room', None) if zone is not None else None
+        if r is None:
+            return None
+        span = zone.play_right - zone.play_left
+        fx = (x - zone.play_left) / span if span > 0 else 0.5
+        px = r['x1'] + fx * (r['x2'] - r['x1'])
+        up = max(0.0, y - self.floor_y(zone)) * pcprofile.PX_PER_UNIT
+        return (int(round(px)), int(round(r['floor'] - up)))
+
+    def _pc1_item_point(self, it):
+        """the station's PC point for the coming visit (PCWalkPoint), None where
+        the PC's station lies in another room than the item's zone (the leg is
+        then the mobile's own, mapped into its room)"""
+        p = it.pc_walk.get(self.role) if it is not None else None
+        if not p:
+            return None
+        if isinstance(p[0], list):
+            p = p[it.pc_use_visit % len(p)]
+        z = self.level.zone_by_pid(it.zone)
+        r = getattr(z, 'pc_walk_room', None) if z is not None else None
+        if r is None or (len(p) > 2 and p[2] != r['room']):
+            return None
+        return (p[0], p[1])
+
+    def _pc1_arrived(self, st):
+        """the station reached: the next walk leaves from its PC point"""
+        leg = st.get('pc1')
+        if leg is not None and 'to' in leg and self.zone is not None:
+            self._pc1_at = (leg['to'], self.zone.pid, self.sprite.x, self.sprite.y)
 
     def _pc_back_door_pace(self, door, key, dist):
         """a back door's climb (`in`) or descent (`out`) pace under the
@@ -2478,6 +2661,7 @@ class Pawn:
                                 return
                         self._arm_item_snap(s['item'], tx)
                         self._pc_arrived(s['item'])
+                        self._pc1_arrived(s)
                     self._next_step()     # TryUseItem / TakeNextStep: zero
                 return
             nx, ny = dx / mag, dy / mag
@@ -2567,6 +2751,7 @@ class Pawn:
                 self.velocity = (0.0, 0.0)
                 self._arm_item_snap(it, self._step_target()[0])
                 self._pc_arrived(it)
+                self._pc1_arrived(self._step)
                 self._next_step()         # on_arrive fires the use
 
     def _arm_item_snap(self, item, tx):

@@ -154,7 +154,7 @@ def _mono_qsort(a, cmp, low0, high0):
 class Zone:
     __slots__ = ('name', 'pid', 'x', 'y', 'w', 'h', 'exit',
                  'play_left', 'play_right', 'ty', 'height_delta', 'tx',
-                 'name_string', 'end_string', 'pc_room')
+                 'name_string', 'end_string', 'pc_room', 'pc_walk_room')
 
     def __init__(self, name, pid, x, y, w, h, is_exit, ty=0.0, height_delta=0.0,
                  tx=0.0):
@@ -169,6 +169,9 @@ class Zone:
         # the PC profile's Season 2 room for the path finder's routes
         # (levels/pc overlays' PCRoom, tools/pcref/pc_walks_s2.py)
         self.pc_room = None
+        # the PC profile's Season 1 room: its path's x span and floor line in
+        # px of the PC scene (PCWalkRoom, tools/pcref/pc_walks_s1.py)
+        self.pc_walk_room = None
         # Level.SetPlayLeft/SetPlayRight, filled in from the Level component;
         # the collider box is containment, these are the walking limits
         self.play_left = x - w * 0.5
@@ -190,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout',
+                 'pc_hideout', 'pc_walk',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -413,6 +416,10 @@ class Item:
         # and its height against the room's floor (levels/pc overlays,
         # tools/pcref/pc_walks_s2.py)
         self.pc_approach = d.get('PCApproach') or {}
+        # the PC profile's Season 1 station: per role the hotspot of the PC
+        # object the walk goes to, px of the PC room — one point, or one a
+        # visit (PCWalkPoint, tools/pcref/pc_walks_s1.py)
+        self.pc_walk = d.get('PCWalkPoint') or {}
         # the PC profile's Season 2 catch: per role the span of the PC's flag 4
         # at this station — the catcher neither catches nor is seen
         # (levels/pc overlays, tools/pcref/pc_catch_s2.py)
@@ -1233,7 +1240,7 @@ class Door:
                  'disabled', 'description_string', 'walk_deltas',
                  'exit_door', 'woody_delta_use_height', 'use_woody_extra',
                  'can_use', 'dont_use_on', 'with_string', 'temporal_lock',
-                 'pc_pass', 'pc_claim')
+                 'pc_pass', 'pc_claim', 'pc_walk')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -1245,6 +1252,10 @@ class Door:
         # the PC profile's Season 2 pass of the door pair per pawn role
         # (levels/pc overlays, tools/pcref/pc_walks_s2.py; pcprofile.s2_pass_ticks)
         self.pc_pass = d.get('PCPass') or {}
+        # the PC profile's Season 1 door pair per role: the near door's
+        # standing point and the far door's, px of their PC rooms (PCWalkDoor,
+        # tools/pcref/pc_walks_s1.py)
+        self.pc_walk = d.get('PCWalkDoor') or {}
         # the pawn holding the pair on the PC (its door-pass step's flag 8,
         # Pawn._pc_claim_pair)
         self.pc_claim = None
@@ -1742,6 +1753,7 @@ class Level:
         z.name_string = o['data'].get('NameString') or ''
         z.end_string = o['data'].get('EndString') or ''
         z.pc_room = o['data'].get('PCRoom')
+        z.pc_walk_room = o['data'].get('PCWalkRoom')
         self.zones.append(z)
         self._zone_comp[pid] = z          # behaviors reference the component
 

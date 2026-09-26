@@ -602,6 +602,36 @@ def s2_pass_ticks(role, gait, p, sneaking=False):
     return t + run(p.get('dx', 0), h) + run(p.get('dy', 0), v)
 
 
+# Season 1 (game.exe, docs/PC_VERIFICATION.md "the walking speed"): a GOTO's walk job
+# (vtable 0x4e53d0, update 0x475c80) pushes a mover a leg — to the near door's standing
+# point, after the door step from the far door's, at last to the target's hotspot
+# (tools/pcref/pc_walks_s1.py) — and a mover (vtable 0x4e59e8, update 0x47cb50) moves one
+# axis a tick, x before y, at the facing's speed record, its first move `start` px longer
+# (the mover's +0x14 flag, cleared after it: generic/objects.xml mg1 8 facing right, mg3 10
+# facing left, the run's mr1 / mr3 the same, the vertical records 0), clamped at the target,
+# which it finds in the update of its last move (0x47cf7f-0x47cfac).
+S1_START_PX = (8, 10)     # the first move's extra px, facing right / left
+
+
+def s1_leg_ticks(role, gait, dx, dy, sneaking=False):
+    """the ticks of one Season 1 mover over (dx, dy) px of the PC scene at the pawn's gait"""
+    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
+    if rec is None:
+        return None
+    h, v = rec[0], rec[1]
+    if (role, gait) in GAIT_PX_PER_TICK:
+        h, v = GAIT_PX_PER_TICK[(role, gait)]
+    t = 0
+    if dx:
+        start = S1_START_PX[0 if dx > 0 else 1] \
+            if role == 'Rottweiler' and gait in ('walk', 'run') else 0
+        a = abs(dx)
+        t += 1 + (-(-(a - h - start) // h) if a > h + start else 0)
+    if dy:
+        t += -(-abs(dy) // v)
+    return t
+
+
 def clip_fps(name, fps, frames=0):
     """the rate a door strip plays at: the one that lasts its PC action's ticks
     (Season 1, the neighbour and Woody), else a frame a tick"""
