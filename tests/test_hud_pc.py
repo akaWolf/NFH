@@ -117,6 +117,22 @@ class Rage(unittest.TestCase):
         self.assertEqual((cur, hold), (116, 60))
         self.assertTrue(cur > 0)                    # the bonus test
 
+    def test_closed_form_from_the_fire(self):
+        # the fire in the actors' pass, the level tick after it in the same
+        # game tick: s1_rage_at is the tick rule from the fire's own tick on,
+        # and a fire G ticks later finds a current iff G <= amount + 59
+        for amount in (156, 240):
+            cur, hold = pcprofile.s1_rage_fire(0, amount)
+            for k in range(0, 360):
+                cur, hold = pcprofile.s1_rage_tick(cur, hold)
+                self.assertEqual((cur, hold), pcprofile.s1_rage_at(amount, k))
+            for gap in range(1, 360):
+                self.assertEqual(pcprofile.s1_rage_before(amount, gap) > 0, gap <= amount + 59)
+        # the port's seconds to the PC's ticks: the nearest (106's picture to
+        # the bathroom-door soap, 17.92 s: 215 ticks, the picture's 156 + 59)
+        self.assertEqual(pcprofile.s1_ticks(17.92), 215)
+        self.assertTrue(pcprofile.s1_rage_before(156, pcprofile.s1_ticks(17.92)) > 0)
+
     def test_s2_decay(self):
         # the Season 2 gauge: leveldata's time (30) off the meter every 1/12 s
         m = 50.0

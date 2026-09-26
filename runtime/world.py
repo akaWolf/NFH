@@ -596,6 +596,11 @@ class Pawn:
         self.rage_hold = 0
         self.rage_bonus = False          # the flag of the last trick (+0x7c)
         self.rage_acc = 0.0              # seconds toward the next 1/12 s tick
+        # the Season 1 rage from the last fire (pcprofile.s1_rage_at): its
+        # amount right after it and its world time — the ticks since counted
+        # from it, the PC's fire falling on a tick
+        self.rage_amount = 0
+        self.rage_fire_t = None
         self.tricked_aux = False         # Rottweiler.TrickedAux: set at cs:652,
                                          # cleared by every Item.Fix (Item.cs:2065)
         self.sneaking = False
@@ -2287,13 +2292,13 @@ class Pawn:
         if pcprofile.is_pc() and self.rage_max > 0:
             # the PC level state's tick (game.exe fcn.00438a80, 12 Hz): the
             # hold counts down first, then the current; the mobile meter
-            # mirrors the mercury, current * 100 / the level's angrytime
-            self.rage_acc += dt
-            period = 1.0 / pcprofile.S1_TICK_HZ
-            while self.rage_acc >= period - 1e-9:
-                self.rage_acc -= period
+            # mirrors the mercury, current * 100 / the level's angrytime. The
+            # ticks count from the last fire (the PC's falls on a tick, the
+            # port's on a frame: pcprofile.s1_ticks)
+            if self.rage_fire_t is not None and self.world is not None:
+                k = pcprofile.s1_ticks(self.world.time - self.rage_fire_t)
                 self.rage_current, self.rage_hold = \
-                    pcprofile.s1_rage_tick(self.rage_current, self.rage_hold)
+                    pcprofile.s1_rage_at(self.rage_amount, k)
                 if self.rage_current == 0:
                     self.rage_bonus = False
             self.angry_meter = float(
@@ -7560,7 +7565,12 @@ class World:
         OnTrickDone score rides the fire, so the completion count and the
         level's end follow it too."""
         points = self._would_pay(item)
-        bonus = points > 0 and pawn.rage_current > 0
+        # the current this fire finds: the ticks since the last fire, the
+        # level tick of this one still to come (pcprofile.s1_rage_before)
+        before = pcprofile.s1_rage_before(
+            pawn.rage_amount, pcprofile.s1_ticks(self.time - pawn.rage_fire_t)) \
+            if pawn.rage_fire_t is not None else 0
+        bonus = points > 0 and before > 0
         if points > 0:
             # the profile's payment record (the harness reads it for the chains)
             self.pay_log.append((round(self.time, 2), item.name, points, bool(bonus)))
@@ -7572,8 +7582,10 @@ class World:
             self._audience_laugh(pawn, 'medium')
         if points > 0:
             self._hud_angry(3 if bonus else 2 if points > 10 else 1)
-            pawn.rage_current, pawn.rage_hold = pcprofile.s1_rage_fire(
-                pawn.rage_current, item.pc_angry_time or pawn.rage_max)
+            pawn.rage_amount = pcprofile.s1_rage_fire(
+                before, item.pc_angry_time or pawn.rage_max)[0]
+            pawn.rage_fire_t = self.time
+            pawn.rage_current, pawn.rage_hold = pcprofile.s1_rage_at(pawn.rage_amount, 0)
             pawn.rage_bonus = bonus
             pawn.angry_meter = float(
                 pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))

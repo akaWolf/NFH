@@ -187,6 +187,27 @@ def s1_rage_tick(current, hold):
     return current, hold
 
 
+def s1_rage_at(amount, ticks):
+    """(current, hold) at the end of the level tick `ticks` after the fire's —
+    the fire in the actors' pass (0x43b2f5), the level state's tick after it
+    in the same game tick (0x43b2fc): the hold 59 as the fire's tick ends"""
+    return max(0, amount - max(0, ticks - 59)), max(0, 59 - ticks)
+
+
+def s1_rage_before(amount, gap):
+    """the current a fire `gap` ticks after the last one finds — its tick's
+    actors' pass comes before its level tick: the state at the end of the
+    tick before; the +3 is paid iff it is above zero (gap <= amount + 59)"""
+    return s1_rage_at(amount, gap - 1)[0] if gap > 0 else amount
+
+
+def s1_ticks(seconds):
+    """the port's seconds between two events as the PC's whole ticks: the
+    nearest (the PC runs every step on the 12 Hz tick, the port on its 60 Hz
+    frames — a step's end falls up to a frame late)"""
+    return int(seconds * S1_TICK_HZ + 0.5)
+
+
 def s1_rage_percent(current, level_angrytime):
     """the mercury: integer percent of the level's angrytime, clipped"""
     if level_angrytime <= 0:
