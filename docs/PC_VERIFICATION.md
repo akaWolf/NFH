@@ -268,10 +268,19 @@ actors' job pass the update calls at 0x100445f8.
 
 - The Season 1 step boundaries around other steps: an ACTION lasts its
   time + 2 ticks (carried since 2026-09-26 — "the action durations"), a
-  sequence's first update puts a tick before its first step; the GOTO,
-  ENTER and LEAVE steps' own updates around their walks and actions are
-  not read, and the lap model counts none of them (a tick or two a
-  station).
+  sequence's first update puts a tick before its first step. Read the
+  same evening, not carried: the GOTO step (vtable 0x4e19e8, update
+  0x44a7b0) pushes a walk job (vtable 0x4e53d0, update 0x475c80: a LEAVE
+  of the occupied object first, 0x475ce6, the door steps fcn.00474a20,
+  the movers fcn.0047d030) and the walk job its movers, each with the
+  run-now flag 0; a mover (vtable 0x4e59e8, update 0x47cb50) moves one
+  axis a tick — x before y, the facing's speed record clamped at the
+  target (fcn.004459c0) — and finds the target in the update of its last
+  move (0x47cf7f-0x47cfac), so legs chain without a gap, while the GOTO's
+  and the walk job's first updates stand two ticks before the first move
+  — 0.17 s a walk the port does not stand, the lap model does not count.
+  ENTER and LEAVE (fcn.00473e20 / fcn.00473ea0) and the door steps' own
+  updates are unread.
 - The Season 1 walk's layout: the port walks the mobile scene's paths —
   its item positions and depth offsets, its door standing points, a climb
   to every back door and a descent from its twin — at the PC's records;
