@@ -283,12 +283,28 @@ def video_laps():
 
 
 def model(L, toks, verbose=False):
-    """the legs of one lap: (kind, text, ticks) — kinds walk / door / action / intro / ?"""
+    """the legs of one lap: (kind, text, ticks) — kinds walk / door / action / intro / ?.
+    Where the walker marks the case the lap's last `next` re-enters (WRAP),
+    the steady lap is the tokens from there, walked from where lap 1 ends
+    (107's painting walk, case 16, opens every lap; 108's toothbrush is the
+    first lap's only); else lap 1 from the level's start, its first walk the
+    intro"""
+    if any(k == 'WRAP' for k, _ in toks):
+        i = next(j for j, (k, _) in enumerate(toks) if k == 'WRAP')
+        _, end = _lap(L, [t for t in toks if t[0] != 'WRAP'], None)
+        return _lap(L, toks[i + 1:], end)[0]
+    return _lap(L, toks, None)[0]
+
+
+def _lap(L, toks, start):
+    """the legs of the tokens and the end state (room, x, y, occupied,
+    current): from the level's start with the first walk as the intro, or
+    from `start` with every walk counted"""
     legs = []
-    room, x, y = L.start
-    occupied = None      # the container object the neighbour sits in
-    current = None       # the object of the last GOTO / ENTER (the target of a bare ACTION)
-    first = True
+    room, x, y = L.start if start is None else start[:3]
+    occupied = None if start is None else start[3]      # the container object the neighbour sits in
+    current = None if start is None else start[4]       # the object of the last GOTO / ENTER (the target of a bare ACTION)
+    first = start is None
 
     def base_of(objs):
         b = [o for o in objs if o not in L.tricks]
@@ -394,7 +410,7 @@ def model(L, toks, verbose=False):
             else:
                 legs.append(('action', '%s %s' % (used, name), t))
     # the lap closes on the first station's enter; its leave opens the next lap
-    return legs
+    return legs, (room, x, y, occupied, current)
 
 
 def stations(legs):

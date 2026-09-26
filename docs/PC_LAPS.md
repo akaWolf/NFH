@@ -201,7 +201,25 @@ time + 2), and a time of 0 makes no job. The model with it: 101 33.8 s
 126.7, 107 49.6 (54), 108 92.2 (94), 109 113.2 (113), 110 61.8 (59), 111
 116.1 (122), 112 149.8 (155), 113 170.5 (191), 114 171.8 (168) — the fit
 over the videos best at time + 1 (5.4 % mean deviation without 103 and
-106, 5.7 % at the time alone, 5.9 % at time + 2).
+106, 5.7 % at the time alone, 5.9 % at time + 2). The same day the model
+takes the steady lap where the walker's case chain is one lap: from the
+case the last `next` re-enters (routine_order.py marks it WRAP), walked
+from where lap 1 ends — 107's lap opens with the walk to the painting
+(case 16; the first lap's walk from the level start had stood in as the
+intro, leaving out the walk back from the statue) and 108's toothbrush
+belongs to the first lap only (the lap wraps to the coffee, case 3): 107
+65.7 s (video 54), 108 94.3 (94), the rest unchanged.
+
+The port's idle laps under the profile against the model (2026-09-26,
+`runs/idlejob1`, the neighbour alone, the steady lap): 101 33.8/33.8 s,
+102 27.2/28.5, 103 27.7/28.6, 104 71.0/74.2, 105 45.8/46.4, 106
+120.3/126.7, 107 61.0/65.7, 108 92.7/94.3, 109 113.5/113.2, 110
+58.2/61.8, 111 119.5/116.1, 112 149.2/149.8, 113 178.2/170.5, 114
+176.7/171.8 — the actions equal station by station, the walks off by
+1-3 s a leg where the mobile's item positions, depth offsets and doors
+are not the PC's hotspots (113: the angle grinder 15.2/16.5, the main
+valve 30.0/26.6, the fuse box 7.2/5.7 and 20.2/18.2); Season 1's walk
+still runs on the mobile's layout at the PC's speeds.
 
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in

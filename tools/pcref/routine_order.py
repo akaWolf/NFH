@@ -383,9 +383,15 @@ for lv in order:
             print('   PC lap %d by code: %s' % (i + 1, ' > '.join(lp)))
         if os.environ.get('LAPS'):
             # the ordered ICON/GOTO/ACTION tokens of each lap, for tools/pcref/lap_model.py
+            # WRAP marks where the last case's `next` re-enters lap 1 — a walk
+            # of one lap, no case repeated: the steady lap runs from there
+            # (108's toothbrush, cases 0 and 2, is the first lap's only)
             toks = []; seen_c = set(); n = 0
+            wrap = seq[-1][2] if len({c for c, _, _ in seq}) == len(seq) else None
             for c, labels, nxt in seq:
                 if c in seen_c and toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks))); toks = []; seen_c = set()
                 seen_c.add(c)
+                if n == 0 and c == wrap and c != seq[0][0]:
+                    toks.append('WRAP')
                 toks += ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK')]
             if toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks)))
