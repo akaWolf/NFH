@@ -201,28 +201,30 @@ class Level:
         return bool(e and 'neighbor_out' in e['hot'] and ('neighbor', 'enter') in e['act'] and ('neighbor', 'leave') in e['act'])
 
     # -- geometry -------------------------------------------------------------
-    def object_point(self, obj):
+    def object_point(self, obj, actor='neighbor'):
         """an entity's hotspot = its position + the hotspot's offset (fcn.00445aa0:
-        [+0x28/+0x2c] + the map entry's [+0x10/+0x14], else the position); objects
-        sit at 0/0 of their room, an actor where level.xml places it (109's parrot),
-        else at 0/0 of the room of its name (105's football, made by the script)"""
+        [+0x28/+0x2c] + the map entry's [+0x10/+0x14], else the position), the one
+        named after the actor that walks to it; objects sit at 0/0 of their room,
+        an actor where level.xml places it (109's parrot), else at 0/0 of the room
+        of its name (105's football, made by the script)"""
         e = self.objects.get(obj)
         base = (obj.split('/')[0], 0, 0)
         if not e and obj in self.actors and obj != 'neighbor':
             e = self.actors[obj]
             base = self.placed.get(obj) or base
         if not e: return None
-        p = e['hot'].get('neighbor') or e['hot'].get('woody')
+        other = 'woody' if actor == 'neighbor' else 'neighbor'
+        p = e['hot'].get(actor) or e['hot'].get(other)
         if not p: return None
         return base[0], base[1] + p[0], base[2] + p[1]
 
-    def door_point(self, door, out=False):
-        """the standing point of a door in its room: the type's neighbour hotspot (`neighbor_out` when the
-        neighbour comes out of it) + the door's position"""
+    def door_point(self, door, out=False, actor='neighbor'):
+        """the standing point of a door in its room: the type's hotspot of the actor
+        (`<actor>_out` when the actor comes out of it) + the door's position"""
         room = door.split('/')[0]
         e = self.doors.get(door)
         if not e or room not in self.rooms or door not in self.rooms[room]['doors']: return None
-        h = (e['hot'].get('neighbor_out') if out else None) or e['hot'].get('neighbor')
+        h = (e['hot'].get(actor + '_out') if out else None) or e['hot'].get(actor)
         if not h: return None
         px, py = self.rooms[room]['doors'][door]
         return h[0] + px, h[1] + py

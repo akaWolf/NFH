@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The Season 1 walk of the PC original into the levels/pc overlays (the neighbour).
+"""The Season 1 walk of the PC original into the levels/pc overlays (the neighbour and Woody).
 
     python3 tools/pcref/pc_walks_s1.py            # print the map, the doors and the stations
     python3 tools/pcref/pc_walks_s1.py --write    # PCWalkRoom, PCWalkDoor, PCWalkPoint
@@ -7,28 +7,32 @@
 game.exe walks a GOTO (the step's vtable 0x4e19e8, update 0x44a7b0) through a walk
 job it pushes with the run-now flag 1 (vtable 0x4e53d0, update 0x475c80): the room
 list of the path, and for each next room a mover to the near door's standing point
-— the door's entity position plus the door type's `neighbor` hotspot (fcn.00445aa0)
-— then the door step (vtable 0x4e5370, update 0x474590: the near door's `enter` and
-the far door's `leave` as one step list, fcn.004741e0 over fcn.00478030, the actor
-standing at the far door's point), and at the end a mover to the target's hotspot;
-the movers are pushed with the run-now flag 1, so a leg's first move falls in the
-tick the one before it ends. A mover (vtable 0x4e59e8, update 0x47cb50) moves one
-axis a tick — x before y — at the facing's speed record, clamped at the target, and
-finds the target in the update of its last move. The PC's walk is so straight
-lines between those points: along x at the height it starts from, then up or down
-to the target's — no floor line on the way (the room's path1/path2 bound the
-room, the movers do not follow it), which the mobile scene's paths do: a back
-door's climb, the floor, an item's climb.
+— the door's entity position plus the door type's hotspot of the actor (`neighbor`,
+`woody`; fcn.00445aa0) — then the door step (vtable 0x4e5370, update 0x474590: the
+actor placed at the far door's point, and one ACTION step of the near door's `enter`
+and the far door's `leave` started together, fcn.004741e0 over fcn.00478030), and at
+the end a mover to the target's hotspot; the movers are pushed with the run-now flag
+1, so a leg's first move falls in the tick the one before it ends. A mover (vtable
+0x4e59e8, update 0x47cb50) moves one axis a tick at the facing's speed record: while
+x is off the target's, y goes to the room's floor line first (fcn.0044bac0 on the
+actor's room: its path's y), then x along it, and once x is the target's, y to the
+target's height; clamped at the target, the arrival read in the update of its last
+move. A walk between two raised points — two back doors' hotspots 50 px above the
+floor, two stations' 30 — so goes down to the floor and up again, as the mobile
+scene's paths do on their own geometry.
 
 The overlay entries, in px of the PC scene (the room's own coordinates):
   Zone       PCWalkRoom   {'room', 'x1', 'x2' (the room's path), 'floor'}
-  Door       PCWalkDoor   {'Rottweiler': {'near': [x, y], 'far': [x, y]}}: the near
-                          door's standing point and the far door's (`neighbor_out`)
-  items      PCWalkPoint  {'Rottweiler': [x, y, room]}: the hotspot of the PC object
-                          the neighbour's station walks to (the lap model's GOTO of
-                          the station tools/pcref/pc_durations.py pairs the item
-                          with) and its room — a list of them where the visits
-                          walk to different objects
+  Door       PCWalkDoor   {role: {'near': [x, y], 'far': [x, y]}}: the near door's
+                          standing point and the far door's (`<actor>_out`), the
+                          neighbour's and Woody's
+  items      PCWalkPoint  {'Rottweiler': [x, y, room], 'Woody': [x, y, room]}: the
+                          hotspot of the PC object the neighbour's station walks to
+                          (the lap model's GOTO of the station tools/pcref/
+                          pc_durations.py pairs the item with) — a list of them
+                          where the visits walk to different objects — and the
+                          `woody` hotspot of the object Woody's action on the item
+                          takes place at (`woody_targets`)
 The zones map to the rooms geometrically (the rooms' path centres against the
 zones', the house at 96 px a unit, one shift a level), the exit porch through the
 door graph; a door pair of the mobile scene is the PC door of its two rooms.
@@ -154,6 +158,51 @@ def station_targets(n):
     return out
 
 
+def woody_targets(n):
+    """mobile item -> the PC object Woody's action on it takes place at
+    (tools/pcref/pc_woody.py's pairing): the base object of the trick's
+    combination (combine.xml, the item's PC trick of pc_reactions.TABLE), the
+    one container whose `<content>`s hold the SearchItem's inventory, the
+    hideout of the HideItem's name; a trick laid on a room's floor has none"""
+    import pc_reactions
+    import pc_woody
+    L = lap_model.Level(n)
+    combos = pc_woody.combinations(L)
+    items = pc_woody.mobile_items(n)
+    out = {}
+    for item, spec in pc_reactions.TABLE.get(n, {}).items():
+        if item not in items:
+            continue
+        base = next((i for i in (combos.get(spec['pc']) or []) if '/' in i), None)
+        if base is not None:
+            out[item] = base
+    d = json.load(open(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n)))['objects']
+    ob = canon.read(os.path.join(lap_model.X, L.folder, 'objects.xml'))
+    contents = {}
+    for om in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', ob, re.S):
+        cs = set(re.findall(r'<content name="([^"]+)"', om.group(2)))
+        if cs:
+            contents[om.group(1)] = cs
+    for o in d.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if not nm or nm in out:
+            continue
+        if o.get('type') == 'SearchItem':
+            invs = {canon.norm(i.get('Type')) for i in (dd.get('InventoryItems') or [])
+                    if isinstance(i, dict) and i.get('Type')}
+            cands = [obj for obj, cs in contents.items() if invs & cs]
+            if len(cands) == 1:
+                out[nm] = cands[0]
+        elif o.get('type') == 'HideItem':
+            cands = [obj for obj in L.objects if obj.split('/')[-1] == nm.lower()
+                     and re.search(r'<object name="%s"[^>]*>(?:(?!</object>).)*<flag name="hideout"'
+                                   % re.escape(obj), ob, re.S)]
+            if len(cands) == 1:
+                out[nm] = cands[0]
+    return out
+
+
 def level_data(n):
     from runtime.scene import Level
     M = Level(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n))
@@ -183,11 +232,14 @@ def level_data(n):
         a, b = zmap.get(zname.get(d.zone)), zmap.get(zname.get(o.zone))
         if a is None or b is None:
             continue
-        near = L.door_point('%s/%s' % (a, b))
-        far = L.door_point('%s/%s' % (b, a), out=True)
-        if near is None or far is None:
-            continue
-        doors[(d.name, zname.get(d.zone))] = {'Rottweiler': {'near': list(near), 'far': list(far)}}
+        entry = {}
+        for role, actor in (('Rottweiler', 'neighbor'), ('Woody', 'woody')):
+            near = L.door_point('%s/%s' % (a, b), actor=actor)
+            far = L.door_point('%s/%s' % (b, a), out=True, actor=actor)
+            if near is not None and far is not None:
+                entry[role] = {'near': list(near), 'far': list(far)}
+        if entry:
+            doors[(d.name, zname.get(d.zone))] = entry
     points = {}
     for item, objs in station_targets(n).items():
         pts = [list(L.object_point(o)[1:]) + [L.object_point(o)[0]] for o in objs if L.object_point(o)]
@@ -197,7 +249,21 @@ def level_data(n):
         # (107's camera: the posing spot, then the camera) — the
         # visits cycle as PCUseSeconds' do (Routine._pc_visit_seconds)
         points[item] = {'Rottweiler': pts[0] if all(p == pts[0] for p in pts) else pts}
+    for item, obj in woody_targets(n).items():
+        p = L.object_point(obj, actor='woody')
+        if p is not None:
+            points.setdefault(item, {})['Woody'] = [p[1], p[2], p[0]]
     return zmap, rooms, doors, points
+
+
+def item_kind_hide(n, name):
+    """the component of a hideout (Woody's walk points reach the HideItems too)"""
+    d = json.load(open(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n)))['objects']
+    for o in d.values():
+        dd = o.get('data') or {}
+        if o['type'] == 'HideItem' and (dd.get('m_GameObject') or {}).get('name') == name:
+            return 'HideItem'
+    return None
 
 
 def write(n, rooms, doors, points):
@@ -216,7 +282,7 @@ def write(n, rooms, doors, points):
         ov['patches'].append({'object': dn, 'component': 'Door', 'zone': zn, 'set': {'PCWalkDoor': v},
                               'source': src})
     for item, v in sorted(points.items()):
-        kind = pc_durations.item_kind(n, item) or 'TrickItem'
+        kind = pc_durations.item_kind(n, item) or item_kind_hide(n, item) or 'TrickItem'
         ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWalkPoint': v},
                               'source': src})
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
@@ -229,9 +295,10 @@ def main(argv):
     for n in levels:
         zmap, rooms, doors, points = level_data(n)
         print('%d: rooms %s' % (n, ' '.join('%s=%s' % kv for kv in sorted(zmap.items()))))
-        print('   doors %s' % ' '.join('%s@%s %s>%s' % (dn, zn, v['Rottweiler']['near'], v['Rottweiler']['far'])
+        print('   doors %s' % ' '.join('%s@%s %s' % (dn, zn, ' '.join('%s %s>%s' % (r[0], e['near'], e['far'])
+                                                                   for r, e in sorted(v.items())))
                                      for (dn, zn), v in sorted(doors.items())))
-        print('   points %s' % ' '.join('%s %s' % (k, v['Rottweiler']) for k, v in sorted(points.items())))
+        print('   points %s' % ' '.join('%s %s' % (k, v) for k, v in sorted(points.items())))
         if do_write:
             write(n, rooms, doors, points)
     return 0
