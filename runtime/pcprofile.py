@@ -613,29 +613,44 @@ def s2_pass_ticks(role, gait, p, sneaking=False):
 # (vtable 0x4e53d0, update 0x475c80) pushes a mover a leg — to the near door's standing
 # point, after the door step from the far door's, at last to the target's hotspot
 # (tools/pcref/pc_walks_s1.py) — and a mover (vtable 0x4e59e8, update 0x47cb50) moves one
-# axis a tick, x before y, at the facing's speed record, its first move `start` px longer
-# (the mover's +0x14 flag, cleared after it: generic/objects.xml mg1 8 facing right, mg3 10
-# facing left, the run's mr1 / mr3 the same, the vertical records 0), clamped at the target,
-# which it finds in the update of its last move (0x47cf7f-0x47cfac).
-S1_START_PX = (8, 10)     # the first move's extra px, facing right / left
+# axis a tick at the facing's speed record: while x is off the target's, y first goes to
+# the room's floor line (the room's point, fcn.0044bac0 on the actor's room, 0x47cbc6-
+# 0x47cc9d), then x — its first move `start` px longer when it leaves the standing
+# animation (the mover's +0x14 flag and the `ms` test, 0x47ccc6-0x47cd27: generic/
+# objects.xml mg1 8 facing right, mg3 10 facing left, the runs' mr1 / mr3 the same) —
+# and once x is the target's, y goes to the target's; clamped at the target, found in
+# the update of its last move (0x47cf7f-0x47cfac).
+S1_START_PX = {           # the first move's extra px, facing right / left (generic/objects.xml)
+    'Rottweiler': (8, 10),    # mg1 / mg3, the runs' mr1 / mr3 the same
+    'Woody': (12, 12),        # mg1 / mg3
+    'Woody_sneak': (2, 2),    # sn1 / sn3
+}
 
 
-def s1_leg_ticks(role, gait, dx, dy, sneaking=False):
-    """the ticks of one Season 1 mover over (dx, dy) px of the PC scene at the pawn's gait"""
-    rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
+def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
+    """the ticks of one Season 1 mover from (x0, y0) to (x1, y1), px of the PC scene,
+    in a room whose floor line is at `floor`, at the pawn's gait"""
+    key = 'Woody_sneak' if (role == 'Woody' and sneaking) else role
+    rec = WALK_PX_PER_TICK.get(key)
     if rec is None:
         return None
     h, v = rec[0], rec[1]
     if (role, gait) in GAIT_PX_PER_TICK:
         h, v = GAIT_PX_PER_TICK[(role, gait)]
     t = 0
-    if dx:
-        start = S1_START_PX[0 if dx > 0 else 1] \
-            if role == 'Rottweiler' and gait in ('walk', 'run') else 0
-        a = abs(dx)
+    standing = True
+    if x1 != x0:
+        if y0 != floor:
+            t += -(-abs(floor - y0) // v)
+            y0 = floor
+            standing = False
+        sp = S1_START_PX.get(key)
+        start = sp[0 if x1 > x0 else 1] \
+            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) else 0
+        a = abs(x1 - x0)
         t += 1 + (-(-(a - h - start) // h) if a > h + start else 0)
-    if dy:
-        t += -(-abs(dy) // v)
+    if y1 != y0:
+        t += -(-abs(y1 - y0) // v)
     return t
 
 

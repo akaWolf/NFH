@@ -1014,6 +1014,10 @@ class Pawn:
         UseWoodyExtraDeltaHeight (the Woody.cs:744-755 override). Both Item
         and Door carry the three fields (Door : Item; the door step reads
         them at Pawn.cs:1330, 1412)."""
+        return abs(self.sprite.y - obj.y) < self._use_thr(obj)
+
+    def _use_thr(self, obj):
+        """IsAtUseLocation's y window for this pawn (at_use_location)"""
         thr = self.item_threshold + obj.delta_use_height
         if self.role == 'Woody':
             if obj.use_woody_extra:
@@ -1021,7 +1025,7 @@ class Pawn:
                     + self.extra_delta_height
             else:
                 thr += obj.woody_delta_use_height
-        return abs(self.sprite.y - obj.y) < thr
+        return thr
 
     # -- commands ----------------------------------------------------------
     def start_move_flags(self):
@@ -1262,7 +1266,7 @@ class Pawn:
             last['x'] = min(max(last['x'], dest.left), dest.right)
         if pcprofile.is_pc():
             self._pc_floor_marks(steps, self._pc_departure_step(steps))
-            if not self.nfh2 and self.role == 'Rottweiler':
+            if not self.nfh2 and self.role in ('Rottweiler', 'Woody'):
                 self._pc1_marks(steps)
             self._pc_claim_marks(steps)
         H['step_index'] = len(steps)                # FindPath's StepIndex stamp
@@ -1865,8 +1869,9 @@ class Pawn:
         GOTO walks legs between the points its walk job gives its movers — the
         near door's standing point, the far door's after the door step, the
         station's hotspot (PCWalkDoor, PCWalkPoint) — each a mover's ticks
-        (pcprofile.s1_leg_ticks: one axis a tick, x before y, straight, no floor
-        line on the way), and the mobile scene's steps of a leg — its floor, a
+        (pcprofile.s1_leg_ticks: one axis a tick, off the target's x down or up to
+        the room's floor line first, along it, then to the target's height), and
+        the mobile scene's steps of a leg — its floor, a
         back door's climb and the descent after it, an item's climb — run at one
         pace that lasts the leg (`pc1` on a step, `pc1_out` on a door step for
         the descent). A leg after a door starts in the far door's `leave`'s last
@@ -1887,7 +1892,7 @@ class Pawn:
             return
         x, y = self.sprite.x, self.sprite.y
         zone = z
-        leg = {'from': start, 'nat': 0.0, 'after': False}
+        leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': z.pc_walk_room['floor']}
         legs = [leg]
         n = len(steps)
         for i, st in enumerate(steps):
@@ -1910,8 +1915,7 @@ class Pawn:
                 floor = self.floor_y(zone)
                 leg['nat'] += abs(d.x + d.dx - x) / v_floor
                 if d.should_walk_up:
-                    thr = self.item_threshold + d.delta_use_height
-                    leg['nat'] += max(0.0, abs(d.y - floor) - thr) / v_vert
+                    leg['nat'] += max(0.0, abs(d.y - floor) - self._use_thr(d)) / v_vert
                 pw = d.pc_walk.get(self.role)
                 if not pw or other is None:
                     # a pass the PC data has no standing points for (the front
@@ -1924,10 +1928,19 @@ class Pawn:
                 self._pc1_close(leg, near, gait, False)
                 zone = self.level.zone_by_pid(other.zone) or zone
                 far = pw['far']
-                leg = {'from': far, 'nat': 0.0, 'after': True}
+                wr = getattr(zone, 'pc_walk_room', None)
+                if wr is None:
+                    # the far room has no PC room (the porch): the mobile pace
+                    self._pc1_unmark(steps)
+                    return
+                leg = {'from': far, 'nat': 0.0, 'after': True, 'floor': wr['floor']}
                 legs.append(leg)
-                # the far door's placement (_warp_through)
-                x, y = other.x + self.door_delta[0], other.y + self.door_delta[1]
+                # the far door's placement (_warp_through: Woody's the door's
+                # own exit offset)
+                if self.role == 'Woody':
+                    x, y = other.x + other.delta_exit[0], other.y + other.delta_exit[1]
+                else:
+                    x, y = other.x + self.door_delta[0], other.y + self.door_delta[1]
                 if d.should_walk_up:
                     ffloor = self.floor_y(zone)
                     leg['nat'] += max(0.0, (y - ffloor) - self.zone_threshold) / v_vert
@@ -1941,8 +1954,7 @@ class Pawn:
                 leg['nat'] += abs(st['x'] - x) / v_floor
                 x, y = st['x'], floor
                 if it.should_walk_up:
-                    thr = self.item_threshold + it.delta_use_height
-                    leg['nat'] += max(0.0, abs(it.y - floor) - thr) / v_floor
+                    leg['nat'] += max(0.0, abs(it.y - floor) - self._use_thr(it)) / v_floor
                 st['pc1'] = leg
                 end = self._pc1_item_point(it)
                 if end is None:
@@ -1964,7 +1976,8 @@ class Pawn:
     def _pc1_close(self, leg, end, gait, last):
         """a leg's PC seconds and the pace factor of its mobile steps"""
         fx, fy = leg['from']
-        t = pcprofile.s1_leg_ticks(self.role, gait, end[0] - fx, end[1] - fy) or 0
+        t = pcprofile.s1_leg_ticks(self.role, gait, fx, fy, end[0], end[1], leg['floor'],
+                                   sneaking=self.sneaking) or 0
         if leg['after'] and t > 0:
             t -= 1                        # its first move in the leave's last tick
         if last:

@@ -233,6 +233,16 @@
        458,
        367
       ]
+     },
+     "Woody": {
+      "near": [
+       781,
+       370
+      ],
+      "far": [
+       478,
+       367
+      ]
      }
     }
    },
@@ -251,6 +261,16 @@
       ],
       "far": [
        150,
+       370
+      ]
+     },
+     "Woody": {
+      "near": [
+       483,
+       370
+      ],
+      "far": [
+       170,
        370
       ]
      }
@@ -273,6 +293,16 @@
        761,
        370
       ]
+     },
+     "Woody": {
+      "near": [
+       478,
+       367
+      ],
+      "far": [
+       781,
+       370
+      ]
      }
     }
    },
@@ -293,6 +323,16 @@
        463,
        370
       ]
+     },
+     "Woody": {
+      "near": [
+       170,
+       370
+      ],
+      "far": [
+       483,
+       370
+      ]
      }
     }
    },
@@ -305,6 +345,16 @@
    "set": {
     "PCWalkDoor": {
      "Rottweiler": {
+      "near": [
+       88,
+       420
+      ],
+      "far": [
+       551,
+       420
+      ]
+     },
+     "Woody": {
       "near": [
        88,
        420
@@ -333,6 +383,56 @@
        763,
        420
       ]
+     },
+     "Woody": {
+      "near": [
+       279,
+       420
+      ],
+      "far": [
+       763,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorLeft01",
+   "component": "Door",
+   "zone": "Zone05",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       56,
+       218
+      ],
+      "far": [
+       840,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorRight01",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       840,
+       420
+      ],
+      "far": [
+       66,
+       218
+      ]
      }
     }
    },
@@ -351,6 +451,16 @@
       ],
       "far": [
        279,
+       420
+      ]
+     },
+     "Woody": {
+      "near": [
+       763,
+       420
+      ],
+      "far": [
+       289,
        420
       ]
      }
@@ -373,6 +483,16 @@
        88,
        420
       ]
+     },
+     "Woody": {
+      "near": [
+       551,
+       420
+      ],
+      "far": [
+       98,
+       420
+      ]
      }
     }
    },
@@ -386,6 +506,11 @@
      "Rottweiler": [
       510,
       400,
+      "kit"
+     ],
+     "Woody": [
+      298,
+      395,
       "kit"
      ]
     }
@@ -401,6 +526,39 @@
       298,
       395,
       "kit"
+     ],
+     "Woody": [
+      298,
+      395,
+      "kit"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      640,
+      390,
+      "anc"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Fridge",
+   "component": "SearchItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      640,
+      390,
+      "kit"
      ]
     }
    },
@@ -414,6 +572,81 @@
      "Rottweiler": [
       820,
       410,
+      "anc"
+     ],
+     "Woody": [
+      840,
+      400,
+      "anc"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Microwave",
+   "component": "TrickItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      298,
+      395,
+      "kit"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "MumPicture",
+   "component": "TrickItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      455,
+      390,
+      "anc"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "SoapDish",
+   "component": "SearchItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      405,
+      420,
+      "toi"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      530,
+      397,
+      "toi"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      386,
+      387,
       "anc"
      ]
     }
