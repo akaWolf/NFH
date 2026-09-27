@@ -13,7 +13,7 @@
    "component": "TrickItem",
    "set": {
     "AngerAmount": 30,
-    "PCUseSeconds": 6.2
+    "PCUseSeconds": 6.7
    }
   },
   {
@@ -24,19 +24,19 @@
     "PCExtraCoin206": 30,
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 7.17,
-    "PCUseSecondsLinked": 6.5,
+    "PCUseSecondsTricked": 7.42,
+    "PCUseSecondsLinked": 6.75,
     "PCShout": 1,
-    "PCFixSeconds": 1.75,
+    "PCFixSeconds": 2.0,
     "PCHitSeconds": {
      "Mother": 3.33
     },
-    "PCCreditAt": 4.08,
-    "PCCreditAtLinked": 3.33,
+    "PCCreditAt": 4.33,
+    "PCCreditAtLinked": 3.58,
     "PCShoutLinked": 1,
-    "PCFixSecondsLinked": 1.75,
-    "PCLinkedPaysAt": 3.75,
-    "PCExtraPaysAtLinked": 4.17,
+    "PCFixSecondsLinked": 2.0,
+    "PCLinkedPaysAt": 4.0,
+    "PCExtraPaysAtLinked": 4.42,
     "PCTrickArm": [
      1,
      2
@@ -48,7 +48,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 1.2
+    "PCUseSeconds": 1.3
    }
   },
   {
@@ -59,7 +59,7 @@
     "PCUseSecondsTricked": 13.58,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 8.58
+    "PCCreditAt": 8.67
    }
   },
   {
@@ -67,10 +67,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 5.92,
+    "PCUseSecondsTricked": 6.0,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 3.33,
+    "PCCreditAt": 3.5,
     "PCTrickFire": [
      1,
      2
@@ -82,10 +82,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 14.33,
+    "PCUseSecondsTricked": 14.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 8.83
+    "PCCreditAt": 9.08
    }
   },
   {
@@ -133,7 +133,12 @@
       "xi": 650,
       "xo": 990,
       "dx": 340,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -141,7 +146,12 @@
       "xi": 650,
       "xo": 990,
       "dx": 340,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 50,
@@ -149,7 +159,12 @@
       "xi": 650,
       "xo": 990,
       "dx": 340,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -165,24 +180,42 @@
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -270
+      "dy": -270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -270
+      "dy": -270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": -50,
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -270
+      "dy": -270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -199,7 +232,12 @@
       "xi": 950,
       "xo": 600,
       "dx": -350,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -207,7 +245,12 @@
       "xi": 950,
       "xo": 600,
       "dx": -350,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 50,
@@ -215,7 +258,12 @@
       "xi": 950,
       "xo": 600,
       "dx": -350,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -231,24 +279,42 @@
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": -50,
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -265,7 +331,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -273,7 +344,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 20,
@@ -281,7 +357,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -298,7 +379,12 @@
       "xi": 810,
       "xo": 550,
       "dx": -260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 60,
@@ -306,7 +392,12 @@
       "xi": 810,
       "xo": 550,
       "dx": -260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 60,
@@ -314,7 +405,12 @@
       "xi": 810,
       "xo": 550,
       "dx": -260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -331,7 +427,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 270
+      "dy": 270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -339,7 +440,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 270
+      "dy": 270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 20,
@@ -347,7 +453,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 270
+      "dy": 270,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -364,7 +475,12 @@
       "xi": 600,
       "xo": 860,
       "dx": 260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -372,7 +488,12 @@
       "xi": 600,
       "xo": 860,
       "dx": 260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 50,
@@ -380,7 +501,12 @@
       "xi": 600,
       "xo": 860,
       "dx": 260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }

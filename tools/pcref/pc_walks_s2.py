@@ -616,19 +616,49 @@ def passes(n):
         for actor, role in ROLES:
             a = g.point(din, actor + '_in', exact=True)
             b = g.point(dout, actor + '_out', exact=True)
-            if a is None or b is None:
+            nb = g.point(din, actor, exact=True)
+            if a is None or b is None or nb is None:
                 continue
             # the floor's ends as well: the walk along the near room's floor
-            # stops at `<actor>_in`'s x, the far room's starts at `<actor>_out`'s
-            p = {'in': a[1] - g.floor(ra), 'out': g.floor(rb) - b[1], 'xi': a[0], 'xo': b[0]}
+            # stops at `<actor>_in`'s x, the far room's starts where the run
+            # back to its floor puts him — `<actor>_out`'s x kept within the
+            # floor line (fcn.10003454, 0x10003544-0x100035ba: x first at
+            # `<actor>_out`'s y, `ox`, then y — +0x31 set)
+            fr = g.rooms[rb]
+            cx = min(max(b[0], fr['x1']), fr['x2'])
+            p = {'in': a[1] - g.floor(ra), 'out': g.floor(rb) - b[1], 'xi': a[0], 'xo': cx}
+            if cx != b[0]:
+                p['ox'] = cx - b[0]
+            # the route's movement comes up or down to the near door's
+            # `<actor>` hotspot (fcn.1000901b, 0x1000ab8d), the pass's own
+            # goes on to `<actor>_in` (fcn.10003130): `in` split there
+            if nb[1] != g.floor(ra) and nb[1] != a[1]:
+                p['nb'] = nb[1] - g.floor(ra)
+            mb = tuple(nb) != tuple(a)          # the pass's walk to `<actor>_in` steps
             if actor in g.door_acts.get(din, ()):
                 t1 = d.action_ticks(din, 'enter', actor)
                 t2 = d.action_ticks(dout, 'leave', actor)
                 if t1 is None or t2 is None:
                     continue
                 p['enter'] = t1; p['leave'] = t2
+                mid = 0 if mb else 1
             else:
                 p['dx'] = b[0] - a[0]; p['dy'] = b[1] - a[1]
+                mid = -1 if mb else 0
+                if (p['dx'], p['dy']) == (0, 0):
+                    mid = 1
+            # the job boundaries (lap_model_s2.walk_span): each job of the
+            # route and the pass is pushed with a first run in the tick the
+            # last is done, and a movement is done in its last step's tick —
+            # the walk to `<actor>_in` starts in the tick the route's
+            # movement ends (`in` -1) and the straight movement or the enter
+            # in the tick it ends (-1); the pass's next state waits a tick
+            # after a job with no step (+1 where the straight has none, or
+            # the enter follows no walk to `<actor>_in`: the leave's end,
+            # then the run back pushed without a first run); the next
+            # movement starts in the tick the run back ends (`out` -1)
+            so = cx != b[0] or fr['y'] != b[1]
+            p['jt'] = [-1 if mb else 0, mid, -1 if so else 0]
             per[role] = p
         out.append((name, z, fz, comp, din, dout, per))
     return m, out

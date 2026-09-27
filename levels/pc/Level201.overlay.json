@@ -16,9 +16,9 @@
     "PCRunTo": true,
     "PCUseSecondsTricked": 4.08,
     "PCShout": 1,
-    "PCFixSeconds": 1.75,
-    "PCCreditAt": 0.67,
-    "PCUseSeconds": 5.25
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 0.75,
+    "PCUseSeconds": 5.17
    }
   },
   {
@@ -26,11 +26,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 8.42,
+    "PCUseSecondsTricked": 8.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 4.58,
-    "PCUseSeconds": 10.08
+    "PCCreditAt": 4.67,
+    "PCUseSeconds": 10.0
    }
   },
   {
@@ -38,15 +38,15 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 3.58,
-    "PCUseSecondsLinked": 6.42,
+    "PCUseSecondsTricked": 3.75,
+    "PCUseSecondsLinked": 6.58,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 0.42,
-    "PCCreditAtLinked": 0.42,
+    "PCCreditAt": 0.58,
+    "PCCreditAtLinked": 0.58,
     "PCUseSeconds": [
-     1.25,
-     1.25
+     1.17,
+     1.17
     ]
    }
   },
@@ -55,7 +55,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 4.33
+    "PCUseSeconds": 4.25
    }
   },
   {
@@ -84,7 +84,12 @@
       "xi": 700,
       "xo": 920,
       "dx": 220,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -92,7 +97,12 @@
       "xi": 700,
       "xo": 920,
       "dx": 220,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -108,16 +118,28 @@
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -134,7 +156,12 @@
       "xi": 870,
       "xo": 650,
       "dx": -220,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -142,7 +169,12 @@
       "xi": 870,
       "xo": 650,
       "dx": -220,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -158,16 +190,28 @@
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -184,7 +228,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -192,7 +241,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -209,7 +263,12 @@
       "xi": 810,
       "xo": 550,
       "dx": -260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 60,
@@ -217,7 +276,12 @@
       "xi": 810,
       "xo": 550,
       "dx": -260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -234,7 +298,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -242,7 +311,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -259,7 +333,12 @@
       "xi": 600,
       "xo": 860,
       "dx": 260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 60,
@@ -267,7 +346,12 @@
       "xi": 600,
       "xo": 860,
       "dx": 260,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }

@@ -28,19 +28,19 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 2.25,
+    "PCUseSecondsTricked": 2.5,
     "PCShout": 1,
-    "PCFixSeconds": 5.0,
+    "PCFixSeconds": 5.25,
     "PCHitSeconds": {
      "Olga": 6.5
     },
-    "PCCreditAt": 1.25,
+    "PCCreditAt": 1.5,
     "PCFixDepart": [
      410,
      -36
     ],
     "PCToiletPaysAt": 2.25,
-    "PCUseSeconds": 2.08
+    "PCUseSeconds": 2.0
    }
   },
   {
@@ -48,11 +48,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 3.58,
+    "PCUseSecondsTricked": 3.75,
     "PCShout": 1,
     "PCFixSeconds": 0,
-    "PCCreditAt": 1.25,
-    "PCUseSeconds": 7.08
+    "PCCreditAt": 1.42,
+    "PCUseSeconds": 7.0
    }
   },
   {
@@ -68,7 +68,7 @@
     "PCMinigameFailed": "neighbor",
     "PCMinigameLift": -92,
     "PCMinigameFailedTicks": 10,
-    "PCUseSeconds": 9.25
+    "PCUseSeconds": 9.17
    }
   },
   {
@@ -76,11 +76,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 5.5,
+    "PCUseSecondsTricked": 5.58,
     "PCShout": 1,
-    "PCFixSeconds": 1.75,
-    "PCCreditAt": 2.08,
-    "PCUseSeconds": 6.92
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 2.25,
+    "PCUseSeconds": 6.83
    }
   },
   {
@@ -88,11 +88,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 7.0,
+    "PCUseSecondsTricked": 7.08,
     "PCShout": 1,
-    "PCFixSeconds": 1.75,
-    "PCCreditAt": 0.83,
-    "PCUseSeconds": 6.0
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 1.0,
+    "PCUseSeconds": 5.92
    }
   },
   {
@@ -125,7 +125,12 @@
       "xi": 580,
       "xo": 830,
       "dx": 250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -133,7 +138,12 @@
       "xi": 580,
       "xo": 830,
       "dx": 250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -149,16 +159,28 @@
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 210,
       "xo": 210,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -174,8 +196,14 @@
       "out": 40,
       "xi": 1000,
       "xo": 1010,
+      "nb": -80,
       "enter": 16,
-      "leave": 16
+      "leave": 16,
+      "jt": [
+       -1,
+       0,
+       -1
+      ]
      },
      "Woody": {
       "in": -100,
@@ -183,7 +211,12 @@
       "xi": 1000,
       "xo": 1010,
       "enter": 13,
-      "leave": 13
+      "leave": 13,
+      "jt": [
+       0,
+       1,
+       -1
+      ]
      }
     }
    }
@@ -200,7 +233,12 @@
       "xi": 780,
       "xo": 530,
       "dx": -250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 50,
@@ -208,7 +246,12 @@
       "xi": 780,
       "xo": 530,
       "dx": -250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -224,16 +267,28 @@
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": -50,
       "out": -20,
       "xi": 1200,
       "xo": 1200,
+      "nb": -30,
       "dx": 0,
-      "dy": -280
+      "dy": -280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -250,7 +305,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -258,7 +318,12 @@
       "xi": 1200,
       "xo": 1200,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -275,7 +340,12 @@
       "xi": 930,
       "xo": 680,
       "dx": -250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 60,
@@ -283,7 +353,12 @@
       "xi": 930,
       "xo": 680,
       "dx": -250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 60,
@@ -291,7 +366,12 @@
       "xi": 930,
       "xo": 680,
       "dx": -250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -308,7 +388,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 20,
@@ -316,7 +401,12 @@
       "xi": 210,
       "xo": 210,
       "dx": 0,
-      "dy": 280
+      "dy": 280,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -333,7 +423,12 @@
       "xi": 730,
       "xo": 980,
       "dx": 250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Woody": {
       "in": 60,
@@ -341,7 +436,12 @@
       "xi": 730,
       "xo": 980,
       "dx": 250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      },
      "Mother": {
       "in": 60,
@@ -349,7 +449,12 @@
       "xi": 730,
       "xo": 980,
       "dx": 250,
-      "dy": 0
+      "dy": 0,
+      "jt": [
+       -1,
+       -1,
+       -1
+      ]
      }
     }
    }
@@ -366,7 +471,12 @@
       "xi": 1010,
       "xo": 1000,
       "enter": 16,
-      "leave": 16
+      "leave": 16,
+      "jt": [
+       0,
+       1,
+       -1
+      ]
      },
      "Woody": {
       "in": -40,
@@ -374,7 +484,12 @@
       "xi": 1010,
       "xo": 1000,
       "enter": 13,
-      "leave": 13
+      "leave": 13,
+      "jt": [
+       0,
+       1,
+       -1
+      ]
      }
     }
    }
@@ -1136,13 +1251,6 @@
    }
   },
   {
-   "object": "ToiletMen",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 3.17
-   }
-  },
-  {
    "object": "ChestDrawer",
    "component": "SearchItem",
    "set": {
@@ -1222,6 +1330,13 @@
     }
    },
    "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- bottomleft/deckchair_woody the job 11 ticks; leave <- bottomleft/deckchair_woody the job 10 ticks"
+  },
+  {
+   "object": "ToiletMen",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.17
+   }
   }
  ]
 }

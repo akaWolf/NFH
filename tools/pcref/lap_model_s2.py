@@ -638,18 +638,22 @@ def step_ticks(ev, ctx):
     each) and the script's — the script's job (213's neighbour: update
     0x10037726 -> fcn.1000e131) runs the step and returns 0, the step's
     sequence pushed without a first run (fcn.10049216) starting on the
-    tick after; a step that walks (its GoTo, fcn.1000e3e0 -> fcn.10007a10,
-    pushed the same way) has the GoTo's first tick before the walk and,
-    after the arrival, its done tick (the GoTo job sets +0x14 as the actor
-    arrives and returns 1 on its next update, 0x10007409 / 0x10007670) —
-    3 ticks, 1 for a step at the place of the last (ctx['go'])"""
+    tick after; a step that walks returns once its GoTo is pushed
+    (fcn.1000e3e0 -> fcn.10007a10, the same way; 0x1001e0ce-0x1001e0d5),
+    the walk's first step is the GoTo's first update's (walk_span), and
+    after the arrival — the GoTo's +0x14 set in its tick (0x10007670) —
+    the GoTo is done on its next update (0x10007409) and the step, run
+    again there, pushes its sequence: 2 ticks besides the walk, 1 for a
+    step at the place of the last (ctx['go']). Until 2026-09-27 a tick
+    more, a first GoTo tick before the walk"""
     n = sum(1 for e in ev if e[0] in TICK_ELEMENTS
             or (e[0] == 'E2f40' and len(e) > 3 and e[3] == 'instant'))
     go = next((e[1] for e in ev if e[0] == 'GO'), None)
     walks = go is not None and go != ctx.get('go')
     if go is not None:
         ctx['go'] = go
-    return n + (3 if walks else 1)
+    ctx['walks'] = walks
+    return n + (2 if walks else 1)
 
 
 def station_ticks(d, ev, ctx=None):
@@ -781,7 +785,13 @@ def lap_steps(n):
                 if isinstance(x, str) and not x.startswith('$'):
                     objs.add(x)
         out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, station_ticks(d, ev, ctx)))
+        LAP_WALKS.setdefault(n, {})[i] = ctx.get('walks', False)
     return out, loop
+
+
+# {level: {lap row: whether its step walks}} (lap_steps, step_ticks): a tricked
+# visit's stand starts as the row's own stay does (_flow)
+LAP_WALKS = {}
 
 
 def short(obj):
@@ -927,11 +937,23 @@ class Geometry:
     def run(self, d, s):
         """ticks of one axis run of d px at s px a tick: the walk step
         (fcn.10009215) moves one axis a tick, clamped at the waypoint. The
-        first horizontal tick of a walk that starts from the stand ms1/ms3
-        adds the record's `start` (0x10009332) — at most a tick a walk, not
+        first horizontal tick of a movement that starts from the stand
+        ms1 / ms3 facing its way adds the record's `start` (0x10009332,
+        the movement's +0x2c) — a movement after another's vertical run
+        starts from that run's stand, so at most a tick a walk, not
         counted here"""
         d = abs(d)
         return -(-d // s) if d else 0
+
+    def leg_direct(self, x, y, tx, ty, actor='neighbor', gait='mg'):
+        """a movement made with +0x31 set (fcn.10008f6a's last argument, 1
+        from the door pass: its walk to `<actor>_in`, fcn.10003130, and its
+        run back to the far room's floor, fcn.10003454): fcn.10009177 takes
+        x first at the current y, then y — no floor line"""
+        sp = self.speed[actor]
+        v = sp[gait + '0'][0]; vd = sp[gait + '2'][0]
+        h = sp[gait + '1'][0]
+        return self.run(tx - x, h) + self.run(ty - y, v if ty < y else vd)
 
     def leg(self, x, y, tx, ty, fy, actor='neighbor', gait='mg'):
         """a movement's ticks from (x, y) to (tx, ty) with floor line fy, by the
@@ -1002,9 +1024,96 @@ def walk_ticks(g, frm, to, actor='neighbor', data=None, detail=None):
     return t + t3, (r2, p2[0], p2[1])
 
 
+def walk_span(g, frm, to, actor='neighbor', data=None, detail=None):
+    """(room, x, y) -> an object's `<actor>` hotspot as GameLogic.dll runs a
+    GoTo: (the ticks from the step that pushes it to the arrival's, the
+    position). The step returns once fcn.1000e3e0 has pushed the GoTo
+    without a first run (0x1001e0ce-0x1001e0d5) and runs again when it is
+    done. The GoTo's first update pushes the route (fcn.1000a4aa, vtable
+    0x100ab688, update 0x1000a80c) with a first run (0x10007504 ->
+    fcn.10049246), and the route pushes its jobs the same way, each in the
+    tick the last is done (the runner, fcn.100492a8, goes on past a done
+    job, 0x10049338-0x10049386): per hop a movement to the near door's
+    `<actor>` hotspot (fcn.1000901b, 0x1000ab8d; the route tests the point
+    first, 0x1000aac2) and the door pass (fcn.10003d50, 0x1000ab17), then
+    the movement to the target (0x1000ac45). A movement (vtable
+    0x100ab4f0, update 0x10009a90) steps on every update, its first
+    included (fcn.10009889 -> fcn.10009215), and is done in the update of
+    its last step (fcn.10007a96 after the step, 0x10009a55): s steps
+    pushed with a first run end s - 1 ticks after the tick it starts in.
+    The pass (update 0x10003a19) goes by states, each job it pushes with a
+    first run — one with no step is done at once and the next state waits
+    for the next update: 0 the walk to `<actor>_in` (fcn.10003130:
+    fcn.10008f6a, +0x31 set — Geometry.leg_direct); 2 the near door's
+    `enter` where it has one for the actor (fcn.10003647), else the
+    movement straight to the far door's `<actor>_out` (fcn.100037f8 ->
+    fcn.100090bd, the start's y the floor line); 3 the placement at
+    `<actor>_out` and the far door's `leave` (fcn.10003236); 4 the far
+    room and a movement back to its floor line, x kept within it
+    (fcn.10003454, 0x10003544-0x100035ba: +0x31 set, pushed without a
+    first run — from the next tick; its test against L"fro" matches no
+    room); 5 done (0x10003b47), in the tick that movement is. The last
+    movement's arrival makes the route done (0x1000acb5) and sets the
+    GoTo's +0x14 (0x10007670) in its tick; the GoTo is done on its next
+    update (0x10007409) and the step, run again, pushes its sequence
+    without a first run: the step's own 2 ticks (step_ticks). `detail`
+    collects (kind, ticks) parts"""
+    room, x, y = frm
+    r2 = g.room_of(to); p2 = g.point(to, actor)
+    if p2 is None or r2 not in g.rooms or room not in g.rooms:
+        return None, frm
+    if room == r2 and (x, y) == tuple(p2):
+        return 0, frm             # there: fcn.1000e3e0 pushes no GoTo
+    rt = g.route(room, (x, y), r2, p2, actor)
+    if rt is None:
+        return None, frm
+    t = 1                         # the GoTo's first update: the route's, its first job's
+    for din, dout in rt:
+        nb = g.point(din, actor, exact=True)
+        a = g.point(din, actor + '_in', exact=True)
+        b = g.point(dout, actor + '_out', exact=True)
+        if nb is None or a is None or b is None:
+            return None, frm
+        t0 = t
+        s = g.leg(x, y, nb[0], nb[1], g.floor(room), actor)
+        if s:
+            t += s - 1            # to the `<actor>` hotspot
+        if detail is not None:
+            detail.append(('room', t - t0)); t0 = t
+        s = g.leg_direct(nb[0], nb[1], a[0], a[1], actor)
+        t += s - 1 if s else 1    # state 0: to `<actor>_in`
+        if actor in g.door_acts.get(din, ()):
+            je = data.action_ticks(din, 'enter', actor) if data is not None else None
+            jl = data.action_ticks(dout, 'leave', actor) if data is not None else None
+            if je is None or jl is None:
+                return None, frm
+            t += je + jl          # states 2 and 3: the enter, the leave
+        else:
+            s = g.leg(a[0], a[1], b[0], b[1], a[1], actor)
+            t += s - 1 if s else 1
+        room = g.room_of(dout)
+        if room not in g.rooms:
+            return None, frm
+        fr = g.rooms[room]
+        cx, cy = min(max(b[0], fr['x1']), fr['x2']), fr['y']
+        s = g.leg_direct(b[0], b[1], cx, cy, actor)
+        t += s if s else 1        # state 4's movement, from the next tick
+        x, y = cx, cy
+        if detail is not None:
+            detail.append(('pass %s' % din, t - t0))
+    t0 = t
+    s = g.leg(x, y, p2[0], p2[1], g.floor(room), actor)
+    if s:
+        t += s - 1
+    if detail is not None:
+        detail.append(('room', t - t0))
+    return t, (r2, p2[0], p2[1])
+
+
 def lap_estimate(n, verbose=False):
     """the lap's seconds: the stays of lap_steps plus the walks between the steps'
-    targets (walk_ticks); None parts counted as 0 and reported"""
+    targets (walk_span; walk_ticks' sum of the legs until 2026-09-27); None
+    parts counted as 0 and reported"""
     d = Data(n); g = Geometry(n)
     st = level_start(n); lv = Level(n)
     steps, loop = walk(lv, st)
@@ -1030,7 +1139,7 @@ def lap_estimate(n, verbose=False):
                 p = g.point(real)
                 pos = (g.room_of(real), p[0], p[1]) if p else None
             else:
-                t, pos2 = walk_ticks(g, pos, real, data=d)
+                t, pos2 = walk_span(g, pos, real, data=d)
                 if t is None:
                     unknown.append('walk to %s' % real)
                 else:
@@ -1348,52 +1457,118 @@ def _repair_walk(n, d, ev):
     p, q = g.point(a), g.point(b)
     if a == b or p is None or q is None:
         return 0, None
-    t, _pos = walk_ticks(g, (g.room_of(a), p[0], p[1]), b, data=d)
+    t, _pos = walk_span(g, (g.room_of(a), p[0], p[1]), b, data=d)
     if not t:
         return 0, None
     return t, (q[0], q[1] - g.floor(g.room_of(b)))
 
 
-def _step_parts_split(d, ev, own=None):
-    """a tricked step's parts cut at its SHOUT (fcn.1000f977 / fcn.1000fede):
-    (the ticks before it — the tricked stand —, the SHOUT's level, -1 when
-    the step has no SHOUT, None when its level is no constant the walker
-    follows, the repair's ticks after
-    it or None, the tick of the stand its first named trick record pays
-    at — the parts before its action plus the record's `time` — or None);
-    a part of unknown length leaves the stand None. `own(object, action)`
-    keeps a station's own parts where the step is shared with another
-    mobile station (212's cliff: the ledge's `enter` is the pre-ledge's)"""
-    before, level, shout, repair, credit = 0, None, False, None, None
-    unknown = False
+def _is_instant(e):
+    """an element the sequence finishes on its first update: a tick
+    (step_ticks)"""
+    return e[0] in TICK_ELEMENTS or (e[0] == 'E2f40' and len(e) > 3 and e[3] == 'instant')
+
+
+def _flow(d, ev, own=None, walked=True):
+    """a flow's events on the lap's clock (step_ticks, station_ticks): [(tick,
+    kind, payload)] — 'part' (object, action, ticks) at the tick it starts,
+    'shout' its level at its tick, 'step' at each step's start after the
+    first. Each step of the flow takes its own start — 2 where it walks (its
+    GoTo, walk_span; the flow's first step only where the visit walked to
+    it, `walked`), else 1 —, an instant element a tick, a part its ticks. A
+    step starts at a ('STEP',) mark or at a GO after the step's first element
+    (fcn.1000e3e0 runs before the step builds its sequence). `own(object,
+    action)` keeps a station's own parts where the step is shared with
+    another mobile station (212's cliff: the ledge's `enter` is the
+    pre-ledge's)"""
+    out = []
+    t = 0
+    first, started, go, elems = True, False, False, 0
+    ctx = {}
     for e in ev or []:
+        if e[0] == 'STEP' or (e[0] == 'GO' and elems):
+            if elems:
+                first = False
+            started, go, elems = False, False, 0
+            if e[0] == 'STEP':
+                continue
+        if e[0] == 'GO':
+            go = True
+            continue
+        instant = _is_instant(e)
+        parts = [] if (instant or e[0] == 'SHOUT') else _station_parts(d, [e], ctx)
+        if not (instant or e[0] == 'SHOUT' or parts):
+            continue
+        if not started:
+            if not first:
+                out.append((t, 'step', go))
+            t += 2 if (go and (walked or not first)) else 1
+            started = True
+        elems += 1
         if e[0] == 'SHOUT':
-            shout = True
             imms = e[2] if len(e) > 2 else []
             # the level is the SHOUT's last parameter (fcn.1000f977's
             # arg_14h, its first push: a constant or the zeroed ebx — 201's
             # buffet pushes ebx, 0); a register the walker does not follow
             # leaves it unknown (None)
-            level = imms[0] if imms else None
+            out.append((t, 'shout', imms[0] if imms else None))
             continue
-        parts = station_ticks(d, [e], {})
-        for o, a, t in parts:
-            if a in ('-', '?') and t is None:
+        if instant:
+            out.append((t, 'instant', e[0]))
+            t += 1
+            continue
+        for o, a, jt in parts:
+            if a in ('-', '?') and jt is None:
                 continue
             if own is not None and a not in ('-', '?') and not own(o, a):
                 continue
-            if not shout:
-                if credit is None and not unknown and a not in ('-', '?', 'bar'):
-                    recs = d.tricks(o, a)
-                    if recs:
-                        credit = before + recs[0][1]
-                if t is None:
-                    unknown = True        # a part of unknown length: no stand
-                else:
-                    before += t
-            elif a == 'repair':
-                repair = (repair or 0) + (t or 0)
-    return (None if unknown else before), (level if shout else -1), repair, credit
+            out.append((t, 'part', (o, a, jt)))
+            if jt is None:
+                out.append((t, 'unknown', (o, a)))   # the clock stops being known
+                continue
+            t += jt
+    return out + [(t, 'end', None)]
+
+
+def _step_parts_split(d, ev, own=None, walked=True):
+    """a tricked flow cut at its SHOUT (fcn.1000f977 / fcn.1000fede): (the
+    ticks before it — the tricked stand, from the arrival —, the SHOUT's
+    level, -1 when the flow has no SHOUT, None when its level is no
+    constant the walker follows, the repair's ticks after it — from the
+    SHOUT's end to the repair's and the instant elements right after it
+    (the tail the step plays then: 205's kid's laugh, 88 ticks, a SHOUT
+    with no repair's SET and SWITCH, is not carried) — or None, the tick of
+    the stand its first named trick record pays at — its action's start
+    plus the record's `time` — or None); a part of unknown length leaves
+    the stand None. On the lap's clock (_flow) since 2026-09-27: until then
+    each part took a step's tick of its own and the instant elements and
+    the steps' starts none (station_ticks run on each event alone)"""
+    fl = _flow(d, ev, own, walked)
+    level, shout_t, repair, credit = None, None, None, None
+    unknown = False                       # before the SHOUT: no stand
+    after_repair = False
+    for t, kind, x in fl:
+        if shout_t is None:
+            if kind == 'unknown':
+                unknown = True
+            elif kind == 'shout':
+                shout_t, level = t, x
+            elif kind == 'part' and credit is None and not unknown \
+                    and x[1] not in ('-', '?', 'bar') and x[2] is not None:
+                recs = d.tricks(x[0], x[1])
+                if recs:
+                    credit = t + recs[0][1]
+            continue
+        if kind == 'part' and x[1] == 'repair':
+            repair = t + (x[2] or 0) - shout_t
+            after_repair = True
+        elif kind == 'instant' and after_repair:
+            repair = t + 1 - shout_t
+        elif kind != 'unknown':
+            after_repair = False
+    if shout_t is None:
+        return (None if unknown else fl[-1][0]), -1, None, credit
+    return (None if unknown else shout_t), level, repair, credit
 
 
 def tricked_presence(n):
@@ -1506,24 +1681,19 @@ def mobile_linked(n):
     return out
 
 
-def _step_records(d, ev, own=None):
-    """the step's named trick records before its SHOUT, in order: [(name,
-    tick)], the tick the parts before the record's action plus its `time`
-    (fcn.1000140b credits each at its own); up to a part of unknown length"""
-    before, out = 0, []
-    for e in ev or []:
-        if e[0] == 'SHOUT':
+def _step_records(d, ev, own=None, walked=True):
+    """the flow's named trick records before its SHOUT, in order: [(name,
+    tick)], its action's start on the lap's clock (_flow) plus the record's
+    `time` (fcn.1000140b credits each at its own); up to a part of unknown
+    length"""
+    out = []
+    for t, kind, x in _flow(d, ev, own, walked):
+        if kind == 'shout':
             break
-        for o, a, t in station_ticks(d, [e], {}):
-            if a in ('-', '?') and t is None:
-                continue
-            if own is not None and a not in ('-', '?') and not own(o, a):
-                continue
-            if a not in ('-', '?', 'bar'):
-                out += [(nm, before + tm) for nm, tm in d.tricks(o, a)]
-            if t is None:
-                return out
-            before += t
+        if kind == 'part' and x[1] not in ('-', '?', 'bar'):
+            out += [(nm, t + tm) for nm, tm in d.tricks(x[0], x[1])]
+        if kind == 'unknown':
+            break
     return out
 
 
@@ -1562,8 +1732,8 @@ def code_stays_tricked(n):
         if by in trick:
             trick[item] = (set(trick[by][0]) | more, set(trick[by][1]) | less)
 
-    def entry(ev2, own=None):
-        stand, level, repair, credit = _step_parts_split(d, ev2, own)
+    def entry(ev2, own=None, walked=True):
+        stand, level, repair, credit = _step_parts_split(d, ev2, own, walked)
         return {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                 'repair': round(repair / 12.0, 2) if repair is not None else None,
                 'credit': round(credit / 12.0, 2) if credit is not None else None}
@@ -1595,7 +1765,8 @@ def code_stays_tricked(n):
             for i in sorted(set(i for i, _j, _p in v)):
                 lvi, byi = _row_level(n, snaps, lap[i][0])
                 ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi)
-                e = entry(ev2, own_of(item, i)) if ev2 is not None else None
+                e = entry(ev2, own_of(item, i), LAP_WALKS.get(n, {}).get(lap[i][0], True)) \
+                    if ev2 is not None else None
                 if e is not None:
                     cont = TRICKED_CONT.get(n, {}).get(item)
                     if cont is not None and e['shout'] == -1:
@@ -1611,7 +1782,7 @@ def code_stays_tricked(n):
                         run_step(lvc, lap[i][1], dict(byi))
                         evc = []
                         for stp in steps:
-                            evc += run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
+                            evc += [('STEP',)] + run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
                         cstand, clevel, crepair, _c = _step_parts_split(d, evc)
                         wk, dep = _repair_walk(n, d, evc) if crepair is not None else (0, None)
                         e.update({'shout': clevel,
@@ -1658,7 +1829,7 @@ def code_stays_tricked(n):
             ev2 = _tricked_run(n, lvi, item, cur, trick, byi)
             if ev2 is None:
                 continue
-            e = entry(ev2, own)
+            e = entry(ev2, own, LAP_WALKS.get(n, {}).get(rows[row][0], True))
             s1, h1 = trick[item]
             lvc = Level(n); lvc.present = (set(lvi.present) - h1) | s1
             _e, nx2 = run_step(lvc, cur, dict(byi))
@@ -1704,7 +1875,7 @@ def code_stays_tricked(n):
                 return None
             ev_s, nx_s = run_step(lv2, cur, by, unknown=1)
             ev_r = run_step(lv2, nx_s, by)[0] if nx_s else []
-            return shot, shot + ev_s + ev_r
+            return shot, shot + [('STEP',)] + ev_s + [('STEP',)] + ev_r
 
         f1 = flow((item,))
         if f1 is None:

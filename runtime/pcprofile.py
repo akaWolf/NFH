@@ -617,7 +617,16 @@ def door_ticks(role, side, nfh2=None):
 # vertical runs off and back onto the floors, `dx`/`dy` the straight movement or
 # `enter`/`leave` the two clips.
 def s2_pass_ticks(role, gait, p, sneaking=False):
-    """the ticks of a Season 2 door pass `p` (a PCPass entry) for the pawn's gait"""
+    """the ticks of a Season 2 door pass `p` (a PCPass entry, or the part of one
+    a piece of the hop is timed by: `in`, `dx`/`dy` or `enter`/`leave`, `out`)
+    for the pawn's gait. The `in` run splits at `nb`, the near door's `<actor>`
+    hotspot the route's movement comes up or down to before the pass's own
+    goes on to `<actor>_in` (fcn.1000901b / fcn.10003130); `out` follows the
+    run `ox` along x at `<actor>_out`'s y where the far floor line ends short
+    of it (fcn.10003454); `jt` adds the job boundaries' ticks of the pieces
+    present — [`in`, the straight or the enter/leave, `out`] (each job pushed
+    with a first run in the tick the last is done: tools/pcref/lap_model_s2.py
+    walk_span)"""
     rec = WALK_PX_PER_TICK.get('Woody_sneak' if (role == 'Woody' and sneaking) else role)
     if rec is None:
         return None
@@ -628,10 +637,18 @@ def s2_pass_ticks(role, gait, p, sneaking=False):
     def run(d, s):
         d = abs(d)
         return -(-d // s) if d else 0
-    t = run(p.get('in', 0), v) + run(p.get('out', 0), v)
+    jt = p.get('jt') or (0, 0, 0)
+    t = 0
+    if 'in' in p:
+        nb = p.get('nb', 0)
+        t += run(nb, v) + run(p['in'] - nb, v) + jt[0]
+    if 'out' in p:
+        t += run(p.get('ox', 0), h) + run(p['out'], v) + jt[2]
     if 'enter' in p:
-        return t + p['enter'] + p['leave']
-    return t + run(p.get('dx', 0), h) + run(p.get('dy', 0), v)
+        return t + p['enter'] + p['leave'] + jt[1]
+    if 'dx' in p or 'dy' in p:
+        t += run(p.get('dx', 0), h) + run(p.get('dy', 0), v) + jt[1]
+    return t
 
 
 # Season 1 (game.exe, docs/PC_VERIFICATION.md "the walking speed"): a GOTO's walk job

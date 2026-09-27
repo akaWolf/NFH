@@ -106,6 +106,25 @@ def pc_route(level, role, zone, pos, dest, target):
     return None
 
 
+def pc_pass_piece(p, key):
+    """the part of a PCPass entry (Door.pc_pass) that times one piece of a
+    Season 2 hop — 'in' (split at `nb`), 'out' (after its run along x,
+    `ox`), 'straight' (`dx`, `dy`) — with the job boundaries' ticks (`jt`;
+    pcprofile.s2_pass_ticks)"""
+    keys = {'in': ('in', 'nb'), 'out': ('out', 'ox'), 'straight': ('dx', 'dy')}[key]
+    q = {k: p[k] for k in keys if k in p}
+    if key != 'straight':
+        q.setdefault(key, 0)
+    jt = p.get('jt')
+    if jt:
+        if 'enter' in p:
+            # a back door's strips last their clips: the tick the pass waits
+            # after the leave (jt[1]) goes with the run back to the floor
+            jt = [jt[0], 0, jt[2] + jt[1]]
+        q['jt'] = jt
+    return q
+
+
 def pc_ap_x(ap, it):
     """a station's PC hotspot x (Item.pc_approach `x`): one value, or one
     per visit where the GoTo takes another hotspot of the object each visit
@@ -1557,7 +1576,7 @@ class Pawn:
                 x, y = tx, ty
                 if 'transfer' in stp:
                     break
-            straight = {k: p[k] for k in ('dx', 'dy') if k in p}
+            straight = pc_pass_piece(p, 'straight')
             ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), straight, self.sneaking)
             pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
             self._pc_pass = cur = (near, pace)
@@ -1676,7 +1695,7 @@ class Pawn:
         """seconds of a hop's `in` or `out` run at the pawn's gait"""
         p = run[1].pc_pass.get(self.role) or {}
         ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(),
-                                        {run[0]: p.get(run[0], 0)}, self.sneaking)
+                                        pc_pass_piece(p, run[0]), self.sneaking)
         return (ticks or 0) / pcprofile.TICKS_PER_SECOND
 
     def _pc_station_ticks(self, it):
@@ -2092,7 +2111,7 @@ class Pawn:
         p = door.pc_pass.get(self.role) if (door is not None and pcprofile.is_pc()) else None
         if not p:
             return None
-        ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {key: p.get(key, 0)}, self.sneaking)
+        ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), pc_pass_piece(p, key), self.sneaking)
         if not ticks or dist <= 0.0:
             return None
         return dist * pcprofile.TICKS_PER_SECOND / ticks
