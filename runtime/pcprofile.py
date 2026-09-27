@@ -267,16 +267,19 @@ S2_TICK_HZ = 12
 # oneshots (shout2 26 frames, shout2_hard 85, shout2_high 26, freakout1 37,
 # freakout2 38, freakout3 63), which Loader.dll stores less one. The SHOUT
 # element's first update pushes the action's DoActions job in front of
-# itself (fcn.10049216) and returns 0 (0x1000d8a2), the job runs the
-# Loader's time + 2 ticks from the tick after, and the element's next update
-# returns 1 (0x1000d8a6): the reaction lasts the time + 4 — shout2 29,
-# shout2_hard 88, shout2_high 29, freakout1 40, freakout2 41, freakout3 66
-# (the element ticks of tools/pcref/lap_model_s2.py). Where the model reaches no
+# itself without a first run (fcn.10049216) and returns 0 (0x1000d8a2), the
+# job runs the Loader's time + 2 ticks from the tick after (its states 0-2,
+# 0x100020c0: the count fcn.100011f2 ends past the time), and the element's
+# next update — in the job's last tick, the runner going on past a done job
+# (fcn.100492a8) — returns 1 at once (0x1000d8a6): the reaction lasts the
+# time + 3 — shout2 28, shout2_hard 87, shout2_high 28, freakout1 39,
+# freakout2 40, freakout3 65 (a tick more until 2026-09-27, the element's
+# done update counted as its own tick). Where the model reaches no
 # SHOUT the trick record's `laugh` stands in for the level (PCLaugh); the
 # mobile's tantrum is its own AngryEasyUp + AngryHard clips (~7.6 s), paced
 # to the PC clip under the profile (World.play_angry).
-S2_SHOUT_TICKS = {0: (29,), 1: (29, 29), 2: (88, 88, 88), 3: (29,)}
-S2_FREAKOUT_TICKS = (40, 41, 66)
+S2_SHOUT_TICKS = {0: (28,), 1: (28, 28), 2: (87, 87, 87), 3: (28,)}
+S2_FREAKOUT_TICKS = (39, 40, 65)
 
 
 def s2_reaction_seconds(level, rng, full=False):
