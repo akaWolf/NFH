@@ -1,0 +1,25 @@
+# Level101 under the PC profile (2026-09-27): the binoculars at his window
+# visit, the TV as he comes back into the living room, the sofa as he sits,
+# the microwave on his next walk to the window — four tricks and three
+# bonuses. game.exe's walk-by is a trigger whose reaction re-runs the
+# interrupted case (his walk to the window), so the microwave goes last: a
+# microwave before the binoculars' fire sends him back to the window first
+# (the mobile skipped the fired station; docs/PC_VERIFICATION.md). Badinfos'
+# E01 pays microwave > binoculars > TV > sofa (17.7, 17.4, 16.2 s) off a
+# 23-s sofa stay the port's lap (14 s) does not give.
+take Fridge IT_Egg
+take Drawer IT_Fartbag
+take FirstAid IT_Superglue
+whenusing Sofa                    # he sits in the living room
+usewith Binoculars IT_Superglue   # Zone03, while he sits
+whenusing Binoculars              # the glue fires at the window
+use! Television                   # Zone02: noticed as he comes back in
+usewith! Sofa IT_Fartbag          # Zone02
+park! Zone01
+whenusing Sofa                    # he sits: the fart bag fires
+usewith! Microwave IT_Egg         # Zone03: fires on his next walk to the window
+park! Zone01
+await Binoculars 30
+await Television 20
+await Sofa 25
+await Microwave 16

@@ -1039,6 +1039,14 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "PigKeys",
+   "component": "SearchItem",
+   "set": {
+    "PCUseSecondsTricked": 2.083
+   },
+   "source": "the emptied container's branch: the neighbour's `surprise` (Level_Pig's case 13, 0x46a109; generic/objects.xml, an ACTION step of 25 ticks — the Loader's time 23 + 2 — at 12 a second, tools/pcref/pc_durations.py EMPTIES)"
   }
  ]
 }

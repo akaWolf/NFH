@@ -5025,7 +5025,10 @@ class Routine:
             self._pc_visit_seconds(it)
             return float(it.pc_use_secs_linked)
         if getattr(t, 'pc_use_secs_tricked', None) is not None \
-                and it.is_tricked(self.level.items):
+                and (it.is_tricked(self.level.items)
+                     or (it.kind == 'SearchItem' and it.tricked)):
+            # (a SearchItem's tricked visit is the emptied container's: 109's
+            # key board without its pigkey, the case's `surprise` branch)
             # the tricked stand's own seconds (PCUseSecondsTricked: game.exe
             # runs kit/foambottle's make_foampudding, 38 frames, not
             # kit/milkbottle's make_pudding — docs/PC_ROUTINES.md "The
@@ -5954,7 +5957,14 @@ class Routine:
             # a wiped drawing skips its own redo
             self._pending = 'skip'
         elif it is not None and it.got_tricked and not self.marbles_next and \
-                it.name not in ('WateringCan', 'ValveHot', 'ValveMain'):
+                it.name not in ('WateringCan', 'ValveHot', 'ValveMain') \
+                and not (kind == 'surprise_near' and pcprofile.is_pc() and not nfh2):
+            # (the PC's walk-by is a trigger: the level class's handleTrigger
+            # re-runs the interrupted case — Level_Laundry's 0x454726 sets
+            # the case to the one last run — and that case decides on its own
+            # objects: 109's key board, emptied by Woody, is walked to again
+            # and plays its `surprise` branch, Level_Pig 0x46a109, as E09
+            # shows after the bedroom banana)
             # the skip goes straight to StartAction, without the
             # StartNextAction extras (ActionManager.cs:614-619). GotTricked
             # is the sticky "its trick has fired on him" mark (Item.cs:836-

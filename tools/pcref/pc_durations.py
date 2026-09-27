@@ -96,6 +96,11 @@ ALERTERS = (107, 109, 111, 112, 113, 114)
 # vacuum icon and the walk (0x456502) — the TrickItem's PCSurpriseSeconds, its
 # SurpriseFar (the remaster's Search) played at that pace
 SEARCHES = {111: ['DirtyCarpet']}
+# a container station the neighbour finds emptied by Woody: the case's other
+# branch plays his `surprise` (109's key board without its pigkey, Level_Pig's
+# case 13, 0x46a109) — the SearchItem's tricked (emptied) visit,
+# PCUseSecondsTricked
+EMPTIES = {109: ['PigKeys']}
 
 
 def pc_stations(n, toks):
@@ -225,6 +230,20 @@ def main(argv):
             else:
                 ov['patches'].append({'object': item, 'component': item_kind(n, item),
                                       'set': {'PCSurpriseSeconds': v}, 'source': src})
+        for item in EMPTIES.get(n, ()):
+            t = lap_model.Level(n).job_ticks('neighbor', 'surprise')
+            v = round(t / lap_model.TICK, 3)
+            src = ("the emptied container's branch: the neighbour's `surprise` (Level_Pig's case 13, 0x46a109; "
+                   "generic/objects.xml, an ACTION step of %d ticks — the Loader's time %d + 2 — at 12 a second, "
+                   "tools/pcref/pc_durations.py EMPTIES)" % (t, t - 2))
+            e = next((e for e in ov['patches'] if e.get('object') == item
+                      and 'PCUseSecondsTricked' in (e.get('set') or {})), None)
+            if e is not None:
+                e['set']['PCUseSecondsTricked'] = v
+                e['source'] = src
+            else:
+                ov['patches'].append({'object': item, 'component': item_kind(n, item),
+                                      'set': {'PCUseSecondsTricked': v}, 'source': src})
         for item, obj in LEAVES.get(n, ()):
             t = lap_model.Level(n).job_ticks(obj, 'leave')
             if t is None:
