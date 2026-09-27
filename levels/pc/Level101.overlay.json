@@ -21,7 +21,9 @@
      "SitUp"
     ],
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.0
+    "PCUseSecondsTricked": 5.167,
+    "PCFireAt": 4.333,
+    "PCFireLead": true
    }
   },
   {

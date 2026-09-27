@@ -12,8 +12,10 @@ two String slots, read through the stack emulation), GoTo (fcn.00479da0),
 Switch (fcn.00451de0), the repair helper (fcn.0047ae70: the tricked object's
 `repair`, else `clean`), a sub-sequence (fcn.00476770), the waits and the
 fire itself (OBJ2 = fcn.0047c290 scores after the steps before it; FIRE5 =
-fcn.0047c320 scores before its own clip; FIRE4 = fcn.0047c3b0 scores after
-its ready step, the clip queued just before it). The seconds are objects.xml's
+fcn.0047c320 scores before its own clip; FIRE4 = fcn.0047c3b0 scores before
+its ready step — what the script builds after its last push to the main list,
+moved after the fire by _ready_after; until 2026-09-27 read as scoring after
+it). The seconds are objects.xml's
 `time` ticks or the actor clip's frames at 12 a second, an action looked up
 on its `<object>` or `<actor>` (the neighbour's own smokepipe_explosive,
 riphat, spit …) in the level's file, then generic/objects.xml.
@@ -761,7 +763,7 @@ def analyse(levels):
                 j = hit[0]
                 flat[j]['fire'] = True
                 g0, g1, icon = _stand(flat, j)
-                row['steps'] = flat[g0:g1]
+                row['steps'] = _ready_after(flat[g0:g1])
                 row['group'] = (icon, g0, g1)
                 row['class'] = '%x' % f.a_sw
                 row['chain'] = used
@@ -769,9 +771,74 @@ def analyse(levels):
                 row['note'] = 'no case chain reaches the site'
         if row['steps'] is None:
             lo, hi, steps = branch(i)
-            row['steps'] = steps; row['lo'] = parse(L[lo])[0]; row['hi'] = parse(L[hi])[0]
+            row['steps'] = _ready_after(steps); row['lo'] = parse(L[lo])[0]; row['hi'] = parse(L[hi])[0]
         rows.append(row)
     return rows
+
+
+def _ready_span(fire_a):
+    """the addresses (lo, hi) of the calls that build a FIRE4's ready step —
+    its fourth argument, the step the fire's own list plays first (the
+    fire's update 0x47bd00 scores on its first call, then pushes its list:
+    the step's +0x18 — fcn.0047bc00 stores the argument there — before the
+    shout and the StopMsg, 0x47be5b-0x47be7c): what the script builds after
+    its last push to the main list and before the fire (109's alarm: the
+    sub-list of the bed's LEAVE and the switch back, 0x46969c-0x469775; 102's
+    laxative beer: the sofa's LEAVE and the spit; 101's fart bag: the sofa's
+    LEAVE; 110's fuel beer: the barbecue's switch); None where the main list
+    is no register"""
+    idx = next((k for k, ln in enumerate(L) if ln.startswith('0x%08x ' % fire_a)), None)
+    if idx is None:
+        return None
+    main = None
+    for k in range(idx + 1, min(len(L), idx + 40)):
+        a, ins = parse(L[k])
+        if ins is None:
+            continue
+        m = re.match(r'mov ecx, (e[a-z]{2})$', ins)
+        if m:
+            main = m.group(1)
+        if ins == 'call fcn.004766e0':
+            break
+    if main not in ('esi', 'edi', 'ebp', 'ebx'):
+        return None
+    last_mov = None
+    for k in range(idx - 1, max(0, idx - 400), -1):
+        a, ins = parse(L[k])
+        if ins is None:
+            continue
+        if ins == 'call fcn.004766e0':
+            # its list: the `mov ecx, …` between the call before it and it
+            reg = None
+            for kk in range(k - 1, max(0, k - 30), -1):
+                aa, ii = parse(L[kk])
+                if ii is None:
+                    continue
+                mm = re.match(r'mov ecx, (.+)$', ii)
+                if mm:
+                    reg = mm.group(1)
+                    break
+                if ii.startswith('call '):
+                    break
+            if reg == main:
+                return a, fire_a
+    return None
+
+
+def _ready_after(steps):
+    """a FIRE4's ready step moved after its fire (_ready_span)"""
+    fire = next((k for k, t in enumerate(steps) if t.get('fire') and t['kind'] == 'FIRE4'), None)
+    if fire is None:
+        return steps
+    span = _ready_span(steps[fire]['a'])
+    if span is None:
+        return steps
+    lo, hi = span
+    ready = [t for t in steps[:fire] if lo < t['a'] < hi]
+    if not ready:
+        return steps
+    rest = [t for t in steps[:fire] if not (lo < t['a'] < hi)]
+    return rest + [steps[fire]] + [dict(t, ready=True) for t in ready] + steps[fire + 1:]
 
 
 def _pair_rule(steps):
@@ -793,7 +860,7 @@ def summarise(row, lv):
     the fire make `pre_fire`, the trailing ones go with the last action"""
     before = []; after = []; seen_fire = False; fix = None; walks = []
     unknown = []; fixes = []; repair = None
-    held = 0.0; pre_fire = 0.0; last = None
+    held = 0.0; pre_fire = 0.0; last = None; ready_held = 0.0
     prefer = [row['name']]
     if '_' in row['name'].split('/')[-1]:
         prefer.append(row['name'].rsplit('_', 1)[0])       # the normal twin (lir/tabacbox of lir/tabacbox_explosive)
@@ -810,6 +877,8 @@ def summarise(row, lv):
             continue
         if s['kind'] in ('SUBSEQ', 'MSG', 'STOPMSG'):
             held += 1 / FPS
+            if s.get('ready'):
+                ready_held += 1 / FPS
             continue
         if s['kind'] == 'ACTION':
             v, label = seconds(lv, s['obj'], s['act'], prefer)
@@ -846,6 +915,11 @@ def summarise(row, lv):
                 fixes.append(('%s.%s' % (obj, nm), v + held)); held = 0.0
                 last = fixes
                 repair = obj          # the helper walks to its hotspot first (isActorAtObject)
+    if ready_held and (last is None or last is before):
+        # a FIRE4's ready step that is a message alone (110's barbecue
+        # switched to the burning one): after the fire, before its shout
+        after.append(('(ready step)', ready_held))
+        held = max(0.0, held - ready_held)
     if held and last:
         # the trailing instants: with the last action of the stand
         lbl, v = last[-1]; last[-1] = (lbl, v + held); held = 0.0

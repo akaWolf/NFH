@@ -48,8 +48,10 @@
     ],
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.833,
-    "PCStopSkip": true
+    "PCUseSecondsTricked": 3.0,
+    "PCStopSkip": true,
+    "PCFireAt": 2.75,
+    "PCFireLead": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.9 s; BBQ <- bbq#1 1.6 s"
   },

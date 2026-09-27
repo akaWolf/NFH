@@ -88,7 +88,9 @@
     "PCUseSeconds": 3.58,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.75
+    "PCUseSecondsTricked": 4.917,
+    "PCFireAt": 3.0,
+    "PCFireLead": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AlarmClock <- alarm_clock#0 3.6 s"
   },
