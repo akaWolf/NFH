@@ -18,7 +18,14 @@
     "PCFixSeconds": 0,
     "PCBreathSeconds": 2.5,
     "PCShoutAfter": 2.25,
-    "PCStopSkip": true
+    "PCStopSkip": true,
+    "PCReactLead": 6,
+    "PCFallSeconds": 4.167,
+    "PCSlideTo": [
+     690,
+     420,
+     "kit"
+    ]
    }
   },
   {

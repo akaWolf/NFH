@@ -523,6 +523,8 @@ class RollerSkaterBehavior(Behavior):
                 vx, vy = self.velocity
                 sk = pcprofile.gait_speed('Rottweiler', 'skate') \
                     if pcprofile.is_pc() and not pcprofile.SEASON2 else None
+                if getattr(self, '_pc_slide_speed', None):
+                    sk = self._pc_slide_speed
                 if sk and (vx or vy):
                     # game.exe's skate: gait 5 before the slide to the window
                     # (0x46312f), skate1 18 px a tick (level_fitness)
@@ -551,10 +553,33 @@ class RollerSkaterBehavior(Behavior):
             self.state = self.SKATE
             self.enabled = True
             self.hide_obj(self.roller_skater, True)   # SetActiveObjectHidden
+            self._pc_slide_speed = None
+            to = self._pc('pc_slide_to')
+            rott = self.rott()
+            if to and rott is not None:
+                # the PC's slide is the list's GoTo from where he stands to
+                # kit/window's hotspot at the skate gait (fcn.0044ad10,
+                # skate1 18 px a tick): the mobile's way to WindowX at the
+                # speed that lasts those ticks
+                here = rott._pc1_here()
+                z = rott.zone
+                r = getattr(z, 'pc_walk_room', None) if z is not None else None
+                if here is not None and r is not None:
+                    t = pcprofile.s1_leg_ticks('Rottweiler', 'skate', here[0], here[1], to[0], to[1],
+                                               r['floor']) or 0
+                    dist = abs(self.window_x - rott.sprite.x)
+                    if t > 0 and dist > 0.0:
+                        self._pc_slide_speed = dist * pcprofile.TICKS_PER_SECOND / t
 
     def _fall(self):
         self.state = self.FALL                        # cs:161-166
         self._fall_left = self.fall_delay
+        secs = self._pc('pc_fall_secs')
+        if secs:
+            # the PC's list at the window (Level_Fitness 0x463207-0x4632f5):
+            # the `fallout`, the list's 12-tick timer (fcn.0047e520) and a
+            # StopMsg before the step's fire (PCFallSeconds)
+            self._fall_left = secs
         rott = self.rott()
         if rott is not None and rott.anim.has(self.fall_animation):
             rott.anim.play_single(self.fall_animation)
@@ -587,8 +612,10 @@ class RollerSkaterBehavior(Behavior):
             # before the list's next step: the fall's countdown holds them
             self.world.s1_fire(rott, self.roller_skater)
             if not pcprofile.SEASON2:
+                # (and the list's gait message before the walk back in,
+                # 0x463335: a tick)
                 self.roller_skater.pc_lead_stood = True
-                self._fall_left = pcprofile.S1_FIRE_LEAD_TICKS / pcprofile.TICKS_PER_SECOND
+                self._fall_left = (pcprofile.S1_FIRE_LEAD_TICKS + 1) / pcprofile.TICKS_PER_SECOND
                 return
         self.state = self.COMEBACK                    # cs:168-179
         rott.sprite.hidden = False
@@ -607,6 +634,15 @@ class RollerSkaterBehavior(Behavior):
     def _breath(self):
         self.state = self.BREATH                      # cs:181-185
         rott = self.rott()
+        if self._pc('pc_breath_secs') and not getattr(self, '_pc_breath_held', False):
+            # the list's gait message after the walk back in (0x463401): a
+            # tick before the `wheeze`
+            self._pc_breath_held = True
+            if rott is not None:
+                rott._stand()
+            self.world.call_later(1 / pcprofile.TICKS_PER_SECOND, self._breath)
+            return
+        self._pc_breath_held = False
         if rott is not None and rott.anim.has(self.breath_animation):
             rott.anim.play_single(self.breath_animation)
             secs = self._pc('pc_breath_secs')
@@ -644,7 +680,9 @@ class RollerSkaterBehavior(Behavior):
 
                 def shouted():
                     rott.anim.time_scale = 1.0
-                    self._shout()
+                    # the list's StopMsg after the shout2 (0x46355a): a tick
+                    rott._stand()
+                    self.world.call_later(1 / pcprofile.TICKS_PER_SECOND, self._shout)
                 rott.anim.play_sequence([clip], on_end=shouted)
                 return
         self.state = self.SHOUT                       # cs:187-192

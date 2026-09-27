@@ -245,7 +245,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -721,6 +721,11 @@ class Item:
         # table redoes no `give`, 108's brush no first `take3`), which the
         # mobile's redo of the normal use stands for
         self.pc_redo_secs = _f('PCRedoSeconds')
+        # the skate's list at the window: the `fallout`, its timer and a
+        # StopMsg before the fire (PCFallSeconds; RollerSkaterBehavior)
+        self.pc_fall_secs = _f('PCFallSeconds')
+        # and the slide's end, kit/window's hotspot [x, y, room] (PCSlideTo)
+        self.pc_slide_to = d.get('PCSlideTo')
         # the PC profile's floor tricks lie where Woody laid them (game.exe
         # creates toi/groundsoap, kit/groundbanana … at his position: their
         # hotspots 0/0 and 0/6): the floor click's x (pc_drop_x, World.

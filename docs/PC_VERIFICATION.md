@@ -302,13 +302,21 @@ actors' job pass the update calls at 0x100445f8.
   ticks without a record, as the lap model counts them.
   The lists' own first updates, their message steps and StopMsgs are
   carried since 2026-09-27 (the row "the instant steps and the fire
-  step"). Left as they are: the skate's list (Level_Fitness
-  0x46303e-0x46355a: its start, a StopMsg, two message steps and a StopMsg
-  before the slide, a 12-tick wait (fcn.0047e520) and a StopMsg before the
-  fire, the gait messages around the walk back in, a StopMsg after its
-  shout2 — the RollerSkater keeps the mobile's sequence around the PC's
-  fallout, wheeze and shout2, the fire's own two ticks carried) and the
-  pet alarm's (fcn.0047a690: pushed with the run-now flag 0, no StopMsg —
+  step"). The skate's list (Level_Fitness 0x46303e-0x46355a) is carried
+  in the RollerSkater since the same day: the slide's first move six ticks
+  after the trigger (the case's push, the list's start, a StopMsg, the
+  skate's and the gait's message steps, a StopMsg: PCReactLead 6), the
+  slide at the skate gait from his PC point to kit/window's hotspot
+  (PCSlideTo, skate1 18 px a tick), the `fallout`, the list's 12-tick
+  timer (fcn.0047e520 — the ACTION's timer, an element's time + 1) and a
+  StopMsg before the fire (PCFallSeconds 50 ticks where the mobile's
+  FallDelay is 48), the gait message after the fire and before the
+  `wheeze`, the StopMsg after the shout2 — 112's bicycle-skates-marbles
+  pairs are +0.6 and −0.5 s against Badinfos' (+0.1 and −0.7 before), their
+  sum +0.1 (−0.6 before): the walk back in through the front door (the
+  fallout lands him on the porch, anc/inside past fro/anc) is the mobile's
+  way from EntranceLocation to BreathLocation, not the PC's. Left as it
+  is: the pet alarm's (fcn.0047a690: pushed with the run-now flag 0, no StopMsg —
   the port's alarm run is the mobile's with the PC's search). game.exe
   tests the nearobj triggers every tick wherever he stands (fcn.00472390
   over fcn.00471bc0); the port notices on the walk's frames and, under

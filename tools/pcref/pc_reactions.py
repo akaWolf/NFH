@@ -272,7 +272,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
-        'PCRedoSeconds')
+        'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo')
 
 
 def slip_cleans(n, item, floor, lv):
@@ -454,6 +454,20 @@ def specs(n):
                     # the slide, the wait and the walk back are the
                     # RollerSkater's to carry: docs/PC_VERIFICATION.md)
                     keys['PCSurpriseSeconds'] = round(_sum(lv, [('kit/window', 'fallout')]), 3)
+                    # the skate's list (Level_Fitness 0x46303e-0x46355a): its
+                    # start, a StopMsg, the skate's and the gait's message
+                    # steps and a StopMsg before the slide (the case's push a
+                    # tick more: the slide's first move six ticks after the
+                    # trigger); at the window the `fallout`, the list's timer
+                    # of 12 ticks (fcn.0047e520, an element's time + 1) and a
+                    # StopMsg before the fire (PCFallSeconds, from the arrival)
+                    keys['PCReactLead'] = 6
+                    keys['PCFallSeconds'] = round(_sum(lv, [('kit/window', 'fallout')]) + (12 + 1 + 1) / FPS, 3)
+                    # the slide is the list's GoTo to kit/window's hotspot at
+                    # the skate gait (skate1, 18 px a tick; fcn.0044ad10)
+                    pt = fix_point(n, 'kit/window')
+                    if pt:
+                        keys['PCSlideTo'] = pt
                     keys['PCFixSeconds'] = round(fix + after, 3)
                     # the list's tail after the run back in (Level_Fitness,
                     # 0x46349f and 0x463507): `wheeze`, then an explicit
