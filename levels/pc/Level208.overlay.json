@@ -51,6 +51,7 @@
     "PCUseSecondsTricked": 7.42,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 4.58,
     "PCUseSeconds": 5.25
    }

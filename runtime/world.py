@@ -8474,6 +8474,20 @@ class World:
                 fix_secs = item.pc_fix_secs_linked     # PCFixSecondsLinked
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
+            tail_secs = getattr(item, 'pc_shout_tail', None)
+            if both and getattr(item, 'pc_shout_linked', None) is not None:
+                tail_secs = getattr(item, 'pc_shout_tail_linked', None)   # PCShoutTailLinked
+
+            def tail_s2(played_angry=True):
+                # the rest of the SHOUT's step after the repair, or after
+                # the SHOUT with none (PCShoutTail: its SET and SWITCH, 210's
+                # take, 205's kid's laugh) — stood before the next step
+                if tail_secs:
+                    pawn.anim.time_scale = 1.0
+                    pawn._stand()
+                    self.call_later(tail_secs, lambda: after_run(played_angry))
+                else:
+                    after_run(played_angry)
 
             def play_fixes_s2():
                 pawn.anim.time_scale = 1.0
@@ -8482,9 +8496,9 @@ class World:
                         mobile = pawn.anim.sequence_seconds(fixes)
                         if mobile > 0.0:
                             pawn.anim.time_scale = mobile / fix_secs
-                    pawn.anim.play_sequence(fixes, on_end=after_run)
+                    pawn.anim.play_sequence(fixes, on_end=tail_s2)
                 else:
-                    after_run(bool(head))
+                    tail_s2(bool(head))
 
             extra = [a for a in item.rott_extra_angry if a in head] \
                 if (resume and item.pc_resume_head_secs is not None) else []

@@ -1541,10 +1541,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   continuation its own start (a ('STEP',) mark where the flows are
   joined), the repair runs to the instants right after it (the trailing
   SWITCH): the stands and credits move by 1-5 ticks, the repairs by one.
-  Not carried: the elements a step plays after its repair (205's sand
-  lion: the kid's `laugh`, 88 ticks, in his sequence) and after a SHOUT
-  with no repair (the SET and SWITCH, 1-2 ticks, 203's melons, 204's hot
-  dog, 212's cigars) — the port goes on after the shout or the repair.
+  What the SHOUT's step plays after its repair and the instants right
+  after it — or after the SHOUT where it has none — before its next step
+  takes over is stood (lap_model_s2 `_shout_tail` -> PCShoutTail,
+  PCShoutTailLinked; World's S2 reaction, `tail_s2`): the SET of most
+  SHOUTs, 1 tick, the SET and SWITCH of 203's melons, 204's hot dog and
+  212's cigars, 2, 212's ledge 3 and 4, 210's turban shop's take3, 1.25 s,
+  and the kid's `laugh` after 205's sand lion's repair, a DoActions job
+  in the neighbour's sequence, 7.58 s — the port had gone on after the
+  shout or the repair.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which

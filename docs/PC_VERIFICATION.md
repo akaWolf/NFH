@@ -996,3 +996,9 @@ actors' job pass the update calls at 0x100445f8.
   visits re-measured (runs/idlejt2; the 2026-09-23 file had outlived the
   walks): 213's picnic 12.8 -> 10.8 s, 206's chair and pillows +0.1 and
   +0.5 s. Every Season 2 writer re-run.
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
+  `runtime/scene.py`, `runtime/world.py`, `levels/pc/Level2*.overlay.json`
+  (2026-09-27): the SHOUT's step's tail stood — PCShoutTail /
+  PCShoutTailLinked (`_shout_tail`: the step after its repair, or after
+  the SHOUT with none, to its end; 31 visits, 1-4 ticks, 210's turban shop
+  1.25 s, 205's sand lion 7.58 s with the kid's laugh). All 14 at 100.

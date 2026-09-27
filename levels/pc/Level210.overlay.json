@@ -18,6 +18,7 @@
     "PCUseSecondsTricked": 9.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCHitSeconds": {
      "Mother": 3.33
     },
@@ -38,6 +39,7 @@
     "PCCreditAtLinked": 3.75,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.08,
     "PCLinkedPaysAt": 5.25,
     "PCUseSeconds": 3.0
    }
@@ -51,6 +53,7 @@
     "PCUseSecondsTricked": 4.17,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 1.25,
     "PCCreditAt": 2.17,
     "PCUseSeconds": 6.83
    }
@@ -731,9 +734,6 @@
       "routes": {}
      }
     },
-    "PCClipSeconds": {
-     "Stand_Left": 0.53
-    },
     "PCClipSecondsRole": {
      "Mother": {
       "MotherCall": 1.75,
@@ -748,6 +748,9 @@
       "at": "start",
       "then": 0.0
      }
+    },
+    "PCClipSeconds": {
+     "Stand_Left": 0.53
     }
    }
   },

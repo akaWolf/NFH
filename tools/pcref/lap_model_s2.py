@@ -1536,8 +1536,7 @@ def _step_parts_split(d, ev, own=None, walked=True):
     level, -1 when the flow has no SHOUT, None when its level is no
     constant the walker follows, the repair's ticks after it — from the
     SHOUT's end to the repair's and the instant elements right after it
-    (the tail the step plays then: 205's kid's laugh, 88 ticks, a SHOUT
-    with no repair's SET and SWITCH, is not carried) — or None, the tick of
+    (what the step plays after that is _shout_tail's) — or None, the tick of
     the stand its first named trick record pays at — its action's start
     plus the record's `time` — or None); a part of unknown length leaves
     the stand None. On the lap's clock (_flow) since 2026-09-27: until then
@@ -1681,6 +1680,44 @@ def mobile_linked(n):
     return out
 
 
+def _secs(t):
+    return round(t / 12.0, 2) if t is not None else None
+
+
+def _shout_tail(d, ev, own=None, walked=True):
+    """the ticks the SHOUT's step plays after its repair and the instant
+    elements right after it (_step_parts_split's `repair`) — or after the
+    SHOUT where it has no repair — to the end of its sequence: the SET and
+    SWITCH of a SHOUT with no repair (203's melons, 204's hot dog), the
+    take after it (210's turban shop: its take3, 15 ticks with the SET,
+    SWITCH and the hide after), the kid's laugh after 205's sand lion's
+    repair (91 ticks, a DoActions job in his sequence) — before the step's next one takes
+    over (a ('STEP',) mark or a GO); None where the flow has no SHOUT or a
+    part of unknown length follows it"""
+    fl = _flow(d, ev, own, walked)
+    k = next((i for i, (_t, kind, _x) in enumerate(fl) if kind == 'shout'), None)
+    if k is None:
+        return None
+    # (a repair in a later step — its walk's — has the SHOUT's step's tail
+    # in `repair` already: the tail is the repair's step's)
+    start, end = fl[k][0], None
+    after_repair = False
+    for t, kind, x in fl[k + 1:]:
+        if kind == 'unknown':
+            return None
+        if kind == 'part' and x[1] == 'repair':
+            start, end = t + (x[2] or 0), None
+            after_repair = True
+            continue
+        if kind == 'instant' and after_repair:
+            start = t + 1
+            continue
+        after_repair = False
+        if kind in ('step', 'end') and end is None:
+            end = t
+    return max(0, (end if end is not None else start) - start)
+
+
 def _step_records(d, ev, own=None, walked=True):
     """the flow's named trick records before its SHOUT, in order: [(name,
     tick)], its action's start on the lap's clock (_flow) plus the record's
@@ -1736,7 +1773,8 @@ def code_stays_tricked(n):
         stand, level, repair, credit = _step_parts_split(d, ev2, own, walked)
         return {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                 'repair': round(repair / 12.0, 2) if repair is not None else None,
-                'credit': round(credit / 12.0, 2) if credit is not None else None}
+                'credit': round(credit / 12.0, 2) if credit is not None else None,
+                'tail': _secs(_shout_tail(d, ev2, own, walked))}
     # the parts of each lap row the stations pair with: a tricked part is
     # another station's where its action and object (the variant's name
     # starts with the object's: altar_statue_snake) are one of that
@@ -1786,6 +1824,7 @@ def code_stays_tricked(n):
                         cstand, clevel, crepair, _c = _step_parts_split(d, evc)
                         wk, dep = _repair_walk(n, d, evc) if crepair is not None else (0, None)
                         e.update({'shout': clevel,
+                                  'tail': _secs(_shout_tail(d, evc)),
                                   'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
                         if dep is not None:
@@ -1813,6 +1852,7 @@ def code_stays_tricked(n):
                             # (and the walk to it: 203's stage to the generator)
                             wk, dep = _repair_walk(n, d, ev2 + evr)
                             e['repair'] = round((sum(rp) + wk) / 12.0, 2)
+                            e['tail'] = _secs(_shout_tail(d, ev2 + [('STEP',)] + evr))
                             if dep is not None:
                                 e['fix_depart'] = dep
                     out[item] = e
@@ -1847,6 +1887,7 @@ def code_stays_tricked(n):
                         e['credit'] = round((base + ccredit) / 12.0, 2)
                 e['shout'] = clevel
                 e['repair'] = round(crepair / 12.0, 2) if crepair is not None else None
+                e['tail'] = _secs(_shout_tail(d, evc))
                 e['cont'] = 0.0
             e['rejoins'] = nx2 == nx1
             out[item] = e
@@ -1887,6 +1928,7 @@ def code_stays_tricked(n):
              'repair': round(repair / 12.0, 2) if repair is not None else None,
              'credit': round(credit / 12.0, 2) if credit is not None else None,
              'hit': {actor: round(ft / 12.0, 2) if ft is not None else None},
+             'tail': _secs(_shout_tail(d, all1)),
              'arm': [arm, fire], 'rejoins': True}
         f2 = flow((item, lnk)) if lnk in trick else None
         if f2 is not None:
@@ -1899,6 +1941,7 @@ def code_stays_tricked(n):
             e.update({'linked': round(stand2 / 12.0, 2) if stand2 is not None else None,
                       'linked_shout': level2,
                       'linked_repair': round(repair2 / 12.0, 2) if repair2 is not None else None,
+                      'linked_tail': _secs(_shout_tail(d, all2)),
                       'linked_credit': round(credit2 / 12.0, 2) if credit2 is not None else None,
                       'linked_pays': round(others[0][1] / 12.0, 2) if others else None})
             if len(others) > 1:
@@ -1926,6 +1969,7 @@ def code_stays_tricked(n):
         out[item] = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                      'repair': round(repair / 12.0, 2) if repair is not None else None,
                      'credit': round(credit / 12.0, 2) if credit is not None else None,
+                     'tail': _secs(_shout_tail(d, ev2)),
                      'arm': [fire_v, drop_v], 'rejoins': True}
     for item, (obj, act, actor, her) in TRICKED_RUSH.get(n, {}).items():
         if item not in out:
@@ -1979,16 +2023,18 @@ def code_stays_tricked(n):
         if dos(ev2) == dos(ev1):
             continue
         own = own_of(item, i)
-        stand, level, repair, _first = _step_parts_split(d, ev2, own)
+        wk_i = LAP_WALKS.get(n, {}).get(lap[i][0], True)
+        stand, level, repair, _first = _step_parts_split(d, ev2, own, wk_i)
         if stand is None:
             continue
         # the item's own records are the ones its variant alone plays
-        mine = set(nm for nm, _t in _step_records(d, ev1, own))
-        recs = _step_records(d, ev2, own)
+        mine = set(nm for nm, _t in _step_records(d, ev1, own, wk_i))
+        recs = _step_records(d, ev2, own, wk_i)
         credit = next((t for nm, t in recs if nm in mine), None)
         pays = next((t for nm, t in recs if nm not in mine), None)
         e = {'linked': round(stand / 12.0, 2), 'linked_shout': level,
              'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
+             'linked_tail': _secs(_shout_tail(d, ev2, own, wk_i)),
              'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
              'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
         cont = LINKED_CONT.get(n, {}).get(item)
@@ -2005,6 +2051,7 @@ def code_stays_tricked(n):
             if lift is not None and cstand is not None and crecs:
                 e.update({'linked_shout': clevel,
                           'linked_repair': round(crepair / 12.0, 2) if crepair is not None else None,
+                          'linked_tail': _secs(_shout_tail(d, evc)),
                           'linked_hit': round(lift / 12.0, 2),
                           'linked_after_hit': round(max(0, cstand - lift) / 12.0, 2),
                           'linked_extra': crecs[0][0],

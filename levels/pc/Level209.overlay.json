@@ -25,10 +25,12 @@
     "PCUseSecondsLinked": 9.25,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 1.5,
     "PCCreditAtLinked": 1.5,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.08,
     "PCLinkedPaysAt": 3.0,
     "PCUseSeconds": [
      0,

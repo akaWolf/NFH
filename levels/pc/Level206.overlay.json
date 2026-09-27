@@ -59,6 +59,7 @@
     "PCUseSecondsTricked": 13.58,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 8.67
    }
   },
@@ -70,6 +71,7 @@
     "PCUseSecondsTricked": 6.0,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 3.5,
     "PCTrickFire": [
      1,
@@ -85,6 +87,7 @@
     "PCUseSecondsTricked": 14.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 9.08
    }
   },

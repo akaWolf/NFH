@@ -27,6 +27,7 @@
     "PCUseSecondsTricked": 16.25,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 13.58,
     "PCUseSeconds": 10.83
    }
@@ -39,6 +40,7 @@
     "PCUseSecondsTricked": 5.17,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCHitSeconds": {
      "Olga": 3.58
     },
@@ -57,10 +59,12 @@
     "PCUseSecondsLinked": 9.92,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 4.5,
     "PCCreditAtLinked": 4.58,
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.17,
     "PCLinkedPaysAt": 8.0,
     "PCHitSecondsLinked": {
      "Olga": 2.58

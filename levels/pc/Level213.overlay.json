@@ -16,6 +16,7 @@
     "PCUseSecondsTricked": 9.5,
     "PCShout": 3,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 6.08,
     "PCUseSeconds": 3.75
    }
@@ -30,6 +31,7 @@
     "PCUseSecondsTricked": 8.17,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 5.17,
     "PCUseSeconds": 8.5
    }
@@ -43,6 +45,7 @@
     "PCUseSecondsTricked": 4.75,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 1.75,
     "PCUseSeconds": 1.67
    }
@@ -1326,12 +1329,12 @@
       }
      }
     },
-    "PCBehaviourAtEnd": 0.08,
     "PCClipSecondsRole": {
      "Olga": {
       "BullRide": 6.83
      }
-    }
+    },
+    "PCBehaviourAtEnd": 0.08
    }
   },
   {

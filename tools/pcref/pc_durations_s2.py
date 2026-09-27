@@ -429,7 +429,7 @@ def write_tricked_keys(ov, n, clips):
               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-              'PCToiletPaysAt', 'PCFixDepart'):
+              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked'):
         ov['patches'] = _strip_key(ov['patches'], k)
     sys.path.insert(0, HERE)
     import lap_model_s2
@@ -446,6 +446,11 @@ def write_tricked_keys(ov, n, clips):
         if tr['shout'] is not None and tr['shout'] >= 0:
             _set_key(ov['patches'], item, 'PCShout', tr['shout'])
             _set_key(ov['patches'], item, 'PCFixSeconds', tr['repair'] or 0)
+            if tr.get('tail'):
+                # what the SHOUT's step plays after the repair — or after
+                # the SHOUT with none — before the next step (the SET and
+                # SWITCH, 210's take, 205's kid's laugh)
+                _set_key(ov['patches'], item, 'PCShoutTail', tr['tail'])
         elif tr['shout'] == -1 and (tr.get('rejoins') or 'cont' in tr):
             # no SHOUT in the tricked flow at all: no reaction
             _set_key(ov['patches'], item, 'PCShout', -1)
@@ -461,6 +466,8 @@ def write_tricked_keys(ov, n, clips):
         if tr.get('linked_shout') is not None and tr['linked_shout'] >= 0:
             _set_key(ov['patches'], item, 'PCShoutLinked', tr['linked_shout'])
             _set_key(ov['patches'], item, 'PCFixSecondsLinked', tr.get('linked_repair') or 0)
+            if tr.get('linked_tail'):
+                _set_key(ov['patches'], item, 'PCShoutTailLinked', tr['linked_tail'])
         if tr.get('linked_pays') is not None:
             _set_key(ov['patches'], item, 'PCLinkedPaysAt', tr['linked_pays'])
         if tr.get('linked_hit') is not None:

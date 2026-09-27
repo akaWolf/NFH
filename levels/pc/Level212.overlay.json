@@ -40,6 +40,7 @@
     "PCUseSecondsTricked": 6.17,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.17,
     "PCCreditAt": 3.67,
     "PCUseSeconds": 7.42
    }
@@ -65,10 +66,12 @@
     "PCUseSecondsLinked": 10.92,
     "PCShout": 0,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.25,
     "PCCreditAt": 0.83,
     "PCCreditAtLinked": 0.83,
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.33,
     "PCLinkedPaysAt": 3.92,
     "PCUseSeconds": 9.0
    }

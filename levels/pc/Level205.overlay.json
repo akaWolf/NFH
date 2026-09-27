@@ -60,6 +60,7 @@
     "PCUseSecondsTricked": 3.33,
     "PCShout": 1,
     "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
     "PCCreditAt": 2.42,
     "PCUseSeconds": 2.75
    }
@@ -72,6 +73,7 @@
     "PCUseSecondsTricked": 6.17,
     "PCShout": 0,
     "PCFixSeconds": 1.83,
+    "PCShoutTail": 7.58,
     "PCCreditAt": 4.92,
     "PCUseSeconds": 7.33
    }
@@ -671,14 +673,14 @@
       "routes": {}
      }
     },
-    "PCBehaviourAt": 0.33,
-    "PCUseSeconds": 6.42,
     "PCItemClipSeconds": {
      "N2TrickItemExtra1": 0.75,
      "N2TrickItemUseNormal": 7.58,
      "N2TrickItemExtra3": 2.92,
      "N2TrickItemExtra2": 0.75
-    }
+    },
+    "PCBehaviourAt": 0.33,
+    "PCUseSeconds": 6.42
    }
   },
   {
