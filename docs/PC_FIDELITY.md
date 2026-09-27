@@ -1096,8 +1096,23 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (the Hat again); the tricked visits had replayed the take and takehat
   (4.7 s): the marbles to the medal box 33.2 s, the box to the hat 8.1 and
   the hat to the horn 19.4 against E14's 33.7, ~8.1 and ~20.4 (37.9, 9.6
-  and 19.4 before, the box's bonus lost once the clean went in). The
-  stands come out of the
+  and 19.4 before, the box's bonus lost once the clean went in). 103's
+  letter box is AngryWithoutAnimations on the mobile, whose early return
+  had skipped the PC shout of anc/mailbox_trap's five-argument step
+  (flags 0: shout2, shout2_extra on a bonus); the shout now plays, and
+  the mobile's rush to the first aid follows it as Level_Mail's case 7
+  does (the first_aid icon, gait 2, toi/firstaid; take3 and put_plaster)
+  — E03's letter box to the picture 12.7 s against 13.4 (5.0 before). The
+  skates' list ends with the run back in, `wheeze` (30 ticks) and an
+  explicit `shout2` (27; the step itself shouts nothing), where the port
+  played the mobile's Breath at its own 2.2 s and no shout (PCBreathSeconds,
+  PCShoutAfter; RollerSkaterBehavior) — E12's skates to the marbles 26.9 s
+  against 27.7 (24.3 before). 103's cake is one PC station (Level_Mail's
+  case 4) the mobile plays as a prime leg and a use: tricked through its
+  candle, put_tnt and light_tnt (0.83 s) then celebrate_boom (2.83) and the
+  fire, where the prime leg had stood its normal 3.04 s
+  (PCPrimeSecondsTricked) — E03's microwave to the cake 16.6 s against
+  16.4 (18.8 before). The stands come out of the
   level classes' case chains simulated with the trick in place
   (tools/pcref/trick_branches.py, the keys through tools/pcref/
   pc_reactions.py, the shout index and flags through tools/pcref/
