@@ -120,7 +120,9 @@ STATIONS = {
     209: {'FireFakir': {'Rottweiler': 'fire_fakir/groove'},
           'HotShoe': {'Rottweiler': 'tadj_mahal/shoe_mat'},
           # the shoe step goes to the shoe mat and enters the curtain from
-          # there, no GoTo between (the mobile's two stations are one spot)
+          # there (its `enter` element, fcn.10006bd4, walks nowhere), and the
+          # curtain step's bar helper finds him inside (fcn.1000e7f2's first
+          # branch): no GoTo between (the mobile's two stations are one spot)
           'TadjMahal': {'Rottweiler': 'tadj_mahal/shoe_mat'},
           'Coal': {'Rottweiler': 'coal_area/coal'},
           'IceCream': {'Rottweiler': 'bazar/icecream_machine'},

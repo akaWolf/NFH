@@ -654,6 +654,37 @@ INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET', 'Ef82b', 'Efac4', 'Ef779'
 TICK_ELEMENTS = INSTANT | {'Eebbf', 'Ef51a'}
 
 
+def _go_target(ev, inside=None):
+    """the object the step's GoTo walks to: its own (fcn.1000e3e0), or the
+    bar helper's — fcn.1000e7f2 calls fcn.1000e3e0 with its hideout
+    (0x1000e98d-0x1000e9b3) and returns while the GoTo walks, unless the
+    actor is in the hideout already (its first branch, fcn.10049190 and the
+    name compare, makes the bar at once: 209's curtain, entered from the shoe
+    mat by the shoe step's own `enter` element, fcn.10006bd4, which walks
+    nowhere); None where the step has neither"""
+    go = next((e[1] for e in ev if e[0] == 'GO'), None)
+    if go is None:
+        we = next((e for e in ev if e[0] == 'WAITEVENT'), None)
+        if we is not None:
+            go = next((x for x in we[1] if isinstance(x, str) and '_' in x and not x.startswith('$')), None)
+            if go is not None and inside is not None and go.replace('/', '_') == str(inside).replace('/', '_'):
+                go = None
+    return go
+
+
+def _place(ctx, go):
+    """the step's GoTo target as a place: the room and the `neighbor` hotspot
+    where ctx carries the level's Geometry and Data (two objects at one
+    hotspot are one place: the GoTo finds him there — 210's deck chair and
+    the guarded one), else its name"""
+    g, d = ctx.get('geom'), ctx.get('data')
+    if go is None or g is None:
+        return go
+    obj = d.real.get(go, go) if d is not None else go
+    p = g.point(obj)
+    return (g.room_of(obj), tuple(p)) if p is not None else go
+
+
 def step_ticks(ev, ctx):
     """the step's own ticks besides its parts: its instant elements' (a tick
     each) and the script's — the script's job (213's neighbour: update
@@ -669,7 +700,7 @@ def step_ticks(ev, ctx):
     more, a first GoTo tick before the walk"""
     n = sum(1 for e in ev if e[0] in TICK_ELEMENTS
             or (e[0] == 'E2f40' and len(e) > 3 and e[3] == 'instant'))
-    go = next((e[1] for e in ev if e[0] == 'GO'), None)
+    go = _place(ctx, _go_target(ev, ctx.get('inside_before')))
     walks = go is not None and go != ctx.get('go')
     if go is not None:
         ctx['go'] = go
@@ -685,6 +716,7 @@ def station_ticks(d, ev, ctx=None):
     step's own ticks (step_ticks) go with its first timed part, or with the
     next step's where it has none (a walk-by: 202's rake)"""
     ctx = {} if ctx is None else ctx
+    ctx['inside_before'] = ctx.get('inside')
     parts = _station_parts(d, ev, ctx)
     extra = step_ticks(ev, ctx) + ctx.pop('carry', 0)
     k = next((i for i, p in enumerate(parts) if p[2] is not None), None)
@@ -795,7 +827,7 @@ def lap_steps(n):
     for hid, shown in LAP_PRESENT.get(n, ()):
         lv.present.discard(hid); lv.present.add(shown)
     steps, loop = walk(lv, st, bytes0=LAP_BYTES.get(n))
-    out = []; ctx = {}
+    out = []; ctx = {'geom': Geometry(n), 'data': d}
     for i, (cur, ev, nxt) in enumerate(steps):
         ic = [e[1] for e in ev if e[0] == 'IC']
         objs = set()
@@ -1140,7 +1172,7 @@ def lap_estimate(n, verbose=False):
     steps, loop = walk(lv, st)
     if loop is None:
         return None
-    ctx = {}
+    ctx = {'geom': g, 'data': d}
     pos = None; total = 0; walks = 0; stays = 0; unknown = []
     order = steps[loop:] + steps[:loop] + steps[loop:loop + 1]    # the lap, closed on its first step
     for k, (cur, ev, nxt) in enumerate(order):
@@ -1154,6 +1186,8 @@ def lap_estimate(n, verbose=False):
                     dos = [x[1][0] for x in ev if x[0] == 'DO' and x[1] and not x[1][0].startswith('$') and x[1][0] != 'neighbor']
                     target = (pick or dos or [None])[0]
                 break
+        else:
+            target = _go_target(ev, ctx.get('inside_before'))       # the bar helper's GoTo
         if target:
             real = d.real.get(target, target)
             if pos is None:
