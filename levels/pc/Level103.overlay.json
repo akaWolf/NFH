@@ -29,7 +29,8 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.667
+    "PCUseSecondsTricked": 2.833,
+    "PCPrimeSecondsTricked": 0.833
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BirthdayCake <- cake#0 6.1 s /2"
   },

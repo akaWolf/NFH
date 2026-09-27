@@ -194,6 +194,7 @@ class Item:
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
                  'pc_hideout', 'pc_walk', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
+                 'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -432,6 +433,10 @@ class Item:
         # (tools/pcref/pc_reactions.py; behaviors.RollerSkaterBehavior)
         self.pc_breath_secs = d.get('PCBreathSeconds')
         self.pc_shout_after = d.get('PCShoutAfter')
+        # a PC station the mobile plays as a prime leg and a use: the prime
+        # leg's part when the item is tricked (103's cake: put_tnt and
+        # light_tnt, the use celebrate_boom — tools/pcref/pc_reactions.py)
+        self.pc_prime_secs_tricked = d.get('PCPrimeSecondsTricked')
         # the PC profile's Season 2 catch: per role the span of the PC's flag 4
         # at this station — the catcher neither catches nor is seen
         # (levels/pc overlays, tools/pcref/pc_catch_s2.py)

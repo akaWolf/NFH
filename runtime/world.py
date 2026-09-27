@@ -4074,6 +4074,7 @@ class Routine:
                 # (TrickItem.cs:260) — no angry, no exit delta swap, and
                 # OnUseEnded keeps the primed pose (cs:691) — until the next
                 # RottweilerUse clears it (Item.cs:835)
+                pc_tricked = it.is_tricked(self.level.items)   # (read before the leg's flag)
                 it.was_priming = True
                 if unprime and it.kind in TRICK_KINDS:
                     # TrickItem.RottweilerUnprime returns the item to idle at
@@ -4090,6 +4091,13 @@ class Routine:
                 if self.role == 'Rottweiler' and seq and pcprofile.is_pc() \
                         and pcprofile.rule('durations'):
                     pc = self._pc_visit_seconds(it)
+                    if pc_tricked and getattr(it, 'pc_prime_secs_tricked', None) is not None:
+                        # the tricked station's part the prime leg stands for
+                        # (PCPrimeSecondsTricked: 103's cake, tricked through
+                        # its candle, Level_Mail's case 4 — put_tnt and
+                        # light_tnt before celebrate_boom and the fire); its
+                        # visit slot passes all the same
+                        pc = float(it.pc_prime_secs_tricked)
                     if pc:
                         mobile = self.pawn.anim.sequence_seconds(seq)
                         if mobile > 0.0:

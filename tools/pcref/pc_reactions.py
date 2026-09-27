@@ -69,11 +69,11 @@ REG = {'lir/stickybook': (1, 0), 'lir/bathcandy': (0, 3), 'toi/tub_hair': (0, 3)
        'wor/book_replaced': (0, 0), 'kit/skate': (0, 3)}
 
 
-def use(pc, site=None, before=None, after=None, fix=None, own=None):
+def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None):
     """a station use: the tool's stand, or the listed (object, action) parts
     (`own`: the five-argument step's clip where the site passes its actor in a
-    register)"""
-    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own)
+    register; `prime`: the part the mobile's prime leg plays when tricked)"""
+    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own, prime=prime)
 
 
 def wb(pc, site=None, fix=None):
@@ -98,7 +98,13 @@ TABLE = {
     102: {'Microwave': wb('kit/microwavedirty'), 'Toilet': wb('toi/toiletstuffed'), 'Television': use('lir/twistedantenna'),
           'Sofa': use('lir/sofa_broken'), 'Beer': use('kit/laxativebeer')},
     103: {'MumPicture': wb('anc/mum_smeared'), 'Toilet': wb('toi/toiletstuffed'), 'Microwave': wb('kit/microwavedirty'),
-          'Candle': use('kit/candlebox_boom'), 'BirthdayCake': use('kit/candlebox_boom'), 'LetterBox': use('anc/mailbox_trap')},
+          # the cake is one PC station (Level_Mail's case 4) the mobile plays
+          # as a prime leg and a use: tricked, put_tnt and light_tnt, then
+          # celebrate_boom and the fire
+          'Candle': use('kit/candlebox_boom'),
+          'BirthdayCake': use('kit/candlebox_boom', before=[('kit/cake', 'celebrate_boom')],
+                              prime=[('kit/cake', 'put_tnt'), ('kit/cake', 'light_tnt')]),
+          'LetterBox': use('anc/mailbox_trap')},
     104: {'MumPicture': wb('anc/mum_smeared'), 'Toilet': wb('toi/toiletstuffed'), 'Microwave': use('kit/microwavedirty'),
           'WhippedCream': use('kit/foamcream'),
           # the basin stand serves both tricks: each item takes its own action
@@ -215,7 +221,7 @@ BANANA_LEVELS = (107, 108, 109, 110)
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
-        'PCShoutAfter')
+        'PCShoutAfter', 'PCPrimeSecondsTricked')
 
 
 def slip_cleans(n, item, floor, lv):
@@ -417,6 +423,8 @@ def specs(n):
                 total = before + own + after
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCUseSecondsTricked'] = round(total, 3)
+                if spec.get('prime'):
+                    keys['PCPrimeSecondsTricked'] = round(_sum(lv, spec['prime']), 3)
                 if fix and sm.get('repair') and spec.get('fix') is None:
                     # the repair helper's walk to the tricked object when he
                     # does not stand on it (fix_point)
