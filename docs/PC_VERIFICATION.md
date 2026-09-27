@@ -1019,3 +1019,14 @@ actors' job pass the update calls at 0x100445f8.
   212's ledge step to the cliff (STATIONS; the lap 4 s longer), 205's put
   step to the guarded skis through edx (PCApproach x / px per visit,
   VISIT_OBJECTS, world.pc_ap_px); a tick more or less on nine stays.
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_walks_s2.py`,
+  `runtime/world.py`, `levels/pc/Level2*.overlay.json` (2026-09-27): a
+  step's place by its hotspot (fcn.1000e3e0 pushes no GoTo at the target's
+  hotspot: 212's bench after the cigars, one spot), the bar helper's own
+  GoTo (fcn.1000e7f2 -> fcn.1000e3e0 unless inside: 209's curtain is
+  entered from the shoe mat), and a hideout's leave placing him at its
+  `<actor>_out` (fcn.10006c2e -> 0x1000690a: 212's ledge leaves the water
+  exit, 265 px left of the cliff; 209's tricked hot coal 293 px right,
+  212's tricked bench 75 right, 210's hedgehog chair 47 left — PCApproach
+  `tx`/`dpx`, `txt`/`dpxt`). All 14 Season 2 at 100, the mobile
+  regression byte-identical.

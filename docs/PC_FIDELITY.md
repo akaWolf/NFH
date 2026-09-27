@@ -1571,6 +1571,23 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   108.2); a tick more on the stays of 203's microphone, 205's rockets and
   sand lion, 212's whip and cigars, 213's tortilla, one less on 210's
   basket and elephant.
+  A hideout's leave places the actor (2026-09-27): fcn.10006c2e's job
+  (vtable 0x100ab334, update 0x1000690a) joins the actor's name and "out"
+  (fcn.10049057), looks the hotspot up on the hideout (fcn.10049e01) and
+  sets his position there (fcn.100418f6) before its `leave` DoAction plays
+  (0x1000699c-0x10006a8e) — the next walk leaves from the hideout's
+  `<actor>_out`, not from the station's hotspot (a hideout without one
+  would place him at its own position, fcn.10049a08's (0, 0): none of the
+  neighbour's in a lap). Carried (lap_model_s2 `_leave_place`,
+  `code_places`, `code_places_tricked`, `TRICKED_PLACES` -> PCApproach
+  `tx`/`dpx`, `txt`/`dpxt`; world `_pc_arrived`): 212's ledge leaves the
+  water exit at 1155/1094, 265 px left of the cliff and 44 below the floor
+  (the model's lap 128.2 s); 209's hot coal's tricked visit 293 px right
+  of the coal (read as 0 until then); 212's tricked bench 75 px right of
+  the bench; 210's hedgehog chair 47 px left; 209's curtain puts him 1 px
+  off the shoe mat, 213's picnic 5 px left and 10 up (the model's lap
+  124.0 s). Not carried: 213's tricked picnic (picnic_manip's out 225 px
+  right; the flow after its GoTo is one the walker does not follow).
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
