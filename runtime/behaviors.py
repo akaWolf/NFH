@@ -462,7 +462,7 @@ class RollerSkaterBehavior(Behavior):
     frame), four seconds later he re-enters at the street door, runs to the
     breath spot, shouts the skates off and resumes."""
 
-    SKATE, FALL, COMEBACK, BREATH, SHOUT, FINAL = range(6)
+    SKATE, FALL, COMEBACK, BREATH, SHOUT, FINAL, PC_SHOUT2 = range(7)
 
     def __init__(self, world, d):
         super().__init__(world, d)
@@ -601,10 +601,45 @@ class RollerSkaterBehavior(Behavior):
         rott = self.rott()
         if rott is not None and rott.anim.has(self.breath_animation):
             rott.anim.play_single(self.breath_animation)
+            secs = self._pc('pc_breath_secs')
+            if secs:
+                # the PC's `wheeze` (Level_Fitness 0x46349f, 30 ticks): the
+                # clip reaches BreathEndFrame, where the shout follows, at
+                # the PC's pace
+                i = rott.anim.by_name.get(self.breath_animation)
+                a = rott.anim.sprite.anims[i] if i is not None else None
+                if a is not None and self.breath_end_frame > 0:
+                    rott.anim.time_scale = (self.breath_end_frame / float(a.fps or 10.0)) / secs
+
+    def _pc(self, key):
+        """the skates' PC key under the profile, else None"""
+        if not pcprofile.is_pc() or pcprofile.SEASON2 or self.roller_skater is None:
+            return None
+        return getattr(self.roller_skater, key, None)
 
     def _shout(self):
-        self.state = self.SHOUT                       # cs:187-192
         rott = self.rott()
+        secs = self._pc('pc_shout_after')
+        if rott is not None:
+            rott.anim.time_scale = 1.0
+        if secs and self.state == self.BREATH and rott is not None:
+            # the list's explicit `shout2` after the wheeze (0x463507, the
+            # UTF-16 name at 0x4e3d54; 27 ticks) — the skate's own step
+            # shouts nothing (flags 3): the mobile's AngryHard at its pace,
+            # then the SHOUT state's angry and fix
+            clip = getattr(self.roller_skater, 'angry_hard', None) or 'AngryHard'
+            if rott.anim.has(clip):
+                self.state = self.PC_SHOUT2
+                mobile = rott.anim.sequence_seconds([clip])
+                if mobile > 0.0:
+                    rott.anim.time_scale = mobile / secs
+
+                def shouted():
+                    rott.anim.time_scale = 1.0
+                    self._shout()
+                rott.anim.play_sequence([clip], on_end=shouted)
+                return
+        self.state = self.SHOUT                       # cs:187-192
         if rott is not None and self.roller_skater is not None:
             self.world.play_angry(rott, self.roller_skater)
             self.world._fix(self.roller_skater)       # RollerSkater.Fix()

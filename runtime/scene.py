@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk', 'pc_align_x', 'pc_fix_point',
+                 'pc_hideout', 'pc_walk', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -427,6 +427,11 @@ class Item:
         # isActorAtObject, fcn.0047aa90) — [x, y, room] of the PC room
         self.pc_align_x = bool(d.get('PCAlignX'))
         self.pc_fix_point = d.get('PCFixPoint')
+        # 112's skates under the profile: the tail of Level_Fitness's list
+        # after the run back in — `wheeze`, then an explicit `shout2`
+        # (tools/pcref/pc_reactions.py; behaviors.RollerSkaterBehavior)
+        self.pc_breath_secs = d.get('PCBreathSeconds')
+        self.pc_shout_after = d.get('PCShoutAfter')
         # the PC profile's Season 2 catch: per role the span of the PC's flag 4
         # at this station — the catcher neither catches nor is seen
         # (levels/pc overlays, tools/pcref/pc_catch_s2.py)

@@ -214,7 +214,8 @@ BANANA_LEVELS = (107, 108, 109, 110)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
-        'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint')
+        'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
+        'PCShoutAfter')
 
 
 def slip_cleans(n, item, floor, lv):
@@ -376,6 +377,12 @@ def specs(n):
                     # the skate: the fall out of the window, then the fire
                     keys['PCSurpriseSeconds'] = round(before, 3)
                     keys['PCFixSeconds'] = round(fix + after, 3)
+                    # the list's tail after the run back in (Level_Fitness,
+                    # 0x46349f and 0x463507): `wheeze`, then an explicit
+                    # `shout2` (the UTF-16 name at 0x4e3d54) — the step
+                    # itself shouts nothing (flags 3)
+                    keys['PCBreathSeconds'] = round(_sum(lv, [('neighbor', 'wheeze')]), 3)
+                    keys['PCShoutAfter'] = round(_sum(lv, [('neighbor', 'shout2')]), 3)
                 elif base == 'Pig':
                     # the pig's stand: the fire on arrival, the catch after it
                     keys['PCFixSeconds'] = round(fix + after, 3)

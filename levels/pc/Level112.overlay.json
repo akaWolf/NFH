@@ -15,7 +15,9 @@
     "TrickScore": 8,
     "PCShoutSkip": true,
     "PCSurpriseSeconds": 3.0,
-    "PCFixSeconds": 0
+    "PCFixSeconds": 0,
+    "PCBreathSeconds": 2.5,
+    "PCShoutAfter": 2.25
    }
   },
   {
