@@ -313,6 +313,14 @@
    "source": "the pet's alarm: the level class's `noise` case, then the neighbour's `search` (fcn.0047a690; generic/objects.xml, the Loader's time 26 ticks at 12 a second, tools/pcref/pc_durations.py ALERTERS)"
   },
   {
+   "object": "PigKeys",
+   "component": "SearchItem",
+   "set": {
+    "PCUseSecondsTricked": 2.083
+   },
+   "source": "the emptied container's branch: the neighbour's `surprise` (Level_Pig's case 13, 0x46a109; generic/objects.xml, an ACTION step of 25 ticks — the Loader's time 23 + 2 — at 12 a second, tools/pcref/pc_durations.py EMPTIES)"
+  },
+  {
    "object": "Zone01",
    "component": "Zone",
    "set": {
@@ -646,9 +654,14 @@
        420
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "leave": 25
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorLeft01",
@@ -696,9 +709,14 @@
        218
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "enter": 20
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorRight01",
@@ -1039,14 +1057,6 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
-  },
-  {
-   "object": "PigKeys",
-   "component": "SearchItem",
-   "set": {
-    "PCUseSecondsTricked": 2.083
-   },
-   "source": "the emptied container's branch: the neighbour's `surprise` (Level_Pig's case 13, 0x46a109; generic/objects.xml, an ACTION step of 25 ticks — the Loader's time 23 + 2 — at 12 a second, tools/pcref/pc_durations.py EMPTIES)"
   }
  ]
 }

@@ -505,7 +505,13 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   frames confirmed it: they run together (`pcprofile.doors_concurrent`), a
   walk-up door's too, the pass as long as the far door's `leave`. Season
   2's doors are not `<door>` objects and keep the mobile's pass at a frame
-  a tick.
+  a tick. Since 2026-09-27 a door whose own records differ from its type's
+  paces its strip to them (`PCDoorTicks`, tools/pcref/pc_walks_s1.py):
+  the front door's pair for Woody on twelve levels — anc/fro's `enter` 18
+  where a right door has 15, fro/anc's `leave` 23 (101-106, 109) or 25
+  (108, 110, 111, 113, 114) where a left door has 24 — so his way out
+  lasts 25 or 27 ticks (26 on 107 and 112, the type's); his way in is the
+  type's everywhere.
 - The stations' durations (2026-09-17, `tools/pcref/pc_durations.py`):
   every Season 1 overlay carries `PCUseSeconds` per routine item — the
   PC station's DoActions at 12 ticks a second, from the lap model's

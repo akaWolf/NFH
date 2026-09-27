@@ -374,9 +374,14 @@
        420
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "leave": 25
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorRight01",
@@ -394,9 +399,14 @@
        218
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "enter": 20
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorRight01",

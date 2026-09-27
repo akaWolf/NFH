@@ -543,7 +543,9 @@ def walk_speed(role, sneaking, vx, vy, climbing=False, stairs=False, gait='walk'
 # Every door of Season 1 is a <door> of the level's objects.xml with two actions per actor:
 # `enter` on the near door, `leave` on the far one, each `time` ticks long, the same figures
 # on every door of a type across the 14 levels — the neighbour 19 + 19 through a side door
-# and 11 + 22 through a back door, Woody 15 + 23 (right), 18 + 24 (left), 9 + 25 (back).
+# and 11 + 22 through a back door, Woody 15 + 23 (right), 18 + 24 (left), 9 + 25 (back) —
+# but the front door's pair for Woody on twelve of them (anc/fro's `enter` 18, fro/anc's
+# `leave` 23 or 25), which the overlays carry per door (Door.pc_door_ticks).
 # game.exe's door step (vtable 0x4e5370, update 0x474590 -> fcn.004741e0) places the actor
 # at the far door's hotspot — its room pointer follows the placement (fcn.00448d70) — and
 # pushes ONE ACTION step (fcn.00478030 over fcn.00477ed0, vtable 0x4e546c) of two entries,

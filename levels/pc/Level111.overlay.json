@@ -354,6 +354,14 @@
    "source": "the pet's alarm: the level class's `noise` case, then the neighbour's `search` (fcn.0047a690; generic/objects.xml, the Loader's time 26 ticks at 12 a second, tools/pcref/pc_durations.py ALERTERS)"
   },
   {
+   "object": "DirtyCarpet",
+   "component": "TrickItem",
+   "set": {
+    "PCSurpriseSeconds": 2.167
+   },
+   "source": "the room trigger's case: the neighbour's `search` before the run (Level_Laundry's case 20, fcn.00479ba0 at 0x4564ee; generic/objects.xml, an ACTION step of 26 ticks — the Loader's time 24 + 2 — at 12 a second, tools/pcref/pc_durations.py SEARCHES)"
+  },
+  {
    "object": "Zone01",
    "component": "Zone",
    "set": {
@@ -773,9 +781,14 @@
        420
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "leave": 27
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorLeft01",
@@ -853,9 +866,14 @@
        218
       ]
      }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "enter": 20
+     }
     }
    },
-   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
   },
   {
    "object": "DoorRight01",
@@ -1230,14 +1248,6 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
-  },
-  {
-   "object": "DirtyCarpet",
-   "component": "TrickItem",
-   "set": {
-    "PCSurpriseSeconds": 2.167
-   },
-   "source": "the room trigger's case: the neighbour's `search` before the run (Level_Laundry's case 20, fcn.00479ba0 at 0x4564ee; generic/objects.xml, an ACTION step of 26 ticks — the Loader's time 24 + 2 — at 12 a second, tools/pcref/pc_durations.py SEARCHES)"
   }
  ]
 }

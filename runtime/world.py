@@ -2209,6 +2209,18 @@ class Pawn:
         if pcp and 'enter' in pcp:
             self._pc_clip_pace(door.sprite, leave_anim, pcp['enter'])
             self._pc_clip_pace(other.sprite, enter_anim, pcp['leave'])
+        if pcprofile.is_pc() and pcprofile.rule('doors'):
+            # Season 1: the near door's `enter` and the far door's `leave` of
+            # the pair's own objects.xml records where they differ from the
+            # type's the strips run at (pcprofile.clip_fps) — Woody's way out
+            # through the front door: anc/fro's `enter` 18 and fro/anc's
+            # `leave` 23 or 25 (Door.pc_door_ticks)
+            t = door.pc_door_ticks.get(self.role, {}).get('enter')
+            if t:
+                self._pc_clip_pace(door.sprite, leave_anim, t)
+            t = other.pc_door_ticks.get(self.role, {}).get('leave')
+            if t:
+                self._pc_clip_pace(other.sprite, enter_anim, t)
         if sequential:
             # walk-up: Leave first; its end starts the far Enter
             def leave_done():

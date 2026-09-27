@@ -2,7 +2,7 @@
 """The Season 1 walk of the PC original into the levels/pc overlays (the neighbour and Woody).
 
     python3 tools/pcref/pc_walks_s1.py            # print the map, the doors and the stations
-    python3 tools/pcref/pc_walks_s1.py --write    # PCWalkRoom, PCWalkDoor, PCWalkPoint
+    python3 tools/pcref/pc_walks_s1.py --write    # PCWalkRoom, PCWalkDoor, PCWalkPoint, PCDoorTicks
 
 game.exe walks a GOTO (the step's vtable 0x4e19e8, update 0x44a7b0) through a walk
 job it pushes with the run-now flag 1 (vtable 0x4e53d0, update 0x475c80): the room
@@ -26,6 +26,13 @@ The overlay entries, in px of the PC scene (the room's own coordinates):
   Door       PCWalkDoor   {role: {'near': [x, y], 'far': [x, y]}}: the near door's
                           standing point and the far door's (`<actor>_out`), the
                           neighbour's and Woody's
+             PCDoorTicks  {role: {'enter': ticks, 'leave': ticks}}: the door's own
+                          `enter` / `leave` ACTION steps (time + 2, lap_model.
+                          job_ticks) where they differ from its type's
+                          (pcprofile.DOOR_TICKS) — the front door's pair for Woody:
+                          anc/fro's `enter` 18 where a right door has 15, fro/anc's
+                          `leave` 23 or 25 where a left door has 24 (107 and 112
+                          the type's)
   items      PCWalkPoint  {'Rottweiler': [x, y, room], 'Woody': [x, y, room]}: the
                           hotspot of the PC object the neighbour's station walks to
                           (the lap model's GOTO of the station tools/pcref/
@@ -49,6 +56,7 @@ sys.path.insert(0, ROOT)
 import canon       # noqa: E402
 import lap_model   # noqa: E402
 import pc_durations  # noqa: E402
+from runtime import pcprofile  # noqa: E402
 
 SCRATCH = os.environ.get('LAP_TOKENS')
 
@@ -223,6 +231,7 @@ def level_data(n):
             continue
         rooms[z.name] = {'room': rn, 'x1': r['x1'], 'x2': r['x2'], 'floor': r['y']}
     doors = {}
+    own = {}
     for d in M.doors:
         if d.link_to is None:
             continue
@@ -233,11 +242,18 @@ def level_data(n):
         if a is None or b is None:
             continue
         entry = {}
+        side = (d.door_type or '').replace('DT_', '')
         for role, actor in (('Rottweiler', 'neighbor'), ('Woody', 'woody')):
             near = L.door_point('%s/%s' % (a, b), actor=actor)
             far = L.door_point('%s/%s' % (b, a), out=True, actor=actor)
             if near is not None and far is not None:
                 entry[role] = {'near': list(near), 'far': list(far)}
+            # the door's own figures against its type's (the strips' pace)
+            typ = pcprofile.DOOR_TICKS.get((role, side))
+            for i, act in enumerate(('enter', 'leave')):
+                t = L.job_ticks('%s/%s' % (a, b), act, actor=actor)
+                if t is not None and typ is not None and t != typ[i]:
+                    own.setdefault((d.name, zname.get(d.zone)), {}).setdefault(role, {})[act] = t
         if entry:
             doors[(d.name, zname.get(d.zone))] = entry
     points = {}
@@ -253,7 +269,7 @@ def level_data(n):
         p = L.object_point(obj, actor='woody')
         if p is not None:
             points.setdefault(item, {})['Woody'] = [p[1], p[2], p[0]]
-    return zmap, rooms, doors, points
+    return zmap, rooms, doors, points, own
 
 
 def item_kind_hide(n, name):
@@ -266,10 +282,10 @@ def item_kind_hide(n, name):
     return None
 
 
-def write(n, rooms, doors, points):
+def write(n, rooms, doors, points, own):
     p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(p))
-    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint')
+    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks')
     for e in ov['patches']:
         for k in keys:
             (e.get('set') or {}).pop(k, None)
@@ -278,9 +294,17 @@ def write(n, rooms, doors, points):
            "movers; level.xml's rooms and doors, objects.xml's hotspots)")
     for zn, v in sorted(rooms.items()):
         ov['patches'].append({'object': zn, 'component': 'Zone', 'set': {'PCWalkRoom': v}, 'source': src})
-    for (dn, zn), v in sorted(doors.items()):
-        ov['patches'].append({'object': dn, 'component': 'Door', 'zone': zn, 'set': {'PCWalkDoor': v},
-                              'source': src})
+    for dk in sorted(set(doors) | set(own)):
+        dn, zn = dk
+        st = {}
+        if dk in doors:
+            st['PCWalkDoor'] = doors[dk]
+        if dk in own:
+            st['PCDoorTicks'] = own[dk]
+        ov['patches'].append({'object': dn, 'component': 'Door', 'zone': zn, 'set': st,
+                              'source': src if dk not in own else
+                              src[:-1] + "; the door's own `enter`/`leave` records where they differ "
+                              "from its type's, pcprofile.DOOR_TICKS)"})
     for item, v in sorted(points.items()):
         kind = pc_durations.item_kind(n, item) or item_kind_hide(n, item) or 'TrickItem'
         ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWalkPoint': v},
@@ -293,14 +317,15 @@ def main(argv):
     do_write = '--write' in argv
     levels = [int(a) for a in argv[1:] if a.isdigit()] or list(range(101, 115))
     for n in levels:
-        zmap, rooms, doors, points = level_data(n)
+        zmap, rooms, doors, points, own = level_data(n)
         print('%d: rooms %s' % (n, ' '.join('%s=%s' % kv for kv in sorted(zmap.items()))))
         print('   doors %s' % ' '.join('%s@%s %s' % (dn, zn, ' '.join('%s %s>%s' % (r[0], e['near'], e['far'])
                                                                    for r, e in sorted(v.items())))
                                      for (dn, zn), v in sorted(doors.items())))
         print('   points %s' % ' '.join('%s %s' % (k, v) for k, v in sorted(points.items())))
+        print('   own door ticks %s' % ' '.join('%s@%s %s' % (dn, zn, v) for (dn, zn), v in sorted(own.items())))
         if do_write:
-            write(n, rooms, doors, points)
+            write(n, rooms, doors, points, own)
     return 0
 
 

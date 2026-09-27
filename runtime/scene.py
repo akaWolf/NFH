@@ -1257,7 +1257,7 @@ class Door:
                  'disabled', 'description_string', 'walk_deltas',
                  'exit_door', 'woody_delta_use_height', 'use_woody_extra',
                  'can_use', 'dont_use_on', 'with_string', 'temporal_lock',
-                 'pc_pass', 'pc_claim', 'pc_walk')
+                 'pc_pass', 'pc_claim', 'pc_walk', 'pc_door_ticks')
 
     def __init__(self, name, pid, x, y, zone, link_to, locked, door_type, d):
         self.name = name; self.pid = pid; self.x = x; self.y = y
@@ -1273,6 +1273,11 @@ class Door:
         # standing point and the far door's, px of their PC rooms (PCWalkDoor,
         # tools/pcref/pc_walks_s1.py)
         self.pc_walk = d.get('PCWalkDoor') or {}
+        # the PC profile's Season 1 door figures where the door's own differ
+        # from its type's (pcprofile.DOOR_TICKS): {role: {'enter': ticks,
+        # 'leave': ticks}}, its ACTION steps' time + 2 — the front door's
+        # pair for Woody (PCDoorTicks, tools/pcref/pc_walks_s1.py)
+        self.pc_door_ticks = d.get('PCDoorTicks') or {}
         # the pawn holding the pair on the PC (its door-pass step's flag 8,
         # Pawn._pc_claim_pair)
         self.pc_claim = None
