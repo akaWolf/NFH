@@ -1487,6 +1487,64 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   from there (`Pawn._pc_arrived`, the same departure as the neighbour's);
   the only one the data has (201's soap and 214's swiffer had been read
   across a self-closing object's end).
+  The walk's job boundaries (2026-09-27, read in GameLogic.dll and
+  carried). The actor's queue is a stack (the list's front, fcn.100082d8 /
+  fcn.100081c6) whose runner (fcn.100492a8) updates the top and goes on
+  past every job that is done in the same tick (0x10049338-0x10049386),
+  and every job of a walk is pushed with a first run (fcn.10049246, push
+  1): the step returns once fcn.1000e3e0 has pushed the GoTo
+  (0x1001e0ce-0x1001e0d5, no first run) and runs again when it is done;
+  the GoTo's first update pushes the route (fcn.1000a4aa, vtable
+  0x100ab688, update 0x1000a80c; 0x10007504), the route its movements
+  (fcn.1000901b: to the near door's `<actor>` hotspot, 0x1000ab8d, and to
+  the target, 0x1000ac45) and the door pass (fcn.10003d50, 0x1000ab17),
+  the pass its own (states 0 and 2: the walk to `<actor>_in`, fcn.10003130,
+  and the straight movement, fcn.100037f8, or the enter and — state 3,
+  fcn.10003236 — the leave). A movement (vtable 0x100ab4f0, update
+  0x10009a90) steps on every update, its first included (fcn.10009889 ->
+  fcn.10009215), and is done in the update of its last step (the target
+  tested after the step, 0x10009a55): the next job's first step shares
+  that tick. State 4 (fcn.10003454) sets the far room and pushes, without
+  a first run, a movement back to the far floor line with x kept within
+  it (0x10003544-0x100035ba, +0x31 set: x first at `<actor>_out`'s y,
+  then y — fcn.10009177; its test against L"fro" matches no room), and
+  the pass is done in the tick that movement is; the route's arrival makes
+  the GoTo set +0x14 in its tick (0x10007670), the GoTo is done on its next
+  update (0x10007409) and the step, run again, pushes its sequence without
+  a first run. So a walk's first step is the GoTo's first tick, and the
+  element after it starts two ticks after the arrival — `step_ticks` had
+  a GoTo tick before the walk (3, now 2) —, the walk to `<actor>_in` and
+  the straight movement start in the ticks the movements before them end
+  (-1 each), and the next movement in the tick the run back ends (-1):
+  a pass is 3 ticks shorter than its runs (2 where `<actor>_out` is on the
+  far floor, 1 where the near `<actor>` hotspot is `<actor>_in`; a back
+  door's with its enter and leave 2, or none), and the run back goes along
+  x first where `<actor>_out` lies beyond the far floor line (25 passes of
+  212's and 213's bottom doors: 10 px at 8 before the climb, the far floor
+  starting there). Carried: PCPass `jt` [`in`, straight, `out`] per pawn,
+  `nb` (the `in` run split at the near `<actor>` hotspot, each part its own
+  ceiling), `ox` and the clamped `xo` (tools/pcref/pc_walks_s2.py;
+  pcprofile.s2_pass_ticks, world.pc_pass_piece), the lap model's walks by
+  `walk_span`; the stays one tick shorter per walking step
+  (lap_model_s2 step_ticks), the model's laps 0.6-2.3 s shorter (203 105.6
+  s, 208 85.7, 209 107.6, 211 85.7, 212 126.2, 213 124.3, 214 90.8, 202
+  88.3). With them the idle visits the video's stays are paired against
+  were re-measured (scratchpad s2_idle_visits.json, the 2026-09-23 file
+  had outlived the walks since): 213's picnic stay 12.8 -> 10.8 s (the
+  port's walk to it 18.2 s, not the file's 16.2), 206's chair and pillows
+  +0.1 and +0.5 s. And the tricked flows are on the lap's clock
+  (lap_model_s2 `_flow`): `_step_parts_split` ran station_ticks on each
+  event alone since the elements' ticks came in (2026-09-25), so each
+  part took a step's tick of its own and the instant elements and the
+  steps' starts none; now the flow's step takes its start (2 where the
+  row's step walks, `LAP_WALKS`), the instants a tick each, a step of a
+  continuation its own start (a ('STEP',) mark where the flows are
+  joined), the repair runs to the instants right after it (the trailing
+  SWITCH): the stands and credits move by 1-5 ticks, the repairs by one.
+  Not carried: the elements a step plays after its repair (205's sand
+  lion: the kid's `laugh`, 88 ticks, in his sequence) and after a SHOUT
+  with no repair (the SET and SWITCH, 1-2 ticks, 203's melons, 204's hot
+  dog, 212's cigars) — the port goes on after the shout or the repair.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
@@ -2422,7 +2480,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   way) and its done tick after the arrival (the job sets +0x14 as the
   actor arrives and returns 1 on its next update, 0x10007670 /
   0x10007409): 3 ticks a walking step, 1 a step at the place of the
-  last (`step_ticks`, with the step's first timed part). The laps the
+  last (`step_ticks`, with the step's first timed part; 2 since
+  2026-09-27 — the GoTo's first update already makes the walk's first
+  step, "Season 2 walks" above). The laps the
   model closes grow by 0.9-2.4 s (202 88.8, 203 106.8, 208 87.3, 209
   109.3, 211 87.1, 212 127.3, 213 125.8, 214 92.2 s), each stay by
   0.1-0.5 s; 208's plan parks through Zone05 at once after the rat
