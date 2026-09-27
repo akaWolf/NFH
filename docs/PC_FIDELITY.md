@@ -1122,9 +1122,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   way back (PCReturnSeconds) — where the port paid after the mobile's
   VacuumLoop and explosion clips, 12.9 s after his living-room entry
   against the PC's 6.8 (Badinfos' vacuum icon at 215, the fire at 221.8)
-  — and the carpet's room trigger runs cases 20-22 at once, without the
-  startled look of the mobile's RunToTrickedItem (the SurpriseFar, 2.1
-  s). 109's pig visit is one station: Level_Pig's case 18 fires the
+  — and the carpet's room trigger runs case 20 first, the neighbour's
+  `search` (fcn.00479ba0 at 0x4564ee, 26 ticks: the carpet's SurpriseFar,
+  the remaster's Search, at that pace since 2026-09-27 — the earlier
+  reading had cases 20-22 at once, the search missed), then case 21's
+  vacuum icon and walk and case 22. 109's pig visit is one station: Level_Pig's case 18 fires the
   pigout, catches the pig and returns to case 17, which feeds it (case
   20: shake_bottle, the nitro bottle's fire) — ReuseAfterFix on the Pig
   restarts the station after the catch, and the PigMilk's trick plays in
@@ -1585,8 +1587,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and the data: the dirty carpet is a room trigger
   (`level_laundry/trigger.xml`: `position="room" type="always"`; the
   mobile's OnChangeZone skips the carpet, Rottweiler.cs:188, and only the
-  dog's yell sends him, cs:485-510) that runs Level_Laundry's cases 20-22
-  at once, and the glued vacuum is that case's tool (the playing trick,
+  dog's yell sends him, cs:485-510) that runs Level_Laundry's case 20 —
+  his `search` — then cases 21 and 22, and the glued vacuum is that case's tool (the playing trick,
   above); the board burns only between his give and his ironing (case 8's
   give switches in bed/ironingboard_clothes, the one variant Woody's use
   burns, and case 16 irons it, 71 ticks — the mobile's phase; the

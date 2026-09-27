@@ -90,6 +90,12 @@ LEAVES = {109: [('Bed', 'bed/bed_sleep')]}
 # `neighbor` — e.g. 112's cases 21 and 22, 0x46504a-0x465120) — the Alerter's
 # PCSurpriseSeconds, the remaster's Search played at its pace
 ALERTERS = (107, 109, 111, 112, 113, 114)
+# a room trigger whose case plays the neighbour's `search` before its run: 111's
+# dirty carpet — Level_Laundry's case 20 (0x45647f) asserts the carpet dirty and
+# pushes the ACTION `search` on him (fcn.00479ba0 at 0x4564ee), case 21 the
+# vacuum icon and the walk (0x456502) — the TrickItem's PCSurpriseSeconds, its
+# SurpriseFar (the remaster's Search) played at that pace
+SEARCHES = {111: ['DirtyCarpet']}
 
 
 def pc_stations(n, toks):
@@ -205,6 +211,20 @@ def main(argv):
                 else:
                     ov['patches'].append({'object': pet, 'component': 'Alerter',
                                           'set': {'PCSurpriseSeconds': v}, 'source': src})
+        for item in SEARCHES.get(n, ()):
+            t = lap_model.Level(n).job_ticks('neighbor', 'search')
+            v = round(t / lap_model.TICK, 3)
+            src = ("the room trigger's case: the neighbour's `search` before the run (Level_Laundry's case 20, "
+                   "fcn.00479ba0 at 0x4564ee; generic/objects.xml, an ACTION step of %d ticks — the Loader's "
+                   "time %d + 2 — at 12 a second, tools/pcref/pc_durations.py SEARCHES)" % (t, t - 2))
+            e = next((e for e in ov['patches'] if e.get('object') == item
+                      and 'PCSurpriseSeconds' in (e.get('set') or {})), None)
+            if e is not None:
+                e['set']['PCSurpriseSeconds'] = v
+                e['source'] = src
+            else:
+                ov['patches'].append({'object': item, 'component': item_kind(n, item),
+                                      'set': {'PCSurpriseSeconds': v}, 'source': src})
         for item, obj in LEAVES.get(n, ()):
             t = lap_model.Level(n).job_ticks(obj, 'leave')
             if t is None:

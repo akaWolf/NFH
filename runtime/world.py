@@ -6531,10 +6531,38 @@ class Routine:
                 self.pawn.steps = []
                 self.pawn.state = self.pawn.IDLE
                 if it.name == 'DirtyCarpet' and pcprofile.is_pc():
-                    # the PC's room trigger runs Level_Laundry's cases 20-22
-                    # at once: the variant test, the vacuum icon and the walk
-                    # to the vacuum (game.exe 0x45647f-0x456561) — no look
-                    self.start_urgent(it)
+                    # the PC's room trigger runs Level_Laundry's case 20 —
+                    # the variant test and the ACTION `search` on him
+                    # (fcn.00479ba0 at 0x4564ee) — then case 21's vacuum
+                    # icon and walk (0x456502) and case 22 (game.exe). The
+                    # behaviour is delivered once no job above the level
+                    # class refuses to be broken (fcn.00447d90: the job's
+                    # +4; the door step's is 0, 0x474075), i.e. at the far
+                    # clip's end, where this runs; the search is the item's
+                    # SurpriseFar (the remaster's Search) at the PC's
+                    # 26 ticks (PCSurpriseSeconds, tools/pcref/
+                    # pc_durations.py SEARCHES)
+                    startle = it.surprise_far_left if self.pawn.facing == 'Right' \
+                        else it.surprise_far_right
+                    secs = getattr(it, 'pc_surprise_secs', None)
+                    if startle and secs and self.pawn.anim.has(startle):
+                        # the jobs above the level class are aborted with the
+                        # delivery (fcn.00447d90, 0x447e74-0x447f00): a pet
+                        # alarm's run and its case's list end here — E11's
+                        # `dog_shout` case 18 is cut by case 20's search
+                        self._sz_watch = False
+                        self.state = self.USING
+                        mobile = self.pawn.anim.sequence_seconds([startle])
+                        if mobile > 0.0:
+                            self.pawn.anim.time_scale = mobile / secs
+
+                        def searched(i=it):
+                            self.pawn.anim.time_scale = 1.0
+                            self.start_urgent(i)
+                        self.pawn.anim.play_sequence(
+                            [startle], on_end=searched, as_sequence=False)
+                    else:
+                        self.start_urgent(it)
                     return True
                 startle = it.surprise_far_left if self.pawn.facing == 'Right' \
                     else it.surprise_far_right

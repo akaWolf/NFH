@@ -1204,6 +1204,14 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DirtyCarpet",
+   "component": "TrickItem",
+   "set": {
+    "PCSurpriseSeconds": 2.167
+   },
+   "source": "the room trigger's case: the neighbour's `search` before the run (Level_Laundry's case 20, fcn.00479ba0 at 0x4564ee; generic/objects.xml, an ACTION step of 26 ticks — the Loader's time 24 + 2 — at 12 a second, tools/pcref/pc_durations.py SEARCHES)"
   }
  ]
 }

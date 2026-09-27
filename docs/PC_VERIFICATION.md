@@ -334,11 +334,30 @@ actors' job pass the update calls at 0x100445f8.
   18.9 and 22.1 before) — the toilet to the aftershave 1.2 s and the
   picture to the dirty oven 2.2 s shorter than the PC's (E04's frames hold
   him at the pie about 2 s, 221-223, before he turns for the oven; the
-  port's `take` and step down from its hotspot are 0.8 s, 217.7-218.5);
-  E11's living room after the dog's alarm: 11.3 s from his entry to the
-  vacuum's fire on the PC, 8.0 in the port (7.3 before), whose carpet
-  trigger starts the vacuum case the moment he enters — whether game.exe
-  lets the alarm's GOTO2 and `search` end first is not read.
+  port's `take` and step down from its hotspot are 0.8 s, 217.7-218.5).
+  E11's living room after the dog's alarm, read 2026-09-27: a room trigger
+  fires on every tick its two rooms match, into a pending list
+  (fcn.00472390, the check fcn.00471bc0), and a pending behaviour is
+  offered down the actor's queue (fcn.00448180 → fcn.00447d90): the job
+  that takes it — the level class, slot 5 (Level_Laundry's 0x454a90
+  refuses the carpet only in its own cases 20-23) — gets it when every job
+  above has its +4 set, which are aborted (slot 3) before the class's slot
+  4 (0x454600: case 20); one above with +4 clear keeps it pending. The
+  door step and its ACTION carry 0 (0x474075, 0x4743de), the walk job 1
+  (0x4755ff), a GOTO its caller's flag (fcn.0044a710; the cases' GoTos
+  pass 1), the cases' lists 0 (Level_Laundry's eight fcn.00476770 calls)
+  and the pet alarm's list 1 (fcn.0047a690). So in E11 the carpet waits
+  through the living-room door, the alarm's walk to the room ends, case 18
+  shows `dog_shout` and pushes its list, the carpet aborts it and case 20
+  plays the `search` (the bubble: `?!` to 212.25, `dog_shout` 212.5-214.5,
+  the vacuum from 214.75). The port plays that search since
+  (runs/search111: the entry 315.8, the search 317.8-320.0, the fire 326.0
+  — 10.2 s against the PC's 11.3, 8.0 before); the other 1.1 s lie in the
+  vacuum's case 22 (E11: the take ends ~217.1 and the vacuum clip starts
+  ~218.8, where the port walks the 70 px between the two hotspots in 0.8 s
+  — not read further). A carpet met during a case's list (+4 clear) would
+  wait for the list's end on the PC; no plan meets it, and the port takes
+  it at the door.
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
