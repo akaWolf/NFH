@@ -1728,20 +1728,24 @@ class Pawn:
         `txt` for a tricked visit)"""
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
         if ap:
-            tx = ap.get('tx', 0)
-            if isinstance(tx, list):
-                tx = tx[it.pc_use_visit % len(tx)] if tx else 0
+            def visit(v):
+                return (v[it.pc_use_visit % len(v)] if v else None) if isinstance(v, list) else v
+            tx = visit(ap.get('tx', 0)) or 0
+            # the height he leaves from: the station's hotspot's, or where a
+            # hideout's leave put him (PCApproach `dpx`: its `<actor>_out`,
+            # lap_model_s2._leave_place — 212's water exit after the ledge)
+            dpx = visit(ap.get('dpx'))
             if 'txt' in ap and self.level is not None and it.is_tricked(self.level.items):
                 # the tricked visit's own move (PCApproach `txt`, per visit on a
                 # two-way station: the step's tricked variants — 207's sand
                 # castle with the crayfish has him splash the kid 154 px on,
-                # 214's manipulated pistol 95, 209's hot coal places him back
-                # at it, 201's soaped puddle's crash_short 200 on the slip's
-                # side)
-                tx = ap['txt']
-                if isinstance(tx, list):
-                    tx = tx[it.pc_use_visit % len(tx)] if tx else 0
-            self._pc_depart = (pc_ap_x(ap, it) + tx, pc_ap_px(ap, it), self.sprite.x, self.sprite.y, it)
+                # 214's manipulated pistol 95, 209's hot coal's leave puts him
+                # 293 px on, 201's soaped puddle's crash_short 200 on the
+                # slip's side)
+                tx = visit(ap['txt']) or 0
+                dpx = visit(ap.get('dpxt'))
+            self._pc_depart = (pc_ap_x(ap, it) + tx, dpx if dpx is not None else pc_ap_px(ap, it),
+                               self.sprite.x, self.sprite.y, it)
         else:
             self._pc_depart = None
         self._pc_from_x = None

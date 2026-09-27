@@ -581,7 +581,8 @@
        ]
       },
       "tx": 190,
-      "txt": 0
+      "txt": 293,
+      "dpxt": -33
      },
      "Woody": {
       "obj": "coal_area/coal",
@@ -781,7 +782,9 @@
         "Zone02",
         "Zone01"
        ]
-      }
+      },
+      "tx": -1,
+      "dpx": -38
      },
      "Woody": {
       "obj": "tadj_mahal/shoe_mat",

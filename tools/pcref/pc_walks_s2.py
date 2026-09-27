@@ -454,6 +454,8 @@ def approaches(n):
     raw = json.load(open('%s/levels/s2/Level%d.json' % (ROOT, n)))
     moves = S.code_moves(n)
     tricked = S.code_moves_tricked(n)
+    places = S.code_places(n)
+    places_t = S.code_places_tricked(n)
     out = []
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
@@ -493,6 +495,38 @@ def approaches(n):
             if role == 'Rottweiler' and name in tricked:
                 # ... and the tricked visit's (the step's tricked variants)
                 per[role]['txt'] = tricked[name]
+            if role == 'Rottweiler' and name in places:
+                # a visit whose step leaves a hideout: the leave puts him at
+                # its `<actor>_out` (lap_model_s2._leave_place, code_places —
+                # 212's ledge at the water exit): his next walk leaves from
+                # there, x and the height against the floor (dpx), per visit
+                xs = per[role]['x'] if isinstance(per[role]['x'], list) else None
+                pl = places[name]
+                mv = moves.get(name, 0)
+                txs, dps = [], []
+                for k, q in enumerate(pl):
+                    x_k = xs[k % len(xs)] if xs else per[role]['x']
+                    px_k = per[role]['px'][k % len(per[role]['px'])] if isinstance(per[role]['px'], list) \
+                        else per[role]['px']
+                    if q is None:
+                        txs.append(mv[k % len(mv)] if isinstance(mv, list) else mv)
+                        dps.append(px_k)
+                    else:
+                        txs.append(q[0] - x_k)
+                        dps.append(q[1] - g.floor(r))
+                one = len(pl) == 1
+                if any(txs):
+                    per[role]['tx'] = txs[0] if one else txs
+                pxs = per[role]['px'] if isinstance(per[role]['px'], list) else [per[role]['px']] * len(dps)
+                if any(a != b for a, b in zip(dps, pxs)):
+                    per[role]['dpx'] = dps[0] if one else dps
+            if role == 'Rottweiler' and name in places_t:
+                # ... and after a tricked visit (209's hot coal: out 293 px on)
+                q = places_t[name]
+                if not isinstance(q, list):
+                    x0 = per[role]['x'][0] if isinstance(per[role]['x'], list) else per[role]['x']
+                    per[role]['txt'] = q[0] - x0
+                    per[role]['dpxt'] = q[1] - g.floor(r)
         obj = WOODY.get(n, {}).get(name)
         if obj is not None:
             # Woody's run up or down to the object's `woody` hotspot (his clicks

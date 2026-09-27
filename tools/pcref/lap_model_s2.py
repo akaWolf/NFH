@@ -839,12 +839,30 @@ def lap_steps(n):
                     objs.add(x)
         out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, station_ticks(d, ev, ctx)))
         LAP_WALKS.setdefault(n, {})[i] = ctx.get('walks', False)
+        if any(e[0] == 'E6c2e' for e in ev):
+            LAP_LEAVES.setdefault(n, {})[i] = ctx.get('hideout')
     return out, loop
 
 
 # {level: {lap row: whether its step walks}} (lap_steps, step_ticks): a tricked
 # visit's stand starts as the row's own stay does (_flow)
 LAP_WALKS = {}
+# {level: {lap row: the hideout its step leaves}} (lap_steps): the leave places
+# him at the hideout's `<actor>_out` (_leave_place, code_places)
+LAP_LEAVES = {}
+
+
+def _leave_place(g, d, obj, actor='neighbor'):
+    """where a hideout leave (fcn.10006c2e: vtable 0x100ab334, update
+    0x1000690a) puts the actor before its `leave` plays: the object's
+    `<actor>_out` hotspot — the actor's name and "out" joined
+    (fcn.10049057), looked up and set as his position (fcn.10049e01,
+    fcn.100418f6; 0x1000699c-0x10006a3d) — 213's picnic 5 px left of its
+    `neighbor` hotspot and 10 up, the tricked picnic 225 px right, 209's
+    hot coal 293 px right; None where the object has none (the lookup,
+    fcn.10049a08, gives (0, 0), the object's own position: not taken)"""
+    o = d.real.get(obj, obj) if (d is not None and obj) else obj
+    return g.point(o, actor + '_out', exact=True) if o else None
 
 
 def short(obj):
@@ -1203,10 +1221,21 @@ def lap_estimate(n, verbose=False):
                 if verbose: print('   walk -> %-30s %5.1f s' % (real, (t or 0) / 12.0))
         if k == len(order) - 1:
             break            # the closing step: its walk ends the lap
-        if pos is not None and not any(a == 'leave' for _o, a, _t in parts):
+        hid = ctx.get('hideout') if any(e[0] == 'E6c2e' for e in ev) else None
+        place = _leave_place(g, d, hid) if hid else None
+        kl = next((k for k in range(len(parts) - 1, -1, -1)
+                   if parts[k][1] == 'leave' and parts[k][0] == hid), None) if place else None
+        if pos is not None and kl is not None:
+            # a hideout's leave places him at its `<actor>_out` (_leave_place:
+            # 212's water exit after the ledge), the leave's and the later
+            # parts' translations from there
+            pos = (g.room_of(d.real.get(hid, hid)), place[0], place[1])
+            for o, a, _t in parts[kl:]:
+                tx, ty = d.translation(o, a)
+                pos = (pos[0], pos[1] + tx, pos[2] + ty)
+        elif pos is not None and not any(a == 'leave' for _o, a, _t in parts):
             # the actions' translations move the actor off the hotspot: the
-            # next walk leaves from there (a `leave` places him at another
-            # object — 212's water exit — not modelled)
+            # next walk leaves from there
             for o, a, _t in parts:
                 tx, ty = d.translation(o, a)
                 pos = (pos[0], pos[1] + tx, pos[2] + ty)
@@ -1359,6 +1388,36 @@ def code_moves(n):
                 dx.append(sum(d.translation(o, a)[0] for o, a, _t in parts))
         if any(dx):
             out[item] = dx if many else dx[0]
+    return out
+
+
+def code_places(n):
+    """{mobile item: [(x, y) or None per visit]}: where the next walk leaves
+    from after a visit whose step leaves a hideout (_leave_place) — the
+    placement at the hideout's `<actor>_out`, then the translations of the
+    leave and the parts after it; items with no such visit left out"""
+    d = Data(n); g = Geometry(n)
+    lap, pairs = _paired_parts(n)
+    out = {}
+    for item, (many, visits) in pairs.items():
+        if any(v is None for v in visits):
+            continue
+        per = []
+        for v in visits:
+            i, j = max((i, j) for i, j, _p in v)
+            parts = lap[i][4]
+            hid = LAP_LEAVES.get(n, {}).get(lap[i][0])
+            place = _leave_place(g, d, hid) if hid else None
+            k = next((k for k in range(len(parts) - 1, -1, -1)
+                      if parts[k][1] == 'leave' and parts[k][0] == hid), None)
+            if place is None or k is None or j != len(parts) - 1:
+                per.append(None)
+                continue
+            dx = sum(d.translation(o, a)[0] for o, a, _t in parts[k:])
+            dy = sum(d.translation(o, a)[1] for o, a, _t in parts[k:])
+            per.append((place[0] + dx, place[1] + dy))
+        if any(x is not None for x in per):
+            out[item] = per
     return out
 
 
@@ -2153,6 +2212,102 @@ def code_moves_tricked(n):
         if dx != moves.get(item, 0):
             out[item] = dx
     return out
+
+
+def code_places_tricked(n):
+    """{mobile item: (x, y), or a list per visit}: code_places after a TRICKED
+    visit — the station's step run with the tricked variants of its
+    IsVariant pairs shown (_tricked_move's), where it leaves a hideout
+    (209's hot coal: out at 1365 px, 293 right of the coal; 213's tricked
+    picnic 225 right; 212's tricked bench 75 right; 210's hedgehog chair
+    47 left); items without such a variant left out"""
+    d = Data(n); g = Geometry(n)
+    lap, pairs = _paired_parts(n)
+    st = LAP_START.get(n) or level_start(n)
+    lv = Level(n)
+    for hid, shown in LAP_PRESENT.get(n, ()):
+        lv.present.discard(hid); lv.present.add(shown)
+    snaps = []
+    steps, _loop = walk(lv, st, bytes0=LAP_BYTES.get(n), snaps=snaps)
+    events = {cur: ev for cur, ev, _nxt in steps}
+    out = {}
+    for item, (many, visits) in pairs.items():
+        if any(v is None for v in visits):
+            continue
+        per = []
+        for v in (visits if many else visits[:1]):
+            i = max(i for i, _j, _p in v)
+            per.append(_tricked_place(n, d, g, lap, events, snaps, i))
+        if any(x is not None for x in per):
+            out[item] = per if many else per[0]
+    for item, (stp, shown, hidden) in TRICKED_PLACES.get(n, {}).items():
+        lv2 = Level(n)
+        for hid, sh in LAP_PRESENT.get(n, ()):
+            lv2.present.discard(hid); lv2.present.add(sh)
+        lv2.present.discard(hidden); lv2.present.add(shown)
+        ev2, _nx = run_step(lv2, stp, dict(LAP_BYTES.get(n) or {}))
+        if stp == 0x1003613a:
+            # the leave step names no hideout: the one the bench's bar step
+            # entered with the variant shown (its IsVariant's pick)
+            ev2 = [('E6bd4', [shown], [])] + ev2
+        q = _place_of(d, g, ev2)
+        if q is not None:
+            out[item] = q
+    return out
+
+
+# the tricked visits whose hideout leave is in a step the IsVariant swap of
+# the visit's last row does not reach: {level: {mobile item: (the step, the
+# variant shown, the one hidden)}} — 212's bench: its leave step 0x1003613a
+# with bank_manip present leaves it (then the bull's crash and SHOUT 1);
+# 210's chair: 0x1001964b with the hedgehog's picks it, enters and leaves it
+# (SHOUT 0, the repair). 213's tricked picnic (0x100382e1 with
+# picnic_manip: its GoTo, then a flow the walker does not follow) would leave
+# him at picnic_manip's `neighbor_out`, 225 px right: not carried
+TRICKED_PLACES = {212: {'SleepBench': (0x1003613a, 'midleft_bank_manip', 'midleft_bank')},
+                  210: {'DeckChair': (0x1001964b, 'beachleft_deckchair_hedgehog', 'beachleft_deckchair')}}
+
+
+def _place_of(d, g, ev):
+    """the placement of the flow's last hideout leave and the translations of
+    the parts from it on (code_places), None without one"""
+    if not any(e[0] == 'E6c2e' for e in ev):
+        return None
+    ctx = {}
+    parts = _station_parts(d, ev, ctx)
+    hid = ctx.get('hideout')
+    place = _leave_place(g, d, hid) if hid else None
+    kl = next((k for k in range(len(parts) - 1, -1, -1)
+               if parts[k][1] == 'leave' and parts[k][0] == hid), None) if place else None
+    if kl is None:
+        return None
+    x, y = place
+    for o, a, _t in parts[kl:]:
+        tx, ty = d.translation(o, a)
+        x += tx; y += ty
+    return (x, y)
+
+
+def _tricked_place(n, d, g, lap, events, snaps, i):
+    """the placement after the lap row i's step run with its tricked
+    variants (_tricked_move), where it leaves a hideout; else None"""
+    cur = lap[i][1]
+    lv, byi = _row_level(n, snaps, lap[i][0])
+    alts = []
+    for e in events.get(cur) or []:
+        if e[0] != 'IFVAR':
+            continue
+        cands = [c for c in e[1] if not str(c).startswith('$')]
+        if len(cands) > 1 and e[2] == cands[0]:
+            alts.append((cands[0], cands[1]))
+    if not alts:
+        return None
+    lv2 = Level(n)
+    lv2.present = set(lv.present)
+    for pick, alt in alts:
+        lv2.present.discard(pick); lv2.present.add(alt)
+    ev2, _nx = run_step(lv2, cur, dict(byi))
+    return _place_of(d, g, ev2)
 
 
 def _tricked_move(n, d, lap, events, snaps, i, untricked):

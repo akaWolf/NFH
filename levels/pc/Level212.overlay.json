@@ -1019,7 +1019,9 @@
         "Zone02",
         "Zone01"
        ]
-      }
+      },
+      "txt": -265,
+      "dpxt": 44
      }
     },
     "PCUseSeconds": 2.83
@@ -1115,7 +1117,11 @@
         "Zone02",
         "Zone01"
        ]
-      }
+      },
+      "tx": -265,
+      "dpx": 44,
+      "txt": -265,
+      "dpxt": 44
      },
      "Woody": {
       "obj": "bottomright/parrot",
@@ -1165,7 +1171,9 @@
         "Zone03",
         "Zone02"
        ]
-      }
+      },
+      "txt": 75,
+      "dpxt": -64
      },
      "Woody": {
       "obj": "midleft/bank",

@@ -951,7 +951,9 @@
         "Zone01",
         "Zone04"
        ]
-      }
+      },
+      "txt": -47,
+      "dpxt": -15
      },
      "Woody": {
       "obj": "beachleft/deckchair",
