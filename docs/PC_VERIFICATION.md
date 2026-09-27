@@ -332,9 +332,17 @@ actors' job pass the update calls at 0x100445f8.
   18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan 18.2,
   11.9, 21.1, 11.8, 19.0 and 24.6 (runs/floor2s1; 18.6, 11.7, 19.0, 11.8,
   18.9 and 22.1 before) — the toilet to the aftershave 1.2 s and the
-  picture to the dirty oven 2.2 s shorter than the PC's (E04's frames hold
-  him at the pie about 2 s, 221-223, before he turns for the oven; the
-  port's `take` and step down from its hotspot are 0.8 s, 217.7-218.5).
+  picture to the dirty oven 2.2 s shorter than the PC's. The picture to
+  the oven, split on E04's frames (2026-09-27): from the fire (199.9) to
+  case 1's pie icon (210.9) 11.0 s against the port's 9.95 (shout2_extra's
+  93 ticks and the clean's 25 give 9.8; the frames show the shout over at
+  ~207.6 and him at the picture until ~210.9, 39 ticks for a clean of 25 —
+  unread), the walk from the picture to the kitchen's back door 5.8 s
+  against the port's 4.6 (its leg 4.67 s from x 447, the mover's 5.1 from
+  the hotspot's 435 — the near door opens at 216.7, the far one at 217.4),
+  and from the pass to the oven's fire 10.0 s against 10.05 (the pie
+  itself — the up step, the take and the turn — about 1.75 s against the
+  port's 1.5).
   E11's living room after the dog's alarm, read 2026-09-27: a room trigger
   fires on every tick its two rooms match, into a pending list
   (fcn.00472390, the check fcn.00471bc0), and a pending behaviour is
