@@ -328,21 +328,19 @@ actors' job pass the update calls at 0x100445f8.
   the level's season (`doors_concurrent`), and the Season 2 sweep is
   byte-identical under it.
 - The Season 1 chains against Badinfos' runs (2026-09-26, remeasured
-  2026-09-27 with the door pass and the floor line): E04 pays its seven
-  18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan 18.2,
-  11.9, 21.1, 11.8, 19.0 and 24.6 (runs/floor2s1; 18.6, 11.7, 19.0, 11.8,
-  18.9 and 22.1 before) — the toilet to the aftershave 1.2 s and the
-  picture to the dirty oven 2.2 s shorter than the PC's. The picture to
-  the oven, split on E04's frames (2026-09-27): from the fire (199.9) to
-  case 1's pie icon (210.9) 11.0 s against the port's 9.95 (shout2_extra's
-  93 ticks and the clean's 25 give 9.8; the frames show the shout over at
-  ~207.6 and him at the picture until ~210.9, 39 ticks for a clean of 25 —
-  unread), the walk from the picture to the kitchen's back door 5.8 s
-  against the port's 4.6 (its leg 4.67 s from x 447, the mover's 5.1 from
-  the hotspot's 435 — the near door opens at 216.7, the far one at 217.4),
-  and from the pass to the oven's fire 10.0 s against 10.05 (the pie
-  itself — the up step, the take and the turn — about 1.75 s against the
-  port's 1.5).
+  2026-09-27): E04 pays its seven 18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s
+  apart, the port's plan 18.2, 12.5, 22.1, 11.8, 19.2 and 26.5 since the
+  reaction walks (runs/look_s1; 18.2, 11.9, 21.1, 11.8, 19.0 and 24.6 with
+  the door pass and the floor line alone, runs/floor2s1; 18.6, 11.7, 19.0,
+  11.8, 18.9 and 22.1 before those). The picture to the oven had been
+  split on E04's frames: from the fire (199.9) to case 1's pie icon 11.0 s
+  against the port's 9.95 — the shout (93 ticks), then the repair's walk
+  from the floor line up to anc/mum_smeared's hotspot (435/390, 30 px: 11
+  ticks, fcn.0047ae70 over isActorAtObject) and the clean (25) —, and the
+  walk to the kitchen's back door 5.8 s against 4.6, the first 10 ticks of
+  it the way down from that hotspot to the floor line; from the pass to
+  the oven's fire 10.0 s against 10.05, the pie's own stand about 1.75 s
+  against 1.5.
   E11's living room after the dog's alarm, read 2026-09-27: a room trigger
   fires on every tick its two rooms match, into a pending list
   (fcn.00472390, the check fcn.00471bc0), and a pending behaviour is

@@ -1073,7 +1073,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   fix at a ReuseAfterFix item), AngryHard at the pace of the PC shout (none at
   flags 2), the fix clips at the pace of the PC repair or clean
   (PCFixSeconds, dropped at 0), the doubletake, the fall and the shock at
-  theirs (PCSurpriseSeconds, PCSlipSeconds). The stands come out of the
+  theirs (PCSurpriseSeconds, PCSlipSeconds). Since 2026-09-27 the walks
+  inside a reaction as well: a look walk-by's list (the picture's
+  fcn.0047d520, the microwave's, the toilet's, 111's board) opens with
+  CreateGoToObjXJob (fcn.0047a4a0: a GOTO to the tricked object's hotspot
+  x at his own y) before the doubletake, an ACTION step of 16 ticks (the
+  frames' 15 before), and the repair helper (fcn.0047ae70) walks to the
+  tricked object's `neighbor` hotspot first whenever he does not stand on
+  it (isActorAtObject, fcn.0047aa90 — the picture's 435/390 lies 30 px
+  above the hall's floor line, so he climbs to clean it and the next walk
+  comes down first); the port stands those GOTOs' mover ticks (PCAlignX,
+  PCFixPoint; `Pawn.pc1_goto_ticks`) and leaves from the hotspot. The
+  stands come out of the
   level classes' case chains simulated with the trick in place
   (tools/pcref/trick_branches.py, the keys through tools/pcref/
   pc_reactions.py, the shout index and flags through tools/pcref/
