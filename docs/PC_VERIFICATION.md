@@ -347,34 +347,43 @@ actors' job pass the update calls at 0x100445f8.
   letter box's shout and first-aid run, the cake's prime split), E06
   within 0.9 s of its reading, E09 10.3, 37.7, 15.9, 22.4 and 39.2 against
   11.2, 38.3, 15.7, 23.2 and 38.0 (the key board's re-run), E10 within 1.4
-  s, E12 within 0.8 s (the skates' wheeze and shout2); E01, E05, E07, E08
-  and E13 pay other orders than the port's plans. E11's chain
-  (runs/clean_s1) 23.7, 15.5, 25.3, 26.8, 28.6, 22.0 and 20.4 s against
-  Badinfos' 23.7, 16.0, 26.3, 27.6, 29.4, 22.5 and 20.9 (the marbles'
-  clean carried), E14's last three 33.2, 8.1 and 19.4 against 33.7, ~8.1
-  and ~20.4 (the hat stand's visits, runs/hat114). E11's living room after
-  the dog's alarm, read 2026-09-27: a room trigger fires on every tick its
-  two rooms match, into a pending list (fcn.00472390, the check
-  fcn.00471bc0), and a pending behaviour is offered down the actor's queue
-  (fcn.00448180 → fcn.00447d90): the job that takes it — the level class,
-  slot 5 (Level_Laundry's 0x454a90 refuses the carpet only in its own
-  cases 20-23) — gets it when every job above has its +4 set, which are
-  aborted (slot 3) before the class's slot 4 (0x454600: case 20); one
-  above with +4 clear keeps it pending. The door step and its ACTION carry
-  0 (0x474075, 0x4743de), the walk job 1 (0x4755ff), a GOTO its caller's
-  flag (fcn.0044a710; the cases' GoTos pass 1), the cases' lists 0
-  (Level_Laundry's eight fcn.00476770 calls) and the pet alarm's list 1
-  (fcn.0047a690). So in E11 the carpet waits through the living-room door,
-  the alarm's walk to the room ends, case 18 shows `dog_shout` and pushes
-  its list, the carpet aborts it and case 20 plays the `search` (the
-  bubble: `?!` to 212.25, `dog_shout` 212.5-214.5, the vacuum from
-  214.75). The port plays that search since (runs/search111: the entry
-  315.8, the search 317.8-320.0, the fire 326.0 — 10.2 s against the PC's
-  11.3, 8.0 before); the other 1.1 s lie in the vacuum's case 22 (E11: the
-  take ends ~217.1 and the vacuum clip starts ~218.8, where the port walks
-  the 70 px between the two hotspots in 0.8 s — not read further). A
-  carpet met during a case's list (+4 clear) would wait for the list's end
-  on the PC; no plan meets it, and the port takes it at the door.
+  s, E12 within 0.8 s (the skates' wheeze and shout2), E07 within 1.0 s
+  once the potter's wheel walks to its tricked hotspot before its repair
+  (the generator to the statue 20.7 against 21.2, 17.8 before; the drawing
+  and the dove merge in the thermometer); E08 and E13, read off the HUD's
+  counter in the frames after each jump, pay other orders than the port's
+  plans, and their comparable pairs agree — E08 the deck chair to the
+  lotion 12.8 against 13.4, the coffee to the toothbrush 12.9 against
+  13.3; E13 the chair to the marbles 16.3 against 17.2, the marbles to the
+  grinder 26.5 against 26.5, the ladder to the fuse 13.4 against 13.9; E01
+  (microwave > binoculars > TV > sofa) and E05 (the bowling ball first)
+  pay other orders too. E11's chain (runs/clean_s1) 23.7, 15.5, 25.3,
+  26.8, 28.6, 22.0 and 20.4 s against Badinfos' 23.7, 16.0, 26.3, 27.6,
+  29.4, 22.5 and 20.9 (the marbles' clean carried), E14's last three 33.2,
+  8.1 and 19.4 against 33.7, ~8.1 and ~20.4 (the hat stand's visits,
+  runs/hat114). E11's living room after the dog's alarm, read 2026-09-27:
+  a room trigger fires on every tick its two rooms match, into a pending
+  list (fcn.00472390, the check fcn.00471bc0), and a pending behaviour is
+  offered down the actor's queue (fcn.00448180 → fcn.00447d90): the job
+  that takes it — the level class, slot 5 (Level_Laundry's 0x454a90
+  refuses the carpet only in its own cases 20-23) — gets it when every job
+  above has its +4 set, which are aborted (slot 3) before the class's slot
+  4 (0x454600: case 20); one above with +4 clear keeps it pending. The
+  door step and its ACTION carry 0 (0x474075, 0x4743de), the walk job 1
+  (0x4755ff), a GOTO its caller's flag (fcn.0044a710; the cases' GoTos
+  pass 1), the cases' lists 0 (Level_Laundry's eight fcn.00476770 calls)
+  and the pet alarm's list 1 (fcn.0047a690). So in E11 the carpet waits
+  through the living-room door, the alarm's walk to the room ends, case 18
+  shows `dog_shout` and pushes its list, the carpet aborts it and case 20
+  plays the `search` (the bubble: `?!` to 212.25, `dog_shout` 212.5-214.5,
+  the vacuum from 214.75). The port plays that search since
+  (runs/search111: the entry 315.8, the search 317.8-320.0, the fire 326.0
+  — 10.2 s against the PC's 11.3, 8.0 before); the other 1.1 s lie in the
+  vacuum's case 22 (E11: the take ends ~217.1 and the vacuum clip starts
+  ~218.8, where the port walks the 70 px between the two hotspots in 0.8 s
+  — not read further). A carpet met during a case's list (+4 clear) would
+  wait for the list's end on the PC; no plan meets it, and the port takes
+  it at the door.
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
