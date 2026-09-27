@@ -430,6 +430,14 @@ actors' job pass the update calls at 0x100445f8.
   the 70 px between the two hotspots in 0.8 s — not read further). A
   carpet met during a case's list (+4 clear) would wait for the list's end
   on the PC; no plan meets it, and the port takes it at the door.
+  Remeasured 2026-09-27 after the job ticks (the fire step, the lists'
+  instants, the walk's boundaries, the pet alarm's list; runs/alarm_s1):
+  the 45 order-comparable pairs of 103, 104, 109, 110, 111, 112 and 114
+  average +0.04 s against Badinfos' (−0.40 before the pass), their mean
+  distance 0.38 s (0.52); the widest left are 109's bed to the alarm clock
+  +1.9, 114's polish to the phonograph +1.2 (the dog's alarm in between)
+  and 111's drier to the vacuum −0.9 (case 22's take to the carpet: E11's
+  1.7 s against the model's 0.8).
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
@@ -461,6 +469,7 @@ actors' job pass the update calls at 0x100445f8.
   declines; GameLogic calls no clock at all (its GetTickCount seeds random generators: the
   level constructor fcn.10044bb5, the mini-game's fcn.100507f4); so the spacing sits in the
   object the frame drives at app+0x20 (its slot 15) or below it, still unread.
+  Reread 2026-09-27: game.exe reads no clock per frame outside the fps timer — QueryPerformanceCounter and timeGetTime only in fcn.00402da0 (the fps timer's), GetTickCount in the level constructor's random seed (0x43bce0, the generator at +0x8c), the double-click test (0x407eef), fcn.00408c6e, a stamp at 0x40fc37 and fcn.0040eb00 (0x40ebc9), which hands the start time to the object it stores at app+0x20 through that object's slot 0 — the object the frame drives by its slot 15, its class chosen by fcn.0040eb00's caller (not followed).
 - Season 1, settled on 2026-09-18: the catch's busy byte (+0x78) is
   toggled by one message only — the level's slot 49 (fcn.00440c10,
   `sete` on the byte of the actor named in the event, reached through
