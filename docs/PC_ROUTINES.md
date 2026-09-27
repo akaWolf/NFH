@@ -139,13 +139,22 @@ soap and marbles slip; flags 3 (no shout, no sync) at toi/tub_hair, toi/dirtytow
 lir/bathcandy, anc/stinkflower, bed/medalbox_rat, bal/fuelbeer, kit/laxativebeer and
 kit/skate; flags 2 (no shout) at kit/coffeebox_soil, lir/sofa_broken, toiletpaper and
 bed/cactusclock; the rest flags 0. The four-argument step fcn.0047c3b0 (fcn.0047bc00: name,
-index, flags and a ready step at +0x18 the fire waits on before the shout) serves the marbles
-(0x45b2aa queues slip1 then slip3 as two DoActions — the second alone plays — and fires after
-it; 0x45a1cf fires after a level event step), kit/laxativebeer (the fire after the queued
-`spit`), bal/fuelbeer (the fire after `pour_fuel` on the barbecue, 29 frames = 2.42 s, with the
-Switch to bal/barbecue_burn inside it and flags 3: no shout, no sync), bed/cactusclock (flags
-2, a bed/bed_sleep event step inside) and lir/sofa_fartbag (the index from a level helper):
-at these the pay follows the clip, unlike the soap slip. The three engine-side steps of
+index, flags and a ready step at +0x18) serves the marbles (0x45b2aa: slip1 then slip3 as two
+DoActions — the second alone plays; 0x45a1cf a level event step — in a list that is itself
+the ready step, the fire pushed on the actor, fcn.00444d30), kit/laxativebeer, bal/fuelbeer
+(after `pour_fuel` on the barbecue, 29 frames = 2.42 s; flags 3: no shout, no sync),
+bed/cactusclock (flags 2) and lir/sofa_fartbag (the index from a level helper). The ready
+step is what the script builds after its last push to the main list and before the fire:
+102's laxative beer the sofa's LEAVE and the `spit` (a sub-list, 0x46fcc4-0x46fd66), 109's
+cactus clock the bed's LEAVE, the switch back and a message (0x46969c-0x469775), 101's fart
+bag the sofa's LEAVE, 110's fuel beer the Switch to bal/barbecue_burn. The step pays first,
+as the others do — its update 0x47bd00 scores on its first call (the object, its points
+0x47bdb4, the count, the rage, the face, the jingle) and only then pushes its list, the ready
+step first (0x47be5b-0x47be7c), then the shout and the StopMsg: the ready step plays after
+the pay and before the shout. E09 shows it: the thermometer jumps at 2346.6 s, as the
+neighbour's hand leaves the cactus, before he gets out of bed. (Read the other way until
+2026-09-27 — "the pay follows the clip" —, which put the ready steps before the fire in
+tools/pcref/trick_branches.py: 109's bed to the alarm clock ran 1.9 s long against E09.) The three engine-side steps of
 these sequences are read through GFXEngine.dll (its text listing
 ~/nfh-bench/pcref/r2/nfh1_gfxengine_text.txt, made like the game.exe one; the events are
 0xc-byte objects whose slot 2 calls one slot of every registered listener's 111-slot table,
