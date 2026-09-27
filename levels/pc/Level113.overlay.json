@@ -37,7 +37,12 @@
     "PCUseSeconds": 6.5,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 7.417,
-    "PCFireAt": 4.667
+    "PCFireAt": 4.667,
+    "PCFixPoint": [
+     660,
+     425,
+     "lir"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.5 s"
   },
@@ -48,7 +53,12 @@
     "PCUseSeconds": 6.75,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 7.583,
-    "PCFireAt": 6.833
+    "PCFireAt": 6.833,
+    "PCFixPoint": [
+     540,
+     420,
+     "bal"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 6.8 s"
   },
@@ -112,7 +122,12 @@
     },
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 7.417,
-    "PCFireAt": 4.667
+    "PCFireAt": 4.667,
+    "PCFixPoint": [
+     660,
+     425,
+     "lir"
+    ]
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 25 ticks"
   },
@@ -154,7 +169,12 @@
      "IT_Tongs": 2.083
     },
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 1.5
+    "PCUseSecondsTricked": 1.5,
+    "PCFixPoint": [
+     465,
+     420,
+     "wor"
+    ]
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 25 ticks"
   },

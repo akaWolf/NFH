@@ -90,7 +90,12 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 2.0
+    "PCUseSecondsTricked": 2.0,
+    "PCFixPoint": [
+     490,
+     415,
+     "kit"
+    ]
    },
    "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- kit/stool pins 13 ticks"
   },

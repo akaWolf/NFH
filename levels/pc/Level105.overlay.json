@@ -41,7 +41,12 @@
    "set": {
     "PCUseSeconds": 9.58,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 3.667
+    "PCUseSecondsTricked": 3.667,
+    "PCFixPoint": [
+     710,
+     410,
+     "lir"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.6 s"
   },

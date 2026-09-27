@@ -16,7 +16,12 @@
     "PCShoutSkip": true,
     "PCFixSeconds": 4.083,
     "PCUseSecondsTricked": 7.25,
-    "PCFireAt": 0.583
+    "PCFireAt": 0.583,
+    "PCFixPoint": [
+     335,
+     420,
+     "lir"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.9 s"
   },

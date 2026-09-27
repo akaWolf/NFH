@@ -36,7 +36,12 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 4.0
+    "PCUseSecondsTricked": 4.0,
+    "PCFixPoint": [
+     380,
+     420,
+     "lir"
+    ]
    }
   },
   {

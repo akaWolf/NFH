@@ -30,7 +30,12 @@
     "TrickScore": 12,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 0.417,
-    "PCFireAt": 0
+    "PCFireAt": 0,
+    "PCFixPoint": [
+     505,
+     410,
+     "bal"
+    ]
    }
   },
   {
@@ -74,7 +79,12 @@
     "PCAngryTime": 270,
     "PCStationEndsOnTrick": true,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 3.417
+    "PCUseSecondsTricked": 3.417,
+    "PCFixPoint": [
+     615,
+     390,
+     "bas"
+    ]
    }
   },
   {
@@ -131,7 +141,12 @@
    "set": {
     "PCStationEndsOnTrick": true,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 9.75
+    "PCUseSecondsTricked": 9.75,
+    "PCFixPoint": [
+     525,
+     390,
+     "bas"
+    ]
    }
   },
   {

@@ -73,7 +73,12 @@
     "RequirePriming": false,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 2.417,
-    "PCFireAt": 2.0
+    "PCFireAt": 2.0,
+    "PCFixPoint": [
+     720,
+     390,
+     "lir"
+    ]
    },
    "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
   },
@@ -94,7 +99,12 @@
      1.42
     ],
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 2.083
+    "PCUseSecondsTricked": 2.083,
+    "PCFixPoint": [
+     410,
+     390,
+     "wor"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.4 s; Polish <- polish#1 1.4 s"
   },

@@ -398,6 +398,10 @@ def specs(n):
                 keys['PCFireAt'] = round(before - inside, 3)
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCFixUseSeconds'] = round(after, 3)
+                if fix and sm.get('repair'):
+                    pt = fix_point(n, sm['repair'])
+                    if pt:
+                        keys['PCFixPoint'] = pt
                 if spec.get('use'):
                     keys['PCToolUseSeconds'] = round(_sum(lv, [spec['use']]), 3)
                 keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3) \
@@ -406,12 +410,20 @@ def specs(n):
                 total = before + own + after
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCUseSecondsTricked'] = round(total, 3)
+                if fix and sm.get('repair') and spec.get('fix') is None:
+                    # the repair helper's walk to the tricked object when he
+                    # does not stand on it (fix_point)
+                    pt = fix_point(n, sm['repair'])
+                    if pt:
+                        keys['PCFixPoint'] = pt
                 if own + after > 0 or total == 0:
                     # the fire before the step's own clip or more actions,
                     # or on arrival when the stand plays nothing before it
                     keys['PCFireAt'] = round(before, 3)
         if base in RUNTO.get(n, ()):
             keys['PCRunTo'] = True
+            # the run ends on the object's hotspot: the repair does not walk
+            keys.pop('PCFixPoint', None)
         run = FIXRUN.get(n, {}).get(base)
         if run is not None:
             keys['PCGrabSeconds'] = round(_sum(lv, [run]), 3)

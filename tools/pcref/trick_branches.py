@@ -783,7 +783,7 @@ def _pair_rule(steps):
 def summarise(row, lv):
     """before/after seconds around the fire, the fire's own clip, the fix"""
     before = []; after = []; seen_fire = False; fix = None; walks = []
-    unknown = []; fixes = []
+    unknown = []; fixes = []; repair = None
     prefer = [row['name']]
     if '_' in row['name'].split('/')[-1]:
         prefer.append(row['name'].rsplit('_', 1)[0])       # the normal twin (lir/tabacbox of lir/tabacbox_explosive)
@@ -825,6 +825,7 @@ def summarise(row, lv):
             nm, v = lv.fix(obj)
             if nm:
                 fixes.append(('%s.%s' % (obj, nm), v))
+                repair = obj          # the helper walks to its hotspot first (isActorAtObject)
     own = None
     if row['kind'] == 'FIRE5':
         anim = row['args'][3] if len(row['args']) > 3 else None
@@ -833,7 +834,8 @@ def summarise(row, lv):
         if v is None and isinstance(anim, str):
             v = lv.clip(anim)
         own = ('%s.%s' % (actor, anim), v)
-    return dict(before=before, after=after, own=own, fix=fix, fixes=fixes, unknown=unknown, walks=walks)
+    return dict(before=before, after=after, own=own, fix=fix, fixes=fixes, unknown=unknown, walks=walks,
+                repair=repair)
 
 
 def dump_cases(n, levels):

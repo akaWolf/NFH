@@ -51,7 +51,12 @@
    "set": {
     "PCAngryTime": 288,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 3.583
+    "PCUseSecondsTricked": 3.583,
+    "PCFixPoint": [
+     380,
+     420,
+     "lir"
+    ]
    }
   },
   {
@@ -60,7 +65,12 @@
    "set": {
     "PCAngryTime": 264,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 6.917
+    "PCUseSecondsTricked": 6.917,
+    "PCFixPoint": [
+     422,
+     420,
+     "bas"
+    ]
    }
   },
   {
@@ -109,7 +119,12 @@
    "set": {
     "PCUseSeconds": 6.08,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 6.083
+    "PCUseSecondsTricked": 6.083,
+    "PCFixPoint": [
+     525,
+     420,
+     "bed"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Trampoline <- trampoline#0 6.1 s"
   },
@@ -128,7 +143,12 @@
     "PCUseSeconds": 6.42,
     "PCShoutIndex": 1,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 3.0
+    "PCUseSecondsTricked": 3.0,
+    "PCFixPoint": [
+     721,
+     420,
+     "bas"
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChestExpander <- expander#0 6.4 s"
   },
