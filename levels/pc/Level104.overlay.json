@@ -13,8 +13,14 @@
    "component": "TrickItem",
    "set": {
     "PCAngryTime": 264,
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 2.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     435,
+     390,
+     "anc"
+    ]
    }
   },
   {
@@ -22,8 +28,14 @@
    "component": "TrickItem",
    "set": {
     "PCAngryTime": 228,
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 4.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     505,
+     397,
+     "toi"
+    ]
    }
   },
   {

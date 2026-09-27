@@ -38,8 +38,14 @@
     "PCWoodySeconds": {
      "IT_Egg": 2.083
     },
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 2.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     298,
+     395,
+     "kit"
+    ]
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
   },
@@ -64,8 +70,14 @@
     "PCWoodySeconds": {
      "IT_Wcpaper": 2.083
     },
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 4.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     505,
+     397,
+     "toi"
+    ]
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },

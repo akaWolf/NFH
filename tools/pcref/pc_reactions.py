@@ -13,9 +13,9 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       a clip or more actions follow the fire (0 = on arrival)
   PCFixSeconds        the repair or clean after the fire (0 = the PC plays
                       none, the mobile's fix clips are dropped)
-  PCSurpriseSeconds   a walk-by's clip before its fire: doubletake3 (15
-                      frames), the skate's fall out of the window, the
-                      electric shock
+  PCSurpriseSeconds   a walk-by's clip before its fire: the doubletake
+                      (its ACTION step, 16 ticks), the skate's fall out of
+                      the window, the electric shock
   PCFireBefore        the fire before that clip (the slips, the trap)
   PCSlipSeconds       a slip's fall, slip1/slip3 (31 frames)
   PCGrabSeconds       a fixing tool's take (the mobile's grab), and at the
@@ -28,6 +28,14 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       101/102's antenna shout, 110's extinguisher fetch and
                       113's valves — whose station is the switch alone
                       (FIXRUN: PCGrabSeconds; the use and the return none)
+  PCAlignX            a look walk-by (the picture, the toilet, the
+                      microwave, 111's board): CreateGoToObjXJob before the
+                      doubletake (fcn.0047a4a0: the tricked object's hotspot
+                      x at the actor's own y)
+  PCFixPoint          the tricked object's `neighbor` hotspot [x, y, room],
+                      where the repair walks first when he does not stand
+                      on it (fcn.0047ae70 over isActorAtObject, fcn.0047aa90)
+                      — the look walk-bys and the trap
 
 The seconds are objects.xml's `time` ticks or the clip's frames at 12 a
 second. The pairing mobile item -> PC object is the TABLE below, by hand
@@ -190,7 +198,19 @@ TRAP_NAMES = ('ElectricTrap',)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
-        'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn')
+        'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint')
+
+
+def fix_point(n, obj):
+    """the repair's walk target: fcn.0047ae70 asks isActorAtObject (fcn.0047aa90:
+    the same room and the actor's point equal to the tricked object's `neighbor`
+    hotspot, fcn.00445aa0) and else goes there first (fcn.0044ac80 to that
+    object, x and y) — the tricked object, the helper's fourth argument, in
+    every Season 1 reaction (the picture 0x47d6f7, the microwave, the toilet
+    0x47dbef, the trap 0x47b584, 111's board 0x45495b); [x, y, room]"""
+    import lap_model
+    p = lap_model.Level(n).object_point(obj)
+    return [p[1], p[2], p[0]] if p else None
 
 _ROWS = None
 _LEVELS = None
@@ -277,6 +297,9 @@ def specs(n):
             shock = lv.action('neighbor', 'electroshock')
             keys = {'PCShoutIndex': 1, 'PCFireBefore': True, 'PCSurpriseSeconds': round(shock, 3),
                     'PCFixSeconds': round(lv.fix('bas/electrotrap')[1], 3)}
+            pt = fix_point(n, 'bas/electrotrap')
+            if pt and keys['PCFixSeconds']:
+                keys['PCFixPoint'] = pt
         else:
             spec = TABLE.get(n, {}).get(base)
             if spec is None:
@@ -308,8 +331,16 @@ def specs(n):
                     # the pig's stand: the fire on arrival, the catch after it
                     keys['PCFixSeconds'] = round(fix + after, 3)
                 else:
-                    keys['PCSurpriseSeconds'] = round(DOUBLETAKE, 3)
+                    # the look (fcn.0047d520 and its kin): CreateGoToObjXJob
+                    # (fcn.0047a4a0 — the object's hotspot x at the actor's own
+                    # y), the doubletake as an ACTION step (time + 2), the fire,
+                    # the shout, the repair with its walk (fix_point)
+                    keys['PCSurpriseSeconds'] = round(lv.action('neighbor', 'doubletake3') or DOUBLETAKE, 3)
                     keys['PCFixSeconds'] = round(fix + own + after, 3)
+                    keys['PCAlignX'] = True
+                    pt = fix_point(n, spec['pc'])
+                    if pt:
+                        keys['PCFixPoint'] = pt
             elif spec['kind'] == 'tool':
                 inside = sum(v for a, v in sm['before'] if a.startswith(spec['pc'] + '.'))
                 grab = inside or _sum(lv, [(spec['pc'], 'take')])
@@ -364,14 +395,29 @@ def _set_key(patches, item, key, value):
 
 
 def write(n, sp):
+    """the keys set in place — a patch keeps its other keys and its place, a key
+    no longer wanted is dropped (and a patch left empty), the new ones added;
+    a patch another writer sourced (tools/pcref/pc_durations.py's SEARCHES and
+    ALERTERS) is not this writer's"""
     p = os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)
     ov = json.load(open(p)) if os.path.exists(p) else {'source': '', 'patches': []}
-    patches = ov.get('patches', [])
-    for k in KEYS:
-        patches = _strip_key(patches, k)
-    for item, keys in sp.items():
-        for k, v in keys.items():
-            _set_key(patches, item, k, v)
+    want = {(item, k): v for item, keys in sp.items() for k, v in keys.items()}
+    patches = []
+    for e in ov.get('patches', []):
+        st = e.get('set')
+        if e.get('component') == 'TrickItem' and isinstance(st, dict) \
+                and 'pc_durations.py' not in (e.get('source') or ''):
+            for k in [k for k in st if k in KEYS]:
+                v = want.pop((e.get('object'), k), None)
+                if v is None:
+                    del st[k]
+                else:
+                    st[k] = v
+            if not st:
+                continue
+        patches.append(e)
+    for (item, k), v in want.items():
+        _set_key(patches, item, k, v)
     ov['patches'] = patches
     src = ov.get('source', '')
     note = ("The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: "

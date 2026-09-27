@@ -127,8 +127,14 @@
     "PCWoodySeconds": {
      "IT_Egg": 2.167
     },
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 2.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     298,
+     395,
+     "kit"
+    ]
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 26 ticks"
   },
@@ -139,8 +145,14 @@
     "PCWoodySeconds": {
      "IT_Marker": 2.083
     },
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 2.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 2.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     435,
+     390,
+     "anc"
+    ]
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
@@ -151,8 +163,14 @@
     "PCWoodySeconds": {
      "IT_Wcpaper": 2.083
     },
-    "PCSurpriseSeconds": 1.25,
-    "PCFixSeconds": 4.083
+    "PCSurpriseSeconds": 1.333,
+    "PCFixSeconds": 4.083,
+    "PCAlignX": true,
+    "PCFixPoint": [
+     505,
+     397,
+     "toi"
+    ]
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },

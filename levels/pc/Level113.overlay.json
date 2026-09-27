@@ -274,7 +274,12 @@
     "PCShoutIndex": 1,
     "PCFireBefore": true,
     "PCSurpriseSeconds": 5.083,
-    "PCFixSeconds": 2.083
+    "PCFixSeconds": 2.083,
+    "PCFixPoint": [
+     625,
+     400,
+     "bas"
+    ]
    }
   },
   {
