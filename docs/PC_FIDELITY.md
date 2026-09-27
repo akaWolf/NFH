@@ -1084,6 +1084,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   above the hall's floor line, so he climbs to clean it and the next walk
   comes down first); the port stands those GOTOs' mover ticks (PCAlignX,
   PCFixPoint; `Pawn.pc1_goto_ticks`) and leaves from the hotspot. The
+  marbles' and the banana's falls push the floor object's `clean` after
+  the fall (fcn.0047b6a0, fcn.0047d0e0: 49 ticks the marbles, 13 or 25 the
+  banana by its room; the soap's fcn.0047ddc0 has none), which the port
+  had dropped (PCFixSeconds 0 on every slip) — E11's marbles to the board
+  28.6 s against Badinfos' 29.4 (24.5 without it). 114's hat stand
+  (Level_Hunter's cases 22-24) is one PC station the port plays in three
+  visits — the take and takehat (the Hat), the medals or the rat's dance
+  (the MedalBox: its five-argument step fires first, then `ratdance`, 51
+  ticks), the rip and the sticky hat's fire or the putback, and the give
+  (the Hat again); the tricked visits had replayed the take and takehat
+  (4.7 s): the marbles to the medal box 33.2 s, the box to the hat 8.1 and
+  the hat to the horn 19.4 against E14's 33.7, ~8.1 and ~20.4 (37.9, 9.6
+  and 19.4 before, the box's bonus lost once the clean went in). The
   stands come out of the
   level classes' case chains simulated with the trick in place
   (tools/pcref/trick_branches.py, the keys through tools/pcref/

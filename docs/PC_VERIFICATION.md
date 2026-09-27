@@ -340,7 +340,10 @@ actors' job pass the update calls at 0x100445f8.
   walk to the kitchen's back door 5.8 s against 4.6, the first 10 ticks of
   it the way down from that hotspot to the floor line; from the pass to
   the oven's fire 10.0 s against 10.05, the pie's own stand about 1.75 s
-  against 1.5.
+  against 1.5. E11's chain (runs/clean_s1) 23.7, 15.5, 25.3, 26.8, 28.6,
+  22.0 and 20.4 s against Badinfos' 23.7, 16.0, 26.3, 27.6, 29.4, 22.5 and
+  20.9 (the marbles' clean carried), E14's last three 33.2, 8.1 and 19.4
+  against 33.7, ~8.1 and ~20.4 (the hat stand's visits, runs/hat114).
   E11's living room after the dog's alarm, read 2026-09-27: a room trigger
   fires on every tick its two rooms match, into a pending list
   (fcn.00472390, the check fcn.00471bc0), and a pending behaviour is
