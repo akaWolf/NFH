@@ -1430,9 +1430,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   where the step's parts go on without a GoTo, nor after a `leave`). A
   station is the object its step's GoTo goes to (pc_walks_s2.py
   STATIONS, checked against the lap model's GoTo targets): 212's ledge
-  step walks to the parrot and plays the cliff's `enter` and `use`, the
-  water's and the water exit's from there, so both mobile ledge stations
-  are the parrot's (the same-object snap between them); 209's shoe step
+  step walks to the cliff (0x100353d2-0x100353f5; the parrot until
+  2026-09-27, when the GoTo's target was first read — below) and plays
+  the cliff's `enter` and `use`, the water's and the water exit's from
+  there, so both mobile ledge stations are the cliff's (the same-object
+  snap between them); 209's shoe step
   puts the shoes on the mat and enters the curtain from it, so the Taj
   is the shoe mat's; 204's jade step walks to the jade, not its dummy
   (67 px).
@@ -1550,6 +1552,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and the kid's `laugh` after 205's sand lion's repair, a DoActions job
   in the neighbour's sequence, 7.58 s — the port had gone on after the
   shout or the repair.
+  The GoTo's own argument (2026-09-27): the lap model's walker took the
+  step object loaded into ecx for the thiscall (`mov ecx, [ebp-X]` right
+  before `call fcn.1000e3e0`) for the object's name, so nearly every
+  step's GoTo read `$0x..` and the lap's walks fell back on the step's
+  IsVariant pick or its DoActions' object — 203's toilet step walked to
+  the toilet paper, 85 px short of the toilet it goes to
+  (0x10033e6e-0x10033e8e: groundleft_toilet), 212's ledge step to the
+  parrot, 211 px short of the cliff (0x100353d2-0x100353f5) —, and
+  step_ticks compared those names: two steps whose GoTos took their names
+  from the same stack offset counted as one place (a tick short). Read
+  since (`this_k`; a name put in its slot through edx too, 205's put
+  step: beachleft_waterski_guarded, 5 px above the ride's
+  beachleft/waterski — PCApproach `x`/`px` per visit, pc_walks_s2
+  VISIT_OBJECTS): the model's laps 203 107.5 s and 208 87.2, the port's
+  idle laps' own (107.5, 87.2), 212 130.3 with the cliff (the ledge's
+  stations the cliff's, pc_walks_s2 STATIONS), 209 107.6 (the port
+  108.2); a tick more on the stays of 203's microphone, 205's rockets and
+  sand lion, 212's whip and cigars, 213's tortilla, one less on 210's
+  basket and elephant.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which

@@ -1009,3 +1009,13 @@ actors' job pass the update calls at 0x100445f8.
   the sofa's LEAVE and the spit, 101's fart bag before the sofa's LEAVE,
   110's fuel beer before the barbecue's switch. All 14 Season 1 at 100;
   109's bed to the alarm clock 38.1 s (the video's 38.0; 39.9 before).
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_walks_s2.py`,
+  `runtime/world.py`, `tests/run_tricks.py`, `levels/pc/Level2*.overlay.json`
+  (2026-09-27): the Season 2 GoTo's own argument — the walker had taken the
+  step object loaded into ecx for the thiscall for the object's name, the
+  lap's walks falling back on the IsVariant pick or the DoActions' object
+  and step_ticks comparing `$` names. 203's toilet step walks to the toilet
+  (the model's lap 107.5 s, the port's idle lap's own; 208 87.2 the same),
+  212's ledge step to the cliff (STATIONS; the lap 4 s longer), 205's put
+  step to the guarded skis through edx (PCApproach x / px per visit,
+  VISIT_OBJECTS, world.pc_ap_px); a tick more or less on nine stays.
