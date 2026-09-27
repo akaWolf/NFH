@@ -327,16 +327,18 @@ actors' job pass the update calls at 0x100445f8.
   (`Pawn.pc_room`), not the zone. The concurrent pass of 2026-09-26 keys on
   the level's season (`doors_concurrent`), and the Season 2 sweep is
   byte-identical under it.
-- The Season 1 chains against Badinfos' runs (2026-09-26): E04 pays its
-  seven 18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan
-  18.6, 11.7, 19.0, 11.8, 18.9 and 22.1 — the toilet to the aftershave
-  3.3 s and the picture to the dirty oven 4.7 s shorter than the PC's
-  (E04's frames hold him at the pie about 2 s, 221-223, before he turns
-  for the oven, where the port's `take` is 0.33 s; the rest is in the
-  walks); E11's living room after the dog's alarm: 11.3 s from his entry
-  to the vacuum's fire on the PC, 7.3 in the port, whose carpet trigger
-  starts the vacuum case the moment he enters — whether game.exe lets the
-  alarm's GOTO2 and `search` end first is not read.
+- The Season 1 chains against Badinfos' runs (2026-09-26, remeasured
+  2026-09-27 with the door pass and the floor line): E04 pays its seven
+  18.2, 12.6, 22.3, 12.2, 19.0 and 26.8 s apart, the port's plan 18.2,
+  11.9, 21.1, 11.8, 19.0 and 24.6 (runs/floor2s1; 18.6, 11.7, 19.0, 11.8,
+  18.9 and 22.1 before) — the toilet to the aftershave 1.2 s and the
+  picture to the dirty oven 2.2 s shorter than the PC's (E04's frames hold
+  him at the pie about 2 s, 221-223, before he turns for the oven; the
+  port's `take` and step down from its hotspot are 0.8 s, 217.7-218.5);
+  E11's living room after the dog's alarm: 11.3 s from his entry to the
+  vacuum's fire on the PC, 8.0 in the port (7.3 before), whose carpet
+  trigger starts the vacuum case the moment he enters — whether game.exe
+  lets the alarm's GOTO2 and `search` end first is not read.
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
