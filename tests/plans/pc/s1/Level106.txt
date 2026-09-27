@@ -2,7 +2,10 @@
 # thermometer of pc_s1_all_720.mp4, 1149.4 s on; the pays in level seconds):
 # Microwave 197.5 > Pudding 212.5 (+15.0) > MumPicture 234.5 (+22.0, the
 # pudding's 25 s window) > Ground@Zone04 252.0 (+17.5: the soap at the
-# bathroom door) > BathTub 267.5 (+15.5) > Towel 274.5 (+7.0) > PhotoAlbum
+# bathroom door — laid there, x=-4.2 by the door at -4.07 (its box, to -4.16, takes a click nearer): the PC's floor
+# trick lies where Woody lays it; the mobile's spot, 0.74 units into the
+# room, lets the picture's 18-s window lapse) > BathTub 267.5 (+15.5) >
+# Towel 274.5 (+7.0) > PhotoAlbum
 # 292.5 (+18.0, the towel's 23 s window) > Candy 304.5 (+12.0) > Toilet 313.0
 # (+8.5, on the candy rush) — nine tricks, eight bonuses, 100.
 # His idle lap under the profile (runs/idlepc4): living 0-14 (album 3-12.5,
@@ -44,7 +47,7 @@ park! Zone01
 usewith! MumPicture IT_Marker        # Zone01 (~180): pays on his lap-4 hall pass to the bathroom (~234)
 usewith! BathTub IT_Hairrestorer     # Zone04 (~182): the tub is full since his lap-3 fill (168)
 usewith! Towel IT_Shoepolish         # Zone04
-usewith! Ground@Zone04 IT_Soap       # Zone04: the slip at the bathroom door
+usewith! Ground@Zone04 IT_Soap x=-4.2   # Zone04: the slip at the bathroom door
 park! Zone01
 hide! Wardrobe                       # by 194: he enters the kitchen at 195 and stays through the egg, the pour and two tantrums (~226)
 whenzone Zone03                      # (195) the chain lap: the living room is free until his lap-4 album (~290)

@@ -15,7 +15,7 @@
     "PCAngryTime": 204,
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 6.167,
+    "PCUseSecondsTricked": 6.333,
     "PCFixPoint": [
      630,
      420,
@@ -35,14 +35,14 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     3.58,
+     3.67,
      0.42
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.0
+    "PCUseSecondsTricked": 4.333
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.6 s; Camera <- camera#1 0.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.7 s; Camera <- camera#1 0.4 s"
   },
   {
    "object": "MagnesiumBottle",
@@ -56,11 +56,11 @@
    "object": "MumStatueFootStool",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.42,
+    "PCUseSeconds": 5.5,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.667
+    "PCUseSecondsTricked": 3.917
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.5 s"
   },
   {
    "object": "Ground",
@@ -72,7 +72,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Banana <- woody laydown 5 ticks"
   },
@@ -95,12 +98,13 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 2.0,
+    "PCUseSecondsTricked": 2.167,
     "PCFixPoint": [
      490,
      415,
      "kit"
-    ]
+    ],
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_art's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Pins <- kit/stool pins 13 ticks"
   },
@@ -200,25 +204,25 @@
    "object": "Drawing",
    "component": "Drawing",
    "set": {
-    "PCUseSeconds": 3.5
+    "PCUseSeconds": 3.58
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.6 s"
   },
   {
    "object": "DieselChair",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.17
+    "PCUseSeconds": 0.25
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.17 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.25 s"
   },
   {
    "object": "DieselGenerator",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.75
+    "PCUseSeconds": 4.83
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter 4.75 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter 4.83 s"
   },
   {
    "object": "Chili",
@@ -234,7 +238,7 @@
    "set": {
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 0.0,
-    "PCFireAt": 0
+    "PCFireAt": 0.0
    }
   },
   {

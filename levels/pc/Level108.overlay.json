@@ -16,56 +16,61 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
    "object": "CoffeeMaker",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.42,
+    "PCUseSeconds": 6.58,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 8.0,
-    "PCFireAt": 6.417
+    "PCUseSecondsTricked": 8.5,
+    "PCFireAt": 6.75,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 6.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 6.6 s"
   },
   {
    "object": "Shezlong",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.25,
+    "PCUseSeconds": 2.33,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 1.667,
+    "PCUseSecondsTricked": 1.833,
     "PCFixPoint": [
      505,
      410,
      "bal"
-    ]
+    ],
+    "PCReactTail": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.3 s"
   },
   {
    "object": "WateringCan",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.75,
-     0.75
+     0.92,
+     0.92
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.8 s; WateringCan <- ewer#2 0.8 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.9 s; WateringCan <- ewer#2 0.9 s"
   },
   {
    "object": "Plant",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.25,
+    "PCUseSeconds": 2.33,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.25
+    "PCUseSecondsTricked": 2.5
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.3 s"
   },
   {
    "object": "SunLotion",
@@ -76,7 +81,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.833
+    "PCUseSecondsTricked": 8.0
    },
    "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- bal/suncream honey 25 ticks"
   },
@@ -109,8 +114,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.75,
-    "PCFireAt": 2.083
+    "PCUseSecondsTricked": 7.167,
+    "PCFireAt": 2.333,
+    "PCFireLead": true,
+    "PCRedoSeconds": 3.917
    },
    "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Brush <- toi/toothbrushset brush 25 ticks"
   },
@@ -200,9 +207,9 @@
    "object": "ToothBrush",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.08
+    "PCUseSeconds": 4.33
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 4.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 4.3 s"
   },
   {
    "object": "Ground",

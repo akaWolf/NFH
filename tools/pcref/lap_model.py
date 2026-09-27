@@ -344,6 +344,12 @@ def _lap(L, toks, start):
             t = L.walk_ticks(x, y, xo, yo, L.rooms.get(room, {}).get('y', y))
             if after and t:
                 t -= 1                # its first move in the leave's last tick (0x4760ad, run-now 1)
+            if t:
+                # the walk job pushes the door step with the run-now flag 1 in
+                # the update its mover arrives in (0x476004-0x476070), and the
+                # step its ACTION the same way (0x474480-0x474496): the pass
+                # starts in the leg's last move's tick
+                t -= 1
             legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
             # the door step's one ACTION of two entries (fcn.004741e0 -> fcn.00478030):
             # the near `enter` and the far `leave` start together, the longer times it
@@ -356,16 +362,19 @@ def _lap(L, toks, start):
             t -= 1
         legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
 
-    def leave(obj=None, implicit=False):
+    def leave(obj=None, implicit=False, shared=False):
         """the object's leave; the one a walk makes (the neighbour still in the
         object when the next GOTO starts) plays there before the walk, so it
-        closes the station he sits in: it goes before the next station's icon"""
+        closes the station he sits in: it goes before the next station's icon;
+        `shared`: the walk after it opens in its last tick"""
         nonlocal occupied
         obj = obj or occupied
         if obj:
             # the LEAVE step's ACTION `leave`: two updates without a record
             t = L.job_ticks(obj, 'leave')
             t = 2 if t is None else t
+            if shared:
+                t -= 1
             i = len(legs)
             while implicit and i > 0 and legs[i - 1][0] == 'icon':
                 i -= 1
@@ -386,13 +395,25 @@ def _lap(L, toks, start):
         if first:
             legs.append(('intro', 'start %s %d/%d -> %s' % (room, x, y, obj), 0)); room, x, y = r2, x2, y2; first = False
         else:
-            if occupied and occupied != obj: leave(implicit=True)
+            left = bool(occupied and occupied != obj)
             moved = (r2, x2, y2) != (room, x, y)
+            if left:
+                # the walk job's own LEAVE (0x475ce6, pushed with the run-now
+                # flag 1 in the GOTO's first update): the walk's first move or
+                # door falls in its last tick, which the station's leave gives
+                # up (the GOTO then ends with the walk)
+                leave(implicit=True, shared=moved)
             walk_to(r2, x2, y2, obj)
-            # the GOTO's next update ends it a tick after the last move
-            # (0x44aab0); with no move the walk job ends inside its first
-            # update and the arrival is read on the second: three ticks
-            legs.append(('goto', 'the GOTO ends', 1 if moved else 3))
+            moved = moved or left
+            # the mover reads its arrival in the update of its last move
+            # (0x47cf93-0x47d00d, done), the walk job then finds the path's
+            # end in the same tick (0x476112 -> 0x476209, done) and the GOTO
+            # under it, started (+0x14), is done there too (0x44a81b ->
+            # 0x44aab0): the next step, pushed with the run-now flag 0, starts
+            # on the tick after the last move — no tick of the GOTO's own;
+            # with no move the walk job ends inside the GOTO's first update
+            # and the GOTO on its second: two ticks
+            legs.append(('goto', 'the GOTO ends', 0 if moved else 2))
         current = obj
         return True
 
@@ -403,6 +424,13 @@ def _lap(L, toks, start):
         if kind == 'ICON':
             legs.append(('icon', ' '.join(strs), 0)); continue
         if kind == 'TRICK': continue
+        if kind in ('SUBSEQ', 'MSG', 'STOPMSG'):
+            # an instant step of the case's list (routine_order.py INSTANT): the
+            # list's own first update (pushed by the case with the run-now flag
+            # 0, it only pushes its first element — the sequence update
+            # 0x476530), a message step or a StopMsg (update 0x47c550, done on
+            # its first call) — the next element starts a tick later
+            legs.append(('action', 'step %s' % kind.lower(), 1)); continue
         if kind in ('GOTO', 'GOTOENTER', 'ENTER'):
             obj = base_of(objs)
             if obj is None:

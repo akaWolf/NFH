@@ -6,12 +6,16 @@
 # microwave before the binoculars' fire sends him back to the window first
 # (the mobile skipped the fired station; docs/PC_VERIFICATION.md). Badinfos'
 # E01 pays microwave > binoculars > TV > sofa (17.7, 17.4, 16.2 s) off a
-# 23-s sofa stay the port's lap (14 s) does not give.
+# 23-s sofa stay the port's lap (14 s) does not give. The glue goes on from
+# the hall as he leaves the window for the sofa (the kitchen is his for 15 s
+# of every 30-s lap: 13-28 s, 43-58 s …).
 take Fridge IT_Egg
 take Drawer IT_Fartbag
 take FirstAid IT_Superglue
-whenusing Sofa                    # he sits in the living room
-usewith Binoculars IT_Superglue   # Zone03, while he sits
+park! Zone01                      # the hall, off his lap (the living room and the window's kitchen)
+whenzone Zone02                   # he leaves the window for the sofa: the kitchen is free ~15 s
+usewith Binoculars IT_Superglue   # Zone03
+park! Zone01
 whenusing Binoculars              # the glue fires at the window
 use! Television                   # Zone02: noticed as he comes back in
 usewith! Sofa IT_Fartbag          # Zone02

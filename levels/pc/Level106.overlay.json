@@ -36,12 +36,13 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 4.0,
+    "PCUseSecondsTricked": 4.167,
     "PCFixPoint": [
      380,
      420,
      "lir"
-    ]
+    ],
+    "PCReactTail": 1
    }
   },
   {
@@ -50,8 +51,8 @@
    "set": {
     "PCAngryTime": 240,
     "PCShoutIndex": 1,
-    "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 3.25
+    "PCFixSeconds": 2.25,
+    "PCUseSecondsTricked": 3.5
    }
   },
   {
@@ -61,8 +62,10 @@
     "PCAngryTime": 216,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.5,
-    "PCFireAt": 2.0
+    "PCUseSecondsTricked": 6.167,
+    "PCFireAt": 2.25,
+    "PCStopSkip": true,
+    "PCFireLead": true
    }
   },
   {
@@ -70,60 +73,64 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     9.58,
-     9.58
+     9.67,
+     9.67
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PhotoAlbum <- photo_album#0 9.6 s; PhotoAlbum <- photo_album#1 9.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PhotoAlbum <- photo_album#0 9.7 s; PhotoAlbum <- photo_album#1 9.7 s"
   },
   {
    "object": "Pudding",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     8.08,
-     8.08
+     8.17,
+     8.17
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pudding <- milk_bottle#0 8.1 s; Pudding <- milk_bottle#1 8.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pudding <- milk_bottle#0 8.2 s; Pudding <- milk_bottle#1 8.2 s"
   },
   {
    "object": "Candy",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.92,
-     0.92
+     1.0,
+     1.0
     ],
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.583,
-    "PCFireAt": 0.917
+    "PCUseSecondsTricked": 3.0,
+    "PCFireAt": 1.083,
+    "PCStopSkip": true,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candy <- candy#0 0.9 s; Candy <- candy#1 0.9 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candy <- candy#0 1.0 s; Candy <- candy#1 1.0 s"
   },
   {
    "object": "BathTub",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     2.92
+     0.58,
+     3.0
     ],
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.583,
-    "PCFireAt": 2.917
+    "PCUseSecondsTricked": 7.917,
+    "PCFireAt": 3.083,
+    "PCStopSkip": true,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BathTub <- bath#0 0.4 s; BathTub <- bath#1 2.9 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BathTub <- bath#0 0.6 s; BathTub <- bath#1 3.0 s"
   },
   {
    "object": "Towel",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.0
+    "PCUseSeconds": 3.33
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Towel <- towel#0 3.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Towel <- towel#0 3.3 s"
   },
   {
    "object": "Microwave",
@@ -139,7 +146,9 @@
      298,
      395,
      "kit"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 26 ticks"
   },
@@ -157,7 +166,9 @@
      435,
      390,
      "anc"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
@@ -175,7 +186,9 @@
      505,
      397,
      "toi"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
@@ -189,7 +202,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_bath's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Knotbook <- woody laydown 5 ticks"
   },

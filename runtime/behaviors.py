@@ -572,17 +572,25 @@ class RollerSkaterBehavior(Behavior):
             rt.frozen = True                          # ActionManager.Freeze
 
     def _come_back(self):
-        self.state = self.COMEBACK                    # cs:168-179
         rott = self.rott()
         if rott is None:
+            self.state = self.COMEBACK                # cs:168-179
             return
         if pcprofile.is_pc() and self.roller_skater is not None \
                 and self.roller_skater.tricked and not self.roller_skater.pc_fired:
             # game.exe's skate site (0x4632f5): the fall out of the window
             # (kit/window.fallout, 2.92 s), then the step's fire, then the
             # wait and the walk back in — the shout state's play_angry below
-            # finds the trick fired (docs/PC_ROUTINES.md "The stands")
+            # finds the trick fired (docs/PC_ROUTINES.md "The stands"). The
+            # step's own two ticks (its fire, its list's first update — the
+            # list empty under flags 3, pcprofile.S1_FIRE_LEAD_TICKS) pass
+            # before the list's next step: the fall's countdown holds them
             self.world.s1_fire(rott, self.roller_skater)
+            if not pcprofile.SEASON2:
+                self.roller_skater.pc_lead_stood = True
+                self._fall_left = pcprofile.S1_FIRE_LEAD_TICKS / pcprofile.TICKS_PER_SECOND
+                return
+        self.state = self.COMEBACK                    # cs:168-179
         rott.sprite.hidden = False
         rott.movement_paused = False                  # ContinueMovement
         rott.sprite.x, rott.sprite.y = self.entrance_location

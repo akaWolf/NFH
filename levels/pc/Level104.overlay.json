@@ -20,7 +20,9 @@
      435,
      390,
      "anc"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -35,7 +37,9 @@
      505,
      397,
      "toi"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -43,25 +47,25 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
+     0.5,
      2.5
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.4 s; ApplePie <- whippedcream#0 eat 2.50 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.5 s; ApplePie <- whippedcream#0 eat 2.50 s"
   },
   {
    "object": "Microwave",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 16.75,
+    "PCUseSeconds": 16.83,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 0.0,
-    "PCFireAt": 0,
+    "PCUseSecondsTricked": 0.167,
     "PCFixPoint": [
      298,
      395,
      "kit"
-    ]
+    ],
+    "PCReactTail": 1
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Microwave <- microwave#0 16.8 s"
   },
@@ -75,7 +79,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 5 ticks"
   },
@@ -88,7 +95,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.833
+    "PCUseSecondsTricked": 5.0
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- toi/aftershave superglue 13 ticks"
   },
@@ -101,7 +108,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.0
+    "PCUseSecondsTricked": 4.083
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Hairrestorer <- toi/grease hairrestorer 13 ticks"
   },
@@ -134,7 +141,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.833
+    "PCUseSecondsTricked": 5.0
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/aftershave superglue 13 ticks"
   },
@@ -147,7 +154,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.0
+    "PCUseSecondsTricked": 4.083
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/grease hairrestorer 13 ticks"
   },
@@ -170,7 +177,7 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.083
+    "PCUseSecondsTricked": 6.333
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Shavingfoam <- kit/whippedcream shavingfoam 13 ticks"
   },
@@ -229,39 +236,39 @@
    "object": "WhippedCream",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.67
+    "PCUseSeconds": 2.75
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WhippedCream <- whippedcream#0 put_cream 2.67 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WhippedCream <- whippedcream#0 put_cream 2.75 s"
   },
   {
    "object": "Deodrant",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     0.42
+     0.58,
+     0.58
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Deodrant <- basin#0 take 0.42 s; Deodrant <- basin#2 give 0.42 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Deodrant <- basin#0 take 0.58 s; Deodrant <- basin#2 give 0.58 s"
   },
   {
    "object": "AfterShave",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     0.42
+     0.5,
+     0.5
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AfterShave <- basin#0 take 0.42 s; AfterShave <- basin#2 give 0.42 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AfterShave <- basin#0 take 0.50 s; AfterShave <- basin#2 give 0.50 s"
   },
   {
    "object": "SinkAftershave",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.67
+    "PCUseSeconds": 3.75
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SinkAftershave <- basin#1 shave 3.67 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SinkAftershave <- basin#1 shave 3.75 s"
   },
   {
    "object": "SinkDeodrant",

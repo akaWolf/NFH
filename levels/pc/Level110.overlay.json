@@ -16,7 +16,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -31,7 +34,7 @@
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.75
+    "PCUseSeconds": 0.83
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 0.8 s"
   },
@@ -40,26 +43,28 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.83,
-     1.5
+     1.92,
+     1.58
     ],
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.5
+    "PCUseSecondsTricked": 2.833,
+    "PCStopSkip": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.8 s; BBQ <- bbq#1 1.5 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.9 s; BBQ <- bbq#1 1.6 s"
   },
   {
    "object": "CarnivorPlantSpray",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.33,
+    "PCUseSeconds": 3.42,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.917,
-    "PCFireAt": 4.25
+    "PCUseSecondsTricked": 7.333,
+    "PCFireAt": 4.5,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CarnivorPlantSpray <- plant#0 3.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CarnivorPlantSpray <- plant#0 3.4 s"
   },
   {
    "object": "SteakChair",
@@ -67,7 +72,8 @@
    "set": {
     "PCUseSeconds": 6.75,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 2.583
+    "PCUseSecondsTricked": 3.167,
+    "PCRedoSeconds": 6.333
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.8 s"
   },
@@ -75,11 +81,12 @@
    "object": "SteakWine",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.33,
+    "PCUseSeconds": 1.42,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.917
+    "PCUseSecondsTricked": 3.083,
+    "PCReactTail": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakWine <- wine#0 1.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakWine <- wine#0 1.4 s"
   },
   {
    "object": "FireExtinguisher",
@@ -89,13 +96,14 @@
      "use": 1.083
     },
     "PCGrabSeconds": 0.417,
-    "PCUseSecondsTricked": 7.917,
-    "PCFireAt": 7.917,
-    "PCFixSeconds": 2.083,
+    "PCUseSecondsTricked": 8.333,
+    "PCFireAt": 8.167,
+    "PCFixSeconds": 2.25,
     "PCFixUseSeconds": 0,
     "PCToolUseSeconds": 3.333,
     "PCReturnSeconds": 0.0,
-    "PCRunTo": true
+    "PCRunTo": true,
+    "PCFireLead": true
    },
    "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/extinguisher 13 ticks"
   },

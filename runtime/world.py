@@ -501,7 +501,9 @@ class AnimPlayer:
         if self.time_scale != 1.0:
             dt = dt * self.time_scale     # the profile only; the mobile path keeps its floats
         self.acc = _f32(self.acc - _f32(dt))
-        if self.acc > 0.0:
+        if self.acc > (pcprofile.TIMER_EPS if pcprofile.is_pc() else 0.0):
+            # (the PC profile: a frame paced to whole PC ticks ends on the
+            # frame they are reached, not a float residue later)
             return
         a = self.anim
         if self.sound_sink:
@@ -1161,6 +1163,8 @@ class Pawn:
         self.item_aux = it                          # Pawn.cs:595
         self._capture_click(dest)
         final = {'kind': 'item', 'item': it, 'x': it.move_x(self.role)}
+        if self.role == 'Woody' and getattr(it, 'pc_drop_x', None) is not None:
+            final['x'] = it.pc_drop_x     # the PC's floor trick: the clicked point
         if it.should_walk_up and abs(self.sprite.x - it.x) >= 0.1:
             final = [{'kind': 'point', 'x': it.target_x}, final]
         return self._route(dest, final, on_arrive)
@@ -1876,9 +1880,13 @@ class Pawn:
         pace that lasts the leg (`pc1` on a step, `pc1_out` on a door step for
         the descent). A leg after a door starts in the far door's `leave`'s last
         tick (the walk job pushes the next mover with the run-now flag 1,
-        0x4760ad), the GOTO ends a tick after its last move (its next update,
-        0x44aab0), three ticks with no move at all (the walk job done inside
-        the GOTO's first update, the arrival read on its second)"""
+        0x4760ad), a door's pass in the last move's tick of the leg before it
+        (the door step and its ACTION pushed with the run-now flag 1,
+        0x476004-0x476070, 0x474480-0x474496), and the GOTO ends in the tick
+        of its last move — the mover, the walk job and the GOTO all done in it
+        (0x47cf93-0x47d00d, 0x476112-0x476209, 0x44a81b-0x44aab0) — two ticks
+        with no move at all (the walk job done inside the GOTO's first update,
+        the GOTO on its second)"""
         z = self.zone
         if z is None or getattr(z, 'pc_walk_room', None) is None:
             return
@@ -1980,8 +1988,18 @@ class Pawn:
                                    sneaking=self.sneaking) or 0
         if leg['after'] and t > 0:
             t -= 1                        # its first move in the leave's last tick
-        if last:
-            t += 3 if (t == 0 and not leg['after']) else 1
+        if not last and t > 0:
+            # the walk job pushes the door step with the run-now flag 1 in the
+            # update its mover arrives in (0x476004-0x476070), the step its
+            # ACTION the same way (0x474480-0x474496): the pass starts in the
+            # leg's last move's tick
+            t -= 1
+        if last and t == 0 and not leg['after']:
+            # no move and no door: the walk job ends inside the GOTO's first
+            # update, the GOTO on its second — the next step two ticks on;
+            # after a move the GOTO ends in its tick (0x47cf93-0x47d00d,
+            # 0x476112-0x476209, 0x44a81b-0x44aab0)
+            t = 2
         leg['to'] = tuple(end)
         leg['secs'] = t / pcprofile.TICKS_PER_SECOND
         leg['scale'] = leg['nat'] / leg['secs'] if leg['secs'] > 0.0 and leg['nat'] > 0.0 \
@@ -2036,8 +2054,8 @@ class Pawn:
     def pc1_goto_ticks(self, point, x_only=False):
         """a Season 1 GOTO from where the pawn stands to `point` ([x, y, room] of
         its PC room): (ticks, the PC point reached) — the mover's
-        (pcprofile.s1_leg_ticks) and the GOTO's end a tick after its last move,
-        three ticks with no move (Pawn._pc1_marks); x_only is CreateGoToObjXJob's
+        (pcprofile.s1_leg_ticks), the GOTO ending in the tick of its last move,
+        two ticks with no move (Pawn._pc1_marks); x_only is CreateGoToObjXJob's
         target (fcn.0047a4a0: the hotspot's x at the actor's own y), which walks
         even when he stands there; the repair's (fcn.0047ae70) is skipped on the
         point (isActorAtObject, fcn.0047aa90): 0 ticks. None outside the point's
@@ -2054,7 +2072,7 @@ class Pawn:
             return 0, to
         t = pcprofile.s1_leg_ticks(self.role, self._pc_gait(), here[0], here[1], to[0], to[1],
                                    r['floor'], sneaking=self.sneaking) or 0
-        return (t + 1 if t > 0 else 3), to
+        return (t if t > 0 else 2), to
 
     def pc1_stand_at(self, point):
         """the pawn stands on a PC point: the next walk leaves from it"""
@@ -2671,6 +2689,18 @@ class Pawn:
                 passed = True
             if mag <= self._min_dist() or passed:
                 s = self._step
+                if self.walk_hook is not None and pcprofile.is_pc() and not self.nfh2 \
+                        and not s.get('pc_noticed'):
+                    # game.exe's nearobj triggers are tested every tick wherever
+                    # he stands (fcn.00472390 over fcn.00471bc0), the tick he
+                    # arrives in too — the frame of the arrival runs
+                    # UpdateWalking's notice once more (a walk that lasts the
+                    # PC's ticks may reach its target without a frame inside
+                    # the notice distance before it)
+                    s['pc_noticed'] = True
+                    self.walk_hook()
+                    if self.state != self.WALK:
+                        return
                 if 'pc_secs' in s and self._pc_step_t < s['pc_secs'] - 1e-9:
                     # a timed step of the PC profile holds until its time is out
                     self.velocity = (0.0, 0.0)
@@ -3360,6 +3390,7 @@ class Routine:
         self.timer = 0.0
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
         self.pc_zero_visit = False       # this visit's PCUseSeconds is 0: the PC plays nothing
+        self._pc_redo = None             # the ReuseAfterFix redo's item (PCRedoSeconds)
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
@@ -5016,8 +5047,15 @@ class Routine:
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
         self.pc_zero_visit = False
+        redo, self._pc_redo = self._pc_redo, None
         if it is None or not pcprofile.is_pc() or not pcprofile.rule('durations'):
             return 0.0
+        if redo is it and getattr(it, 'pc_redo_secs', None) is not None and self.role == 'Rottweiler':
+            # the mobile's redo of the normal use after the fix (ReuseAfterFix)
+            # stands for the PC case's own actions after the repair
+            # (PCRedoSeconds); the visit's slot passes as the redo's would
+            self._pc_visit_seconds(it)
+            return float(it.pc_redo_secs)
         if self.role != 'Rottweiler':
             # another actor's stand at the PC data's `time` (PCUseSecondsRole)
             vals = (getattr(it, 'pc_use_secs_role', None) or {}).get(self.role)
@@ -5194,6 +5232,8 @@ class Routine:
             self._action_stopped()
         if target is not None and target.reuse_after_fix:
             self._pending = 'start'
+            if pcprofile.is_pc():
+                self._pc_redo = target    # the redo's PC seconds (PCRedoSeconds)
         else:
             self._pending = 'advance'
             if pcprofile.is_pc() and target is not None and target is it \
@@ -6346,16 +6386,12 @@ class Routine:
         self.pawn.anim.time_scale = 1.0
         w = self.pawn.world
         # a station the mobile makes a walk-by: 111's rack, whose case 14
-        # fires its OBJ2 bal/clothes_food on his arrival (PCFireAt 0), then
-        # the repair and the take — no doubletake (tools/pcref/
-        # trick_branches.py)
-        station = pcprofile.is_pc() and getattr(it, 'pc_fire_at', None) == 0.0
-        if pcprofile.is_pc() and w is not None and it.tricked and not it.pc_fired \
-                and (getattr(it, 'pc_fire_before', False) or station):
-            # the soap and marbles slips: game.exe's five-argument step
-            # scores first and plays the fall inside it (PCFireBefore); the
-            # station fires on arrival
-            w.s1_fire(self.pawn, it)
+        # fires its OBJ2 bal/clothes_food on his arrival — after its list's
+        # start and StopMsg (PCFireAt, stood before the fire) — then the
+        # repair and the take — no doubletake (tools/pcref/trick_branches.py)
+        station = pcprofile.is_pc() and getattr(it, 'pc_fire_at', None) is not None
+        fire_first = pcprofile.is_pc() and w is not None and it.tricked and not it.pc_fired \
+            and (getattr(it, 'pc_fire_before', False) or station)
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
         # arm (Rottweiler.cs:1049-1052)
         self._urgent_action = {'kind': 'surprise_near'}
@@ -6374,7 +6410,7 @@ class Routine:
         def surprise():
             if seq:
                 pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
-                      or (it.pc_use_secs_tricked if station else None)) \
+                      or ((it.pc_use_secs_tricked or 0.0) - float(it.pc_fire_at) if station else None)) \
                     if pcprofile.is_pc() else None
                 if pc:
                     # the PC fall (slip1/slip3, 31 frames) or the doubletake
@@ -6388,17 +6424,37 @@ class Routine:
             else:
                 self._surprise_near_done()
 
-        g = self.pawn.pc1_goto_ticks(getattr(it, 'pc_fix_point', None), x_only=True) \
-            if pcprofile.is_pc() and getattr(it, 'pc_align_x', False) else None
-        if g is not None:
-            # the PC's look: CreateGoToObjXJob to the tricked object's hotspot
-            # x before the doubletake (fcn.0047a4a0 in fcn.0047d520 and its
-            # kin) — its ticks stood, the pawn then on that point
-            self.pawn.pc1_stand_at(g[1])
+        def begin():
+            if fire_first:
+                # the soap and marbles slips: game.exe's five-argument step
+                # scores first and plays the fall inside it (PCFireBefore); the
+                # station fires on arrival
+                w.s1_fire(self.pawn, it)
+            g = self.pawn.pc1_goto_ticks(getattr(it, 'pc_fix_point', None), x_only=True) \
+                if pcprofile.is_pc() and getattr(it, 'pc_align_x', False) else None
+            if g is not None:
+                # the PC's look: CreateGoToObjXJob to the tricked object's hotspot
+                # x before the doubletake (fcn.0047a4a0 in fcn.0047d520 and its
+                # kin) — its ticks stood, the pawn then on that point
+                self.pawn.pc1_stand_at(g[1])
+                self.pawn._stand()
+                self.pawn.world.call_later(g[0] / pcprofile.TICKS_PER_SECOND, surprise)
+            else:
+                surprise()
+
+        lead = it.pc_react_lead if pcprofile.is_pc() and not pcprofile.SEASON2 else 0
+        if station:
+            lead += int(round(float(it.pc_fire_at) * pcprofile.TICKS_PER_SECOND))
+        if lead:
+            # the handler's list (fcn.0047d520, fcn.0047b6a0 and their kin):
+            # pushed with the run-now flag 0 as the trigger pass delivers the
+            # behaviour, its first update in the same tick's actors' pass (the
+            # level's update runs fcn.00472390 before fcn.00439cd0), its StopMsg
+            # on the next — the first element two ticks after the trigger
             self.pawn._stand()
-            self.pawn.world.call_later(g[0] / pcprofile.TICKS_PER_SECOND, surprise)
+            self.pawn.world.call_later(lead / pcprofile.TICKS_PER_SECOND, begin)
         else:
-            surprise()
+            begin()
 
     def _surprise_near_done(self):
         """the drain reaches StopAction(canPostponeStop: true): a tricked
@@ -7909,11 +7965,66 @@ class World:
                 pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))
         item.pc_shout_secs = pcprofile.s1_shout_seconds(
             points, bonus, item.pc_shout_index, item.pc_shout_skip)
+        item.pc_fire_points = points
         if not item.dont_get_angry:
             self._on_trick_done(item)              # cs:785-787, at the PC's fire
         if self.level_script is not None:
             self.level_script.on_trick_done()      # cs:789-792
         item.pc_fired = True
+
+    def _s1_fire_stands(self, item, fired_early, shout):
+        """the seconds the PC's fire step stands before its shout and after it
+        (game.exe 0x47bd00, pcprofile.S1_FIRE_LEAD_TICKS): its first update
+        fires and pushes its list, whose first update pushes the first element
+        — two ticks, which the early fire's paced span carries when the
+        overlay says so (PCFireLead: the use past PCFireAt, the fall, the
+        shock) or its site stood them (the skates); the `shout` icon before a
+        shout; the StopMsg after the list unless the step's flag 1 (PCStopSkip)
+        — a fire that scored nothing builds no list, only its two ticks"""
+        listed = (item.pc_fire_points or 0) > 0
+        stood = fired_early and (item.pc_fire_lead or item.pc_lead_stood)
+        item.pc_lead_stood = False
+        pre = (0 if stood else pcprofile.S1_FIRE_LEAD_TICKS) \
+            + (pcprofile.S1_FIRE_ICON_TICKS if shout > 0.0 else 0)
+        post = pcprofile.S1_FIRE_STOP_TICKS if listed and not item.pc_stop_skip else 0
+        return pre / pcprofile.TICKS_PER_SECOND, post / pcprofile.TICKS_PER_SECOND
+
+    def _angry_without_animations(self, pawn, item, on_done, routine, nfh2):
+        """Rottweiler.PlayAngryAnimation's AngryWithoutAnimations branch
+        (cs:719-736). (The PC's step shouts whatever the mobile's flag: 103's
+        letter box, anc/mailbox_trap's five-argument step with flags 0 at
+        0x45f140, plays shout2 — or shout2_extra on a bonus — like any trick;
+        the profile's shout and repair take play_angry's own path.) Source
+        order: CheckRushToToilet, TryFix, the stop/restart, FixDirectly,
+        OnTrickDone, the meter latch (cs:721-796)"""
+        items = self.level.items
+        rush = item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
+            and routine is not None
+        fetch = self._try_fix(item, pawn)      # a fetch owns the resume
+        if on_done and not fetch:
+            on_done()
+        if item.fix_directly:                  # cs:781-784
+            self._fix(item)
+        item.pc_linked_due = item.pc_linked_paid = item.pc_linked_overflow = False
+        item.pc_linked_amount = None
+        if item.pc_done_due:               # booked at play_angry at the latest
+            item.pc_done_due = False
+            self._pc_trick_done(item)
+        if item.pc_credited:
+            item.pc_credited = False           # paid already (pc_s2_credit)
+        else:
+            if not item.dont_get_angry:
+                self._on_trick_done(item)      # cs:785-787
+            if self.level_script is not None:
+                self.level_script.on_trick_done()  # cs:789-792
+        if rush and not fetch:
+            # the run started before the stop in the original (cs:721),
+            # so the meter latch of cs:793-796 holds through it — the
+            # port starts it after the stop, whose OnUseEnded release
+            # (RoutineActionUse.cs:352 -> Rottweiler.cs:891) it follows
+            if not nfh2:
+                pawn.can_decrease_angry = False
+            routine.move_to_toilet(item.cause_sickness)
 
     def play_angry(self, pawn, item, on_done=None):
         """Rottweiler.PlayAngryAnimation (Rottweiler.cs:552-797), the
@@ -7987,6 +8098,7 @@ class World:
             and pawn.rage_max > 0
         fired_early = False
         pc_shout = 0.0
+        fire_pre = fire_post = 0.0
         if pc_s1:
             # the PC's trick step (game.exe fcn.0047bd00, docs/PC_ROUTINES.md
             # "The anger and the bonus" and "The fire's tail"): the fire —
@@ -8009,6 +8121,7 @@ class World:
             item.pc_shout_secs = None
             if item.angry_hard and pc_shout > 0.0:
                 seq = [item.angry_hard]
+            fire_pre, fire_post = self._s1_fire_stands(item, fired_early, pc_shout)
         elif self.game is not None and not nfh2:   # Classic (cs:595-612)
             if pawn.angry_meter <= 0.0:
                 if item.angry_easy_up:
@@ -8122,40 +8235,16 @@ class World:
                 pawn.can_decrease_angry = False
                 routine.move_to_toilet(item.cause_sickness)
 
+        if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0) \
+                and fire_pre + fire_post > 0.0:
+            # the PC fire step's own ticks before the stop (_s1_fire_stands:
+            # a step without a shout — 102's laxative beer, flags 3)
+            pawn._stand()
+            self.call_later(fire_pre + fire_post,
+                            lambda: self._angry_without_animations(pawn, item, on_done, routine, nfh2))
+            return
         if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0):   # cs:719-736
-            # (the PC's step shouts whatever the mobile's flag: 103's letter
-            # box, anc/mailbox_trap's five-argument step with flags 0 at
-            # 0x45f140, plays shout2 — or shout2_extra on a bonus — like any
-            # trick; the profile's shout and repair follow below)
-            # source order: CheckRushToToilet, TryFix, the stop/restart,
-            # FixDirectly, OnTrickDone, the meter latch (cs:721-796)
-            rush = item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
-                and routine is not None
-            fetch = self._try_fix(item, pawn)      # a fetch owns the resume
-            if on_done and not fetch:
-                on_done()
-            if item.fix_directly:                  # cs:781-784
-                self._fix(item)
-            item.pc_linked_due = item.pc_linked_paid = item.pc_linked_overflow = False
-            item.pc_linked_amount = None
-            if item.pc_done_due:               # booked at play_angry at the latest
-                item.pc_done_due = False
-                self._pc_trick_done(item)
-            if item.pc_credited:
-                item.pc_credited = False           # paid already (pc_s2_credit)
-            else:
-                if not item.dont_get_angry:
-                    self._on_trick_done(item)      # cs:785-787
-                if self.level_script is not None:
-                    self.level_script.on_trick_done()  # cs:789-792
-            if rush and not fetch:
-                # the run started before the stop in the original (cs:721),
-                # so the meter latch of cs:793-796 holds through it — the
-                # port starts it after the stop, whose OnUseEnded release
-                # (RoutineActionUse.cs:352 -> Rottweiler.cs:891) it follows
-                if not nfh2:
-                    pawn.can_decrease_angry = False
-                routine.move_to_toilet(item.cause_sickness)
+            self._angry_without_animations(pawn, item, on_done, routine, nfh2)
             return
         affected = self.pawn_by_pid(item.pawn_to_affect) \
             if item.pawn_to_affect is not None else None
@@ -8268,7 +8357,7 @@ class World:
                         mobile = pawn.anim.sequence_seconds(fixes)
                         if mobile > 0.0:
                             pawn.anim.time_scale = mobile / fix_secs
-                    pawn.anim.play_sequence(fixes, on_end=after_run)
+                    pawn.anim.play_sequence(fixes, on_end=tail)
                 else:
                     if not seq and pawn.anim.seq_end_hook is not None:
                         # nothing to play at all (a flag-3 step with no repair:
@@ -8277,15 +8366,45 @@ class World:
                         # BehaviorOnAnimationSequenceEnded, cs:448: the
                         # RollerSkater's SHOUT state waits for it)
                         pawn.anim.seq_end_hook()
-                    after_run(bool(seq))
+                    tail(bool(seq))
 
-            if seq:
-                mobile = pawn.anim.sequence_seconds(seq)
-                if mobile > 0.0 and pc_shout > 0.0:
-                    pawn.anim.time_scale = mobile / pc_shout
-                pawn.anim.play_sequence(seq, on_end=play_fixes)
+            def tail(played_angry=True):
+                # the message step closing the handler's list or the repair
+                # helper's (PCReactTail: the object switched back, the floor
+                # object removed — fcn.0047ae70's fcn.0047add0, fcn.0047b610)
+                if item.pc_react_tail:
+                    pawn.anim.time_scale = 1.0
+                    pawn._stand()
+                    self.call_later(item.pc_react_tail / pcprofile.TICKS_PER_SECOND,
+                                    lambda: after_run(played_angry))
+                else:
+                    after_run(played_angry)
+
+            def shouted():
+                # the StopMsg closing the fire's list (_s1_fire_stands)
+                pawn.anim.time_scale = 1.0
+                if fire_post > 0.0:
+                    pawn._stand()
+                    self.call_later(fire_post, play_fixes)
+                else:
+                    play_fixes()
+
+            def shout():
+                if seq:
+                    mobile = pawn.anim.sequence_seconds(seq)
+                    if mobile > 0.0 and pc_shout > 0.0:
+                        pawn.anim.time_scale = mobile / pc_shout
+                    pawn.anim.play_sequence(seq, on_end=shouted)
+                else:
+                    shouted()
+
+            if fire_pre > 0.0:
+                # the fire's own tick, its list's first update and the
+                # `shout` icon before the shout (_s1_fire_stands)
+                pawn._stand()
+                self.call_later(fire_pre, shout)
             else:
-                play_fixes()
+                shout()
             return
         level = None
         both = linked is not None and linked.tricked and item.tricked \
@@ -9804,6 +9923,13 @@ class World:
                 self._wont_go()          # Pawn.cs:615-618
                 self._move_refused()
                 return True
+            if item.is_floor and pcprofile.is_pc() and not pcprofile.SEASON2:
+                # the PC lays a floor trick where Woody stands: he walks to
+                # the clicked point of the room's floor and `laydown` there
+                # (Item.pc_drop_x, applied at _woody_trick_done)
+                z = self.level.zone_by_pid(item.zone)
+                lo, hi = (z.play_left, z.play_right) if z is not None else (wx, wx)
+                item.pc_drop_x = min(max(wx, lo), hi)
             self.woody_use(item)
             return True
         if door is not None:
@@ -10619,6 +10745,17 @@ class World:
         if item.grab_directly:
             self.inventory.add([{'type': item.required_inventory,
                                  'use_count': 0, 'name': item.name}])
+        if item.pc_drop_x is not None:
+            # the PC's floor trick lies where Woody laid it (toi/groundsoap and
+            # its kin, created at his position): the neighbour's notice point
+            # (TargetLocation) and the overlay move there from the mobile's spot
+            off = item.pc_drop_x - (item.x + item.dx)
+            if item.tricked_object_go is not None:
+                for sp in self.level.sprites:
+                    if sp.go == item.tricked_object_go:
+                        sp.x += off - item.pc_drop_dx
+            item.pc_drop_dx = off
+            item.pc_drop_x = None
         # the tricked overlay swap (TrickItem.OnUseAnimationCompleted,
         # cs:295-299) and the hide-other restore (cs:300-304)
         if item.tricked_object_go is not None:
@@ -11696,10 +11833,15 @@ class World:
                 self.music_bank.play_music(
                     self.level.music['level'],
                     loop=self.level.music.get('loop', True))
-        # the MonoBehaviour.Invoke queue (GameInfo.InvokeMethodForSetPrime)
+        # the MonoBehaviour.Invoke queue (GameInfo.InvokeMethodForSetPrime);
+        # under the PC profile a wait of whole PC ticks ends on the frame its
+        # ticks are reached — k/12 s counted down in 1/60 s steps leaves a
+        # +1e-17 residue that cost a 5k+1th frame on 50 of the first 60 k
+        # (pcprofile.TIMER_EPS)
+        eps = pcprofile.TIMER_EPS if pcprofile.is_pc() else 0.0
         for entry in self._delayed[:]:
             entry[0] -= dt
-            if entry[0] <= 0.0:
+            if entry[0] <= eps:
                 self._delayed.remove(entry)
                 entry[1]()
         if self._pc_landing is not None:

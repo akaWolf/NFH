@@ -14,13 +14,14 @@
    "set": {
     "TrickScore": 13,
     "PCShoutIndex": 1,
-    "PCGrabSeconds": 0.417,
-    "PCUseSecondsTricked": 5.667,
-    "PCFireAt": 3.0,
+    "PCGrabSeconds": 0.5,
+    "PCUseSecondsTricked": 5.917,
+    "PCFireAt": 3.083,
     "PCFixSeconds": 1.083,
-    "PCFixUseSeconds": 3.0,
+    "PCFixUseSeconds": 3.083,
     "PCToolUseSeconds": 3.0,
-    "PCReturnSeconds": 0.417
+    "PCReturnSeconds": 0.417,
+    "PCFireLead": true
    }
   },
   {
@@ -29,13 +30,15 @@
    "set": {
     "TrickScore": 12,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 0.417,
-    "PCFireAt": 0,
+    "PCUseSecondsTricked": 0.833,
+    "PCFireAt": 0.167,
     "PCFixPoint": [
      505,
      410,
      "bal"
-    ]
+    ],
+    "PCFireLead": true,
+    "PCReactTail": 1
    }
   },
   {
@@ -45,13 +48,16 @@
     "TrickScore": 7,
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.167,
+    "PCSurpriseSeconds": 5.333,
     "PCFixSeconds": 2.083,
     "PCFixPoint": [
      650,
      400,
      "bas"
-    ]
+    ],
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -62,7 +68,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 4.083,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -84,7 +93,8 @@
      615,
      390,
      "bas"
-    ]
+    ],
+    "PCReactTail": 1
    }
   },
   {
@@ -100,8 +110,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     6.08
+     0.58,
+     6.25
     ],
     "PCSurpriseSeconds": 1.333,
     "PCFixSeconds": 4.583,
@@ -110,30 +120,32 @@
      535,
      410,
      "bed"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.4 s; Iron <- ironing#1 6.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.6 s; Iron <- ironing#1 6.2 s"
   },
   {
    "object": "Airer",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.67,
-     0.42
+     1.83,
+     0.58
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Airer <- laundry_rack#0 1.7 s; Airer <- laundry_rack#1 0.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Airer <- laundry_rack#0 1.8 s; Airer <- laundry_rack#1 0.6 s"
   },
   {
    "object": "FishTank",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.0,
-    "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 3.583
+    "PCUseSeconds": 2.25,
+    "PCFixSeconds": 1.167,
+    "PCUseSecondsTricked": 3.833
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.2 s"
   },
   {
    "object": "WashingMachine",
@@ -146,7 +158,8 @@
      525,
      390,
      "bas"
-    ]
+    ],
+    "PCReactTail": 1
    }
   },
   {
@@ -326,24 +339,24 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
+     0.5,
      5.08,
      2.08
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WashingMachine <- washing_machine#0 give 0.42 s, wash 5.08 s, get_clothes 2.08 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WashingMachine <- washing_machine#0 give 0.50 s, wash 5.08 s, get_clothes 2.08 s"
   },
   {
    "object": "Drier",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
+     0.5,
      2.58,
      0.42
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.42 s, dry 2.58 s, take 0.42 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drier <- tumble_drier#0 give 0.50 s, dry 2.58 s, take 0.42 s"
   },
   {
    "object": "Dog",

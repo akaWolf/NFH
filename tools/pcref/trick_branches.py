@@ -324,7 +324,13 @@ def token(j, f, site_line=None):
         return dict(a=a, kind='ICON', args=call_args(j, 2), fire=False)
     if kind in ('OBJ2', 'FIRE5', 'FIRE4'):
         return dict(a=a, kind=kind, args=call_args(j, FS.NARGS[kind]), fire=(j == site_line))
-    if kind in ('post', 'dtor', 'wait', 'wait2', 'obj', 'STOPMSG'):
+    if kind == 'wait':
+        # a message step (fcn.0047c640's wrapper: a switch, the object's state):
+        # an instant element of the list, one tick (lap_model.py)
+        return dict(a=a, kind='MSG', fire=False)
+    if kind == 'STOPMSG':
+        return dict(a=a, kind='STOPMSG', fire=False)
+    if kind in ('post', 'dtor', 'wait2', 'obj'):
         return None
     if kind == 'LOOKUP':
         names = []
@@ -781,9 +787,13 @@ def _pair_rule(steps):
 
 
 def summarise(row, lv):
-    """before/after seconds around the fire, the fire's own clip, the fix"""
+    """before/after seconds around the fire, the fire's own clip, the fix. A
+    list's instant steps (its start, a message step, a StopMsg — a tick each,
+    lap_model.py) count with the action that follows them; those right before
+    the fire make `pre_fire`, the trailing ones go with the last action"""
     before = []; after = []; seen_fire = False; fix = None; walks = []
     unknown = []; fixes = []; repair = None
+    held = 0.0; pre_fire = 0.0; last = None
     prefer = [row['name']]
     if '_' in row['name'].split('/')[-1]:
         prefer.append(row['name'].rsplit('_', 1)[0])       # the normal twin (lir/tabacbox of lir/tabacbox_explosive)
@@ -796,22 +806,31 @@ def summarise(row, lv):
     for s in _pair_rule(row['steps']):
         if s.get('fire'):
             seen_fire = True
+            pre_fire, held = held, 0.0
+            continue
+        if s['kind'] in ('SUBSEQ', 'MSG', 'STOPMSG'):
+            held += 1 / FPS
             continue
         if s['kind'] == 'ACTION':
             v, label = seconds(lv, s['obj'], s['act'], prefer)
             if v is None:
                 unknown.append(label)
                 v = 0.0
+            v += held; held = 0.0
             if seen_fire and s['act'] in ('repair', 'clean'):
+                last = fixes
                 fixes.append((label, v))
             else:
-                (after if seen_fire else before).append((label, v))
+                last = after if seen_fire else before
+                last.append((label, v))
         elif s['kind'] in ('ENTER', 'LEAVE'):
             act = s['kind'].lower()
             v, label = seconds(lv, s['obj'], act, prefer)
             if v is None:
                 unknown.append(label); v = 0.0
-            (after if seen_fire else before).append((label, v))
+            v += held; held = 0.0
+            last = after if seen_fire else before
+            last.append((label, v))
         elif s['kind'] in ('GOTO', 'GOTOENTER'):
             walks.append(('%s:%s' % (s['kind'].lower(), s['obj']), seen_fire))
             if seen_fire:
@@ -824,8 +843,12 @@ def summarise(row, lv):
             obj = named[-1] if named else row['name']
             nm, v = lv.fix(obj)
             if nm:
-                fixes.append(('%s.%s' % (obj, nm), v))
+                fixes.append(('%s.%s' % (obj, nm), v + held)); held = 0.0
+                last = fixes
                 repair = obj          # the helper walks to its hotspot first (isActorAtObject)
+    if held and last:
+        # the trailing instants: with the last action of the stand
+        lbl, v = last[-1]; last[-1] = (lbl, v + held); held = 0.0
     own = None
     if row['kind'] == 'FIRE5':
         anim = row['args'][3] if len(row['args']) > 3 else None
@@ -835,7 +858,7 @@ def summarise(row, lv):
             v = lv.clip(anim)
         own = ('%s.%s' % (actor, anim), v)
     return dict(before=before, after=after, own=own, fix=fix, fixes=fixes, unknown=unknown, walks=walks,
-                repair=repair)
+                repair=repair, pre_fire=pre_fire + held)
 
 
 def dump_cases(n, levels):

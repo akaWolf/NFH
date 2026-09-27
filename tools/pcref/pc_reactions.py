@@ -36,6 +36,17 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       where the repair walks first when he does not stand
                       on it (fcn.0047ae70 over isActorAtObject, fcn.0047aa90)
                       — the look walk-bys and the trap
+  PCStopSkip          flag 1: the step's list ends without its StopMsg
+  PCReactLead         a reaction handler's ticks before its list's first
+                      element (REACT_LEAD: the look walk-bys, the slips, the
+                      trap)
+  PCReactTail         the message step after its repair or the floor
+                      object's removal (REACT_TAIL)
+  PCFireLead          the paced span after an early fire (the use past
+                      PCFireAt, the fall, the shock) carries the step's own
+                      two ticks (its fire, its list's first update — FIRE_LEAD
+                      added to that span); without it the runtime stands them
+                      before the shout (runtime/pcprofile.py S1_FIRE_LEAD_TICKS)
 
 The seconds are objects.xml's `time` ticks or the clip's frames at 12 a
 second. The pairing mobile item -> PC object is the TABLE below, by hand
@@ -57,6 +68,25 @@ import trick_branches as TB   # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(HERE))
 FPS = 12.0
 SLIP = 31 / FPS          # slip1 / slip3
+# the fire step's own two ticks before its list's first element (0x47bd00:
+# the fire and the push of its list with the run-now flag 0; the list's first
+# update pushes the element, run-now 0 again — runtime/pcprofile.py
+# S1_FIRE_LEAD_TICKS)
+FIRE_LEAD = 2 / FPS
+# a reaction handler (the look fcn.0047d520 / fcn.0047d780 / fcn.0047d9e0 and
+# 111's board in Level_Laundry, the slips fcn.0047b6a0 / fcn.0047d0e0 /
+# fcn.0047ddc0, the trap fcn.0047b470) builds a list and pushes it with the
+# run-now flag 0 as the trigger pass (fcn.00472390, before the actors' pass
+# fcn.00439cd0 in the level's update) delivers the behaviour: the list's first
+# update in that tick's actors' pass pushes its first element, a StopMsg
+# (fcn.0047c6c0, one tick), so the handler's own first element — the look's
+# GoToObjX, the slip's or the trap's five-argument step — starts two ticks
+# after the trigger; the repair helper (fcn.0047ae70) ends with a message step
+# switching the object back (fcn.0047add0 wrapped by fcn.0047c640), a slip's
+# list with the floor object's removal (fcn.0047b610, the same wrapper): one
+# tick each
+REACT_LEAD = 2
+REACT_TAIL = 1
 DOUBLETAKE = 15 / FPS    # doubletake3, the one of the pair that plays
 
 # the register-valued index and flags of the sites whose call passes a
@@ -69,13 +99,18 @@ REG = {'lir/stickybook': (1, 0), 'lir/bathcandy': (0, 3), 'toi/tub_hair': (0, 3)
        'wor/book_replaced': (0, 0), 'kit/skate': (0, 3)}
 
 
-def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None, fixwalk=False):
+def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None, fixwalk=False, pre=None,
+        redo=None):
     """a station use: the tool's stand, or the listed (object, action) parts
     (`own`: the five-argument step's clip where the site passes its actor in a
     register; `prime`: the part the mobile's prime leg plays when tricked;
-    `fixwalk`: the case walks to `fix`'s hotspot before its repair)"""
+    `fixwalk`: the case walks to `fix`'s hotspot before its repair; `pre`: the
+    station's actions of the cases before the tricked one, which the tricked
+    visit plays too; `redo`: a ReuseAfterFix station's tail after the case's
+    own actions after the repair — PCRedoSeconds, what the mobile's redo of
+    the normal use stands for)"""
     return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own, prime=prime,
-                fixwalk=fixwalk)
+                fixwalk=fixwalk, pre=pre, redo=redo)
 
 
 def wb(pc, site=None, fix=None):
@@ -131,7 +166,10 @@ TABLE = {
                                  before=[('kit/potterswheel_fast', 'potter_fast'),
                                          ('kit/potterswheel_fast', 'leave')]),
           'MumStatueFootStool': use('lir/footstool_unlocked'), 'Camera': use('bed/camera_flashy'), 'Dove': use('bal/dove_free')},
-    108: {'Shezlong': use('bal/foldingchair_pins'), 'ToothBrush': use('toi/shoebrushset'), 'CoffeeMaker': use('kit/coffeebox_soil'),
+    # the brush's redo after the repair is the case's brush_teeth and take3 —
+    # the first take3 is the tricked stand's
+    108: {'Shezlong': use('bal/foldingchair_pins'), 'ToothBrush': use('toi/shoebrushset', redo=[]),
+          'CoffeeMaker': use('kit/coffeebox_soil'),
           'SunLotion': use('bal/suncream_sweet'), 'Plant': use('anc/deadflower')},
     109: {'AlarmClock': use('bed/cactusclock'), 'PigMilk': use('kit/babybottle_nitro'), 'Bed': use('bed/bed_pins'),
           # the chili's stand plays the chips' trick: CornChips pays it
@@ -144,7 +182,11 @@ TABLE = {
           # extinguisher is not taken back
           'FireExtinguisher': tool('bed/extinguisher_knotted', use=('bal/barbecue_burn', 'extinguish')),
           'CarnivorPlantSpray': use('bal/growspray'),
-          'SteakChair': use('lir/chair_pins'), 'SteakWine': use('lir/vinegar')},
+          # the table's `give` is its own case before the chair's (the
+          # tricked visit plays it); after the repair the case enters and eats
+          # again and the walk leaves the table — no second give
+          'SteakChair': use('lir/chair_pins', pre=[('lir/table', 'give')], redo=[('lir/table', 'leave')]),
+          'SteakWine': use('lir/vinegar')},
     111: {# the machines' give is the mobile's prime leg (PCUseSeconds' first
           # visit, tools/pcref/pc_durations.py): the tricked use is the rest
           'Drier': use('bas/tumbledrier_smashed', before=[('bas/tumbledrier_smashed', 'dry')]),
@@ -229,7 +271,8 @@ BANANA_LEVELS = (107, 108, 109, 110)
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
-        'PCShoutAfter', 'PCPrimeSecondsTricked')
+        'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
+        'PCRedoSeconds')
 
 
 def slip_cleans(n, item, floor, lv):
@@ -314,9 +357,17 @@ def trick_items(n):
     return out, reuse
 
 
-def _sum(lv, parts):
+def _sum(lv, parts, sm=None):
+    """the seconds of the named (object, action) parts — as the stand counts
+    them where it has the action (`sm`: trick_branches.summarise's entries, the
+    list's instant steps before an action counted with it), else the record's"""
+    pool = list(sm['before'] + sm['after'] + sm['fixes']) if sm else []
     s = 0.0
     for obj, name in parts:
+        j = next((j for j, (lbl, _) in enumerate(pool) if lbl.rsplit('.', 1)[-1] == name), None)
+        if j is not None:
+            s += pool.pop(j)[1]
+            continue
         v = lv.action(obj, name)
         if v is None:
             raise KeyError('%s.%s' % (obj, name))
@@ -343,7 +394,11 @@ def specs(n):
         base = name.split('@')[0]
         keys = {}
         if base in SLIP_NAMES:
-            keys = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True, 'PCSlipSeconds': round(SLIP, 3)}
+            # the fall is the five-argument step's own clip: its list's first
+            # element, two ticks after the fire (FIRE_LEAD)
+            keys = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True,
+                    'PCSlipSeconds': round(SLIP + FIRE_LEAD, 3), 'PCFireLead': True,
+                    'PCReactLead': REACT_LEAD, 'PCReactTail': REACT_TAIL}
             floor = SLIP_CLEAN.get(base) or ('groundbanana' if n in BANANA_LEVELS else None)
             if floor:
                 # the clean of the floor object in each of the item's rooms:
@@ -358,8 +413,9 @@ def specs(n):
         elif base in TRAP_NAMES:
             row = site_of(n, 'bas/electrotrap')
             shock = lv.action('neighbor', 'electroshock')
-            keys = {'PCShoutIndex': 1, 'PCFireBefore': True, 'PCSurpriseSeconds': round(shock, 3),
-                    'PCFixSeconds': round(lv.fix('bas/electrotrap')[1], 3)}
+            keys = {'PCShoutIndex': 1, 'PCFireBefore': True, 'PCSurpriseSeconds': round(shock + FIRE_LEAD, 3),
+                    'PCFixSeconds': round(lv.fix('bas/electrotrap')[1], 3), 'PCFireLead': True,
+                    'PCReactLead': REACT_LEAD, 'PCReactTail': REACT_TAIL}
             pt = fix_point(n, 'bas/electrotrap')
             if pt and keys['PCFixSeconds']:
                 keys['PCFixPoint'] = pt
@@ -374,8 +430,13 @@ def specs(n):
                 keys['PCShoutIndex'] = 1
             if fl & 2:
                 keys['PCShoutSkip'] = True
-            before = _sum(lv, spec['before']) if spec.get('before') is not None else sum(v for _, v in sm['before'])
-            after = _sum(lv, spec['after']) if spec.get('after') is not None else sum(v for _, v in sm['after'])
+            if fl & 1:
+                keys['PCStopSkip'] = True
+            # the stand's actions before the fire, and the list's instant
+            # steps right before it (pre_fire: its start, a StopMsg, a message)
+            before = (_sum(lv, spec['before'], sm) if spec.get('before') is not None
+                      else sum(v for _, v in sm['before'])) + sm.get('pre_fire', 0.0)
+            after = _sum(lv, spec['after'], sm) if spec.get('after') is not None else sum(v for _, v in sm['after'])
             if base in reuse:
                 after = 0.0         # the mobile's redo of the normal use (ReuseAfterFix)
             own = _sum(lv, spec['own']) if spec.get('own') is not None \
@@ -388,8 +449,11 @@ def specs(n):
                 print('   %s: unresolved %s' % (name, ', '.join(sm['unknown'])), file=sys.stderr)
             if spec['kind'] == 'wb':
                 if row['kind'] == 'OBJ2' and sm['before'] and base == 'GroundSkates':
-                    # the skate: the fall out of the window, then the fire
-                    keys['PCSurpriseSeconds'] = round(before, 3)
+                    # the skate: the fall out of the window, then the fire —
+                    # the fall's own record (the list's instant steps around
+                    # the slide, the wait and the walk back are the
+                    # RollerSkater's to carry: docs/PC_VERIFICATION.md)
+                    keys['PCSurpriseSeconds'] = round(_sum(lv, [('kit/window', 'fallout')]), 3)
                     keys['PCFixSeconds'] = round(fix + after, 3)
                     # the list's tail after the run back in (Level_Fitness,
                     # 0x46349f and 0x463507): `wheeze`, then an explicit
@@ -398,8 +462,12 @@ def specs(n):
                     keys['PCBreathSeconds'] = round(_sum(lv, [('neighbor', 'wheeze')]), 3)
                     keys['PCShoutAfter'] = round(_sum(lv, [('neighbor', 'shout2')]), 3)
                 elif base == 'Pig':
-                    # the pig's stand: the fire on arrival, the catch after it
+                    # the pig's stand: the fire on arrival — after its list's
+                    # start and StopMsg — the catch after it
                     keys['PCFixSeconds'] = round(fix + after, 3)
+                    lead = int(round(sm.get('pre_fire', 0.0) * FPS))
+                    if lead:
+                        keys['PCReactLead'] = lead
                 else:
                     # the look (fcn.0047d520 and its kin): CreateGoToObjXJob
                     # (fcn.0047a4a0 — the object's hotspot x at the actor's own
@@ -408,6 +476,8 @@ def specs(n):
                     keys['PCSurpriseSeconds'] = round(lv.action('neighbor', 'doubletake3') or DOUBLETAKE, 3)
                     keys['PCFixSeconds'] = round(fix + own + after, 3)
                     keys['PCAlignX'] = True
+                    keys['PCReactLead'] = REACT_LEAD
+                    keys['PCReactTail'] = REACT_TAIL
                     pt = fix_point(n, spec['pc'])
                     if pt:
                         keys['PCFixPoint'] = pt
@@ -415,8 +485,10 @@ def specs(n):
                 inside = sum(v for a, v in sm['before'] if a.startswith(spec['pc'] + '.'))
                 grab = inside or _sum(lv, [(spec['pc'], 'take')])
                 keys['PCGrabSeconds'] = round(grab, 3)
-                keys['PCUseSecondsTricked'] = round(before - inside + own, 3)
+                # the step's own clip follows its fire two ticks on (FIRE_LEAD)
+                keys['PCUseSecondsTricked'] = round(before - inside + FIRE_LEAD + own, 3)
                 keys['PCFireAt'] = round(before - inside, 3)
+                keys['PCFireLead'] = True
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCFixUseSeconds'] = round(after, 3)
                 if fix and sm.get('repair'):
@@ -428,9 +500,19 @@ def specs(n):
                 keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3) \
                     if spec.get('back') else 0.0
             else:
-                total = before + own + after
+                pre = _sum(lv, spec['pre']) if spec.get('pre') else 0.0
+                total = pre + before + own + after
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCUseSecondsTricked'] = round(total, 3)
+                if spec.get('redo') is not None:
+                    # a `leave` in the tail is the walk job's, whose last tick
+                    # the walk's first move shares (tools/pcref/lap_model.py)
+                    shared = sum(1 for _, a in spec['redo'] if a == 'leave') / FPS
+                    keys['PCRedoSeconds'] = round(sum(v for _, v in sm['after']) + _sum(lv, spec['redo'])
+                                                  - shared, 3)
+                if sm.get('fix') is not None and spec.get('fix') is None:
+                    # the repair helper's closing message step (REACT_TAIL)
+                    keys['PCReactTail'] = REACT_TAIL
                 if spec.get('prime'):
                     keys['PCPrimeSecondsTricked'] = round(_sum(lv, spec['prime']), 3)
                 if fix and sm.get('repair') and spec.get('fix') is None:
@@ -446,7 +528,13 @@ def specs(n):
                 if own + after > 0 or total == 0:
                     # the fire before the step's own clip or more actions,
                     # or on arrival when the stand plays nothing before it
-                    keys['PCFireAt'] = round(before, 3)
+                    keys['PCFireAt'] = round(pre + before, 3)
+                if own + after > 0:
+                    # what follows the fire in the stand starts two ticks on
+                    # (the step's own clip, its list's first element — or
+                    # the stand's next step after its list; FIRE_LEAD)
+                    keys['PCUseSecondsTricked'] = round(total + FIRE_LEAD, 3)
+                    keys['PCFireLead'] = True
         if base in RUNTO.get(n, ()):
             keys['PCRunTo'] = True
             # the run ends on the object's hotspot: the repair does not walk
@@ -492,18 +580,19 @@ def _set_key(patches, item, key, value):
 def write(n, sp):
     """the keys set in place — a patch keeps its other keys and its place, a key
     no longer wanted is dropped (and a patch left empty), the new ones added;
-    a patch another writer sourced (tools/pcref/pc_durations.py's SEARCHES and
-    ALERTERS) is not this writer's"""
+    the keys another writer sets in a patch it sourced (tools/pcref/
+    pc_durations.py's PCSurpriseSeconds of SEARCHES, beside its PCUseSeconds)
+    are not this writer's"""
     p = os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)
     ov = json.load(open(p)) if os.path.exists(p) else {'source': '', 'patches': []}
     want = {(item, k): v for item, keys in sp.items() for k, v in keys.items()}
     patches = []
     for e in ov.get('patches', []):
         st = e.get('set')
-        if e.get('component') == 'TrickItem' and isinstance(st, dict) \
-                and 'pc_durations.py' not in (e.get('source') or ''):
+        if e.get('component') == 'TrickItem' and isinstance(st, dict):
+            theirs = ('PCSurpriseSeconds',) if 'pc_durations.py' in (e.get('source') or '') else ()
             who = e.get('object') + ('@' + e['zone'] if e.get('zone') else '')
-            for k in [k for k in st if k in KEYS]:
+            for k in [k for k in st if k in KEYS and k not in theirs]:
                 v = want.pop((who, k), None)
                 if v is None:
                     del st[k]

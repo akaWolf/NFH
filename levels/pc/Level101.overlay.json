@@ -21,16 +21,16 @@
      "SitUp"
     ],
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.75
+    "PCUseSecondsTricked": 5.0
    }
   },
   {
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.92
+    "PCUseSeconds": 3.83
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.9 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.8 s"
   },
   {
    "object": "Binoculars",
@@ -39,7 +39,7 @@
     "PCUseSeconds": 6.08,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.5
+    "PCUseSecondsTricked": 7.75
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.1 s"
   },
@@ -57,7 +57,9 @@
      298,
      395,
      "kit"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
   },
@@ -69,9 +71,9 @@
      "use": 1.083
     },
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 0.0,
-    "PCFireAt": 0,
-    "PCRunTo": true
+    "PCUseSecondsTricked": 0.167,
+    "PCRunTo": true,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_peep's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 13 ticks"
   },

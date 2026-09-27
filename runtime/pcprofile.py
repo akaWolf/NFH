@@ -150,6 +150,29 @@ S1_RAGE_HOLD_TICKS = 60
 # (tools/pcref/lap_model.py job_ticks).
 S1_SHOUT_TICKS = {'shout2_extra': 93, 'shout0_light': 26, 'shout0_medium': 46,
                   'shout0': 27, 'shout2': 27}
+# The fire is itself a step of the stand's list (vtable 0x4e5944, update
+# 0x47bd00): its first update fires — the score, the rage, the face, the
+# jingle — builds a list of its own (fcn.00476770) and pushes it with the
+# run-now flag 0 (0x47c015-0x47c031), returning not done; the list's first
+# update only pushes its first element (the sequence update 0x476530, the
+# run-now flag 0 again), so that element starts two ticks after the fire.
+# The list: the step's own clip where it has one (the five- and four-argument
+# steps' +0x18: the fall, the shock, the explode), then — unless flag 2 —
+# the `shout` icon message (fcn.004618b0 wrapped by fcn.0047c640: an instant
+# step, one tick) and the shout ACTION, then — unless flag 1 — a StopMsg
+# (fcn.0047c6c0 with fcn.0047bc90, which sets the actor's +0x8a, the level's
+# end check; one tick). The step ends with its list, and the stand's next
+# step starts on the tick after: flags 0 and no clip of its own, the shout
+# starts three ticks after the fire and the next step four after its end.
+S1_FIRE_LEAD_TICKS = 2           # the fire's own tick and its list's first update
+# The profile's waits and paced clips are whole PC ticks (1/12 s), counted down
+# in the frame's steps: k/12 s less 5k steps of 1/60 s leaves a float residue
+# (+1e-17 in doubles, ~1e-8 in the clips' floats) that cost one frame more on
+# most k — a frame a wait, some 0.1-0.3 s over a chain of reactions. A wait
+# ends once what is left is below this.
+TIMER_EPS = 1e-6
+S1_FIRE_ICON_TICKS = 1           # the `shout` icon message before the shout
+S1_FIRE_STOP_TICKS = 1           # the StopMsg after it
 
 
 def s1_shout_clip(points, bonus, index=0, skip=False):

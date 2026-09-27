@@ -108,12 +108,25 @@ def pc_stations(n, toks):
     L = lap_model.Level(n)
     legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
-    acts = []; lead = []
+    acts = []; lead = []; held = 0.0
     for kind, text, t in legs:
         if kind == 'icon':
+            if held and acts and acts[-1]:
+                a, v = acts[-1][-1]; acts[-1][-1] = (a, v + held)
+            held = 0.0
             acts.append([])
+        elif kind == 'action' and text.startswith('step '):
+            # a list's instant step (lap_model: its start, a message step, a
+            # StopMsg): the stand before the station's next action, the
+            # last one's where none follows
+            held += t / lap_model.TICK
         elif kind == 'action':
-            (acts[-1] if acts else lead).append((text.split()[-1], t / lap_model.TICK))
+            (acts[-1] if acts else lead).append((text.split()[-1], t / lap_model.TICK + held))
+            held = 0.0
+    if held:
+        tgt = acts[-1] if acts and acts[-1] else lead
+        if tgt:
+            a, v = tgt[-1]; tgt[-1] = (a, v + held)
     if lead and acts:
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)

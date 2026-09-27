@@ -22,7 +22,7 @@
    "set": {
     "PCAngryTime": 276,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.75
+    "PCUseSecondsTricked": 3.0
    }
   },
   {
@@ -32,31 +32,32 @@
     "PCAngryTime": 288,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.417
+    "PCUseSecondsTricked": 3.583
    }
   },
   {
    "object": "Piano",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 9.58,
+    "PCUseSeconds": 9.67,
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 3.667,
+    "PCUseSecondsTricked": 3.833,
     "PCFixPoint": [
      710,
      410,
      "lir"
-    ]
+    ],
+    "PCReactTail": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.7 s"
   },
   {
    "object": "Football",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.42
+    "PCUseSeconds": 1.58
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.6 s"
   },
   {
    "object": "Window",
@@ -73,7 +74,8 @@
     "PCUseSeconds": 3.92,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 2.417
+    "PCUseSecondsTricked": 2.667,
+    "PCStopSkip": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PlantStink <- flower#0 3.9 s"
   },
@@ -91,7 +93,9 @@
      298,
      395,
      "kit"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 26 ticks"
   },
@@ -109,7 +113,9 @@
      435,
      390,
      "anc"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
@@ -127,7 +133,9 @@
      505,
      397,
      "toi"
-    ]
+    ],
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
@@ -232,7 +240,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 5 ticks"
   },

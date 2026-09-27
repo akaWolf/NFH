@@ -245,7 +245,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -699,8 +699,35 @@ class Item:
             return float(v) if v is not None else None
         self.pc_shout_index = int(d.get('PCShoutIndex') or 0)
         self.pc_shout_skip = bool(d.get('PCShoutSkip'))
+        # the fire step's flag 1: no StopMsg after its list (PCStopSkip), and
+        # the item's paced span after an early fire (the use past PCFireAt,
+        # the fall, the shock) carrying the step's first two ticks
+        # (PCFireLead; pcprofile.S1_FIRE_LEAD_TICKS)
+        self.pc_stop_skip = bool(d.get('PCStopSkip'))
+        self.pc_fire_lead = bool(d.get('PCFireLead'))
+        self.pc_lead_stood = False        # a site stood them itself (the skates)
+        self.pc_fire_points = 0           # the last fire's score (its list built)
+        # a reaction handler's own ticks (tools/pcref/pc_reactions.py): before
+        # its list's first element — the list pushed with the run-now flag 0 in
+        # the trigger pass, its first update in the actors' pass, its StopMsg
+        # (PCReactLead) — and after its repair or the floor object's removal,
+        # the message step that closes it (PCReactTail)
+        self.pc_react_lead = int(d.get('PCReactLead') or 0)
+        self.pc_react_tail = int(d.get('PCReactTail') or 0)
         self.pc_fix_secs = _f('PCFixSeconds')
         self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
+        # the PC's part of a ReuseAfterFix station after the fire (PCRedoSeconds:
+        # the case's actions after the repair and the station's tail — 110's
+        # table redoes no `give`, 108's brush no first `take3`), which the
+        # mobile's redo of the normal use stands for
+        self.pc_redo_secs = _f('PCRedoSeconds')
+        # the PC profile's floor tricks lie where Woody laid them (game.exe
+        # creates toi/groundsoap, kit/groundbanana … at his position: their
+        # hotspots 0/0 and 0/6): the floor click's x (pc_drop_x, World.
+        # woody_click) and, once laid, the item's offset from the mobile's
+        # spot (pc_drop_dx, in TargetLocation — the neighbour's notice point)
+        self.pc_drop_x = None
+        self.pc_drop_dx = 0.0
         # the hideout's `leave` under the profile (PCLeaveSeconds: 109's
         # bed/bed_sleep left on a noise, the Loader's time of its `leave`)
         self.pc_leave_secs = _f('PCLeaveSeconds')
@@ -1178,8 +1205,9 @@ class Item:
 
     @property
     def target_x(self):
-        """Item.TargetLocation = position + DeltaLocation"""
-        return self.x + self.dx
+        """Item.TargetLocation = position + DeltaLocation (+ where the PC
+        profile's Woody laid a floor trick, pc_drop_dx — 0.0 otherwise)"""
+        return self.x + self.dx + self.pc_drop_dx
 
     def move_x(self, role):
         """the x a pawn walks to for the item: Item.GetMoveLocation offsets

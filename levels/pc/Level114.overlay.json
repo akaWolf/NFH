@@ -35,13 +35,16 @@
     "PCAngryTime": 272,
     "PCShoutIndex": 1,
     "PCFireBefore": true,
-    "PCSurpriseSeconds": 5.167,
+    "PCSurpriseSeconds": 5.333,
     "PCFixSeconds": 2.083,
     "PCFixPoint": [
      650,
      400,
      "bas"
-    ]
+    ],
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -52,7 +55,10 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 4.083,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCSlipSeconds": 2.75,
+    "PCFireLead": true,
+    "PCReactLead": 2,
+    "PCReactTail": 1
    }
   },
   {
@@ -62,7 +68,7 @@
     "RequirePriming": false,
     "RottweilerUseTogglesPrime": false,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.667
+    "PCUseSecondsTricked": 5.917
    },
    "source": "PC objects.xml (level_hunter): lir/tabacbox's `gunpowder` is Woody's plain action (time 23), no condition — the tin takes the gunpowder any time; the remaster's RequirePriming and the prime toggle on the neighbour's every pipe (Item.cs:1085/1331: an unprimed Pipe stops taking clicks) have no PC counterpart (2026-09-17)"
   },
@@ -72,13 +78,15 @@
    "set": {
     "RequirePriming": false,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 2.417,
-    "PCFireAt": 2.0,
+    "PCUseSecondsTricked": 2.833,
+    "PCFireAt": 2.167,
     "PCFixPoint": [
      720,
      390,
      "lir"
-    ]
+    ],
+    "PCFireLead": true,
+    "PCReactTail": 1
    },
    "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
   },
@@ -95,49 +103,50 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     1.42,
-     1.42
+     1.58,
+     1.58
     ],
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 2.083,
+    "PCUseSecondsTricked": 2.333,
     "PCFixPoint": [
      410,
      390,
      "wor"
-    ]
+    ],
+    "PCReactTail": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.4 s; Polish <- polish#1 1.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.6 s; Polish <- polish#1 1.6 s"
   },
   {
    "object": "GoldCup",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.08
+    "PCUseSeconds": 2.17
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): GoldCup <- cups#0 2.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): GoldCup <- cups#0 2.2 s"
   },
   {
    "object": "Pipe",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     5.75
+     0.58,
+     5.92
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pipe <- smoke#0 0.4 s; Pipe <- smoke#1 5.8 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pipe <- smoke#0 0.6 s; Pipe <- smoke#1 5.9 s"
   },
   {
    "object": "Gramaphone",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     0.42,
-     0.67,
-     0.42
+     0.58,
+     0.83,
+     0.58
     ]
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.4 s; Gramaphone <- phonograph#1 0.7 s; Gramaphone <- phonograph#2 0.4 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.6 s; Gramaphone <- phonograph#1 0.8 s; Gramaphone <- phonograph#2 0.6 s"
   },
   {
    "object": "CDs",
@@ -151,50 +160,55 @@
    "object": "Shotgun",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 5.08,
+    "PCUseSeconds": 5.33,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.583,
-    "PCFireAt": 5.167
+    "PCUseSecondsTricked": 6.083,
+    "PCFireAt": 5.417,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.1 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.3 s"
   },
   {
    "object": "Hat",
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": [
-     4.67,
-     1.42
+     4.83,
+     1.75
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.25,
-    "PCFireAt": 3.833
+    "PCUseSecondsTricked": 4.833,
+    "PCFireAt": 4.083,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 take+takehat 4.67 s; Hat <- hat#0 putbackhat+give 1.42 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 take+takehat 4.83 s; Hat <- hat#0 putbackhat+give 1.75 s"
   },
   {
    "object": "Horn",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 6.0,
+    "PCUseSeconds": 6.25,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.917,
-    "PCFireAt": 4.5
+    "PCUseSecondsTricked": 5.417,
+    "PCFireAt": 4.75,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 6.0 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 6.2 s"
   },
   {
    "object": "MedalBox",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.5,
+    "PCUseSeconds": 4.67,
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.25,
-    "PCFireAt": 0.0
+    "PCUseSecondsTricked": 4.667,
+    "PCFireAt": 0.25,
+    "PCStopSkip": true,
+    "PCFireLead": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MedalBox <- hat#0 wearmedals 4.50 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MedalBox <- hat#0 wearmedals 4.67 s"
   },
   {
    "object": "Gramaphone",

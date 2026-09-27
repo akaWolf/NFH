@@ -2141,10 +2141,35 @@ class Driver(Recorder):
                     return wx, wy
         return cx, cy
 
+    def _floor_x(self, it):
+        """where the leg's Woody stands for the item: a PC-profile floor trick's
+        drop point (the leg's `x=`, else the mobile's spot), the item's
+        TargetLocation otherwise"""
+        if it.is_floor and pcprofile.is_pc() and not pcprofile.SEASON2:
+            x = getattr(self, '_drop_x', None)
+            return x if x is not None else it.x + it.dx
+        return it.target_x
+
     def click_item(self, it):
         if it.collider is None:
             return 'no-collider'
         wx, wy = self._click_point_of(it)
+        if it.is_floor and pcprofile.is_pc() and not pcprofile.SEASON2:
+            # the PC lays a floor trick at the clicked point: click the floor
+            # where the leg wants it (the mobile's spot unless `x=`), at a
+            # height of its box the raycast gives to the floor item (a door's
+            # box in front of it takes the click otherwise)
+            wx = self._floor_x(it)
+            hit = getattr(self.v, '_hit_at', None)
+            if hit is not None and hit(wx, wy)[0] is not it:
+                c = it.collider
+                for j in range(9):
+                    y = c[1] - c[3] * 0.5 + c[3] * (j + 0.5) / 9
+                    if hit(wx, y)[0] is it:
+                        wy = y
+                        break
+                else:
+                    return 'floor point %.2f not on %s' % (wx, it.name)
         self.look_at(wx, wy)
         sx, sy = self.v.cam.world_to_screen(wx, wy, WIDTH, HEIGHT)
         self.mouse[0], self.mouse[1] = sx, sy
@@ -2459,7 +2484,7 @@ class Driver(Recorder):
     def _use_leg(self, name, typ, pred_of, wait_prime=False):
         it = self.item(name)
         self._leg_zone = it.zone
-        self._leg_x = it.target_x
+        self._leg_x = self._floor_x(it)
         self._leg_item = it
         if wait_prime and it.require_priming and it.rott_toggles_prime \
                 and not it.primed:
@@ -2477,7 +2502,7 @@ class Driver(Recorder):
             self._leg_item = it
             if not ok:
                 return False, 'never primed by the neighbour'
-        ok = self.wait_gate(it.zone, it.target_x, it)
+        ok = self.wait_gate(it.zone, self._floor_x(it), it)
         if not ok:
             return False, 'zone never clear'
         if typ is not None and not self.select_type(typ):
@@ -2515,7 +2540,16 @@ class Driver(Recorder):
                                poke=poke, fire=fire)
         return done, None if done else 'predicate never held'
 
-    def leg_use(self, name, typ=None):
+    def leg_use(self, name, typ=None, *opts):
+        # `x=<units>`: where Woody lays a floor trick under the PC profile
+        # (the floor click's point, World.woody_click; the mobile's spot else)
+        self._drop_x = next((float(o[2:]) for o in opts if o.startswith('x=')), None)
+        try:
+            return self._leg_use(name, typ)
+        finally:
+            self._drop_x = None
+
+    def _leg_use(self, name, typ=None):
         def pred_of(it):
             # the compound inventory on a Compound item lands as
             # CompoundTricked (TrickItem.CanWoodyUse cs:509-529, before the

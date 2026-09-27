@@ -56,6 +56,16 @@ def ins(k):
     t = L[k].strip(); m = re.match(r'(0x[0-9a-f]{8})\s+[0-9a-f.]+\s+(.*)', t)
     return (int(m.group(1), 16), m.group(2)) if m else (None, None)
 LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2', 'fcn.0047a960': 'GOTO', 'fcn.0047a4a0': 'GOTO'}
+# the instant steps a case's list carries (tools/pcref/lap_model.py counts a
+# tick each): the list itself (fcn.00476770 — the case pushes it with the
+# run-now flag 0, its first update only pushes its first element, the
+# sequence update 0x476530), a message step (fcn.0047c640 over a message:
+# SWITCH, OBJ1, the switch back after a take …; update 0x47c550 done on its
+# first call) and a StopMsg (fcn.0047c6c0, the same wrapper) — they carry no
+# arguments of their own and leave the call's argument strings to the next
+# labelled call
+LABEL.update({'fcn.00476770': 'SUBSEQ', 'fcn.0047c640': 'MSG', 'fcn.0047c6c0': 'STOPMSG'})
+INSTANT = ('SUBSEQ', 'MSG', 'STOPMSG')
 # fcn.0047a960 and fcn.0047a4a0 are GoTo builders too (their asserts: CreateGoToObjectJob,
 # CreateGoToObjXJob — the object in the actor's room): 114's case 7 walks to lir/tabacbox
 PRED = ('fcn.0047a130', 'fcn.00479ff0', 'fcn.0047c290', 'fcn.0047c6c0', 'fcn.00413780')
@@ -160,7 +170,7 @@ def run_level(sw):
             m = re.match(r'call (fcn\.[0-9a-f]+)', t)
             if m:
                 fn = m.group(1)
-                if fn in LABEL: labels.append((LABEL[fn], pstr[-4:]))
+                if fn in LABEL: labels.append((LABEL[fn], [] if LABEL[fn] in INSTANT else pstr[-4:]))
                 elif depth < 1 and lo - 0x2000 <= int(fn[4:], 16) < hi + 0x2000 and fn not in NATTRUE and fn not in NATFALSE_FN and not re.search(r'fcn\.(0045c600|004706a0|0045e640|0047f740)', fn):
                     # a helper of the class (the sofa's sit/sit_remo picker, fcn.004707e0): its own
                     # GoTo/DoAction calls belong to the case that calls it
@@ -174,7 +184,7 @@ def run_level(sw):
                         lastcall = ('flag', 'true' if ss[-1] in present else 'false')
                     elif fn == 'fcn.00451de0' and len(ss) >= 2:
                         present.discard(ss[-1]); present.add(ss[-2])
-                if fn in LABEL and LABEL[fn] != 'IFVARIANT':
+                if fn in LABEL and LABEL[fn] != 'IFVARIANT' and LABEL[fn] not in INSTANT:
                     # an IFVARIANT's pick is the next call's object (107's ENTER of
                     # the stool or its pinned twin)
                     pstr = []
@@ -411,5 +421,5 @@ for lv in order:
                 seen_c.add(c)
                 if n == 0 and c == wrap and c != seq[0][0]:
                     toks.append('WRAP')
-                toks += ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK')]
+                toks += ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK') + INSTANT]
             if toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks)))
