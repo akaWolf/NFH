@@ -512,6 +512,45 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   (108, 110, 111, 113, 114) where a left door has 24 — so his way out
   lasts 25 or 27 ticks (26 on 107 and 112, the type's); his way in is the
   type's everywhere.
+- The instant steps, the fire step and the walk's boundaries (2026-09-27,
+  docs/PC_VERIFICATION.md "the instant steps and the fire step"): a Season 1
+  list's own first update, its message steps and StopMsgs take a tick each
+  — a case pushes its list with the run-now flag 0 and the list pushes one
+  element a call — and the fire is a step of its own: it scores on its
+  first update and pushes a list of the step's own clip, the `shout` icon,
+  the shout and a StopMsg (flag 2 drops the icon and the shout, flag 1 the
+  StopMsg), so the shout starts three ticks after the fire and the stand
+  goes on four ticks after the shout's end; a reaction handler's list (the
+  looks, the slips, the trap) starts two ticks after its trigger with a
+  StopMsg and ends with a message step after the repair or the removal.
+  The walk's segments share their boundary ticks the other way: the
+  mover, the walk job and the GOTO are all done in the tick of the last
+  move, and a door's pass (or the walk job's own LEAVE of an occupied
+  object) starts in the last move's tick before it — the port and the lap
+  model had counted a tick more a walk and one more a door. The port
+  counted the ACTION steps alone; now World.play_angry stands the fire's
+  ticks (`_s1_fire_stands`, PCStopSkip, PCFireLead where the early fire's
+  paced span carries them), the surprise stands the handler's (PCReactLead,
+  PCReactTail), tools/pcref/lap_model.py and trick_branches.py count the
+  instants into the stations' PCUseSeconds and the tricked stands, the
+  walk legs and pc1_goto_ticks share the boundaries, and the profile's
+  waits and paced clips end on the frame their whole ticks are reached
+  (pcprofile.TIMER_EPS: k/12 s counted down in 1/60 s steps had cost a
+  frame more on 50 of the first 60 k). Two more reads of the same pass: a
+  ReuseAfterFix station's redo stands for the case's own actions after the
+  repair (PCRedoSeconds: 110's table re-enters and eats — its `give` comes
+  before the chair's case — and 108's brush brushes and puts the brush
+  back), and a floor trick lies where Woody lays it (game.exe creates
+  toi/groundsoap and its kin at his position): under the profile the floor
+  click's point is the trick's (Item.pc_drop_x / pc_drop_dx; the harness
+  lays at the mobile's spot unless a leg says `x=`). With the walks a tick
+  shorter, a walk could reach its target without a frame inside the notice
+  distance: under the profile the arrival's frame notices too (game.exe
+  tests its nearobj triggers every tick wherever he stands; 102's rush had
+  sat down on the stuffed toilet unnoticed). Against Badinfos'
+  thermometers the order-comparable chain pairs had run 0.40 s short of the
+  PC's on average (n = 45); with all of it they average −0.03 s, their
+  mean distance 0.38 s against 0.52 (runs/fin_s1).
 - The stations' durations (2026-09-17, `tools/pcref/pc_durations.py`):
   every Season 1 overlay carries `PCUseSeconds` per routine item — the
   PC station's DoActions at 12 ticks a second, from the lap model's
@@ -1470,10 +1509,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   8 + 8 facing right, mg3 8 + 10 facing left, mg0 / mg2 3 up and down with
   none; the runs' mr records 18 / 9) — and once x is the target's, y goes
   to the target's; clamped at the target, the arrival read in the update
-  of its last move (0x47cf7f-0x47cfac); the GOTO's next update ends it a
-  tick after the last move (0x44aab0) — three ticks with no move, the walk
-  job done inside the GOTO's first update and the arrival read on its
-  second. A walk between two raised points — two back doors' hotspots 50
+  of its last move (0x47cf7f-0x47cfac); the walk job finds the path's end in the same update (0x476112 ->
+  0x476209, done) and the GOTO under it, started (+0x14), ends there too
+  (0x44a81b -> 0x44aab0): the next step, pushed with the run-now flag 0,
+  starts on the tick after the last move — with no move the walk job ends
+  inside the GOTO's first update and the GOTO on its second, two ticks; the
+  walk job pushes a door step with the run-now flag 1 in the update its
+  mover arrives in (0x476004-0x476070) and the step its ACTION likewise
+  (0x474480-0x474496), so the pass starts in the last move's tick, and its
+  own LEAVE of an occupied object (0x475ce6, run-now 1) lends its last tick
+  to the first move (read so on 2026-09-27; the earlier reading had the
+  GOTO end a tick after the last move, three ticks with no move, and the
+  pass start on the tick after the arrival: a tick too many a walk and
+  one more a door). A walk between two raised points — two back doors' hotspots 50
   px above the floor, two stations' 30 — so goes down to the floor and up
   again, as the mobile scene's paths do on their own geometry: read on
   2026-09-27, when E13's frames put the living room's leg between its two
