@@ -6,8 +6,8 @@ the level script's lap is read, the PC videos' elsewhere.
 On the levels of CODE the stays are GameLogic.dll's (tools/pcref/lap_model_s2.py
 code_stays: the parts of the untricked lap — the DoActions' `time` or clips, a
 hideout's enter/leave, a bar's ticks — summed per mobile item by its PAIRS); an
-item the model leaves untimed (209's fire fakir, whose `spit` is untimed, 213's
-picnic behind its polls) falls back to the video.
+item the model leaves untimed (209's fire fakir, whose `spit` is untimed) falls
+back to the video.
 The video: the PC lap is the HUD bubble's span sequence of docs/PC_LAPS_DETAIL.md
 (its second lap, the first starts mid-station); a span runs from the icon's
 appearance — the walk to the station — to the next icon, so the stay is the span
@@ -429,7 +429,7 @@ def write_tricked_keys(ov, n, clips):
               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked'):
+              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter'):
         ov['patches'] = _strip_key(ov['patches'], k)
     sys.path.insert(0, HERE)
     import lap_model_s2
@@ -459,6 +459,11 @@ def write_tricked_keys(ov, n, clips):
             # the co-actor's `fight` (the generic action's ticks)
             _set_key(ov['patches'], item, 'PCHitSeconds',
                      {ROLE[a]: v for a, v in tr['hit'].items() if v is not None})
+        if tr.get('hit_after') and any(v is not None for v in tr['hit_after'].values()):
+            # her own steps and walk between his stand and her fight
+            # (lap_model_s2.FIGHT_BEFORE: 213's Olga out of the boat)
+            _set_key(ov['patches'], item, 'PCHitAfter',
+                     {ROLE[a]: v for a, v in tr['hit_after'].items() if v is not None})
         if tr['credit'] is not None and item not in CREDIT.get(n, {}):
             _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
         if tr.get('linked_credit') is not None:

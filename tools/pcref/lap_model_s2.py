@@ -61,8 +61,9 @@ from another actor's script — 204, 205, 207 and 210 are timed from a start
 step round to that handover since 2026-09-24 (LAP_START; their handshakes
 are the runtime's, docs/PC_FIDELITY.md "205's table", "207's board", "210's
 call"; 204's is its own gong's message). Not modelled:
-206's and 214's waits on the Mother, 213's polls on Olga's picnic and bull
-ride, 209's fakir `spit`. With
+206's and 214's waits on the Mother, 213's polls on Olga's bull ride (its
+picnic's `boat` latch is set before he arrives on the video's laps: his
+tortilla step sends her to the boat, 0x100386ad), 209's fakir `spit`. With
 the walks the laps come to 105 s (203), 85.5 (208), 106.7 (209: its coal walk
 leaves him 190 px on, an action's <translation>, Data.translation), 85 (211),
 124 (212), 123 (213) and 90.3 (214) against the PC video's 84-112, 86, 97, 85,
@@ -113,11 +114,15 @@ class Level:
                 self.present.add(a['name'].replace('/', '_'))
     def is_present(self, name):
         return name.replace('/', '_') in self.present
-def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
+def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, latch=0):
     """one step: returns (events, next); `unknown` takes a poll's awaited
     object as shown, `streq` a name compare the walker cannot resolve (an
     object's animation against a name, fcn.1004948f) as holding — the poll
-    that waits for another actor's action"""
+    that waits for another actor's action —, `latch` the step's event
+    latches (fcn.10013269: the byte fcn.10013319 sets when a behaviour of
+    the latch's name reaches the script) as set, the scene's tests left to
+    the scene (213's picnic waits for Olga's `boat`, then asks which
+    picnic is shown)"""
     k = at(start); seen = set(); ev = []; nxt = None
     slots = []; al = None; vars_ = {}; regs = {}; zf = None
     this_k = None         # the slot of an ecx load no argument took (the thiscall's this)
@@ -130,6 +135,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                           # own byte +0x28 through eax (0x10038ab1)
     entered = False       # past the prologue (its SEH call fcn.10059e30)
     gpush = []            # names pushed by their globals' addresses (fcn.10014cf7's)
+    lea_ecx = None        # the local `lea ecx` points at: a string assignment's target
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -184,6 +190,11 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
         m = re.match(r'push (0x100e[0-9a-f]{4})$', t)
         if m:
             gpush.append(gname(m.group(1)))
+        m = re.match(r'lea ecx, \[ebp - (0x[0-9a-f]+)\]$', t)
+        if m:
+            lea_ecx = m.group(1)
+        elif re.match(r'(mov|lea|pop|xor) ecx\b', t):
+            lea_ecx = None
         # the constants the general registers hold (a SHOUT's level is often
         # one: the zeroed ebx of the prologue, 212's bull's `xor edi, edi`,
         # 203's toilet's `push 2; pop eax` or `xor eax, eax` by its bytes)
@@ -246,6 +257,13 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                 pick = next((c for c in cands if lv.is_present(c)), cands[-1] if cands else None)
                 if outs: vars_[outs[-1][1]] = pick
                 ev.append(('IFVAR', cands, pick))
+                al = None
+            elif fn == 'fcn.10007a10':
+                # a GoTo the step builds and appends to its sequence
+                # (fcn.1000ef28): its object and hotspot name, the
+                # arguments pushed last-first (213's picnic 0x10038516:
+                # the water's `beat`; 211's toilet 0x1003102b: wcright's)
+                ev.append(('GOEL', list(reversed(names))))
                 al = None
             elif fn == 'fcn.1000ec67':
                 nm = names[-1] if names else None
@@ -327,14 +345,21 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                 else:
                     ev.append((kind, args, imms))
                 al = None
+            elif fn == 'fcn.10009b58' and lea_ecx and gpush:
+                # a string assigned to a local from a global's address (211's
+                # toilet step: the women's or the men's wc by the sign,
+                # 0x10030e34-0x10030e45)
+                vars_[lea_ecx] = gpush[-1]
             elif fn in ('fcn.1000aeb8', 'fcn.1000ae19', 'fcn.100088be', 'fcn.10059e30', 'fcn.10009b58',
                         'fcn.1000ee93', 'fcn.1000eec6', 'fcn.1000ef28', 'fcn.10049216'):
                 pass
+            elif fn == 'fcn.10013269' and latch:
+                al = 1
             else:
                 al = unknown   # an unknown predicate (a trigger latch, another actor's
                                # state) reads false, or true on a poll's re-run
             slots = []; this_k = None; edx_g = None; edx_names = []
-            gpush = []
+            gpush = []; lea_ecx = None
             first_push = None
             k += 1; continue
         # the flags: ZF from the tests the scripts branch on; any other
@@ -520,6 +545,14 @@ class Data:
         # the code's constants spell 'room/object' as 'room_object'; rooms have
         # underscores of their own (fire_fakir, tadj_mahal, coal_area)
         self.real = {k.replace('/', '_'): k for k in self.objects}
+        self.n = n
+        self._geom = None
+
+    def geom(self):
+        """the level's Geometry (the walks a flow's GoTo elements make)"""
+        if self._geom is None:
+            self._geom = Geometry(self.n)
+        return self._geom
 
     def flags_of(self, obj):
         """the object's objects.xml flags"""
@@ -735,9 +768,15 @@ def _station_parts(d, ev, ctx):
         if k == 'DO':
             names = [x for x in e[1] if not x.startswith('$')]
             if len(names) >= 2:
-                parts.append((names[0], names[1], d.action_ticks(names[0], names[1])))
+                parts.append((names[0], names[1], d.action_ticks(names[0], names[1], ctx.get('actor', 'neighbor'))))
+                if ctx.get('pos'):
+                    # the action's <translation> moves him (Data.translation)
+                    tx, ty = d.translation(names[0], names[1], ctx.get('actor', 'neighbor'))
+                    r, x, y = ctx['pos']
+                    ctx['pos'] = (r, x + tx, y + ty)
             else:
                 parts.append((names[0] if names else '?', '?', None))
+                ctx['pos'] = None
         elif k in ('E6bd4', 'E6c2e'):
             names = [x for x in e[1] if not x.startswith('$')]
             if not names and ctx.get('hideout'):
@@ -745,7 +784,18 @@ def _station_parts(d, ev, ctx):
             act = 'enter' if k == 'E6bd4' else 'leave'
             if names: ctx['hideout'] = names[0]
             ctx['inside'] = names[0] if (names and act == 'enter') else None
-            parts.append((names[0] if names else '?', act, d.action_ticks(names[0], act) if names else None))
+            who = ctx.get('actor', 'neighbor')
+            parts.append((names[0] if names else '?', act, d.action_ticks(names[0], act, who) if names else None))
+            if act == 'leave' and names:
+                # the leave places him at the hideout's `<actor>_out`
+                # (_leave_place) — where a GoTo element after it walks from
+                g = d.geom()
+                q = _leave_place(g, d, names[0], who)
+                tx, ty = d.translation(names[0], 'leave', who)
+                ctx['pos'] = (g.room_of(d.real.get(names[0], names[0])), q[0] + tx, q[1] + ty) \
+                    if q is not None else None
+            elif act == 'enter':
+                ctx['pos'] = None
         elif k == 'WAITEVENT' and isinstance(e[2], int):
             # fcn.1000e7f2: to the hideout, its `enter` (fcn.10006bd4), then the bar
             # the hideout the step has just shown, when it shows one (202's mat
@@ -764,6 +814,20 @@ def _station_parts(d, ev, ctx):
             parts.append((obj or '?', 'bar', e[2]))
         elif k == 'WAIT':
             parts.append(('-', 'wait', e[2][-1] if e[2] else None))
+        elif k == 'GOEL':
+            # a GoTo element: pushed with a first run (the sequence's
+            # update 0x1000ad52, fcn.10049246), its walk from its first
+            # update to the arrival (walk_span's ticks); done on its next
+            # update, in the tick the sequence pushes the next element —
+            # from where the flow's last hideout leave put him, else unknown
+            names = [x for x in e[1] if not x.startswith('$')]
+            obj = d.real.get(names[0], names[0]) if names else None
+            hs = names[1] if len(names) > 1 else None
+            t = None
+            if obj and ctx.get('pos'):
+                t, pos = walk_span(d.geom(), ctx['pos'], obj, ctx.get('actor', 'neighbor'), d, hotspot=hs)
+                ctx['pos'] = pos if t is not None else None
+            parts.append((names[0] if names else '?', 'goto', t))
         elif k == 'E2f40' and len(e) > 3 and e[3] == 'instant':
             continue
         elif k == 'Ef779':
@@ -881,11 +945,6 @@ def report(n):
               ', '.join('%s.%s %s' % (short(o), a, '?' if t is None else round(t / 12.0, 2)) for o, a, t in parts),
               '  [unknown: %s]' % ', '.join(unk) if unk else ''))
     print("  the lap's actions: %.1f s" % (lap / 12.0))
-
-
-if __name__ == '__main__':
-    for n in [int(x) for x in sys.argv[1:]] or range(201, 215):
-        report(n)
 
 
 # -- the walks (GameLogic.dll) -------------------------------------------------------
@@ -1095,10 +1154,12 @@ def walk_ticks(g, frm, to, actor='neighbor', data=None, detail=None):
     return t + t3, (r2, p2[0], p2[1])
 
 
-def walk_span(g, frm, to, actor='neighbor', data=None, detail=None):
-    """(room, x, y) -> an object's `<actor>` hotspot as GameLogic.dll runs a
-    GoTo: (the ticks from the step that pushes it to the arrival's, the
-    position). The step returns once fcn.1000e3e0 has pushed the GoTo
+def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None):
+    """(room, x, y) -> an object's `<actor>` hotspot — or the one the GoTo
+    names (`hotspot`: its +0xc, fcn.10049e01 at 0x1000744d; the actor's
+    name where it has none, fcn.1003cc45 at 0x10007430) — as GameLogic.dll
+    runs a GoTo: (the ticks from the step that pushes it to the arrival's,
+    the position). The step returns once fcn.1000e3e0 has pushed the GoTo
     without a first run (0x1001e0ce-0x1001e0d5) and runs again when it is
     done. The GoTo's first update pushes the route (fcn.1000a4aa, vtable
     0x100ab688, update 0x1000a80c) with a first run (0x10007504 ->
@@ -1130,7 +1191,12 @@ def walk_span(g, frm, to, actor='neighbor', data=None, detail=None):
     without a first run: the step's own 2 ticks (step_ticks). `detail`
     collects (kind, ticks) parts"""
     room, x, y = frm
-    r2 = g.room_of(to); p2 = g.point(to, actor)
+    if isinstance(to, tuple):
+        # a point (room, x, y): the GoTo's position mode (fcn.1000e601's
+        # walk to another actor)
+        r2, p2 = to[0], (to[1], to[2])
+    else:
+        r2 = g.room_of(to); p2 = g.point(to, hotspot, exact=True) if hotspot else g.point(to, actor)
     if p2 is None or r2 not in g.rooms or room not in g.rooms:
         return None, frm
     if room == r2 and (x, y) == tuple(p2):
@@ -1291,6 +1357,11 @@ PAIRS = {
     213: {'LiveBull': [(None, 'limberwall', 'use')],
           'PlantCarnivore': [('carnivore', 'neighbor', 'lookaround'), (None, 'carnivore', 'use')],
           'Tortilla': [(None, 'tortilla', 'use')], 'Pinata': [(None, 'pinata', 'use')],
+          # the picnic: its step waits for Olga's `boat` (the latch +0x18,
+          # 0x100383f6 — her `enter` of the picnic posts it, sent there by
+          # his tortilla step's `boat` as he arrives, 0x100386ad), then his
+          # `enter` and `leave`
+          'BoatPicnic': [(None, 'picnic', 'enter'), (None, 'picnic', 'leave')],
           'CementBath': [('washingtub', 'neighbor', 'lookaround'), (None, 'washingtub', 'use')]},
     # the untricked lap: the hatch looked into open (the step's byte +0xe is
     # set only once the fish round has written it off), the shower, the
@@ -1457,7 +1528,64 @@ TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,)),
                 214: {'CaptainDoor': ('steps', None, (0x1003af18,)),
                       'Shower': ('fight', 'olga', (0x1003ba90,)),
                       'Bouquet': ('fight', 'olga', (0x1003b677,)),
-                      'Pistol': ('fight', 'mother', (0x1003b328,))}}
+                      'Pistol': ('fight', 'mother', (0x1003b328,))},
+                # 213's termites: the crash and the `leave` of the tricked
+                # picnic, the jump into the water and out, to its `beat`
+                # (the GoTo element 0x10038516) in `fear` — his `leave`
+                # sends Olga (`leave`) out of the boat into the water and on
+                # to him (0x100391cc, 0x1003917e: fcn.1000eb19), whose fight
+                # the step 0x10038221 waits for (its latch +0x10), SHOUT 1
+                213: {'BoatPicnic': ('fight', 'olga', (0x10038221,))}}
+# the co-actor's own steps between the behaviour his tricked flow posts her
+# and her walk to him: {level: {item: (her step, the actor, his part that
+# posts it)}} — 213's termites: his `leave` of the tricked picnic carries
+# behavior="leave" for Olga (me_c2 objects.xml); her step 0x100391cc (its
+# latch +0x14) leaves the boat, jumps into the water and climbs out
+# (bottomright/water2), and 0x1003917e sends her to him (fcn.1000eb19 ->
+# fcn.1000e601: a GoTo to his x less or plus FIGHT_GAP on her side) and on to
+# the fight
+FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_manip', 'leave'))}}
+# the gap fcn.1000e601 leaves between a fighter and the actor she walks to:
+# [0x100cc814] = 50 px, taken off his x from her side (0x1000e706/0x1000e70e)
+FIGHT_GAP = 50
+
+
+def _hit_after(n, d, lv, bytes0, ev, own, walked, spec):
+    """the ticks from the end of his tricked flow to the first update of the
+    co-actor's fight (FIGHT_BEFORE): his part posts her behaviour as its job
+    ends (the DoActions' state 2); her step reads its latch on the tick after
+    (the offer's tick, as the call of 210), builds its sequence (its own
+    tick) and plays it (_flow for her records); the step after it pushes her
+    GoTo to him without a first run (fcn.1000e601, fcn.10049216) — walk_span
+    from where her flow's last leave put her to his place less FIGHT_GAP —
+    and, run again once she is there, the fight without one: its first
+    update two ticks after her arrival's. None where a part is unknown"""
+    stp, actor, (po, pa) = spec
+    fl = _flow(d, ev, own, walked)
+    post = next((t + x[2] for t, kind, x in fl
+                 if kind == 'part' and x[0] == po and x[1] == pa and x[2] is not None), None)
+    if post is None or any(kind == 'unknown' for _t, kind, _x in fl):
+        return None
+    end = fl[-1][0]
+    evh, _nx = run_step(lv, stp, dict(bytes0), latch=1)
+    flh = _flow(d, evh, walked=False, actor=actor)
+    if any(kind == 'unknown' for _t, kind, _x in flh):
+        return None
+    her_end = post + 1 + flh[-1][0]
+    ctxh = {'actor': actor}
+    _station_parts(d, evh, ctxh)
+    ctx = {}
+    _station_parts(d, ev, ctx)
+    frm, his = ctxh.get('pos'), ctx.get('pos')
+    if frm is None or his is None:
+        return None
+    x = his[1] - FIGHT_GAP if frm[1] < his[1] else his[1] + FIGHT_GAP
+    t, _p = walk_span(d.geom(), frm, (his[0], x, his[2]), actor, d)
+    if t is None:
+        return None
+    return her_end + t + 2 - end
+
+
 # the scene a tricked continuation needs besides the item's own trick: 211's
 # sweets with the toilet sign tricked (the mobile's LinkedTrickRushToilet)
 # run to the women's toilet (0x10030dc2: wcright's puke, the beat, then SHOUT
@@ -1583,7 +1711,7 @@ def _is_instant(e):
     return e[0] in TICK_ELEMENTS or (e[0] == 'E2f40' and len(e) > 3 and e[3] == 'instant')
 
 
-def _flow(d, ev, own=None, walked=True):
+def _flow(d, ev, own=None, walked=True, actor='neighbor'):
     """a flow's events on the lap's clock (step_ticks, station_ticks): [(tick,
     kind, payload)] — 'part' (object, action, ticks) at the tick it starts,
     'shout' its level at its tick, 'step' at each step's start after the
@@ -1594,11 +1722,12 @@ def _flow(d, ev, own=None, walked=True):
     (fcn.1000e3e0 runs before the step builds its sequence). `own(object,
     action)` keeps a station's own parts where the step is shared with
     another mobile station (212's cliff: the ledge's `enter` is the
-    pre-ledge's)"""
+    pre-ledge's); `actor` whose records time the parts (213's Olga out of
+    the tricked boat)"""
     out = []
     t = 0
     first, started, go, elems = True, False, False, 0
-    ctx = {}
+    ctx = {'actor': actor}
     for e in ev or []:
         if e[0] == 'STEP' or (e[0] == 'GO' and elems):
             if elems:
@@ -1608,6 +1737,12 @@ def _flow(d, ev, own=None, walked=True):
                 continue
         if e[0] == 'GO':
             go = True
+            # the step's GoTo leaves him at the object's `<actor>` hotspot
+            # (fcn.1000e3e0): where a GoTo element of the flow walks from
+            g = d.geom()
+            obj = d.real.get(e[1], e[1]) if len(e) > 1 and e[1] else None
+            q = g.point(obj, actor) if obj else None
+            ctx['pos'] = (g.room_of(obj), q[0], q[1]) if q is not None else None
             continue
         instant = _is_instant(e)
         parts = [] if (instant or e[0] == 'SHOUT') else _station_parts(d, [e], ctx)
@@ -1751,20 +1886,23 @@ def _row_level(n, snaps, row):
     return lv, by
 
 
-def _tricked_run(n, lv, item, cur, trick, bytes0=None):
+def _tricked_run(n, lv, item, cur, trick, bytes0=None, latch=0):
     """the step `cur` run with the item's trick in the scene (tricked_presence);
-    None when the trick changes none of its DoActions"""
+    None when the trick changes none of its DoActions or hideout elements.
+    `latch`: the step polls its event latch on the lap (a POLL row: 213's
+    picnic waits for Olga's `boat`), taken as set as the lap's walk does"""
     shown, hidden = trick.get(item, (set(), set()))
     if not shown:
         return None
     by = bytes0 if bytes0 is not None else (LAP_BYTES.get(n) or {})
     lv2 = Level(n)
     lv2.present = (set(lv.present) - hidden) | shown
-    ev2, _nx = run_step(lv2, cur, dict(by))
+    ev2, _nx = run_step(lv2, cur, dict(by), latch=latch)
     lv1 = Level(n)
     lv1.present = set(lv.present)
-    ev1, _nx = run_step(lv1, cur, dict(by))
-    dos = lambda ev: [tuple(e[1]) for e in ev if e[0] == 'DO']
+    ev1, _nx = run_step(lv1, cur, dict(by), latch=latch)
+    dos = lambda ev: [(e[0],) + tuple(e[1]) for e in ev
+                      if e[0] == 'DO' or (latch and e[0] in ('E6bd4', 'E6c2e'))]
     if dos(ev2) == dos(ev1):
         return None
     return ev2
@@ -1916,7 +2054,9 @@ def code_stays_tricked(n):
                 continue
             for i in sorted(set(i for i, _j, _p in v)):
                 lvi, byi = _row_level(n, snaps, lap[i][0])
-                ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi)
+                # a row the lap's walk passes as a poll: its latch set
+                lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
+                ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi, latch=lat)
                 e = entry(ev2, own_of(item, i), LAP_WALKS.get(n, {}).get(lap[i][0], True)) \
                     if ev2 is not None else None
                 if e is not None:
@@ -1931,7 +2071,7 @@ def code_stays_tricked(n):
                         for other in CONT_SCENE.get(n, {}).get(item, ()):
                             if other in trick:
                                 lvc.present = (lvc.present - trick[other][1]) | trick[other][0]
-                        run_step(lvc, lap[i][1], dict(byi))
+                        run_step(lvc, lap[i][1], dict(byi), latch=lat)
                         evc = []
                         for stp in steps:
                             evc += [('STEP',)] + run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
@@ -1948,12 +2088,20 @@ def code_stays_tricked(n):
                         if kind == 'fight':
                             ft = d.action_ticks('neighbor', 'fight', actor=actor)
                             e['hit'] = {actor: round(ft / 12.0, 2) if ft is not None else None}
+                            spec = FIGHT_BEFORE.get(n, {}).get(item)
+                            if spec is not None:
+                                # her own steps and her walk before the fight
+                                lvh = Level(n)
+                                lvh.present = (set(lvi.present) - h1) | s1
+                                ha = _hit_after(n, d, lvh, byi, ev2, own_of(item, i),
+                                                LAP_WALKS.get(n, {}).get(lap[i][0], True), spec)
+                                e['hit_after'] = {spec[1]: _secs(ha)}
                     # a tricked step with no SHOUT whose flow goes on to the
                     # lap's next step plays no reaction at all
                     lvj = Level(n); lvj.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
-                    _e, nx2 = run_step(lvj, lap[i][1], dict(byi))
+                    _e, nx2 = run_step(lvj, lap[i][1], dict(byi), latch=lat)
                     lvk = Level(n); lvk.present = set(lvi.present)
-                    _e, nx1 = run_step(lvk, lap[i][1], dict(byi))
+                    _e, nx1 = run_step(lvk, lap[i][1], dict(byi), latch=lat)
                     e['rejoins'] = nx2 == nx1
                     if e['shout'] is not None and e['shout'] >= 0 and e['repair'] is None \
                             and nx2 is not None and nx2 != nx1:
@@ -2219,8 +2367,9 @@ def code_places_tricked(n):
     visit — the station's step run with the tricked variants of its
     IsVariant pairs shown (_tricked_move's), where it leaves a hideout
     (209's hot coal: out at 1365 px, 293 right of the coal; 213's tricked
-    picnic 225 right; 212's tricked bench 75 right; 210's hedgehog chair
-    47 left); items without such a variant left out"""
+    picnic out of the water at its `beat`, 1175 px; 212's tricked bench 75
+    right; 210's hedgehog chair 47 left); items without such a variant left
+    out"""
     d = Data(n); g = Geometry(n)
     lap, pairs = _paired_parts(n)
     st = LAP_START.get(n) or level_start(n)
@@ -2261,31 +2410,23 @@ def code_places_tricked(n):
 # variant shown, the one hidden)}} — 212's bench: its leave step 0x1003613a
 # with bank_manip present leaves it (then the bull's crash and SHOUT 1);
 # 210's chair: 0x1001964b with the hedgehog's picks it, enters and leaves it
-# (SHOUT 0, the repair). 213's tricked picnic (0x100382e1 with
-# picnic_manip: its GoTo, then a flow the walker does not follow) would leave
-# him at picnic_manip's `neighbor_out`, 225 px right: not carried
+# (SHOUT 0, the repair). (213's tricked picnic is the lap row's own step,
+# its latch set: out of the water at its `neighbor_out` and on to its `beat`)
 TRICKED_PLACES = {212: {'SleepBench': (0x1003613a, 'midleft_bank_manip', 'midleft_bank')},
                   210: {'DeckChair': (0x1001964b, 'beachleft_deckchair_hedgehog', 'beachleft_deckchair')}}
 
 
 def _place_of(d, g, ev):
     """the placement of the flow's last hideout leave and the translations of
-    the parts from it on (code_places), None without one"""
+    the parts from it on (code_places) — and a GoTo element's walk after it
+    (213's tricked picnic: out of the water to its `beat`) —, None without
+    one (_station_parts' position)"""
     if not any(e[0] == 'E6c2e' for e in ev):
         return None
     ctx = {}
-    parts = _station_parts(d, ev, ctx)
-    hid = ctx.get('hideout')
-    place = _leave_place(g, d, hid) if hid else None
-    kl = next((k for k in range(len(parts) - 1, -1, -1)
-               if parts[k][1] == 'leave' and parts[k][0] == hid), None) if place else None
-    if kl is None:
-        return None
-    x, y = place
-    for o, a, _t in parts[kl:]:
-        tx, ty = d.translation(o, a)
-        x += tx; y += ty
-    return (x, y)
+    _station_parts(d, ev, ctx)
+    pos = ctx.get('pos')
+    return (pos[1], pos[2]) if pos else None
 
 
 def _tricked_place(n, d, g, lap, events, snaps, i):
@@ -2306,7 +2447,9 @@ def _tricked_place(n, d, g, lap, events, snaps, i):
     lv2.present = set(lv.present)
     for pick, alt in alts:
         lv2.present.discard(pick); lv2.present.add(alt)
-    ev2, _nx = run_step(lv2, cur, dict(byi))
+    # (a row the lap's walk passes as a poll: its latch set)
+    lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
+    ev2, _nx = run_step(lv2, cur, dict(byi), latch=lat)
     return _place_of(d, g, ev2)
 
 
@@ -2372,3 +2515,8 @@ def _paired_parts(n):
         else:
             out[item] = (False, [match(sels)])
     return lap, out
+
+
+if __name__ == '__main__':
+    for n in [int(x) for x in sys.argv[1:]] or range(201, 215):
+        report(n)
