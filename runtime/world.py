@@ -8083,8 +8083,20 @@ class World:
                                        pawn.sprite.x, pawn.sprite.y, src)
             if on_done and not fetch:
                 on_done()
+            if pc_s1 and item.angry_without_animations and routine is not None and not fetch \
+                    and item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items):
+                # the mobile's rush (cs:721) after the PC's shout: 103's letter
+                # box goes to the first aid as Level_Mail's case 7 does after
+                # the trap (the first_aid icon, the gait 2 run, the GoTo to
+                # toi/firstaid, 0x45f3be; take3 and put_plaster, case 8)
+                pawn.can_decrease_angry = False
+                routine.move_to_toilet(item.cause_sickness)
 
-        if item.angry_without_animations:          # cs:719-736
+        if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0):   # cs:719-736
+            # (the PC's step shouts whatever the mobile's flag: 103's letter
+            # box, anc/mailbox_trap's five-argument step with flags 0 at
+            # 0x45f140, plays shout2 — or shout2_extra on a bonus — like any
+            # trick; the profile's shout and repair follow below)
             # source order: CheckRushToToilet, TryFix, the stop/restart,
             # FixDirectly, OnTrickDone, the meter latch (cs:721-796)
             rush = item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
