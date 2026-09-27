@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk',
+                 'pc_hideout', 'pc_walk', 'pc_align_x', 'pc_fix_point',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
                  'use_woody_sequence', 'animation_sequence',
@@ -420,6 +420,13 @@ class Item:
         # object the walk goes to, px of the PC room — one point, or one a
         # visit (PCWalkPoint, tools/pcref/pc_walks_s1.py)
         self.pc_walk = d.get('PCWalkPoint') or {}
+        # the PC profile's Season 1 look reaction and repair (tools/pcref/
+        # pc_reactions.py): the walk-by's CreateGoToObjXJob to the tricked
+        # object's hotspot x (fcn.0047a4a0), and the repair's walk to that
+        # hotspot when he does not stand on it (fcn.0047ae70 over
+        # isActorAtObject, fcn.0047aa90) — [x, y, room] of the PC room
+        self.pc_align_x = bool(d.get('PCAlignX'))
+        self.pc_fix_point = d.get('PCFixPoint')
         # the PC profile's Season 2 catch: per role the span of the PC's flag 4
         # at this station — the catcher neither catches nor is seen
         # (levels/pc overlays, tools/pcref/pc_catch_s2.py)

@@ -2033,6 +2033,34 @@ class Pawn:
             return None
         return (p[0], p[1])
 
+    def pc1_goto_ticks(self, point, x_only=False):
+        """a Season 1 GOTO from where the pawn stands to `point` ([x, y, room] of
+        its PC room): (ticks, the PC point reached) — the mover's
+        (pcprofile.s1_leg_ticks) and the GOTO's end a tick after its last move,
+        three ticks with no move (Pawn._pc1_marks); x_only is CreateGoToObjXJob's
+        target (fcn.0047a4a0: the hotspot's x at the actor's own y), which walks
+        even when he stands there; the repair's (fcn.0047ae70) is skipped on the
+        point (isActorAtObject, fcn.0047aa90): 0 ticks. None outside the point's
+        room"""
+        z = self.zone
+        r = getattr(z, 'pc_walk_room', None) if z is not None else None
+        if not point or r is None or (len(point) > 2 and point[2] != r['room']):
+            return None
+        here = self._pc1_here()
+        if here is None:
+            return None
+        to = (point[0], here[1]) if x_only else (point[0], point[1])
+        if not x_only and tuple(here) == to:
+            return 0, to
+        t = pcprofile.s1_leg_ticks(self.role, self._pc_gait(), here[0], here[1], to[0], to[1],
+                                   r['floor'], sneaking=self.sneaking) or 0
+        return (t + 1 if t > 0 else 3), to
+
+    def pc1_stand_at(self, point):
+        """the pawn stands on a PC point: the next walk leaves from it"""
+        if self.zone is not None and point is not None:
+            self._pc1_at = (tuple(point), self.zone.pid, self.sprite.x, self.sprite.y)
+
     def _pc1_arrived(self, st):
         """the station reached: the next walk leaves from its PC point"""
         leg = st.get('pc1')
@@ -6312,20 +6340,35 @@ class Routine:
         self.pawn.pos_snap = True
         self.state = self.USING
         seq = [a for a in seq if self.pawn.anim.has(a)]
-        if seq:
-            pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
-                  or (it.pc_use_secs_tricked if station else None)) \
-                if pcprofile.is_pc() else None
-            if pc:
-                # the PC fall (slip1/slip3, 31 frames) or doubletake3 (15),
-                # or the station's tricked stand (the rack's take, 0.33 s):
-                # the mobile clip at the pace that lasts it
-                mobile = self.pawn.anim.sequence_seconds(seq)
-                if mobile > 0.0:
-                    self.pawn.anim.time_scale = mobile / pc
-            self.pawn.anim.play_sequence(seq, on_end=self._surprise_near_done)
+
+        def surprise():
+            if seq:
+                pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
+                      or (it.pc_use_secs_tricked if station else None)) \
+                    if pcprofile.is_pc() else None
+                if pc:
+                    # the PC fall (slip1/slip3, 31 frames) or the doubletake
+                    # (its ACTION step, 16 ticks), or the station's tricked
+                    # stand (the rack's take, 0.33 s): the mobile clip at the
+                    # pace that lasts it
+                    mobile = self.pawn.anim.sequence_seconds(seq)
+                    if mobile > 0.0:
+                        self.pawn.anim.time_scale = mobile / pc
+                self.pawn.anim.play_sequence(seq, on_end=self._surprise_near_done)
+            else:
+                self._surprise_near_done()
+
+        g = self.pawn.pc1_goto_ticks(getattr(it, 'pc_fix_point', None), x_only=True) \
+            if pcprofile.is_pc() and getattr(it, 'pc_align_x', False) else None
+        if g is not None:
+            # the PC's look: CreateGoToObjXJob to the tricked object's hotspot
+            # x before the doubletake (fcn.0047a4a0 in fcn.0047d520 and its
+            # kin) — its ticks stood, the pawn then on that point
+            self.pawn.pc1_stand_at(g[1])
+            self.pawn._stand()
+            self.pawn.world.call_later(g[0] / pcprofile.TICKS_PER_SECOND, surprise)
         else:
-            self._surprise_near_done()
+            surprise()
 
     def _surprise_near_done(self):
         """the drain reaches StopAction(canPostponeStop: true): a tricked
@@ -8162,9 +8205,22 @@ class World:
             fix_secs = item.pc_fix_secs
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
+            walk = [pawn.pc1_goto_ticks(getattr(item, 'pc_fix_point', None))
+                    if fixes and pawn.role == 'Rottweiler' else None]
 
             def play_fixes():
                 pawn.anim.time_scale = 1.0
+                g, walk[0] = walk[0], None
+                if g is not None:
+                    # the repair's walk to the tricked object's hotspot when
+                    # he does not stand on it (fcn.0047ae70: isActorAtObject,
+                    # fcn.0047aa90, then fcn.0044ac80 to it) — its ticks
+                    # stood; the next walk leaves from that point
+                    pawn.pc1_stand_at(g[1])
+                    if g[0] > 0:
+                        pawn._stand()
+                        self.call_later(g[0] / pcprofile.TICKS_PER_SECOND, play_fixes)
+                        return
                 if fixes:
                     if fix_secs:
                         mobile = pawn.anim.sequence_seconds(fixes)
