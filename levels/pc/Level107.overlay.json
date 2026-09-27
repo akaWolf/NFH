@@ -228,9 +228,10 @@
    "object": "Chili",
    "component": "Alerter",
    "set": {
-    "PCSurpriseSeconds": 2.167
+    "PCSurpriseSeconds": 2.25,
+    "PCAlarmShoutSeconds": 2.167
    },
-   "source": "the pet's alarm: the level class's `noise` case, then the neighbour's `search` (fcn.0047a690; generic/objects.xml, the Loader's time 26 ticks at 12 a second, tools/pcref/pc_durations.py ALERTERS)"
+   "source": "the pet's alarm: the level class's `noise` case, then its list (fcn.0047a690: pushed with the run-now flag 0) — the neighbour's `search` (generic/objects.xml, the Loader's time 24 ticks at 12 a second, + 2, + the list's first update) and, the pet in his room, `shout0_light` (26 ticks: PCAlarmShoutSeconds; tools/pcref/pc_durations.py ALERTERS)"
   },
   {
    "object": "Dove",

@@ -5774,9 +5774,30 @@ class Routine:
                 if mobile > 0.0:
                     self.pawn.anim.time_scale = mobile / secs
                     searched = done
+                    shout = getattr(it, 'pc_alarm_shout_secs', None) \
+                        if not pcprofile.SEASON2 else None
+                    if shout and self.pawn.zone is not None and it.zone != self.pawn.zone.pid:
+                        # the list's other branch: no pet in his room, the
+                        # icon and `shout2` where he stands (0x47a893-0x47a8d2)
+                        shout = pcprofile.S1_SHOUT_TICKS['shout2'] / pcprofile.TICKS_PER_SECOND
 
                     def done():
                         self.pawn.anim.time_scale = 1.0
+                        clip = 'AngryHard'
+                        if shout and self.pawn.anim.has(clip):
+                            # the list goes on at the pet (0x47a7b1-0x47a887):
+                            # `wakeup` sent to it, the `dog_shout` icon, the
+                            # GoTo to it — where the mobile's run already
+                            # ends — and `shout0_light`, its ACTION's ticks
+                            m = self.pawn.anim.sequence_seconds([clip])
+                            if m > 0.0:
+                                self.pawn.anim.time_scale = m / shout
+
+                            def shouted():
+                                self.pawn.anim.time_scale = 1.0
+                                searched()
+                            self.pawn.anim.play_sequence([clip], on_end=shouted)
+                            return
                         searched()
             if seq:
                 self.pawn.anim.play_sequence(seq, on_end=done)

@@ -315,9 +315,16 @@ actors' job pass the update calls at 0x100445f8.
   pairs are +0.6 and −0.5 s against Badinfos' (+0.1 and −0.7 before), their
   sum +0.1 (−0.6 before): the walk back in through the front door (the
   fallout lands him on the porch, anc/inside past fro/anc) is the mobile's
-  way from EntranceLocation to BreathLocation, not the PC's. Left as it
-  is: the pet alarm's (fcn.0047a690: pushed with the run-now flag 0, no StopMsg —
-  the port's alarm run is the mobile's with the PC's search). game.exe
+  way from EntranceLocation to BreathLocation, not the PC's. The pet
+  alarm's list (fcn.0047a690, built by the level class's case after the
+  `noise` run and pushed with the run-now flag 0, no StopMsg) is carried
+  the same day: its first update a tick before the `search` (the Alerters'
+  PCSurpriseSeconds 27 ticks), and after it — the pet found in his room
+  (fcn.0047a1d0) — `wakeup` sent to the pet, the `dog_shout` or
+  `chili_shout` icon, the GoTo to the pet and `shout0_light` (26 ticks,
+  PCAlarmShoutSeconds: the remaster's AngryHard at that pace; the mobile's
+  run already ends at the pet), else the icon and `shout2` where he stands.
+  game.exe
   tests the nearobj triggers every tick wherever he stands (fcn.00472390
   over fcn.00471bc0); the port notices on the walk's frames and, under
   the profile since 2026-09-27, on the arrival's (Pawn.walk_hook: a walk

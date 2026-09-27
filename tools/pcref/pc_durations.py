@@ -216,19 +216,29 @@ def main(argv):
             mob = json.load(open('%s/levels/s1/Level%d.json' % (ROOT, n)))['objects']
             pets = sorted({((o.get('data') or {}).get('m_GameObject') or {}).get('name')
                            for o in mob.values() if o.get('type') == 'Alerter'} - {None})
+            # the case builds the alarm's list (fcn.0047a690) and pushes it with
+            # the run-now flag 0: its first update a tick before the `search`;
+            # after it, the pet found in his room, the list's GoTo to the pet
+            # (the mobile's run already ends at it) and `shout0_light`
+            shout = L.job_ticks('neighbor', 'shout0_light')
             for pet in pets:
-                v = round(t / lap_model.TICK, 3)
-                src = ("the pet's alarm: the level class's `noise` case, then the neighbour's `search` "
-                       "(fcn.0047a690; generic/objects.xml, the Loader's time %d ticks at 12 a second, "
-                       "tools/pcref/pc_durations.py ALERTERS)" % t)
+                v = round((t + 1) / lap_model.TICK, 3)
+                sv = round(shout / lap_model.TICK, 3)
+                src = ("the pet's alarm: the level class's `noise` case, then its list (fcn.0047a690: "
+                       "pushed with the run-now flag 0) — the neighbour's `search` (generic/objects.xml, "
+                       "the Loader's time %d ticks at 12 a second, + 2, + the list's first update) and, "
+                       "the pet in his room, `shout0_light` (%d ticks: PCAlarmShoutSeconds; "
+                       "tools/pcref/pc_durations.py ALERTERS)" % (t - 2, shout))
                 e = next((e for e in ov['patches'] if e.get('object') == pet
                           and 'PCSurpriseSeconds' in (e.get('set') or {}) and e.get('component') == 'Alerter'), None)
                 if e is not None:
                     e['set']['PCSurpriseSeconds'] = v
+                    e['set']['PCAlarmShoutSeconds'] = sv
                     e['source'] = src
                 else:
                     ov['patches'].append({'object': pet, 'component': 'Alerter',
-                                          'set': {'PCSurpriseSeconds': v}, 'source': src})
+                                          'set': {'PCSurpriseSeconds': v, 'PCAlarmShoutSeconds': sv},
+                                          'source': src})
         for item in SEARCHES.get(n, ()):
             t = lap_model.Level(n).job_ticks('neighbor', 'search')
             v = round(t / lap_model.TICK, 3)
