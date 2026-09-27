@@ -226,41 +226,42 @@ legs; docs/PC_VERIFICATION.md "Not verified"); Season 1's walk still runs
 on the mobile's layout at the PC's speeds.
 
 The walk read and carried the same evening (docs/PC_FIDELITY.md "Season 1
-walks"): the model's movers as game.exe's — the first move `start` px longer
-(8 facing right, 10 facing left, none up or down), the arrival in the update
-of the last move, a leg after a door a tick short (its first move in the far
+walks"): the model's movers as game.exe's — one axis a tick; while x is off
+the target's, y first to the room's floor line, then x along it (its first
+move `start` px longer from the standing animation: 8 facing right, 10
+facing left), then y to the target's height; the arrival in the update of
+the last move, a leg after a door a tick short (its first move in the far
 door's last tick), the GOTO's end a tick after the last move, three ticks
-with no move — and the walker's arguments read along its own path, with the
-two GoTo builders it lacked (docs/PC_FIDELITY.md "The walker's arguments":
-108's `make_coffee`, 109's untricked teeth and parrot, 114's first smoke at
-the tobacco box). Later that night the door pass was read to its end: one
-ACTION step of the near door's `enter` and the far door's `leave`, started
-together, the longer timing it (docs/PC_VERIFICATION.md "door transit";
-E14's frames: the three doors of the kitchen-workshop walk 17-24 ticks each)
-— the model with it: 101 30.8 s (video 32), 102 25.4 (28), 103 27.5 (42),
-104 69.4, 105 43.3 (40), 106 112.7, 107 57.2 (54), 108 81.8 (94), 109 104.0
-(113), 110 54.6 (59), 111 98.2 (122), 112 133.4 (155), 113 145.6 (191), 114
-158.5 (168) (with the clips one after the other 34.2, 28.9, 29.7, 75.1,
-47.2, 127.5, 66.4, 98.8, 111.8, 63.8, 117.0, 150.8, 171.2, 181.2). The
-port's idle laps with the neighbour on the PC's legs and doors
-(runs/idledoor1, 108 with Woody in the wardrobe): 101 30.3 s, 102 25.3, 103
-27.3, 104 70.5, 105 43.3, 106 113.2, 107 55.8, 108 82.3, 109 104.7, 110
-53.8, 111 98.8, 112 133.8, 113 146.5, 114 159.8 — within 1.4 s of the model
-on every level. The video laps of the table carry Woody's doings; station by
-station against the bubbles (the icon changes at the case's ICON, the model
-gives a station its walk): E08's coffee 25.2 s against ~26; E14's cups 19.7
-against 19-20, the polish back 19.0 against 18-19, the first smoke 10.3
-against 9-10, the horn 12.7 against 12-13, where the gun (18.7 against
-24-25) and the hat (25.7 against 34-35) stand under them; E13's grinder 20.4
-and basin 20.2 against 19-20, its main valve 21.9 against 29-30, radiator
-15.4 against 19-20, fuse box 5.0 against 8-9 and ladder 19.7 against 24-25 —
-the frames (43.5-48.3 s) put him out of the bedroom-to-living-room door 2.8
-s after the model and take ~2.3 s from that door's `leave` to the living
-room's other back door, where the model walks the 109 px between their
-hotspots at y 370 in 1.2 s (both back-door hotspots of the type sit 50 px
-above the floor; a floor waypoint of the walk plan would be 2.8 s more —
-fcn.00475b30 over the path finder fcn.00448060 pushes one mover a room as
-read).
+with no move — the door pass one step of its two clips, started together
+(docs/PC_VERIFICATION.md "door transit"), and the walker's arguments read
+along its own path, with the two GoTo builders it lacked
+(docs/PC_FIDELITY.md "The walker's arguments": 108's `make_coffee`, 109's
+untricked teeth and parrot, 114's first smoke at the tobacco box). The floor
+line and the door pass were read on 2026-09-27 from the videos' misfits:
+E13's frames put the living room's leg between its two back doors at ~4 s
+and the hall's at ~7.5 where the straight legs gave 1.2 and 4.3 (down 50 px
+and up again at 3 a tick: 2.8 s), E14's the kitchen-to-workshop doors at
+17-24 ticks each where the clips one after the other gave 37-42. The model:
+101 30.8 s (video 32), 102 25.6 (28), 103 32.8 (42), 104 75.9, 105 48.8
+(40), 106 116.8, 107 58.2 (54), 108 92.9 (94), 109 117.8 (113), 110 55.7
+(59), 111 116.2 (122), 112 151.5 (155), 113 177.5 (191), 114 178.6 (168);
+station by station on the bubbles (the icon changes at the case's ICON, the
+model gives a station its walk) within about a second: E08's coffee 25.4 s
+against 24-25, deck chair 22.1 against 21-22, plant 22.4 against 22-23;
+E09's pig key 5.2 against 5-6, milk 18.9 against 18-19, pig 15.1 against
+14-15, cookies 5.9 against 5-6, parrot 12.7 against 12-13, key back 14.0
+against 13-14, teeth 3.8 against 4-5; E13's grinder 20.6 against 19-20, main
+valve 29.6 against 29-30, radiator 20.2 and basin 20.4 against 19-20, second
+valve 14.6 against 14-15, fuse box 9.1 against 8-9, ladder 25.1 against
+24-25, the fuse box again 19.9 against 20-21; E14's cups 19.9 against 19-20,
+polish 19.2 against 18-19, smoke 10.4 against 9-10, records 7.5 against 7-8,
+gun 25.2 against 24-25, hat 35.0 against 34-35, horn 12.8 against 12-13 —
+the video laps of the table carry Woody's doings (113's 21-s gap after the
+ladder, a trick's or an alarm's). The port's idle laps with the neighbour on
+the PC's legs and doors (runs/idlefloor1, 108 with Woody in the wardrobe):
+101 30.3 s, 102 25.7, 103 32.3, 104 77.2, 105 48.7, 106 117.3, 107 56.8, 108
+93.2, 109 118.3, 110 54.8, 111 116.5, 112 151.7, 113 178.0, 114 179.8 —
+within 1.4 s of the model on every level.
 
 The port's own idle laps under the profile's four rules read from the
 binary and the data — the walking speeds, the door pass (both clips in
