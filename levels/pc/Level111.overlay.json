@@ -55,7 +55,7 @@
    "set": {
     "PCAngryTime": 300,
     "PCShoutIndex": 1,
-    "PCFixSeconds": 0.0,
+    "PCFixSeconds": 4.083,
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    }

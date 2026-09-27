@@ -65,7 +65,7 @@
      "IT_Banana": 0.417
     },
     "PCShoutIndex": 1,
-    "PCFixSeconds": 0.0,
+    "PCFixSeconds": 1.083,
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    },

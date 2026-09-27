@@ -14,7 +14,7 @@
    "set": {
     "PCAngryTime": 300,
     "PCShoutIndex": 1,
-    "PCFixSeconds": 0.0,
+    "PCFixSeconds": 1.083,
     "PCFireBefore": true,
     "PCSlipSeconds": 2.583
    }
@@ -873,6 +873,14 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCFixSeconds": 2.083
+   }
   }
  ]
 }

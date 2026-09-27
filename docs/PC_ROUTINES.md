@@ -110,13 +110,17 @@ station — the tricked object's own action, the fire, the shout, the repair; a 
 doubletake1 and doubletake3 (15 frames each) as two DoActions of which only the second is
 appended to the step list (fcn.004766e0) — a DoAction builds an action object with its own node
 list (fcn.00477ed0, fcn.00477d50, fcn.00477e00) that runs only when its step comes up, and the
-first object is released unrun — so doubletake3 alone plays, 1.25 s, then the fire, the shout,
-the repair; a slip (toi/groundsoap: fcn.0047ddc0, reached through fcn.0047e000) — a
+first object is released unrun — so doubletake3 alone plays, 1.25 s by its frames (16 ticks as
+the ACTION step it is, time + 2, since 2026-09-27; before it CreateGoToObjXJob, fcn.0047a4a0,
+aligns him on the object's hotspot x), then the fire, the shout, the repair (with its walk to the
+tricked object's hotspot, fcn.0047ae70 over isActorAtObject); a slip (toi/groundsoap: fcn.0047ddc0, reached through fcn.0047e000) — a
 sub-sequence of the stop message (fcn.0047b350, engine listener slot 26), the fire with the
 fall inside it — slip1 or slip3 (31 frames, 2.58 s each) by the neighbour's facing,
 fcn.0047c7f0 reading the direction digit of his walk animation (mg0/mg1/…), one of the two,
 not both — and a follow-up step (vtable 0x4e1bdc → fcn.00438c80: an engine event, listener
-slot 65, on the soap; no clean animation): the score first, then the fall, then the shout; and
+slot 65, on the soap; no clean animation — the marbles' fcn.0047b6a0 and the banana's
+fcn.0047d0e0 push the floor object's `clean` after the fall, 47 ticks the marbles, 11 or 23 the
+banana): the score first, then the fall, then the shout; and
 the other five-argument sites pay before their own clip too: the tub's hair
 (`show_hair` on toi/shower after the 2.83 s `shower` clip), the dirty towel (`show_black`),
 the electrotrap, the mailbox trap, the vacuum, the sofa, the tabasco teeth, the coffee soil,

@@ -69,9 +69,11 @@ REG = {'lir/stickybook': (1, 0), 'lir/bathcandy': (0, 3), 'toi/tub_hair': (0, 3)
        'wor/book_replaced': (0, 0), 'kit/skate': (0, 3)}
 
 
-def use(pc, site=None, before=None, after=None, fix=None):
-    """a station use: the tool's stand, or the listed (object, action) parts"""
-    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix)
+def use(pc, site=None, before=None, after=None, fix=None, own=None):
+    """a station use: the tool's stand, or the listed (object, action) parts
+    (`own`: the five-argument step's clip where the site passes its actor in a
+    register)"""
+    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own)
 
 
 def wb(pc, site=None, fix=None):
@@ -145,11 +147,15 @@ TABLE = {
     113: {'ValveHot': use('kit/heater_hot'), 'ChairAssembly': use('lir/stoolkit_pain'), 'ChairAssemblyBook': use('lir/stoolkit_pain'),
           'Sink': use('toi/basin_flooded'), 'ValveMain': use('toi/basin_flooded'), 'FuseBox': use('anc/fuse'),
           'Ladder': use('wor/ladder_cut'), 'AngleGrinder': use('bal/anglegrinder_manipulated')},
-    114: {# the hat stand serves the medal box and the hat: the box's take and
-          # the hat's takehat lead to the rat's dance or the medals; the sticky
-          # hat's rip follows the medals — each item takes its own part
-          'MedalBox': use('bed/medalbox_rat'),
-          'Hat': use('bed/stickyhat', before=[('neighbor', 'takehat'), ('neighbor', 'riphat')]),
+    114: {# the hat stand serves the medal box and the hat (Level_Hunter's cases
+          # 22-24): the take and takehat (the Hat's first visit), the medals or
+          # the rat's dance (the five-argument step fires first, then
+          # `ratdance`), the rip and the sticky hat's fire or the putback, the
+          # give (the Hat's second visit) — each visit takes its own part; the
+          # take and takehat, played at the Hat's first visit, are no part of
+          # the tricked visits
+          'MedalBox': use('bed/medalbox_rat', before=[], own=[('neighbor', 'ratdance')], after=[]),
+          'Hat': use('bed/stickyhat', before=[('neighbor', 'riphat')]),
           'Gramaphone': use('lir/phono_nail'), 'Polish': use('kit/blackpolish'), 'Horn': use('bal/balloonhorn'),
           'Pipe': use('lir/tabacbox_explosive'), 'Shotgun': use('bas/gun_loaded')},
 }
@@ -190,15 +196,46 @@ RUNTO_S2 = {201: ('Buffet',), 204: ('PullKart',), 205: ('TabbleTennis',), 206: (
 # where he pants (`pant`), shouts (fcn.1000f977) and repairs it (0x1002512d)
 # before the lap goes on (0x10024929); the neighbour's actions, by name
 RETURN_S2 = {205: {'WaterSkiis': ('pant',)}}
-# the generic handlers: every soap, banana and marbles slip (fcn.0047ddc0: the
-# fire first, one fall clip, no clean, index 1) and the electric trap
+# the generic handlers: every soap, banana and marbles slip (the fire first,
+# one fall clip, index 1; the soap's fcn.0047ddc0 without a clean, the
+# marbles' and the banana's with one, SLIP_CLEAN) and the electric trap
 # (bas/electrotrap: the fire first, the shock clip, index 1, its repair)
 SLIP_NAMES = ('Ground', 'GroundMarbles')
 TRAP_NAMES = ('ElectricTrap',)
+# the fall's list after the five-argument step: the marbles (fcn.0047b6a0,
+# 0x47b838) and the banana (fcn.0047d0e0, 0x47d26c) push the neighbour's
+# `clean` of the floor object — 47 ticks the marbles, 11 or 23 the banana by
+# its room — before its removal (fcn.0047b610); the soap's (fcn.0047ddc0)
+# has none. The mobile's floor item is named Ground (soap, banana) or
+# GroundMarbles; the banana's is Ground on the levels whose trigger.xml has
+# banana_on_floor
+SLIP_CLEAN = {'GroundMarbles': 'marbles'}
+BANANA_LEVELS = (107, 108, 109, 110)
 
 KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'PCFireAt', 'PCFireBefore',
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint')
+
+
+def slip_cleans(n, item, floor, lv):
+    """[(zone, seconds)] of the `clean` of `<room>/<floor>` in each zone the
+    mobile has the item in (the zone's PC room from the overlay's PCWalkRoom),
+    in the mobile file's order"""
+    d = json.load(open(os.path.join(ROOT, 'levels/s1/Level%d.json' % n)))
+    ov = json.load(open(os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)))
+    rooms = {e['object']: e['set']['PCWalkRoom']['room'] for e in ov.get('patches', [])
+             if e.get('component') == 'Zone' and 'PCWalkRoom' in (e.get('set') or {})}
+    out = []
+    for o in d['objects'].values():
+        dd = o.get('data') or {}
+        if o.get('type') != 'TrickItem' or (dd.get('m_GameObject') or {}).get('name') != item:
+            continue
+        zone = (dd.get('Zone') or {}).get('name')
+        room = rooms.get(zone)
+        v = lv.action('%s/%s' % (room, floor), 'clean') if room else None
+        if v is not None and zone not in [z for z, _ in out]:
+            out.append((zone, v))
+    return out
 
 
 def fix_point(n, obj):
@@ -292,6 +329,17 @@ def specs(n):
         keys = {}
         if base in SLIP_NAMES:
             keys = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True, 'PCSlipSeconds': round(SLIP, 3)}
+            floor = SLIP_CLEAN.get(base) or ('groundbanana' if n in BANANA_LEVELS else None)
+            if floor:
+                # the clean of the floor object in each of the item's rooms:
+                # the level's first as the item's, another as its zone's
+                cleans = slip_cleans(n, base, floor, lv)
+                if cleans:
+                    first = cleans[0][1]
+                    keys['PCFixSeconds'] = round(first, 3)
+                    for zone, v in cleans[1:]:
+                        if v != first:
+                            out['%s@%s' % (name, zone)] = {'PCFixSeconds': round(v, 3)}
         elif base in TRAP_NAMES:
             row = site_of(n, 'bas/electrotrap')
             shock = lv.action('neighbor', 'electroshock')
@@ -315,7 +363,8 @@ def specs(n):
             after = _sum(lv, spec['after']) if spec.get('after') is not None else sum(v for _, v in sm['after'])
             if base in reuse:
                 after = 0.0         # the mobile's redo of the normal use (ReuseAfterFix)
-            own = (sm['own'][1] or 0.0) if sm['own'] else 0.0
+            own = _sum(lv, spec['own']) if spec.get('own') is not None \
+                else ((sm['own'][1] or 0.0) if sm['own'] else 0.0)
             if spec.get('fix') is not None:
                 fix = lv.fix(spec['fix'])[1]
             else:
@@ -388,10 +437,17 @@ def _strip_key(patches, key):
 
 
 def _set_key(patches, item, key, value):
+    """`item` may name one zone's instance, `Name@ZoneNN` (a patch with `zone`)"""
+    base, _, zone = item.partition('@')
     for e in patches:
-        if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
+        if e.get('object') == base and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict) \
+                and (e.get('zone') or '') == zone:
             e['set'][key] = value; return
-    patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
+    p = {'object': base, 'component': 'TrickItem'}
+    if zone:
+        p['zone'] = zone
+    p['set'] = {key: value}
+    patches.append(p)
 
 
 def write(n, sp):
@@ -407,8 +463,9 @@ def write(n, sp):
         st = e.get('set')
         if e.get('component') == 'TrickItem' and isinstance(st, dict) \
                 and 'pc_durations.py' not in (e.get('source') or ''):
+            who = e.get('object') + ('@' + e['zone'] if e.get('zone') else '')
             for k in [k for k in st if k in KEYS]:
-                v = want.pop((e.get('object'), k), None)
+                v = want.pop((who, k), None)
                 if v is None:
                     del st[k]
                 else:

@@ -12,11 +12,7 @@
    "object": "Ground",
    "component": "TrickItem",
    "set": {
-    "PCAngryTime": 276,
-    "PCShoutIndex": 1,
-    "PCFixSeconds": 0.0,
-    "PCFireBefore": true,
-    "PCSlipSeconds": 2.583
+    "PCAngryTime": 276
    },
    "zone": "Zone03"
   },
@@ -227,7 +223,11 @@
    "set": {
     "PCWoodySeconds": {
      "IT_Soap": 0.417
-    }
+    },
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCSlipSeconds": 2.583
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Soap <- woody laydown 5 ticks"
   },
