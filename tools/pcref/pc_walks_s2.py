@@ -149,11 +149,13 @@ STATIONS = {
           'CigarBox': {'Rottweiler': 'midleft/cigars'},
           'SleepBench': {'Rottweiler': 'midleft/bank'},
           'MechanicalBull': {'Rottweiler': 'bottomleft/bullride'},
-          # the ledge step's GoTo is the parrot (0x10035388: IsVariant of
-          # bottomright/parrot and parrot_manip), its DoActions the cliff's,
-          # the water's and the water exit's — both mobile ledge actions
-          'PreParrotLedge': {'Rottweiler': 'bottomright/parrot'},
-          'ParrotLedge': {'Rottweiler': 'bottomright/parrot'},
+          # the ledge step's GoTo is the cliff (0x100353d2-0x100353f5:
+          # bottomright_cliff; the IsVariant of bottomright/parrot and
+          # parrot_manip after it had been taken for its target until
+          # 2026-09-27), its DoActions the cliff's, the water's and the water
+          # exit's — both mobile ledge actions
+          'PreParrotLedge': {'Rottweiler': 'bottomright/cliff'},
+          'ParrotLedge': {'Rottweiler': 'bottomright/cliff'},
           'MumWaitZone4': {'Mother': 'midleft/red_bull'},
           'MumWaitZone3': {'Mother': 'midright/statue_hideout'}},
     213: {'LiveBull': {'Rottweiler': 'midleft/limberwall'},
@@ -425,6 +427,11 @@ ACTOR = {role: actor for actor, role in ROLES}
 # hotspot (0x1002847f, 0x1002a769), the left slip's `neighborleft`
 # (0x10028ea6, 0x1002a4ea); PCApproach `x` is then one per visit
 VISIT_HOTSPOTS = {201: {'WaterPuddle': ('neighbor', 'neighborleft')}}
+# a station whose visits' GoTos take other objects: 205's skis — the ride's
+# step walks to beachleft/waterski (0x100251eb, the IsVariant's pick) and
+# shows the guarded skis after it, the put step to beachleft/waterski_guarded
+# (0x10024e37: the name put in its slot through edx, 0x10024e62), 5 px higher
+VISIT_OBJECTS = {205: {'WaterSkiis': ('beachleft/waterski', 'beachleft/waterski_guarded')}}
 
 
 def approaches(n):
@@ -472,6 +479,11 @@ def approaches(n):
             hs = VISIT_HOTSPOTS.get(n, {}).get(name) if role == 'Rottweiler' else None
             if hs:
                 per[role]['x'] = [g.point(obj, h, exact=True)[0] for h in hs]
+            vo = VISIT_OBJECTS.get(n, {}).get(name) if role == 'Rottweiler' else None
+            if vo:
+                pts = [g.point(o2, actor, exact=True) for o2 in vo]
+                per[role]['x'] = [q[0] for q in pts]
+                per[role]['px'] = [q[1] - g.floor(r) for q in pts]
             if role == 'Rottweiler' and name in moves:
                 # the station's actions move him along the floor (their
                 # <translation>s): his next walk leaves from x + tx (per visit)

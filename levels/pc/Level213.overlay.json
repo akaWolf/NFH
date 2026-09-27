@@ -42,12 +42,12 @@
    "set": {
     "PCLaugh": 2,
     "AngerAmount": 15,
-    "PCUseSecondsTricked": 4.75,
+    "PCUseSecondsTricked": 4.83,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
-    "PCCreditAt": 1.75,
-    "PCUseSeconds": 1.67
+    "PCCreditAt": 1.83,
+    "PCUseSeconds": 1.75
    }
   },
   {
@@ -1329,12 +1329,12 @@
       }
      }
     },
+    "PCBehaviourAtEnd": 0.08,
     "PCClipSecondsRole": {
      "Olga": {
       "BullRide": 6.83
      }
-    },
-    "PCBehaviourAtEnd": 0.08
+    }
    }
   },
   {

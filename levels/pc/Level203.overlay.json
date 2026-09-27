@@ -26,15 +26,15 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 13.67,
+    "PCUseSecondsTricked": 13.75,
     "PCShout": 1,
     "PCFixSeconds": 4.58,
-    "PCCreditAt": 7.17,
+    "PCCreditAt": 7.25,
     "PCFixDepart": [
      1147,
      -22
     ],
-    "PCUseSeconds": 15.42
+    "PCUseSeconds": 15.5
    }
   },
   {

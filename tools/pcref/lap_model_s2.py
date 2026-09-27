@@ -120,6 +120,8 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
     that waits for another actor's action"""
     k = at(start); seen = set(); ev = []; nxt = None
     slots = []; al = None; vars_ = {}; regs = {}; zf = None
+    this_k = None         # the slot of an ecx load no argument took (the thiscall's this)
+    edx_g = None; edx_names = []   # names stored into argument slots through edx
     first_push = None     # the first argument pushed since the last call (its last parameter)
     consts = {}; pending_push = None
     pose = False          # the element E2f40 appends is a pose element (fcn.10014c5c / fcn.1000de51)
@@ -143,8 +145,20 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
         if m and m.group(1) in regs: nxt = regs[m.group(1)]
         m = re.match(r'mov ecx, dword \[(0x100[de][0-9a-f]{4})\]$', t)
         if m: slots.append(('g', gname(m.group(1))))
+        m = re.match(r'mov edx, dword \[(0x100[de][0-9a-f]{4})\]$', t)
+        if m:
+            edx_g = gname(m.group(1))
+        elif t == 'mov dword [eax], edx' and edx_g is not None:
+            # a name put in its argument's slot through edx (205's put step,
+            # 0x10024e62-0x10024e6d: beachleft_waterski_guarded) — the GoTo's
+            edx_names.append(edx_g)
         m = re.match(r'mov ecx, dword \[ebp - (0x[0-9a-f]+)\]$', t)
-        if m: slots.append(('v', vars_.get(m.group(1), '$' + m.group(1))))
+        if m:
+            slots.append(('v', vars_.get(m.group(1), '$' + m.group(1))))
+            this_k = len(slots) - 1       # a thiscall's `this` unless ecx is stored or pushed
+        elif this_k is not None and (re.match(r'mov dword \[e[a-z]x\], ecx$', t) or t == 'push ecx'
+                                     or t.startswith('mov ecx,')):
+            this_k = None
         if first_push is None and t.startswith('push '):
             m = re.match(r'push (0x[0-9a-f]+|[0-9]+)$', t)
             m2 = re.match(r'push (e[a-z][a-z])$', t)
@@ -249,7 +263,14 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
                     al = 1
                 ev.append(('STREQ', names[-2:], al))
             elif fn == 'fcn.1000e3e0':
-                ev.append(('GO', names[-1] if names else None)); al = 0
+                # the object's name: the step's `this` loaded into ecx for
+                # the call is none of its arguments (203's toilet step,
+                # 0x10033e6e-0x10033e8e: groundleft_toilet, then ecx =
+                # [ebp-0x20] and the call)
+                gn = [s2[1] for i2, s2 in enumerate(slots) if s2[0] in ('g', 'v') and i2 != this_k]
+                if not gn and edx_names:
+                    gn = edx_names[-1:]
+                ev.append(('GO', gn[-1] if gn else (names[-1] if names else None))); al = 0
             elif fn == 'fcn.1000e7f2':
                 # a timed stay (the bar): fcn.1000b154's object (vtable 0x100ab710,
                 # update 0x1000b312) counts its +0xc up to the pushed ticks +8 a
@@ -312,7 +333,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0):
             else:
                 al = unknown   # an unknown predicate (a trigger latch, another actor's
                                # state) reads false, or true on a poll's re-run
-            slots = []
+            slots = []; this_k = None; edx_g = None; edx_names = []
             gpush = []
             first_push = None
             k += 1; continue

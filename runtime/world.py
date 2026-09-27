@@ -137,6 +137,18 @@ def pc_ap_x(ap, it):
     return x
 
 
+def pc_ap_px(ap, it):
+    """a station's PC hotspot height against its room's floor (Item.pc_approach
+    `px`): one value, or one per visit where the visits' GoTos take other
+    objects (205's skis: the ride's step walks to beachleft/waterski, the put
+    step to the guarded skis, 5 px higher — pc_walks_s2.VISIT_OBJECTS), the
+    visit about to play, the item's PCUseSeconds slot"""
+    px = ap.get('px')
+    if isinstance(px, list):
+        return px[it.pc_use_visit % len(px)] if px else 0
+    return px
+
+
 def pc_target(role, zone, step):
     """the PC point a path's last step walks to: a station's hotspot
     (Item.pc_approach), else the item's or the point's x on the room's floor
@@ -147,7 +159,7 @@ def pc_target(role, zone, step):
     it = step.get('item') if step.get('kind') == 'item' else None
     ap = it.pc_approach.get(role) if it is not None else None
     if ap:
-        return (pc_ap_x(ap, it), pr['floor'] + ap['px'])
+        return (pc_ap_x(ap, it), pr['floor'] + pc_ap_px(ap, it))
     if it is not None:
         return (pc_room_x(zone, it.x), pr['floor'])
     if step.get('x') is not None:
@@ -1706,7 +1718,7 @@ class Pawn:
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
         if not ap or pc_ap_x(ap, it) == self._pc_from_x:
             return None
-        return pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': ap['px']}, self.sneaking) or None
+        return pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': pc_ap_px(ap, it)}, self.sneaking) or None
 
     def _pc_arrived(self, it):
         """a station reached: the next walk leaves from its PC hotspot, or
@@ -1729,7 +1741,7 @@ class Pawn:
                 tx = ap['txt']
                 if isinstance(tx, list):
                     tx = tx[it.pc_use_visit % len(tx)] if tx else 0
-            self._pc_depart = (pc_ap_x(ap, it) + tx, ap['px'], self.sprite.x, self.sprite.y, it)
+            self._pc_depart = (pc_ap_x(ap, it) + tx, pc_ap_px(ap, it), self.sprite.x, self.sprite.y, it)
         else:
             self._pc_depart = None
         self._pc_from_x = None

@@ -25,11 +25,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 4,
-    "PCUseSecondsTricked": 6.42,
+    "PCUseSecondsTricked": 6.5,
     "PCShout": 0,
     "PCFixSeconds": 1.83,
-    "PCCreditAt": 4.0,
-    "PCUseSeconds": 5.08
+    "PCCreditAt": 4.08,
+    "PCUseSeconds": 5.17
    }
   },
   {
@@ -37,12 +37,12 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.17,
+    "PCUseSecondsTricked": 6.25,
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.17,
-    "PCCreditAt": 3.67,
-    "PCUseSeconds": 7.42
+    "PCCreditAt": 3.75,
+    "PCUseSeconds": 7.5
    }
   },
   {
@@ -987,9 +987,9 @@
    "set": {
     "PCApproach": {
      "Rottweiler": {
-      "obj": "bottomright/parrot",
-      "x": 1209,
-      "px": 26,
+      "obj": "bottomright/cliff",
+      "x": 1420,
+      "px": 20,
       "routes": {
        "PreAztecThrone": [
         "Zone02",
@@ -1083,9 +1083,9 @@
    "set": {
     "PCApproach": {
      "Rottweiler": {
-      "obj": "bottomright/parrot",
-      "x": 1209,
-      "px": 26,
+      "obj": "bottomright/cliff",
+      "x": 1420,
+      "px": 20,
       "routes": {
        "PreAztecThrone": [
         "Zone02",

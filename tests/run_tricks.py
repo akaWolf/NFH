@@ -80,7 +80,7 @@ sys.path.insert(0, os.path.join(ROOT, 'runtime'))
 
 from record import Recorder, DT, WIDTH, HEIGHT     # noqa: E402
 import pcprofile  # noqa: E402
-from world import pc_ap_x  # noqa: E402
+from world import pc_ap_x, pc_ap_px  # noqa: E402
 from app import App                                 # noqa: E402
 from prefs import MemoryPrefs                       # noqa: E402
 from menu import GameIntroAnimation                 # noqa: E402
@@ -503,7 +503,7 @@ class Driver(Recorder):
             if fa and pc_ap_x(fa, frm) == pc_ap_x(ap, it):
                 return 0.0
         gait = p._pc_gait() if p is not None and hasattr(p, '_pc_gait') else 'walk'
-        return (pcprofile.s2_pass_ticks(role, gait, {'in': ap['px']},
+        return (pcprofile.s2_pass_ticks(role, gait, {'in': pc_ap_px(ap, it)},
                                         bool(getattr(p, 'sneaking', False))) or 0) / 12.0
 
     def door_time(self, door, p=None):

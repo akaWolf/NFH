@@ -40,7 +40,7 @@
     "PCCreditAt": 6.25,
     "PCUseSeconds": [
      17.58,
-     0.83
+     0.92
     ]
    }
   },
@@ -57,12 +57,12 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 3.33,
+    "PCUseSecondsTricked": 3.42,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
-    "PCCreditAt": 2.42,
-    "PCUseSeconds": 2.75
+    "PCCreditAt": 2.5,
+    "PCUseSeconds": 2.83
    }
   },
   {
@@ -70,12 +70,12 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 6.17,
+    "PCUseSecondsTricked": 6.25,
     "PCShout": 0,
     "PCFixSeconds": 1.83,
     "PCShoutTail": 7.58,
-    "PCCreditAt": 4.92,
-    "PCUseSeconds": 7.33
+    "PCCreditAt": 5.0,
+    "PCUseSeconds": 7.42
    }
   },
   {
@@ -673,14 +673,14 @@
       "routes": {}
      }
     },
+    "PCBehaviourAt": 0.33,
+    "PCUseSeconds": 6.42,
     "PCItemClipSeconds": {
      "N2TrickItemExtra1": 0.75,
      "N2TrickItemUseNormal": 7.58,
      "N2TrickItemExtra3": 2.92,
      "N2TrickItemExtra2": 0.75
-    },
-    "PCBehaviourAt": 0.33,
-    "PCUseSeconds": 6.42
+    }
    }
   },
   {
@@ -721,8 +721,14 @@
     "PCApproach": {
      "Rottweiler": {
       "obj": "beachleft/waterski_guarded",
-      "x": 320,
-      "px": 3,
+      "x": [
+       320,
+       320
+      ],
+      "px": [
+       8,
+       3
+      ],
       "routes": {
        "OlgaMatBeach": [
         "Zone01",

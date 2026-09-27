@@ -22,7 +22,7 @@
     "PCHitSeconds": {
      "Mother": 3.33
     },
-    "PCUseSeconds": 2.58
+    "PCUseSeconds": 2.5
    }
   },
   {
@@ -41,7 +41,7 @@
     "PCFixSecondsLinked": 0,
     "PCShoutTailLinked": 0.08,
     "PCLinkedPaysAt": 5.25,
-    "PCUseSeconds": 3.0
+    "PCUseSeconds": 2.92
    }
   },
   {
@@ -734,6 +734,9 @@
       "routes": {}
      }
     },
+    "PCClipSeconds": {
+     "Stand_Left": 0.53
+    },
     "PCClipSecondsRole": {
      "Mother": {
       "MotherCall": 1.75,
@@ -748,9 +751,6 @@
       "at": "start",
       "then": 0.0
      }
-    },
-    "PCClipSeconds": {
-     "Stand_Left": 0.53
     }
    }
   },
