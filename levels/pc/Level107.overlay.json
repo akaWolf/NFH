@@ -15,7 +15,12 @@
     "PCAngryTime": 204,
     "PCShoutIndex": 1,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 6.167
+    "PCUseSecondsTricked": 6.167,
+    "PCFixPoint": [
+     630,
+     420,
+     "kit"
+    ]
    }
   },
   {

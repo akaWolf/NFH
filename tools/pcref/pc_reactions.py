@@ -69,11 +69,13 @@ REG = {'lir/stickybook': (1, 0), 'lir/bathcandy': (0, 3), 'toi/tub_hair': (0, 3)
        'wor/book_replaced': (0, 0), 'kit/skate': (0, 3)}
 
 
-def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None):
+def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None, fixwalk=False):
     """a station use: the tool's stand, or the listed (object, action) parts
     (`own`: the five-argument step's clip where the site passes its actor in a
-    register; `prime`: the part the mobile's prime leg plays when tricked)"""
-    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own, prime=prime)
+    register; `prime`: the part the mobile's prime leg plays when tricked;
+    `fixwalk`: the case walks to `fix`'s hotspot before its repair)"""
+    return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own, prime=prime,
+                fixwalk=fixwalk)
 
 
 def wb(pc, site=None, fix=None):
@@ -121,7 +123,13 @@ TABLE = {
     107: {# the stool's stand is the potter's wheel's: the seat, the cry, the hurt
           # and the repair are the chair's, the potting after it the wheel's use
           'DieselChair': use('kit/stool_pins', after=[]),
-          'DieselGenerator': use('kit/potterswheel_fast', fix='kit/potterswheel_fast'),
+          # Level_Art's case 9 tricked: potter_fast, the LEAVE of the wheel
+          # (its ENTER is the DieselChair's visit), the fire, a GoTo to
+          # kit/potterswheel_fast's own hotspot (0x45814a — 630/420, the
+          # wheel's 490/415) and its repair (fixwalk: PCFixPoint)
+          'DieselGenerator': use('kit/potterswheel_fast', fix='kit/potterswheel_fast', fixwalk=True,
+                                 before=[('kit/potterswheel_fast', 'potter_fast'),
+                                         ('kit/potterswheel_fast', 'leave')]),
           'MumStatueFootStool': use('lir/footstool_unlocked'), 'Camera': use('bed/camera_flashy'), 'Dove': use('bal/dove_free')},
     108: {'Shezlong': use('bal/foldingchair_pins'), 'ToothBrush': use('toi/shoebrushset'), 'CoffeeMaker': use('kit/coffeebox_soil'),
           'SunLotion': use('bal/suncream_sweet'), 'Plant': use('anc/deadflower')},
@@ -429,6 +437,10 @@ def specs(n):
                     # the repair helper's walk to the tricked object when he
                     # does not stand on it (fix_point)
                     pt = fix_point(n, sm['repair'])
+                    if pt:
+                        keys['PCFixPoint'] = pt
+                elif fix and spec.get('fixwalk'):
+                    pt = fix_point(n, spec['fix'])
                     if pt:
                         keys['PCFixPoint'] = pt
                 if own + after > 0 or total == 0:
