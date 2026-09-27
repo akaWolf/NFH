@@ -30,12 +30,11 @@ park! Zone03                         # the kitchen through the living room (~96)
 take! RubbishBinBanana2 IT_Banana    # Zone03
 take! Fridge IT_Vinegar              # Zone03
 park! Zone02                         # the living room (~104): he fetches the extinguisher through the bedroom 99-111
-whenzone Zone07                      # he is back on the balcony with the extinguisher until ~140 (the PC's case 9 keeps it: no walk back)
-usewith! Ground@Zone06 IT_Banana     # Zone06 (~122): the slip on his way back (~147)
-park! Zone02                         # down to the living room
-usewith! SteakChair IT_Pins          # Zone02, 10: at his steak (~163)
+whenzone Zone07                      # he is back on the balcony with the extinguisher until ~132 (the PC's case 9 keeps it: no walk back)
+usewith! SteakChair IT_Pins          # Zone02, 10: at his steak
 usewith! SteakWine IT_Vinegar        # Zone02, 15: at his wine after the pins
-park! Zone01                         # the hall: off his lap
+usewith! Ground@Zone06 IT_Banana     # Zone06: the slip on his way back (~135)
+hide! Bed                            # Zone06: he slips by the bed and goes down to the steak
 await BBQ 20
 await FireExtinguisher 15
 await CarnivorPlantSpray 15

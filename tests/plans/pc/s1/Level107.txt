@@ -1,32 +1,35 @@
-# Level107 under the PC profile (2026-09-17, the PC paces: the neighbour 1.0 u/s,
-# Woody 2.1, the doors a frame a tick, the catch the room alone). His lap (61 s,
-# the idle run under the profile): bedroom 0-6 > balcony (drawing) 6-16 >
-# bedroom (camera, magnesium, camera) 16-31 > living 31-35 > kitchen (chair,
-# generator) 35-47 > living (statue) 47-60 > bedroom 60-67 > balcony 67-77 >
-# bedroom 77-92 > living 92-96 > kitchen 96-108 > living 108-122 > ... The hall
-# and the bathroom are off his lap. Woody collects downstairs while he is up
-# (0-31), climbs while he is in the kitchen (35-47) for the magnesium, the
-# camera and the balcony, hides in the bed for his crossing, and arms the living
-# room and the kitchen while he draws (67-77). Seven tricks' 82 need six ticks:
-# the camera at 79, the slip at 92, the chair and the generator at 99, the
-# statue at 109, the dove and the drawing at 128.
-take PinsBoard IT_Pins               # Zone01 (3-7)
+# Level107 under the PC profile. His lap (55.8 s idle, the PC's legs and door passes):
+# bedroom 0-5 > balcony (drawing) 5-11 > bedroom (camera, magnesium, camera) 11-25 >
+# living 26-31 > kitchen (chair, generator) 31-40 > living (statue) 42-51 > bedroom
+# 53-61 > balcony 61-67 > bedroom (camera, magnesium) 67-78 > living 81-87 > kitchen
+# 87-96 > living (statue) 98-107 > bedroom 108-116 > balcony 116-... The hall and the
+# bathroom are off his lap. Woody takes the pins, the wrench and the scissors while he
+# is up, climbs to the bed while he is in the kitchen (31) and hides there through his
+# crossing, drawing, camera and magnesium; out while he is in the kitchen again (87),
+# the magnesium and the camera, the dove and the drawing on the balcony, back in the
+# bed before he comes up (108); while he draws he takes the banana and arms the living
+# room and the kitchen. Seven tricks' 82 need six ticks: the drawing, the dove, the
+# camera, the slip on his way to the kitchen, the chair, the generator, the statue.
+take PinsBoard IT_Pins               # Zone01
 take Drawer IT_Wrench                # Zone01
 take FirstAid IT_Scissors            # Zone04: scissors + antispot together
-take RubbishBinBanana IT_Banana      # Zone03 (18-24); he comes down at 31, to the kitchen at 35
-park Zone01
-whenzone Zone03                      # (35) he is in the kitchen until 47: up through the living room
-take! MagnesiumBottle IT_Magnesium   # Zone06 (~44), after his first camera
-usewith! Camera IT_Magnesium         # Zone06, 12 (RottweilerUseTogglesPrime): pays at his lap-2 camera (79)
+walk -2.6 -3.4                       # Zone01 by the living-room stairs
+whenzone Zone03                      # (31) his lap-1 kitchen: the living room is free until 42
+hide! Bed                            # Zone06 (~41): his crossing, balcony, camera and magnesium pass by
+whenzone Zone07                      # (61) his lap-2 balcony
+whenzone Zone03                      # (87) his lap-2 kitchen: the bedroom is free until 108
+take! MagnesiumBottle IT_Magnesium   # Zone06, after his camera
+usewith! Camera IT_Magnesium         # Zone06, 12 (RottweilerUseTogglesPrime)
 usewith! Dove IT_Scissors            # Zone07, 10, NoticeWhenEnterZone
-usewith! Drawing IT_Antispot         # Zone07, 12: the wall shows only after his first drawing
-hide! Bed                            # Zone06 by 58: he comes up at 60, draws 67-77, photographs 77-92
-whenzone Zone07                      # (67) he draws: the living room is free until 92, the kitchen until 96
+usewith! Drawing IT_Antispot         # Zone07, 12
+hide! Bed                            # Zone06 before he comes up (108)
+whenzone Zone07                      # (116) he draws: the living room and the kitchen are free
+take! RubbishBinBanana IT_Banana     # Zone03
+usewith! Ground@Zone02 IT_Banana     # Zone02, 8, NoticeWhenWalkNearby: his slip on the way to the kitchen
 use! MumStatueFootStool              # Zone02, bare hand, 15
-usewith! Ground@Zone02 IT_Banana     # Zone02, 8, NoticeWhenWalkNearby: the slip on his way to the kitchen (92)
 usewith! DieselChair IT_Pins         # Zone03, 10
 usewith! DieselGenerator IT_Wrench   # Zone03, 15
-park! Zone01                         # the hall before he comes down (92)
+park! Zone01                         # the hall before he comes down
 await Camera 12
 await Ground@Zone02 8
 await DieselChair 10

@@ -20,13 +20,13 @@
 # while he is on the balcony, the wardrobe before he leaves it, the fuse once he has
 # taken his.
 take RubbishBinCable IT_Cable         # Z03 (he is upstairs 0-41)
-take BasementDrawer IT_Tongs          # Z09
-prime ElectricTrapTatter              # Z09: the tatter's water; the trap waits for the cable
 use ValveMain                         # Z09, bare, twice: closes, then arms -> the Sink at his lap-1 sink (~96), 12 — cold
 take! Drawer IT_Fuse                  # Z01: IT_Fuse + IT_Marbles, before he comes down (46.5)
 hide! Wardrobe                        # Z01: he passes it down to the basement (55) and back up (61)
 whenzone Zone03                       # (68) the kitchen
+prime! ElectricTrapTatter             # Z09: the tatter's water; the trap waits for the cable
 usewith! ElectricTrap IT_Cable        # Z09 x 2.07, 8: the shock on his run from the sink (~111) — hot
+take! BasementDrawer IT_Tongs         # Z09
 whenzone Zone01                       # (80) his lap-1 radiator is done
 use! ValveHot                         # Z09: the radiator hot for his lap-2 kitchen, 15 — cold
 whenzone Zone04                       # (91) he is at the sink: up through the hall before his run down it (~102)
