@@ -760,7 +760,18 @@ routine log shows got_tricked False at both urgent ends of 112), so the
 rule never fires there — the profile ran without it for a while, which
 cost Level106 (the pudding, fired at [2], must be skipped at [6] after
 the candy's toilet rush or the chain runs past the six minutes), and it
-is back on both profiles. The two skips actually seen were port faults,
+is back on both profiles — and on 2026-09-27 read in game.exe for the
+walk-bys: a walk-by is a trigger, whose handleTrigger sets the level
+class's case back to the one last run (Level_Laundry 0x454726, Level_Pig
+0x4689fc) before the reaction, so the interrupted station's case runs
+again and decides on its own objects; under the profile a SurpriseNear
+no longer takes the GotTricked skip (the toilet rushes and the other
+urgents keep it): 109's key board, emptied by Woody, is walked to again
+after the bedroom banana and plays its case's `surprise` (E09: the banana
+to the bed's pins 22.4 s against 23.2, 16.5 before), and 101's plan, whose
+microwave had skipped him past the tricked binoculars, pays the
+binoculars, the TV, the sofa and then the microwave. The two skips
+actually seen were port faults,
 fixed for both profiles:
 the roller-skater scene (Level112's skates) ended without closing its
 SurpriseNear urgent, so the next surprise inherited its OriginalAction —
