@@ -55,7 +55,18 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 10.8
+    "PCUseSecondsTricked": 11.92,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
+    "PCHitSeconds": {
+     "Olga": 3.58
+    },
+    "PCHitAfter": {
+     "Olga": 5.67
+    },
+    "PCCreditAt": 4.08,
+    "PCUseSeconds": 12.83
    }
   },
   {
@@ -1105,7 +1116,11 @@
         "Zone01",
         "Zone04"
        ]
-      }
+      },
+      "tx": -5,
+      "dpx": 75,
+      "txt": 200,
+      "dpxt": 22
      },
      "Olga": {
       "obj": "bottomright/picnic",
@@ -1329,12 +1344,12 @@
       }
      }
     },
-    "PCBehaviourAtEnd": 0.08,
     "PCClipSecondsRole": {
      "Olga": {
       "BullRide": 6.83
      }
-    }
+    },
+    "PCBehaviourAtEnd": 0.08
    }
   },
   {

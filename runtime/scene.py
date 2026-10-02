@@ -328,7 +328,7 @@ class Item:
                  'pc_credit_at', 'pc_credit_at_linked',
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'pc_shout_tail', 'pc_shout_tail_linked',
-                 'pc_hit_secs', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
+                 'pc_hit_secs', 'pc_hit_after', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
                  'pc_fix_depart',
                  'enable_anim_index_control', 'anims_to_control',
@@ -1013,6 +1013,10 @@ class Item:
         # the part of his flow after it (PCResumeHeadSeconds: 207's billboard)
         # and the record that pays there (PCExtraCoinLinked: 207's bill)
         self.pc_hit_secs = dict(d.get('PCHitSeconds') or {}) or None
+        # the co-actor's own steps and walk between his stand's end and her
+        # fight (PCHitAfter: 213's Olga leaves the boat, jumps into the
+        # water and out and walks to him — lap_model_s2 FIGHT_BEFORE)
+        self.pc_hit_after = dict(d.get('PCHitAfter') or {}) or None
         self.pc_hit_secs_linked = dict(d.get('PCHitSecondsLinked') or {}) or None
         self.pc_resume_head_secs = d.get('PCResumeHeadSeconds')
         self.pc_extra_coin_linked = d.get('PCExtraCoinLinked')

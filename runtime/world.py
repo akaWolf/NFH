@@ -8327,7 +8327,15 @@ class World:
                     hs = item.pc_hit_secs_linked
                 affected.pc_hit_secs = (hs or {}).get(affected.role) \
                     if pcprofile.is_pc() else None
-                afr.run_to_hit_pawn(pawn)          # Pawn.RunToHitPawn
+                after = (item.pc_hit_after or {}).get(affected.role) \
+                    if pcprofile.is_pc() else None
+                if after:
+                    # her own steps and her walk to him before the fight
+                    # (PCHitAfter: 213's Olga out of the boat, into the water
+                    # and out — GameLogic 0x100391cc, 0x1003917e -> fcn.1000eb19)
+                    self.call_later(after, lambda afr=afr, pawn=pawn: afr.run_to_hit_pawn(pawn))
+                else:
+                    afr.run_to_hit_pawn(pawn)      # Pawn.RunToHitPawn
                 oit = afr.item
                 if oit is not None and oit.change_item_anim_when_affected \
                         and oit.item_anim_when_affected:
