@@ -8505,7 +8505,7 @@ class World:
             def tail_s2(played_angry=True):
                 # the rest of the SHOUT's step after the repair, or after
                 # the SHOUT with none (PCShoutTail: its SET and SWITCH, 210's
-                # take, 205's kid's laugh) — stood before the next step
+                # take) — stood before the next step
                 if tail_secs:
                     pawn.anim.time_scale = 1.0
                     pawn._stand()

@@ -20,7 +20,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 12.67
+    "PCUseSeconds": 11.42
    }
   },
   {
@@ -32,7 +32,7 @@
     "PCShout": 0,
     "PCFixSeconds": 1.83,
     "PCCreditAt": 1.58,
-    "PCUseSeconds": 4.5
+    "PCUseSeconds": 4.58
    }
   },
   {
