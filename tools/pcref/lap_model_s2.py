@@ -136,6 +136,13 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
     entered = False       # past the prologue (its SEH call fcn.10059e30)
     gpush = []            # names pushed by their globals' addresses (fcn.10014cf7's)
     lea_ecx = None        # the local `lea ecx` points at: a string assignment's target
+    pushed_lea = None     # the last such local pushed (an out argument)
+    ecx_var = None        # the local ecx was loaded from (a thiscall's `this`)
+    arg_vars = []         # locals stored into argument slots through ecx
+    actor_vars = set()    # locals holding another actor (fcn.1004ba02's out)
+    seq_vars = {}         # locals holding a sequence built for another queue
+                          # (fcn.1000aeb8) -> the indices of the events appended
+    last_elem = None      # the index of the last element event built
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -195,6 +202,15 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
             lea_ecx = m.group(1)
         elif re.match(r'(mov|lea|pop|xor) ecx\b', t):
             lea_ecx = None
+        if t == 'push ecx' and lea_ecx:
+            pushed_lea = lea_ecx
+        m = re.match(r'mov ecx, dword \[ebp - (0x[0-9a-f]+)\]$', t)
+        if m:
+            ecx_var = m.group(1)
+        elif re.match(r'(mov|lea|pop|xor) ecx\b', t):
+            ecx_var = None
+        if t == 'mov dword [eax], ecx' and ecx_var:
+            arg_vars.append(ecx_var)
         # the constants the general registers hold (a SHOUT's level is often
         # one: the zeroed ebx of the prologue, 212's bull's `xor edi, edi`,
         # 203's toilet's `push 2; pop eax` or `xor eax, eax` by its bytes)
@@ -344,7 +360,32 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                     ev.append((kind, args, imms, 'instant')); pose = False
                 else:
                     ev.append((kind, args, imms))
+                last_elem = len(ev) - 1
                 al = None
+            elif nxt is not None and fn == 'fcn.%x' % nxt:
+                # the step runs its next one itself, in its own tick (208's
+                # fakir step 0x1001eff3, 210's 0x100197ac)
+                ev.append(('CALLNEXT',))
+            elif fn == 'fcn.1004ba02' and pushed_lea:
+                # an actor found by its name (its out argument): a job pushed
+                # onto its queue is that actor's (208's fakir, 202's kid)
+                actor_vars.add(pushed_lea)
+            elif fn == 'fcn.1000aeb8' and outs:
+                seq_vars[outs[-1][1]] = []
+            elif fn == 'fcn.1000ae19' and ecx_var in seq_vars and last_elem is not None:
+                seq_vars[ecx_var].append(last_elem)
+            elif fn == 'fcn.10049216' and ecx_var in actor_vars:
+                # a job pushed onto another actor's queue (fcn.10049216 on
+                # the actor fcn.1004ba02 found): its elements are that
+                # actor's — the step does not wait for them (208's step
+                # 0x1001ee76 pushes the fakir's `play` onto the fakir,
+                # 0x1001efba-0x1001efc4, and runs its next step at once;
+                # 202's dive step the kid's sequence, 0x100221dd-0x100221e3)
+                arg = arg_vars[-1] if arg_vars else None
+                idx = seq_vars.get(arg, [last_elem] if last_elem is not None else [])
+                for i in idx:
+                    if i is not None and i < len(ev) and not ev[i][0].startswith('O'):
+                        ev[i] = ('O' + ev[i][0],) + tuple(ev[i][1:])
             elif fn == 'fcn.10009b58' and lea_ecx and gpush:
                 # a string assigned to a local from a global's address (211's
                 # toilet step: the women's or the men's wc by the sign,
@@ -359,7 +400,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 al = unknown   # an unknown predicate (a trigger latch, another actor's
                                # state) reads false, or true on a poll's re-run
             slots = []; this_k = None; edx_g = None; edx_names = []
-            gpush = []; lea_ecx = None
+            gpush = []; lea_ecx = None; pushed_lea = None; ecx_var = None; arg_vars = []
             first_push = None
             k += 1; continue
         # the flags: ZF from the tests the scripts branch on; any other
@@ -738,7 +779,10 @@ def step_ticks(ev, ctx):
     if go is not None:
         ctx['go'] = go
     ctx['walks'] = walks
-    return n + (2 if walks else 1)
+    # a step that calls its next step itself (CALLNEXT) builds no sequence
+    # of its own: the next one's starts in the tick it runs again in
+    own = 1 if any(e[0] == 'CALLNEXT' for e in ev) else 0
+    return n + (2 if walks else 1) - own
 
 
 def station_ticks(d, ev, ctx=None):
@@ -752,6 +796,19 @@ def station_ticks(d, ev, ctx=None):
     ctx['inside_before'] = ctx.get('inside')
     parts = _station_parts(d, ev, ctx)
     extra = step_ticks(ev, ctx) + ctx.pop('carry', 0)
+    # (the other actor's instants he waits through, a tick each)
+    extra += sum(1 for i in _waited(d, ev, ctx.get('actor', 'neighbor'))
+                 if ev[i][0][1:] in TICK_ELEMENTS)
+    hid = ctx['inside_before']
+    if ctx.get('walks') and hid and not any(e[0] in ('E6bd4', 'E6c2e') for e in ev[:1]):
+        # a walk from inside a hideout: the route's first update pushes the
+        # hideout's leave (fcn.10049190 -> fcn.10006c2e, with a first run,
+        # 0x1000a840-0x1000a87e) and paths from the next — the leave's job
+        # before the walk, from its `<actor>_out` (lap_steps puts it on the
+        # step before: 208's platform, left on the way to the shoe cleaner)
+        ctx['route_leave'] = hid
+        if ctx.get('inside') == hid:
+            ctx['inside'] = None
     k = next((i for i, p in enumerate(parts) if p[2] is not None), None)
     if k is None:
         ctx['carry'] = extra
@@ -812,6 +869,17 @@ def _station_parts(d, ev, ctx):
                     parts.append((obj, 'enter', t))
             if obj: ctx['hideout'] = obj; ctx['inside'] = obj
             parts.append((obj or '?', 'bar', e[2]))
+        elif k == 'ODO':
+            # another actor's job (run_step: pushed onto its queue): his
+            # steps go on without it, but for one whose record posts him a
+            # behaviour, which the step after it waits for (204's gong: the
+            # Elvis's `use`, behavior="gong" behavioractor="neighbor", and
+            # the idle step 0x10031b70's latch); the fakir's `play` and
+            # `stop` (208) and the kid's dive (202) and sand lion (205) none
+            who = ctx.get('actor', 'neighbor')
+            names = [x for x in e[1] if not x.startswith('$')]
+            if _waits_on(d, e, who):
+                parts.append((names[0], names[1], d.action_ticks(names[0], names[1], who)))
         elif k == 'WAIT':
             parts.append(('-', 'wait', e[2][-1] if e[2] else None))
         elif k == 'GOEL':
@@ -901,11 +969,42 @@ def lap_steps(n):
             for x in (e[1] if isinstance(e[1], list) else [e[1]]):
                 if isinstance(x, str) and not x.startswith('$'):
                     objs.add(x)
-        out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, station_ticks(d, ev, ctx)))
+        parts = station_ticks(d, ev, ctx)
+        hid = ctx.pop('route_leave', None)
+        if hid and out:
+            # the route's leave of the hideout the last step left him in
+            # (station_ticks): its time and placement the last row's
+            out[-1][4].append((hid, 'leave', d.action_ticks(hid, 'leave')))
+            LAP_LEAVES.setdefault(n, {})[out[-1][0]] = hid
+        out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, parts))
         LAP_WALKS.setdefault(n, {})[i] = ctx.get('walks', False)
         if any(e[0] == 'E6c2e' for e in ev):
             LAP_LEAVES.setdefault(n, {})[i] = ctx.get('hideout')
+    hid = ctx.get('inside')
+    if loop is not None and out and hid and LAP_WALKS[n].get(loop):
+        # (the lap's last step left him inside and the loop's first walks)
+        out[-1][4].append((hid, 'leave', d.action_ticks(hid, 'leave')))
+        LAP_LEAVES.setdefault(n, {})[out[-1][0]] = hid
     return out, loop
+
+
+def role_lap(n, start, actor):
+    """another actor's lap by her script from `start` (212's Mother
+    0x10035048, 213's 0x100372f0, 214's 0x1003a0b8): [(step, parts)] as
+    lap_steps times the neighbour's — station_ticks with the actor's
+    records (her DoActions' jobs, the step's own ticks), a walk from inside
+    a hideout starting with the route's leave of it (the last step's part)"""
+    d = Data(n)
+    steps, _loop = walk(Level(n), start)
+    out = []
+    ctx = {'geom': Geometry(n), 'data': d, 'actor': actor}
+    for cur, ev, _nxt in steps:
+        parts = station_ticks(d, ev, ctx)
+        hid = ctx.pop('route_leave', None)
+        if hid and out:
+            out[-1][1].append((hid, 'leave', d.action_ticks(hid, 'leave', actor)))
+        out.append((cur, parts))
+    return out
 
 
 # {level: {lap row: whether its step walks}} (lap_steps, step_ticks): a tricked
@@ -1261,6 +1360,20 @@ def lap_estimate(n, verbose=False):
     order = steps[loop:] + steps[:loop] + steps[loop:loop + 1]    # the lap, closed on its first step
     for k, (cur, ev, nxt) in enumerate(order):
         parts = station_ticks(d, ev, ctx)
+        rl = ctx.pop('route_leave', None)
+        if rl and pos is not None:
+            # the route leaves the hideout first (station_ticks): its leave's
+            # job, the walk from its `<actor>_out`
+            q = _leave_place(g, d, rl)
+            if q is not None:
+                tx, ty = d.translation(rl, 'leave')
+                pos = (g.room_of(d.real.get(rl, rl)), q[0] + tx, q[1] + ty)
+            lt = d.action_ticks(rl, 'leave')
+            if lt is None:
+                unknown.append('%s.leave' % short(rl))
+            elif k > 0:
+                stays += lt
+            if verbose: print('   stay %-30s %5.1f s' % ('%s.leave' % short(rl), (lt or 0) / 12.0))
         target = None
         for e in ev:
             if e[0] == 'GO':
@@ -1337,8 +1450,11 @@ PAIRS = {
           'ToiletPaper': [(None, 'toilet', 'shit')], 'ToiletFlush': [(None, 'toilet', 'flush')],
           'Watermelon': [(None, 'melons', 'use')], 'Bicycle': [(None, 'bike', 'use')]},
     208: {'ArmsBowl': [('statue', 'neighbor', 'lookaround'), (None, 'statue', 'take')],
-          'IndianPlatform': [(None, 'fakir', 'play'), (None, 'platform', 'enter'), (None, 'platform', 'bar'),
-                             (None, 'fakir', 'stop')],
+          # (the fakir's `play` and `stop` his own queue's: pushed onto the
+          # fakir, 0x1001efba-0x1001efc4, not waited for; the platform left by
+          # the walk to the shoe cleaner, the route's first job)
+          'IndianPlatform': [(None, 'platform', 'enter'), (None, 'platform', 'bar'),
+                             (None, 'platform', 'leave')],
           'ShoeMachine': [(None, 'shoe_cleaner', 'use')],
           'AngryElephant': [('elephant', 'neighbor', 'lookaround'), (None, 'elephant', 'fool')]},
     209: {'Cow': [('cow', 'neighbor', 'lookaround'), (None, 'cow', 'ride')],
@@ -1705,6 +1821,34 @@ def _repair_walk(n, d, ev):
     return t, (q[0], q[1] - g.floor(g.room_of(b)))
 
 
+def _waits_on(d, e, who='neighbor'):
+    """another actor's job (ODO) whose record posts `who` a behaviour — the
+    step after it waits for it (204's gong: the Elvis's `use`)"""
+    if e[0] != 'ODO':
+        return False
+    names = [x for x in e[1] if not str(x).startswith('$')]
+    r = d._record(names[0], names[1], who) if len(names) >= 2 else None
+    return bool(r is not None and r[1].get('behavior') and r[1].get('behavioractor') == who)
+
+
+def _waited(d, ev, who='neighbor'):
+    """the indices of the other actor's elements the flow's actor waits
+    through: those of a step (up to a STEP mark or a GO) up to a job of
+    that actor's he waits for (_waits_on) — 204's Elvis's camera before
+    his `use`, a tick of the wait"""
+    out, run = set(), []
+    for i, e in enumerate(ev or []):
+        if e[0] in ('STEP', 'GO'):
+            run = []
+            continue
+        if e[0].startswith('O'):
+            run.append(i)
+            if _waits_on(d, e, who):
+                out.update(run)
+                run = []
+    return out
+
+
 def _is_instant(e):
     """an element the sequence finishes on its first update: a tick
     (step_ticks)"""
@@ -1728,7 +1872,8 @@ def _flow(d, ev, own=None, walked=True, actor='neighbor'):
     t = 0
     first, started, go, elems = True, False, False, 0
     ctx = {'actor': actor}
-    for e in ev or []:
+    waited = _waited(d, ev, actor)
+    for ie, e in enumerate(ev or []):
         if e[0] == 'STEP' or (e[0] == 'GO' and elems):
             if elems:
                 first = False
@@ -1744,7 +1889,7 @@ def _flow(d, ev, own=None, walked=True, actor='neighbor'):
             q = g.point(obj, actor) if obj else None
             ctx['pos'] = (g.room_of(obj), q[0], q[1]) if q is not None else None
             continue
-        instant = _is_instant(e)
+        instant = _is_instant(e) or (ie in waited and e[0][1:] in TICK_ELEMENTS)
         parts = [] if (instant or e[0] == 'SHOUT') else _station_parts(d, [e], ctx)
         if not (instant or e[0] == 'SHOUT' or parts):
             continue
@@ -1902,7 +2047,7 @@ def _tricked_run(n, lv, item, cur, trick, bytes0=None, latch=0):
     lv1.present = set(lv.present)
     ev1, _nx = run_step(lv1, cur, dict(by), latch=latch)
     dos = lambda ev: [(e[0],) + tuple(e[1]) for e in ev
-                      if e[0] == 'DO' or (latch and e[0] in ('E6bd4', 'E6c2e'))]
+                      if e[0] in ('DO', 'ODO') or (latch and e[0] in ('E6bd4', 'E6c2e'))]
     if dos(ev2) == dos(ev1):
         return None
     return ev2
@@ -1942,10 +2087,11 @@ def _shout_tail(d, ev, own=None, walked=True):
     SHOUT where it has no repair — to the end of its sequence: the SET and
     SWITCH of a SHOUT with no repair (203's melons, 204's hot dog), the
     take after it (210's turban shop: its take3, 15 ticks with the SET,
-    SWITCH and the hide after), the kid's laugh after 205's sand lion's
-    repair (91 ticks, a DoActions job in his sequence) — before the step's next one takes
-    over (a ('STEP',) mark or a GO); None where the flow has no SHOUT or a
-    part of unknown length follows it"""
+    SWITCH and the hide after) — before the step's next one takes over (a
+    ('STEP',) mark or a GO); None where the flow has no SHOUT or a part of
+    unknown length follows it. (205's sand lion's kid laughs on his own
+    queue, 0x10024426-0x1002443e, as the neighbour shouts and repairs: no
+    tail since 2026-10-03)"""
     fl = _flow(d, ev, own, walked)
     k = next((i for i, (_t, kind, _x) in enumerate(fl) if kind == 'shout'), None)
     if k is None:
@@ -2272,7 +2418,7 @@ def code_stays_tricked(n):
             out[item]['linked_credit'] = round(credit / 12.0, 2) if credit is not None else None
     # the linked trick in the same step: the station's step run with both
     # tricks in the scene
-    dos = lambda ev: [tuple(e[1]) for e in ev if e[0] == 'DO']
+    dos = lambda ev: [tuple(e[1]) for e in ev if e[0] in ('DO', 'ODO')]
     for item, lnk in sorted(mobile_linked(n).items()):
         if item not in where or 'linked' in out[item] or lnk not in trick:
             continue

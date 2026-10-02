@@ -449,7 +449,7 @@ def write_tricked_keys(ov, n, clips):
             if tr.get('tail'):
                 # what the SHOUT's step plays after the repair — or after
                 # the SHOUT with none — before the next step (the SET and
-                # SWITCH, 210's take, 205's kid's laugh)
+                # SWITCH, 210's take)
                 _set_key(ov['patches'], item, 'PCShoutTail', tr['tail'])
         elif tr['shout'] == -1 and (tr.get('rejoins') or 'cont' in tr):
             # no SHOUT in the tricked flow at all: no reaction
