@@ -79,8 +79,10 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                # the bar of 120 ticks over the mobile's seven sleep clips; the
                # beer step 0x1002299f: the `use`, getbeer — tricked the crab's,
                # takecrab — and the `leave`): its flag 4 ends where the PC's does
-               'BeerMat': {'BeachLayDown': ('beachright_mat_hn_guarded', 'enter'),
-                           'BeachPinLayDown': ('beachright_mat_hn_guarded', 'enter'),
+               # (the lie-down the visit's first clip after his walk: with
+               # the step's own ticks, 'step')
+               'BeerMat': {'BeachLayDown': ('beachright_mat_hn_guarded', 'enter', 'step'),
+                           'BeachPinLayDown': ('beachright_mat_hn_guarded', 'enter', 'step'),
                            'BeachSleep': ('bar', 0x10022c8d, 7),
                            'BeachSleepCrab': ('bar', 0x10022c8d, 7),
                            'BeachGetBeer': ('beachright_mat_hn_guarded', 'use'),
@@ -90,7 +92,7 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
         # the bar of 120 ticks over the mobile's four sun clips; then the
         # chair's `wakeup` and the awake loop he waits in for the Mother's
         # call, 0x10018f4a; the call's step leaves it, 0x1001911e)
-        210: {'DeckChair': {'ChairEnter': ('beachleft_deckchair_guarded', 'enter'),
+        210: {'DeckChair': {'ChairEnter': ('beachleft_deckchair_guarded', 'enter', 'step'),
                             'ChairSun': ('bar', 0x100195a4, 4),
                             'ChairWakeup': ('beachleft_deckchair_guarded', 'wakeup'),
                             'ChairAwake': ('anim', 'beachleft/deckchair', 'awake'),
@@ -330,6 +332,10 @@ def clip_secs(n):
                     t = (t + 1) / float(src[4])
             else:
                 t = d.action_ticks(src[0], src[1])
+                if t is not None and len(src) > 2 and src[2] == 'step':
+                    # the visit's first clip after his walk: the step's own
+                    # ticks before it (lap_model_s2.WALK_STEP_TICKS)
+                    t += lap_model_s2.WALK_STEP_TICKS
             if t is not None:
                 out[clip] = round(t / 12.0, 2)
         clips[item] = out

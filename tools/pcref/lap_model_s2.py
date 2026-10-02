@@ -728,6 +728,13 @@ INSTANT = {'Ef499', 'Ef8cd', 'Ef41f', 'SWITCH', 'SET', 'Ef82b', 'Efac4', 'Ef779'
 TICK_ELEMENTS = INSTANT | {'Eebbf', 'Ef51a'}
 
 
+# a step's own ticks before its sequence's first element where it walks: the
+# GoTo's done tick, in which the step runs again and pushes the sequence
+# without a first run, and the sequence's first update (step_ticks) — one
+# where it does not
+WALK_STEP_TICKS = 2
+
+
 def _go_target(ev, inside=None):
     """the object the step's GoTo walks to: its own (fcn.1000e3e0), or the
     bar helper's — fcn.1000e7f2 calls fcn.1000e3e0 with its hideout
@@ -782,7 +789,7 @@ def step_ticks(ev, ctx):
     # a step that calls its next step itself (CALLNEXT) builds no sequence
     # of its own: the next one's starts in the tick it runs again in
     own = 1 if any(e[0] == 'CALLNEXT' for e in ev) else 0
-    return n + (2 if walks else 1) - own
+    return n + (WALK_STEP_TICKS if walks else 1) - own
 
 
 def station_ticks(d, ev, ctx=None):
@@ -1635,7 +1642,11 @@ LINKED_CONT = {207: {'SandCastle': (0x1001513f, 'beachleft_sandcastle_destroyed'
 # 210's elephant: the Mother, mother_fight -> 0x1001a379, 0x1001b597-
 # 0x1001b5ba; 214's shower 0x1003ba90 and bouquet 0x1003b677 on
 # olga_fight, the pistol 0x1003b328 on mother_fight, 0x1003bb9a-0x1003bbff)
-TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,)),
+# — 'stand' fourth: the continuation's parts before its SHOUT go on the
+# tricked stand where the port has no mechanism of its own for them (204's
+# gong: the gong's `leave` in 0x10032f52 before SHOUT 3; 205's skis run back
+# with PCTrickReturn, 211's rush with RUSH)
+TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,), 'stand'),
                       'PullKart': ('fight', 'olga', (0x10032b6f,))},
                 205: {'WaterSkiis': ('steps', None, (0x10024fc2,))},
                 207: {'Shell': ('fight', 'olga', (0x1001596a,))},
@@ -1661,6 +1672,18 @@ TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,)),
 # fcn.1000e601: a GoTo to his x less or plus FIGHT_GAP on her side) and on to
 # the fight
 FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_manip', 'leave'))}}
+# a tricked visit that pays in another actor's job her own script starts on
+# his part: {level: {item: ((his object, action), the actor, (her object,
+# action))}} — 210's elephant: Fifi's step 0x10018239 waits while she is
+# `inv` (0x1001826c, her animation against `inv`) — his `put1` shows her —
+# and then builds her sequence, the bat's `disappear` set at once
+# (fcn.100419a3), bar/elefant's `dogattack_bat` (its record at 5 ticks),
+# the bat hidden and her `fall` (0x10018337-0x100183fc): the attack's first
+# update the tick after the offer's (the sequence pushed without a first
+# run), the record its `time` into it
+CREDIT_BY = {210: {'Elephant': (('fifi', 'put1'), 'fifi', ('bar_elefant', 'dogattack_bat'))}}
+
+
 # the gap fcn.1000e601 leaves between a fighter and the actor she walks to:
 # [0x100cc814] = 50 px, taken off his x from her side (0x1000e706/0x1000e70e)
 FIGHT_GAP = 50
@@ -2198,19 +2221,42 @@ def code_stays_tricked(n):
         for v in visits:
             if v is None or item in out:
                 continue
-            for i in sorted(set(i for i, _j, _p in v)):
+            rows_v = sorted(set(i for i, _j, _p in v))
+            prefix = []
+            for i in rows_v:
                 lvi, byi = _row_level(n, snaps, lap[i][0])
                 # a row the lap's walk passes as a poll: its latch set
                 lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
                 ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi, latch=lat)
-                e = entry(ev2, own_of(item, i), LAP_WALKS.get(n, {}).get(lap[i][0], True)) \
+                if ev2 is None:
+                    # a row of the visit the trick leaves as it is leads its
+                    # flow (212's bench: the manipulated bench entered and
+                    # slept on — the bar step — before the leave step's crash)
+                    if item in trick:
+                        lvp = Level(n)
+                        lvp.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
+                        prefix += run_step(lvp, lap[i][1], dict(byi), latch=lat)[0] + [('STEP',)]
+                    continue
+                if prefix:
+                    ev2 = prefix + ev2
+                own_i = own_of(item, i) if not prefix else \
+                    (lambda o, a, ks=rows_v: all(own_of(item, k)(o, a) for k in ks))
+                e = entry(ev2, own_i, LAP_WALKS.get(n, {}).get(lap[rows_v[0] if prefix else i][0], True)) \
                     if ev2 is not None else None
+                if e is not None and e['credit'] is None and item in CREDIT_BY.get(n, {}):
+                    (po, pa), who, (ho, ha) = CREDIT_BY[n][item]
+                    fl = _flow(d, ev2, own_i, LAP_WALKS.get(n, {}).get(lap[rows_v[0] if prefix else i][0], True))
+                    end = next((t + x[2] for t, kind, x in fl
+                                if kind == 'part' and x[0] == po and x[1] == pa and x[2] is not None), None)
+                    recs = d.tricks(ho, ha, who)
+                    if end is not None and recs:
+                        e['credit'] = _secs(end + 2 + recs[0][1])
                 if e is not None:
                     cont = TRICKED_CONT.get(n, {}).get(item)
                     if cont is not None and e['shout'] == -1:
                         # the reaction's steps: the scene the tricked step
                         # leaves, each step's events in turn (polls passed)
-                        kind, actor, steps = cont
+                        kind, actor, steps = cont[:3]
                         s1, h1 = trick[item]
                         lvc = Level(n)
                         lvc.present = (set(lvi.present) - h1) | s1
@@ -2227,6 +2273,8 @@ def code_stays_tricked(n):
                                   'tail': _secs(_shout_tail(d, evc)),
                                   'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
+                        if cont[3:] == ('stand',) and cstand is not None and e['tricked'] is not None:
+                            e['tricked'] = round(e['tricked'] + cstand / 12.0, 2)
                         if dep is not None:
                             # the repair's walk leaves him at the repaired
                             # object (211's sign)
