@@ -1533,7 +1533,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   88.3). With them the idle visits the video's stays are paired against
   were re-measured (scratchpad s2_idle_visits.json, the 2026-09-23 file
   had outlived the walks since): 213's picnic stay 12.8 -> 10.8 s (the
-  port's walk to it 18.2 s, not the file's 16.2), 206's chair and pillows
+  port's walk to it 18.2 s, not the file's 16.2; the code's 12.83 since the
+  same night, "213's picnic" below: 18.2 s is the port's first lap's walk,
+  its later laps' 16.3), 206's chair and pillows
   +0.1 and +0.5 s. And the tricked flows are on the lap's clock
   (lap_model_s2 `_flow`): `_step_parts_split` ran station_ticks on each
   event alone since the elements' ticks came in (2026-09-25), so each
@@ -1586,8 +1588,52 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   of the coal (read as 0 until then); 212's tricked bench 75 px right of
   the bench; 210's hedgehog chair 47 px left; 209's curtain puts him 1 px
   off the shoe mat, 213's picnic 5 px left and 10 up (the model's lap
-  124.0 s). Not carried: 213's tricked picnic (picnic_manip's out 225 px
-  right; the flow after its GoTo is one the walker does not follow).
+  124.0 s). 213's tricked picnic was left out until the picnic was read
+  (the entry below): out of the water at its `beat`, 200 px right.
+- *213's picnic (2026-09-27, read in GameLogic.dll and carried).* The
+  picnic is a meeting: his tortilla step posts `boat` to Olga as he
+  arrives there (0x100386ad, fcn.1004000a), her script's latch (+0xc,
+  polled by 0x100393ee) sends her to the picnic (0x100392f2: its GoTo and
+  her `enter`), and her `enter` carries behavior="boat" for him (me_c2
+  objects.xml); his picnic step, at the picnic, polls its own latch (+0x18,
+  named `boat` by the constructor 0x10038ccf; fcn.10013269 reads and
+  clears the byte fcn.10013319 sets when a behaviour of the latch's name
+  arrives) before its `enter` and `leave`, and his `leave` carries
+  behavior="leave" for her, on which she leaves the boat (0x100391cc,
+  latch +0x14). The latch keeps a behaviour that comes early: on the
+  video's laps she is in the boat before he is there (the spans 37-65 and
+  192-220 s, 29 s each, are the model's walk from the tortilla, 16.4 s,
+  and his `enter` and `leave`, 111 + 41 ticks with the step's 2: 12.83 s),
+  so the stay is the code's 12.83 s — the video's 10.8 of the same day had
+  taken the port's first-lap walk, 18.2 s, for the PC's. The tricked
+  picnic (picnic_manip shown by the termites) plays the camera, the crash
+  (`enter`, 103 + 2 ticks; the record `picnic` at 46), the `leave` (no
+  clip: 2 ticks), the water's `enter` and `leave` (2 and 19: out at its
+  `neighbor_out`), hides the manipulated picnic, walks to the water's
+  `beat` hotspot — a GoTo the step appends to its sequence itself
+  (fcn.10007a10 over fcn.1000ef28, 0x10038516; the GoTo's +0xc names the
+  hotspot, its update looking it up by that name, 0x1000741c-0x1000744d),
+  10 ticks up — and plays `fear`: 143 ticks from his arrival. The step
+  after it (0x10038221) shows `o_hurt_n` and waits for `olga_fight` (its
+  latch +0x10), then SHOUT 1 and the camera back. Olga, on his `leave`:
+  her own `leave` (2), the second water's `enter` and `leave` (2 and 39),
+  then fcn.1000eb19 -> fcn.1000e601 walks her to his x less 50 px
+  ([0x100cc814]) on her side — from water2's `olga_out` to 1125/1072, 54
+  ticks — and pushes the generic `fight` (43): its first update 68 ticks
+  after the end of his flow (the offer's tick, her step's own, her 43
+  ticks of parts, the GoTo pushed and done without a first run). Carried
+  (lap_model_s2: PAIRS, TRICKED_CONT 'fight', FIGHT_BEFORE, run_step
+  `latch` for the rows the lap passes as polls, the GOEL element timed by
+  `walk_span` from the position the flow tracks — the GO's hotspot, the
+  leaves' `<actor>_out`, the translations): PCUseSeconds 12.83,
+  PCUseSecondsTricked 11.92, PCCreditAt 4.08, PCShout 1, PCShoutTail 0.08,
+  PCHitSeconds 3.58 and PCHitAfter 5.67 (World.play_angry calls her run
+  after it), PCApproach `tx` -5 / `dpx` 75 and `txt` 200 / `dpxt` 22. The
+  port's tricked picnic then leaves him for the pinata 23.67 s after his
+  arrival, the code's 23.75 (the SHOUT's first update two ticks after the
+  fight's end, the shout2 28, the camera 1); the remaster's crash stays at
+  the picnic and her walk is the port's (from the boat, 0.2 u: within
+  reach at once on the plan's run, runs/p213picnic2).
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
