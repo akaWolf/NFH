@@ -1057,3 +1057,16 @@ actors' job pass the update calls at 0x100445f8.
   211's toilet continuation (not carried) gains its walk to wcright's
   `beat` (17 ticks). The model's script run: its `__main__` block moved
   below the Geometry it now needs.
+- `tools/pcref/lap_model_s2.py`, `levels/pc/Level205.overlay.json`,
+  `levels/pc/Level208.overlay.json` (2026-10-03): other actors' jobs — a
+  DoActions job or a sequence a step pushes onto the actor fcn.1004ba02
+  finds (fcn.10049216 with it for `this`) is that actor's (ODO), his
+  only where its record posts him a behaviour he waits for (204's Elvis's
+  gong); a walk that starts inside a hideout leaves it first (the route,
+  fcn.10049190 -> fcn.10006c2e, 0x1000a840-0x1000a87e); a step that
+  calls its next itself builds no sequence (CALLNEXT, a tick less). 208's
+  IndianPlatform 11.42 s (the fakir's `play` and `stop` off, the
+  platform's leave on), ShoeMachine 4.58, its lap by code 86.0 s — the
+  video's 86; 205's OlgaMatBeach 6.5, the sand lion's PCShoutTail 7.58
+  gone (the kid laughs on his own queue); 202's lap by code 73.2 s (the
+  kid's dive his own).

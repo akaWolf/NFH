@@ -1553,7 +1553,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   212's cigars, 2, 212's ledge 3 and 4, 210's turban shop's take3, 1.25 s,
   and the kid's `laugh` after 205's sand lion's repair, a DoActions job
   in the neighbour's sequence, 7.58 s — the port had gone on after the
-  shout or the repair.
+  shout or the repair. (The laugh is the kid's: read 2026-10-03, the step
+  pushes it onto the kid's queue, 0x10024426-0x1002443e, and his own
+  sequence onto his, 0x100244c4 — no tail; "Other actors' jobs" below.)
   The GoTo's own argument (2026-09-27): the lap model's walker took the
   step object loaded into ecx for the thiscall (`mov ecx, [ebp-X]` right
   before `call fcn.1000e3e0`) for the object's name, so nearly every
@@ -1634,6 +1636,42 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   fight's end, the shout2 28, the camera 1); the remaster's crash stays at
   the picnic and her walk is the port's (from the boat, 0.2 u: within
   reach at once on the plan's run, runs/p213picnic2).
+- *Other actors' jobs, a walk out of a hideout (2026-10-03, read in
+  GameLogic.dll and carried).* A step can build a job for another actor:
+  it finds the actor by its name (fcn.1004ba02) and pushes the DoActions
+  job, or a sequence it has built for it (fcn.1000aeb8, its elements
+  appended by fcn.1000ae19), onto that actor's queue (fcn.10049216 with
+  the actor for `this`) — and its own steps go on. 208's platform step
+  pushes the fakir's `play` onto the fakir (0x1001ef75-0x1001efc4) and
+  runs its next step itself in the same tick (0x1001eff3), the stop step
+  his `stop` (0x1001e8d5); 202's dive step the kid's dive, switch and run
+  ashore (0x100220a1-0x100221e3); 205's sand lion step the kid's `dirt`
+  or `laugh` (0x10024426-0x1002443e) and the next step his rebuilding
+  (`build`, 290 ticks, 0x10023e2c-0x10023e81); 204's gong step the
+  Elvis's camera and `use` of the gong (0x10031efb-0x10031ff9). The lap
+  model had counted these jobs as the neighbour's: the fakir's 4.25 s at
+  the platform, the kid's 16.8 s dive, the kid's 24.2 s rebuilding and
+  8.5 s dirt at the sand lion, the kid's 7.58 s laugh after its tricked
+  repair (PCShoutTail). Where the job's record posts him a behaviour he
+  waits for it: the gong's `use` is the Elvis's with behavior="gong"
+  behavioractor="neighbor" (cn_c1 objects.xml), and the idle step after
+  it (0x10031b70) waits on its latch — its camera tick and its 44 ticks
+  stay his. A walk that starts inside a hideout leaves it first: the
+  route's first update finds the actor's hideout (fcn.10049190) and
+  pushes the hideout's leave with a first run (fcn.10006c2e,
+  0x1000a840-0x1000a87e), the path from its next update — the leave's job
+  and its `<actor>_out` before the walk (208's platform, 35 ticks, left on
+  the way to the shoe cleaner; 202's sea, 21, on the way to the bridge,
+  whose clips had it already). The two steps that call their next one
+  themselves (208's 0x1001eff3, 210's 0x100197ac) build no sequence of
+  their own: a tick less. 208's lap by code 86.0 s (the video's shoe
+  machine to shoe machine, 9 -> 95 s: 86; its 35-s shoe span is the walk
+  from the platform, 27.9 s, the platform's leave, 2.9, and the use, 4.5);
+  IndianPlatform 11.42 s (was 12.67 with the fakir's and no leave),
+  ShoeMachine 4.58; 205's OlgaMatBeach 6.5 (the rebuilding step's own
+  tick), its sand lion's PCShoutTail gone; 202's lap 73.2 s (the video's
+  70-94, his wait for Olga's sub not modelled), its stays per clip as
+  before.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
