@@ -13,6 +13,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 9.5,
     "PCShout": 3,
     "PCFixSeconds": 0,
@@ -28,6 +32,10 @@
     "PCLaugh": 3,
     "AngerAmount": 15,
     "PCExtraCoin": 20,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 8.17,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -42,6 +50,10 @@
    "set": {
     "PCLaugh": 2,
     "AngerAmount": 15,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 4.83,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -55,18 +67,6 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 11.92,
-    "PCShout": 1,
-    "PCFixSeconds": 0,
-    "PCShoutTail": 0.08,
-    "PCHitSeconds": {
-     "Olga": 3.58
-    },
-    "PCHitAfter": {
-     "Olga": 5.67
-    },
-    "PCCreditAt": 4.08,
-    "PCUseSeconds": 12.83,
     "PCClipSecondsRole": {
      "Olga": {
       "PicnicEnter": 2.0,
@@ -80,7 +80,23 @@
       "item": "BoatPicnic",
       "then": 0.0
      }
-    }
+    },
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 11.92,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
+    "PCHitSeconds": {
+     "Olga": 3.58
+    },
+    "PCHitAfter": {
+     "Olga": 5.67
+    },
+    "PCCreditAt": 4.08,
+    "PCUseSeconds": 12.83
    }
   },
   {
@@ -105,6 +121,10 @@
    "set": {
     "PCLaugh": 3,
     "PCBehaviourAt": 0.08,
+    "PCScene": [
+     0.17,
+     "use"
+    ],
     "PCUseSeconds": [
      1.0,
      0.08
@@ -116,6 +136,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 15.0,
     "PCShout": 1,
     "PCFixSeconds": 1.92,
@@ -1368,12 +1392,12 @@
       }
      }
     },
-    "PCBehaviourAtEnd": 0.08,
     "PCClipSecondsRole": {
      "Olga": {
       "BullRide": 7.0
      }
-    }
+    },
+    "PCBehaviourAtEnd": 0.08
    }
   },
   {

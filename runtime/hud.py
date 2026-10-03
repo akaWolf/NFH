@@ -1089,7 +1089,10 @@ class Hud:
         if woody is not None and woody.nfh2:
             if not pcprofile.is_pc():
                 return
-            n = max(0, int(self.world.time))
+            # (stopped at the board: the level's count is the board's, the
+            # video's 2:40 of E02 from 504.5 s on)
+            end = self.world._pc_clock_end
+            n = max(0, int(self.world.time if end is None else end))
             s = '%d:%02d' % (n // 60, n % 60)
         elif g.timed:
             n = max(0, int(g.time_seconds))

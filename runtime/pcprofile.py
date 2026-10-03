@@ -287,6 +287,16 @@ S2_FREAKOUT_TICKS = (39, 40, 65)
 # the fight's end (213's 0x10038221, 207's 0x1001596a, 204's 0x10032b6f,
 # 210's 0x1001a379, 214's three: lap_model_s2's `cont` a tick each)
 S2_HIT_TAIL_TICKS = 2
+# The Season 2 success (GameLogic fcn.10041086) hands Woody the `won`
+# behaviour (fcn.100409f8 -> fcn.1004000a); his script's filter (0x100136ab)
+# takes it on the tick after, and its step (0x100135c0) plays `triumph`
+# (fcn.1000efcd; generic/objects.xml woody: 23 frames, time="auto" — the
+# Loader's 22, the job's 24 ticks), whose end runs 0x1001355a: the level's
+# slot 0x34 with 1 (fcn.1004256d), the level-end status the board shows —
+# its time the status's count (+0x24) on that tick. 25 ticks from the
+# success: the camera's cut to Woody to the board, 2.069 s in the video's
+# E02 (502.636 -> 504.705) and 2.068 s in E03 (734.603 -> 736.671)
+S2_WON_TICKS = 25
 
 
 def s2_reaction_seconds(level, rng, full=False):

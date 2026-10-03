@@ -1033,6 +1033,21 @@ class TutorialPC201(Tutorial):
     def _go(self, step):
         self.step = step
 
+    @property
+    def follow(self):
+        return self._follow
+
+    @follow.setter
+    def follow(self, on):
+        """the neighbour camera's callbacks (Ef51a on, Eebbf off) store the
+        level's scene flag +0x6e before the camera (fcn.10040137 from
+        fcn.1000d31a / fcn.1000d559), which holds the completion check
+        (World._pc_s2_success)"""
+        self._follow = on
+        w = getattr(self, 'world', None)
+        if w is not None:
+            w._pc_scene = bool(on)
+
     # -- the director's element helpers --------------------------------------
     def _msg(self, name):
         """fcn.100101f3: the message box shows the text"""

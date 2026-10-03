@@ -4521,6 +4521,10 @@ class Routine:
                 # rubberrabbit, the ExtraCoin206)
                 self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
                 self.pc_credit3_item = target
+            if w is not None and target is not None:
+                # the reaction's scene: the level's flag +0x6e, which holds
+                # the completion check (World.pc_scene_start)
+                w.pc_scene_start(self, it, self._pc_trick_item(it), both)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -5245,6 +5249,9 @@ class Routine:
         541-553). The stop also removes spent actions (cs:415-427)."""
         self.pawn.anim.time_scale = 1.0
         self._pc_clip_end()
+        w = self.pawn.world
+        if w is not None and w._pc_scene_use is not None:
+            w.pc_scene_use_end(self)          # a scene the stand's end drops
         if self.pawn.pc_bed and self.item is not None and self.item.name == 'AlarmClock':
             self.pawn.pc_bed = False      # the alarm clock's BedOut: the leave
         if pcprofile.is_pc() and self.item is not None \
@@ -7786,6 +7793,17 @@ class World:
         # state function on the same tick; the last fire's item
         self._pc_end_check = False
         self._pc_last_fire = None
+        # the PC's Season 2 scene flag, the level's +0x6e: the camera
+        # callbacks store it first (fcn.10040137 from fcn.1000d31a / fcn.1000d559)
+        # and the completion check (fcn.10041086) tests done == reachable only
+        # while it is clear; the reaction whose SHOUT's end drops it and the
+        # latest scene's token (pc_scene_start)
+        self._pc_scene = False
+        self._pc_scene_shout = None
+        self._pc_scene_use = None         # (routine, station, token): dropped at the stand's end
+        self._pc_scene_token = 0
+        self._pc_board_score = False      # the PC's Season 2 board reads the score (_win)
+        self._pc_clock_end = None         # the level's time at the board (the PC's HUD clock stops)
         self._entrance_hello = False
         self._open_furniture = []        # SearchItem.CloseTime holders
         self.snap_request = None         # HUD face clicks -> CameraMover
@@ -8142,6 +8160,77 @@ class World:
             return
         self._pc_trick_done(item)
 
+    def pc_scene_span(self, item, both):
+        """the tricked reaction's scene, [rise, drop] (PCScene; the linked
+        variant's PCSceneLinked), [] for none. Where the lap model reads no
+        tricked flow of the item the reaction's own span stands: from the
+        stand's start to the end of the SHOUT the profile plays for it (the
+        trick record's PCLaugh) — every flow it reads closes its scene right
+        after its SHOUT (fcn.1000f5c9's end or fcn.1000ebbf after
+        fcn.1000f977; lap_model_s2._scene_span)"""
+        span = item.pc_scene_linked if (both and item.pc_scene_linked is not None) \
+            else item.pc_scene
+        return [0.0, 'shout'] if span is None else span
+
+    def pc_scene_start(self, routine, station, item, both):
+        """a tricked stand's scene under the PC's Season 2 (GameLogic.dll):
+        the camera callback's update (0x1000d70b) stores the level's flag
+        +0x6e before anything else — fcn.1000d31a sets it for a start
+        (fcn.1000f51a's, or the one fcn.1000f5c9 puts before the list),
+        fcn.1000d559 clears it for an end (fcn.1000ebbf's, or the wrapper's
+        after the list) — the camera itself the `autoscroll` option's (flag
+        8); it rises so far into the stand and drops as the reaction's SHOUT
+        ends (_pc_scene_shout_end), as the stand ends (pc_scene_use_end) or
+        so far into the stand"""
+        if not pcprofile.is_pc() or self.woody is None or not self.woody.nfh2:
+            return
+        span = self.pc_scene_span(item, both)
+        if not span:
+            return
+        rise, drop = float(span[0] or 0.0), span[1]
+        self._pc_scene_token += 1
+        tok = self._pc_scene_token
+
+        def live():
+            # the same stand still playing (its list not dropped)
+            return tok == self._pc_scene_token and routine.state == routine.USING \
+                and station in (routine.item, routine.urgent_item)
+
+        def up():
+            if live():
+                self._pc_scene = True
+
+        def down():
+            if live():
+                self._pc_scene = False
+                self._pc_scene_shout = None
+
+        # (the angry's item is the stand's trick or the station itself)
+        self._pc_scene_shout = (station, item) if drop == 'shout' else None
+        self._pc_scene_use = (routine, station, tok) if drop == 'use' else None
+        if rise > 0.0:
+            self.call_later(rise, up)
+        else:
+            up()
+        if isinstance(drop, (int, float)):
+            self.call_later(float(drop), down)
+
+    def pc_scene_use_end(self, routine):
+        """the tricked stand is over: the scene that drops with it ends
+        (213's bull controls: the hurt step's Eebbf after the `use`)"""
+        r, station, tok = self._pc_scene_use
+        if r is routine and tok == self._pc_scene_token \
+                and station in (routine.item, routine.urgent_item):
+            self._pc_scene_use = None
+            self._pc_scene = False
+
+    def _pc_scene_shout_end(self, item):
+        """the reaction's SHOUT is over: the scene that drops after it ends
+        (the end callback the list runs next, fcn.1000d559)"""
+        if self._pc_scene_shout is not None and item in self._pc_scene_shout:
+            self._pc_scene_shout = None
+            self._pc_scene = False
+
     def _pc_trick_done(self, item):
         """the trick's completion as the mobile books it (cs:785-792)"""
         if not item.dont_get_angry:
@@ -8268,6 +8357,7 @@ class World:
         items = self.level.items
         rush = item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
             and routine is not None
+        self._pc_scene_shout_end(item)         # no reaction to wait for
         fetch = self._try_fix(item, pawn)      # a fetch owns the resume
         if on_done and not fetch:
             on_done()
@@ -8479,6 +8569,8 @@ class World:
             the AngryWithoutAnimations branch below does (cs:721). A started
             fetch owns the resume"""
             pawn.anim.time_scale = 1.0             # (the profile's reaction pace, below)
+            # (the reaction's end: its scene's end callback has run)
+            self._pc_scene_shout_end(item)
             fetch = self._try_fix(item, pawn)
             pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
             if pcprofile.is_pc() and item.pc_fix_depart and played_angry:
@@ -8739,6 +8831,8 @@ class World:
 
             def play_fixes_s2():
                 pawn.anim.time_scale = 1.0
+                # the SHOUT's end: the list's end callback next (fcn.1000d559)
+                self._pc_scene_shout_end(item)
                 if fixes:
                     if fix_secs:
                         mobile = pawn.anim.sequence_seconds(fixes)
@@ -8784,7 +8878,12 @@ class World:
                 mobile = pawn.anim.sequence_seconds(seq)
                 if mobile > 0.0 and pc > 0.0:
                     pawn.anim.time_scale = mobile / pc
-            pawn.anim.play_sequence(seq, on_end=after_run)
+
+            def reacted():
+                # the reaction standing for the SHOUT is over (pc_scene_span)
+                self._pc_scene_shout_end(item)
+                after_run()
+            pawn.anim.play_sequence(seq, on_end=reacted)
         else:
             after_run(False)
 
@@ -11961,7 +12060,8 @@ class World:
         if self.snap_camera is not None:
             self.snap_camera()            # SnapToWoodyImmediate, cs:368
         self.camera_frozen = True         # GameCamera.Freeze, cs:369
-        self._score()                     # CalculateScore, cs:370
+        if not self._pc_board_score:
+            self._score()                 # CalculateScore, cs:370
 
     def _freeze_woody(self):
         """Woody.Freeze (Woody.cs:993-997): Frozen — the click gate of
@@ -11991,6 +12091,15 @@ class World:
         """GameInfo.FinishAnimationEnded (GameInfo.cs:343-356): GameEnded
         (the score board, HUD.DrawScore cs:731), every active sleep bar is
         disabled, and the three pawns freeze"""
+        if self._pc_clock_end is None:
+            self._pc_clock_end = self.time
+        if self._pc_board_score:
+            # the PC's Season 2 board: the level-end status of the triumph's
+            # end (fcn.1004256d), its time that tick's (_win)
+            self._pc_board_score = False
+            if self.woody is not None:
+                self.woody.anim.time_scale = 1.0
+            self._score()
         self.game.ended = True
         # DisableAllProgressBars (cs:346, 535-541) -> ProgressBar.
         # DisableProgressBar on every subscribed (active) bar (cs:303-307)
@@ -12084,6 +12193,12 @@ class World:
         self.is_playing_finish = True     # cs:1119
         name = w.win_animation if self.game.won else w.lose_animation
         if name and w.anim.has(name):     # cs:1120-1127
+            if self._pc_board_score and self.game.won:
+                # the PC's `triumph` and the board at its end (_win): the
+                # mobile's win clip at the pace that lasts it
+                mobile = w.anim.sequence_seconds([name])
+                if mobile > 0.0:
+                    w.anim.time_scale = mobile / (pcprofile.S2_WON_TICKS / float(pcprofile.S2_TICK_HZ))
             w.anim.play_sequence([name],
                                  on_end=self._finish_animation_ended,
                                  as_sequence=False)
@@ -12116,16 +12231,47 @@ class World:
             self._win()
         return True
 
+    def _pc_s2_success(self):
+        """the PC's Season 2 completion (GameLogic.dll): the level update's
+        status tick (0x10044710-0x100447f1) calls fcn.10041086 at 0x100447f8
+        every tick, which succeeds while the scene flag +0x6e is clear and
+        done == reachable (status +0xc / +0x10, the credits' count,
+        fcn.1000140b -> fcn.100522e6): the tick the last reaction's scene
+        ends (pc_scene_start) — the level runs on until then, its time
+        with it (the status's count +0x24, 0x100447df). The success: the
+        camera on Woody (the level's slot 0x40, `woody`), the neighbour and
+        the Mother frozen (flag 0x100000, fcn.100450bf), Woody's `won`
+        (fcn.100409f8 / fcn.1004000a) — _win. False where the mobile's rule
+        stays: Season 1, the mobile profile, a forced win"""
+        if not pcprofile.is_pc() or self.woody is None or not self.woody.nfh2 \
+                or self.game.win_immediate:
+            return False
+        if self._pc_scene:
+            return True
+        self.game.ending = True
+        self._win()
+        return True
+
     def _win(self):
         """GameInfo.PlayWinAnimations (GameInfo.cs:304-313): FinishGame,
         Woody's win animation, only the Rottweiler freezes here (the Mother
         keeps moving until FinishAnimationEnded, cs:343-356), and
-        PlaySuccess(perfect: true) regardless of the rating"""
+        PlaySuccess(perfect: true) regardless of the rating. The PC's
+        Season 2 success (_pc_s2_success) freezes the Mother with him
+        (fcn.100450bf(0x100000, 1) on `mother`, 0x10041185), plays Woody's
+        `triumph` and shows the board at its end — the score's time read
+        there (pcprofile.S2_WON_TICKS)"""
+        s2 = pcprofile.is_pc() and self.woody is not None and self.woody.nfh2 \
+            and not self.game.win_immediate
+        self._pc_board_score = s2
         self._finish_game()               # cs:306
         self._play_finish_animation()     # cs:307
         rott = self.pawns.get('Rottweiler')
         if rott is not None:
             self._freeze_pawn(rott)       # Rottweiler.Freeze, cs:308-311
+        mother = self.pawns.get('Mother') if s2 else None
+        if mother is not None:
+            self._freeze_pawn(mother)
         if self.woody is not None and pcprofile.s1_jingles(self.woody.nfh2):
             self._play_jingle(pcprofile.S1_JINGLES[5])   # the PC's state 5
         else:
@@ -12404,6 +12550,8 @@ class World:
             # input stays live (Frozen comes with FinishGame at its end);
             # WinImmediate (ForceWinGame, cs:315-321) plays the win now
             if self._pc_s1_success(end_check):
+                pass
+            elif self._pc_s2_success():
                 pass
             elif not self.game.win_immediate:
                 self.game.ending = True

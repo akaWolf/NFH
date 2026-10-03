@@ -2241,6 +2241,43 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   ends through its level class's own end-check StopMsgs (seven sites,
   docs/PC_VERIFICATION.md "The level's end") — the mobile's wait stays for
   it.
+- *The Season 2 level's end (2026-10-04, carried).* GameLogic's level
+  update calls the completion check (fcn.10041086, 0x100447f8) on every
+  tick, and it tests done == reachable (status +0xc / +0x10, the credits'
+  count) only while the level's byte +0x6e is clear. That byte is the
+  scene flag of the camera callbacks (the class SwitchObjectsJobCallback's
+  slot 0x1000d70b): a start (fcn.1000d31a) sets it and an end
+  (fcn.1000d559) clears it before anything else (fcn.10040137(1) at
+  0x1000d338, (0) at 0x1000d57a) — the camera on the neighbour, Woody and
+  the Mother frozen (flags 8 and 2) come after and only with the options'
+  "Trick Camera" (autoscroll, the level's +0x28 byte +4). The level scripts
+  wrap each reaction's list in a start and an end (fcn.1000f5c9, 52 sites,
+  or fcn.1000f51a / fcn.1000ebbf by hand): every flow the lap model reads
+  closes its scene right after its SHOUT, before the repair
+  (lap_model_s2._scene_span). So the level completes as the last
+  reaction's SHOUT ends, not at the last credit; the success sets the
+  camera to Woody (the level's slot 0x40), freezes the neighbour and the
+  Mother (fcn.100450bf(0x100000)) and hands Woody `won`, whose step plays
+  `triumph` (24 ticks) and ends the level (slot 0x34, fcn.1004256d) — the
+  board, its time read then. The video: E02's last coin (the electrified
+  rail, the statue lit at 496.5) to the cut to Woody 502.636 and the board
+  504.705; E03's bicycle, 729.3 to 734.603 and 736.671 — each the stand's
+  rest and a freakout (39-40 ticks) after the credit, then 25 ticks. The
+  port started the mobile's 2.5 s wait at the last credit (the clock and
+  the catches dead from it) and scored the time there. Under the profile
+  the reaction's scene is PCScene ([its rise into the tricked stand, the
+  SHOUT's end, or the stand's end for 213's bull controls, whose flow has
+  none]; tools/pcref/pc_durations_s2.py from the model, SCENE_STEPS for four
+  flows off its lap), the level runs on until it drops (World.pc_scene_start,
+  _pc_s2_success), Woody's win clip lasts the 25 ticks and the score is
+  read at the board (pcprofile.S2_WON_TICKS): 202's plan ends 6.2 s after
+  its last credit and boards 2.08 s later (the video 6.1 and 2.07). Not
+  carried: the Trick Camera itself — with the option on the camera goes to
+  the neighbour at a scene's start and Woody and the Mother stand frozen
+  through it; the videos' setting is not read (no `Neighbour camera`
+  label shows in them, the success's `Woody camera` does); the items the
+  model reads no tricked flow of (PCLaugh's stand-ins) hold their scene
+  over the stand-in reaction.
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and

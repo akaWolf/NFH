@@ -68,6 +68,14 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCSceneLinked": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 6.83,
     "PCUseSecondsLinked": 9.25,
     "PCShout": 1,

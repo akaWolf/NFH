@@ -16,6 +16,14 @@
     "PCExtraCoin206": 30,
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCSceneLinked": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 7.42,
     "PCUseSecondsLinked": 6.75,
     "PCShout": 1,
@@ -59,6 +67,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 13.58,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -72,6 +84,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 6.0,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -92,6 +108,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     1.67,
+     "shout"
+    ],
     "PCUseSecondsTricked": 15.5,
     "PCShout": 1,
     "PCFixSeconds": 0,

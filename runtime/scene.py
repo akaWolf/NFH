@@ -327,7 +327,7 @@ class Item:
                  'pc_extra_coin', 'pc_extra_coin_206', 'pc_laugh', 'pc_shout',
                  'pc_credit_at', 'pc_credit_at_linked',
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
-                 'pc_shout_tail', 'pc_shout_tail_linked',
+                 'pc_shout_tail', 'pc_shout_tail_linked', 'pc_scene', 'pc_scene_linked',
                  'pc_hit_secs', 'pc_hit_after', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
                  'pc_fix_depart',
@@ -1020,6 +1020,14 @@ class Item:
         # with none, before the next step (lap_model_s2._shout_tail): stood
         self.pc_shout_tail = d.get('PCShoutTail')
         self.pc_shout_tail_linked = d.get('PCShoutTailLinked')
+        # the reaction's scene: the level's flag +0x6e that holds the
+        # completion check (fcn.10041086) — [the second of the tricked stand
+        # it rises at, 'shout' where it drops as the SHOUT ends or the second
+        # it drops at], [] for none (PCScene, the linked variant's
+        # PCSceneLinked; lap_model_s2._scene_span); None: not read, the
+        # reaction's own span (World.pc_scene_span)
+        self.pc_scene = d.get('PCScene')
+        self.pc_scene_linked = d.get('PCSceneLinked')
         # the co-actor's hit on him after the trick, by her role: the generic
         # `fight` she plays (Olga 42 ticks, the Mother 39; PCHitSecondsLinked
         # the co-actor's action the linked flow waits on — 207's n_lift),

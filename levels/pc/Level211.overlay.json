@@ -33,6 +33,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 2.5,
     "PCShout": 1,
     "PCFixSeconds": 5.25,
@@ -53,6 +57,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 3.75,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -82,6 +90,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 5.58,
     "PCShout": 1,
     "PCFixSeconds": 1.83,
@@ -94,6 +106,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 7.08,
     "PCShout": 1,
     "PCFixSeconds": 1.83,
@@ -106,7 +122,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCRunTo": true
+    "PCRunTo": true,
+    "PCScene": [
+     0.17,
+     "shout"
+    ]
    }
   },
   {
@@ -747,7 +767,6 @@
       "routes": {}
      }
     },
-    "PCUseSeconds": 3.42,
     "PCClipSecondsRole": {
      "Olga": {
       "OlgaWCEnter": 1.75,
@@ -761,7 +780,8 @@
       "item": "Sweets",
       "then": 0.0
      }
-    }
+    },
+    "PCUseSeconds": 3.42
    }
   },
   {
@@ -1398,13 +1418,6 @@
    "source": "Woody's trick action (ship3's objects.xml, the DoActions job: the Loader's time + 2 at 12 a second, tools/pcref/pc_woody.py): enter <- bottomleft/deckchair_woody the job 11 ticks; leave <- bottomleft/deckchair_woody the job 10 ticks"
   },
   {
-   "object": "ToiletMen",
-   "component": "TrickItem",
-   "set": {
-    "PCUseSeconds": 3.17
-   }
-  },
-  {
    "object": "Olga",
    "component": "Olga",
    "set": {
@@ -1446,6 +1459,13 @@
      "x": 1010,
      "px": 0
     }
+   }
+  },
+  {
+   "object": "ToiletMen",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSeconds": 3.17
    }
   }
  ]

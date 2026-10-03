@@ -636,7 +636,16 @@ predicate, then the all-tricks win.
   the success on the tick that StopMsg sets its check flag (fcn.00436bb0,
   fcn.0047bc90) — and the win plays then (`World._pc_s1_success`:
   `play_angry`'s `shouted` sets `_pc_end_check`; a last trick without its
-  StopMsg, PCStopSkip, keeps the mobile's wait).
+  StopMsg, PCStopSkip, keeps the mobile's wait). A Season 2 level under the
+  profile runs on past the last credit while the reaction's scene holds the
+  level's flag +0x6e (GameLogic's completion check, fcn.10041086, tests the
+  count only while it is clear): `World.pc_scene_start` raises it so far
+  into the tricked stand (the item's PCScene) and drops it as the reaction's
+  SHOUT ends (`_pc_scene_shout_end` from `play_angry`), as the stand ends
+  (`pc_scene_use_end`) or so far in; the 201 tutorial's neighbour camera
+  (`follow`) writes it too. `World._pc_s2_success` wins on the first tick
+  it is clear; Woody's win clip then lasts the PC's `triumph` (25 ticks,
+  `pcprofile.S2_WON_TICKS`) and the score is read at its end, the board.
 - **Hiding** (`HideItem.InternalUse` → `Woody.Hide`, `Woody.Unhide` →
   `HideItem.Leave`): using a wardrobe hides Woody at once and plays `Hide_In`;
   any new move leaves it, restoring the wardrobe idle and playing its

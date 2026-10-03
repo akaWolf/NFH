@@ -23,7 +23,11 @@
      "item": "TabbleTennis",
      "then": 4.33,
      "at": "start"
-    }
+    },
+    "PCScene": [
+     0.17,
+     "shout"
+    ]
    }
   },
   {
@@ -34,6 +38,10 @@
     "PCTrickReturn": {
      "pant": 2.92
     },
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 17.67,
     "PCShout": 1,
     "PCFixSeconds": 1.83,
@@ -57,6 +65,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 3.42,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -70,6 +82,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 6.25,
     "PCShout": 0,
     "PCFixSeconds": 1.83,

@@ -14,17 +14,18 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCUseSecondsTricked": 4.08,
-    "PCShout": 1,
-    "PCFixSeconds": 1.83,
-    "PCCreditAt": 0.75,
-    "PCUseSeconds": 5.17,
     "PCClipSecondsRole": {
      "Olga": {
       "BuffetEat": 4.17,
       "BuffetCrash": 2.58
      }
-    }
+    },
+    "PCScene": [],
+    "PCUseSecondsTricked": 4.08,
+    "PCShout": 1,
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 0.75,
+    "PCUseSeconds": 5.17
    }
   },
   {
@@ -32,6 +33,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 8.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
@@ -45,6 +50,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCSceneLinked": [],
     "PCUseSecondsTricked": 3.75,
     "PCUseSecondsLinked": 6.58,
     "PCShout": 1,

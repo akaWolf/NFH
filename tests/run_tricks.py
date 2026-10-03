@@ -155,6 +155,12 @@ class Driver(Recorder):
             end = 'time'
         if end is not None:
             self.wait_until(lambda: g.ending and g.rating != '', secs)
+            # the PC's Season 2 board reads the score at Woody's triumph's
+            # end (World._win): the ending runs on to it
+            deadline = self.t + secs
+            while getattr(w, '_pc_board_score', False) and g.rating == '' \
+                    and self.t < deadline:
+                self.step_world()
         if g.rating == '':
             import copy
             probe = copy.copy(g)

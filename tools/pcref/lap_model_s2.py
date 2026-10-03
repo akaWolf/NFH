@@ -1990,6 +1990,37 @@ TRICKED_RUSH = {211: {'Sweets': ('topleft_wcright', 'puke', 'olga', 'mad')}}
 # 0x10029a6c after her fight: the SHOUT that takes the actor for its level,
 # the repair; the knife is spent by then)
 TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
+# the tricked flows of stations code_stays_tricked does not reach, read for
+# their scene alone (scene_steps): the steps in order and the objects shown
+# and hidden for the trick — 205's egg on the table (0x100254d5: Ef51a before
+# the `play`; 0x1002577a: SHOUT 0, Eebbf), 208's rake (0x1001d828: crash,
+# SHOUT, the wrapper), 211's cabin phone (0x1002fcbe: crash, SHOUT 1, the
+# wrapper), 213's bull controls (0x10037de6: Ef51a, the `use`; 0x10037d3b:
+# the hurt icon, Eebbf — no SHOUT)
+SCENE_STEPS = {205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
+                                      {'beachright_pingpong', 'beachright_pingpong_guarded'})},
+               208: {'Rake': ((0x1001d828,), set(), set())},
+               211: {'CabinPhone': ((0x1002fcbe,), set(), set())},
+               213: {'MechanicalBullControls': ((0x10037de6, 0x10037d3b), None, None)}}
+
+
+def scene_steps(n):
+    """{mobile item: PCScene} of SCENE_STEPS (_scene_span over the steps'
+    events with the trick in the scene: tricked_presence, else the table's)"""
+    out = {}
+    d = Data(n)
+    trick = tricked_presence(n)
+    for item, (steps, shown, hidden) in SCENE_STEPS.get(n, {}).items():
+        lv = Level(n)
+        if shown is None:
+            shown, hidden = trick.get(item, (set(), set()))
+        lv.present = (set(lv.present) - set(hidden)) | set(shown)
+        ev = []
+        for st in steps:
+            evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=1, latch=1)
+            ev += ([('STEP',)] if ev else []) + evs
+        out[item] = _scene_secs(_scene_span(d, ev))
+    return out
 
 
 def _repair_walk(n, d, ev):
@@ -2168,6 +2199,59 @@ def _step_parts_split(d, ev, own=None, walked=True):
     return (None if unknown else shout_t), level, repair, credit
 
 
+# the elements that raise and drop the level's scene flag +0x6e, which the
+# completion check fcn.10041086 reads (done == reachable counts only while it
+# is clear): the camera callback's update 0x1000d70b runs fcn.1000d31a for a
+# start (its flags' bit 0) and fcn.1000d559 for an end, and both store the
+# flag first (fcn.10040137(1) at 0x1000d338, fcn.10040137(0) at 0x1000d57a)
+# whatever the camera does after — fcn.1000f51a (Ef51a) builds a start,
+# fcn.1000ebbf (Eebbf) an end, and the wrapper fcn.1000f5c9 (SET) puts a start
+# before the list built so far and an end after it
+SCENE_ON, SCENE_OFF = ('Ef51a',), ('SET', 'Eebbf')
+# (an element appended to another actor's sequence — 'O' before its kind —
+# stores the same flag: 204's gong step raises it in the Elvis's, before his
+# `use`, 0x10031f72)
+
+
+def _scene_span(d, ev, own=None, walked=True):
+    """the scene of a tricked flow — the level's flag +0x6e (SCENE_ON /
+    SCENE_OFF) on the flow's clock (_flow): a step whose list the wrapper
+    closes (a SET in it) raises it at its first element, Ef51a raises it, the
+    first SET or Eebbf after drops it. (the tick it rises at, where it drops:
+    'shout' right after the flow's SHOUT — the read flows' own: fcn.1000f5c9
+    or fcn.1000ebbf follows fcn.1000f977 —, 'use' where no SHOUT comes first
+    and no part after (the stand's end: 213's bull controls, the `use` then
+    the hurt step's Eebbf), else the tick it drops at, None past another
+    part or the flow's end); None: no scene"""
+    fl = _flow(d, ev, own, walked)
+    segs, cur = [], []
+    for row in fl:
+        if row[1] == 'step':               # a step's start after the first
+            segs.append(cur)
+            cur = []
+        cur.append(row)
+    segs.append(cur)
+    rise, shout, part_after = None, None, False
+    for seg in segs:
+        if rise is None and any(k == 'instant' and x.lstrip('O') == 'SET' for _t, k, x in seg):
+            rise = seg[0][0]               # the wrapper's start: the list's first element
+        for t, kind, x in seg:
+            if kind == 'shout':
+                shout, part_after = t, False
+            elif kind == 'part' and shout is not None:
+                part_after = True
+            elif kind == 'instant' and x.lstrip('O') in SCENE_ON and rise is None:
+                rise = t
+            elif kind == 'instant' and x.lstrip('O') in SCENE_OFF and rise is not None:
+                if shout is None:
+                    # before any SHOUT: its tick, or the stand's end where no
+                    # part follows
+                    later = any(k == 'part' and tt >= t for tt, k, _x in fl)
+                    return rise, (t if later else 'use')
+                return rise, (None if part_after else 'shout')
+    return (rise, None) if rise is not None else None
+
+
 def tricked_presence(n):
     """{mobile item: (shown, hidden)}: what the item's trick leaves in the
     PC scene — the combine.xml combinations that take the inventory the
@@ -2285,6 +2369,15 @@ def _secs(t):
     return round(t / 12.0, 2) if t is not None else None
 
 
+def _scene_secs(span):
+    """a _scene_span for the overlay (PCScene): [the second it rises at, the
+    second it drops at or 'shout'] into the flow, [] for none"""
+    if span is None:
+        return []
+    rise, drop = span
+    return [_secs(rise), _secs(drop) if isinstance(drop, int) else drop]
+
+
 def _shout_tail(d, ev, own=None, walked=True):
     """the ticks the SHOUT's step plays after its repair and the instant
     elements right after it (_step_parts_split's `repair`) — or after the
@@ -2376,7 +2469,8 @@ def code_stays_tricked(n):
         return {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                 'repair': round(repair / 12.0, 2) if repair is not None else None,
                 'credit': round(credit / 12.0, 2) if credit is not None else None,
-                'tail': _secs(_shout_tail(d, ev2, own, walked))}
+                'tail': _secs(_shout_tail(d, ev2, own, walked)),
+                'scene': _scene_secs(_scene_span(d, ev2, own, walked))}
     # the parts of each lap row the stations pair with: a tricked part is
     # another station's where its action and object (the variant's name
     # starts with the object's: altar_statue_snake) are one of that
@@ -2456,6 +2550,10 @@ def code_stays_tricked(n):
                                   'tail': _secs(_shout_tail(d, evc)),
                                   'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
+                        # the scene across the tricked step and its reaction's
+                        e['scene'] = _scene_secs(_scene_span(
+                            d, ev2 + [('STEP',)] + evc, own_i,
+                            LAP_WALKS.get(n, {}).get(lap[rows_v[0] if prefix else i][0], True)))
                         if cont[3:] == ('stand',) and cstand is not None and e['tricked'] is not None:
                             e['tricked'] = round(e['tricked'] + cstand / 12.0, 2)
                         if dep is not None:
@@ -2572,6 +2670,9 @@ def code_stays_tricked(n):
                 e['repair'] = round(crepair / 12.0, 2) if crepair is not None else None
                 e['tail'] = _secs(_shout_tail(d, evc))
                 e['cont'] = 0.0
+                # the scene across the row's step and the flow's own
+                e['scene'] = _scene_secs(_scene_span(d, ev2 + [('STEP',)] + evc, own,
+                                                     LAP_WALKS.get(n, {}).get(rows[row][0], True)))
             e['rejoins'] = nx2 == nx1
             out[item] = e
     for item, (row, k_shot, actor, arm, fire) in TRICKED_ARM.get(n, {}).items():
@@ -2612,6 +2713,7 @@ def code_stays_tricked(n):
              'credit': round(credit / 12.0, 2) if credit is not None else None,
              'hit': {actor: round(ft / 12.0, 2) if ft is not None else None},
              'tail': _secs(_shout_tail(d, all1)),
+             'scene': _scene_secs(_scene_span(d, all1)),
              'arm': [arm, fire], 'rejoins': True}
         f2 = flow((item, lnk)) if lnk in trick else None
         if f2 is not None:
@@ -2625,6 +2727,7 @@ def code_stays_tricked(n):
                       'linked_shout': level2,
                       'linked_repair': round(repair2 / 12.0, 2) if repair2 is not None else None,
                       'linked_tail': _secs(_shout_tail(d, all2)),
+                      'linked_scene': _scene_secs(_scene_span(d, all2)),
                       'linked_credit': round(credit2 / 12.0, 2) if credit2 is not None else None,
                       'linked_pays': round(others[0][1] / 12.0, 2) if others else None})
             if len(others) > 1:
@@ -2653,6 +2756,7 @@ def code_stays_tricked(n):
                      'repair': round(repair / 12.0, 2) if repair is not None else None,
                      'credit': round(credit / 12.0, 2) if credit is not None else None,
                      'tail': _secs(_shout_tail(d, ev2)),
+                     'scene': _scene_secs(_scene_span(d, ev2)),
                      'arm': [fire_v, drop_v], 'rejoins': True}
     for item, (obj, act, actor, her) in TRICKED_RUSH.get(n, {}).items():
         if item not in out:
@@ -2687,10 +2791,12 @@ def code_stays_tricked(n):
     for item, step in LINKED_STEP.get(n, {}).items():
         lv2 = Level(n)
         lv2.present = set(lv.present)
-        stand, _level, _repair, credit = _step_parts_split(d, run_step(lv2, step, dict(LAP_BYTES.get(n) or {}))[0])
+        evl = run_step(lv2, step, dict(LAP_BYTES.get(n) or {}))[0]
+        stand, _level, _repair, credit = _step_parts_split(d, evl)
         if stand is not None and item in out:
             out[item]['linked'] = round(stand / 12.0, 2)
             out[item]['linked_credit'] = round(credit / 12.0, 2) if credit is not None else None
+            out[item]['linked_scene'] = _scene_secs(_scene_span(d, evl))
     # the linked trick in the same step: the station's step run with both
     # tricks in the scene
     dos = lambda ev: [tuple(e[1]) for e in ev if e[0] in ('DO', 'ODO')]
@@ -2718,6 +2824,7 @@ def code_stays_tricked(n):
         e = {'linked': round(stand / 12.0, 2), 'linked_shout': level,
              'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
              'linked_tail': _secs(_shout_tail(d, ev2, own, wk_i)),
+             'linked_scene': _scene_secs(_scene_span(d, ev2, own, wk_i)),
              'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
              'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
         cont = LINKED_CONT.get(n, {}).get(item)
@@ -2738,7 +2845,8 @@ def code_stays_tricked(n):
                           'linked_hit': round(lift / 12.0, 2),
                           'linked_after_hit': round(max(0, cstand - lift) / 12.0, 2),
                           'linked_extra': crecs[0][0],
-                          'linked_extra_at': round(crecs[0][1] / 12.0, 2)})
+                          'linked_extra_at': round(crecs[0][1] / 12.0, 2),
+                          'linked_scene': _scene_secs(_scene_span(d, ev2 + [('STEP',)] + evc, own, wk_i))})
         out[item].update(e)
     return out
 

@@ -444,7 +444,8 @@ def write_tricked_keys(ov, n, clips):
               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter'):
+              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter',
+              'PCScene', 'PCSceneLinked'):
         ov['patches'] = _strip_key(ov['patches'], k)
     sys.path.insert(0, HERE)
     import lap_model_s2
@@ -452,6 +453,12 @@ def write_tricked_keys(ov, n, clips):
     for item, tr in sorted(lap_model_s2.code_stays_tricked(n).items()):
         if item in clips:
             continue      # timed per clip (CLIPS)
+        if tr.get('scene') is not None:
+            # the reaction's scene, the level's flag +0x6e that holds the
+            # completion (lap_model_s2._scene_span): [rise, drop]
+            _set_key(ov['patches'], item, 'PCScene', tr['scene'])
+        if tr.get('linked_scene') is not None:
+            _set_key(ov['patches'], item, 'PCSceneLinked', tr['linked_scene'])
         if tr['tricked'] is not None and (tr['tricked'] > 0 or tr['credit'] is not None):
             # (a variant with no action of its own — 214's
             # captain's door on the bridge — plays nothing to time)
@@ -519,6 +526,9 @@ def write_tricked_keys(ov, n, clips):
             # the linked item's own firing visit and the visit
             # that drops it (206's harpoon: the take, the put)
             _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
+    for item, sc in sorted(lap_model_s2.scene_steps(n).items()):
+        # the scene of a tricked flow off the model's lap (SCENE_STEPS)
+        _set_key(ov['patches'], item, 'PCScene', sc)
 
 
 def write_code_stays(ov, n, clips):

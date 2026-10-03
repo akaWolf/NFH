@@ -28,6 +28,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 4.33,
     "PCShout": 0,
     "PCFixSeconds": 1.83,
@@ -48,6 +52,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSecondsTricked": 7.42,
     "PCShout": 0,
     "PCFixSeconds": 0,
@@ -790,7 +798,11 @@
       "px": -25,
       "routes": {}
      }
-    }
+    },
+    "PCScene": [
+     0.17,
+     "shout"
+    ]
    }
   },
   {
