@@ -877,7 +877,25 @@ def _port_x(zone, pcx):
     return zone.left + (pcx - pr['x1']) * (zone.right - zone.left) / w
 
 
-class TutorialPC201(Tutorial):
+class _SceneFollow:
+    """the Season 2 tutorials' neighbour camera (`follow`): its callbacks
+    (Ef51a on, Eebbf off) store the level's scene flag +0x6e before the
+    camera (fcn.10040137 from fcn.1000d31a / fcn.1000d559), which holds
+    the completion check (World._pc_s2_success)"""
+
+    @property
+    def follow(self):
+        return self._follow
+
+    @follow.setter
+    def follow(self, on):
+        self._follow = on
+        w = getattr(self, 'world', None)
+        if w is not None:
+            w._pc_scene = bool(on)
+
+
+class TutorialPC201(_SceneFollow, Tutorial):
     """The PC's own 201 tutorial, in place of the mobile's LevelScript and
     TutorialScriptCameraNFH2 under the PC profile (docs/PC_FIDELITY.md
     "201's tutorial"). GameLogic.dll runs it as two scripts: the invisible
@@ -1032,21 +1050,6 @@ class TutorialPC201(Tutorial):
 
     def _go(self, step):
         self.step = step
-
-    @property
-    def follow(self):
-        return self._follow
-
-    @follow.setter
-    def follow(self, on):
-        """the neighbour camera's callbacks (Ef51a on, Eebbf off) store the
-        level's scene flag +0x6e before the camera (fcn.10040137 from
-        fcn.1000d31a / fcn.1000d559), which holds the completion check
-        (World._pc_s2_success)"""
-        self._follow = on
-        w = getattr(self, 'world', None)
-        if w is not None:
-            w._pc_scene = bool(on)
 
     # -- the director's element helpers --------------------------------------
     def _msg(self, name):
@@ -1698,7 +1701,7 @@ class _PCScript:
         return False
 
 
-class TutorialPC206(Tutorial):
+class TutorialPC206(_SceneFollow, Tutorial):
     """The PC's own 206 lesson, in place of the mobile's LevelScript and
     TutorialScriptCameraNFH2206 under the PC profile (docs/PC_FIDELITY.md
     "206's lesson"). GameLogic.dll runs it as three scripts (_PCScript):

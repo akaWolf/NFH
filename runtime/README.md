@@ -642,8 +642,8 @@ predicate, then the all-tricks win.
   count only while it is clear): `World.pc_scene_start` raises it so far
   into the tricked stand (the item's PCScene) and drops it as the reaction's
   SHOUT ends (`_pc_scene_shout_end` from `play_angry`), as the stand ends
-  (`pc_scene_use_end`) or so far in; the 201 tutorial's neighbour camera
-  (`follow`) writes it too. `World._pc_s2_success` wins on the first tick
+  (`pc_scene_use_end`) or so far in; the Season 2 tutorials' neighbour
+  camera (201's, 206's lesson: `follow`, its Ef51a and Eebbf) writes it too. `World._pc_s2_success` wins on the first tick
   it is clear; Woody's win clip then lasts the PC's `triumph` (25 ticks,
   `pcprofile.S2_WON_TICKS`) and the score is read at its end, the board.
 - **Hiding** (`HideItem.InternalUse` → `Woody.Hide`, `Woody.Unhide` →

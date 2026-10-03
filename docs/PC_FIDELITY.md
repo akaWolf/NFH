@@ -2268,16 +2268,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the reaction's scene is PCScene ([its rise into the tricked stand, the
   SHOUT's end, or the stand's end for 213's bull controls, whose flow has
   none]; tools/pcref/pc_durations_s2.py from the model, SCENE_STEPS for four
-  flows off its lap), the level runs on until it drops (World.pc_scene_start,
-  _pc_s2_success), Woody's win clip lasts the 25 ticks and the score is
+  flows off its lap; the Season 2 tutorials' neighbour camera — 201's, 206's
+  lesson — writes it with its own Ef51a and Eebbf), the level runs on until
+  it drops (World.pc_scene_start, _pc_s2_success), Woody's win clip lasts the 25 ticks and the score is
   read at the board (pcprofile.S2_WON_TICKS): 202's plan ends 6.2 s after
-  its last credit and boards 2.08 s later (the video 6.1 and 2.07). Not
-  carried: the Trick Camera itself — with the option on the camera goes to
-  the neighbour at a scene's start and Woody and the Mother stand frozen
-  through it; the videos' setting is not read (no `Neighbour camera`
-  label shows in them, the success's `Woody camera` does); the items the
-  model reads no tricked flow of (PCLaugh's stand-ins) hold their scene
-  over the stand-in reaction.
+  its last credit and boards 2.08 s later (the video 6.1 and 2.07). The
+  Trick Camera itself — with the option on the camera goes to the
+  neighbour at a scene's start and Woody and the Mother stand frozen
+  through it — was off in the reference run: GFXEngine draws the new
+  target's `camera` string on every change (fcn.10003df0 drops the old
+  label, fcn.10004e90 draws it, its gate +0x131 set by the reset
+  fcn.10008dd0 and never cleared), 201's director shows `Neighbor camera`
+  at 79.3 s, yet no scene of a regular level does (E02's rail 470-500 s,
+  E03's bicycle 706-734 s: the view stays where the player scrolled, and
+  the one label is the success's `Woody camera`). The profile plays it
+  off. The items the model reads no tricked flow of (PCLaugh's stand-ins)
+  hold their scene over the stand-in reaction; the flows read by hand
+  besides SCENE_STEPS — 207's awning dive, 208's elephant, tap, platform
+  and seesaw, 211's lifeboat (its ladder step's SHOUT and Eebbf,
+  0x1003059d), 205's chef — close it after the SHOUT, as the default has.
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and
