@@ -469,7 +469,7 @@ actors' job pass the update calls at 0x100445f8.
   declines; GameLogic calls no clock at all (its GetTickCount seeds random generators: the
   level constructor fcn.10044bb5, the mini-game's fcn.100507f4); so the spacing sits in the
   object the frame drives at app+0x20 (its slot 15) or below it, still unread.
-  Reread 2026-09-27: game.exe reads no clock per frame outside the fps timer — QueryPerformanceCounter and timeGetTime only in fcn.00402da0 (the fps timer's), GetTickCount in the level constructor's random seed (0x43bce0, the generator at +0x8c), the double-click test (0x407eef), fcn.00408c6e, a stamp at 0x40fc37 and fcn.0040eb00 (0x40ebc9), which hands the start time to the object it stores at app+0x20 through that object's slot 0 — the object the frame drives by its slot 15, its class chosen by fcn.0040eb00's caller (not followed).
+  Reread 2026-09-27: game.exe reads no clock per frame outside the fps timer — QueryPerformanceCounter and timeGetTime only in fcn.00402da0 (the fps timer's), GetTickCount in the level constructor's random seed (0x43bce0, the generator at +0x8c), the double-click test (0x407eef), fcn.00408c6e, a stamp at 0x40fc37 and fcn.0040eb00 (0x40ebc9), which hands the start time to the object it stores at app+0x20 through that object's slot 0 — the object the frame drives by its slot 15, its class chosen by fcn.0040eb00's caller (not followed). Followed 2026-10-03: fcn.0040eb00 (called by fcn.00410a40 for an 0xa8-byte object of vtable 0x4e6e80) passes GetTickCount to the object embedded at its +0x40 (fcn.004198d0, vtable 0x4dc624), whose slot 0 (0x419700) seeds a Mersenne Twister — 624 words (0x270) of 0x9c0 bytes, the multiplier 0x10dcd, slot 1 (0x419740) its regeneration — a random generator, not a clock; the object it stores at +0x20 is its second argument. The pacer stays unlocated.
 - Season 1, settled on 2026-09-18: the catch's busy byte (+0x78) is
   toggled by one message only — the level's slot 49 (fcn.00440c10,
   `sete` on the byte of the actor named in the event, reached through
@@ -1070,3 +1070,19 @@ actors' job pass the update calls at 0x100445f8.
   video's 86; 205's OlgaMatBeach 6.5, the sand lion's PCShoutTail 7.58
   gone (the kid laughs on his own queue); 202's lap by code 73.2 s (the
   kid's dive his own).
+- `tools/pcref/pc_durations_others.py`, `tools/pcref/lap_model_s2.py`,
+  `tools/pcref/pc_durations_s2.py`, `tests/run_tricks.py`,
+  `levels/pc/Level2*.overlay.json` (2026-10-03): the Mother's stands by
+  her script (ROLE_LAPS over lap_model_s2.role_lap: each a step's GoTo,
+  its `use` job and the step's two ticks; 212's statue 8.67 s and red bull
+  12.0, 213's water 12.83 and flowers 17.0 — her 213 lap has no statue —,
+  214's reling 7.0 and chair sit 1.0); a stand timed per clip takes the
+  step's two ticks with its first clip after the walk ('step'); a tricked
+  visit whose first step plays the same leads the flow of the one that
+  differs (212's bench: 10.92 s, its credit at 10.08); 204's gong's
+  continuation `leave` on its stand (5.5 s); 210's elephant's credit in
+  Fifi's `dogattack_bat`, 1.83 s (CREDIT_BY: her step starts once his
+  `put1` shows her). Plan 212 v8. The harness: a rush leg
+  (`op!`), whose gate does not run, clicked the way-round waypoint the
+  last gated leg had left (Level214's fish from the chair walked off
+  through Zone04 into his shower room): the waypoint is the leg's own now.

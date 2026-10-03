@@ -1672,6 +1672,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tick), its sand lion's PCShoutTail gone; 202's lap 73.2 s (the video's
   70-94, his wait for Olga's sub not modelled), its stays per clip as
   before.
+- *A tricked visit over two steps (2026-10-03).* The tricked stand is
+  the flow from the visit's arrival to its SHOUT; where the visit's first
+  step plays the same with the trick in place and its next one does not,
+  the first leads the flow (lap_model_s2 code_stays_tricked): 212's bench
+  — the manipulated bench's `enter` and the 60-tick `sleep` bar, then the
+  leave step (0x1003613a) with the red bull woken, the bench's `leave`
+  (25 ticks), the bull's `crash` (31, its record `red_bull` at 21), SHOUT
+  1 — stands 10.92 s with its credit at 10.08 (the leave had been
+  nameless and the stand unknown: the port had paced the remaster's
+  clip). A continuation's own parts before its SHOUT stand with the
+  tricked stand where the port has no mechanism for them (TRICKED_CONT's
+  'stand'): 204's gong, the gong's `leave` in 0x10032f52 before SHOUT 3,
+  5.5 s where it had been 5.25. 210's elephant pays in Fifi's own
+  job — bar/elefant's `dogattack_bat`, actor fifi, its record at 5 ticks
+  (in_b2 objects.xml) — which her script starts (the step round
+  0x10018239 tests her animation against `inv`), not his flow (his
+  `put1`, the camera and his `fifi_bat`, 9.5 s to the Mother's fight):
+  its PCCreditAt was the remaster's until her script was read — read the
+  same night: her step waits while she is `inv`, his `put1` shows her, and
+  her sequence's first element is the attack, the tick after the offer's
+  (lap_model_s2 CREDIT_BY): PCCreditAt 1.83 s.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which
@@ -1859,6 +1880,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   nap and sea-view loops have no explicit time and keep the mobile clips;
   214's Mother takes her script's (the reling's 80 ticks, her bar in the
   chair — "214's handshake").
+  By code since 2026-10-03 (tools/pcref/pc_durations_others.py ROLE_LAPS
+  over lap_model_s2.role_lap): her script's lap is walked as the
+  neighbour's — each station a step, its GoTo, the DoActions `use` of the
+  Loader's time + 2 and the step's own two ticks (the GoTo's done tick,
+  the sequence's first) — so 212's statue 104 ticks and red bull 144
+  (8.67 and 12.0 s, the data's 8.3 and 11.7 before), 213's water 154 and
+  flowers 204 (12.83 and 17.0 s), 214's reling 84 (7.0) and her chair's
+  sit 12 (1.0 s, the step's two with the `enter`'s ten) before the bar's
+  600 and the `leave` the route of her walk to the reling plays (17). Her
+  213 lap is the water and the flowers alone (0x100372f0 <-> 0x100374a6):
+  me_c2's statue_hideout `use` for her is data no step of hers plays, and
+  the Zone05 stand had summed it with the flowers' less a 2-s walk (19.7
+  s). A stand timed per clip (CLIPS, CLIPS_ROLE, ITEM_CLIPS) takes the
+  step's two ticks with its first clip after the walk (the 'step' mark,
+  lap_model_s2.WALK_STEP_TICKS): 202's lie-down on the mat and Olga's, her
+  sub's take, 205's mat under Olga, 207's and 210's Mother into the chair
+  and the pool, 210's chair under him, 213's Olga on the bull — 0.17 s a
+  visit, the job's alone before; 202's swim holds its wait clip until the
+  sub (its step's own ticks inside the hold).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier
