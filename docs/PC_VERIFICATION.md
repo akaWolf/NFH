@@ -341,9 +341,19 @@ actors' job pass the update calls at 0x100445f8.
   15 (`setl` at 0x471e1a), and fcn.00472390's state machine delivers a
   flag-2 trigger as its condition turns true (0x4724fa-0x472525: the
   0x200 bit set until it turns false, 0x47252c-0x472542; 0x1000 removes a
-  one-shot, 0x47254c). The walk-by stations (the microwave, the toilet,
-  the pictures, 109's pig, 111's airer and iron, the electric traps) keep
-  the mobile's walk frames: their triggers are not read.
+  one-shot, 0x47254c). The triggers are the level's data: trigger.xml,
+  per actor a behaviour and its triggers — `object`, `position` nearobj /
+  room / house, `type` once / always, `noise` — the floor tricks
+  (groundbanana, groundsoap, marbles, skate) and the stations
+  kit/microwavedirty, toi/toiletstuffed, anc/mum_smeared (`always` on
+  level_piano), bas/electrotrap and 111's bed/ironingboard_burn (`always`)
+  nearobj, 111's lir/dirtycarpet `room always`, 105's anc/phoneringing and
+  the generic `alarm` `house always`, the pets' `wakeup` `room always
+  noise`: the walk-by stations with a nearobj trigger take the same reach
+  and the standing ticks (pcprofile.S1_NEAROBJ_ITEMS: the microwave, the
+  toilet, the mum picture, the electric trap, the iron), where the
+  mobile's Drawing (107), Pig (109) and Airer (111) have no trigger on
+  the PC and keep their walk frames.
 - Woody's Season 1 walk, carried 2026-09-27: his clicks reach the same
   GOTO as the neighbour's steps (the level's command handlers at 0x440088
   / 0x44014f / 0x4401fd call fcn.004364f0 / fcn.004368d0, which build it
