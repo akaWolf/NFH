@@ -22,6 +22,7 @@
     "PCHitSeconds": {
      "Mother": 3.33
     },
+    "PCCreditAt": 1.83,
     "PCUseSeconds": 2.5
    }
   },
@@ -64,7 +65,7 @@
    "set": {
     "PCLaugh": 4,
     "PCClipSeconds": {
-     "ChairEnter": 0.67,
+     "ChairEnter": 0.83,
      "ChairSun": 2.5,
      "ChairWakeup": 0.42,
      "ChairAwake": 6.0,
@@ -125,7 +126,7 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherSitPillow": 0.83,
+      "MotherSitPillow": 1.0,
       "MotherSleepPillow": 0.0,
       "MotherSleepSingle": 6.67,
       "MotherLookLoop": 15.0,
@@ -734,9 +735,6 @@
       "routes": {}
      }
     },
-    "PCClipSeconds": {
-     "Stand_Left": 0.53
-    },
     "PCClipSecondsRole": {
      "Mother": {
       "MotherCall": 1.75,
@@ -751,6 +749,9 @@
       "at": "start",
       "then": 0.0
      }
+    },
+    "PCClipSeconds": {
+     "Stand_Left": 0.53
     }
    }
   },

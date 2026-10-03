@@ -52,8 +52,8 @@
     "AngerAmount": 20,
     "PCLaugh": 3,
     "PCClipSeconds": {
-     "BeachLayDown": 0.58,
-     "BeachPinLayDown": 0.58,
+     "BeachLayDown": 0.75,
+     "BeachPinLayDown": 0.75,
      "BeachSleep": 1.43,
      "BeachSleepCrab": 1.43,
      "BeachGetBeer": 5.42,
@@ -621,7 +621,7 @@
     },
     "PCClipSecondsRole": {
      "Olga": {
-      "BeachLayDown": 0.75,
+      "BeachLayDown": 0.92,
       "TowelSleep": 7.58,
       "TowelLaydown": 3.0,
       "BeachGetUp": 0.75
@@ -650,8 +650,8 @@
     },
     "PCClipSecondsRole": {
      "Olga": {
-      "OlgaPutSub": 1.58,
-      "OlgaPutSubTricked": 1.58
+      "OlgaPutSub": 1.75,
+      "OlgaPutSubTricked": 1.75
      }
     }
    }

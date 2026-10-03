@@ -60,7 +60,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 5.25,
+    "PCUseSecondsTricked": 5.5,
     "PCShout": 3,
     "PCFixSeconds": 1.83,
     "PCCreditAt": 3.33,

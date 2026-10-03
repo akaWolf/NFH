@@ -95,8 +95,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
+    "PCUseSecondsTricked": 10.92,
     "PCShout": 1,
     "PCFixSeconds": 1.92,
+    "PCCreditAt": 10.08,
     "PCUseSeconds": 13.0
    }
   },
@@ -1203,7 +1205,7 @@
      }
     },
     "PCUseSecondsRole": {
-     "Mother": 8.3
+     "Mother": 8.67
     }
    }
   },
@@ -1226,7 +1228,7 @@
      }
     },
     "PCUseSecondsRole": {
-     "Mother": 11.7
+     "Mother": 12.0
     }
    }
   },

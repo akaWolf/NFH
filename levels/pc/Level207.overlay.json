@@ -127,7 +127,7 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherPoolLadderEnter": 3.5,
+      "MotherPoolLadderEnter": 3.67,
       "MotherPoolLadderSwim": 8.33,
       "MotherPoolLadderLeave": 4.25
      }
@@ -144,7 +144,7 @@
     },
     "PCClipSecondsRole": {
      "Mother": {
-      "MotherSitPillow": 0.83,
+      "MotherSitPillow": 1.0,
       "MotherSleepLoop": 6.67,
       "MotherGetUpPillow": 1.42
      }

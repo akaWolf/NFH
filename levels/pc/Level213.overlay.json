@@ -895,7 +895,7 @@
      }
     },
     "PCUseSecondsRole": {
-     "Mother": 12.5
+     "Mother": 12.83
     }
    }
   },
@@ -1273,7 +1273,7 @@
      }
     },
     "PCUseSecondsRole": {
-     "Mother": 19.7
+     "Mother": 17.0
     }
    }
   },
@@ -1346,7 +1346,7 @@
     },
     "PCClipSecondsRole": {
      "Olga": {
-      "BullRide": 6.83
+      "BullRide": 7.0
      }
     },
     "PCBehaviourAtEnd": 0.08

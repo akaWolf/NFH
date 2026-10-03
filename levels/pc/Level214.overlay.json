@@ -107,7 +107,7 @@
       ]
      }
     },
-    "PCSitSeconds": 0.83,
+    "PCSitSeconds": 1.0,
     "PCSleepSeconds": 50.0,
     "PCGetUpSeconds": 1.42
    }
@@ -794,7 +794,7 @@
      }
     },
     "PCUseSecondsRole": {
-     "Mother": 6.7
+     "Mother": 7.0
     }
    }
   },
