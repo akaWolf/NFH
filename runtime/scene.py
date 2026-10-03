@@ -246,7 +246,7 @@ class Item:
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
-                 'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
+                 'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
@@ -761,6 +761,10 @@ class Item:
         self.pc_fire_before = bool(d.get('PCFireBefore'))
         self.pc_slip_secs = _f('PCSlipSeconds')
         self.pc_surprise_secs = _f('PCSurpriseSeconds')
+        # the ticks between a walk-by's doubletake and its fire: tutorial_2's
+        # tut_laugh1 message step (game.exe 0x45afff-0x45b085, the list's
+        # element before the OBJ2 fire; tools/pcref/pc_tutorial_s1.py)
+        self.pc_fire_wait = int(d.get('PCFireWait') or 0)
         # a fixing tool's PC case (111's vacuum, case 22; 110's extinguisher,
         # case 9): the take at the tool, the use after the repair (0: none),
         # a sound tool's use, the give on the way back (0: the tool is kept)
@@ -2369,6 +2373,38 @@ class Level:
             zone = pending[0]
             if cost[zone] >= INF:
                 return None
+        return None
+
+    def find_path_open(self, start_pid, end_pid):
+        """the fewest hops from start to end through the doors that are open
+        (not locked, not disabled): the PC profile's Season 1 path finder,
+        which leaves out a link whose door is not present (game.exe
+        fcn.004471a0, the flag 0x20 test at 0x4472a7-0x4472cc; the rooms'
+        links cost 1000 each in the tutorials' level.xml, far above a room's
+        walk) — None when there is none"""
+        if start_pid == end_pid:
+            return []
+        prev = {start_pid: None}
+        queue = [start_pid]
+        while queue:
+            zone = queue.pop(0)
+            for nb, door in self.graph.get(zone, ()):
+                if nb in prev or door.disabled or door.locked:
+                    continue
+                other = next((d for d in self.doors if d.pid == door.link_to), None)
+                if other is None or other.disabled or other.locked:
+                    continue
+                prev[nb] = (zone, door)
+                if nb == end_pid:
+                    out = []
+                    n = nb
+                    while prev[n] is not None:
+                        c, dr = prev[n]
+                        out.append((n, dr))
+                        n = c
+                    out.reverse()
+                    return out
+                queue.append(nb)
         return None
 
     @property

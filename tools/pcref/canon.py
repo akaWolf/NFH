@@ -25,6 +25,9 @@ S1 = {101: 'peep', 102: 'sofa', 103: 'mail', 104: 'pie', 105: 'piano', 106: 'bat
       108: 'suntan', 109: 'pig', 110: 'barbecue', 111: 'laundry', 112: 'fitness', 113: 'DIY', 114: 'hunter'}
 S2 = {201: 'ship1', 202: 'cn_b1', 203: 'cn_c2', 204: 'cn_c1', 205: 'cn_b2', 206: 'ship2', 207: 'in_b1',
       208: 'in_c1', 209: 'in_c2', 210: 'in_b2', 211: 'ship3', 212: 'me_c1', 213: 'me_c2', 214: 'ship4'}
+# the remaster's three Intro scenes are the PC's tutorial levels (game.exe's
+# Level_Tutorial1 and the tutorial_2 / tutorial_3 classes)
+TUTORIALS = {'Intro101': 'tutorial_1', 'Intro102': 'tutorial_2', 'Intro103': 'tutorial_3'}
 
 
 def read(p):
@@ -33,8 +36,12 @@ def read(p):
 
 
 def pc_level(n):
-    season = 'nfh1' if n < 200 else 'nfh2'
-    folder = ('level_' + S1[n]) if n < 200 else S2[n]
+    """a level number's PC data, or an Intro scene's (its tutorial folder)"""
+    if n in TUTORIALS:
+        season, folder = 'nfh1', TUTORIALS[n]
+    else:
+        season = 'nfh1' if n < 200 else 'nfh2'
+        folder = ('level_' + S1[n]) if n < 200 else S2[n]
     d = '%s/%s/x/%s' % (ROOT, season, folder)
     out = {'folder': folder}
     lv = read(d + '/level.xml')

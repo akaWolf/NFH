@@ -233,6 +233,25 @@ the record's noise field (+0x10 in SetSpeedMsg's record) is not traced.
 | the pet calms when the neighbour arrives | `OnRottweilerEnter` → "poor" | the class's tick (fcn.0045bfa0, read 2026-09-25) compares the rooms of `woody` and `neighbor` with its own every tick; awake (state 4) it barks while Woody is in the room unhidden (bark1/bark3 by its facing, `startle_woody` posted once per entry, latch +0x1c), else barks once for a pending whistle (latch +0x1d), else — the neighbour in the room — faces him and whines (`whine1`/`whine3`: poor1/poor3, 23 ticks the dog, 29 the parrot), else idles (ms1/ms3) and counts its timer down; asleep (state 2) it has no branch for the neighbour, and his gaits carry no noise; a bark or a whine is an action on the pet's queue that holds the class's step, so state 4 decides again only as it ends | differed: the port's pet woke for the neighbour and whined only when he answered its alarm; carried since 2026-09-25 (`AlerterFSM` under `pcprofile.s1_pets`): an awake pet with no Woody to bark at whines whenever the neighbour is in its room — one whine the remaster's PoorSequence clips at its ticks (`S1_PET_WHINE`: the dog's two 12-frame clips, poor1 running its whine twice; the parrot's one), Woody's arrival and the neighbour's leaving waiting for its end — an asleep one sleeps on |
 | the pet falls asleep again | the WakeSequence's length after the alert (the dog's 65 frames at 8 a second, 8.1 s; the parrot's 23, 2.9 s) | state 3 (a noise of 1 or the whistle while asleep) plays `wakeup` and sets the timer to 72 ticks (0x45c153); state 4 counts it only in the idle branch — the bark and the whine are actions on the pet's queue, which hold the class's step — and at 0 it goes to state 1, `fallasleep` then `sleep` (0x45c45a-0x45c46f) | differed; carried since 2026-09-25 (`AlerterFSM.pc_timer`, `pcprofile.S1_PET_AWAKE_TICKS`): 6 s of idle in the room without Woody or the neighbour before the pet sleeps, its idle the remaster's WakeSequence — it falls asleep the tick the timer ends, not at the idle clip's end, and a bark or a whine in hand stops the count |
 
+### The tutorials
+
+game.exe runs tutorial_1-3 as level classes of their own (Level_Tutorial1,
+vtable 0x4e2ec8; tutorial_2's director 0x45a550 and neighbour 0x45acd0;
+tutorial_3's 0x459520 and 0x459b10), read 2026-10-03: a switch on the
+state at +0xc once a level tick, the director's opening count of 12, the
+waiting states moved on by trigger.xml's behaviours (nearobj and room
+triggers to HAL and the neighbour), the actions' `behavior` records and
+the scripts' messages; the PC video shows the three from 20 s to 220 s.
+
+| rule | port | binary / data | verdict |
+|---|---|---|---|
+| the director's opening | the remaster's LevelScript: the first box as the tutorial activates | state 0 stores 12, state 1 counts it down, state 2 speaks: tick 15 (tutorial_2's box at 74.17, tutorial_3's at 149.92, 1.17 s after the title card goes) | differed; carried 2026-10-03 (TutorialPC101-103: the box on tick 15) |
+| the flow | the LevelScript actions (location, door, zone, item signals) and the camera scripts | the states, the triggers (nearobj: the same room, \|dx\| < 15 px; room: every tick; `once`/`always`), the filter slots, `take`/`marker`/`hide` posted as Woody's action ends, `start`/`target`/`whistle` on the next tick | differed in the details (the signs' reach, the stops, the doors' moments, the camera, the level won at the location action); carried 2026-10-03 — the PC's states step by step |
+| tutorial_2's neighbour | back and forth between the signs, no wait | `start`, then GoTo lir_sign1, 96 updates, GoTo kit_sign2, round again (0x45acd0) | differed; carried 2026-10-03: from `start` the doubletake +5.85 s (the video +6.0), tut_laugh1 +7.17 (+7.33), the picture back +12.8 (+12.91), at sign 1 +16.38 (+16.5), off to sign 2 +24.42 (+24.58) |
+| the reactions | the mobile pace (AngryHard 6.7 s) | the look walk-by's list with tut_laugh1's message step before the OBJ2 fire; FIRE4 (`marbles`, index 2: `!= 0`, shout2; flags 0) pushed alone, its ready list [StopMsg, (tutorial_3: tut_laugh), the fall, (the empty message)] | differed; carried 2026-10-03 (the items' PC data, PCFireWait; "Ha, ha!" 0.33 s to 3.08 s after the fire — the video's 210.08 to 212.83 after its ≈209.75) |
+| tutorial_3's walk to sign 2 | the mobile's three MoveOnly steps (lir, anc, kit) | lir/kit closed (its dummy shown) right before the GoTo to kit_sign2: the path finder leaves out a link whose door is not present (fcn.004471a0, 0x4472a7-0x4472cc) — through anc | carried 2026-10-03 (`Level.find_path_open` under the Season 1 profile, where the mobile's shortest hops across a locked door are refused) |
+| tutorial_3's dog | AlertOnStartTimer 3 s | the director's `whistle` on tick 15 (the pet class: state 3); the neighbour's noise icon and camera at 151.92, 2.0 s after it, the dog's bark from 150.92 | the whistle carried; open: the port's pet model has him hear the bark as it starts (0.83 s after the whistle) — the PC 12 ticks later, on the levels' pets too |
+
 ## Season 2
 
 Read earlier and carried (docs/PC_ROUTINES.md, the Season 2 sections): the
@@ -1204,7 +1223,7 @@ actors' job pass the update calls at 0x100445f8.
   it, the port's 0.6 s earlier (the clock's zero against the scripts'
   first tick unread). The lap past the lesson 118.5, 118.67 and 118.5 s
   (runs/les206f), his put at Fifi FifiPutLeft. tests/run_tutorial.py
-  (59 checks, 60 since 2026-10-03): the remaster's lesson under the mobile profile, the PC's
+  (59 checks, 60 since 2026-10-03, 88 with the Season 1 tutorials by the PC's code): the remaster's lesson under the mobile profile, the PC's
   under the PC one — the binding, step1 and his laugh, her call, her
   order, step2 and the toy box, step2a and the pillows, step3 and the
   pipe, step4 and her second call, the fart paying the chair's trick, her

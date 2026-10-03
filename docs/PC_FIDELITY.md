@@ -2145,19 +2145,67 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   212's 300 against 414, 214's 1074 against 1200); the mobile's greeting
   (HelloAnimationNFH2, a second with the input locked) stays — the video
   does not show his first frames.
-- *The Season 1 tutorials' texts (2026-10-03).* The remaster's Intro101-103
-  are the PC's tutorial_1-3 step for step — the same rooms, targets, doors,
-  items and the neighbour's slips; its LevelScript actions carry a
-  PC-build text (TUT<n>MSG<m>_PC) that is the PC's director message
-  reworded ("neighbor", "the director." for "the director of the show.",
-  102's fourth box "Woody is now using the marker pen on the picture" for
-  the PC's "A progress bar above Woody's head shows you the duration of an
-  action"), and the port had shown the mobile's touch wording. Under the
-  profile the director says the PC's own message (tools/pcref/
-  pc_tutorial_s1.py: 5 + 8 + 6 boxes paired by content). Not carried: the
-  PC's two "Ha, ha!" boxes after the slips (tutorial_2's tut_laugh2,
-  tutorial_3's tut_laugh, 0x459ffb), which no action of the remaster's
-  scripts shows.
+- *The Season 1 tutorials by the PC's code (2026-10-03, carried).* The
+  remaster's Intro101-103 are the PC's tutorial_1-3 — the same rooms,
+  signs, doors, items and slips — but game.exe runs each as a level class
+  of its own, not as the remaster's LevelScript actions and camera
+  scripts: Level_Tutorial1 (vtable 0x4e2ec8, its run 0x45b600, its trigger
+  handler 0x45b4a0) and, for tutorial_2 and tutorial_3, a director on the
+  invisible HAL (0x45a550 / 0x459520, their handlers 0x45a3d0 / 0x459370
+  and filters 0x45a4d0 / 0x4594a0) and a script on the neighbour (0x45acd0
+  / 0x459b10, handlers 0x45ae00 / 0x459eb0). Each update is a switch on the
+  state at +0xc, once a level tick; a director opens with a count of 12
+  (its first message on tick 15, 1.17 s — the video's 74.17 and 149.92
+  against the ticking's start as the title card goes, 73.0 and 148.75),
+  and a waiting state stores the next in +0x14 and moves on when the
+  behaviour it waits for arrives: trigger.xml's (nearobj ones as their
+  condition turns true — the same room, |dx| < 15 px —, room ones on every
+  tick they hold, the filter dropping what the script does not wait for),
+  the actions' `behavior` records (`take`, `marker`, `hide`: posted as
+  the action ends — 102's marker box follows the 25-tick use, 92.17 s) and
+  the scripts' messages (`start`, `target`, the dog's `whistle`: the next
+  tick's pass). The port had run the remaster's flow: the first box at
+  once, tutorial_2's neighbour back and forth between the signs without
+  stopping (the PC's script counts 96 updates at sign 1 — 97 ticks, 8.08 s:
+  the video's sign2 icon at 121.25, his arrival at 113.2), his reactions
+  at the mobile pace (a 6.7 s AngryHard; the PC's doubletake 16 ticks, the
+  tut_laugh1 message step, the fire, shout0, the walk to the picture and
+  its 25-tick clean), the level won at the location action and tutorial_3's
+  dog barking on AlertOnStartTimer. Under the profile TutorialPC101-103 run
+  the PC's scripts (runtime/tutorial.py; data PCTutorial,
+  tools/pcref/pc_tutorial_s1.py): the messages, the markers, the signs and
+  the doors by the states; tutorial_1's triggers stop a walking Woody
+  where the byte +0x18 says so, and the porch scores its `trick` (100);
+  tutorial_2's neighbour starts at `start`, walks to lir_sign1 (the icon
+  sign1: the MoveOnly step's zone bubble, bubble_tafel1), waits his 96
+  updates, walks to kit_sign2 and round again, his `mum_smeared` the
+  profile's look walk-by with the handler's tut_laugh1 message step a tick
+  before the fire (PCFireWait), his slip the profile's with FIRE4's list
+  (PCReactLead 0, the ready list's instants in PCSlipSeconds); the camera
+  follows him from `start` to the picture's clean and for the slip;
+  tutorial_3's director whistles the dog awake, the neighbour's alarm (the
+  profile's pet alarm) is followed by the GoTo to sign 1 and `target`,
+  then `start` closes lir/kit and sends him to kit_sign2 through anc — the
+  PC's path finder leaves out a link whose door is not present (fcn.004471a0,
+  the flag 0x20 test at 0x4472a7-0x4472cc), where the mobile's refuses the
+  shortest hops across a locked door outright (Level.find_path_open under
+  the Season 1 profile) — and his slip shows "Ha, ha!" 4 ticks after the
+  fire and an empty box 37 ticks after it (the fire's ready list: StopMsg,
+  the message, the fall, the empty message; the video 210.08 to 212.83,
+  the port 0.33 to 3.08 s after its fire). The levels' S1 walk data
+  (PCWalkRoom, PCWalkDoor, PCDoorTicks; tools/pcref/pc_walks_s1.py on the
+  Intro scenes) and Woody's points (PCWalkPoint: the flower, the chest, the
+  picture, the wardrobe) came with it. Against the video, tutorial_2's
+  neighbour from `start`: the doubletake +5.85 s (the PC's +6.0 by the
+  message box: 104.00 less its 16 ticks), tut_laugh1 +7.17 (+7.33), the
+  picture back +12.8 (+12.91), parked at sign 1 +16.38 (+16.5), off to
+  sign 2 +24.42 (+24.58). Open: the dog's alarm reaches him 12 ticks after
+  the bark starts on the PC (the neighbour's noise icon at 151.92, the
+  dog's bark from 150.92) where the profile's pet model has him hear the
+  bark as it starts (0.83 s after the whistle against the video's 2.0) —
+  the levels' pets share it; the level's end after its last trick (the
+  mobile's 2.5 s WinGameOnCompleteAllTricks; the PC's board 9.5 s after
+  tutorial_3's fire, its reaction list 5.8 s of it).
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and

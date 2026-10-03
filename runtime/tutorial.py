@@ -233,6 +233,10 @@ class Tutorial:
         if a is not None and a.get('UseAlternateDescriptionOnTrick'):
             self._alt[id(a)] = True
 
+    def pc_react_step(self, item, step):
+        """a PC reaction handler's step the PC tutorials show a message at
+        (TutorialPCS1): the mobile's LevelScript has none"""
+
     def on_rottweiler_action(self):
         """RoutineActionUse.OnUseEnded (RoutineActionUse.cs:405-407)"""
         a = self.current
@@ -314,33 +318,15 @@ class Tutorial:
                            idx_after=int(a.get('ActionIndexAfterForceAdvanceAction') or 0))
         self._alt[id(a)] = False
 
-    def _pc_descriptions(self):
-        """the overlay's PCDescriptions on the level's LevelScript (the
-        profile patches the level's objects, pcprofile.apply_overlay)"""
-        for o in self.level.objs.values():
-            if o.get('type') == 'LevelScript':
-                return (o.get('data') or {}).get('PCDescriptions') or {}
-        return {}
-
     def _rott_routine(self):
         rott = self.world.pawns.get('Rottweiler')
         return next((r for r in self.world.routines if r.pawn is rott), None)
 
     def get_description(self, a):
-        """GetDescription (cs:168-176): the mobile strings — under the PC
-        profile the PC's own director message (PCDescriptions, the PC
-        tutorial's strings.xml text for the action's PC-build key: tools/
-        pcref/pc_tutorial_s1.py), else the PC-build key's text"""
-        alt = self._alt.get(id(a))
-        import pcprofile
-        if pcprofile.is_pc():
-            key = a.get('AlternateDescription') if alt else a.get('Description')
-            pc = self._pc_descriptions().get(key or '')
-            if pc:
-                return pc
-            if key:
-                return self.loc(key).replace('\\n', '\n')
-        key = a.get('AlternateDescriptionMobile') if alt else a.get('DescriptionMobile')
+        """GetDescription (cs:168-176): the mobile strings (under the PC
+        profile the Intro scenes run the PC's tutorials, TutorialPCS1)"""
+        key = a.get('AlternateDescriptionMobile') \
+            if self._alt.get(id(a)) else a.get('DescriptionMobile')
         return self.loc(key or '').replace('\\n', '\n')
 
     # -- LevelScript.OnGUI (cs:85-146) -------------------------------------
@@ -2359,6 +2345,837 @@ class TutorialPC206(Tutorial):
                 self.director.draw(g)
 
 
+class TutorialPCS1(Tutorial):
+    """The PC's Season 1 tutorials, in place of the mobile's LevelScript and
+    camera scripts under the PC profile (docs/PC_FIDELITY.md "The Season 1
+    tutorials"). game.exe runs each tutorial level as a class of its own —
+    Level_Tutorial1 (vtable 0x4e2ec8: its run 0x45b600, its trigger handler
+    0x45b4a0), tutorial_2 and tutorial_3 as a director on the invisible HAL
+    (0x45a550 / 0x45a3d0 / 0x45a4d0, 0x459520 / 0x459370 / 0x4594a0: the
+    update, the handler, the filter) and a script on the neighbour (0x45acd0 /
+    0x45ae00, 0x459b10 / 0x459eb0 / 0x459a90). An update is a switch on the
+    state at +0xc, run once a level tick (12 a second) while the script's
+    job is its actor's front one; the director's states are the `_d<n>`
+    methods and the neighbour's the `_n<n>` ones, numbered as the PC's. A
+    director state that waits stores the next in +0x14 and goes to 13
+    (fcn.0045a380, which keeps the state it leaves in +0x10); the handler
+    moves it on when the behaviour it waits for arrives. The behaviours are
+    trigger.xml's (the trigger pass fcn.00472390, before the actors' pass:
+    a nearobj trigger fires as its condition turns true — the same room,
+    |dx| < 15 px, fcn.00471bc0 —, a room trigger on every tick it holds, a
+    `once` one is dropped after firing; the filter slot throws away what the
+    script does not wait for), the actions' `behavior` records (posted as the
+    action ends: tutorial_2's `take` and `marker`, tutorial_3's `take` and
+    `hide`) and the scripts' own messages (fcn.00424150 + fcn.004728d0),
+    delivered by the next tick's pass. The neighbour's GoTos are the mobile
+    routine's MoveOnly steps to the PC points (the manager frozen on
+    arrival: his script's wait), his reactions the Season 1 profile's
+    walk-by and slip (the items' PC data of tools/pcref/pc_tutorial_s1.py,
+    the handlers' message steps through pc_react_step). Data: PCTutorial on
+    the LevelScript (tools/pcref/pc_tutorial_s1.py)."""
+
+    TICK = 1.0 / 12.0
+
+    def __init__(self, d, W, H, loc, viewer, director, pc):
+        Tutorial.__init__(self, d, W, H, loc, viewer, director=director)
+        self.pc = pc
+        self.actions = []                 # no LevelScriptActions: current is None
+        self.text = None                  # the message box's text ('' an empty box)
+        self.msg = None
+        self.shown = []                   # the messages in the order shown
+        self.markers = set()              # the items under the marker arrow
+        self.signs = set()                # tutorial_1's signs shown
+        self.follow = False               # the camera on the neighbour (the level's slot 0x40)
+        self.state, self.prev, self.next = 0, 0, 0     # +0xc, +0x10, +0x14
+        self.count = 0                    # the opening count (+0x18 / +0x14)
+        self.nb_state, self.nb_prev = 0, 0
+        self.nb_count = 0
+        self.tick_n = 0
+        self._acc = 0.0
+        self.posts = []                   # [(tick, script, behaviour)]
+        self._near_in = set()             # the nearobj triggers standing true
+        self._goto_to = None              # the PC point of the GoTo under way
+        self._fired = set()               # the `once` triggers fired
+        self.items = {it.name: it for it in self.level.items.values()}
+        self.zones = {z.name: z for z in self.level.zones}
+        r = self.rott_routine
+        self.base = [dict(a) for a in r.actions] if r is not None else []
+        # the mobile arrows' offsets over the same objects (the LevelScript
+        # actions' AnimOffset) and its signs' places (Location + AnimOffset)
+        self.arrow_off = {}
+        self.sign_at = []
+        for a in d.get('Actions') or []:
+            off = a.get('AnimOffset') or {}
+            ref = self._pid(a.get('Item'))
+            it = self.level.items.get(ref) if ref is not None else None
+            if it is not None and (a.get('DrawArrow') or a.get('DrawArrowRight')):
+                self.arrow_off.setdefault(it.name, (off.get('x') or 0.0, off.get('y') or 0.0))
+            if a.get('DrawSign'):
+                loc = a.get('Location') or {}
+                self.sign_at.append(((loc.get('x') or 0.0) + (off.get('x') or 0.0),
+                                     (loc.get('y') or 0.0) + (off.get('y') or 0.0)))
+        self._setup()
+
+    # -- the level as the PC starts it ---------------------------------------
+    def _zone_of(self, room):
+        return next((z for z in self.level.zones
+                     if (getattr(z, 'pc_walk_room', None) or {}).get('room') == room), None)
+
+    def _point(self, rec):
+        """[x, y, room] of the PC -> (zone, mobile x): the room's path onto the
+        zone's walking span (Pawn._pc1_map the other way)"""
+        if not rec:
+            return None, 0.0
+        z = self._zone_of(rec[2])
+        if z is None:
+            return None, 0.0
+        r = z.pc_walk_room
+        w = float(r['x2'] - r['x1']) or 1.0
+        return z, z.play_left + (rec[0] - r['x1']) * (z.play_right - z.play_left) / w
+
+    def _place(self, pawn, rec):
+        """level.xml's placement: the pawn on the PC point, its next walk
+        leaving from it"""
+        z, x = self._point(rec)
+        if pawn is None or z is None:
+            return
+        pawn.sprite.x, pawn.sprite.y = x, pawn.floor_y(z)
+        pawn.zone = z
+        pawn.pos_snap = True
+        pawn.pc1_stand_at((rec[0], rec[1]))
+
+    def _setup(self):
+        start = self.pc.get('start') or {}
+        w = self.world
+        if w.woody is not None and start.get('woody'):
+            self._place(w.woody, start['woody'])
+            self.level.entrance_location = (w.woody.sprite.x, w.woody.sprite.y)
+        if self.rott is not None and start.get('neighbor'):
+            self._place(self.rott, start['neighbor'])
+        r = self.rott_routine
+        if r is not None:
+            r.frozen = True               # the script's idle state until its first behaviour
+            r.delay_start = 0.0
+
+    @property
+    def rott(self):
+        return self.world.pawns.get('Rottweiler')
+
+    @property
+    def rott_routine(self):
+        rott = self.rott
+        return next((r for r in self.world.routines if r.pawn is rott), None)
+
+    # -- the lifecycle -------------------------------------------------------
+    def activate(self):
+        if self.active:
+            return
+        self.active = True
+        if self.director is not None:
+            self.director.restart()
+
+    def tick(self, dt):
+        if not self.active:
+            return
+        if self.director is not None:
+            self.director.tick(dt)
+        self._acc += dt
+        while self._acc >= self.TICK - 1e-9:
+            self._acc -= self.TICK
+            self._level_tick()
+        if self.follow:
+            r = self.rott
+            if r is not None:
+                self.viewer.cam.x, self.viewer.cam.y = r.sprite.x, r.sprite.y
+                self.viewer._clamp_camera()
+
+    def _level_tick(self):
+        """one level tick: the trigger pass (the posts due, the triggers), then
+        the scripts' updates"""
+        self.tick_n += 1
+        due = [p for p in self.posts if p[0] <= self.tick_n]
+        self.posts = [p for p in self.posts if p[0] > self.tick_n]
+        for _t, who, name in due:
+            self._deliver(who, name)
+        for who, name in self._triggers():
+            self._deliver(who, name)
+        getattr(self, '_d%d' % self.state, lambda: None)()
+        if self._nb_idle():
+            if self._goto_to is not None:
+                # the GoTo's mover clamps him on the target (0x47cc9f-0x47cd59):
+                # his next walk leaves the PC point itself
+                self.rott.pc1_stand_at(self._goto_to)
+                self._goto_to = None
+            getattr(self, '_n%d' % self.nb_state, lambda: None)()
+
+    def _post(self, who, name):
+        """a message to a script (fcn.00424150 + fcn.004728d0), or an action's
+        behaviour record: the next tick's pass delivers it"""
+        self.posts.append((self.tick_n + 1, who, name))
+
+    def _deliver(self, who, name):
+        if who == 'HAL':
+            if self._d_accepts(name):
+                self._d_handle(name)
+        elif self._n_accepts(name):
+            self._n_handle(name)
+
+    def _d_accepts(self, name):
+        return True
+
+    def _n_accepts(self, name):
+        return True
+
+    def _d_handle(self, name):
+        pass
+
+    def _n_handle(self, name):
+        pass
+
+    def _go(self, state):
+        """fcn.0045a380: the state left kept in +0x10"""
+        self.prev, self.state = self.state, state
+
+    def _nb_go(self, state):
+        """fcn.004706a0 (new, the one to keep)"""
+        self.nb_prev, self.nb_state = self.nb_state, state
+
+    def _nb_idle(self):
+        """the neighbour's script job is his front one: the routine parked on
+        the script's wait, no reaction or run on top"""
+        r = self.rott_routine
+        return r is not None and r.frozen and r.state == r.IDLE and r.urgent_item is None \
+            and r._urgent_action is None
+
+    # -- the triggers (the trigger pass, fcn.00472390) ------------------------
+    def _triggers(self):
+        return []
+
+    def _room(self, pawn):
+        """the PC room of the pawn's zone: its PCWalkRoom, else the room whose
+        door the zone holds (the porch, `fro`: PCTutorial doors) — the door
+        step puts the actor in the far room as the pass starts (game.exe
+        0x474590), the port's zone changes with the leave clip"""
+        z = pawn.zone if pawn is not None else None
+        if z is None:
+            return None
+        r = getattr(z, 'pc_walk_room', None)
+        if r is not None:
+            return r['room']
+        for name, rec in (self.pc.get('doors') or {}).items():
+            if rec[1] == z.name:
+                return name.split('/')[0]
+        return None
+
+    def _pc_at(self, pawn):
+        """(room, x, y) of the PC point the pawn stands at (Pawn._pc1_here), or
+        None off the mapped rooms"""
+        room = self._room(pawn)
+        p = pawn._pc1_here() if room is not None else None
+        if p is None:
+            return None
+        return room, p[0], p[1]
+
+    def _near(self, key, pawn, rec):
+        """a nearobj trigger (fcn.00471bc0: the same room, |dx| < 15 px) as its
+        condition turns true; once again only after it went false"""
+        at = self._pc_at(pawn)
+        inside = at is not None and rec is not None and at[0] == rec[2] \
+            and abs(at[1] - rec[0]) < 15
+        was = key in self._near_in
+        if inside:
+            self._near_in.add(key)
+        else:
+            self._near_in.discard(key)
+        return inside and not was
+
+    def _in_room(self, pawn, room):
+        return self._room(pawn) == room
+
+    def _once(self, key, cond):
+        if key in self._fired or not cond:
+            return False
+        self._fired.add(key)
+        return True
+
+    # -- the world's signals ---------------------------------------------------
+    def on_item_used(self, item):
+        """the actions' behaviour records, posted as Woody's action ends"""
+        name = self._use_behaviours().get(item.name)
+        if name:
+            self._post('HAL', name)
+
+    def _use_behaviours(self):
+        return {}
+
+    def on_item_lookat(self, item):
+        pass
+
+    def on_woody_door_entered(self, door):
+        pass
+
+    def on_woody_zone_entered(self, zone_pid):
+        pass
+
+    # -- the director's elements ---------------------------------------------
+    def _msg(self, name):
+        """fcn.0047b150: the message box shows the text of the name ('' an
+        empty box: the closing message step's empty string; None closes it)"""
+        self.msg = name
+        if name is None:
+            self.text = None
+            return
+        self.text = (self.pc.get('texts') or {}).get(name, '') if name else ''
+        if name:
+            self.shown.append(name)
+            if self.director is not None:
+                self.director.animating = True
+                self.director.restart()
+
+    def _marker(self, obj, on):
+        """fcn.00438760: the marker arrow over the object, or none"""
+        it = self.items.get((self.pc.get('markers') or {}).get(obj))
+        if it is None:
+            return
+        if on:
+            self.markers.add(it.name)
+        else:
+            self.markers.discard(it.name)
+
+    def _show(self, obj):
+        """the closed container's dummy hidden, the container shown
+        (fcn.00438c80, fcn.0043ab40): Woody may open the mobile's item"""
+        it = self.items.get((self.pc.get('markers') or {}).get(obj))
+        if it is not None:
+            it.locked = False
+
+    def _door(self, name):
+        rec = (self.pc.get('doors') or {}).get(name)
+        if not rec:
+            return None
+        z = self.zones.get(rec[1])
+        return next((dd for dd in self.level.doors
+                     if dd.name == rec[0] and z is not None and dd.zone == z.pid), None)
+
+    def _open(self, *names):
+        """a door's closed dummy hidden and the door shown (fcn.00438c80,
+        fcn.0043ab40): the mobile door unlocked"""
+        for n in names:
+            d = self._door(n)
+            if d is not None:
+                self.world.unlock_door(d)
+
+    def _close(self, *names):
+        """the door hidden and its closed dummy shown: the mobile door locked"""
+        for n in names:
+            d = self._door(n)
+            if d is not None:
+                d.locked = True
+
+    def _camera(self, neighbour):
+        """the level's slot 0x40 (name, 1): the camera on the neighbour, or back
+        on Woody"""
+        self.follow = neighbour
+        if not neighbour:
+            self._snap_woody()
+
+    def _snap_woody(self):
+        if self.world.snap_camera is not None:
+            self.world.snap_camera()
+
+    def _stop_woody_walk(self):
+        """the trigger handler's stop (0x45b54a-0x45b5a7): a walking Woody gets a
+        GoTo to where he stands in place of his jobs"""
+        w = self.world.woody
+        if w is not None and w.state in w.MOVING:
+            self._stop_woody()
+
+    # -- the neighbour's GoTo -------------------------------------------------
+    def _goto(self, point, start=True):
+        """fcn.00479da0 GoTo(point): the routine's MoveOnly step to the PC point
+        (the manager parked on arrival: the script's next update runs there);
+        its bubble is the step's zone's (the tutorial zones' bubble_tafel1 /
+        bubble_tafel2: the PC's icons sign1 / sign2, objects.xml's <icon>)"""
+        rec = (self.pc.get('points') or {}).get(point)
+        z, x = self._point(rec)
+        r = self.rott_routine
+        if r is None or z is None:
+            return
+        self._goto_to = (rec[0], rec[1])
+        a = dict(self.base[0]) if self.base else _blank_move_action(z.pid)
+        a.update({'move_only': True, 'move_x': x, 'move_zone': z.pid, 'item': None,
+                  'freeze_after_completion': True, 'doors_to_unlock': [], 'items_to_unlock': []})
+        r.actions = [a]
+        r.index = 0
+        if start:
+            r.unfreeze(start_next=True)
+
+    # -- the drawing -------------------------------------------------------------
+    @property
+    def current(self):
+        return None
+
+    def draw(self, g, dt, menu_open=False):
+        if menu_open:
+            return
+        cam = self.viewer.cam
+        if self.arrow:
+            s = self.H * 64 // 768
+            self.arrow_anim.update(dt)
+            for name in sorted(self.markers):
+                it = self.items.get(name)
+                if it is None:
+                    continue
+                ox, oy = self.arrow_off.get(name, (0.0, 0.0))
+                sx, sy = cam.world_to_screen(it.x + ox, it.y + oy, self.W, self.H)
+                g.tex(self.arrow[self.arrow_anim.frame], (sx, sy, s, s))
+        if self.sign and self.signs:
+            w = self.W * 128 // 1024
+            h = self.H * 64 // 768
+            self.sign_anim.update(dt)
+            for name in sorted(self.signs):
+                at = self._sign_place(name)
+                if at is None:
+                    continue
+                sx, sy = cam.world_to_screen(at[0], at[1], self.W, self.H)
+                g.tex(self.sign[self.sign_anim.frame], (sx, sy, w, h))
+        if self.text is not None:
+            g.tex(self.message_background, self.message_rect)
+            if self.text:
+                g.label(self.description_rect, self.text, self.message_style, self.font)
+            if self.director is not None:
+                self.director.draw(g)
+
+    def _sign_place(self, name):
+        """the mobile's sign drawn for a PC sign: the LevelScript's DrawSign
+        place nearest the sign's `woody` hotspot, in its zone"""
+        rec = (self.pc.get('signs') or {}).get(name)
+        z, x = self._point(rec)
+        if z is None or not self.sign_at:
+            return None
+        cands = [p for p in self.sign_at if z.play_left - 0.5 <= p[0] <= z.play_right + 0.5
+                 and abs(p[1] - z.y) < 1.5] or self.sign_at
+        return min(cands, key=lambda p: abs(p[0] - x))
+
+
+class TutorialPC101(TutorialPCS1):
+    """Level_Tutorial1 (game.exe 0x45b600, the handler 0x45b4a0): the signs
+    in kit, lir and anc and the doors between them, one `target` trigger each
+    (trigger.xml: the signs' nearobj ones and the rooms', all `once`, all to
+    HAL); a trigger moves the run to the state stored in +0x10 and — the
+    byte +0x18 set — stops a walking Woody; the exit's state scores the
+    level's `trick` (100) and the level ends"""
+
+    ORDER = (('near', 'kit/sign'), ('room', 'lir'), ('near', 'lir/sign'),
+             ('room', 'anc'), ('near', 'anc/sign'), ('room', 'fro'))
+
+    def __init__(self, *a, **k):
+        self.armed = False
+        TutorialPCS1.__init__(self, *a, **k)
+
+    def _triggers(self):
+        out = []
+        signs = self.pc.get('signs') or {}
+        w = self.world.woody
+        for kind, what in self.ORDER:
+            key = (kind, what)
+            cond = self._near(key, w, signs.get(what)) if kind == 'near' \
+                else self._in_room(w, what)
+            if self._once(key, cond):
+                out.append(('HAL', 'target'))
+        return out
+
+    def _d_handle(self, name):
+        if name != 'target':
+            return
+        if self.armed:
+            self._stop_woody_walk()
+        self.state = self.prev            # fcn.0045b460([+0x10])
+
+    def _wait(self, nxt, armed=True):
+        self.prev = nxt                   # +0x10: the state the trigger goes on to
+        self.armed = armed                # +0x18
+        self.state = 9
+
+    def _d0(self):
+        self.count = self.pc.get('lead') or 0
+        self.state = 1
+
+    def _d1(self):
+        if self.count > 0:
+            self.count -= 1
+        else:
+            self.state = 2
+
+    def _d2(self):
+        self.signs.add('kit/sign')
+        self._msg('tut_target1')
+        self._wait(3)
+
+    def _d3(self):
+        self.signs.discard('kit/sign')
+        self._open('lir/kit', 'kit/lir')
+        self._msg('tut_door')
+        self._wait(4)
+
+    def _d4(self):
+        self.signs.add('lir/sign')
+        self._msg('tut_target2')
+        self._wait(5)
+
+    def _d5(self):
+        self.signs.discard('lir/sign')
+        self._open('lir/anc', 'anc/lir')
+        self.signs.add('anc/sign')
+        self._msg('tut_target3')
+        self._wait(6, armed=False)
+
+    def _d6(self):
+        self._wait(7)
+
+    def _d7(self):
+        self.signs.discard('anc/sign')
+        self._open('fro/anc', 'anc/fro')
+        self._msg('tut_exit')
+        self._wait(8)
+
+    def _d8(self):
+        # the box closed, the `trick` scored (fcn.00443920, fcn.00438070 with
+        # its quota 100) and the StopMsg's end check (fcn.0047bc90): the
+        # mobile's ForceWinGame, a 100 rating
+        self._msg(None)
+        self.state = 10
+        self.world.game.force_win()
+
+
+class TutorialPC102(TutorialPCS1):
+    """tutorial_2: the director (0x45a550; the handler 0x45a3d0, the filter
+    0x45a4d0) and the neighbour's script (0x45acd0; the handler 0x45ae00).
+    The director: the plant's marker and look (isActorAtObject), the chest
+    shown and its `take`, the doors to lir and the picture's `marker`, Woody
+    back in anc — the neighbour started (`start`), the camera on him, lir/kit
+    opened — the picture back (isObjectPresent lir/mum: his repair), anc/kit
+    opened and the camera back, the marbles near Woody, Woody in anc again —
+    the camera on the neighbour for the slip. The neighbour: sign1's icon and
+    the GoTo to lir_sign1, 96 updates there, sign2's icon and the GoTo to
+    kit_sign2, round again; his `mum_smeared` reaction (the walk-by's
+    doubletake, the tut_laugh1 message step, the fire, the clean) and his
+    `marbles` slip are the profile's walk-by and slip on the mobile items"""
+
+    def _use_behaviours(self):
+        return {'Drawer': 'take', 'MumPicture': 'marker'}
+
+    def _triggers(self):
+        out = []
+        w = self.world.woody
+        if self._in_room(w, 'anc'):
+            out.append(('HAL', 'anc'))    # anc/ark `room` `always`
+        g = self.items.get('Ground')
+        if g is not None and g.tricked and w is not None:
+            # kit/marbles `nearobj` `once` for woody: the marbles Woody laid
+            # (the object's `woody` hotspot 0/0, where he stood)
+            z = self.level.zone_by_pid(g.zone)
+            at = w._pc1_map(z, g.x, w.floor_y(z)) if z is not None else None
+            rec = [at[0], at[1], z.pc_walk_room['room']] if at is not None else None
+            if self._once('marbles', self._near('marbles', w, rec)):
+                out.append(('HAL', 'marbles'))
+        return out
+
+    def _d_accepts(self, name):
+        return name != 'anc' or self.prev in (6, 10)
+
+    def _d_handle(self, name):
+        if self.state == 13 and ((name == 'take' and self.prev == 4)
+                                 or (name == 'marker' and self.prev == 5)
+                                 or (name == 'anc' and self.prev in (6, 10))
+                                 or (name == 'marbles' and self.prev == 9)):
+            self._go(self.next)
+
+    def _wait(self, nxt):
+        self.next = nxt
+        self._go(13)
+
+    def _d0(self):
+        self.count = self.pc.get('lead') or 0
+        self._go(1)
+
+    def _d1(self):
+        if self.count > 0:
+            self.count -= 1
+        else:
+            self._go(2)
+
+    def _d2(self):
+        self._marker('anc/flower', True)
+        self._msg('tut_lookat_plant')
+        self._go(3)
+
+    def _d3(self):
+        # isActorAtObject(woody, anc/flower): at its `woody` hotspot
+        rec = (self.pc.get('at') or {}).get('anc/flower')
+        at = self._pc_at(self.world.woody)
+        if at is not None and rec is not None and at[0] == rec[2] \
+                and (at[1], at[2]) == (rec[0], rec[1]):
+            self._go(4)
+
+    def _d4(self):
+        self._marker('anc/flower', False)
+        self._show('anc/ark')
+        self._marker('anc/ark', True)
+        self._msg('tut_take_objects')
+        self._wait(5)
+
+    def _d5(self):
+        self._marker('anc/ark', False)
+        self._open('lir/anc', 'anc/lir')
+        self._marker('lir/mum', True)
+        self._msg('tut_use_marker')
+        self._wait(6)
+
+    def _d6(self):
+        self._marker('lir/mum', False)
+        self._msg('tut_hallway1')
+        self._wait(7)
+
+    def _d7(self):
+        self._camera(True)
+        self._open('lir/kit', 'kit/lir')
+        self._post('neighbor', 'start')
+        self._msg('tut_watch2')
+        self._go(8)
+
+    def _d8(self):
+        # isObjectPresent(lir/mum): the picture switched back by his clean
+        mum = self.items.get('MumPicture')
+        if mum is not None and not mum.tricked:
+            self._go(9)
+
+    def _d9(self):
+        self._camera(False)
+        self._open('anc/kit', 'kit/anc')
+        self._wait(10)
+
+    def _d10(self):
+        self._msg('tut_hallway2')
+        self._wait(11)
+
+    def _d11(self):
+        self._camera(True)
+        self._msg('tut_watch3')
+        self._go(12)
+
+    # -- the neighbour ---------------------------------------------------------
+    def _n_handle(self, name):
+        if name == 'start':
+            self._nb_go(2)
+
+    def _n2(self):
+        # the icon sign1 (the move's zone bubble) and the GoTo; the count
+        self._goto('lir_sign1')
+        self.nb_count = self.pc.get('wait') or 0
+        self._nb_go(3)
+
+    def _n3(self):
+        if self.nb_count > 0:
+            self.nb_count -= 1
+        else:
+            self._nb_go(4)
+
+    def _n4(self):
+        self._goto('kit_sign2')
+        self._nb_go(5)
+
+    def _n5(self):
+        self._nb_go(2)
+
+    def pc_react_step(self, item, step):
+        """the `mum_smeared` list's tut_laugh1 message step (fcn.00459db0 under
+        fcn.0047c640), the tick before its fire"""
+        if step == 'fire_wait' and item.name == 'MumPicture':
+            self._msg('tut_laugh1')
+
+
+class TutorialPC103(TutorialPCS1):
+    """tutorial_3: the director (0x459520; the handler 0x459370, the filter
+    0x4594a0) and the neighbour's script (0x459b10; the handler 0x459eb0,
+    the filter 0x459a90). The director: the introduction and the dog's
+    `whistle` (it wakes: the pet class's state 3), the neighbour's `target`
+    from sign 1, the camera to Woody, the chest shown and its `take`, anc/kit
+    opened and the marbles near Woody, Woody in anc, his `hide` in the
+    wardrobe, the neighbour in lir — lir/anc opened, lir/kit closed, the
+    neighbour started, the camera on him. The neighbour: the dog's `alarm`
+    (the noise icon, the run to kit and the alarm's list fcn.0047a690: the
+    profile's pet alarm; the camera on him for the first one), then sign1's
+    icon and the GoTo to lir_sign1 and `target` to the director; `start`:
+    sign2's icon and the GoTo to kit_sign2 (through anc: lir/kit is closed);
+    the `marbles` slip is the profile's, its list's tut_laugh message steps
+    timed from the fire"""
+
+    def __init__(self, *a, **k):
+        self.alarmed = False              # the neighbour's +0x15: the camera once
+        self.in_alarm = False
+        TutorialPCS1.__init__(self, *a, **k)
+        fsm = self._dog_fsm()
+        if fsm is not None:
+            fsm.start_timer = 0.0         # the dog wakes on the director's whistle
+        # his script's state 5 after an alarm: the GoTo to sign 1 (the
+        # routine resumes it as the alarm's run ends)
+        self._goto('lir_sign1', start=False)
+
+    def _dog_fsm(self):
+        dog = self.items.get('Dog')
+        return next((f for f in self.world.alerters.values() if f.item is dog), None) \
+            if dog is not None else None
+
+    def _use_behaviours(self):
+        return {'Drawer': 'take', 'Wardrobe': 'hide'}
+
+    def _triggers(self):
+        out = []
+        w = self.world.woody
+        if self._in_room(w, 'anc'):
+            out.append(('HAL', 'anc'))
+        g = self.items.get('Ground')
+        if g is not None and g.tricked and w is not None:
+            z = self.level.zone_by_pid(g.zone)
+            at = w._pc1_map(z, g.x, w.floor_y(z)) if z is not None else None
+            rec = [at[0], at[1], z.pc_walk_room['room']] if at is not None else None
+            if self._once('marbles', self._near('marbles', w, rec)):
+                out.append(('HAL', 'marbles'))
+        return out
+
+    def _d_accepts(self, name):
+        return name != 'anc' or self.prev == 7
+
+    def _d_handle(self, name):
+        if name == 'target' and self.state == 3:
+            self._go(4)
+        elif self.state == 13 and ((name == 'take' and self.prev == 5)
+                                   or (name == 'marbles' and self.prev == 6)
+                                   or (name == 'anc' and self.prev == 7)
+                                   or (name == 'hide' and self.prev == 8)):
+            self._go(self.next)
+
+    def _wait(self, nxt):
+        self.next = nxt
+        self._go(13)
+
+    def _d0(self):
+        self.count = self.pc.get('lead') or 0
+        self._go(1)
+
+    def _d1(self):
+        if self.count > 0:
+            self.count -= 1
+        else:
+            self._go(2)
+
+    def _d2(self):
+        self._msg('introduction')
+        # `whistle` to the dog: the pet class wakes it (0x45be33: state 3)
+        self._post('dog', 'whistle')
+        self._go(3)
+
+    def _d4(self):
+        self._snap_woody()                # fcn.0047b250(woody)
+        self._go(5)
+
+    def _d5(self):
+        self._show('anc/ark')
+        self._msg('tut_take_marbles')
+        self._wait(6)
+
+    def _d6(self):
+        self._open('anc/kit', 'kit/anc')
+        self._msg('tut_put_marbles')
+        self._wait(7)
+
+    def _d7(self):
+        self._msg('tut_hiding')
+        self._wait(8)
+
+    def _d8(self):
+        self._msg('tut_hiding2')
+        self._wait(9)
+
+    def _d9(self):
+        if self._in_room(self.rott, 'lir'):
+            self._go(10)
+
+    def _d10(self):
+        self._camera(True)
+        self._open('lir/anc', 'anc/lir')
+        self._close('lir/kit', 'kit/lir')
+        self._post('neighbor', 'start')
+        self._msg('tut_watch')
+        self._go(12)
+
+    def _deliver(self, who, name):
+        if who == 'dog':
+            fsm = self._dog_fsm()
+            if fsm is not None and not fsm.awake:
+                fsm.triggered_by_woody = False
+                fsm.on_notice_woody()
+            return
+        TutorialPCS1._deliver(self, who, name)
+
+    # -- the neighbour ---------------------------------------------------------
+    def _n_handle(self, name):
+        if name == 'start':
+            self._nb_go(7)
+
+    def _nb_idle(self):
+        return TutorialPCS1._nb_idle(self) and not self.in_alarm
+
+    def _level_tick(self):
+        self._alarm_watch()
+        TutorialPCS1._level_tick(self)
+
+    def _alarm_watch(self):
+        """the dog's `alarm` (the filter: none while states 2-4 run): the
+        profile's pet alarm runs it — the noise icon, the run, the search, the
+        dog's shout — on the mobile routine; its end is state 4 (the camera
+        back after the first), then state 5"""
+        r = self.rott_routine
+        dog = self.items.get('Dog')
+        if r is None or dog is None:
+            return
+        busy = r.urgent_item is dog
+        if busy and not self.in_alarm:
+            self.in_alarm = True
+            self._nb_go(2)
+            if not self.alarmed:
+                self._camera(True)        # state 2: the first alarm's camera
+        elif not busy and self.in_alarm:
+            self.in_alarm = False
+            if not self.alarmed:
+                self.alarmed = True
+                self._camera(False)       # state 4
+            # state 5: the icon sign1 and the GoTo to lir_sign1, then 6
+            self._goto('lir_sign1')
+            self._nb_go(6)
+
+    def _n6(self):
+        self._post('HAL', 'target')
+        self._nb_go(1)
+
+    def _n7(self):
+        self._goto('kit_sign2')
+        self._nb_go(8)
+
+    def pc_react_step(self, item, step):
+        """the `marbles` list's message steps (0x459ffb, 0x45a12b): the fire's
+        ready list — its StopMsg, tut_laugh, the fall, the empty message —
+        four ticks after the fire and after the fall (tools/pcref/
+        pc_tutorial_s1.py SLIP_LEAD, SLIP_TAIL)"""
+        if step != 'fire' or item.name != 'Ground':
+            return
+        w = self.world
+        t = 1.0 / 12.0
+        w.call_later(4 * t, lambda: self._msg('tut_laugh'))
+        w.call_later((4 + 32 + 1) * t, lambda: self._msg(''))
+
+
 CAMERA_CLASSES = {'TutorialScriptCamera': TutorialCamera102,
                   'TutorialScriptCameraIntro3': TutorialCamera103,
                   'TutorialScriptCameraNFH2': TutorialCameraNFH2,
@@ -2378,6 +3195,13 @@ def build(scene_data, W, H, loc, viewer):
         if dgo == go:
             director = DirectorFaces(dd, W, H)
             break
+    s1 = _pc_tutorial_s1(viewer)
+    if s1 is not None:
+        # the PC profile's Intro scenes: the PC's tutorial classes replace
+        # the LevelScript and the camera script (TutorialPC101-103)
+        cls = {'tutorial_1': TutorialPC101, 'tutorial_2': TutorialPC102,
+               'tutorial_3': TutorialPC103}[s1['folder']]
+        return cls(d, W, H, loc, viewer, director, s1), None
     kind, pc = _pc_tutorial(viewer)
     if pc is not None:
         # the PC profile's 201 and 206: the PC's own tutorial replaces the
@@ -2395,6 +3219,19 @@ def build(scene_data, W, H, loc, viewer):
             tut.camera_script = cam
             break
     return tut, cam
+
+
+def _pc_tutorial_s1(viewer):
+    """the overlay's PCTutorial on the level's LevelScript (the Intro scenes,
+    tools/pcref/pc_tutorial_s1.py; pcprofile.apply_overlay patches the
+    level's objects) under the PC profile, else None"""
+    import pcprofile
+    if not pcprofile.is_pc():
+        return None
+    for o in viewer.level.objs.values():
+        if o.get('type') == 'LevelScript':
+            return (o.get('data') or {}).get('PCTutorial')
+    return None
 
 
 def _pc_tutorial(viewer):

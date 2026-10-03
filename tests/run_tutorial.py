@@ -76,19 +76,23 @@ def teleport(app, x, y, zone_pid):
         wd.zone = z
 
 
+def settle(app, secs=20.0):
+    """Woody standing, out of any door pass"""
+    wd = app.viewer.woody
+    return wait(app, lambda: wd.state == wd.IDLE and not wd.is_warping, secs)
+
+
 def main():
+    # -- the Intro scenes' LevelScripts (the mobile's: the PC profile runs
+    # the PC's own tutorials, checked below) -------------------------------
+    profile = os.environ.get('NFH_PROFILE')
+    os.environ['NFH_PROFILE'] = 'mobile'
     # -- Intro101: the full walkthrough (location + door signals) --------
     app = start('Intro101')
     w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
                    app.viewer.level)
     check('101: the tutorial activates after the cards',
           t is not None and t.active and t.action_index == 0)
-    if os.environ.get('NFH_PROFILE', 'pc') != 'mobile':
-        # the PC profile's director says the PC's tutorial_1 message
-        # (tools/pcref/pc_tutorial_s1.py)
-        check('101: the PC director text (tut_target1)',
-              t.get_description(t.current).startswith(
-                  "Welcome to the 'Neighbours from Hell' show. I'm Joe, the director of the show."))
     check('101: the world clock started', wait(app, lambda: w.time > 0.1, 2))
     w.woody_click(3.7, 0.3, None, None)
     check('101: the location signal (x threshold)',
@@ -185,10 +189,157 @@ def main():
           and not r.frozen)
     check('103: the slip pays the level',
           wait(app, lambda: w.game.won, 90))
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
+
+    # -- the Intro scenes under the PC profile: game.exe's tutorial classes
+    os.environ['NFH_PROFILE'] = 'pc'
+    app = start('Intro101')
+    w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
+                   app.viewer.level)
+    check('pc 101: Level_Tutorial1 binds, no camera script',
+          type(t).__name__ == 'TutorialPC101' and app.tutorial_camera is None)
+    check('pc 101: the director speaks on tick 15 (12 ticks counted)',
+          wait(app, lambda: t.msg == 'tut_target1', 3) and t.tick_n == 15
+          and t.text.startswith("Welcome to the 'Neighbours from Hell' show."))
+    signs = t.pc['signs']
+    z, x = t._point(signs['kit/sign'])
+    w.woody_click(x - 0.5, wd.sprite.y, None, None)
+    check('pc 101: the kit sign\'s nearobj stops Woody at it',
+          wait(app, lambda: t.msg == 'tut_door', 10) and settle(app)
+          and abs(t._pc_at(wd)[1] - signs['kit/sign'][0]) < 15)
+    check('pc 101: lir/kit opened', not L.door_by_pid(128).locked)
+    click_door(app, 128)
+    check('pc 101: the room trigger as the pass starts: tut_target2',
+          wait(app, lambda: t.msg == 'tut_target2', 15) and wd.zone.name == 'Zone02')
+    settle(app)
+    z, x = t._point(signs['lir/sign'])
+    w.woody_click(x, wd.sprite.y, None, None)
+    check('pc 101: the lir sign opens lir/anc: tut_target3',
+          wait(app, lambda: t.msg == 'tut_target3', 15)
+          and not L.door_by_pid(144).locked and 'anc/sign' in t.signs)
+    settle(app)
+    click_door(app, 144)
+    check('pc 101: into anc (no stop on that trigger)',
+          wait(app, lambda: t.state == 9 and t.prev == 7, 20))
+    settle(app)
+    z, x = t._point(signs['anc/sign'])
+    w.woody_click(x, wd.sprite.y, None, None)
+    check('pc 101: the anc sign opens the front door: tut_exit',
+          wait(app, lambda: t.msg == 'tut_exit', 20) and not L.door_by_pid(130).locked)
+    settle(app)
+    click_door(app, 130)
+    check('pc 101: the porch scores the trick (100) and ends the level',
+          wait(app, lambda: w.game.ending, 20) and w.game.won
+          and w.game.final_viewer_rating == 100)
+
+    app = start('Intro102')
+    w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
+                   app.viewer.level)
+    items = {it.name: it for it in L.items.values()}
+    rott = w.pawns['Rottweiler']
+    r = t.rott_routine
+    check('pc 102: the tutorial_2 classes bind, the neighbour at kit 500/420',
+          type(t).__name__ == 'TutorialPC102' and app.tutorial_camera is None
+          and rott.zone.name == 'Zone03' and r.frozen)
+    check('pc 102: tick 15: the plant\'s marker, tut_lookat_plant',
+          wait(app, lambda: t.msg == 'tut_lookat_plant', 3)
+          and 'PlantStink' in t.markers)
+    plant = items['PlantStink']
+    w.woody_click(plant.x, plant.y, plant, None)
+    check('pc 102: Woody at the flower: the chest shown, tut_take_objects',
+          wait(app, lambda: t.msg == 'tut_take_objects', 15)
+          and not items['Drawer'].locked and 'Drawer' in t.markers)
+    settle(app)
+    drawer = items['Drawer']
+    w.woody_click(drawer.x, drawer.y, drawer, None)
+    check('pc 102: `take`: the doors to lir, the picture\'s marker',
+          wait(app, lambda: t.msg == 'tut_use_marker', 15)
+          and not L.door_by_pid(217).locked and 'MumPicture' in t.markers)
+    settle(app)
+    use_with(app, items['MumPicture'], 'IT_Marker')
+    check('pc 102: `marker`: tut_hallway1',
+          wait(app, lambda: t.msg == 'tut_hallway1', 30))
+    settle(app)
+    click_door(app, 217)
+    check('pc 102: Woody in anc: `start`, the camera on him, tut_watch2',
+          wait(app, lambda: t.msg == 'tut_watch2', 30) and t.follow
+          and wait(app, lambda: not r.frozen, 1))
+    check('pc 102: the doubletake, then tut_laugh1 before the fire',
+          wait(app, lambda: t.msg == 'tut_laugh1', 40) and not w.pay_log)
+    check('pc 102: the picture cleaned: anc/kit opened, the camera back',
+          wait(app, lambda: t.state == 13 and t.prev == 9, 30)
+          and not t.follow and not L.door_by_pid(220).locked
+          and w.pay_log and w.pay_log[0][1:3] == ('MumPicture', 50))
+    check('pc 102: parked at sign 1 (its neighbor hotspot)',
+          wait(app, lambda: t.nb_state == 3 and r.frozen, 30)
+          and wait(app, lambda: t._goto_to is None, 1)
+          and t._pc_at(rott)[1:] == tuple(t.pc['points']['lir_sign1'][:2]),
+          str(t._pc_at(rott)))
+    t0 = w.time
+    check('pc 102: 96 updates there, then off to sign 2',
+          wait(app, lambda: t.nb_state == 5, 15)
+          and 7.9 < w.time - t0 < 8.3)
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
+
+    os.environ['NFH_PROFILE'] = 'pc'
+    app = start('Intro103')
+    w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
+                   app.viewer.level)
+    items = {it.name: it for it in L.items.values()}
+    rott = w.pawns['Rottweiler']
+    r = t.rott_routine
+    check('pc 103: the tutorial_3 classes bind, the neighbour in lir',
+          type(t).__name__ == 'TutorialPC103' and rott.zone.name == 'Zone02')
+    check('pc 103: tick 15: the introduction and the dog\'s whistle',
+          wait(app, lambda: t.msg == 'introduction', 3)
+          and wait(app, lambda: t._dog_fsm().awake, 1))
+    check('pc 103: the alarm runs him, the camera on him',
+          wait(app, lambda: t.in_alarm, 5) and t.follow)
+    check('pc 103: after it sign 1 and `target`: the chest, tut_take_marbles',
+          wait(app, lambda: t.msg == 'tut_take_marbles', 40)
+          and not t.follow and not items['Drawer'].locked)
+    settle(app)
+    drawer = items['Drawer']
+    w.woody_click(drawer.x, drawer.y, drawer, None)
+    check('pc 103: `take`: anc/kit opened, tut_put_marbles',
+          wait(app, lambda: t.msg == 'tut_put_marbles', 15)
+          and not L.door_by_pid(219).locked)
+    settle(app)
+    click_door(app, 219)
+    wait(app, lambda: wd.zone.name == 'Zone03', 20)
+    settle(app)
+    wd.sneaking = True
+    use_with(app, items['Ground'], 'IT_Marbles')
+    check('pc 103: the marbles near Woody: tut_hiding',
+          wait(app, lambda: t.msg == 'tut_hiding', 20))
+    settle(app)
+    click_door(app, 148)
+    check('pc 103: Woody in anc: tut_hiding2',
+          wait(app, lambda: t.msg == 'tut_hiding2', 20))
+    settle(app)
+    wardrobe = items['Wardrobe']
+    w.woody_click(wardrobe.x, wardrobe.y, wardrobe, None)
+    check('pc 103: `hide`: lir/kit closed, `start`, tut_watch',
+          wait(app, lambda: t.msg == 'tut_watch', 20)
+          and L.door_by_pid(208).locked and t.follow)
+    check('pc 103: round lir/kit through anc',
+          wait(app, lambda: rott.zone.name == 'Zone01', 30))
+    check('pc 103: the slip pays the level, Ha, ha! after the fire',
+          wait(app, lambda: w.game.won, 60)
+          and wait(app, lambda: t.msg == 'tut_laugh', 1))
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
 
     # -- Level201: the NFH2 camera's opening (the mobile's tutorial: the
     # PC profile runs the PC's own, checked below) ------------------------
-    profile = os.environ.get('NFH_PROFILE')
     os.environ['NFH_PROFILE'] = 'mobile'
     app = start('Level201')
     w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,

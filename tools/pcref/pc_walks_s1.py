@@ -248,9 +248,15 @@ def woody_targets(n):
     return out
 
 
+def scene_name(n):
+    """the mobile scene of a level number, or an Intro scene's own name (the
+    tutorials, canon.TUTORIALS)"""
+    return n if isinstance(n, str) else 'Level%d' % n
+
+
 def level_data(n):
     from runtime.scene import Level
-    M = Level(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n))
+    M = Level(os.path.join(ROOT, 'levels', 's1', scene_name(n) + '.json'))
     L = lap_model.Level(n)
     R = pc_rooms(n)
     zmap = zone_map(M, R, L)
@@ -294,6 +300,10 @@ def level_data(n):
         if entry:
             doors[(d.name, zname.get(d.zone))] = entry
     points = {}
+    if isinstance(n, str):
+        # a tutorial: its scripts' walks are the tutorial's own (tools/pcref/
+        # pc_tutorial_s1.py), no lap stations
+        return zmap, rooms, doors, points, own, {}
     for item, objs in station_targets(n).items():
         pts = [list(L.object_point(o)[1:]) + [L.object_point(o)[0]] for o in objs if L.object_point(o)]
         if not pts:
@@ -325,7 +335,7 @@ def item_kind_hide(n, name):
 
 
 def write(n, rooms, doors, points, own, vias):
-    p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
+    p = os.path.join(ROOT, 'levels', 'pc', scene_name(n) + '.overlay.json')
     ov = json.load(open(p))
     keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia')
     for e in ov['patches']:
@@ -360,10 +370,11 @@ def write(n, rooms, doors, points, own, vias):
 
 def main(argv):
     do_write = '--write' in argv
-    levels = [int(a) for a in argv[1:] if a.isdigit()] or list(range(101, 115))
+    levels = [int(a) if a.isdigit() else a for a in argv[1:]
+              if a.isdigit() or a in canon.TUTORIALS] or list(range(101, 115))
     for n in levels:
         zmap, rooms, doors, points, own, vias = level_data(n)
-        print('%d: rooms %s' % (n, ' '.join('%s=%s' % kv for kv in sorted(zmap.items()))))
+        print('%s: rooms %s' % (n, ' '.join('%s=%s' % kv for kv in sorted(zmap.items()))))
         print('   doors %s' % ' '.join('%s@%s %s' % (dn, zn, ' '.join('%s %s>%s' % (r[0], e['near'], e['far'])
                                                                    for r, e in sorted(v.items())))
                                      for (dn, zn), v in sorted(doors.items())))

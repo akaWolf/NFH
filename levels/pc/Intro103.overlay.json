@@ -1,19 +1,413 @@
 {
- "source": "The director's messages (tools/pcref/pc_tutorial_s1.py): the PC's tutorial_3 strings.xml texts by their code names, paired one to one with the LevelScript actions' PC-build keys (PCDescriptions).",
+ "source": "The PC's tutorial (tools/pcref/pc_tutorial_s1.py): the level class's director and neighbour scripts run in place of the LevelScript and the camera script (runtime/tutorial.py TutorialPC101-103), their data in PCTutorial.",
  "patches": [
+  {
+   "object": "Zone01",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "anc",
+     "x1": 100,
+     "x2": 840,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Zone02",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "lir",
+     "x1": 184,
+     "x2": 770,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Zone03",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "kit",
+     "x1": 276,
+     "x2": 688,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack01",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       761,
+       370
+      ],
+      "far": [
+       458,
+       367
+      ]
+     },
+     "Woody": {
+      "near": [
+       781,
+       370
+      ],
+      "far": [
+       478,
+       367
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack01",
+   "component": "Door",
+   "zone": "Zone02",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       461,
+       367
+      ],
+      "far": [
+       150,
+       370
+      ]
+     },
+     "Woody": {
+      "near": [
+       481,
+       367
+      ],
+      "far": [
+       170,
+       370
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack01",
+   "component": "Door",
+   "zone": "Zone03",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       458,
+       367
+      ],
+      "far": [
+       761,
+       370
+      ]
+     },
+     "Woody": {
+      "near": [
+       478,
+       367
+      ],
+      "far": [
+       781,
+       370
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack02",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       150,
+       370
+      ],
+      "far": [
+       461,
+       367
+      ]
+     },
+     "Woody": {
+      "near": [
+       170,
+       370
+      ],
+      "far": [
+       481,
+       367
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorLeft",
+   "component": "Door",
+   "zone": "Zone05",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       56,
+       218
+      ],
+      "far": [
+       838,
+       420
+      ]
+     }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "leave": 25
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
+  },
+  {
+   "object": "DoorLeft01",
+   "component": "Door",
+   "zone": "Zone03",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       279,
+       420
+      ],
+      "far": [
+       763,
+       420
+      ]
+     },
+     "Woody": {
+      "near": [
+       279,
+       420
+      ],
+      "far": [
+       763,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorRight",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       838,
+       420
+      ],
+      "far": [
+       66,
+       218
+      ]
+     }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "enter": 20
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
+  },
+  {
+   "object": "DoorRight01",
+   "component": "Door",
+   "zone": "Zone02",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       763,
+       420
+      ],
+      "far": [
+       279,
+       420
+      ]
+     },
+     "Woody": {
+      "near": [
+       763,
+       420
+      ],
+      "far": [
+       289,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
   {
    "object": "LevelScript",
    "component": "LevelScript",
    "set": {
-    "PCDescriptions": {
-     "TUT3MSG1_PC": "Hi! In the last part of the introduction, you'll learn about some of Woody's more sophisticated options. \n \nLater episodes will also include the neighbour's pets. As you can see here, the neighbour will come running as soon as a pet raises the alarm.",
-     "TUT3MSG2_PC": "You'll have to make Woody sneak past the animal to prevent the pet raising the alarm. To do this, you'll have to use the right instead of the left mouse button for your actions. A right click on the floor, on a door or an object will make Woody sneak there. Once there, he can get creative without the pet raising the alarm. \n \nPlease have Woody first take the marbles from the chest of drawers to try this out.",
-     "TUT3MSG3_PC": "Now have Woody put these on the floor in room B on the upper floor. But instead of using the left mouse button, press the right mouse button to make Woody sneak. ",
-     "TUT3MSG4_PC": "Excellent! Now let Woody sneak back to the lower floor with a right click.",
-     "TUT3MSG5_PC": "In a moment, the neighbour will walk through room C, so Woody should hide in the wardrobe. \n \nAs long as Woody is hiding in the wardrobe or under the bed, the neighbour and his pets won't be able to see him. He's safe. \n \nNow left click on the wardrobe to make Woody hide in there.",
-     "TUT3MSG6_PC": "Congratulations! \n \nThe neighbour won't notice you and will trip over the marbles at any moment. Now you've learnt all that's necessary to pay back the neighbour from hell. \n \nThe 'Neighbours from Hell' show can begin!"
+    "PCTutorial": {
+     "folder": "tutorial_3",
+     "texts": {
+      "introduction": "Hi! In the last part of the introduction, you'll learn about some of Woody's more sophisticated options. \n \nLater episodes will also include the neighbour's pets. As you can see here, the neighbour will come running as soon as a pet raises the alarm.",
+      "tut_take_marbles": "You'll have to make Woody sneak past the animal to prevent the pet raising the alarm. To do this, you'll have to use the right instead of the left mouse button for your actions. A right click on the floor, on a door or an object will make Woody sneak there. Once there, he can get creative without the pet raising the alarm. \n \nPlease have Woody first take the marbles from the chest of drawers to try this out.",
+      "tut_put_marbles": "Now have Woody put these on the floor in room B on the upper floor. But instead of using the left mouse button, press the right mouse button to make Woody sneak. ",
+      "tut_hiding": "Excellent! Now let Woody sneak back to the lower floor with a right click.",
+      "tut_hiding2": "In a moment, the neighbour will walk through room C, so Woody should hide in the wardrobe. \n \nAs long as Woody is hiding in the wardrobe or under the bed, the neighbour and his pets won't be able to see him. He's safe. \n \nNow left click on the wardrobe to make Woody hide in there.",
+      "tut_watch": "Congratulations! \n \nThe neighbour won't notice you and will trip over the marbles at any moment. Now you've learnt all that's necessary to pay back the neighbour from hell. \n \nThe 'Neighbours from Hell' show can begin!",
+      "tut_laugh": "Ha, ha!"
+     },
+     "lead": 12,
+     "start": {
+      "woody": [
+       650,
+       420,
+       "anc"
+      ],
+      "neighbor": [
+       500,
+       420,
+       "lir"
+      ]
+     },
+     "doors": {
+      "kit/anc": [
+       "DoorBack01",
+       "Zone03"
+      ],
+      "fro/anc": [
+       "DoorLeft",
+       "Zone05"
+      ],
+      "anc/fro": [
+       "DoorRight",
+       "Zone01"
+      ],
+      "lir/anc": [
+       "DoorBack01",
+       "Zone02"
+      ],
+      "lir/kit": [
+       "DoorRight01",
+       "Zone02"
+      ],
+      "kit/lir": [
+       "DoorLeft01",
+       "Zone03"
+      ],
+      "anc/lir": [
+       "DoorBack02",
+       "Zone01"
+      ],
+      "anc/kit": [
+       "DoorBack01",
+       "Zone01"
+      ]
+     },
+     "markers": {
+      "anc/ark": "Drawer"
+     },
+     "points": {
+      "lir_sign1": [
+       340,
+       420,
+       "lir"
+      ],
+      "kit_sign2": [
+       590,
+       420,
+       "kit"
+      ]
+     }
     }
-   }
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
+  },
+  {
+   "object": "Dog",
+   "component": "Alerter",
+   "set": {
+    "PCSurpriseSeconds": 2.25,
+    "PCAlarmShoutSeconds": 2.167
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
+  },
+  {
+   "object": "Drawer",
+   "component": "SearchItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      640,
+      390,
+      "anc"
+     ]
+    }
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "set": {
+    "PCShoutIndex": 1,
+    "PCFixSeconds": 0.0,
+    "PCFireBefore": true,
+    "PCFireLead": true,
+    "PCSlipSeconds": 3.0,
+    "PCReactLead": 0
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
+  },
+  {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCAngryTime": 280
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
+  },
+  {
+   "object": "Wardrobe",
+   "component": "HideItem",
+   "set": {
+    "PCWalkPoint": {
+     "Woody": [
+      386,
+      387,
+      "anc"
+     ]
+    }
+   },
+   "source": "the PC's tutorial_3 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
   }
  ]
 }

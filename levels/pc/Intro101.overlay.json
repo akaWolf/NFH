@@ -1,18 +1,285 @@
 {
- "source": "The director's messages (tools/pcref/pc_tutorial_s1.py): the PC's tutorial_1 strings.xml texts by their code names, paired one to one with the LevelScript actions' PC-build keys (PCDescriptions).",
+ "source": "The PC's tutorial (tools/pcref/pc_tutorial_s1.py): the level class's director and neighbour scripts run in place of the LevelScript and the camera script (runtime/tutorial.py TutorialPC101-103), their data in PCTutorial.",
  "patches": [
+  {
+   "object": "Zone01",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "anc",
+     "x1": 100,
+     "x2": 840,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Zone02",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "lir",
+     "x1": 184,
+     "x2": 770,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Zone03",
+   "component": "Zone",
+   "set": {
+    "PCWalkRoom": {
+     "room": "kit",
+     "x1": 276,
+     "x2": 688,
+     "floor": 420
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack01",
+   "component": "Door",
+   "zone": "Zone02",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       461,
+       367
+      ],
+      "far": [
+       150,
+       370
+      ]
+     },
+     "Woody": {
+      "near": [
+       481,
+       367
+      ],
+      "far": [
+       170,
+       370
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorBack02",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       150,
+       370
+      ],
+      "far": [
+       461,
+       367
+      ]
+     },
+     "Woody": {
+      "near": [
+       170,
+       370
+      ],
+      "far": [
+       481,
+       367
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorLeft",
+   "component": "Door",
+   "zone": "Zone05",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       56,
+       218
+      ],
+      "far": [
+       838,
+       420
+      ]
+     }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "leave": 25
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
+  },
+  {
+   "object": "DoorLeft01",
+   "component": "Door",
+   "zone": "Zone03",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       279,
+       416
+      ],
+      "far": [
+       763,
+       420
+      ]
+     },
+     "Woody": {
+      "near": [
+       279,
+       420
+      ],
+      "far": [
+       763,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "DoorRight",
+   "component": "Door",
+   "zone": "Zone01",
+   "set": {
+    "PCWalkDoor": {
+     "Woody": {
+      "near": [
+       838,
+       420
+      ],
+      "far": [
+       66,
+       218
+      ]
+     }
+    },
+    "PCDoorTicks": {
+     "Woody": {
+      "enter": 20
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots; the door's own `enter`/`leave` records where they differ from its type's, pcprofile.DOOR_TICKS)"
+  },
+  {
+   "object": "DoorRight01",
+   "component": "Door",
+   "zone": "Zone02",
+   "set": {
+    "PCWalkDoor": {
+     "Rottweiler": {
+      "near": [
+       763,
+       420
+      ],
+      "far": [
+       279,
+       416
+      ]
+     },
+     "Woody": {
+      "near": [
+       763,
+       420
+      ],
+      "far": [
+       289,
+       420
+      ]
+     }
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
   {
    "object": "LevelScript",
    "component": "LevelScript",
    "set": {
-    "PCDescriptions": {
-     "TUT1MSG1_PC": "Welcome to the 'Neighbours from Hell' show. I'm Joe, the director of the show. \n \nIn the course of the following three episodes you will learn how to help Woody, the hero of our show, play tricks on the nasty neighbour. \n \nYou can give Woody commands with the mouse. To do this, move the mouse pointer to the place or object you want Woody to go to. Now press the left mouse button (left click) to make Woody execute the action indicated in the message line. \n \nNow send Woody to his first target: the green floor marking to his left.",
-     "TUT1MSG2_PC": "Perfect! Let Woody go through the now unlocked door into room A to get to your next target. \n \nTo do this, left click on the door.",
-     "TUT1MSG3_PC": "Very good! Your screen shows only a part of the house. \n \nYou can look at other parts of the house with the help of your mouse or the directional keys of your keyboard; this is what is called 'scrolling'. \n \nNow scroll to the left and send Woody to his second target.",
-     "TUT1MSG4_PC": "Doors at the back wall always connect floors: they lead to the door directly above or below it. \n \nIn order to send Woody to his third target, you can either click on the door at the back wall and then on the target, or you can left click straight on the target in room C.",
-     "TUT1MSG5_PC": "Well done! You've learned the basic elements for controlling Woody. Now you can go to objects, through doors and into further rooms. \n \nNow get Woody to leave the house through the front door and you will have completed the introductory episode."
+    "PCTutorial": {
+     "folder": "tutorial_1",
+     "texts": {
+      "tut_target1": "Welcome to the 'Neighbours from Hell' show. I'm Joe, the director of the show. \n \nIn the course of the following three episodes you will learn how to help Woody, the hero of our show, play tricks on the nasty neighbour. \n \nYou can give Woody commands with the mouse. To do this, move the mouse pointer to the place or object you want Woody to go to. Now press the left mouse button (left click) to make Woody execute the action indicated in the message line. \n \nNow send Woody to his first target: the green floor marking to his left.",
+      "tut_door": "Perfect! Let Woody go through the now unlocked door into room A to get to your next target. \n \nTo do this, left click on the door.",
+      "tut_target2": "Very good! Your screen shows only a part of the house. \n \nYou can look at other parts of the house with the help of your mouse or the directional keys of your keyboard; this is what is called 'scrolling'. \n \nNow scroll to the left and send Woody to his second target.",
+      "tut_target3": "Doors at the back wall always connect floors: they lead to the door directly above or below it. \n \nIn order to send Woody to his third target, you can either click on the door at the back wall and then on the target, or you can left click straight on the target in room C.",
+      "tut_exit": "Well done! You've learned the basic elements for controlling Woody. Now you can go to objects, through doors and into further rooms. \n \nNow get Woody to leave the house through the front door and you will have completed the introductory episode."
+     },
+     "lead": 12,
+     "start": {
+      "woody": [
+       650,
+       420,
+       "kit"
+      ]
+     },
+     "doors": {
+      "lir/kit": [
+       "DoorRight01",
+       "Zone02"
+      ],
+      "kit/lir": [
+       "DoorLeft01",
+       "Zone03"
+      ],
+      "anc/fro": [
+       "DoorRight",
+       "Zone01"
+      ],
+      "lir/anc": [
+       "DoorBack01",
+       "Zone02"
+      ],
+      "fro/anc": [
+       "DoorLeft",
+       "Zone05"
+      ],
+      "anc/lir": [
+       "DoorBack02",
+       "Zone01"
+      ]
+     },
+     "signs": {
+      "kit/sign": [
+       480,
+       420,
+       "kit"
+      ],
+      "lir/sign": [
+       480,
+       420,
+       "lir"
+      ],
+      "anc/sign": [
+       490,
+       420,
+       "anc"
+      ]
+     },
+     "tricks": {
+      "trick": 100
+     }
     }
-   }
+   },
+   "source": "the PC's tutorial_1 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"
   }
  ]
 }

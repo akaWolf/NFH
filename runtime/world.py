@@ -1299,6 +1299,15 @@ class Pawn:
             hops = self._pc_room_route(dest, final_step)
         if hops is None and dest.pid != self.zone.pid:
             hops = self.level.find_path(self.zone.pid, dest.pid)
+            if hops is None and pcprofile.is_pc() and not self.nfh2:
+                # game.exe's path finder skips a room link whose door or far
+                # door is not present (fcn.004471a0: flag 0x20 of the doorin
+                # and doorout objects, 0x4472a7-0x4472cc — a closed door's
+                # dummy shown in its place, the tutorials' fcn.00438c80): the
+                # walk goes round it (tutorial_3's lir/kit, closed as the
+                # neighbour sets out for kit_sign2 through anc); the mobile
+                # refuses the shortest hops across a locked door outright
+                hops = self.level.find_path_open(self.zone.pid, dest.pid)
             if hops is None:
                 self.on_arrive = None
                 return False
@@ -6667,6 +6676,18 @@ class Routine:
         item goes angry first (RoutineActionSurpriseNear.cs:47-57)"""
         self.pawn.anim.time_scale = 1.0       # the paced fall or doubletake is over
         it = self.urgent_item
+        w = self.pawn.world
+        if it is not None and it.tricked and w is not None and pcprofile.is_pc() \
+                and getattr(it, 'pc_fire_wait', 0) and not it.pc_fired:
+            # the handler's steps between the doubletake and the fire (tutorial_2's
+            # tut_laugh1 message step, 0x45afff-0x45b085): the level script shows
+            # its message, the fire follows a tick each later
+            self.pawn._stand()
+            if w.level_script is not None:
+                w.level_script.pc_react_step(it, 'fire_wait')
+            w.call_later(it.pc_fire_wait / pcprofile.TICKS_PER_SECOND,
+                         lambda: w.play_angry(self.pawn, it, on_done=self._surprise_near_stopped))
+            return
         if it is not None and it.tricked and self.pawn.world is not None:
             self.pawn.world.play_angry(self.pawn, it,
                                        on_done=self._surprise_near_stopped)
@@ -8197,6 +8218,9 @@ class World:
             self._on_trick_done(item)              # cs:785-787, at the PC's fire
         if self.level_script is not None:
             self.level_script.on_trick_done()      # cs:789-792
+            # the PC tutorials' message steps timed from the fire (tutorial_3's
+            # `marbles` handler, 0x459f63: the fire's ready list)
+            self.level_script.pc_react_step(item, 'fire')
         item.pc_fired = True
 
     def _s1_fire_stands(self, item, fired_early, shout):

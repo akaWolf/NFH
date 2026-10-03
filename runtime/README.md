@@ -2190,18 +2190,38 @@ routines stay frozen, the thought bubbles' icons through the routines'
 `pc_bubble` (Hud._think_bubble), then the lap from the mobile's selected
 index and the Mother's End1.
 
-The three Intro scenes are the PC's tutorial levels step for step
-(tutorial_1-3: Level_Tutorial1::run and its two siblings in game.exe);
-under the PC profile the director says the PC's own messages — the
-tutorial's strings.xml text for each action's PC-build key (the overlay's
-PCDescriptions, tools/pcref/pc_tutorial_s1.py; `Tutorial.get_description`,
-else the PC-build key's text, never the touch wording of the mobile's).
+Under the PC profile the three Intro scenes run the PC's tutorial levels
+instead (`TutorialPC101`, `TutorialPC102`, `TutorialPC103` over
+`TutorialPCS1`; docs/PC_FIDELITY.md "The Season 1 tutorials by the PC's
+code"): game.exe's Level_Tutorial1 and the tutorial_2 / tutorial_3
+classes — the director's states (`_d<n>`) and the neighbour's (`_n<n>`)
+once a 12 Hz level tick, the PC's numbers; the trigger pass first
+(trigger.xml's nearobj and room triggers, the actions' `behavior`
+records posted as Woody's action ends through `on_item_used`, the
+scripts' messages delivered on the next tick), the filters and handlers
+moving the waiting states on; the messages from the tutorial's
+strings.xml, the marker arrows and the signs over the remaster's strips,
+the doors unlocked (and tutorial_3's lir/kit locked) as the PC shows and
+hides them, the camera on the neighbour (`follow`). His GoTos are the
+routine's MoveOnly steps to the PC points, the manager frozen on arrival
+(the script's next update runs there; the PC point kept, `pc1_stand_at`);
+his reactions the Season 1 profile's walk-by and slip, their message
+steps through `Tutorial.pc_react_step` (`Routine._surprise_near_done`'s
+PCFireWait, `World.s1_fire`); tutorial_3's dog woken by the director's
+whistle (AlerterFSM.on_notice_woody; its AlertOnStartTimer off). The
+Season 1 profile's path goes round a locked door where the mobile's
+shortest hops are refused (`Level.find_path_open`: game.exe's path
+finder leaves out a door that is not present, fcn.004471a0). The data is
+the overlay's PCTutorial on the LevelScript and the items' PC fields
+(tools/pcref/pc_tutorial_s1.py), the walk data PCWalkRoom / PCWalkDoor /
+PCDoorTicks (tools/pcref/pc_walks_s1.py on the Intro scenes).
 
 `tests/run_tutorial.py` drives all five scenes (Intro101 start to the
-forced win; Intro102/103 through every signal kind and both cameras;
+forced win; Intro102/103 through every signal kind and both cameras
+under the mobile profile, and the PC's three tutorials under the PC one;
 the L201/L206 openings, their mobile lessons under the mobile profile,
 L201's PC tutorial up to the demo lap and L206's PC lesson through to the
-lap under the PC one) — 60 checks.
+lap under the PC one) — 88 checks.
 
 ## Not implemented
 
