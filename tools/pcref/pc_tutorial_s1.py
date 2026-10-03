@@ -100,6 +100,10 @@ MESSAGES = {'Intro101': ('tut_target1', 'tut_door', 'tut_target2', 'tut_target3'
                          'tut_hiding2', 'tut_watch', 'tut_laugh')}
 # the extra instants of the handlers' lists, in ticks
 LAUGH1_STEP = 1          # tutorial_2's tut_laugh1 message step before the fire
+# the fire step's own two ticks (its fire, its list's first update), carried by
+# the fall's paced span as the levels' slips carry them (PCFireLead;
+# runtime/pcprofile.py S1_FIRE_LEAD_TICKS, tools/pcref/pc_reactions.py FIRE_LEAD)
+FIRE_LEAD = 2
 # after the fire (FIRE4's first update) to the fall: its list's first update, the
 # ready list's first update, its StopMsg, tutorial_3's tut_laugh message step
 SLIP_LEAD = {'Intro102': 2, 'Intro103': 3}
@@ -199,7 +203,7 @@ def item_data(scene):
     slip = L.job_ticks('neighbor', 'slip1')
     assert slip == L.job_ticks('neighbor', 'slip3')
     ground = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True, 'PCFireLead': True,
-              'PCSlipSeconds': round((SLIP_LEAD[scene] + slip + SLIP_TAIL[scene]) / FPS, 3),
+              'PCSlipSeconds': round((FIRE_LEAD + SLIP_LEAD[scene] + slip + SLIP_TAIL[scene]) / FPS, 3),
               'PCReactLead': 0}
     out[('Ground', 'TrickItem')] = ground
     for item, (comp, obj) in WOODY.get(scene, {}).items():

@@ -384,7 +384,7 @@
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
     "PCFireLead": true,
-    "PCSlipSeconds": 2.833,
+    "PCSlipSeconds": 3.0,
     "PCReactLead": 0
    },
    "source": "the PC's tutorial_2 (tools/pcref/pc_tutorial_s1.py: game.exe's tutorial classes, the tutorial's level.xml, objects.xml, trigger.xml, strings.xml)"

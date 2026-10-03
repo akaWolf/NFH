@@ -7770,6 +7770,11 @@ class World:
         self.sound_sink = sound_sink
         self._last_input_time = 0.0      # Woody.LastInputTime
         self.pay_log = []                # (t, item, points, hot) per paid trick under the profile
+        # the PC's Season 1 success check (game.exe fcn.00436bb0): the flag +0x8a
+        # a trick's StopMsg sets (fcn.0047bc90), read and cleared by the level's
+        # state function on the same tick; the last fire's item
+        self._pc_end_check = False
+        self._pc_last_fire = None
         self._entrance_hello = False
         self._open_furniture = []        # SearchItem.CloseTime holders
         self.snap_request = None         # HUD face clicks -> CameraMover
@@ -8214,6 +8219,7 @@ class World:
         item.pc_shout_secs = pcprofile.s1_shout_seconds(
             points, bonus, item.pc_shout_index, item.pc_shout_skip)
         item.pc_fire_points = points
+        self._pc_last_fire = item
         if not item.dont_get_angry:
             self._on_trick_done(item)              # cs:785-787, at the PC's fire
         if self.level_script is not None:
@@ -8491,6 +8497,9 @@ class World:
             # the PC fire step's own ticks before the stop (_s1_fire_stands:
             # a step without a shout — 102's laxative beer, flags 3)
             pawn._stand()
+            if fire_post > 0.0:
+                # its StopMsg's check flag (fcn.0047bc90), after the fire's ticks
+                self.call_later(fire_pre, lambda: setattr(self, '_pc_end_check', True))
             self.call_later(fire_pre + fire_post,
                             lambda: self._angry_without_animations(pawn, item, on_done, routine, nfh2))
             return
@@ -8646,9 +8655,12 @@ class World:
                     after_run(played_angry)
 
             def shouted():
-                # the StopMsg closing the fire's list (_s1_fire_stands)
+                # the StopMsg closing the fire's list (_s1_fire_stands); its
+                # callback fcn.0047bc90 sets the level's check flag +0x8a
+                # (0x47bfdd), read on the same tick (World._pc_s1_success)
                 pawn.anim.time_scale = 1.0
                 if fire_post > 0.0:
+                    self._pc_end_check = True
                     pawn._stand()
                     self.call_later(fire_post, play_fixes)
                 else:
@@ -12070,6 +12082,29 @@ class World:
         self._finish_animation_ended()
         return False
 
+    def _pc_s1_success(self, end_check):
+        """the PC's Season 1 success (game.exe fcn.00436bb0, state 5; docs/
+        PC_VERIFICATION.md "The level's end"): with every trick fired the
+        level runs on — the catch on sight checked first, as the state
+        function does — until a StopMsg sets the check flag +0x8a
+        (fcn.0047bc90: the last fire's list after its shout, 0x47bfdd), and
+        the win plays on that tick, where the mobile starts its 2.5 s wait at
+        the pay. False where the mobile's rule stays: the Season 2 profile,
+        the mobile one, a forced win, and a last trick whose step has no
+        StopMsg (PCStopSkip: its level class's own end-check StopMsgs —
+        0x46076c, 0x463554, 0x465903, 0x46d06a, 0x46d1cf, 0x46eb76,
+        0x470241 — not carried)"""
+        if not pcprofile.is_pc() or self.woody is None or self.woody.nfh2 \
+                or self.game.win_immediate:
+            return False
+        last = self._pc_last_fire
+        if last is None or last.pc_stop_skip:
+            return False
+        if end_check:
+            self.game.ending = True
+            self._win()
+        return True
+
     def _win(self):
         """GameInfo.PlayWinAnimations (GameInfo.cs:304-313): FinishGame,
         Woody's win animation, only the Rottweiler freezes here (the Mother
@@ -12340,6 +12375,8 @@ class World:
             return
         # (the PC's Season 2 respawn timer: the level update counts it down
         # after the watch walker has fired, 0x10044725 past 0x100445f1)
+        # the PC's Season 1 check flag: read (and cleared) on this tick
+        end_check, self._pc_end_check = self._pc_end_check, False
         barred = self._pc_catch_barred()
         if self._pc_respawn_left > 0.0:
             self._pc_respawn_left = max(0.0, self._pc_respawn_left - dt)
@@ -12355,7 +12392,9 @@ class World:
             # catches and the HUD are dead for the wait while Woody's own
             # input stays live (Frozen comes with FinishGame at its end);
             # WinImmediate (ForceWinGame, cs:315-321) plays the win now
-            if not self.game.win_immediate:
+            if self._pc_s1_success(end_check):
+                pass
+            elif not self.game.win_immediate:
                 self.game.ending = True
                 self.game.win_timer = 2.5
             else:

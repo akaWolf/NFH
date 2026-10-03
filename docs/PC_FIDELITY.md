@@ -2200,12 +2200,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   message box: 104.00 less its 16 ticks), tut_laugh1 +7.17 (+7.33), the
   picture back +12.8 (+12.91), parked at sign 1 +16.38 (+16.5), off to
   sign 2 +24.42 (+24.58). Open: the dog's alarm reaches him 12 ticks after
-  the bark starts on the PC (the neighbour's noise icon at 151.92, the
-  dog's bark from 150.92) where the profile's pet model has him hear the
-  bark as it starts (0.83 s after the whistle against the video's 2.0) —
-  the levels' pets share it; the level's end after its last trick (the
-  mobile's 2.5 s WinGameOnCompleteAllTricks; the PC's board 9.5 s after
-  tutorial_3's fire, its reaction list 5.8 s of it).
+  its wake-up ends on the PC (the neighbour's noise icon at 151.92, the
+  dog awake from 150.92 with no bark to be seen before the icon; the
+  whistle's bark is the pet class's +0x1d flag in state 4, 0x45c2ae) where
+  the profile's pet model has him hear the bark as the wake-up ends (0.83 s
+  after the whistle against the video's 2.0); E11's dog, woken by Woody,
+  has him react about 4 ticks after its wake-up (2708.15 / 2708.50).
+- *The Season 1 level's end (2026-10-03, carried).* game.exe's state
+  function (fcn.00436bb0) turns the level to success (state 5) on the tick
+  a StopMsg sets its check flag +0x8a with every trick fired: the StopMsg
+  closing the fire's list, after the trick's shout (fcn.0047bc90 through
+  the StopMsg message's slot 2, 0x47c4a0; 0x47bfdd). The port started the
+  mobile's 2.5 s wait at the pay (WinGameOnCompleteAllTricks, the catches
+  dead from the pay): E01 — the TV's fire at 350.0, a bonus, shout2_extra
+  to 358.0, Woody's win at 358.5, the board at 360.67 — ended 5.5 s early
+  in the port. Under the profile the level runs on after the last pay
+  (the catch on sight still tested first) until that StopMsg, and the win
+  plays on its tick (World._pc_s1_success); tutorial_3: the win 5.50 s
+  after the fire and the board 9.7 s (the video 5.5 and 9.75). Not
+  carried: a last trick whose step skips its StopMsg (flag 1, PCStopSkip)
+  ends through its level class's own end-check StopMsgs (seven sites,
+  docs/PC_VERIFICATION.md "The level's end") — the mobile's wait stays for
+  it.
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and

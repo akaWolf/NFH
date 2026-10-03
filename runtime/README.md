@@ -623,7 +623,13 @@ predicate, then the all-tricks win.
   drawn in the neighbour's sheets. Its end is `FinishAnimationEnded`.
 - **The win**: `CompletedTricksCount >= TotalTricksCount` waits the coroutine's
   2.5 s, then `PlayWinAnimations` — everything freezes and Woody plays
-  `WinAnimation` (`WinGame`).
+  `WinAnimation` (`WinGame`). Under the PC profile a Season 1 level with
+  every trick fired runs on (the catch still tested first) until the last
+  fire's list closes with its StopMsg — game.exe's state function takes
+  the success on the tick that StopMsg sets its check flag (fcn.00436bb0,
+  fcn.0047bc90) — and the win plays then (`World._pc_s1_success`:
+  `play_angry`'s `shouted` sets `_pc_end_check`; a last trick without its
+  StopMsg, PCStopSkip, keeps the mobile's wait).
 - **Hiding** (`HideItem.InternalUse` → `Woody.Hide`, `Woody.Unhide` →
   `HideItem.Leave`): using a wardrobe hides Woody at once and plays `Hide_In`;
   any new move leaves it, restoring the wardrobe idle and playing its
