@@ -280,6 +280,13 @@ S2_TICK_HZ = 12
 # to the PC clip under the profile (World.play_angry).
 S2_SHOUT_TICKS = {0: (28,), 1: (28, 28), 2: (87, 87, 87), 3: (28,)}
 S2_FREAKOUT_TICKS = (39, 40, 65)
+# a co-actor's fight on him (the generic `fight`, fcn.1000eb19) posts
+# olga_fight / mother_fight as its job ends; his handler's step reads its
+# latch on the tick after (the offer's tick) and pushes its sequence, the
+# SHOUT first, without a first run: the shout's first update two ticks after
+# the fight's end (213's 0x10038221, 207's 0x1001596a, 204's 0x10032b6f,
+# 210's 0x1001a379, 214's three: lap_model_s2's `cont` a tick each)
+S2_HIT_TAIL_TICKS = 2
 
 
 def s2_reaction_seconds(level, rng, full=False):

@@ -625,6 +625,7 @@ class Pawn:
         # every SHOUT after it plays the freakout (pcprofile.s2_reaction_seconds)
         self.pc_rage_full = False
         self.pc_hit_secs = None          # the PC's seconds for this pawn's hit on him (the trick item's PCHitSeconds)
+        self.pc_hit_tail = 0.0           # the PC's ticks from the hit's end to his shout (S2_HIT_TAIL_TICKS)
         self.rage_current = 0
         self.rage_hold = 0
         self.rage_bonus = False          # the flag of the last trick (+0x7c)
@@ -6723,13 +6724,19 @@ class Routine:
         reappears and its parked angry resumes"""
         target, self._hit_target = getattr(self, '_hit_target', None), None
         w = self.pawn.world
+        tail = getattr(self.pawn, 'pc_hit_tail', 0.0) or 0.0
+        self.pawn.pc_hit_tail = 0.0
         if getattr(self.pawn, 'pc_hit_secs', None):
             self.pawn.anim.time_scale = 1.0
             self.pawn.pc_hit_secs = None
         if target is not None:
             target.sprite.hidden = False
             if w is not None:
-                w.continue_angry_animation(target)   # Target.ContinueAngryAnimation
+                if tail > 0.0:
+                    # (the PC's handler step before the shout: S2_HIT_TAIL_TICKS)
+                    w.call_later(tail, lambda t=target: w.continue_angry_animation(t))
+                else:
+                    w.continue_angry_animation(target)   # Target.ContinueAngryAnimation
         self._urgent_finished()
 
     def move_to_toilet(self, feel_sick):
@@ -8407,6 +8414,12 @@ class World:
                     hs = item.pc_hit_secs_linked
                 affected.pc_hit_secs = (hs or {}).get(affected.role) \
                     if pcprofile.is_pc() else None
+                # the shout two ticks after the fight's end: his handler's
+                # step reads the fight's behaviour the tick after and builds
+                # its sequence (pcprofile.S2_HIT_TAIL_TICKS; not the linked
+                # flow's lift, PCResumeHeadSeconds)
+                affected.pc_hit_tail = pcprofile.S2_HIT_TAIL_TICKS / pcprofile.TICKS_PER_SECOND \
+                    if (affected.pc_hit_secs and pcprofile.SEASON2 and hs is item.pc_hit_secs) else 0.0
                 after = (item.pc_hit_after or {}).get(affected.role) \
                     if pcprofile.is_pc() else None
                 if after:
