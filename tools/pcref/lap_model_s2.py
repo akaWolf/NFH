@@ -51,7 +51,10 @@ writes the stair gait 7 for the neighbour — through the waypoints of
 fcn.10009177: off the floor line and off the target's x to the floor first,
 then along it, then straight to the target (Geometry.leg). The first
 horizontal tick from the stand ms1 / ms3 adds the record's `start`
-(0x10009332), at most a tick a walk, not counted.
+(0x10009332), at most a tick a walk, not counted: on the seven closed laps
+no walk within a room starts on the floor line facing its way from ms1 /
+ms3 (checked 2026-10-03: the stations end in ms0 or ms2, or their hotspots
+lie off the floor line, the first move a vertical one).
 
 Coverage (2026-09-23): the untricked lap closes on 203, 206, 208, 209, 211,
 212, 213 and 214 (its hatch behind the step's own byte, its bouquet behind
