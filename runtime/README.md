@@ -1954,6 +1954,21 @@ the level selection menu, LevelLoader, not modelled).
   (Pawn.cs:366-378 has no GameEnding gate — the original then plays two
   endings over each other), the UseDoorAtOnce carry-over, the parked-run
   edge cases above, and the two hidden-use timings of the routine section.
+- Open (2026-10-03): the Season 1 start under the PC profile. In Badinfos'
+  run (pc_s1_all_720 at 30 fps) the neighbour's bubble stays empty for
+  3.07 s after the level's first frame — 230.83 -> 233.90 (101), 370.57 ->
+  373.63 (102), 548.27 -> 551.37 (103), 712.83 -> 715.90 (104), 961.40 ->
+  964.47 (105), 1151.73 -> 1154.83 (106) — while Woody walks in; the port's
+  neighbour starts at 1.65 s (DelayStart's 1.5, Rottweiler.cs:153): 1.4 s
+  early on every Season 1 level. The PC's first case runs when the level
+  state's running flag is set (+0x88, 0x4417d9: game.exe's listener slot
+  37, the StartLevelMsg the relay 0x43deb0 re-sends), which GFXEngine.dll's
+  start object (fcn.10011c70: +0x3c done, +0x40 a limit the constructor
+  zeroes) posts on its first update past the limit or on a key or a click
+  (fcn.10011eb0, fcn.10011f20, fcn.10011fc0); what creates that object ~37
+  ticks into the level is not read yet, so the port keeps the mobile's
+  delay. (Season 2 has no such wait: its scripts' icons are up on the first
+  frame, and the profile starts them there.)
 - Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
   `OnTrickDone` paths die in the parked ride — README above), L113's
   ElectricTrap 8 (its collider sits inside and behind the basement door's,
