@@ -1863,7 +1863,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   hotspot its station's GOTO walks to (PCWalkPoint: the last GOTO before
   the paired actions in the lap model's first lap of the station
   tools/pcref/pc_durations.py pairs with the item — a list where the
-  visits walk to different objects, 107's camera). A walk of the port is
+  visits walk to different objects, 107's camera) and the points that
+  walk passes through first (PCWalkVia, since 2026-10-03: the level
+  class's GOTOs in the station's room with no action between them and the
+  station's own — 107's dove case walks him to bal/dove_free on every lap
+  before the painting's GOTO, 120 px out of his way, and its statue case
+  to lir/statue before the footstool; `station_vias`, the route's point
+  steps ending legs of their own, `Pawn._pc1_vias`). A walk of the port is
   cut into the PC's legs at its door steps and its item; each leg lasts
   the mover's ticks between the PC's points (`pcprofile.s1_leg_ticks`; a
   leg after a door a tick less, the last one a tick more, three with no

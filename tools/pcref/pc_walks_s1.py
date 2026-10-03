@@ -40,6 +40,10 @@ The overlay entries, in px of the PC scene (the room's own coordinates):
                           where the visits walk to different objects — and the
                           `woody` hotspot of the object Woody's action on the item
                           takes place at (`woody_targets`)
+             PCWalkVia    {'Rottweiler': [[x, y, room], ...]}: the points the
+                          station's walk passes through first — the level class's
+                          GOTOs in its room with no action between them and the
+                          station's own (`station_vias`: 107's dove, its statue)
 The zones map to the rooms geometrically (the rooms' path centres against the
 zones', the house at 96 px a unit, one shift a level), the exit porch through the
 door graph; a door pair of the mobile scene is the PC door of its two rooms.
@@ -166,6 +170,39 @@ def station_targets(n):
     return out
 
 
+def station_vias(n):
+    """mobile item -> the PC objects its station's walk passes through: the
+    GOTOs of the level class in the station's room from the last door to the
+    station's own GOTO with no action between them (lap_model's steady lap) —
+    107's dove case walks to bal/dove_free on every lap before the painting's
+    GOTO (an untricked dove plays nothing: game.exe 0x45d5xx's case, the
+    lap model's `walk 14 -> bal/dove_free`), its statue case to lir/statue
+    before the footstool"""
+    L = lap_model.Level(n)
+    toks = lap_model.tokens_of([n], SCRATCH, lap_model.CYCLE)
+    legs = lap_model.model(L, toks[n], steady=True)
+    out = {}
+    for item, objs in station_targets(n).items():
+        obj = objs[0]
+        idx = [i for i, (k, text, _t) in enumerate(legs)
+               if k == 'walk' and text.split(' -> ')[-1].split()[0] == obj]
+        if not idx:
+            continue
+        vias = []
+        for k, text, _t in reversed(legs[:idx[0]]):
+            if k in ('goto', 'icon'):
+                continue
+            if k != 'walk':
+                break                     # an action or a door ends the chain
+            o = text.split(' -> ')[-1].split()[0]
+            if o in L.doors or o.startswith('room') or o == obj:
+                break
+            vias.insert(0, o)
+        if vias:
+            out[item] = vias
+    return out
+
+
 def woody_targets(n):
     """mobile item -> the PC object Woody's action on it takes place at
     (tools/pcref/pc_woody.py's pairing): the base object of the trick's
@@ -269,7 +306,12 @@ def level_data(n):
         p = L.object_point(obj, actor='woody')
         if p is not None:
             points.setdefault(item, {})['Woody'] = [p[1], p[2], p[0]]
-    return zmap, rooms, doors, points, own
+    vias = {}
+    for item, objs in station_vias(n).items():
+        pts = [list(L.object_point(o)[1:]) + [L.object_point(o)[0]] for o in objs if L.object_point(o)]
+        if pts:
+            vias[item] = {'Rottweiler': pts}
+    return zmap, rooms, doors, points, own, vias
 
 
 def item_kind_hide(n, name):
@@ -282,10 +324,10 @@ def item_kind_hide(n, name):
     return None
 
 
-def write(n, rooms, doors, points, own):
+def write(n, rooms, doors, points, own, vias):
     p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(p))
-    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks')
+    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia')
     for e in ov['patches']:
         for k in keys:
             (e.get('set') or {}).pop(k, None)
@@ -307,7 +349,10 @@ def write(n, rooms, doors, points, own):
                               "from its type's, pcprofile.DOOR_TICKS)"})
     for item, v in sorted(points.items()):
         kind = pc_durations.item_kind(n, item) or item_kind_hide(n, item) or 'TrickItem'
-        ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWalkPoint': v},
+        st = {'PCWalkPoint': v}
+        if item in vias:
+            st['PCWalkVia'] = vias[item]
+        ov['patches'].append({'object': item, 'component': kind, 'set': st,
                               'source': src})
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
     open(p, 'a').write('\n')
@@ -317,15 +362,16 @@ def main(argv):
     do_write = '--write' in argv
     levels = [int(a) for a in argv[1:] if a.isdigit()] or list(range(101, 115))
     for n in levels:
-        zmap, rooms, doors, points, own = level_data(n)
+        zmap, rooms, doors, points, own, vias = level_data(n)
         print('%d: rooms %s' % (n, ' '.join('%s=%s' % kv for kv in sorted(zmap.items()))))
         print('   doors %s' % ' '.join('%s@%s %s' % (dn, zn, ' '.join('%s %s>%s' % (r[0], e['near'], e['far'])
                                                                    for r, e in sorted(v.items())))
                                      for (dn, zn), v in sorted(doors.items())))
         print('   points %s' % ' '.join('%s %s' % (k, v) for k, v in sorted(points.items())))
         print('   own door ticks %s' % ' '.join('%s@%s %s' % (dn, zn, v) for (dn, zn), v in sorted(own.items())))
+        print('   vias %s' % ' '.join('%s %s' % kv for kv in sorted(vias.items())))
         if do_write:
-            write(n, rooms, doors, points, own)
+            write(n, rooms, doors, points, own, vias)
     return 0
 
 

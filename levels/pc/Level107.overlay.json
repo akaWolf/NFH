@@ -822,6 +822,15 @@
       420,
       "bal"
      ]
+    },
+    "PCWalkVia": {
+     "Rottweiler": [
+      [
+       530,
+       420,
+       "bal"
+      ]
+     ]
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
@@ -873,6 +882,15 @@
       661,
       415,
       "lir"
+     ]
+    },
+    "PCWalkVia": {
+     "Rottweiler": [
+      [
+       710,
+       420,
+       "lir"
+      ]
      ]
     }
    },

@@ -1227,3 +1227,15 @@ actors' job pass the update calls at 0x100445f8.
   icon ~2614.5, the fire ~2619.45 — the icon to the fire 59 ticks, the
   leave 11, the walk 11 and the drink 37 of the model. The chair to the
   wine 18.59 s (runs/p110occ), Badinfos' 18.7 (19.5 before); 110 at 100.
+- `tools/pcref/pc_walks_s1.py`, `runtime/world.py`, `runtime/scene.py`,
+  `levels/pc/Level107.overlay.json` (2026-10-03): the Season 1 idle laps
+  against the lap model (runs/idleS1b, the neighbour alone): 101 30.0 s
+  (the model 30.4), 102 25.2 (25.2), 103 32.0 (32.5), 104 76.7 (75.9),
+  105 48.3 (48.4), 106 116.6 (116.4), 107 56.2 (57.5), 108 92.3 (92.2),
+  109 118.7 (118.2), 110 54.5 (54.9), 111 115.7 (115.5), 112 150.8
+  (150.9), 113 176.6 (176.2), 114 179.3 (178.7). 107's 1.3 s: the dove
+  case's GOTO to bal/dove_free before the painting's (the lap model's
+  `walk 14 -> bal/dove_free`, then `walk 7 -> bal/picture_empty`), which
+  the port walked straight — the only GOTO of the fourteen laps with no
+  action before the next one in its room but 107's statue on the way to
+  the footstool. Carried (PCWalkVia): 107's lap 57.3 s (runs/idle107v).

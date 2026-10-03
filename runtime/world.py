@@ -1199,7 +1199,32 @@ class Pawn:
             final['x'] = it.pc_drop_x     # the PC's floor trick: the clicked point
         if it.should_walk_up and abs(self.sprite.x - it.x) >= 0.1:
             final = [{'kind': 'point', 'x': it.target_x}, final]
+        vias = self._pc1_vias(it, dest)
+        if vias:
+            # the PC's GOTOs to the points the station's walk passes through
+            # first (PCWalkVia: 107's dove case before the painting's)
+            final = vias + (final if isinstance(final, list) else [final])
         return self._route(dest, final, on_arrive)
+
+    def _pc1_vias(self, it, dest):
+        """the point steps of a Season 1 station's PCWalkVia in its zone's PC
+        room, each at its PC x mapped into the zone (PCWalkRoom), the leg's
+        end (`pc1_via`, Pawn._pc1_marks)"""
+        if not pcprofile.is_pc() or pcprofile.SEASON2 or self.role == 'Woody':
+            return None
+        vias = (getattr(it, 'pc_walk_via', None) or {}).get(self.role)
+        r = getattr(dest, 'pc_walk_room', None)
+        if not vias or r is None:
+            return None
+        span = dest.play_right - dest.play_left
+        w = (r['x2'] - r['x1']) or 1
+        out = []
+        for v in vias:
+            if len(v) > 2 and v[2] != r['room']:
+                return None
+            x = dest.play_left + (v[0] - r['x1']) * span / w
+            out.append({'kind': 'point', 'x': x, 'pc1_via': (v[0], v[1])})
+        return out
 
     def _helpers(self):
         """the Helpers statics the NFH2 pathing consumes
@@ -1947,6 +1972,14 @@ class Pawn:
                 leg['nat'] += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5 / v_floor
                 x, y = tx, ty
                 st['pc1'] = leg
+                if st.get('pc1_via') is not None and not last:
+                    # a GOTO of its own ends there (PCWalkVia), in its last
+                    # move's tick; the next one walks from it
+                    via = tuple(st['pc1_via'])
+                    self._pc1_close(leg, via, gait, True)
+                    leg = {'from': via, 'nat': 0.0, 'after': False, 'floor': zone.pc_walk_room['floor']}
+                    legs.append(leg)
+                    continue
                 if last:
                     end = self._pc1_map(zone, tx, ty)
                     if end is None:
