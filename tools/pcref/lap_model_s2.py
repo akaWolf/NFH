@@ -865,8 +865,16 @@ def _station_parts(d, ev, ctx):
         k = e[0]
         if k == 'DO':
             names = [x for x in e[1] if not x.startswith('$')]
+            who = ctx.get('actor', 'neighbor')
+            rec = d._record(names[0], names[1], who) if len(names) >= 2 else None
+            owner = rec[1].get('actor') if rec is not None else None
+            if owner is not None and owner != who and owner.replace('/', '_') == names[0]:
+                # an action of the object's own actor (209's fakir: `spit`,
+                # actor="fire_fakir/fakir"): the job goes on its queue and his
+                # steps go on without it (fcn.10049216 pushes it there)
+                continue
             if len(names) >= 2:
-                parts.append((names[0], names[1], d.action_ticks(names[0], names[1], ctx.get('actor', 'neighbor'))))
+                parts.append((names[0], names[1], d.action_ticks(names[0], names[1], who)))
                 if ctx.get('pos'):
                     # the action's <translation> moves him (Data.translation)
                     tx, ty = d.translation(names[0], names[1], ctx.get('actor', 'neighbor'))
@@ -1538,9 +1546,17 @@ PAIRS = {
                              (None, 'platform', 'leave')],
           'ShoeMachine': [(None, 'shoe_cleaner', 'use')],
           'AngryElephant': [('elephant', 'neighbor', 'lookaround'), (None, 'elephant', 'fool')]},
-    209: {'Cow': [('cow', 'neighbor', 'lookaround'), (None, 'cow', 'ride')],
-          'TadjMahal': [(None, 'curtain', 'enter'), (None, 'curtain', 'bar'), (None, 'curtain', 'leave')],
-          'HotShoe': [(None, 'shoe_mat_empty', 'take')],
+    # the fakir's step: his `burn` at the groove, the fakir's `spit` its own
+    # actor's job (fire_fakir/fakir's queue)
+    209: {'FireFakir': [(None, 'groove', 'burn')],
+          'Cow': [('cow', 'neighbor', 'lookaround'), (None, 'cow', 'ride')],
+          # the shoe step puts the shoes on the mat and enters the curtain
+          # (0x10020c72) — the mobile's first HotShoe visit, ShoeOff and
+          # TadjMahalEnter —, the curtain's bar and its leave are the Taj's,
+          # the take the second shoe visit's (0x10020806)
+          'TadjMahal': [(None, 'curtain', 'bar'), (None, 'curtain', 'leave')],
+          'HotShoe': [[(None, 'shoe_mat', 'put'), (None, 'curtain', 'enter')],
+                      [(None, 'shoe_mat_empty', 'take')]],
           'Coal': [(None, 'coal', 'walk')], 'IceCream': [(None, 'icecream_machine', 'take')]},
     211: {'Sweets': [(None, 'dish', 'use')], 'FishingRod': [(None, 'rod', 'use')],
           'LifeBoat': [('boat', 'neighbor', 'lookaround'), (None, 'boat', 'use')],

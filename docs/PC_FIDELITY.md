@@ -2145,6 +2145,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   212's 300 against 414, 214's 1074 against 1200); the mobile's greeting
   (HelloAnimationNFH2, a second with the input locked) stays — the video
   does not show his first frames.
+- *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
+  the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
+  on without it) and his own `burn` (time 12): his stand the burn's job and
+  the step's ticks, 16 (1.33 s; the video-read 0.5 before, the model had
+  counted the spit as his). The shoe step puts the shoes on the mat and
+  enters the curtain (23 + 12 ticks): the mobile's first shoe visit (ShoeOff,
+  TadjMahalEnter) 2.92 s — the leading 0 of 2026-09-23 had it end at once
+  and left the enter in the Taj's stand, which is now the bar and the leave
+  (11.08; 12.08 before). Idle lap 106.8-107.0 s (runs/ff209bidle; the model
+  106.0, the port 109.0 before). The level's first walk and the fakir: his
+  next icon 9.15 s in (the video's 8.76).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

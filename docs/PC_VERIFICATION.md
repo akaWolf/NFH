@@ -1346,3 +1346,10 @@ actors' job pass the update calls at 0x100445f8.
   talk, 207 dive, 208 platform, 209 fakir, 210 chair, 212 throne, 214
   shower). All 14 Season 2 plans at 100 with 208's v3 (runs/p208st2:
   276.4 s).
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
+  `levels/pc/Level209.overlay.json` (2026-10-03): 209's fakir (the spit the
+  fakir's job, his burn 16 ticks: 1.33 s) and the shoes (the put with the
+  curtain's enter, 35 ticks: 2.92 s; the Taj the bar and the leave, 11.08).
+  runs/ff209bidle: the fakir 7.82-8.98, the shoes 18.15-20.98, the Taj
+  21.15-31.98, the take 32.15-33.98; the lap 106.83-107.0 (the model
+  106.0). Plan 209 at 100 (runs/ff209bplan, 426.2 s).

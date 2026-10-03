@@ -13,7 +13,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 0.5
+    "PCUseSeconds": 1.33
    }
   },
   {
@@ -33,7 +33,7 @@
     "PCShoutTailLinked": 0.08,
     "PCLinkedPaysAt": 3.0,
     "PCUseSeconds": [
-     0,
+     2.92,
      1.92
     ]
    }
@@ -117,7 +117,7 @@
     "PCHideout": {
      "Rottweiler": {}
     },
-    "PCUseSeconds": 12.08
+    "PCUseSeconds": 11.08
    }
   },
   {

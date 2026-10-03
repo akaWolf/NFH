@@ -216,10 +216,11 @@ def _set_key(patches, item, key, value):
                 and isinstance(e.get('set'), dict):
             e['set'][key] = value; return
     patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
-# visits of the port's lap the PC never makes (209's first shoe: the PC does the
-# Taj before the shoes) — written as a leading 0, a visit the PC plays no
-# action at: it ends at once (RoutineAction.pc_zero_visit)
-LEAD_MOBILE = {209: {'HotShoe': 1}}
+# visits of the port's lap the PC never makes — written as a leading 0, a visit
+# the PC plays no action at: it ends at once (RoutineAction.pc_zero_visit).
+# (209's first shoe was one until 2026-10-03: the shoe step puts the shoes on
+# the mat before the curtain, lap_model_s2 PAIRS)
+LEAD_MOBILE = {}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
 CODE = (201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214)
 # the stations a tricked flow runs him to, off his lap: the use there lasts
