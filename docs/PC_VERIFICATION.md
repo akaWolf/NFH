@@ -1149,3 +1149,11 @@ actors' job pass the update calls at 0x100445f8.
   that the code's lap has (111.9; the port's 112.0). The Mother's rounds
   by her script (role_lap and walk_span for her records) against the same
   idle runs: 212's 37.33 s (the port's 37.33), 213's 70.5 (70.0-70.2).
+- `runtime/pcprofile.py`, `runtime/world.py` (2026-10-03): a co-actor's
+  fight on him posts its behaviour as its job ends, his handler's step
+  reads it on the tick after and pushes its sequence without a first run,
+  the SHOUT first: the shout two ticks after the fight's end
+  (pcprofile.S2_HIT_TAIL_TICKS, Routine._hit_pawn_done; lap_model_s2's
+  `cont` of every 'fight' continuation a tick, and the offer's), where
+  the port had shouted as the hit ended — 204's rickshaw, 207's shell,
+  210's elephant, 213's picnic, 214's shower, bouquet and pistol.
