@@ -353,7 +353,13 @@ actors' job pass the update calls at 0x100445f8.
   and the standing ticks (pcprofile.S1_NEAROBJ_ITEMS: the microwave, the
   toilet, the mum picture, the electric trap, the iron), where the
   mobile's Drawing (107), Pig (109) and Airer (111) have no trigger on
-  the PC and keep their walk frames.
+  the PC and keep their walk frames. Season 2's trigger.xml files hold
+  the generic catch (`fight` / `die`, `room always`) and one nearobj,
+  208's elephant/tap_electricity (`electrify`, `always`), which
+  GameLogic.dll tests on every level tick the same way (fcn.1003f573:
+  the actors' flag 4, the room, |dx| < 15 at 0x1003f7d0): the mobile's
+  ElectricTap takes the reach and the standing ticks as well
+  (pcprofile.S2_NEAROBJ_ITEMS; not in a hideout, pc_flag4).
 - Woody's Season 1 walk, carried 2026-09-27: his clicks reach the same
   GOTO as the neighbour's steps (the level's command handlers at 0x440088
   / 0x44014f / 0x4401fd call fcn.004364f0 / fcn.004368d0, which build it
