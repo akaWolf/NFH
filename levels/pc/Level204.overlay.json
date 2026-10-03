@@ -39,6 +39,9 @@
     "PCHitSeconds": {
      "Olga": 3.58
     },
+    "PCHitAfter": {
+     "Olga": 0.08
+    },
     "PCCreditAt": 2.17,
     "PCUseSeconds": 6.08
    }
