@@ -54,8 +54,8 @@ ROLES = (('neighbor', 'Rottweiler'), ('woody', 'Woody'), ('mother', 'Mother'), (
 # role — the object of the level script's GoTo / DoAction for the station
 # (lap_model_s2.walk's targets: 202's theocean, 205's beachright/mat, 206's fifi, 207's
 # kid, 213's limberwall, 214's door_closed …), else the object whose actor action the
-# station plays; stations without a PC counterpart are left out (214's Olga at
-# her stands, the kid). The Mother's and Olga's are their own scripts' (the
+# station plays; stations without a PC counterpart are left out (the kid). The
+# Mother's and Olga's are their own scripts' (the
 # level's script registry, GameLogic.dll 0x10011000-0x10013fff, pairs each
 # level folder's actor with its script's factory: 208's Mother 0x1001d2ec,
 # 209's 0x1001f87a, 211's 0x1002f92e and Olga 0x10031ae1): 208's Mother goes
@@ -175,7 +175,10 @@ STATIONS = {
           'PlantCarnivore': {'Rottweiler': 'topright/carnivore'},
           'Tortilla': {'Rottweiler': 'bottomright/tortilla'},
           'BoatPicnic': {'Rottweiler': 'bottomright/picnic', 'Olga': 'bottomright/picnic'},
-          'OlgaBackTowel': {'Olga': 'bottomright/picnic'},
+          # her workout by the water (0x10038de2: the GoTo to bottomright_water
+          # and olga_workout, where level.xml starts her; the picnic until
+          # 2026-10-03)
+          'OlgaBackTowel': {'Olga': 'bottomright/water'},
           'Pinata': {'Rottweiler': 'bottomleft/pinata'},
           'MechanicalBullControls': {'Rottweiler': 'bottomleft/bullride_controls'},
           'MechanicalBullControlsWait': {'Rottweiler': 'bottomleft/bullride_controls'},
@@ -190,7 +193,11 @@ STATIONS = {
           'Pistol': {'Rottweiler': 'bottomleft/pistol'},
           'Hatch': {'Rottweiler': 'bottomright/hatch_closed'},
           'DeckChairMother': {'Mother': 'topright/deckchair'},
-          'MotherWait': {'Mother': 'bottomright/reling'}},
+          'MotherWait': {'Mother': 'bottomright/reling'},
+          # Olga at the bouquet (0x1003c19e) and, after his `flowers`, at the
+          # pillar (0x1003c2a0) — the mobile's Glass and BirdPerch
+          'Glass': {'Olga': 'topleft/bouquet'},
+          'BirdPerch': {'Olga': 'topleft/pillar'}},
 }
 # Woody's items: the mobile item -> the PC object his GoTo walks to (its `woody`
 # hotspot) — a search item by its InventoryItems' type = the PC container's <content>,

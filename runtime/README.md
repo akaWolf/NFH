@@ -666,9 +666,17 @@ predicate, then the all-tricks win.
   chair until her call), and another role holds its clip likewise
   (PCWaitForRole: her wait until he stands at her chair; 211's Olga in
   the toilet, at the kid and at the reling until his sweets, rod and
-  diving gear uses end — with those holds the three arms of
+  diving gear uses end, 213's at her workout, in the picnic and at the
+  bull until his tortilla begins, his picnic ends and his first bull
+  controls visit begins — with those holds the arms of
   `Routine._olga_extra_animations` that juggle her loops on his action
-  starts stand down, 2026-10-03).
+  starts stand down, 2026-10-03). A wait's `index` names the routine index
+  of the awaited visit (`Item.pc_mark_index`): another visit's mark goes by
+  (213's controls, visited again after his wait for her ride); `then` holds
+  the clip that long after the release and `then_tricked` after a tricked
+  use's (214's Olga: her `wait` after the bouquet's `flowers`, none after
+  the manip's `crash`); a use restarted after an interruption does not arm
+  a hold that has released for it (`Routine._pc_wait_spent`).
 - **The PC profile's Season 2 tricked visits and reactions**
   (`Routine._use`, `World.play_angry`, `pcprofile.s2_reaction_seconds`):
   a tricked use lasts the PC step's stand (PCUseSecondsTricked;

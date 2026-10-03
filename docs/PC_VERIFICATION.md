@@ -1306,3 +1306,24 @@ actors' job pass the update calls at 0x100445f8.
   looped from lap 2 through the toilet stay, the leave came 1.3 s after
   the sweets' end and lasted 3.25 s. Plan 211 at 100 (runs/o211plan,
   unchanged 261.6 s).
+- `runtime/world.py`, `runtime/scene.py`, `tools/pcref/pc_durations_others.py`,
+  `tools/pcref/pc_walks_s2.py`, `levels/pc/Level213.overlay.json`
+  (2026-10-03): 213's Olga on his uses (her latches `boat`, `leave`,
+  `bull`). runs/o213bidle: his tortilla begins 36.65 — she walks from the
+  water at once, 5.17 s to the picnic (the PC's 63 ticks, 5.25), enters
+  41.82-43.82 (24 ticks, 2.0); his picnic ends 67.3 — her leave 67.32-69.32
+  (24); the bull at 90.65 (a door claim while he passes to the pinata),
+  his controls begin 93.65 — the ride 93.65-100.65 (7.0); to the water
+  100.65-115.98 (184 ticks, 15.33); lap 2 the same at 164.82 / 195.65 /
+  221.98. Before (runs/o213base): in the picnic from 14.15 while he was at
+  the carnivore, out at 33.65, at the bull through his picnic, the lap-2
+  ride at his tortilla. Plan 213 at 100 (runs/o213bplan, 391.4 s).
+- `runtime/world.py`, `tools/pcref/pc_durations_others.py`,
+  `tools/pcref/pc_walks_s2.py`, `levels/pc/Level214.overlay.json`
+  (2026-10-03): 214's Olga on his bouquet (`flowers`: her `wait`, the
+  pillar's `wait`). runs/o214bidle: his Bouquet use ends 30.98 — she walks
+  at 33.65 (the wait's 32 ticks, 2.67), at the pillar 37.65 (4.0 s, the PC's
+  49 ticks, 4.08), off it 40.65 (3.0; 34 ticks, 2.83), at the bouquet
+  44.65 (4.0). Before: off 1.0 s after his next action's start, 5.8 s at
+  the perch. Plan 214 at 100 (runs/o214bplan: the tricked bouquet's fight
+  and shower as before — the Washbucket at 525.0, the end 733.3 s).

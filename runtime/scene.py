@@ -251,7 +251,7 @@ class Item:
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
-                 'pc_put', 'pc_began', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
+                 'pc_put', 'pc_began', 'pc_mark_index', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_after', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
                  'pc_done_due', 'pc_extra_due', 'pc_masked',
@@ -666,6 +666,10 @@ class Item:
         self.pc_wait_for_role = {r: dict(v) for r, v in (d.get('PCWaitForRole') or {}).items()}
         self.pc_put = set()
         self.pc_began = set()
+        # ('began' | 'put', role) -> the routine index of the use that set the
+        # mark: a wait for one of a station's visits (`index`: 213's bull
+        # controls, visited twice a lap) lets another visit's mark go by
+        self.pc_mark_index = {}
         # the item's own clips at the PC's ticks while another role uses it
         # hidden (PCItemClipSeconds, pc_durations_others.py ITEM_CLIPS: 205's
         # mat under Olga — her lie-down, the sun loop, the wake-up, the get-up)

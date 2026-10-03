@@ -171,11 +171,21 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                     # until then (WAITS_ROLE)
                     'ToiletWomen': ('Olga', {'OlgaWCEnter': ('topleft_wcright', 'enter', 'step'),
                                              'OlgaWCLeave': ('topleft_wcright', 'leave')})},
+              # 214's Olga at the pillar (her step 0x1003c2a0 after `flowers`:
+              # the GoTo and her own `wait`, 30 ticks) — the mobile's
+              # BirdPerch, five OlgaStandDownInfinite
+              214: {'BirdPerch': ('Olga', {'OlgaStandDownInfinite': ('split', 'olga', 'wait', 5)})},
               # 213's Olga on the bull (her step 0x10039078: the walk to it, the
               # latch her `bull` handler sets — his controls step posts it as
               # he arrives, 0x10037f5e — and bottomleft/bullride_olga's `use`,
               # ride, whose job posts `leave` to him as it ends)
-              213: {'MechanicalBull': ('Olga', {'BullRide': ('bottomleft_bullride_olga', 'use', 'step')})}}
+              213: {'MechanicalBull': ('Olga', {'BullRide': ('bottomleft_bullride_olga', 'use', 'step')}),
+                    # ... and into the picnic (0x100392f2: the GoTo and the
+                    # picnic's `enter`, olga_enter) and out of it (0x100391cc on
+                    # his `leave`: hers, olga_leave) — held inside until then
+                    # (WAITS_ROLE)
+                    'BoatPicnic': ('Olga', {'PicnicEnter': ('bottomright_picnic', 'enter', 'step'),
+                                            'PicnicLeave': ('bottomright_picnic', 'leave')})}}
 
 
 # level -> mobile item -> {the item's clip: the PC's part} — an item's own
@@ -209,7 +219,26 @@ WAITS_ROLE = {210: {'CallRTMother': ('Mother', {'clip': 'MotherStandDownInfinite
                     'OlgaStandStill': ('Olga', {'clip': 'OlgaStandUpInfinite', 'role': 'Rottweiler',
                                                 'item': 'FishingRod', 'then': 0.0}),
                     'OlgaSeaView': ('Olga', {'clip': 'OlgaStandLeftInfinite', 'role': 'Rottweiler',
-                                             'item': 'DivingGear', 'then': 0.0})}}
+                                             'item': 'DivingGear', 'then': 0.0})},
+              # 213's Olga (her script's latches, 0x100393ee): at her towel until
+              # `boat`, posted as he arrives at the tortilla (0x10038696: its
+              # use begun), in the picnic until his `leave` there (his
+              # BoatPicnic's end), at the bull until `bull`, posted as he
+              # arrives at its controls (0x10037f5e) — the first of the two
+              # MechanicalBullControls visits (`visit`: his list's first)
+              213: {'OlgaBackTowel': ('Olga', {'clip': 'Workout', 'role': 'Rottweiler', 'item': 'Tortilla',
+                                               'at': 'start', 'then': 0.0}),
+                    'BoatPicnic': ('Olga', {'clip': 'PicnicWait', 'role': 'Rottweiler', 'item': 'BoatPicnic',
+                                            'then': 0.0}),
+                    'MechanicalBullWait': ('Olga', {'clip': 'OlgaStandUpInfinite', 'role': 'Rottweiler',
+                                                    'item': 'MechanicalBullControls', 'at': 'start',
+                                                    'visit': 0, 'then': 0.0})},
+              # 214's Olga at the bouquet (0x1003c19e) until his `use` of it
+              # posts `flowers` — her handler (0x1003c37a) pushes her own `wait`
+              # (`then_action`, its job's ticks) before the pillar step;
+              # bouquet_manip's `crash` sends her on at once (`then_tricked`)
+              214: {'Glass': ('Olga', {'clip': 'OlgaStandDownInfinite', 'role': 'Rottweiler', 'item': 'Bouquet',
+                                       'then_action': ('olga', 'wait'), 'then_tricked': 0.0})}}
 
 
 def item_clips(n):
@@ -241,6 +270,12 @@ def role_clips(n, tables=CLIPS_ROLE):
                 # a stand the step plays nothing at: its own ticks (a GoTo's
                 # done tick, the next step's first)
                 t = lap_model_s2.WALK_STEP_TICKS
+            elif src[0] == 'split':
+                # a walking step's one DoAction over so many mobile clips (214's
+                # pillar: Olga's `wait`, 0x1003c2a0, for the five stands)
+                t = d.action_ticks(src[1], src[2], actor=role.lower())
+                if t is not None:
+                    t = (t + lap_model_s2.WALK_STEP_TICKS) / float(src[3])
             elif src[0] == 'bar':
                 ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), src[1], {})
                 t = next((e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)), None)
@@ -310,6 +345,23 @@ def _set_key(patches, item, key, value):
         if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
             e['set'][key] = value; return
     patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
+
+
+def role_index(n, role, item, visit=0):
+    """the role's routine index of the item's `visit`-th entry (mobile level
+    data)"""
+    raw = json.load(open(os.path.join(ROOT, 'levels', 's2', 'Level%d.json' % n)))
+    objs = raw['objects']
+    def goname(o):
+        g = ((o.get('data') or {}).get('m_GameObject') or {}).get('path')
+        return ((objs.get(str(g)) or {}).get('data') or {}).get('name')
+    for o in objs.values():
+        d = o.get('data') or {}
+        if o.get('type') != 'ActionManager' or (d.get('Owner') or {}).get('type') != role:
+            continue
+        names = [goname(objs.get(str((a.get('Item') or {}).get('path'))) or {}) for a in d.get('Actions') or []]
+        return [k for k, nm in enumerate(names) if nm == item][visit]
+    raise KeyError('%d: no %s ActionManager' % (n, role))
 
 
 def role_start(n, role, item):
@@ -388,8 +440,9 @@ def main(argv):
             print('   %-18s item    clips %s' % (item, ', '.join('%s %.2f' % kv for kv in sorted(cl.items()))))
         rwaits = WAITS_ROLE.get(n, {})
         for item, (role, wt) in sorted(rwaits.items()):
-            print('   %-18s %-7s holds %s until %s %s %s' % (
-                item, role, wt['clip'], wt['role'], 'began' if wt.get('at') == 'start' else 'used', wt['item']))
+            print('   %-18s %-7s holds %s until %s %s %s%s' % (
+                item, role, wt['clip'], wt['role'], 'began' if wt.get('at') == 'start' else 'used', wt['item'],
+                (' and its %s.%s' % wt['then_action']) if 'then_action' in wt else ''))
         starts = {}
         for role, item in ROLE_START.get(n, {}).items():
             am, k = role_start(n, role, item)
@@ -412,6 +465,16 @@ def main(argv):
             for item, (role, cl) in rclips.items():
                 _set_key(ov['patches'], item, 'PCClipSecondsRole', {role: cl})
             for item, (role, wt) in rwaits.items():
+                wt = dict(wt)
+                if 'then_action' in wt:
+                    # the seconds held after the release: the action's job
+                    import lap_model_s2
+                    o, a = wt.pop('then_action')
+                    wt['then'] = round(lap_model_s2.Data(n).action_ticks(o, a, actor=role.lower()) / 12.0, 2)
+                if 'visit' in wt:
+                    # the awaited role's routine index of that visit of the
+                    # item (the runtime's `index`: another visit's mark goes by)
+                    wt['index'] = role_index(n, wt['role'], wt['item'], wt.pop('visit'))
                 _set_key(ov['patches'], item, 'PCWaitForRole', {role: wt})
             for item, roles in per.items():
                 _set_key(ov['patches'], item, 'PCUseSecondsRole', roles)

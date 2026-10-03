@@ -3464,6 +3464,7 @@ class Routine:
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
+        self._pc_wait_spent = None       # the action index whose hold has released (_pc_wait_tick)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
@@ -3662,6 +3663,7 @@ class Routine:
     def _advance(self):
         self._override = None
         self._active = None
+        self._pc_wait_spent = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -3814,14 +3816,17 @@ class Routine:
             if self.actions[(self.index - 1) % len(self.actions)]['item'] \
             else None
         name = cur.name if cur is not None else None
-        if pcprofile.is_pc() and name in ('Sweets', 'LifeBoat', 'FishingRod') \
-                and any(it.pc_wait_for_role.get('Olga') for it in items.values()):
-            # the profile's Olga stands on the neighbour's uses (PCWaitForRole:
-            # 211's Olga script, GameLogic 0x10031888 — `bonbons` from the
-            # dish's `use` sends her out of the toilet, `roddone` from the
-            # rod's to the reling, `goup` from the diving gear's back to the
-            # toilet, each as his job ends): the three arms' juggling of her
-            # loops is the mobile's own clock for the same releases
+        # the profile's Olga stands on the neighbour's uses (PCWaitForRole):
+        # 211's script (GameLogic 0x10031888) moves her on `bonbons` from the
+        # dish's `use`, `roddone` from the rod's and `goup` from the diving
+        # gear's, 213's (0x100393ee and its latches) on `boat` as he arrives
+        # at the tortilla (0x10038696), `leave` from his picnic `leave` and
+        # `bull` as he arrives at the controls (0x10037f5e) — each as his job
+        # ends or he arrives. The arms' juggling of her loops is the mobile's
+        # own clock for the same releases
+        pc_held = pcprofile.is_pc() and \
+            any(it.pc_wait_for_role.get('Olga') for it in items.values())
+        if pc_held and name in ('Sweets', 'LifeBoat', 'FishingRod', 'Tortilla', 'Pinata'):
             name = None
         if self.role == 'Rottweiler' and prev is not None and \
                 (prev.rott_use_olga_seq or prev.rott_use_tricked_olga_seq):
@@ -3872,12 +3877,12 @@ class Routine:
                 and not self.second_one_time_olga:    # cs:337-345
             olga.anim.anim.infinite = False
             olga.olga_wait_picnic_anim = olga.anim.anim
-        if self.role == 'Olga' and olga_cur is not None \
+        if self.role == 'Olga' and olga_cur is not None and not pc_held \
                 and olga_cur.name in ('BoatPicnic', 'MechanicalBullWait') \
                 and not self.one_time_olga:           # cs:346-350
             self.one_time_olga = True
             olga.olga_workout2_anim = olga.anim.anim
-        if self.role == 'Olga' and olga_cur is not None \
+        if self.role == 'Olga' and olga_cur is not None and not pc_held \
                 and olga_cur.name == 'MechanicalBullWait':   # cs:351-365
             if olga.olga_wait_picnic_anim is not None:
                 olga.olga_wait_picnic_anim.infinite = True
@@ -4089,6 +4094,7 @@ class Routine:
             # (PCWaitFor `at` start: the behavior= message an action fires as
             # it starts, a poll on the actor's arrival)
             it.pc_began.add(self.role)
+            it.pc_mark_index[('began', self.role)] = self.index
         if pcprofile.is_pc() and self.role == 'Rottweiler' \
                 and pcprofile.sees_while_busy(self.pawn.nfh2):
             # 109's bed: the hideout enter (case 7) sets flag 4, the alarm
@@ -4334,6 +4340,7 @@ class Routine:
             self.timer = a['duration']
             self._after_use_side_effects(a, it)
             self.log.append((it.name, tricked))
+            self._pc_use_tricked = bool(tricked)
             if self.on_use:
                 self.on_use(it, tricked)
             self._finish()
@@ -4415,6 +4422,7 @@ class Routine:
             self.pawn.sprite.x = it.x
             self.pawn.pos_snap = True
         self.log.append((it.name, tricked))
+        self._pc_use_tricked = bool(tricked)
         if self.on_use:
             self.on_use(it, tricked)
         pc = self._pc_use_seconds(it)
@@ -5094,7 +5102,10 @@ class Routine:
         self.pawn.anim.clip_pace = dict(table) if table else None
         wf = it.pc_wait_for if self.role == 'Rottweiler' \
             else it.pc_wait_for_role.get(self.role)
-        if wf:
+        if wf and self._pc_wait_spent != self.index:
+            # (a use resumed after an interruption — 214's Olga back at the
+            # bouquet after her fight — does not wait again for the event
+            # that released it)
             self._pc_wait = dict(wf, released=None)
             self.pawn.anim.hold_clip = wf['clip']
 
@@ -5112,12 +5123,22 @@ class Routine:
                 (src.pc_began if wt.get('at') == 'start' else src.pc_put)
             if marks is not None and wt['role'] in marks:
                 marks.discard(wt['role'])
-                wt['released'] = 0.0
+                key = ('began' if wt.get('at') == 'start' else 'put', wt['role'])
+                if wt.get('index') is None or src.pc_mark_index.get(key) == wt['index']:
+                    wt['released'] = 0.0
+                    if 'then_tricked' in wt and key[0] == 'put' \
+                            and src.pc_mark_index.get(('put_tricked', wt['role'])):
+                        # a tricked use's behaviour sends her on at once
+                        # (214's `crash` from the bouquet_manip: no `wait`)
+                        wt['then'] = wt['then_tricked']
+                # (another visit's mark goes by: 213's controls after his
+                # wait for her ride)
             return
         wt['released'] += dt
         if wt['released'] < float(wt['then']) - 1e-9:
             return
         self._pc_wait = None
+        self._pc_wait_spent = self.index
         anim = self.pawn.anim
         anim.hold_clip = None
         if anim.anim is not None and anim.anim.name == wt['clip']:
@@ -5200,6 +5221,9 @@ class Routine:
             # a held clip elsewhere waits for this role's use of this item
             # (PCWaitFor: Olga's sub in the sea)
             self.item.pc_put.add(self.role)
+            self.item.pc_mark_index[('put', self.role)] = self.index
+            self.item.pc_mark_index[('put_tricked', self.role)] = \
+                getattr(self, '_pc_use_tricked', False)
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
         self.pc_credit_timer = 0.0; self.pc_credit_item = None

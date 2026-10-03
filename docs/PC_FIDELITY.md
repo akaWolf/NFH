@@ -2074,6 +2074,46 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   after each of his use ends, the leave 2.33 s, the walks to the kid 2.67
   and to the reling 2.5 (the PC's 32 and 30 ticks), from the reling to the
   toilet 4.33 (52), its enter 1.67 (21).
+  213's Olga likewise (me_c2's `olga`: the constructor 0x10039439 arms
+  three latches, `boat`, `leave` and `bull`, and her idle step 0x100393ee
+  polls them): `boat` comes as he arrives at the tortilla (his step posts
+  it on the GoTo's done, 0x10038696) — 0x100392f2 walks her to the picnic
+  and enters it (olga_enter, whose record posts `boat` back to his picnic
+  step's poll); his picnic `leave` posts `leave` — 0x100391cc plays hers
+  (olga_leave) and 0x10039073 walks her to the bull; `bull` comes as he
+  arrives at its controls (0x10037f5e) — the ride, whose record posts
+  `leave` to him; then 0x10038de2 walks her to bottomright/water for
+  olga_workout (where level.xml starts her) until the next `boat`. The
+  mobile's juggling (the Tortilla arm clears her workout loop as his
+  routine starts the tortilla — a round later —, the Pinata arm her picnic
+  loop, the Olga-role arms at BoatPicnic and MechanicalBullWait) drifted
+  under the profile's lap: in lap 1 she sat in the picnic from 14 s, left it
+  as he walked to the tortilla and waited at the bull through his picnic;
+  in lap 2 she rode at his tortilla. The profile holds her on his uses
+  (Workout until his Tortilla begins, PicnicWait until his BoatPicnic
+  ends, OlgaStandUpInfinite until his first MechanicalBullControls begins
+  — a wait's `index`, the routine index of that visit, lets his second
+  visit's mark go by), the arms stand down, the picnic's enter and leave
+  take the PC's 24 ticks each (2.0 s; the mobile's 2.62 and 2.88), and her
+  workout is at the water (STATIONS; the picnic before, which made her
+  walk to it take no time): the walk to the picnic 5.17 s (the PC's 63
+  ticks, 5.25), the bull to the water 15.33 (184).
+  214's Olga (ship4's `olga` 0x1003c4e3): her first step 0x1003c19e walks
+  her to topleft/bouquet (`ms2`) and waits; his `use` of the bouquet posts
+  `flowers` — her handler 0x1003c37a pushes her own `wait` (30 ticks, the
+  job 32) and 0x1003c2a0 then walks her to topleft/pillar for another,
+  back to the bouquet after it; bouquet_manip's `use` posts `crash`, which
+  sends her into the fight and the shower at once (0x1003bf93). The mobile's
+  Glass and BirdPerch are those stands: the Glass loop released by the
+  CaptainDoor arm (his next action's start, a round later), the perch's
+  five OlgaStandDownInfinite rounds (5.8 s). The profile holds the Glass
+  until his Bouquet use ends and the wait's 2.67 s more — none after a
+  tricked use (`then_tricked`: a use's end mark carries whether it was
+  tricked) —, times the perch as the pillar step (the walking step's two
+  ticks and the wait: 0.57 s a round), and walks both at the PC's hotspots
+  (STATIONS: the bouquet's and the pillar's `olga`). A held use that an
+  interruption restarts — her fight on the tricked bouquet — does not wait
+  again for the event that released it (`Routine._pc_wait_spent`).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier
