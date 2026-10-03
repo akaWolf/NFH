@@ -332,7 +332,18 @@ actors' job pass the update calls at 0x100445f8.
   the notice distance — 102's rush to the stuffed toilet sat down on it
   unnoticed, the missing paper's reaction lost with it): a trick laid
   within 15 px of where he stands still is noticed on the PC at once, on
-  the port at his next walk.
+  the port at his next walk — carried since 2026-10-03 for the floor
+  tricks (Routine._pc_notice_standing on his standing ticks; the reach
+  15 px, pcprofile.S1_NEAROBJ_PX, where the mobile's
+  NoticeWhenNearTrickedDistance is 0.1 u, 9.6 px): fcn.00471bc0's nearobj
+  mode is the actor in the object's room, not in a hideout (flag 4,
+  fcn.0043c2b0 at 0x471cee) and |x - the object's `neighbor` hotspot x| <
+  15 (`setl` at 0x471e1a), and fcn.00472390's state machine delivers a
+  flag-2 trigger as its condition turns true (0x4724fa-0x472525: the
+  0x200 bit set until it turns false, 0x47252c-0x472542; 0x1000 removes a
+  one-shot, 0x47254c). The walk-by stations (the microwave, the toilet,
+  the pictures, 109's pig, 111's airer and iron, the electric traps) keep
+  the mobile's walk frames: their triggers are not read.
 - Woody's Season 1 walk, carried 2026-09-27: his clicks reach the same
   GOTO as the neighbour's steps (the level's command handlers at 0x440088
   / 0x44014f / 0x4401fd call fcn.004364f0 / fcn.004368d0, which build it
