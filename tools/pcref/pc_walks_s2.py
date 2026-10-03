@@ -54,8 +54,15 @@ ROLES = (('neighbor', 'Rottweiler'), ('woody', 'Woody'), ('mother', 'Mother'), (
 # role — the object of the level script's GoTo / DoAction for the station
 # (lap_model_s2.walk's targets: 202's theocean, 205's beachright/mat, 206's fifi, 207's
 # kid, 213's limberwall, 214's door_closed …), else the object whose actor action the
-# station plays; stations without a PC counterpart are left out (208's and 209's
-# Mother at Fifi and at her start, 211's and 214's Olga at her stands, the kid).
+# station plays; stations without a PC counterpart are left out (214's Olga at
+# her stands, the kid). The Mother's and Olga's are their own scripts' (the
+# level's script registry, GameLogic.dll 0x10011000-0x10013fff, pairs each
+# level folder's actor with its script's factory: 208's Mother 0x1001d2ec,
+# 209's 0x1001f87a, 211's 0x1002f92e and Olga 0x10031ae1): 208's Mother goes
+# to Fifi by the IsVariant pick of bazar/fifi_primary, fifi_secondary and
+# fifi_gone (0x1001d030 — all three at one spot), 209's to the fakir's shop
+# for its `use` (0x1001f729), 211's to the kid for his `shout` (0x1002f570) and
+# Olga to the kid after her `bonbons` (0x10031680).
 # 210's call is her chair for both: his call step runs him to pool_deckchair
 # (0x10019270), her order step waits for him at its `neighbor` hotspot
 # (fcn.1000e172). The approach is the object's `<actor>` hotspot against its
@@ -116,7 +123,8 @@ STATIONS = {
           'ShoeMachine': {'Rottweiler': 'tadj_mahal/shoe_cleaner'},
           'AngryElephant': {'Rottweiler': 'elephant/elephant'},
           'ArmsBowl': {'Rottweiler': 'altar/statue'},
-          'DressingRoom': {'Mother': 'bazar/dressing_room'}},
+          'DressingRoom': {'Mother': 'bazar/dressing_room'},
+          'Fifi': {'Mother': 'bazar/fifi_primary'}},
     209: {'FireFakir': {'Rottweiler': 'fire_fakir/groove'},
           'HotShoe': {'Rottweiler': 'tadj_mahal/shoe_mat'},
           # the shoe step goes to the shoe mat and enters the curtain from
@@ -127,7 +135,8 @@ STATIONS = {
           'Coal': {'Rottweiler': 'coal_area/coal'},
           'IceCream': {'Rottweiler': 'bazar/icecream_machine'},
           'Cow': {'Rottweiler': 'holy_cow/cow'},
-          'DressingRoom': {'Mother': 'bazar/dressing_room'}},
+          'DressingRoom': {'Mother': 'bazar/dressing_room'},
+          'MotherStart': {'Mother': 'bazar/shop'}},
     210: {'DeckChair': {'Rottweiler': 'beachleft/deckchair'},
           'DogBasket': {'Rottweiler': 'pool/fifi_sleep'},
           'DogBasketPut': {'Rottweiler': 'pool/fifi_sleep'},
@@ -144,7 +153,9 @@ STATIONS = {
           'DivingGear': {'Rottweiler': 'bottomright/diving'},
           'ToiletWomen': {'Olga': 'topleft/wcright'},
           'OlgaSeaView': {'Olga': 'topleft/reling'},
-          'DeckChairMother': {'Mother': 'topright/deckchair'}},
+          'OlgaStandStill': {'Olga': 'kid'},
+          'DeckChairMother': {'Mother': 'topright/deckchair'},
+          'OlgaChild': {'Mother': 'kid'}},
     212: {'PreAztecThrone': {'Rottweiler': 'topright/hands'},
           'AztecThrone': {'Rottweiler': 'topright/hands'},
           'Whip': {'Rottweiler': 'midright/whip'},

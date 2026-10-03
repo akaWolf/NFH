@@ -1989,7 +1989,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and caught the hand trip. 208/209's dressing room, 207/210/211's pool,
   nap and sea-view loops have no explicit time and keep the mobile clips;
   214's Mother takes her script's (the reling's 80 ticks, her bar in the
-  chair — "214's handshake").
+  chair — "214's handshake"). (207's, 210's and 206's Mother have taken
+  their scripts' since, and 208's, 209's and 211's — below.)
   By code since 2026-10-03 (tools/pcref/pc_durations_others.py ROLE_LAPS
   over lap_model_s2.role_lap): her script's lap is walked as the
   neighbour's — each station a step, its GoTo, the DoActions `use` of the
@@ -2009,6 +2010,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and the pool, 210's chair under him, 213's Olga on the bull — 0.17 s a
   visit, the job's alone before; 202's swim holds its wait clip until the
   sub (its step's own ticks inside the hold).
+  208's, 209's and 211's Mother by her script (2026-10-03). GameLogic.dll
+  keeps a registry of each level folder's actors and their scripts'
+  factories (0x10011000-0x10013fff: in_c1's `mother` 0x1001d2ec, in_c2's
+  0x1001f87a, ship3's 0x1002f92e; the factory's constructor stores her
+  first step). 208's are the dressing room (0x1001d1b2: the GoTo, then
+  fcn.1000e7f2's 360-tick bar inside — the room's `enter`, 10 ticks,
+  before it and its `leave`, 10, as her next walk starts) and Fifi
+  (0x1001d030: a GoTo to the IsVariant's pick of bazar/fifi_primary,
+  fifi_secondary and fifi_gone, all three at one spot, and back — the
+  step's own two ticks while Fifi is there); 209's the fakir's shop
+  (0x1001f729: its `use`, 120 ticks) and the dressing room (0x1001f564,
+  the same bar) — the shop first, where the mobile list starts at the
+  dressing room (ROLE_START: her ActionManager starts at MotherStart and
+  wraps to 0); 211's her deck chair (0x1002f83f: `enter` 10, the 240-tick
+  bar, `leave` 17) and the kid (0x1002f570: his `shout` for her, 14). The
+  stands per clip (CLIPS_ROLE: Hide_In, the thirty MotherRoomIdle, Hide_Out;
+  the Fifi stand the step's ticks; 211's sit, the three sleeps, the
+  get-up and the bawl) and the stations at the scripts' objects
+  (PCApproach: bazar/fifi_primary, bazar/shop, the kid's `mother`
+  hotspot). Her cycles: 208 43.8-44.0 s, 209 54.3, 211 38.7-38.8 (the
+  mobile stands' 41.5, 41.2 and 33.8) — the video's 43.7-43.8, 54.2 and
+  38.6-38.7 (docs/PC_VERIFICATION.md).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

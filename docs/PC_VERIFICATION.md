@@ -1260,3 +1260,25 @@ actors' job pass the update calls at 0x100445f8.
   pace (CLIPS_ROLE: the sit 1.67 s, the nine sleeps 60, the two looks
   30) — runs/les206h: sat 67.15, asleep 68.82-128.98, awake to 158.98,
   asleep to 219.15. Plan 206 at 100.
+- `tools/pcref/pc_durations_others.py`, `tools/pcref/pc_walks_s2.py`,
+  `tools/pcref/lap_model_s2.py`, `levels/pc/Level208.overlay.json`,
+  `Level209.overlay.json`, `Level211.overlay.json` (2026-10-03): 208's,
+  209's and 211's Mother by her script (GameLogic.dll's registry of the
+  level folders' actor scripts: in_c1's `mother` 0x1001d2ec, in_c2's
+  0x1001f87a, ship3's 0x1002f92e). The video (pc_nfh2_all_720, her HUD
+  portrait at 10 fps: the bubble's icons and the bar's green): 208's
+  bar onsets 5.7, 49.4, 93.2, 136.9 s into E08 — 43.7-43.8 s apart
+  (the dressing room's 360 ticks, its `enter` and `leave`, the walks to
+  Fifi's spot and back, the Fifi step's two ticks: 526 ticks, 43.8 s);
+  209's shop icon at 0.0, 48.4, 102.6, the dressing room's at 11.4,
+  65.6, 119.8 and the bar's green at 18.6, 72.8, 126.9 — a 54.2-s cycle
+  of the shop to the room 17.2 s (the leave, the walk, the `use`'s 124
+  ticks), the room's icon to the bar 7.2 (the walk and the `enter`) and
+  the bar 29.8 (360 ticks); 211's bar onsets 0.0, 38.5, 77.2, 115.9,
+  154.5, 193.2 — 38.6-38.7 apart. The port (runs/idlemo1): 208 43.83-
+  44.0 (the mobile stands' 41.5-41.67), 209 54.33 with the segments 17.3,
+  7.16 and 30.0 (41.17), 211 38.67-38.83 (33.67-33.83 — the new
+  approach to the kid takes the PC's door pass, 7.2 s a way where the
+  mobile's walk had 4.3). Plans 208 and 211 at 100 unchanged; 209 at 100
+  with its two Zone02 takes moved to her next Hide_In (v3, runs/g209b:
+  432.2 s). Mobile 270/270.

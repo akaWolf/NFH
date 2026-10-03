@@ -1026,8 +1026,8 @@ def role_lap(n, start, actor):
     records (her DoActions' jobs, the step's own ticks), a walk from inside
     a hideout starting with the route's leave of it (the last step's part)"""
     d = Data(n)
-    steps, _loop = walk(Level(n), start)
-    out = []
+    steps, loop = walk(Level(n), start)
+    out = []; walks = []
     ctx = {'geom': Geometry(n), 'data': d, 'actor': actor}
     for cur, ev, _nxt in steps:
         parts = station_ticks(d, ev, ctx)
@@ -1035,6 +1035,12 @@ def role_lap(n, start, actor):
         if hid and out:
             out[-1][1].append((hid, 'leave', d.action_ticks(hid, 'leave', actor)))
         out.append((cur, parts))
+        walks.append(ctx.get('walks', False))
+    hid = ctx.get('inside')
+    if loop is not None and out and hid and walks[loop]:
+        # (the lap's last step left her inside and the loop's first walks:
+        # 209's dressing room, left on the way to the fakir's shop — lap_steps)
+        out[-1][1].append((hid, 'leave', d.action_ticks(hid, 'leave', actor)))
     return out
 
 

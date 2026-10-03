@@ -14,6 +14,13 @@ roles' `using` stretches — NFH_SCRATCH/s2_idle_others.json) and are paired by
 hand per level in ALIAS: a mobile stand that covers two PC stations in one room
 takes their sum less the walk between.
 
+Her script is the one GameLogic.dll's registry pairs with her level folder
+(0x10011000-0x10013fff: each folder's actors and their scripts' factories —
+in_c1's `mother` 0x1001d2ec, in_c2's 0x1001f87a, ship3's 0x1002f92e, me_c1's
+0x1003533d; the factory's constructor stores her first step), and where the
+mobile list starts elsewhere her ActionManager starts at that step's item
+(ROLE_START).
+
 A Mother's bar in her own script (BARS: 214's deck chair — GameLogic.dll's
 sleep step 0x1003a0b8 walks her to the chair and holds her there for the
 ticks it pushes to fcn.1000e7f2, 600 at 0x1003a1e0, before the reling step
@@ -42,6 +49,9 @@ ALIAS = {
           'MotherWaitZone5': ('Mother', ['topright/flowers.use'], 0.0)},
     # her reling step after the sleep (0x10039f34: the GoTo and the reling's use)
     214: {'MotherWait': ('Mother', ['bottomright/reling.use'], 0.0)},
+    # her shop step (0x1001f729: the GoTo and the fakir's shop's `use`, 120
+    # ticks) — the mobile's MotherStart, its MotherStandDownSingle
+    209: {'MotherStart': ('Mother', ['bazar/shop.use'], 0.0)},
 }
 # level -> role -> the step her script's lap starts from (lap_model_s2.role_lap):
 # the stays are the code's since 2026-10-03 — each station a step (the GoTo,
@@ -50,7 +60,17 @@ ALIAS = {
 # `time` alone (212's Mother 212: the statue 0x10035048 <-> the red bull
 # 0x10035208; 213: the water 0x100372f0 <-> the flowers 0x100374a6; 214: the
 # deck chair 0x1003a0b8, the reling 0x10039f34)
-ROLE_LAPS = {212: {'Mother': 0x10035048}, 213: {'Mother': 0x100372f0}, 214: {'Mother': 0x1003a0b8}}
+# 209's Mother: the fakir's shop 0x1001f729 <-> the dressing room's bar
+# 0x1001f564 (the script registry's in_c2 `mother`, 0x1001f87a: her first step)
+ROLE_LAPS = {209: {'Mother': 0x1001f729}, 212: {'Mother': 0x10035048}, 213: {'Mother': 0x100372f0},
+             214: {'Mother': 0x1003a0b8}}
+# level -> role -> the mobile item her script's first step stands for, where
+# the mobile list starts elsewhere: the ActionManager starts there and wraps to
+# 0 (ActionStartIndex, LoopFromStartIndex off — AdvanceActionIndex's third
+# arm, ActionManager.cs:566-584). 209's Mother goes to the fakir's shop first
+# (her constructor's step 0x1001f821 stores 0x1001f729), the mobile to the
+# dressing room
+ROLE_START = {209: {'Mother': 'MotherStart'}}
 # level -> mobile item -> (the Mother script's sleep step, the chair) — the step
 # whose fcn.1000e7f2 bar holds her in the chair (lap_model_s2.run_step reads the
 # pushed ticks)
@@ -109,6 +129,28 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
               206: {'DeckChair': ('Mother', {'MotherSitPillow': ('topleft_deckchair', 'enter', 'step'),
                                              'MotherSleepLoop': ('bar', 0x1002b9fe, 9),
                                              'MotherLook': ('ticks', 180)})},
+              # 208's and 209's Mother in the dressing room (her step 0x1001d1b2 /
+              # 0x1001f564: the GoTo, then fcn.1000e7f2's 360-tick bar inside —
+              # the room's `enter` first, its `leave` the route's as she walks on):
+              # the mobile's Hide_In, thirty MotherRoomIdle and Hide_Out; 208's at
+              # Fifi (0x1001d030: the GoTo alone while Fifi is there, then the
+              # dressing room — the step's own ticks, lap_model_s2.WALK_STEP_TICKS)
+              208: {'DressingRoom': ('Mother', {'Hide_In': ('bazar_dressing_room', 'enter', 'step'),
+                                                'MotherRoomIdle': ('bar', 0x1001d1b2, 30),
+                                                'Hide_Out': ('bazar_dressing_room', 'leave')}),
+                    'Fifi': ('Mother', {'MotherStandDownSingle': ('step',)})},
+              209: {'DressingRoom': ('Mother', {'Hide_In': ('bazar_dressing_room', 'enter', 'step'),
+                                                'MotherRoomIdle': ('bar', 0x1001f564, 30),
+                                                'Hide_Out': ('bazar_dressing_room', 'leave')})},
+              # 211's Mother (her script: 0x1002f83f to topright/deckchair — its
+              # `enter`, sitdown — for fcn.1000e7f2's 240-tick bar asleep, then
+              # 0x1002f570 to the kid for his `shout`, her walk leaving the chair
+              # — getup): no pillow pose of its own, the three sleeps the 240
+              211: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('topright_deckchair', 'enter', 'step'),
+                                                   'MotherSleepPillow': ('ticks', 0),
+                                                   'MotherSleepSingle': ('bar', 0x1002f83f, 3),
+                                                   'MotherGetUpPillow': ('topright_deckchair', 'leave')}),
+                    'OlgaChild': ('Mother', {'MotherBawlLeft': ('kid', 'shout', 'step')})},
               # 213's Olga on the bull (her step 0x10039078: the walk to it, the
               # latch her `bull` handler sets — his controls step posts it as
               # he arrives, 0x10037f5e — and bottomleft/bullride_olga's `use`,
@@ -153,6 +195,10 @@ def role_clips(n, tables=CLIPS_ROLE):
                 t = d.frames.get((src[1], src[2]))
             elif src[0] == 'ticks':
                 t = src[1]
+            elif src[0] == 'step':
+                # a stand the step plays nothing at: its own ticks (a GoTo's
+                # done tick, the next step's first)
+                t = lap_model_s2.WALK_STEP_TICKS
             elif src[0] == 'bar':
                 ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), src[1], {})
                 t = next((e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)), None)
@@ -222,6 +268,23 @@ def _set_key(patches, item, key, value):
     patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
 
 
+def role_start(n, role, item):
+    """(the role's ActionManager GameObject name, the index of `item` in its
+    Actions) of the mobile level data"""
+    raw = json.load(open(os.path.join(ROOT, 'levels', 's2', 'Level%d.json' % n)))
+    objs = raw['objects']
+    def goname(o):
+        g = ((o.get('data') or {}).get('m_GameObject') or {}).get('path')
+        return ((objs.get(str(g)) or {}).get('data') or {}).get('name')
+    for o in objs.values():
+        d = o.get('data') or {}
+        if o.get('type') != 'ActionManager' or (d.get('Owner') or {}).get('type') != role:
+            continue
+        names = [goname(objs.get(str((a.get('Item') or {}).get('path'))) or {}) for a in d.get('Actions') or []]
+        return goname(o), names.index(item)
+    raise KeyError('%d: no %s ActionManager' % (n, role))
+
+
 def pc_actions(d):
     """(actor, object, action name, actoranim, seconds|'auto') of the level's objects.xml"""
     p = os.path.join(PCX, d, 'objects.xml')
@@ -241,7 +304,7 @@ def pc_actions(d):
 def main(argv):
     write = '--write' in argv
     levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE)
-                                                             | set(ITEM_CLIPS))
+                                                             | set(ITEM_CLIPS) | set(ROLE_START))
     # the profile's idle runs, for the printed comparison only
     mp = os.path.join(SCRATCH, 's2_idle_others.json')
     mob = json.load(open(mp)) if os.path.exists(mp) else {}
@@ -283,9 +346,19 @@ def main(argv):
         for item, (role, wt) in sorted(rwaits.items()):
             print('   %-18s %-7s holds %s until %s %s %s' % (
                 item, role, wt['clip'], wt['role'], 'began' if wt.get('at') == 'start' else 'used', wt['item']))
+        starts = {}
+        for role, item in ROLE_START.get(n, {}).items():
+            am, k = role_start(n, role, item)
+            print('   %-18s %-7s starts the list (%s index %d), wraps to 0' % (item, role, am, k))
+            starts[am] = k
         if write:
             p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
             ov = json.load(open(p))
+            ov['patches'] = [e for e in ov.get('patches', []) if not (
+                e.get('component') == 'ActionManager' and 'ActionStartIndex' in (e.get('set') or {}))]
+            for am, k in sorted(starts.items()):
+                ov['patches'].append({'object': am, 'component': 'ActionManager',
+                                      'set': {'ActionStartIndex': k, 'LoopFromStartIndex': False}})
             ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSecondsRole')
             for k in ('PCSitSeconds', 'PCSleepSeconds', 'PCGetUpSeconds', 'PCClipSecondsRole', 'PCWaitForRole',
                       'PCItemClipSeconds'):
@@ -319,6 +392,9 @@ def main(argv):
             note4 = " Another actor's clip held (tools/pcref/pc_durations_others.py WAITS_ROLE): PCWaitForRole, until a role's use of an item has begun (at start) or ended."
             if rwaits and 'WAITS_ROLE' not in ov['source']:
                 ov['source'] += note4
+            note6 = " Another actor's first station (tools/pcref/pc_durations_others.py ROLE_START): her ActionManager starts at the item her script's first step stands for and wraps to 0."
+            if starts and 'ROLE_START' not in ov['source']:
+                ov['source'] += note6
             json.dump(ov, open(p, 'w'), indent=1, ensure_ascii=False); open(p, 'a').write('\n')
             print('   wrote', p)
 

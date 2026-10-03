@@ -7,7 +7,10 @@
 # cow (199), the hot shoe inside his lap-3 Taj stay (244) and the knife on the cow after it
 # (272), so his lap 3 pays them all: the fakir (225), the shoe and the drain (254), the coal
 # and the trough (267), the ice cream (300) and the cow (327), the collapse (runs/rp209c:
-# 100 at 327.4 s).
+# 100 at 327.4 s). v3 (2026-10-03): the Mother by her script — the fakir's shop first
+# (10.3 s), then the dressing room's 30-s bar, a 54.3-s cycle (41.2 before) — so the two
+# Zone02 takes wait for her next Hide_In; the knife on the cow and the rest a lap later
+# (runs/g209b: 100 at 432.2 s).
 # Level209 — GameInfo total=7 / winning=5 (S2: TrickScore 0 everywhere). Woody
 # starts WITH the pen knife (InventoryManager.InventoryItems = [IT2_Knife],
 # InventoryManager.cs:5 — the port loads it since the s2_plans fix).
@@ -29,6 +32,7 @@ take ConstructionSet IT2_Fuel          # Zone01: fuel + match
 prime Flowers IT2_Knife                # Zone04: the knife pick (Item.cs:1421-1426) — the held knife becomes IT2_Flowers and a fresh knife lands back
 prime Cow IT2_Flowers                  # Zone01: CowBehavior (Item.cs:1760-1780) — the cow primes at once; frame 27 of its primed pose enables the CowCrap collider (Level208Behaviors.OnAdvanceFrame)
 take CowCrap IT2_Crap                  # Zone01
+whenanim Mother Hide_In                # her next dressing room: the bar's 30 s for the two takes in Zone02
 take AsbestosNappies IT2_Pants         # Zone02 (RequirePrimingOnlyWhenTricked: primes on the TRICKED coal, PrimingItem Coal)
 take PairOfBellows IT2_Air_pump        # Zone02
 whenusing FireFakir                    # his lap-2 fakir
