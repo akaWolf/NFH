@@ -1705,6 +1705,35 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   same night: her step waits while she is `inv`, his `put1` shows her, and
   her sequence's first element is the attack, the tick after the offer's
   (lap_model_s2 CREDIT_BY): PCCreditAt 1.83 s.
+- *206's lap by code (2026-10-03, read in GameLogic.dll and carried).* The
+  level script's constructor (fcn.1002f1bb) starts at 0x1002f15a: the
+  camera on him, then 0x1002f11d waits for the Mother's `call` (the latch
+  +0x14) — the pillow lesson (0x1002f082-0x1002e926, the latches `call`,
+  `order`, `mother_fight` and `tutorial`: the pillows fetched for her deck
+  chair until the fart-bag pillow hurts her, SHOUT 1) —, and 0x1002e926
+  goes on to the lap from 0x1002e63c. That lap is the mobile's loop from
+  its selected index (Level206's ActionSelectedIndex 4, LoopFromSelectedIndex;
+  the deck chair and the pillows before it are the lesson's), station for
+  station: Fifi off her used blanket, onto the ramp and loaded, the harpoon
+  taken, the bear shot, the harpoon put back, Fifi taken at the ramp, put
+  down at the dumbbell for Olga's marvel at his workout and taken again,
+  put back on her blanket, the dynamite — the bag's `take` (0x1002caa1)
+  and the next step's reling (0x1002c674: its GoTo walks him on, 86 px,
+  12 ticks, then the lookaround and the fishing). The profile had timed
+  the lap's stations by the mobile's clips — the video's bubble spans are
+  the lesson's there — and the port's lap ran 105.3 s; by code 118.5 s
+  (lap_model_s2 PAIRS, per visit: DogFifi 1.5 / 1.58, LaunchPad 2.42 /
+  6.0 / 1.17, Harpoon 1.58 / 0.58, FifiWeightsDrop 1.25, Weights 6.92,
+  FifiWeightsGrab 1.0, DynamiteBox 16.17 with the walk between its steps,
+  `_visit_walks`), and his next walk leaves from the reling (`tx` 86,
+  lap_model_s2 code_places); Fifi's take at the ramp walks to
+  bottomleft/fifi, 5 px left and 5 higher (pc_walks_s2 VISIT_OBJECTS). The
+  tricked dynamite (the adhesive's: 0x1002c550, the reling's `explode`,
+  SHOUT 1) walks there too — 15.5 s, credited at 10.08 (14.5 and 9.08
+  without the walk). The lesson stays the mobile's: its opening DogFifi
+  visit (Level206's action 0, where the PC's neighbour stands waiting for
+  the call) keeps its own length ahead of the cycle of the lap's values
+  (PCUseSecondsLead, pc_durations_s2 LEAD_OWN).
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which

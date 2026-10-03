@@ -74,6 +74,11 @@ leaves him 190 px on, an action's <translation>, Data.translation), 85 (211),
 the video's stays (pc_durations_s2.py) held the walk the port's geometry did
 not have until the door passes and the station runs were carried
 (tools/pcref/pc_walks_s2.py); code_stays hands the profile the code's.
+206's since 2026-10-03: its lap after the pillow lesson (the waits on the
+Mother are the lesson's, 0x1002f11d and 0x1002ecb5) is the mobile's loop
+from its selected index, 118.5 s; a visit whose parts span steps takes the
+walks between them (_visit_walks: the dynamite bag's take, then the
+reling's step).
 """
 import re, json, bisect, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -1003,6 +1008,7 @@ def lap_steps(n):
             LAP_LEAVES.setdefault(n, {})[out[-1][0]] = hid
         out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, parts))
         LAP_WALKS.setdefault(n, {})[i] = ctx.get('walks', False)
+        LAP_GOS.setdefault(n, {})[i] = _lap_target(ev, ctx.get('inside_before'))
         if any(e[0] == 'E6c2e' for e in ev):
             LAP_LEAVES.setdefault(n, {})[i] = ctx.get('hideout')
     hid = ctx.get('inside')
@@ -1038,6 +1044,24 @@ LAP_WALKS = {}
 # {level: {lap row: the hideout its step leaves}} (lap_steps): the leave places
 # him at the hideout's `<actor>_out` (_leave_place, code_places)
 LAP_LEAVES = {}
+# {level: {lap row: the object its step walks to}} (lap_steps, _lap_target): a
+# visit whose parts span steps walks between them (_visit_walks, code_places)
+LAP_GOS = {}
+
+
+def _lap_target(ev, inside=None):
+    """the object the step walks to on the lap: its GoTo's (fcn.1000e3e0) —
+    where the name is a local, the IsVariant's pick or the first DoAction's
+    object —, else the bar helper's (_go_target)"""
+    for e in ev:
+        if e[0] == 'GO':
+            target = e[1] if e[1] and not str(e[1]).startswith('$') else None
+            if target is None:
+                pick = [x[2] for x in ev if x[0] == 'IFVAR' and x[2] and not str(x[2]).startswith('$')]
+                dos = [x[1][0] for x in ev if x[0] == 'DO' and x[1] and not x[1][0].startswith('$') and x[1][0] != 'neighbor']
+                target = (pick or dos or [None])[0]
+            return target
+    return _go_target(ev, inside)
 
 
 def _leave_place(g, d, obj, actor='neighbor'):
@@ -1402,17 +1426,7 @@ def lap_estimate(n, verbose=False):
             elif k > 0:
                 stays += lt
             if verbose: print('   stay %-30s %5.1f s' % ('%s.leave' % short(rl), (lt or 0) / 12.0))
-        target = None
-        for e in ev:
-            if e[0] == 'GO':
-                target = e[1] if e[1] and not str(e[1]).startswith('$') else None
-                if target is None:
-                    pick = [x[2] for x in ev if x[0] == 'IFVAR' and x[2] and not str(x[2]).startswith('$')]
-                    dos = [x[1][0] for x in ev if x[0] == 'DO' and x[1] and not x[1][0].startswith('$') and x[1][0] != 'neighbor']
-                    target = (pick or dos or [None])[0]
-                break
-        else:
-            target = _go_target(ev, ctx.get('inside_before'))       # the bar helper's GoTo
+        target = _lap_target(ev, ctx.get('inside_before'))
         if target:
             real = d.real.get(target, target)
             if pos is None:
@@ -1537,6 +1551,27 @@ PAIRS = {
           'Rockets': [(None, 'rocket', 'ignite')],
           'SandSculpture': [('sandlion', 'neighbor', 'lookaround'), (None, 'sandlion', 'kick')],
           'OlgaMatBeach': [(None, 'neighbor', 'talk'), (None, '-', 'wait')]},
+    # his lap after the pillow lesson (0x1002e926 -> 0x1002e63c; the mobile's
+    # loop from its selected index, DogFifi to the dynamite): Fifi taken off
+    # her used blanket and put on the ramp, loaded; the harpoon taken, the
+    # bear shot, the harpoon put back, Fifi taken; put down at the dumbbell,
+    # Olga's marvel at his workout, taken again; put back on her blanket;
+    # the dynamite bag's take, and the next step's reling (its GoTo walks
+    # him on, _visit_walks): the lookaround and the fishing. Per visit: the
+    # mobile's two DogFifi visits (the take, the put), three LaunchPad (the
+    # load, the shot, Fifi taken at the ramp), two Harpoon (the take, the
+    # put)
+    206: {'DogFifi': [[(None, 'topleft_usedblanket', 'empty'), (None, 'topleft_fifi', 'take')],
+                      [(None, 'topleft_fifi', 'put'), (None, 'topleft_usedblanket', 'ms')]],
+          'LaunchPad': [[(None, 'bottomleft_fifi', 'put'), (None, 'bottomleft_ramp', 'load')],
+                        [(None, 'bottomleft_ramp', 'shootbear')],
+                        [(None, 'bottomleft_fifi', 'take')]],
+          'Harpoon': [[(None, 'bottomleft_harpoon', 'take')], [(None, 'bottomleft_harpoon', 'put')]],
+          'FifiWeightsDrop': [(None, 'bottomright_fifi', 'put')],
+          'Weights': [(None, 'olga', 'marvel'), (None, 'bottomright_dumbbell', 'use'), (None, 'olga', 'ms')],
+          'FifiWeightsGrab': [(None, 'bottomright_fifi', 'take')],
+          'DynamiteBox': [(None, 'topright_dynamitebag', 'take'), (None, 'neighbor', 'lookaround'),
+                          (None, 'topright_reling', 'fish')]},
     # his lap after the dive (the bar's drink, the elephant, the shell on
     # Olga's mat, the kid's castle, his towel's bar); the board waits for
     # the Mother in her deck chair and is timed per clip (pc_durations_s2.py
@@ -1565,17 +1600,68 @@ OPEN_LAPS = (204, 205, 207, 210)
 
 def code_stays(n):
     """{mobile item: seconds, or a list of seconds per visit} from the lap's parts
-    by PAIRS[n]; an item whose part is missing or untimed is left out. A lap the
-    walk does not close (210's: his chair waits for the Mother's call, a message
-    the walk does not follow) is the walk from its start (LAP_START), each of
-    its stations once"""
+    by PAIRS[n] and the walks between a visit's steps (_visit_walks); an item
+    whose part is missing or untimed is left out. A lap the walk does not close
+    (210's: his chair waits for the Mother's call, a message the walk does not
+    follow) is the walk from its start (LAP_START), each of its stations once"""
     out = {}
-    _lap, pairs = _paired_parts(n)
+    lap, pairs = _paired_parts(n)
+    d, g = Data(n), Geometry(n)
     for item, (many, visits) in pairs.items():
         if all(v is not None and None not in [t for _i, _j, (_o, _a, t) in v] for v in visits):
-            secs = [round(sum(t for _i, _j, (_o, _a, t) in v) / 12.0, 2) for v in visits]
+            walks = [_visit_walks(n, d, g, lap, v) for v in visits]
+            if None in walks:
+                continue
+            secs = [round((sum(t for _i, _j, (_o, _a, t) in v) + w) / 12.0, 2) for v, w in zip(visits, walks)]
             out[item] = secs if many else secs[0]
     return out
+
+
+def _end_of(d, g, go, parts, hid=None):
+    """(room, x, y) where a step leaves him (lap_estimate's position): a
+    hideout's leave at its `<actor>_out` (_leave_place) and the translations
+    of the parts from the leave on, else the GoTo object's hotspot and the
+    parts' translations (none where a part is a leave); None where it is not
+    known"""
+    place = _leave_place(g, d, hid) if hid else None
+    kl = next((k for k in range(len(parts) - 1, -1, -1)
+               if parts[k][1] == 'leave' and parts[k][0] == hid), None) if place else None
+    if kl is not None:
+        room, x, y = g.room_of(d.real.get(hid, hid)), place[0], place[1]
+        rest = parts[kl:]
+    else:
+        real = d.real.get(go, go) if go else None
+        p = g.point(real) if real else None
+        if p is None:
+            return None
+        room, x, y = g.room_of(real), p[0], p[1]
+        rest = [] if any(a == 'leave' for _o, a, _t in parts) else parts
+    for o, a, _t in rest:
+        tx, ty = d.translation(o, a)
+        x, y = x + tx, y + ty
+    return (room, x, y)
+
+
+def _visit_walks(n, d, g, lap, v):
+    """the ticks of the walks inside a visit whose parts span steps: from
+    where one step leaves him (_end_of) to the next one's GoTo object
+    (LAP_GOS, walk_span) — 206's dynamite: the bag's `take` (0x1002caa1),
+    then 0x1002c674 walks him to the reling, 12 ticks, before its lookaround
+    and the fishing; 0 for a visit of one step or of steps at one object,
+    None where a walk has no known end"""
+    rows = sorted(set(i for i, _j, _p in v))
+    gos = LAP_GOS.get(n, {})
+    total = 0
+    for a, b in zip(rows, rows[1:]):
+        ta, tb = gos.get(lap[a][0]), gos.get(lap[b][0])
+        if tb is None or (ta is not None and d.real.get(ta, ta) == d.real.get(tb, tb)):
+            continue
+        pos = _end_of(d, g, ta, lap[a][4], LAP_LEAVES.get(n, {}).get(lap[a][0]))
+        t, _pos = walk_span(g, pos, d.real.get(tb, tb), data=d) if pos is not None else (None, None)
+        if t is None:
+            return None
+        total += t
+    return total
 
 
 def code_moves(n):
@@ -1610,7 +1696,9 @@ def code_places(n):
     """{mobile item: [(x, y) or None per visit]}: where the next walk leaves
     from after a visit whose step leaves a hideout (_leave_place) — the
     placement at the hideout's `<actor>_out`, then the translations of the
-    leave and the parts after it; items with no such visit left out"""
+    leave and the parts after it —, or whose last step walks him on to
+    another object (_visit_walks: 206's dynamite, fished at the reling 86 px
+    right of the bag); items with no such visit left out"""
     d = Data(n); g = Geometry(n)
     lap, pairs = _paired_parts(n)
     out = {}
@@ -1625,12 +1713,21 @@ def code_places(n):
             place = _leave_place(g, d, hid) if hid else None
             k = next((k for k in range(len(parts) - 1, -1, -1)
                       if parts[k][1] == 'leave' and parts[k][0] == hid), None)
-            if place is None or k is None or j != len(parts) - 1:
-                per.append(None)
+            if place is not None and k is not None and j == len(parts) - 1:
+                dx = sum(d.translation(o, a)[0] for o, a, _t in parts[k:])
+                dy = sum(d.translation(o, a)[1] for o, a, _t in parts[k:])
+                per.append((place[0] + dx, place[1] + dy))
                 continue
-            dx = sum(d.translation(o, a)[0] for o, a, _t in parts[k:])
-            dy = sum(d.translation(o, a)[1] for o, a, _t in parts[k:])
-            per.append((place[0] + dx, place[1] + dy))
+            i0 = min(i2 for i2, _j, _p in v)
+            g0, g1 = LAP_GOS.get(n, {}).get(lap[i0][0]), LAP_GOS.get(n, {}).get(lap[i][0])
+            if i0 != i and j == len(parts) - 1 and g0 and g1 \
+                    and d.real.get(g0, g0) != d.real.get(g1, g1):
+                # the visit's last step walks him on to another object
+                # (_visit_walks): his next walk leaves from there
+                q = _end_of(d, g, g1, parts)
+                per.append((q[1], q[2]) if q else None)
+                continue
+            per.append(None)
         if any(x is not None for x in per):
             out[item] = per
     return out
@@ -1759,15 +1856,15 @@ CONT_SCENE = {211: {'Sweets': ('ToiletSign',)},
 # the bridge from the opened captain's door (0x1003af18: the steering's
 # variant, the manipulated one first; the captain drugged by the mug)
 TRICKED_VIA = {214: {'CaptainWheel': (0x1003af18, ('CaptainDoor', 'CaptainMug', 'CaptainWheel'))}}
-# a level whose mobile lap the PC's does not pair with (206: the mobile's
-# neighbour visits the Mother's deck chair and Olga's pillows between his
-# Fifi rounds, the PC's lap has neither): {level: {item: (the walk's row,
-# the objects of its parts that are the item's)}}, the tricked visit read
-# from the row's step with the item's trick in the scene, and where that
-# step hands over to one off the lap, its steps up to their SHOUT (206's
-# dynamite bag, the adhesive's: taken, then 0x1002c550's lookaround and
-# the reling's explode, SHOUT 1)
-TRICKED_ROWS = {206: {'Weights': (7, ('dumbbell', 'olga')), 'DynamiteBox': (9, ('dynamitebag',))}}
+# a tricked visit read from one lap row's step apart from its pairing, whose
+# flow hands over to a step off the lap: {level: {item: (the walk's row,
+# the objects of its parts that are the item's)}} — the row's step run
+# with the item's trick in the scene, then the step it hands over to, up
+# to its SHOUT, after that step's walk (206's dynamite bag, the adhesive's:
+# taken, then 0x1002c550 walks him to the reling, the lookaround and the
+# explode, SHOUT 1; the untricked visit's second step, 0x1002c674, is the
+# lap's own)
+TRICKED_ROWS = {206: {'DynamiteBox': (9, ('dynamitebag',))}}
 # the item whose trick puts a station's tricked variant in the scene where
 # the mobile station takes no inventory of its own, with what else the
 # variant needs shown: 214's shower, tricked by the fish in the wash bucket
@@ -2238,9 +2335,11 @@ def code_stays_tricked(n):
     out = {}
     where = {}
     snaps = lap_state(n)
+    # (the visits read apart: TRICKED_ROWS, TRICKED_ARM, TRICKED_ARM_LINKED)
+    apart = set(TRICKED_ROWS.get(n, {})) | set(TRICKED_ARM.get(n, {})) | set(TRICKED_ARM_LINKED.get(n, {}))
     for item, (many, visits) in pairs.items():
         for v in visits:
-            if v is None or item in out:
+            if v is None or item in out or item in apart:
                 continue
             rows_v = sorted(set(i for i, _j, _p in v))
             prefix = []
@@ -2372,6 +2471,16 @@ def code_stays_tricked(n):
                 evc, _nx = run_step(lvc, nx2, dict(byi), unknown=1, streq=1)
                 cstand, clevel, crepair, ccredit = _step_parts_split(d, evc)
                 base = round(e['tricked'] * 12) if e['tricked'] is not None else None
+                # ... after its GoTo's walk from where the row's step left
+                # him (206's dynamite: 0x1002c550 walks him from the bag to
+                # the reling, 12 ticks, before the lookaround and the explode)
+                gt = Geometry(n)
+                pos = _end_of(d, gt, _lap_target(ev2), station_ticks(d, ev2, {}))
+                tgt = _lap_target(evc)
+                wk = walk_span(gt, pos, d.real.get(tgt, tgt), data=d)[0] \
+                    if (pos is not None and tgt) else 0
+                if base is not None:
+                    base += wk or 0
                 if cstand is not None and base is not None:
                     e['tricked'] = round((base + cstand) / 12.0, 2)
                     if e['credit'] is None and ccredit is not None:

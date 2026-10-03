@@ -433,7 +433,11 @@ VISIT_HOTSPOTS = {201: {'WaterPuddle': ('neighbor', 'neighborleft')}}
 # step walks to beachleft/waterski (0x100251eb, the IsVariant's pick) and
 # shows the guarded skis after it, the put step to beachleft/waterski_guarded
 # (0x10024e37: the name put in its slot through edx, 0x10024e62), 5 px higher
-VISIT_OBJECTS = {205: {'WaterSkiis': ('beachleft/waterski', 'beachleft/waterski_guarded')}}
+VISIT_OBJECTS = {205: {'WaterSkiis': ('beachleft/waterski', 'beachleft/waterski_guarded')},
+                 # 206's pad: the load and the shot walk to the ramp (0x1002e3df,
+                 # 0x1002d948), Fifi's take to bottomleft/fifi (0x1002d3b6), 5 px
+                 # left and 5 higher
+                 206: {'LaunchPad': ('bottomleft/ramp', 'bottomleft/ramp', 'bottomleft/fifi')}}
 
 
 def approaches(n):

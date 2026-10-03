@@ -1174,3 +1174,19 @@ actors' job pass the update calls at 0x100445f8.
   from 17), the bat's hide and her `fall` (36) post `crash` to the Mother
   at 113, her first move at 115 — a tick after his stand's end (114),
   not carried (PCHitAfter 0).
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
+  `tools/pcref/pc_walks_s2.py`, `levels/pc/Level206.overlay.json`,
+  `runtime/scene.py`, `runtime/world.py` (2026-10-03): 206's lap by code
+  (PAIRS: the mobile's loop from its selected index against the script's
+  lap after the pillow lesson, 0x1002e63c-0x1002c674). An idle run past
+  the lesson under the profile (runs/idle206q: the plan's four lesson legs,
+  then 420 s): the port's lap 118.5, 118.67 and 118.5 s (DogFifi's take to
+  take), the model's 118.5 — 105.3 s before (runs/idle206p), the dynamite
+  4.4 s of the mobile's clip where the code's bag, walk and reling take
+  16.2. The lesson's rows up to the lap's first take byte for byte the
+  same in both runs (its opening DogFifi visit at its own length,
+  PCUseSecondsLead). The idle run without the lesson's legs stops at 34 s
+  on both profiles: TutorialScriptCameraNFH2206's Hold waits for the
+  LevelScript's action 4 (the player's steps), the neighbour frozen after
+  the in-game move to Zone04 (AddInGameActions(4)) — the mobile's lesson,
+  not a stall. Plan 206 unchanged: 100 at 266.5 s (253.5 before).

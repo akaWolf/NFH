@@ -142,7 +142,11 @@ Before the same day's walk: 203 99.5, 208 82.5, 209 100.8, 211 80.8, 212
 119.4, 213 126.6, 214 85.3, 202 81.7, 210 98.7, 205 101.6, 207 100.0, 204 84.3
 — the mobile scene's floor at the PC's record, the passes capped at it and the
 `out` run never stood. 201 (the tutorial) and 206 (his waits on the Mother)
-have no free lap.
+have no free lap on an idle run: 206's pillow lesson holds him until the
+player's steps (TutorialScriptCameraNFH2206's Hold, the PC's own lesson
+waits for the Mother's call). Past the lesson (2026-10-03, runs/idle206q:
+the plan's four lesson legs, then waiting) 206's lap is 118.5 s on the
+port and in the model (105.3 before, its stays the mobile's).
 
 The same Season 1 laps from the code and the data (`tools/pcref/lap_model.py`,
 2026-09-17): the level class's lap as the walker reads it out of game.exe,

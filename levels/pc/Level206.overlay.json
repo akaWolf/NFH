@@ -40,6 +40,11 @@
     "PCTrickArm": [
      1,
      2
+    ],
+    "PCUseSeconds": [
+     2.42,
+     6.0,
+     1.17
     ]
    }
   },
@@ -60,7 +65,8 @@
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
-    "PCCreditAt": 8.67
+    "PCCreditAt": 8.67,
+    "PCUseSeconds": 6.92
    }
   },
   {
@@ -76,6 +82,10 @@
     "PCTrickFire": [
      1,
      2
+    ],
+    "PCUseSeconds": [
+     1.58,
+     0.58
     ]
    }
   },
@@ -84,11 +94,12 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 14.5,
+    "PCUseSecondsTricked": 15.5,
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
-    "PCCreditAt": 9.08
+    "PCCreditAt": 10.08,
+    "PCUseSeconds": 16.17
    }
   },
   {
@@ -719,8 +730,16 @@
     "PCApproach": {
      "Rottweiler": {
       "obj": "bottomleft/ramp",
-      "x": 170,
-      "px": 0,
+      "x": [
+       170,
+       170,
+       165
+      ],
+      "px": [
+       0,
+       0,
+       -5
+      ],
       "routes": {
        "DogFifi": [
         "Zone01",
@@ -802,7 +821,8 @@
        ]
       }
      }
-    }
+    },
+    "PCUseSeconds": 1.25
    }
   },
   {
@@ -906,7 +926,9 @@
         "Zone03",
         "Zone02"
        ]
-      }
+      },
+      "tx": 86,
+      "dpx": 0
      },
      "Woody": {
       "obj": "topright/dynamitebag",
@@ -956,7 +978,8 @@
        ]
       }
      }
-    }
+    },
+    "PCUseSeconds": 1.0
    }
   },
   {
@@ -1071,7 +1094,12 @@
        ]
       }
      }
-    }
+    },
+    "PCUseSeconds": [
+     1.5,
+     1.58
+    ],
+    "PCUseSecondsLead": 1
    }
   },
   {

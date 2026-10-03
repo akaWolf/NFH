@@ -202,16 +202,30 @@ def _strip_item_key(patches, item, key):
 
 
 def _set_key(patches, item, key, value):
-    """set `key` on the item's TrickItem patch, or add one"""
+    """set `key` on the item's TrickItem patch — or, for an item of another
+    component, on a patch of that component another tool has written (a
+    SearchItem's PCApproach: 206's FifiWeightsDrop and FifiWeightsGrab, the
+    Fifi put and take at the dumbbell) —, else add one"""
     for e in patches:
         if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
             e['set'][key] = value; return
+    for e in patches:
+        if e.get('object') == item and e.get('component') in ('SearchItem', 'HideItem') \
+                and isinstance(e.get('set'), dict):
+            e['set'][key] = value; return
     patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})
 # visits of the port's lap the PC never makes (209's first shoe: the PC does the
-# Taj before the shoes) keep the mobile length — written as a leading 0
+# Taj before the shoes) — written as a leading 0, a visit the PC plays no
+# action at: it ends at once (RoutineAction.pc_zero_visit)
 LEAD_MOBILE = {209: {'HotShoe': 1}}
+# an item's first visits before the PC's lap pairs with its own, at the
+# mobile's own length (PCUseSecondsLead): 206's DogFifi — the lesson's
+# opening action (Level206's action 0; the loop runs from its selected index
+# 4), where the PC's neighbour waits for the Mother's call (0x1002f11d, the
+# latch +0x14)
+LEAD_OWN = {206: {'DogFifi': 1}}
 # the levels whose stays are the code's (lap_model_s2.code_stays)
-CODE = (201, 202, 203, 204, 205, 207, 208, 209, 210, 211, 212, 213, 214)
+CODE = (201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214)
 # the stations a tricked flow runs him to, off his lap: the use there lasts
 # the level script's action — 211's sweets send him to the toilet
 # (0x10030dc2): the women's wc with the sign tricked (wcright's `puke`, whose
@@ -220,9 +234,7 @@ RUSH = {211: {'ToiletWomen': ('topleft_wcright', 'puke'), 'ToiletMen': ('topleft
 # the level scripts' actor names as the port's roles
 ROLE = {'olga': 'Olga', 'mother': 'Mother', 'neighbor': 'Rottweiler'}
 # the levels whose tricked visits are the code's too (code_stays_tricked)
-# ... and 206's, whose untricked stays stay the video's (its mobile lap has
-# visits the PC's does not: lap_model_s2.TRICKED_ROWS)
-TRICKED = CODE + (206,)
+TRICKED = CODE
 
 
 def pc_spans(n):
@@ -512,6 +524,14 @@ def write_tricked_keys(ov, n, clips):
             _set_key(ov['patches'], item, 'PCTrickFire', tr['arm'])
 
 
+def _write_leads(ov, n):
+    """the items' leading visits at the mobile's own length (LEAD_OWN) into
+    the overlay dict"""
+    ov['patches'] = _strip_key(ov['patches'], 'PCUseSecondsLead')
+    for item, k in LEAD_OWN.get(n, {}).items():
+        _set_key(ov['patches'], item, 'PCUseSecondsLead', k)
+
+
 def write_code_stays(ov, n, clips):
     """the stays the level script times (code_stays, RUSH, STAYS_CODE) into
     the overlay dict in place of those items' — the --write path's for
@@ -544,6 +564,7 @@ def write_code_stays(ov, n, clips):
             put(item, vals)
         else:
             _strip_item_key(ov['patches'], item, 'PCUseSeconds')
+    _write_leads(ov, n)
     if n in RUSH:
         d = lap_model_s2.Data(n)
         for item, (obj, act) in RUSH[n].items():
@@ -657,6 +678,8 @@ def main(argv):
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])
+            if n >= 200:
+                _write_leads(ov, n)
             if n >= 200 and n in RUSH:
                 d = lap_model_s2.Data(n)
                 for item, (obj, act) in RUSH[n].items():

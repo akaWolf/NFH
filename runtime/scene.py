@@ -244,7 +244,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_lead', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs',
                  'pc_return_secs',
@@ -634,6 +634,13 @@ class Item:
         v = d.get('PCUseSeconds')
         self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         self.pc_use_visit = 0
+        # the item's first visits the PC's lap does not pair with, at the
+        # mobile's own length and before the cycle's first slot
+        # (PCUseSecondsLead: 206's DogFifi — the lesson's opening action,
+        # Level206's action 0, where the PC's neighbour waits for the
+        # Mother's call, GameLogic 0x1002f11d; tools/pcref/pc_durations_s2.py
+        # LEAD_OWN)
+        self.pc_use_lead = int(d.get('PCUseSecondsLead') or 0)
         # the other actors' stays under the profile (PCUseSecondsRole: role ->
         # seconds or one per visit, the PC data's `time` ticks / 12 — the
         # Mother's stands of 212 and 213)
