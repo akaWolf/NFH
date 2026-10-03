@@ -3153,6 +3153,10 @@ class Driver(Recorder):
             op, args = leg[0], leg[1:]
             # `op!` — rush: skip the gate wait, click at once (wait_gate)
             self._rush = op.endswith('!')
+            # (the way-round waypoint is the leg's own gate's: a rush leg,
+            # whose gate does not run, clicked the last gated leg's —
+            # Level214's fish from the chair walked off through Zone04)
+            self._route_via = None
             if self._rush:
                 op = op[:-1]
             # a trailing `+N` — the gate must hold N more seconds beyond

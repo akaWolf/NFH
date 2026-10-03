@@ -1,17 +1,19 @@
-# Level212 under the PC profile (v7, 2026-09-27: the ledge step walks to the cliff, not the
-# parrot — his lap ~130 s; v6 of 2026-09-24: the Season 2 walk by code — the out run stood,
-# the passes and the floor at the PC's ticks, the door claim). His lap: the thrones, Zone05;
-# the whip, Zone03; the cigars and the bench, Zone04; the bull, Zone01; the ledge at the
-# cliff, Zone02; and the Mother stands 8 s in Zone04 and 12 in Zone03 on a ~37-s round, a
-# door pair held for her from the moment she sets off for it. Woody takes the paint pot
-# while she stands in Zone03 and he whips (25), the nest once both have left Zone03 (55), the
-# resin, the crowbar and the corn (~205-216), the plate's game and the statue when she leaves
-# her Zone03 stand (~225-243), sits the Mother out in the statue, arms the thrones after one
-# of his sits, primes the mine for the TNT and hides the lorry while he is up at the cigars
-# and the bench after his lap-6 whip (707-711), then the whip (733), the bull, the cigars,
-# the bench, the slot and the ledge each after that station's visit, so the pile — the whip
-# and the plate, the cigars (842), the bench (855), the bull (878) and the ledge with the slot
-# (910) — lands on his lap 7 and tops the gauge (runs/p212b: 100 at 909.6 s).
+# Level212 under the PC profile (v8, 2026-10-03: the Mother's stands by her script — the statue
+# 8.67 s, the red bull 12.0 — shift her round against his lap; v7 of 2026-09-27: the ledge step
+# walks to the cliff, not the parrot — his lap ~130 s). His lap: the thrones, Zone05; the whip,
+# Zone03; the cigars and the bench, Zone04; the bull, Zone01; the ledge at the cliff, Zone02; and
+# the Mother stands in Zone04 and Zone03 on a ~37-s round, a door pair held for her from the
+# moment she sets off for it. Woody takes the paint pot while she stands in Zone03 and he whips
+# (25), the nest once both have left Zone03 (55), the resin, the crowbar and the corn (~205-216),
+# the plate's game and the statue when she leaves her Zone03 stand (~225-243), sits the Mother
+# out in the statue, arms the thrones after one of his sits, primes the mine for the TNT and
+# hides the lorry while he is up at the cigars and the bench after his lap-6 whip (~700), then
+# the whip (728) and back into the statue; out when she has left her Zone03 stand in his throne
+# sit (790) for the bull's resin (804), and the TNT and the paint at once in the window between
+# her leaving Zone04 for Zone03 (808) and his coming in for the cigars (820), then the slot and
+# the ledge — the pile: the whip and the plate (805), the cigars (827), the bench (845), the
+# bull (867) and the ledge with the slot (899) tops the gauge on his lap 7 (runs/p212p: 100 at
+# 899.0 s).
 take PaintPot IT2_Paint                # Zone04 up the beach's stairs once she has left for her Zone03 stand (25)
 park! Zone01                           # back down before she returns and he comes for the cigars (37)
 take ParrotNest IT2_Ruby               # Zone03 once both have left it (55)
@@ -36,13 +38,18 @@ whenusing CigarBox                     # (554) he is off to Zone04
 whenusing Whip                         # (681) his lap-6 whip
 prime ClosedMine1 IT2_Crowbar          # Zone01 through Zone02 while he is up at the cigars and the bench: IT2_Tnt
 hide Lorry                             # Zone01: he passes the beach for his bull
-usewith Whip IT2_Dagger                # Zone03 once she has left it: his lap-7 whip, the pile's first coin with the plate
-whenusing MechanicalBull               # (733) his lap-6 bull
-usewith MechanicalBull IT2_Resin       # Zone01 once he has left for the ledge (810): his next bull (878)
-usewith CigarBox IT2_Tnt               # Zone04 in her Zone03 stand (818): his next cigars (842)
-usewith SleepBench IT2_Paint           # Zone04: his next bench (855)
+usewith Whip IT2_Dagger                # Zone03 once she has left it (728): his lap-7 whip (801), the pile's first coin with the plate
+whenusing AztecThrone                  # (780) his lap-7 throne sit: Zone05
+whenin Mother Zone04                   # (790) she has left her Zone03 stand
+park! Zone02                           # down from the statue
+park! Zone01
+usewith MechanicalBull IT2_Resin       # Zone01 (~804): his next bull (858)
+whenin Mother Zone03                   # (808) she has left her Zone04 stand
+usewith! CigarBox IT2_Tnt              # Zone04 through the beach door (~812), he at the whip: his next cigars (823)
+usewith! SleepBench IT2_Paint          # Zone04: his next bench (830)
+park! Zone01                           # out before he comes in (820)
 usewith BoatCoinSlot IT2_Coin          # Zone02: the plate's coin
-usewith ParrotLedge IT2_Corn           # Zone02: his next ledge (910), the pile's top
+usewith ParrotLedge IT2_Corn           # Zone02: his next ledge (~880), the pile's top
 await AztecThrone 0
 await AztecThrone2 0
 await Whip 0
