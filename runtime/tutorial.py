@@ -1645,6 +1645,698 @@ class TutorialPC201(Tutorial):
                 self.director.draw(g)
 
 
+PC_TICK = 1.0 / 12.0
+
+
+class _PCScript:
+    """one GameLogic.dll level script of TutorialPC206: its step, run once a
+    level tick while the actor's queue is idle until it stores the next (the
+    level update's script pass), the jobs its steps push onto the actor's
+    queue — each a count of level ticks, the runner going on past a done job
+    in the same tick (fcn.100492a8) —, its GoTo in progress and its latches
+    (fcn.10013269: a behaviour of the latch's name arrived)"""
+
+    def __init__(self, name, step):
+        self.name = name
+        self.step = step
+        self.queue = []                   # [{'ticks', 'start', 'end', 'at'}]
+        self.cur = None
+        self.left = 0
+        self.age = 0
+        self.walking = False
+        self.arrived = None               # the target the last GoTo reached
+        self.latches = set()
+        self.icon = None
+
+    def idle(self):
+        return self.cur is None and not self.queue and not self.walking
+
+    def take(self, name):
+        if name in self.latches:
+            self.latches.discard(name)
+            return True
+        return False
+
+
+class TutorialPC206(Tutorial):
+    """The PC's own 206 lesson, in place of the mobile's LevelScript and
+    TutorialScriptCameraNFH2206 under the PC profile (docs/PC_FIDELITY.md
+    "206's lesson"). GameLogic.dll runs it as three scripts (_PCScript):
+    the invisible `aux` actor's director (fcn.1002b64d: 0x1002b5e7 ...
+    0x1002afee — the messages fcn.100101f3, the markers fcn.10042077, the
+    gates on Woody's inventory fcn.1002b0d9, an object present
+    fcn.1000ec67, his lower-deck rooms fcn.1000ed06 and his hideout flag 4
+    through the level's slot 0x18), the Mother's (0x1002c3af ...
+    0x1002bb39) and the neighbour's (0x1002f15a ... 0x1002e926), which hand
+    each other `call` and `order` (generic/objects.xml's callneighbor and
+    order), `mother_pillow` (the chair's give), `mother_fight` (the fight)
+    and `tutorial` (fcn.1004000a): a job's behaviour posted as it ends, a
+    post offered on the tick after, where the waiting step reads it. The
+    jobs are the mobile pawns' clips paced to the PC's job ticks
+    (PCTutorial `ticks`, tools/pcref/pc_tutorial206.py), the GoTos the
+    pawns' walks to the stations' PC hotspots (a run where the step writes
+    gait 2); both routines stay frozen until the lap — his from the mobile's
+    selected index (0x1002e926 -> 0x1002e63c, DogFifi's take), hers the
+    mobile's End1 (her chair; the PC's 0x1002b9fe bar)."""
+
+    def __init__(self, d, W, H, loc, viewer, director, pc, cam):
+        Tutorial.__init__(self, d, W, H, loc, viewer, director=director)
+        self.pc = pc
+        self.cam_d = cam or {}
+        self.actions = []                 # no LevelScriptActions: current is None
+        self.text = None
+        self.msg = None
+        self.shown = []
+        self.markers = set()
+        self.follow = False
+        self.ticks = self.pc.get('ticks') or {}
+        self.zones = {z.name: z for z in self.level.zones}
+        self.items = {it.name: it for it in self.level.items.values()}
+        self.aux = _PCScript('aux', 'b5e7')
+        self.mom = _PCScript('mother', 'c3af')
+        self.nb = _PCScript('neighbor', 'f15a')
+        self.scripts = (self.aux, self.mom, self.nb)
+        self.posts = []                   # [(offer tick, script, behaviour)]
+        self.tick_n = 0
+        self._acc = 0.0
+        self.inside = False               # the Mother in her chair (the hideout)
+        self.done = False
+        r = self.rott_routine
+        self.base = list(r.actions) if r is not None else []
+        # the mobile arrows' offsets over the same objects (LevelScript
+        # actions' AnimOffset); the pipe's arrow points right
+        self.arrow_off = {}
+        self.arrow_right_items = set()
+        for a in d.get('Actions') or []:
+            off = a.get('AnimOffset') or {}
+            ref = self._pid(a.get('Item'))
+            it = self.level.items.get(ref) if ref is not None else None
+            if it is not None and (a.get('DrawArrow') or a.get('DrawArrowRight')):
+                self.arrow_off.setdefault(it.name, (off.get('x') or 0.0, off.get('y') or 0.0))
+                if a.get('DrawArrowRight'):
+                    self.arrow_right_items.add(it.name)
+        self._setup()
+
+    # -- the level as the PC starts it ---------------------------------------
+    def _setup(self):
+        """level.xml's starts: Woody in bottomright, the neighbour at Fifi
+        laughing (`laughleft`, the mobile's LaughLeftInfinite), the Mother by
+        her chair; the doors open (the remaster's stair locks are its
+        lesson's); both routines frozen for the scripts"""
+        w = self.world
+        for key, pawn in (('woody', w.woody), ('neighbor', self.rott),
+                          ('mother', w.pawns.get('Mother'))):
+            z, x, _y = self._pc_point(self.pc.get(key))
+            if pawn is None or z is None:
+                continue
+            pawn.sprite.x, pawn.sprite.y = x, pawn.floor_y(z)
+            pawn.zone = z
+            pawn.pos_snap = True
+            if key == 'woody':
+                self.level.entrance_location = (pawn.sprite.x, pawn.sprite.y)
+        for key in ('LeftSideStair', 'RightSideStair', 'UpTransition', 'DownTransition'):
+            door = self.level.door_by_pid(self._pid(self.cam_d.get(key)))
+            if door is not None:
+                door.locked = False
+        for r in (self.rott_routine, self.mother_routine):
+            if r is not None:
+                r.frozen = True
+                r.delay_start = 0.0
+        rott = self.rott
+        if rott is not None and rott.anim.has('LaughLeftInfinite'):
+            rott.anim.play_looping('LaughLeftInfinite')
+        fifi = self._item('topleft/fifi')
+        if fifi is not None and not fifi.primed:
+            # the mobile's opening DogFifi visit is its prime leg
+            # (RottweilerPrimeAnimation LaughLeft, LaughLeftInfinite): the
+            # PC's start pose — his lap's first visit takes her; the first
+            # prime's DogFifi arm swaps the later primes to the put
+            # (Item.RottweilerPrime, Routine._use's toggle)
+            w.set_primed(fifi, True)
+            if not fifi.prime_item_aux:
+                fifi.prime_item_aux = True
+                fifi.rott_prime_anim = ['FifiPutLeft']
+
+    def _pc_point(self, rec):
+        """[zone, pc x, pc y, ...] -> (zone, mobile x, pc y)"""
+        if not rec:
+            return None, 0.0, 0.0
+        z = self.zones.get(rec[0])
+        if z is None or getattr(z, 'pc_room', None) is None:
+            return None, 0.0, 0.0
+        return z, _port_x(z, rec[1]), rec[2]
+
+    def _item(self, pc_name):
+        return self.items.get((self.pc.get('items') or {}).get(pc_name))
+
+    @property
+    def rott(self):
+        return self.world.pawns.get('Rottweiler')
+
+    @property
+    def mother(self):
+        return self.world.pawns.get('Mother')
+
+    @property
+    def rott_routine(self):
+        rott = self.rott
+        return next((r for r in self.world.routines if r.pawn is rott), None)
+
+    @property
+    def mother_routine(self):
+        m = self.mother
+        return next((r for r in self.world.routines if r.pawn is m), None)
+
+    # -- the lifecycle -------------------------------------------------------
+    def activate(self):
+        if self.active:
+            return
+        self.active = True
+        if self.director is not None:
+            self.director.restart()
+
+    def tick(self, dt):
+        if not self.active:
+            return
+        if self.director is not None:
+            self.director.tick(dt)
+        if not self.done:
+            self._acc += dt
+            while self._acc >= PC_TICK - 1e-9 and not self.done:
+                self._acc -= PC_TICK
+                self._level_tick()
+        if self.follow:
+            r = self.rott
+            if r is not None:
+                self.viewer.cam.x, self.viewer.cam.y = r.sprite.x, r.sprite.y
+                self.viewer._clamp_camera()
+
+    def _level_tick(self):
+        self.tick_n += 1
+        due = [p for p in self.posts if p[0] <= self.tick_n]
+        self.posts = [p for p in self.posts if p[0] > self.tick_n]
+        for _t, s, name in due:
+            s.latches.add(name)
+        for s in self.scripts:
+            self._run_queue(s)
+            if s.idle() and s.step is not None:
+                getattr(self, '_%s_%s' % (s.name[0], s.step))(s)
+
+    def _run_queue(self, s):
+        """the actor's queue for this tick: the running job's count, its end,
+        and the next job's first tick in the same pass"""
+        while True:
+            if s.cur is None:
+                if not s.queue:
+                    return
+                s.cur = s.queue.pop(0)
+                s.left = int(s.cur.get('ticks') or 0)
+                s.age = 0
+                if s.cur.get('start'):
+                    s.cur['start']()
+            s.age += 1
+            at = s.cur.get('at')
+            if at and s.age == at[0]:
+                at[1]()
+            if s.age >= s.left:
+                job, s.cur = s.cur, None
+                if job.get('end'):
+                    job['end']()
+                continue
+            return
+
+    def _push(self, s, *jobs):
+        """elements pushed onto the actor's queue without a first run
+        (fcn.10049216, the builder's fcn.1000eec6): the first counts from
+        the next tick (the queues run before the steps, _level_tick)"""
+        s.queue.extend(jobs)
+
+    def _post(self, s, name):
+        """fcn.1004000a: the behaviour offered on the tick after"""
+        self.posts.append((self.tick_n + 1, s, name))
+
+    def _icon(self, s, name):
+        """fcn.100422a5: the actor's bubble (the routine's pc_bubble; ''
+        clears it)"""
+        r = self.mother_routine if s is self.mom else self.rott_routine
+        if r is not None:
+            r.pc_bubble = name
+
+    def _goto(self, s, pawn, item, run=False):
+        """fcn.1000e3e0: the GoTo pushed with a first run, the step run again
+        each tick until it returns 0 — at the object's hotspot the GoTo
+        finds the actor there and returns at once"""
+        if s.arrived is item:
+            return True
+        if s.walking:
+            return False
+        pawn.pc_run = run
+        pawn.in_urgent = run
+
+        def arrive(s=s, item=item, pawn=pawn):
+            s.walking = False
+            s.arrived = item
+            pawn.pc_run = False
+            pawn.in_urgent = False
+        s.walking = True
+        if not pawn.goto_item(item, on_arrive=arrive):
+            arrive()
+        return False
+
+    def _leave_station(self, s):
+        s.arrived = None
+
+    def _clip(self, pawn, seq, ticks, loop=None):
+        """a job's clips: the mobile sequence paced to the PC job's ticks,
+        then its next animation looping (the action's actornextanim)"""
+        seq = [a for a in seq if pawn.anim.has(a)]
+        if not seq:
+            if loop and pawn.anim.has(loop):
+                pawn.anim.play_looping(loop)
+            return
+        mobile = pawn.anim.sequence_seconds(seq)
+        secs = ticks * PC_TICK
+        pawn.anim.time_scale = mobile / secs if (mobile > 0.0 and secs > 0.0) else 1.0
+
+        def ended(pawn=pawn, loop=loop):
+            pawn.anim.time_scale = 1.0
+            if loop and pawn.anim.has(loop):
+                pawn.anim.play_looping(loop)
+        pawn.anim.play_sequence(seq, on_end=ended, as_sequence=False)
+
+    def _job(self, name, pawn, seq, loop=None, end=None, at=None):
+        t = int(self.ticks.get(name) or 0)
+        return {'ticks': t, 'start': lambda: self._clip(pawn, seq, t, loop),
+                'end': end, 'at': at}
+
+    # -- the director's helpers ------------------------------------------------
+    def _msg(self, name):
+        """fcn.100101f3: the message box shows the text (none: it closes)"""
+        if self.msg == name:
+            return
+        self.msg = name
+        self.text = (self.pc.get('texts') or {}).get(name) if name else None
+        if name:
+            self.shown.append(name)
+            if self.director is not None:
+                self.director.animating = True
+                self.director.restart()
+
+    def _marker(self, pc_name, on):
+        """fcn.10042077: the marker arrow over the object ('ms') or none"""
+        it = self._item(pc_name)
+        if it is None:
+            return
+        if on:
+            self.markers.add(it.name)
+        else:
+            self.markers.discard(it.name)
+
+    def _has(self, pc_inv):
+        """fcn.1002b0d9 -> fcn.10049cec: Woody's inventory holds the item"""
+        typ = (self.pc.get('inventory') or {}).get(pc_inv)
+        return typ is not None and self.world.inventory.has(typ)
+
+    def _manip(self):
+        """fcn.1000ec67(topright_pillows_manip): the fart bag on the pillows
+        (the mobile's tricked Pillows)"""
+        it = self._item('topright/pillows_manip')
+        return it is not None and it.tricked
+
+    def _lower(self):
+        """fcn.1000ed06(bottomright, bottomleft): Woody's room one of them"""
+        woody = self.world.woody
+        z = woody.pc_room() if woody is not None else None
+        return z is not None and z.name in (self.pc.get('lower') or ())
+
+    def _hidden(self):
+        """the level's slot 0x18 (woody, 4): his flag 4, in a hideout"""
+        woody = self.world.woody
+        return woody is not None and bool(woody.hiding)
+
+    # -- the director (GameLogic.dll, the `aux` script) ----------------------
+    def _a_b5e7(self, s):
+        self._msg('step1')
+        if s.take('tutorial'):
+            s.step = 'b51c'
+
+    def _a_b51c(self, s):
+        self._marker('bottomleft/toybox', True)
+        self._msg('step2')
+        if self._has('fartbag'):
+            self._marker('bottomleft/toybox', False)
+            s.step = 'b434'
+
+    def _a_b434(self, s):
+        self._marker('topright/pillows', True)
+        self._msg('step2a')
+        if self._manip():
+            self._marker('topright/pillows', False)
+            self._msg('step3')
+            s.step = 'b28c'
+
+    def _a_b28c(self, s):
+        self._marker('topright/ventpipe', True)
+        if self._lower():
+            self._msg('step3a')
+        if self._hidden():
+            self._post(self.mom, 'tutorial')
+            self._post(self.nb, 'tutorial')
+            self._marker('topright/ventpipe', False)
+            s.step = 'b226'
+
+    def _a_b226(self, s):
+        self._msg('step4')
+        if s.take('tutorial'):
+            s.step = 'b1af'
+
+    def _a_b1af(self, s):
+        self._msg('step5')
+        if not self._hidden():
+            s.step = 'afee'
+
+    def _a_afee(self, s):
+        self._msg(None)
+        s.step = None
+
+    # -- the Mother's script -----------------------------------------------------
+    def _m_c3af(self, s):
+        # to her chair's `mother` hotspot
+        if self._goto(s, self.mother, self._item('topleft/deckchair')):
+            s.step = 'c2d9'
+
+    def _m_call(self, s):
+        """the builder's leave, pillow_slip and callneighbor (0x1002c2d9,
+        0x1002bf25): the leave done at its first update when she is not in
+        the chair (0x10006945 -> 0x10006ab7), its getup when she is; the
+        call's `call` to him as its job ends"""
+        m = self.mother
+        jobs = []
+        if self.inside:
+            def up():
+                self.inside = False
+            jobs.append(self._job('leave', m, ['MotherGetUpPillow'], end=up))
+        jobs.append(self._job('pillow_slip', m, ['MotherHoldPillow', 'MotherThrowPillow']))
+        jobs.append(self._job('callneighbor', m, ['MotherCall'], loop='MotherStandDownInfinite',
+                              end=lambda: self._post(self.nb, 'call')))
+        self._push(s, *jobs)
+
+    def _m_c2d9(self, s):
+        self._icon(s, 'neighbor')
+        self._m_call(s)
+        s.step = 'c1d9'
+
+    def _m_order(self, s):
+        """fcn.1000e172: he stands at the chair's `neighbor` hotspot (his
+        GoTo there done, waiting for her) — her `order`, posted to him as
+        its job ends"""
+        if not (self.nb.step in ('f082', 'ecb5') and self.nb.arrived is not None
+                and self.nb.arrived is self._item('topleft/deckchair')):
+            return False
+        self._icon(s, 'bring_pillow')
+        self._push(s, self._job('order', self.mother, ['MotherOrder'], loop='MotherStandDownInfinite',
+                                end=lambda: self._post(self.nb, 'order')))
+        return True
+
+    def _m_c1d9(self, s):
+        self._icon(s, 'neighbor')
+        if self._m_order(s):
+            s.step = 'c183'
+
+    def _m_c183(self, s):
+        self._icon(s, '')
+        if s.take('mother_pillow'):
+            s.step = 'c09b'
+
+    def _m_c09b(self, s):
+        if not self._goto(s, self.mother, self._item('topleft/deckchair')):
+            return
+        self._post(self.aux, 'tutorial')
+
+        def sat():
+            self.inside = True
+        # fcn.1000ea30: the chair's enter (sitdown_pillow), then its `look`
+        self._push(s, self._job('enter', self.mother, ['MotherSitPillow'], loop='MotherLookLoop', end=sat))
+        s.step = 'bf25'
+
+    def _m_bf25(self, s):
+        if s.take('tutorial'):
+            self._icon(s, 'neighbor')
+            self._m_call(s)
+            s.step = 'be25'
+
+    def _m_be25(self, s):
+        self._icon(s, 'neighbor')
+        if self._m_order(s):
+            s.step = 'bd7d'
+
+    def _m_bd7d(self, s):
+        self._icon(s, '')
+        if s.take('mother_pillow'):
+            # (the record `time` ticks after the job's first)
+            rec = int(self.pc.get('fart_record') or 0)
+            self._push(s, self._job('fart', self.mother, ['MotherSitFart'],
+                                    at=(rec + 1, self._fart_pays) if rec else None, end=self._fart_end))
+            s.step = 'bd04'
+
+    def _fart_pays(self):
+        """the fart's fartbag record at its `time` (fcn.1000140b): the coin
+        and the rage (the neighbour's) of the chair's trick — the mobile's
+        DeckChair, whose trick the pillows activate (its AngerAmount 45, the
+        record's 45000)"""
+        it = self._item('topleft/deckchair')
+        rott = self.rott
+        if it is not None and rott is not None:
+            self.world.pc_s2_credit(rott, it)
+
+    def _fart_end(self):
+        """sitdown_fart's objnextanim `ms`: the chair plain again"""
+        ch = self._item('topleft/deckchair')
+        if ch is not None:
+            ch.tricked = False
+
+    def _m_bd04(self, s):
+        self._icon(s, '')        # m_hurt_n: no remaster texture, none shown
+        # fcn.1000eb19: to him (fcn.1000e601, his x less or plus 50 px on
+        # her side), then the generic `fight` (fight_neighbor, him `inv`)
+        if not s.walking and s.arrived != 'fight':
+            m, rott = self.mother, self.rott
+            z = rott.zone
+            if z is None or getattr(z, 'pc_room', None) is None:
+                s.arrived = 'fight'
+            else:
+                from world import pc_room_x
+                gap = self.pc.get('fight_gap') or 50
+                hx = pc_room_x(z, rott.sprite.x)
+                mx = pc_room_x(z, m.sprite.x) if m.zone is z else hx - gap
+                tx = hx - gap if mx <= hx else hx + gap
+                m.pc_run = True
+                m.in_urgent = True
+
+                def arrive():
+                    s.walking = False
+                    s.arrived = 'fight'
+                    m.pc_run = False
+                    m.in_urgent = False
+                s.walking = True
+                if not m.goto_zone(z, _port_x(z, tx), on_arrive=arrive):
+                    arrive()
+                return
+        if s.arrived != 'fight':
+            return
+        rott = self.rott
+
+        def hide():
+            rott.set_hidden(True)
+
+        def shown():
+            rott.set_hidden(False)
+            self._post(self.nb, 'mother_fight')
+        job = self._job('fight', self.mother, ['MotherHitNeighbor'], end=shown)
+        start = job['start']
+        job['start'] = lambda: (hide(), start())
+        self._push(s, job)
+        s.step = 'bb39'
+
+    def _m_bb39(self, s):
+        self._post(self.aux, 'tutorial')
+        self._icon(s, None)
+        s.step = None
+        self._mother_lap()
+
+    def _mother_lap(self):
+        """her lap: the mobile End1's (TutorialScriptCameraNFH2206.cs:151-163:
+        her chair from index 3, looping from it, the chair's sleep) for the
+        PC's 0x1002b9fe (the chair's `sleep` bar)"""
+        m = self.mother_routine
+        if m is None:
+            return
+        m.pc_bubble = None
+        # (the mobile's surgery once the pillows are tricked, Hold2,
+        # TutorialScriptCameraNFH2206.cs:112-126: her throw's stands, her
+        # chair's look a single — the loop's own chair visits go on to the
+        # second use's sleep)
+        its = self.level.items
+        if len(m.actions) > 3:
+            it0 = its.get(m.actions[0]['item']) if m.actions[0]['item'] else None
+            if it0 is not None:
+                it0.use_anim['Mother'] = ['MotherStandDownSingle'] * 8
+            it3 = its.get(m.actions[3]['item']) if m.actions[3]['item'] else None
+            if it3 is not None:
+                it3.use_anim['Mother'] = ['MotherSitPillow', 'MotherLook']
+        if self.rott is not None:
+            self.rott.deck_chair_aux = True
+        m.index = 3
+        m.loop_from_selected = True
+        m.frozen = False
+        m._pending = 'start'
+        deck = self._item('topleft/deckchair')
+        mp = self.mother
+        if mp is not None and deck is not None:
+            seq = [a for a in (deck.mother_second_use or []) if mp.anim.has(a)]
+            if seq:
+                mp.anim.play_sequence(seq)
+
+    # -- the neighbour's script --------------------------------------------------
+    def _n_f15a(self, s):
+        self.follow = True               # Ef51a: the camera on him
+        s.step = 'f11d'
+
+    def _n_f11d(self, s):
+        if s.take('call'):
+            s.step = 'f082'
+
+    def _n_chair(self, s, nxt):
+        """to the chair's `neighbor` hotspot at a run, then his wait there
+        for her `order` (0x1002f082, 0x1002ecb5)"""
+        self._icon(s, 'mother')
+        if not self._goto(s, self.rott, self._item('topleft/deckchair'), run=True):
+            return
+        if s.take('order'):
+            self._leave_station(s)
+            s.step = nxt
+
+    def _n_f082(self, s):
+        self._n_chair(s, 'ef9e')
+
+    def _n_pillows(self, s, nxt, manip):
+        self._icon(s, 'get_pillow')
+        pil = self._item('topright/pillows')
+        if not self._goto(s, self.rott, pil, run=True):
+            return
+        self._leave_station(s)
+        end = None
+        if manip:
+            def end():
+                # the switch back to the plain pillows (0x1002ec4c)
+                pil.tricked = False
+        self._push(s, self._job('take', self.rott, ['TakeHigh'], end=end))
+        s.step = nxt
+
+    def _n_ef9e(self, s):
+        self._n_pillows(s, 'ee4d', False)
+
+    def _n_give(self, s, nxt, camera_off):
+        self._icon(s, 'bring_pillow')
+        if not self._goto(s, self.rott, self._item('topleft/deckchair'), run=True):
+            return
+        self._leave_station(s)
+
+        def given():
+            self._post(self.mom, 'mother_pillow')
+            if camera_off:
+                self.follow = False      # Eebbf, done at its first update
+        self._push(s, self._job('give', self.rott, ['TakeLeft'], end=given))
+        s.step = nxt
+
+    def _n_ee4d(self, s):
+        self._n_give(s, 'ed50', True)
+
+    def _n_ed50(self, s):
+        self._icon(s, '')
+        if not self._goto(s, self.rott, self._item('topleft/fifi')):
+            return
+        rott = self.rott
+        # fcn.100419a3: his `wait`
+        if rott.anim.has('WaitWatch') and (rott.anim.anim is None or rott.anim.anim.name != 'WaitWatch'):
+            rott.anim.play_looping('WaitWatch')
+        if s.take('tutorial'):
+            self.follow = True           # Ef51a
+        if s.take('call'):
+            self._leave_station(s)
+            s.step = 'ecb5'
+
+    def _n_ecb5(self, s):
+        self._n_chair(s, 'eb3b')
+
+    def _n_eb3b(self, s):
+        self._n_pillows(s, 'ea57', True)
+
+    def _n_ea57(self, s):
+        self._n_give(s, 'e926', False)
+
+    def _n_e926(self, s):
+        self._icon(s, '')        # m_hurt_n: no remaster texture, none shown
+        if not s.take('mother_fight'):
+            return
+        import pcprofile
+        import random
+        rott = self.rott
+        level = self.pc.get('shout') or 1
+        secs = pcprofile.s2_reaction_seconds(level, random, rott.pc_rage_full)
+        ticks = int(round(secs * 12))
+
+        def shouted():
+            self.follow = False          # Eebbf
+        self._push(s, {'ticks': ticks,
+                       'start': lambda: self._clip(rott, ['AngryEasyUp', 'AngryHard'], ticks),
+                       'end': shouted})
+        s.step = 'lap'
+
+    def _n_lap(self, s):
+        """0x1002e63c: the lap, the mobile's loop from its selected index"""
+        s.step = None
+        self._icon(s, None)
+        r = self.rott_routine
+        if r is not None and len(self.base) > 4:
+            r.actions = list(self.base)
+            r.index = 4
+            r.unfreeze(start_next=True)
+        self.done = True
+
+    # -- the drawing -------------------------------------------------------------
+    @property
+    def current(self):
+        return None
+
+    def draw(self, g, dt, menu_open=False):
+        if menu_open:
+            return
+        cam = self.viewer.cam
+        s = self.H * 64 // 768
+        if self.arrow:
+            self.arrow_anim.update(dt)
+        if self.arrow_right:
+            self.arrow_right_anim.update(dt)
+        for name in sorted(self.markers):
+            it = self.items.get(name)
+            if it is None:
+                continue
+            right = name in self.arrow_right_items and self.arrow_right
+            tex = (self.arrow_right[self.arrow_right_anim.frame] if right
+                   else (self.arrow[self.arrow_anim.frame] if self.arrow else None))
+            if tex is None:
+                continue
+            ox, oy = self.arrow_off.get(name, (0.0, 0.0))
+            sx, sy = cam.world_to_screen(it.x + ox, it.y + oy, self.W, self.H)
+            g.tex(tex, (sx, sy, s, s))
+        if self.text:
+            g.tex(self.message_background, self.message_rect)
+            g.label(self.description_rect, self.text, self.message_style, self.font)
+            if self.director is not None:
+                self.director.draw(g)
+
+
 CAMERA_CLASSES = {'TutorialScriptCamera': TutorialCamera102,
                   'TutorialScriptCameraIntro3': TutorialCamera103,
                   'TutorialScriptCameraNFH2': TutorialCameraNFH2,
@@ -1664,13 +2356,13 @@ def build(scene_data, W, H, loc, viewer):
         if dgo == go:
             director = DirectorFaces(dd, W, H)
             break
-    pc = _pc_tutorial(viewer)
+    kind, pc = _pc_tutorial(viewer)
     if pc is not None:
-        # the PC profile's 201: the PC's own tutorial replaces the LevelScript
-        # and the camera script (TutorialPC201)
-        found = scene_data.find('TutorialScriptCameraNFH2')
-        tut = TutorialPC201(d, W, H, loc, viewer, director, pc,
-                            found[0][1] if found else None)
+        # the PC profile's 201 and 206: the PC's own tutorial replaces the
+        # LevelScript and the camera script (TutorialPC201, TutorialPC206)
+        found = scene_data.find(kind)
+        cls = TutorialPC206 if kind == 'TutorialScriptCameraNFH2206' else TutorialPC201
+        tut = cls(d, W, H, loc, viewer, director, pc, found[0][1] if found else None)
         return tut, None
     tut = Tutorial(d, W, H, loc, viewer, director=director)
     cam = None
@@ -1684,12 +2376,15 @@ def build(scene_data, W, H, loc, viewer):
 
 
 def _pc_tutorial(viewer):
-    """the overlay's PCTutorial of the level (its TutorialScriptCameraNFH2
-    component, patched by pcprofile.apply_overlay), under the PC profile"""
+    """(the camera component, the overlay's PCTutorial on it) of the level —
+    its TutorialScriptCameraNFH2 (201) or TutorialScriptCameraNFH2206 (206),
+    patched by pcprofile.apply_overlay — under the PC profile"""
     import pcprofile
     if not pcprofile.is_pc():
-        return None
+        return None, None
     for o in viewer.level.objs.values():
-        if o.get('type') == 'TutorialScriptCameraNFH2':
-            return (o.get('data') or {}).get('PCTutorial')
-    return None
+        if o.get('type') in ('TutorialScriptCameraNFH2', 'TutorialScriptCameraNFH2206'):
+            pc = (o.get('data') or {}).get('PCTutorial')
+            if pc is not None:
+                return o.get('type'), pc
+    return None, None

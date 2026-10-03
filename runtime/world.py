@@ -5129,8 +5129,6 @@ class Routine:
             self._pc_visit_seconds(it)
             return float(t.pc_use_secs_tricked)
         v = self._pc_visit_seconds(it)
-        if v is None:
-            return 0.0
         # a visit the PC plays no action at: its value 0 (PCUseSeconds [0.0] —
         # 107's stool, whose ENTER pushes an `enter` the object has no record
         # of: the ACTION step's start, fcn.004772f0, finds none and pushes no job)
@@ -5139,12 +5137,7 @@ class Routine:
 
     def _pc_visit_seconds(self, it):
         """the item's PCUseSeconds for this visit: one value, or one per
-        visit in the PC station order, cycling; 0 = none; None for a visit
-        before the PC's lap (PCUseSecondsLead: the mobile's own length, the
-        cycle's slot kept for the next)"""
-        if getattr(it, 'pc_use_lead', 0) > 0:
-            it.pc_use_lead -= 1
-            return None
+        visit in the PC station order, cycling; 0 = none"""
         if not getattr(it, 'pc_use_secs', None):
             return 0.0
         v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]

@@ -982,10 +982,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   window is 60 + amount ticks at 12 Hz, and the profile runs exactly
   that (pcprofile.s1_rage_*).
 - *Season 2 amounts.* `tricks.xml`'s `rage` per trick, in thousandths,
-  is the mobile AngerAmount on all but eight items (202: rake 20, shark
+  is the mobile AngerAmount on all but seven items (202: rake 20, shark
   35, the electrified rail 30; 203: the chilli paper 30; 204: the jade
-  17; 206: the fleas 30; 208: the snake statue 15; 210: the hedgehog 27,
-  the octopus 27) — the amounts read off the gauge on 2026-09-08 were
+  17; 208: the snake statue 15; 210: the hedgehog 27, the octopus 27;
+  206's "fleas 30" was a Pillows 30 — the mobile Weights is the fleas'
+  30 already, and the pillows pay no record on the PC: the fartbag's
+  45000 is the chair's `fart`, withdrawn 2026-10-03 with the PC's lesson)
+  — the amounts read off the gauge on 2026-09-08 were
   read 1.25× the data and are withdrawn — the reader (tools/pcref/
   gauge.py) counts the bar's orange and yellow rows and the bar's top is
   red, so it saturates at ~74 % of the gauge: a jump reads 1/0.74 of its
@@ -1733,7 +1736,65 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   without the walk). The lesson stays the mobile's: its opening DogFifi
   visit (Level206's action 0, where the PC's neighbour stands waiting for
   the call) keeps its own length ahead of the cycle of the lap's values
-  (PCUseSecondsLead, pc_durations_s2 LEAD_OWN).
+  (PCUseSecondsLead, pc_durations_s2 LEAD_OWN — gone the same day with the
+  PC's own lesson, below).
+- *206's lesson (2026-10-03, read in GameLogic.dll and carried).* The PC's
+  206 opens with a lesson of its own, which the remaster retold:
+  GameLogic.dll runs three scripts over it — the invisible `aux` actor's
+  director (fcn.1002b64d: its steps 0x1002b5e7 ... 0x1002afee, run once a
+  level tick until one stores the next), the Mother's (0x1002c3af ...
+  0x1002bb39) and the neighbour's (0x1002f15a ... 0x1002e926) —, which
+  hand each other `call` and `order` (generic/objects.xml: the Mother's
+  callneighbor and order, behavior= on him), `mother_pillow` (the chair's
+  give, on her), `mother_fight` (the fight) and `tutorial` (fcn.1004000a),
+  each waited for on its latch (fcn.10013269). The level starts him
+  laughing at Fifi (level.xml: `laughleft` at topleft/fifi's 550/340) and
+  her by her chair (220/380), and the director shows step1. Her first step
+  walks her to the chair's `mother` hotspot (26 px up at 3 a tick), the
+  next one's builder pushes the chair's leave — done at its first update,
+  she is not in it (0x10006945 -> 0x10006ab7) —, pillow_slip (61 ticks)
+  and callneighbor (21). His 0x1002f11d waits for the call, 0x1002f082
+  runs him to the chair (gait 2) to wait for her order, which her
+  0x1002c1d9 plays once he stands there (fcn.1000e172; 18 ticks);
+  0x1002ef9e runs him to the pillows (take, 17), 0x1002ee4d back to the
+  chair (give, 17: `mother_pillow`) and the camera off, 0x1002ed50 walks
+  him to Fifi to wait (his `wait`). Her 0x1002c183 waits for the pillow,
+  0x1002c09b tells the director and sits in the chair (fcn.1000ea30: the
+  enter, 18; 0x1002bf25 its `look`) until the director's `tutorial`. The
+  director: step2 and the toy box marked; the fart bag held (fcn.1002b0d9
+  -> fcn.10049cec) -> step2a and the pillows; pillows_manip present
+  (fcn.1000ec67) -> step3 and the vent pipe; Woody in the lower deck
+  (fcn.1000ed06) -> step3a; Woody in a hideout (the level's slot 0x18,
+  fcn.10040946 -> fcn.100450dc: the actor's flag 4) -> `tutorial` to her
+  and to him, step4; her `tutorial` after the fight -> step5, until Woody
+  leaves the hideout (0x1002afee closes the box). Her second call: the
+  leave (22 — she is in the chair now), pillow_slip, callneighbor; his
+  errand to pillows_manip (the take, the switch back, 0x1002ec4c) and the
+  give; her `fart` in the chair (41 ticks, the fartbag record at 15: the
+  coin), her fight on him (fcn.1000eb19: to his x less or plus 50,
+  fight_neighbor 40, `mother_fight`), his 0x1002e926: SHOUT 1, the camera
+  off, the lap from 0x1002e63c. The remaster's lesson is another: Woody
+  frozen until the neighbour's opening errand ends; that errand the
+  stations' own Urgent visits, without her call, her order after his
+  give; his hold an in-game MoveOnly to Zone04; the fart bag paid at his
+  tricked chair visit and her fight before any fart; no step3 or step3a
+  (the hiding place's text). Carried under the profile
+  (runtime/tutorial.py TutorialPC206, the overlay's PCTutorial from
+  tools/pcref/pc_tutorial206.py): the three scripts step by step on the
+  level's ticks, their jobs the mobile pawns' clips paced to the PC's job
+  ticks, their GoTos the pawns' walks to the stations' PC hotspots, a post
+  offered on the tick after; the bubbles' icons (the routines'
+  `pc_bubble`, fcn.100422a5: `mother`, `get_pillow`, `bring_pillow` —
+  m_hurt_n has no remaster texture); the camera on him from 0x1002f15a to
+  his give and from the director's `tutorial` to his shout; DogFifi primed
+  at the start (the mobile's opening visit is its prime leg, LaughLeft —
+  the PC's start pose —, and its first prime's DogFifi arm swaps the later
+  primes to FifiPutLeft); the routines frozen until the lap — his from the
+  mobile's selected index (DogFifi's take), hers the mobile End1's with
+  its Hold2 surgery (the chair's look a single: her loop after the lesson
+  the mobile's, as before). The director's gate on the fart bag held is
+  the PC's own: a bag put on the pillows before step2 leaves it waiting at
+  0x1002b51c for good.
 - *Season 1 walks (2026-09-26, read in game.exe and carried).* The GOTO
   step (vtable 0x4e19e8, update 0x44a7b0) pushes the walk job (vtable
   0x4e53d0, update 0x475c80) with the run-now flag 1 (0x44a970), which

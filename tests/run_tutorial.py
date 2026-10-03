@@ -257,7 +257,9 @@ def main():
     else:
         os.environ['NFH_PROFILE'] = profile
 
-    # -- Level206: the NFH2206 camera's opening ----------------------------
+    # -- Level206: the NFH2206 camera's opening (the mobile's lesson: the PC
+    # profile runs the PC's own, checked below) ----------------------------
+    os.environ['NFH_PROFILE'] = 'mobile'
     app = start('Level206')
     w, wd, t = app.viewer.world, app.viewer.woody, app.tutorial
     cam = app.tutorial_camera
@@ -270,6 +272,54 @@ def main():
     check('206: the fourth step frees Woody and messages (-> Hold)',
           wait(app, lambda: cam.state == 'Hold', 90)
           and t.action_index >= 1 and not wd.frozen)
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
+
+    # -- Level206 under the PC profile: the director, the Mother and him ----
+    os.environ['NFH_PROFILE'] = 'pc'
+    app = start('Level206')
+    w, wd, t, L = (app.viewer.world, app.viewer.woody, app.tutorial,
+                   app.viewer.level)
+    items = {it.name: it for it in L.items.values()}
+    rott = w.pawns.get('Rottweiler')
+    check('pc 206: the PC lesson binds, no camera script',
+          type(t).__name__ == 'TutorialPC206' and app.tutorial_camera is None)
+    check('pc 206: step1, he laughs at Fifi, Woody free',
+          wait(app, lambda: 'step1' in t.shown, 5)
+          and rott.anim.anim.name == 'LaughLeftInfinite' and not wd.frozen)
+    check('pc 206: her call runs him to her chair',
+          wait(app, lambda: t.nb.step == 'f082', 20) and t.mom.step == 'c1d9')
+    check('pc 206: her order sends him for the pillows',
+          wait(app, lambda: t.nb.step == 'ef9e', 20))
+    check('pc 206: the pillow given, her tutorial: step2, the toy box',
+          wait(app, lambda: 'step2' in t.shown, 60)
+          and 'ToyBox' in t.markers and t.nb.step == 'ed50')
+    box = items['ToyBox']
+    w.woody_click(box.x, box.y, box, None)
+    check('pc 206: the fart bag taken: step2a, the pillows',
+          wait(app, lambda: 'step2a' in t.shown and 'Pillows' in t.markers, 60))
+    use_with(app, items['Pillows'], 'IT2_Fartbag')
+    check('pc 206: the fart bag on the pillows: step3, the pipe',
+          wait(app, lambda: 'step3' in t.shown and 'Pipe' in t.markers, 60))
+    pipe = items['Pipe']
+    w.woody_click(pipe.x, pipe.y, pipe, None)
+    check('pc 206: Woody hidden: step4, her second call',
+          wait(app, lambda: 'step4' in t.shown, 60)
+          and wait(app, lambda: t.nb.step == 'ecb5', 30))
+    check('pc 206: the fart pays the chair\'s trick',
+          wait(app, lambda: w.game.completed >= 1, 60)
+          and items['DeckChair'].already_tricked)
+    check('pc 206: her fight, his shout, the lap from Fifi\'s take',
+          wait(app, lambda: t.done, 30)
+          and t.rott_routine.index == 4 and not t.rott_routine.frozen)
+    check('pc 206: step5 until Woody leaves the pipe',
+          'step5' in t.shown or wait(app, lambda: 'step5' in t.shown, 10))
+    if profile is None:
+        del os.environ['NFH_PROFILE']
+    else:
+        os.environ['NFH_PROFILE'] = profile
 
     print()
     print('ALL OK' if _ok else 'FAILURES')

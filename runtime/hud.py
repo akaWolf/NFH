@@ -1339,7 +1339,13 @@ class Hud:
             return
         it = routine.urgent_item or routine.item
         name = None
-        if it is not None:
+        pc = getattr(routine, 'pc_bubble', None)
+        if pc is not None:
+            # a PC script's icon element (fcn.100422a5) while the profile's
+            # lesson drives the actor (206's TutorialPC206: `mother`,
+            # `get_pillow`, `bring_pillow`; '' clears the bubble)
+            name = pc or None
+        elif it is not None:
             # Alerter actions show BubbleIconMad (RoutineActionUse.BubbleIcon
             # override); actives win over the plain icon
             if it.kind == 'Alerter':

@@ -1185,8 +1185,29 @@ actors' job pass the update calls at 0x100445f8.
   4.4 s of the mobile's clip where the code's bag, walk and reling take
   16.2. The lesson's rows up to the lap's first take byte for byte the
   same in both runs (its opening DogFifi visit at its own length,
-  PCUseSecondsLead). The idle run without the lesson's legs stops at 34 s
+  PCUseSecondsLead — withdrawn the same day with the PC's own lesson,
+  below). The idle run without the lesson's legs stops at 34 s
   on both profiles: TutorialScriptCameraNFH2206's Hold waits for the
   LevelScript's action 4 (the player's steps), the neighbour frozen after
   the in-game move to Zone04 (AddInGameActions(4)) — the mobile's lesson,
   not a stall. Plan 206 unchanged: 100 at 266.5 s (253.5 before).
+- `runtime/tutorial.py`, `runtime/hud.py`, `tools/pcref/pc_tutorial206.py`,
+  `levels/pc/Level206.overlay.json`, `tests/run_tutorial.py` (2026-10-03):
+  206's lesson by the PC's scripts (TutorialPC206: the director, the
+  Mother's and the neighbour's steps on the level's ticks). Against the
+  let's play (pc_nfh2_all_720, E06; frames at 4 and 2 fps from 1242 s):
+  he starts for her chair at ~1245.9 s — the port 8.32 s —, for the
+  pillows 3.1 s later (the port 2.66: her order's 18-tick job and its
+  offer, the step's own tick), takes them 6.6-7.6 s after his start
+  (7.0), gives them 12.6-13.6 (12.66), and step2 shows 14.6-15.1 (14.2).
+  The video's HUD clock reads 0:01 at 1238.0 s: his start at ~8.9 s of
+  it, the port's 0.6 s earlier (the clock's zero against the scripts'
+  first tick unread). The lap past the lesson 118.5, 118.67 and 118.5 s
+  (runs/les206f), his put at Fifi FifiPutLeft. tests/run_tutorial.py
+  (59 checks): the remaster's lesson under the mobile profile, the PC's
+  under the PC one — the binding, step1 and his laugh, her call, her
+  order, step2 and the toy box, step2a and the pillows, step3 and the
+  pipe, step4 and her second call, the fart paying the chair's trick, her
+  fight, his shout and the lap from Fifi's take, step5. Plan 206 (the fart
+  bag on the pillows after step2a): 100 at 246.3 s, PC 16030 (15876 on
+  the remaster's lesson, whose fart had paid the pillows' 30).

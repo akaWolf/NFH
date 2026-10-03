@@ -2140,12 +2140,23 @@ phase, with the entry run, wheeze and shout after the combo
 (`Routine._finish` asks `pc_trick_hook`), the scripted shouts' levels
 (`World.play_angry` asks `pc_shout`) and the rail's repair on his next
 visit; its data is the overlay's PCTutorial. The App holds the level
-while the welcome box shows; the harness clicks it away.
+while the welcome box shows; the harness clicks it away. Level206 runs
+the PC's own lesson the same way (`TutorialPC206`, docs/PC_FIDELITY.md
+"206's lesson"): the `aux` director, the Mother's and the neighbour's
+scripts step by step on the level's ticks (the messages from
+ship2/strings.xml, the marker arrows, the gates on Woody's inventory,
+room and hideout, the behaviours `call`, `order`, `mother_pillow`,
+`tutorial` and `mother_fight` offered on the tick after their posts),
+the pawns walked and their clips paced to the PC's job ticks while both
+routines stay frozen, the thought bubbles' icons through the routines'
+`pc_bubble` (Hud._think_bubble), then the lap from the mobile's selected
+index and the Mother's End1.
 
 `tests/run_tutorial.py` drives all five scenes (Intro101 start to the
 forced win; Intro102/103 through every signal kind and both cameras;
-the L201/L206 openings, L201's mobile lesson under the mobile profile and
-the PC's up to the demo lap under the PC one) — 48 checks.
+the L201/L206 openings, their mobile lessons under the mobile profile,
+L201's PC tutorial up to the demo lap and L206's PC lesson through to the
+lap under the PC one) — 59 checks.
 
 ## Not implemented
 

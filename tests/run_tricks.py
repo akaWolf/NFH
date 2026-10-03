@@ -2627,7 +2627,9 @@ class Driver(Recorder):
             # until the director has shown that message; `end` its last step
             msg = index
             if msg == 'end':
-                done = lambda: tut.step == '6640'
+                # (201's director at its last step; 206's lesson handed over
+                # to the lap)
+                done = lambda: getattr(tut, 'step', None) == '6640' or getattr(tut, 'done', False)
             else:
                 done = lambda: msg in tut.shown
             what = 'the PC director\'s %s' % msg
