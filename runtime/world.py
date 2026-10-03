@@ -5843,6 +5843,12 @@ class Routine:
                                 searched()
                             self.pawn.anim.play_sequence([clip], on_end=shouted)
                             return
+                        if self._pc_yell_secs and self.pawn.world is not None:
+                            # the list's `wakeup` to the pet and its icon, a
+                            # message step a tick each, before the GoTo
+                            self.pawn.world.call_later(
+                                2 / pcprofile.TICKS_PER_SECOND, searched)
+                            return
                         searched()
             if seq:
                 self.pawn.anim.play_sequence(seq, on_end=done)
