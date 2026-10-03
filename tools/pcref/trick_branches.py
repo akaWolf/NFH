@@ -861,6 +861,7 @@ def summarise(row, lv):
     before = []; after = []; seen_fire = False; fix = None; walks = []
     unknown = []; fixes = []; repair = None
     held = 0.0; pre_fire = 0.0; last = None; ready_held = 0.0
+    occupied = None             # the object his last ENTER took, until a LEAVE
     prefer = [row['name']]
     if '_' in row['name'].split('/')[-1]:
         prefer.append(row['name'].rsplit('_', 1)[0])       # the normal twin (lir/tabacbox of lir/tabacbox_explosive)
@@ -894,9 +895,17 @@ def summarise(row, lv):
                 last.append((label, v))
         elif s['kind'] in ('ENTER', 'LEAVE'):
             act = s['kind'].lower()
-            v, label = seconds(lv, s['obj'], act, prefer)
-            if v is None:
-                unknown.append(label); v = 0.0
+            if act == 'enter' and occupied is not None:
+                # the ENTER step's update finds him occupying an object
+                # already (fcn.00444ad0 at 0x47388a, not null) and ends at
+                # once, 0x473a22: its own tick, no `enter` (110's chair sat
+                # on again after the pins' repair — no LEAVE since)
+                v, label = 1 / FPS, '%s.enter (occupied)' % s['obj']
+            else:
+                v, label = seconds(lv, s['obj'], act, prefer)
+                if v is None:
+                    unknown.append(label); v = 0.0
+            occupied = s['obj'] if act == 'enter' else None
             v += held; held = 0.0
             last = after if seen_fire else before
             last.append((label, v))

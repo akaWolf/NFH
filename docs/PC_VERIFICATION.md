@@ -1211,3 +1211,19 @@ actors' job pass the update calls at 0x100445f8.
   fight, his shout and the lap from Fifi's take, step5. Plan 206 (the fart
   bag on the pillows after step2a): 100 at 246.3 s, PC 16030 (15876 on
   the remaster's lesson, whose fart had paid the pillows' 30).
+- `tools/pcref/trick_branches.py`, `levels/pc/Level110.overlay.json`
+  (2026-10-03): an ENTER on an object while he still occupies one plays
+  no `enter` — the step's update finds the occupied object (fcn.00444ad0
+  at 0x47388a, not null) and ends at once (0x473a22), its own tick; the
+  lap model had it (lap_model.py), the tricked stands' tails did not.
+  110's chair: after the pins' fire the case repairs, switches the chair
+  back and ENTERs the table again with no LEAVE between — the redo is the
+  switch's and the ENTER's ticks and the `eat`, then the walk's leave:
+  PCRedoSeconds 5.417 where it had been 6.333. Against Badinfos' E10
+  (pc_s1_all_720 at 8 fps, the thermometer's 5/6 at 2600.8-2601.0 s):
+  the shout's end and the repair's start ~2608.85 (3 + 93 ticks after the
+  fire), the pins out and the chair switched ~2609.8, seated at once
+  (2610.0 standing, 2610.125 seated), the `eat` to ~2614.5, the wine's
+  icon ~2614.5, the fire ~2619.45 — the icon to the fire 59 ticks, the
+  leave 11, the walk 11 and the drink 37 of the model. The chair to the
+  wine 18.59 s (runs/p110occ), Badinfos' 18.7 (19.5 before); 110 at 100.

@@ -75,7 +75,7 @@
     "PCUseSeconds": 6.75,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 3.167,
-    "PCRedoSeconds": 6.333
+    "PCRedoSeconds": 5.417
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.8 s"
   },

@@ -75,7 +75,10 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   and the bubbles: the DoActions before the fire, the five-argument step's own
   clip, the actions after it, the repair or clean (fcn.0047ae70 or the
   script's own `repair`), in objects.xml seconds — the neighbour's own actions
-  (smokepipe_explosive, riphat, spit …) looked up on the `<actor>` blocks.
+  (smokepipe_explosive, riphat, spit …) looked up on the `<actor>` blocks; an
+  ENTER while he still occupies an object (no LEAVE since the last ENTER) is
+  the step's own tick, no `enter` (0x473830: fcn.00444ad0 not null -> done;
+  110's chair sat on again after the pins' repair, 2026-10-03).
   `--cases`/`--chain` print a level's cases and chain, `--dump` a code range
   with its strings. The walk-trigger handlers (the doubletakes, the slips,
   the trap) are no cases: their straight branch is read instead.
