@@ -1,0 +1,19 @@
+{
+ "source": "The director's messages (tools/pcref/pc_tutorial_s1.py): the PC's tutorial_3 strings.xml texts by their code names, paired one to one with the LevelScript actions' PC-build keys (PCDescriptions).",
+ "patches": [
+  {
+   "object": "LevelScript",
+   "component": "LevelScript",
+   "set": {
+    "PCDescriptions": {
+     "TUT3MSG1_PC": "Hi! In the last part of the introduction, you'll learn about some of Woody's more sophisticated options. \n \nLater episodes will also include the neighbour's pets. As you can see here, the neighbour will come running as soon as a pet raises the alarm.",
+     "TUT3MSG2_PC": "You'll have to make Woody sneak past the animal to prevent the pet raising the alarm. To do this, you'll have to use the right instead of the left mouse button for your actions. A right click on the floor, on a door or an object will make Woody sneak there. Once there, he can get creative without the pet raising the alarm. \n \nPlease have Woody first take the marbles from the chest of drawers to try this out.",
+     "TUT3MSG3_PC": "Now have Woody put these on the floor in room B on the upper floor. But instead of using the left mouse button, press the right mouse button to make Woody sneak. ",
+     "TUT3MSG4_PC": "Excellent! Now let Woody sneak back to the lower floor with a right click.",
+     "TUT3MSG5_PC": "In a moment, the neighbour will walk through room C, so Woody should hide in the wardrobe. \n \nAs long as Woody is hiding in the wardrobe or under the bed, the neighbour and his pets won't be able to see him. He's safe. \n \nNow left click on the wardrobe to make Woody hide in there.",
+     "TUT3MSG6_PC": "Congratulations! \n \nThe neighbour won't notice you and will trip over the marbles at any moment. Now you've learnt all that's necessary to pay back the neighbour from hell. \n \nThe 'Neighbours from Hell' show can begin!"
+    }
+   }
+  }
+ ]
+}

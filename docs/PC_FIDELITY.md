@@ -2145,6 +2145,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   212's 300 against 414, 214's 1074 against 1200); the mobile's greeting
   (HelloAnimationNFH2, a second with the input locked) stays — the video
   does not show his first frames.
+- *The Season 1 tutorials' texts (2026-10-03).* The remaster's Intro101-103
+  are the PC's tutorial_1-3 step for step — the same rooms, targets, doors,
+  items and the neighbour's slips; its LevelScript actions carry a
+  PC-build text (TUT<n>MSG<m>_PC) that is the PC's director message
+  reworded ("neighbor", "the director." for "the director of the show.",
+  102's fourth box "Woody is now using the marker pen on the picture" for
+  the PC's "A progress bar above Woody's head shows you the duration of an
+  action"), and the port had shown the mobile's touch wording. Under the
+  profile the director says the PC's own message (tools/pcref/
+  pc_tutorial_s1.py: 5 + 8 + 6 boxes paired by content). Not carried: the
+  PC's two "Ha, ha!" boxes after the slips (tutorial_2's tut_laugh2,
+  tutorial_3's tut_laugh, 0x459ffb), which no action of the remaster's
+  scripts shows.
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and

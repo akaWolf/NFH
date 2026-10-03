@@ -2190,11 +2190,18 @@ routines stay frozen, the thought bubbles' icons through the routines'
 `pc_bubble` (Hud._think_bubble), then the lap from the mobile's selected
 index and the Mother's End1.
 
+The three Intro scenes are the PC's tutorial levels step for step
+(tutorial_1-3: Level_Tutorial1::run and its two siblings in game.exe);
+under the PC profile the director says the PC's own messages — the
+tutorial's strings.xml text for each action's PC-build key (the overlay's
+PCDescriptions, tools/pcref/pc_tutorial_s1.py; `Tutorial.get_description`,
+else the PC-build key's text, never the touch wording of the mobile's).
+
 `tests/run_tutorial.py` drives all five scenes (Intro101 start to the
 forced win; Intro102/103 through every signal kind and both cameras;
 the L201/L206 openings, their mobile lessons under the mobile profile,
 L201's PC tutorial up to the demo lap and L206's PC lesson through to the
-lap under the PC one) — 59 checks.
+lap under the PC one) — 60 checks.
 
 ## Not implemented
 

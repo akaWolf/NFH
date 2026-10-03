@@ -83,6 +83,12 @@ def main():
                    app.viewer.level)
     check('101: the tutorial activates after the cards',
           t is not None and t.active and t.action_index == 0)
+    if os.environ.get('NFH_PROFILE', 'pc') != 'mobile':
+        # the PC profile's director says the PC's tutorial_1 message
+        # (tools/pcref/pc_tutorial_s1.py)
+        check('101: the PC director text (tut_target1)',
+              t.get_description(t.current).startswith(
+                  "Welcome to the 'Neighbours from Hell' show. I'm Joe, the director of the show."))
     check('101: the world clock started', wait(app, lambda: w.time > 0.1, 2))
     w.woody_click(3.7, 0.3, None, None)
     check('101: the location signal (x threshold)',

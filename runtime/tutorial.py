@@ -314,14 +314,33 @@ class Tutorial:
                            idx_after=int(a.get('ActionIndexAfterForceAdvanceAction') or 0))
         self._alt[id(a)] = False
 
+    def _pc_descriptions(self):
+        """the overlay's PCDescriptions on the level's LevelScript (the
+        profile patches the level's objects, pcprofile.apply_overlay)"""
+        for o in self.level.objs.values():
+            if o.get('type') == 'LevelScript':
+                return (o.get('data') or {}).get('PCDescriptions') or {}
+        return {}
+
     def _rott_routine(self):
         rott = self.world.pawns.get('Rottweiler')
         return next((r for r in self.world.routines if r.pawn is rott), None)
 
     def get_description(self, a):
-        """GetDescription (cs:168-176): the mobile strings"""
-        key = a.get('AlternateDescriptionMobile') \
-            if self._alt.get(id(a)) else a.get('DescriptionMobile')
+        """GetDescription (cs:168-176): the mobile strings — under the PC
+        profile the PC's own director message (PCDescriptions, the PC
+        tutorial's strings.xml text for the action's PC-build key: tools/
+        pcref/pc_tutorial_s1.py), else the PC-build key's text"""
+        alt = self._alt.get(id(a))
+        import pcprofile
+        if pcprofile.is_pc():
+            key = a.get('AlternateDescription') if alt else a.get('Description')
+            pc = self._pc_descriptions().get(key or '')
+            if pc:
+                return pc
+            if key:
+                return self.loc(key).replace('\\n', '\n')
+        key = a.get('AlternateDescriptionMobile') if alt else a.get('DescriptionMobile')
         return self.loc(key or '').replace('\\n', '\n')
 
     # -- LevelScript.OnGUI (cs:85-146) -------------------------------------

@@ -1,0 +1,21 @@
+{
+ "source": "The director's messages (tools/pcref/pc_tutorial_s1.py): the PC's tutorial_2 strings.xml texts by their code names, paired one to one with the LevelScript actions' PC-build keys (PCDescriptions).",
+ "patches": [
+  {
+   "object": "LevelScript",
+   "component": "LevelScript",
+   "set": {
+    "PCDescriptions": {
+     "TUT2MSG1_PC": "Hi, it's Joe! This time, I'd like to show you some things Woody can do. \n \nIn any episode, you can have Woody look at important objects by moving the mouse pointer onto the object and clicking the left mouse button. \n \nWhy don't you try it out right now with the plant?",
+     "TUT2MSG2_PC": "Good! You'll often find useful items in drawers, chests of drawers and other furniture. \n \nAll objects found are automatically put in your inventory at the bottom of the screen. \n \nNow left click on the chest of drawers to make Woody open them and have a look to see whether there's anything hidden in there. ",
+     "TUT2MSG3_PC": "Excellent! Woody has found something. Just leave your mouse pointer on the object for a while to have a closer look at these newly-found objects in your inventory. \n \nYou can use objects from your inventory with other objects. \n \nPlease left click on the marker pen, which now stands out, and use it with the picture in room A on the upper floor by clicking on the picture once more. ",
+     "TUT2MSG4_PC": "Brilliant! A progress bar above Woody's head shows you the duration of an action. \n \nGiving Woody another order during an action will cancel the current action, which is left incomplete. \n \nLet Woody go back to the lower floor to make the neighbour move.",
+     "TUT2MSG5_PC": "Fine! Now the neighbour is on his way. \n \nWalking past the picture, he'll notice that it's smeared, and will get angry about it. ",
+     "TUT2MSG6_PC": "Each time the neighbour gets angry, more points are added to Woody's ratings (at the bottom right). \n \nKeep an eye on the neighbour's picture at the bottom left, too: As soon as he walks into a trap, his anger indicator increases and then goes down again. If the neighbour walks into another trap before this bar is back to zero, Woody will get a bonus! \n \nNow please make Woody put the marbles on the floor in room B. But take care that the neighbour doesn't catch you doing it, otherwise you'll have to repeat the introduction!",
+     "TUT2MSG7_PC": "Well done! Now let Woody go back to room C on the lower floor. \n \nBut hurry up so Woody won't get caught by the neighbour!",
+     "TUT2MSG8_PC": "That was very good! A little hint: Pay attention to the neighbour's thought bubble to see where he is headed and which objects he wants to use. These items can often be used for tricks! \n \nNow enjoy the neighbour slipping on the marbles. See you in the next episode."
+    }
+   }
+  }
+ ]
+}

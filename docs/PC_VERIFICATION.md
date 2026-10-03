@@ -1204,7 +1204,7 @@ actors' job pass the update calls at 0x100445f8.
   it, the port's 0.6 s earlier (the clock's zero against the scripts'
   first tick unread). The lap past the lesson 118.5, 118.67 and 118.5 s
   (runs/les206f), his put at Fifi FifiPutLeft. tests/run_tutorial.py
-  (59 checks): the remaster's lesson under the mobile profile, the PC's
+  (59 checks, 60 since 2026-10-03): the remaster's lesson under the mobile profile, the PC's
   under the PC one — the binding, step1 and his laugh, her call, her
   order, step2 and the toy box, step2a and the pillows, step3 and the
   pipe, step4 and her second call, the fart paying the chair's trick, her
