@@ -6426,21 +6426,27 @@ class Routine:
         return self.pawn.notice_near_distance
 
     def _pc_nearobj(self, it):
-        """a Season 1 walk-by item that is a nearobj trigger of the level's
-        trigger.xml under the profile: the floor tricks and the stations of
-        pcprofile.S1_NEAROBJ_ITEMS"""
-        return pcprofile.is_pc() and not self.pawn.nfh2 \
-            and (it.is_floor or it.name in pcprofile.S1_NEAROBJ_ITEMS)
+        """a walk-by item that is a nearobj trigger of the level's trigger.xml
+        under the profile: Season 1's floor tricks and the stations of
+        pcprofile.S1_NEAROBJ_ITEMS, Season 2's S2_NEAROBJ_ITEMS"""
+        if not pcprofile.is_pc():
+            return False
+        if self.pawn.nfh2:
+            return it.name in pcprofile.S2_NEAROBJ_ITEMS
+        return it.is_floor or it.name in pcprofile.S1_NEAROBJ_ITEMS
 
     def _pc_notice_standing(self):
         """game.exe tests its nearobj triggers on every tick wherever he
-        stands (fcn.00472390 over fcn.00471bc0), not only on a walk's: a
-        Season 1 floor trick or a trigger.xml station (_pc_nearobj) tricked
-        within reach of him standing is noticed as the condition turns true
-        (the trigger's flag 2: once until he is out of reach again) — not in
-        his hideout (flag 4: 109's bed)"""
+        stands (fcn.00472390 over fcn.00471bc0; GameLogic.dll the same,
+        fcn.1003f573), not only on a walk's: a Season 1 floor trick or a
+        trigger.xml station (_pc_nearobj; Season 2's electrified tap)
+        tricked within reach of him standing is noticed as the condition
+        turns true (the trigger's flag 2: once until he is out of reach
+        again) — not in his hideout (flag 4: 109's bed, Season 2's
+        pc_flag4)"""
         w = self.pawn.world
-        if w is None or self.pawn.zone is None or self.pawn.pc_bed:
+        if w is None or self.pawn.zone is None or self.pawn.pc_bed \
+                or (self.pawn.nfh2 and self.pawn.pc_flag4):
             self._pc_near_in = set()
             return
         inside = set()
@@ -6851,10 +6857,10 @@ class Routine:
             w.flag_aux = True
             olga.anim.anim.infinite = False
             self.anim_aux = olga.anim.anim
-        # game.exe's nearobj triggers (the level tick's pass before the
-        # actors'): a floor trick within reach of him standing (under the
-        # profile, Season 1; the walk's own frames run UpdateWalking)
-        if self.role == 'Rottweiler' and pcprofile.is_pc() and not self.pawn.nfh2 \
+        # the nearobj triggers (game.exe's and GameLogic.dll's pass before
+        # the actors'): a trigger item within reach of him standing (under
+        # the profile; the walk's own frames run UpdateWalking)
+        if self.role == 'Rottweiler' and pcprofile.is_pc() \
                 and self.pawn.state == self.pawn.IDLE and self._urgent_action is None:
             self._pc_notice_standing()
             if self._urgent_action is not None:

@@ -510,6 +510,11 @@ S1_NEAROBJ_PX = 15
 # the mobile's Drawing (107), Pig (109) and Airer (111) have none — their
 # reactions are the level classes' cases
 S1_NEAROBJ_ITEMS = {'Microwave', 'Toilet', 'MumPicture', 'ElectricTrap', 'Iron'}
+# Season 2's one nearobj trigger (the levels' trigger.xml; GameLogic.dll tests
+# it on every level tick the same way, fcn.1003f573: flag 4, the room,
+# |dx| < 15 at 0x1003f7d0): 208's elephant/tap_electricity, `electrify`,
+# `always`
+S2_NEAROBJ_ITEMS = {'ElectricTap'}
 WALK_PX_PER_TICK = {
     # role: (along the floor, up or down the room, up or down the stairs — Season 2's stair
     # gaits; Season 1 has no stairs to walk)
