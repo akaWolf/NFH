@@ -482,8 +482,9 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   not; since 2026-09-25 the wake is the pig class's: he leaves the bed —
   BedOut at the `leave`'s 16 ticks (2026-09-26) — skips the alarm clock
   and catches from the room after) — no IgnoreWoodyWhenUse, IsSleeping or blocking-animation windows
-  (Season 1; Season 2 keeps the mobile's windows until GameLogic's watch
-  mode bits are read). The harness's dodging reads the same paces (`_speed`, `woody_speed`,
+  (Season 1; Season 2 kept the mobile's windows until GameLogic's watch
+  predicate was read — since carried: pcprofile.s2_sight, fcn.1003f573's
+  room and flag-4 rule, docs/PC_VERIFICATION.md "the catch"). The harness's dodging reads the same paces (`_speed`, `woody_speed`,
   `door_time`, and `_door_climb` — the ~0.65 u climb to a back door, one
   axis a tick: 1.7 s for the neighbour, 0.9 for a walking Woody, 2.6
   sneaking; a catcher is in the far room once the Leave/Enter pair has
