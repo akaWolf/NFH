@@ -6421,16 +6421,24 @@ class Routine:
         """the walk-by notice's reach: the pawn's NoticeWhenNearTrickedDistance
         (0.1 u), under the profile a Season 1 floor trick's nearobj trigger —
         15 px (pcprofile.S1_NEAROBJ_PX, fcn.00471bc0)"""
-        if pcprofile.is_pc() and not self.pawn.nfh2 and it.is_floor:
+        if self._pc_nearobj(it):
             return pcprofile.S1_NEAROBJ_PX / pcprofile.PX_PER_UNIT
         return self.pawn.notice_near_distance
+
+    def _pc_nearobj(self, it):
+        """a Season 1 walk-by item that is a nearobj trigger of the level's
+        trigger.xml under the profile: the floor tricks and the stations of
+        pcprofile.S1_NEAROBJ_ITEMS"""
+        return pcprofile.is_pc() and not self.pawn.nfh2 \
+            and (it.is_floor or it.name in pcprofile.S1_NEAROBJ_ITEMS)
 
     def _pc_notice_standing(self):
         """game.exe tests its nearobj triggers on every tick wherever he
         stands (fcn.00472390 over fcn.00471bc0), not only on a walk's: a
-        Season 1 floor trick laid or lying within reach of him standing is
-        noticed as the condition turns true (the trigger's flag 2: once until
-        he is out of reach again) — not in his hideout (flag 4: 109's bed)"""
+        Season 1 floor trick or a trigger.xml station (_pc_nearobj) tricked
+        within reach of him standing is noticed as the condition turns true
+        (the trigger's flag 2: once until he is out of reach again) — not in
+        his hideout (flag 4: 109's bed)"""
         w = self.pawn.world
         if w is None or self.pawn.zone is None or self.pawn.pc_bed:
             self._pc_near_in = set()
@@ -6438,7 +6446,7 @@ class Routine:
         inside = set()
         hit = None
         for it in list(w.near_items.get(self.pawn.zone.pid, ())):
-            if it.is_floor and it.tricked and \
+            if self._pc_nearobj(it) and it.tricked and \
                     abs(self.pawn.sprite.x - it.target_x) < self._notice_distance(it):
                 inside.add(id(it))
                 if hit is None and id(it) not in self._pc_near_in:

@@ -502,6 +502,14 @@ TICKS_PER_SECOND = 12.0
 # (fcn.00472390, before the actors' pass) and delivered as the condition turns
 # true (the trigger's flag 2: again only once it has turned false, its 0x200)
 S1_NEAROBJ_PX = 15
+# the mobile's walk-by stations whose tricked object is a nearobj trigger of
+# the level's trigger.xml (the floor tricks — groundbanana, groundsoap,
+# marbles, skate — are the IsFloor items): kit/microwavedirty, toi/
+# toiletstuffed, anc/mum_smeared, bas/electrotrap (`once`: the trigger goes
+# once delivered, 0x47254c) and 111's bed/ironingboard_burn (`always`);
+# the mobile's Drawing (107), Pig (109) and Airer (111) have none — their
+# reactions are the level classes' cases
+S1_NEAROBJ_ITEMS = {'Microwave', 'Toilet', 'MumPicture', 'ElectricTrap', 'Iron'}
 WALK_PX_PER_TICK = {
     # role: (along the floor, up or down the room, up or down the stairs — Season 2's stair
     # gaits; Season 1 has no stairs to walk)
