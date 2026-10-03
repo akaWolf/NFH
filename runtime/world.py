@@ -3479,6 +3479,7 @@ class Routine:
         self._sz_door = None             # RoutineActionMove.RottweilerLastDoor
         self._manager_dead = False       # ActionManager.Update dying at cs:444
         self._same_zone_yelled = False   # ActionManager.AngryAnimationStarted
+        self._pc_yell_secs = None        # the PC alarm's shout0_light at the pet: the yell's pace
         self._alarm_use = False          # the AlarmAction urgent runs a full Use
         self._angry_target = None        # the item the current angry set is for
         self._wait_in_fear_done = None   # the parked resume of the affect flow
@@ -5816,6 +5817,14 @@ class Routine:
                         # the list's other branch: no pet in his room, the
                         # icon and `shout2` where he stands (0x47a893-0x47a8d2)
                         shout = pcprofile.S1_SHOUT_TICKS['shout2'] / pcprofile.TICKS_PER_SECOND
+                    elif shout and self._same_zone:
+                        # the pet in his room and the remaster's SameZone
+                        # choreography on: its walk to the pet after the
+                        # surprise is the list's GoTo to it, and its yell
+                        # there the list's `shout0_light` (0x47a7b1-0x47a887)
+                        # — at that shout's pace (_same_zone_yell), not here
+                        self._pc_yell_secs = shout
+                        shout = None
 
                     def done():
                         self.pawn.anim.time_scale = 1.0
@@ -5932,6 +5941,18 @@ class Routine:
         seq = [a for a in (it.surprise_left if it is not None else [])
                if self.pawn.anim.has(a)]
         self.state = self.USING
+        secs, self._pc_yell_secs = self._pc_yell_secs, None
+        if seq and secs:
+            # the PC alarm's `shout0_light` at the pet (PCAlarmShoutSeconds)
+            mobile = self.pawn.anim.sequence_seconds(seq)
+            if mobile > 0.0:
+                self.pawn.anim.time_scale = mobile / secs
+
+                def yelled():
+                    self.pawn.anim.time_scale = 1.0
+                    self._yell_done()
+                self.pawn.anim.play_sequence(seq, on_end=yelled)
+                return
         if seq:
             self.pawn.anim.play_sequence(seq, on_end=self._yell_done)
         else:
