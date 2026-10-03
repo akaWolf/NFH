@@ -1113,3 +1113,12 @@ actors' job pass the update calls at 0x100445f8.
   (`op!`), whose gate does not run, clicked the way-round waypoint the
   last gated leg had left (Level214's fish from the chair walked off
   through Zone04 into his shower room): the waypoint is the leg's own now.
+- `tools/pcref/lap_model_s2.py` (2026-10-03): the lap is the walk from its
+  loop's step on — lap_estimate and _paired_parts had rotated the steps
+  before it in (213's tub repair, 206's reling: the level's start). The
+  port's idle laps under the profile against the model (runs/idle9, Woody
+  waiting): 203 107.5-107.7 s (the model 107.5), 208 86.0-86.2 (86.0, the
+  video's 86), 209 108.0-108.2 (107.6), 211 85.7-85.8 (85.7), 212
+  128.2-128.3 (128.2), 213 122.7-122.8 (122.2; 124.0 with the tub's
+  repair), 214 90.8 (90.8); 202 78.0 (73.2 and his wait at the shore for
+  Olga's sub, which the model does not time).
