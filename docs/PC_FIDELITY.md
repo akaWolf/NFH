@@ -2122,6 +2122,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   rickshaw (the go-and-enter, 2.0 s; RickshawEnter 2.5) and waits there,
   207's lies down on her mat (0.92 s; BeachLayDown 0.8) and sleeps — each
   clip at the PC's ticks (CLIPS_ROLE); 203's is frozen on both.
+- *The Season 2 start (2026-10-03).* GameLogic.dll's level scripts run from
+  the first tick of play: in Badinfos' run the intro card gives way to the
+  level and the clock's 0:00 with the first steps' icons already up — 209's
+  neighbour's fakir and the Mother's Ramschid's at 2088.47 s of
+  pc_nfh2_all_720, 211's Mother's portrait at 2647.20 and her bar's green a
+  second later (her chair's `enter`, 12 ticks, from the chair's hotspot she
+  starts at). The mobile holds every scripted pawn 1.5 s (DelayStart,
+  Rottweiler.cs:153, Mother.cs:18, Olga.cs:8) and starts it at its
+  LevelLocations, up to 280 px of the PC scene from level.xml's position
+  (213's neighbour), and in 206's case in another room. Under the profile
+  the delay is gone and the actors start where level.xml puts them (PCStart,
+  tools/pcref/pc_walks_s2.py: the zone of the room, the x, the height
+  against the floor the first walk comes down from) — but 201's neighbour,
+  whom the lesson's director places, and 206's Olga, a PC object with no
+  script. 209's Mother reaches the dressing room's icon 12.98 s in (the
+  video 12.76, the model's 154 ticks 12.83; 13.98 before), 211's sleeps
+  from 1.32 s (the video 1.0; 3.32 before). Plan 208 takes its chalk before
+  the cable and rushes its first rat (v3): he crosses the bazar 1.5 s
+  sooner.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

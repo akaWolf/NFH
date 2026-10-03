@@ -2528,6 +2528,10 @@ class Level:
                 # the fallbacks are the Pawn constructor's (Pawn.cs:203-209),
                 # every pawn serializes its own values
                 'speed': pd.get('Speed', 1.25),
+                # the PC profile's Season 2 start: where level.xml places the
+                # scripted actor — its zone, x in px of the PC scene and the
+                # height against the room's floor (tools/pcref/pc_walks_s2.py)
+                'pc_start': pd.get('PCStart'),
                 'speed_sneaking': pd.get('SpeedSneaking', 0.65),
                 'force': pd.get('ForceMagnitude', 300.0),
                 'door_force': pd.get('DoorForceMagnitude', 80.0),

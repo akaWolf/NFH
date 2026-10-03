@@ -9,16 +9,20 @@
 # stand (104-136), before the bowl brings him to Zone04 (141): after the shoe, as
 # the mobile plan has it, the 7.75 s game left the elephant's round to his lap-3
 # walk to the shoe machine (Zone01, from 186) and the SafetyLine re-locked.
+# v3 (2026-10-03, the PC's start: the scripts from the first tick, the actors
+# where level.xml puts them — he crosses the bazar ~1.5 s sooner): the chalk
+# before the cable, and the first rat rushed (the gate wanted 0.6 s more than
+# his ETA); 100 at 276.4 s (runs/p208st2).
 take Balloons IT2_Balloon              # Zone05
 take Spade IT2_Shovel                  # Zone05
 take BoardNail IT2_Blades              # Zone02 (the Mother's zone; her sleep window)
+take Chalk IT2_Chalk_sponge            # Zone02 — BEFORE the elephant: Pawn.ElephantAnimations (Pawn.cs:1536-1558) re-locks the SafetyLine the moment Woody leaves the primed elephant's zone; before the cable, ahead of his first walk through the bazar to the shoe machine (~30)
 take Cable IT2_Cable                   # Zone02
-take Chalk IT2_Chalk_sponge            # Zone02 — BEFORE the elephant: Pawn.ElephantAnimations (Pawn.cs:1536-1558) re-locks the SafetyLine the moment Woody leaves the primed elephant's zone
 whenusing IndianPlatform             # his lap-2 platform (80 s)
 usewith IndianMagician IT2_Balloon     # Zone03: ActivateItemTrick -> IndianPlatform.Tricked (TrickItem.cs:323-327)
 usewith SeeSaw IT2_Shovel              # Zone03: LinkedItemTrick of IndianPlatform
 whenusing ShoeMachine                # his lap-2 shoe machine (125 s)
-take Mouse IT2_Rat                     # Zone04 while he shoes and stands at the elephant (Zone01, 125-138): the PC's game (altar/rat's use, time 360: 7.75 s, PCMinigameTicks), then the take — dexterity search (unlocker IT_NONE, TakeItemCount 20)
+take! Mouse IT2_Rat                    # Zone04 while he shoes and stands at the elephant (Zone01, 125-138): the PC's game (altar/rat's use, time 360: 7.75 s, PCMinigameTicks), then the take — dexterity search (unlocker IT_NONE, TakeItemCount 20)
 park! Zone02                           # out of Zone04 before he climbs to the bowl (the stairs from Zone01, 11 s under the PC pass), through Zone05 while he is at the bowl
 whenzone Zone04                        # his lap-2 bowl (149): Zone01 is his again at 209
 usewith ShoeMachine IT2_Blades         # Zone01

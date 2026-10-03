@@ -649,7 +649,16 @@ predicate, then the all-tricks win.
   leave clip, the catcher's `pc_flag4` clear (`World._pc_flag4_tick`: the
   PC's flag 4 over his neighbor_hideout station's use, `Item.pc_hideout`,
   with the level steps' sleep and wake clips); no IgnoreWoody, IsSleeping,
-  blocking-animation or DonePassing term. The DelayStart gate stays.
+  blocking-animation or DonePassing term. The DelayStart gate went with the
+  delay (2026-10-03, below).
+- **The PC profile's Season 2 start** (`Routine.tick`, `World.spawn_pawn` ->
+  `_pc_place_start`, `_PCStartPoint`): the level scripts run from the first
+  tick of play — no 1.5 s DelayStart (Rottweiler.cs:153, Mother.cs:18,
+  Olga.cs:8), and no detection gate with it — and the scripted actors start
+  where level.xml places them (PCStart: the zone of the room, the mobile x
+  of the PC x, the height against the floor), their first walk leaving from
+  there as from a station's hotspot (`_pc_departure_step`). 201's
+  neighbour (the lesson's) and 206's Olga (an object on the PC) keep theirs.
 - **The PC profile's per-clip uses** (`Routine._pc_clip_use`,
   `_pc_wait_tick`, `AnimPlayer.clip_pace` / `hold_clip`,
   `World.pc_s2_credit`): a station whose PC timing is not one stay plays

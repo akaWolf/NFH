@@ -1333,3 +1333,16 @@ actors' job pass the update calls at 0x100445f8.
   the crash 142.82-145.48), 204's rickshaw enter (2.0 s) and 207's mat
   (0.92 s) at the PC's ticks. Plans 201, 204, 207 at 100 (runs/o201plan,
   runs/o20x: the same scores).
+- `runtime/world.py`, `runtime/scene.py`, `tools/pcref/pc_walks_s2.py`,
+  `levels/pc/Level2*.overlay.json`, `tests/plans/pc/s2/Level208.txt`
+  (2026-10-03): the Season 2 start. pc_nfh2_all_720 at 30 fps: 209's
+  first icons at 2088.47 (the intro card's end), the Mother's dressing
+  room icon at 2101.23 — 12.76 s; runs/st209b: 12.98 (the walk from
+  level.xml's 1100/870 to the shop 2.33 s, the model's 30 ticks 2.5; the
+  use 10.17). 211: the portrait at 2647.20, the bar at 2648.20; runs/st211:
+  the sit 0.32, the bar 1.32. Before: 13.98 and 3.32. The neighbours' first
+  stations are the mobile lists' first on the ten levels whose first step
+  the registry's constructor names (202 mat, 203 speech, 204 rickshaw, 205
+  talk, 207 dive, 208 platform, 209 fakir, 210 chair, 212 throne, 214
+  shower). All 14 Season 2 plans at 100 with 208's v3 (runs/p208st2:
+  276.4 s).

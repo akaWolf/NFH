@@ -125,6 +125,17 @@ def pc_pass_piece(p, key):
     return q
 
 
+class _PCStartPoint:
+    """the PC start a pawn's first walk departs from (World._pc_place_start):
+    the station-like source _pc_departure_step reads — its zone, no
+    approach of its own"""
+    __slots__ = ('zone', 'pc_approach')
+
+    def __init__(self, zone):
+        self.zone = zone
+        self.pc_approach = {}
+
+
 def pc_ap_x(ap, it):
     """a station's PC hotspot x (Item.pc_approach `x`): one value, or one
     per visit where the GoTo takes another hotspot of the object each visit
@@ -6941,6 +6952,13 @@ class Routine:
         # long before the unfreeze, and StartFirstAction under Frozen is a
         # no-op (ActionManager.cs:106) — the Unfreeze's StartNextAction is
         # what starts him, at once
+        if self.delay_start > 0.0 and pcprofile.is_pc() and pcprofile.SEASON2:
+            # the PC's level scripts run from the first tick of play — the
+            # clock's 0:00, as the intro card ends: the icons their first
+            # steps show are up on the first frame (pc_nfh2_all_720, 209's
+            # neighbour and Mother at 2088.6 s) — no 1.5 s before the first
+            # action
+            self.delay_start = 0.0
         if self.delay_start > 0.0:
             self.delay_start -= dt
             if self.delay_start > 0.0:
@@ -11189,6 +11207,9 @@ class World:
                  player=self.players[id(spec['sprite'])], role=role)
         p.world = self
         self.pawns[role] = p
+        st = spec.get('pc_start')
+        if st and pcprofile.is_pc() and pcprofile.SEASON2 and role != 'Woody':
+            self._pc_place_start(p, st)
         if role == 'Woody':
             # Woody.OnSingleAnimationEnded restores the hidden-during-anim
             # items, and OnBlockingAnimationEnded the swapped layers
@@ -11220,6 +11241,23 @@ class World:
                 if name and p.anim.has(name):
                     p.anim.play_single(name)
         return p
+
+    def _pc_place_start(self, p, st):
+        """the PC profile's Season 2 start (PCStart): the actor where
+        level.xml places it — the zone of its room, the mobile x of its PC x
+        on the room's floor line (pc_room_x's inverse) — and its first walk
+        comes down to the floor from its height there, as from a station's
+        hotspot (_pc_departure_step); a room of another zone than the
+        mobile's is left alone"""
+        z = next((z for z in self.level.zones if z.name == st.get('zone')), None)
+        pr = getattr(z, 'pc_room', None) if z is not None else None
+        if z is None or pr is None or p.zone is None or z.pid != p.zone.pid:
+            return
+        w = (pr['x2'] - pr['x1']) or 1.0
+        p.sprite.x = z.left + (float(st['x']) - pr['x1']) * (z.right - z.left) / w
+        p.pos_snap = True
+        p._pc_depart = (float(st['x']), float(st.get('px') or 0.0), p.sprite.x, p.sprite.y,
+                        _PCStartPoint(z.pid))
 
     def spawn_woody(self, sprite, zone, spec=None):
         """port plumbing: build the Woody pawn over his AnimController sprite

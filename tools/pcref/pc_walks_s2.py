@@ -734,6 +734,35 @@ def passes(n):
     return m, out
 
 
+# the actors placed where level.xml puts them — but 201's neighbour, whom the
+# lesson's director moves (TutorialPC201), and 206's Olga, an object the
+# neighbour's steps act on (`marvel`) with no script of her own on the PC
+START_SKIP = {201: ('Rottweiler',), 206: ('Olga',)}
+START_OBJECT = {'Rottweiler': 'Rottweiler2', 'Mother': 'Mother', 'Olga': 'Olga'}
+
+
+def starts(n):
+    """[(object, component, {'zone', 'x', 'px'})]: per scripted actor its
+    level.xml position — the zone of its room, x in px of the PC scene and
+    its height against the room's floor line (the first walk comes down to
+    the floor from there, fcn.10009177, as from a station's hotspot)"""
+    g = S.Geometry(n)
+    doors, zones = mobile_doors(n)
+    zmap = room_map(n, g, doors, zones)
+    lvx = S.canon.read('%s/nfh2/x/%s/level.xml' % (S.canon.ROOT, S.canon.pc_level(n)['folder']))
+    out = []
+    for rm in re.finditer(r'<room name="(\w+)"[^>]*>(.*?)</room>', lvx, re.S):
+        for a in re.finditer(r'<(?:actor|object) name="(neighbor|mother|olga)" position="(-?\d+)/(-?\d+)"',
+                             rm.group(2)):
+            role = dict(ROLES)[a.group(1)]
+            room = rm.group(1)
+            if role in START_SKIP.get(n, ()) or zmap.get(room) is None:
+                continue
+            out.append((START_OBJECT[role], role, {'zone': zmap[room], 'x': int(a.group(2)),
+                                                    'px': int(a.group(3)) - g.floor(room)}))
+    return out
+
+
 def _rewrite(patches, key, want):
     """`key` set from `want` [(object, component, zone, value)]: in the patch
     that has it for the same object, component and zone, else a new patch
@@ -787,6 +816,7 @@ def main(argv):
                                                    for name, z, comp, per in approaches(n)])
         patches = _rewrite(patches, 'PCRoom', [(z, 'Zone', None, pr)
                                                for z, pr in sorted(rooms(n).items())])
+        patches = _rewrite(patches, 'PCStart', [(o, c, None, v) for o, c, v in starts(n)])
         ov['patches'] = patches
         note = (" The door passes (tools/pcref/pc_walks_s2.py): PCPass on each Transition = per pawn the PC"
                 " pass of the door pair it stands for — the near door's <actor>_in against the room's floor,"
@@ -797,14 +827,21 @@ def main(argv):
                 " room's floor (tx: the neighbour's move over the station's actions, their <translation>s; txt: after"
                 " a tricked visit);"
                 " PCRoom on each Zone = its PC room's floor line and <neighbor> records with"
-                " the doors' <actor> hotspots, for the path finder's routes.")
+                " the doors' <actor> hotspots, for the path finder's routes; PCStart on the"
+                " scripted actors = their level.xml positions (zone, x, height against the"
+                " floor), where the first walk departs from.")
         src = ov.get('source', '')
         i = src.find(' The door passes (tools/pcref/pc_walks_s2.py)')
         if i >= 0:
             # the note in its place (its own last words end it)
-            end = "for the path finder's routes."
-            j = src.find(end, i)
-            j = j + len(end) if j >= 0 else src.find(' The ', i + 1)
+            j = -1
+            for end in ("where the first walk departs from.", "for the path finder's routes."):
+                j = src.find(end, i)
+                if j >= 0:
+                    j += len(end)
+                    break
+            if j < 0:
+                j = src.find(' The ', i + 1)
             src = src[:i] + note + (src[j:] if j >= 0 else '')
         else:
             src += note
