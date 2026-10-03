@@ -1327,3 +1327,9 @@ actors' job pass the update calls at 0x100445f8.
   44.65 (4.0). Before: off 1.0 s after his next action's start, 5.8 s at
   the perch. Plan 214 at 100 (runs/o214bplan: the tricked bouquet's fight
   and shower as before — the Washbucket at 525.0, the end 733.3 s).
+- `tools/pcref/pc_durations_others.py`, `levels/pc/Level201.overlay.json`,
+  `Level204.overlay.json`, `Level207.overlay.json` (2026-10-03): 201's Olga
+  at the buffet (BuffetEat 4.17 s a bite, BuffetCrash 2.58 — runs/o201plan:
+  the crash 142.82-145.48), 204's rickshaw enter (2.0 s) and 207's mat
+  (0.92 s) at the PC's ticks. Plans 201, 204, 207 at 100 (runs/o201plan,
+  runs/o20x: the same scores).

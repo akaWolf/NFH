@@ -2114,6 +2114,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (STATIONS: the bouquet's and the pillar's `olga`). A held use that an
   interruption restarts — her fight on the tricked bouquet — does not wait
   again for the event that released it (`Routine._pc_wait_spent`).
+  The rest of Olga's scripts stand still after one action: 201's eats at
+  the buffet over and over (0x1002abfa stores no next step, so the step runs
+  again as each `eat` ends — the job's 49 ticks and the step's one, 4.17 s a
+  bite where the mobile's BuffetEat lasts 7.11; her `crash` on his flirt at
+  the damaged buffet 2.58 s, the mobile's 4.8), 204's gets into the
+  rickshaw (the go-and-enter, 2.0 s; RickshawEnter 2.5) and waits there,
+  207's lies down on her mat (0.92 s; BeachLayDown 0.8) and sleeps — each
+  clip at the PC's ticks (CLIPS_ROLE); 203's is frozen on both.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

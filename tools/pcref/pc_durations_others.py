@@ -109,7 +109,11 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                                              'MotherGetUpPillow': ('pool_deckchair', 'leave')}),
                     'PoolLadder': ('Mother', {'MotherPoolLadderEnter': ('pool_pool', 'enter', 'step'),
                                               'MotherPoolLadderSwim': ('bar', 0x100140af, 2),
-                                              'MotherPoolLadderLeave': ('pool_pool', 'leave')})},
+                                              'MotherPoolLadderLeave': ('pool_pool', 'leave')}),
+                    # 207's Olga onto her mat (her step 0x100174a5: the GoTo and
+                    # the go-and-enter's `enter` of beachright/mat_guarded), asleep
+                    # on it after
+                    'ShellLaydown': ('Olga', {'BeachLayDown': ('beachright_mat_guarded', 'enter', 'step')})},
               210: {'DeckChairMother': ('Mother', {'MotherSitPillow': ('pool_deckchair', 'enter', 'step'),
                                                    'MotherSleepPillow': ('ticks', 0),
                                                    'MotherSleepSingle': ('bar', 0x10018c0b, 3),
@@ -171,6 +175,15 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                     # until then (WAITS_ROLE)
                     'ToiletWomen': ('Olga', {'OlgaWCEnter': ('topleft_wcright', 'enter', 'step'),
                                              'OlgaWCLeave': ('topleft_wcright', 'leave')})},
+              # 204's Olga into the rickshaw (her step 0x10033305: the go-and-
+              # enter's `enter`, waiting inside after)
+              204: {'PullKart': ('Olga', {'RickshawEnter': ('groundleft_rickshaw', 'enter', 'step')})},
+              # 201's Olga at the buffet (her step 0x1002abfa: the GoTo and the
+              # `eat`, the step run again as each ends — no next step) and her
+              # `crash` on his flirt at the damaged one (`buffet_crash`,
+              # 0x1002ae7b)
+              201: {'Buffet': ('Olga', {'BuffetEat': ('topleft_buffet', 'eat', 'again'),
+                                        'BuffetCrash': ('topleft_buffet_damaged', 'crash')})},
               # 214's Olga at the pillar (her step 0x1003c2a0 after `flowers`:
               # the GoTo and her own `wait`, 30 ticks) — the mobile's
               # BirdPerch, five OlgaStandDownInfinite
@@ -288,6 +301,11 @@ def role_clips(n, tables=CLIPS_ROLE):
                     # the stand's first clip after her walk: the step's own
                     # ticks before it (lap_model_s2.WALK_STEP_TICKS)
                     t += lap_model_s2.WALK_STEP_TICKS
+                elif t is not None and len(src) > 2 and src[2] == 'again':
+                    # an action the step pushes again each time it runs at
+                    # the same place: the step's one tick with it (201's
+                    # buffet, 0x1002abfa, stores no next step)
+                    t += 1
             if t is not None:
                 cl[clip] = round(t / 12.0, 2)
         out[item] = (role, cl)
