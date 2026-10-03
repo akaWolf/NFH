@@ -2054,6 +2054,26 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the wait's 10 s: her first one falls after his wake in the chair (flag 4
   off at 14.8 s), so plan 210 takes it at her second and its chain pays a
   lap later (100 at 407.7 s).
+  211's Olga by her script (ship3's `olga` 0x10031ae1): her first step
+  0x10031591 goes to topleft/wcright and enters it, and the handler
+  0x10031888 moves her on the behaviours his actions post as their jobs
+  end (objects.xml): `bonbons` from the dish's `use` — wcright's `leave`,
+  then 0x10031680 to the kid and its `look`; `roddone` from the rod's —
+  0x10031770 to the reling and its `look`; `goup` from the diving gear's —
+  0x10031591 again (`rodhook` from the tricked rod makes her laugh at the
+  kid, `puke` from his tricked visit sends her `mad` into the fight). The
+  mobile times her three stands by ActionManager.OlgaExtraAnimations,
+  which clears her loops' InfiniteLoop as his routine starts the next
+  action and, its first-lap capture taking the enter clip for the toilet's
+  loop, loops OlgaWCEnter through every later toilet visit. Under the
+  profile her stands hold on his use ends (WAITS_ROLE -> PCWaitForRole:
+  OlgaWCUse until Sweets, OlgaStandUpInfinite until FishingRod,
+  OlgaStandLeftInfinite until DivingGear), the juggling's three arms stand
+  down, and the toilet's enter and leave take the PC's ticks (1.75 and
+  2.25 s, the mobile's 2.25 and 3.25). Idle (runs/o211idle): off 0.17 s
+  after each of his use ends, the leave 2.33 s, the walks to the kid 2.67
+  and to the reling 2.5 (the PC's 32 and 30 ticks), from the reling to the
+  toilet 4.33 (52), its enter 1.67 (21).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

@@ -164,7 +164,13 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                                                    'MotherSleepPillow': ('ticks', 0),
                                                    'MotherSleepSingle': ('bar', 0x1002f83f, 3),
                                                    'MotherGetUpPillow': ('topright_deckchair', 'leave')}),
-                    'OlgaChild': ('Mother', {'MotherBawlLeft': ('kid', 'shout', 'step')})},
+                    'OlgaChild': ('Mother', {'MotherBawlLeft': ('kid', 'shout', 'step')}),
+                    # 211's Olga into the toilet (her step 0x10031591: the GoTo
+                    # and wcright's `enter`, olga_enter) and out of it (the
+                    # `bonbons` handler's `leave`, olga_leave) — held inside
+                    # until then (WAITS_ROLE)
+                    'ToiletWomen': ('Olga', {'OlgaWCEnter': ('topleft_wcright', 'enter', 'step'),
+                                             'OlgaWCLeave': ('topleft_wcright', 'leave')})},
               # 213's Olga on the bull (her step 0x10039078: the walk to it, the
               # latch her `bull` handler sets — his controls step posts it as
               # he arrives, 0x10037f5e — and bottomleft/bullride_olga's `use`,
@@ -191,7 +197,19 @@ ITEM_CLIPS = {205: {'OlgaMatBeach': ('Olga', {'N2TrickItemExtra1': ('beachright_
 # role): 210's Mother waits at her chair after the call until he stands there
 # (her order step's poll) — his use of the call begun
 WAITS_ROLE = {210: {'CallRTMother': ('Mother', {'clip': 'MotherStandDownInfinite', 'role': 'Rottweiler',
-                                                'item': 'CallRTMother', 'at': 'start', 'then': 0.0})}}
+                                                'item': 'CallRTMother', 'at': 'start', 'then': 0.0})},
+              # 211's Olga on his uses (her script's handler 0x10031888, the
+              # behaviours his actions post as their jobs end — ship3's
+              # objects.xml): in the toilet until the dish's `bonbons` (the
+              # mobile's Sweets), at the kid until the rod's `roddone`
+              # (FishingRod), at the reling until the diving gear's `goup`
+              # (DivingGear)
+              211: {'ToiletWomen': ('Olga', {'clip': 'OlgaWCUse', 'role': 'Rottweiler', 'item': 'Sweets',
+                                             'then': 0.0}),
+                    'OlgaStandStill': ('Olga', {'clip': 'OlgaStandUpInfinite', 'role': 'Rottweiler',
+                                                'item': 'FishingRod', 'then': 0.0}),
+                    'OlgaSeaView': ('Olga', {'clip': 'OlgaStandLeftInfinite', 'role': 'Rottweiler',
+                                             'item': 'DivingGear', 'then': 0.0})}}
 
 
 def item_clips(n):

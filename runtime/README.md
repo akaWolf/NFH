@@ -664,7 +664,11 @@ predicate, then the all-tricks win.
   call); a wait `at` start releases when the other role's use of the
   item begins (`Item.pc_began`, marked in `Routine._use`: 210's awake
   chair until her call), and another role holds its clip likewise
-  (PCWaitForRole: her wait until he stands at her chair).
+  (PCWaitForRole: her wait until he stands at her chair; 211's Olga in
+  the toilet, at the kid and at the reling until his sweets, rod and
+  diving gear uses end — with those holds the three arms of
+  `Routine._olga_extra_animations` that juggle her loops on his action
+  starts stand down, 2026-10-03).
 - **The PC profile's Season 2 tricked visits and reactions**
   (`Routine._use`, `World.play_angry`, `pcprofile.s2_reaction_seconds`):
   a tricked use lasts the PC step's stand (PCUseSecondsTricked;

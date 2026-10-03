@@ -3814,6 +3814,15 @@ class Routine:
             if self.actions[(self.index - 1) % len(self.actions)]['item'] \
             else None
         name = cur.name if cur is not None else None
+        if pcprofile.is_pc() and name in ('Sweets', 'LifeBoat', 'FishingRod') \
+                and any(it.pc_wait_for_role.get('Olga') for it in items.values()):
+            # the profile's Olga stands on the neighbour's uses (PCWaitForRole:
+            # 211's Olga script, GameLogic 0x10031888 — `bonbons` from the
+            # dish's `use` sends her out of the toilet, `roddone` from the
+            # rod's to the reling, `goup` from the diving gear's back to the
+            # toilet, each as his job ends): the three arms' juggling of her
+            # loops is the mobile's own clock for the same releases
+            name = None
         if self.role == 'Rottweiler' and prev is not None and \
                 (prev.rott_use_olga_seq or prev.rott_use_tricked_olga_seq):
             # cs:270-273: Olga returns to her default pose after the drag

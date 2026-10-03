@@ -1294,3 +1294,15 @@ actors' job pass the update calls at 0x100445f8.
   (the model's 30.4; the mobile stands' 36.2-36.3); the bra's water loop
   19.3-29.3, 49.8-59.8, 80.3-90.3. Plan 210 at 100 with the bra at her
   second shower (v26, runs/p210olge: 407.7 s).
+- `runtime/world.py`, `tools/pcref/pc_durations_others.py`,
+  `levels/pc/Level211.overlay.json` (2026-10-03): 211's Olga on his use
+  ends (her script's handler 0x10031888: `bonbons`, `roddone`, `goup`).
+  runs/o211idle, lap 2: the diving gear's use ends 69.48 — she walks at
+  69.65, is at the toilet 72.98 and in it 73.98-75.65; the sweets end
+  ~90.98 — her leave 91.15-93.48, the kid 96.15; the rod ends 104.65 —
+  she walks at 104.82, the reling 107.32; the diving gear ends ~155.15 —
+  she walks at 155.32. The model: the leave 27 ticks, the walks 32, 30
+  and 52, the enter 21 — each within 0.17 s. Before: her WC enter clip
+  looped from lap 2 through the toilet stay, the leave came 1.3 s after
+  the sweets' end and lasted 3.25 s. Plan 211 at 100 (runs/o211plan,
+  unchanged 261.6 s).
