@@ -330,8 +330,9 @@ actors' job pass the update calls at 0x100445f8.
   `shout0_light` —, so the AngryHard played after the search had doubled
   the shout (114's dog: the search at the bedroom door, the shout there,
   the walk of 3.8 u, the yell: 2.2 s long); the yell is the shout now, at
-  its PC pace (Routine._pc_yell_secs, _same_zone_yell): 114's polish to
-  the phonograph 78.4 s against Badinfos' 79.5 (80.7 before).
+  its PC pace (Routine._pc_yell_secs, _same_zone_yell), the walk after
+  the list's `wakeup` and icon message steps (two ticks standing): 114's
+  polish to the phonograph 78.6 s against Badinfos' 79.5 (80.7 before).
   game.exe
   tests the nearobj triggers every tick wherever he stands (fcn.00472390
   over fcn.00471bc0); the port notices on the walk's frames and, under
