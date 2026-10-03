@@ -1247,3 +1247,16 @@ actors' job pass the update calls at 0x100445f8.
   `fall` 36, whose record posts `crash` to the Mother as its job ends;
   the Mother's first move two ticks after that post, a tick after his
   stand's end: PCHitAfter 0.08 s (0 before). Plan 210 at 100.
+- `tools/pcref/pc_durations_others.py`, `runtime/tutorial.py`,
+  `levels/pc/Level206.overlay.json` (2026-10-03): 206's Mother after the
+  lesson by her script — 0x1002b9fe walks her to her chair, enters it
+  (sitdown_pillow) and holds her asleep for fcn.1000e7f2's 720 ticks, the
+  chair's `sleep`; 0x1002b972 clears her flag 4 and shows the chair's
+  `look`, 0x1002b72a counts 360 ticks (0x168 at 0x1002b73f), then the
+  chair's `sleep_pillow` and her flag 4, and the 720 again. The port had
+  her look 11.8 s after sitting (the mobile's first use, MotherSitPillow
+  and MotherLook), then 58.0 s asleep and 30.7 awake: now her first visit
+  is the sit alone and the second use's set her loop at her script's
+  pace (CLIPS_ROLE: the sit 1.67 s, the nine sleeps 60, the two looks
+  30) — runs/les206h: sat 67.15, asleep 68.82-128.98, awake to 158.98,
+  asleep to 219.15. Plan 206 at 100.

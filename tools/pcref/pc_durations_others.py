@@ -97,6 +97,18 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                                          'BeachGetUp': ('beachleft_mat_olga_guarded', 'leave')}),
                     'Submarine': ('Olga', {'OlgaPutSub': ('beachleft_sub', 'take', 'step'),
                                            'OlgaPutSubTricked': ('beachleft_shark', 'take', 'step')})},
+              # 206's Mother after the lesson (her script: 0x1002b9fe to her
+              # chair — its `enter`, sitdown_pillow — for fcn.1000e7f2's
+              # 720-tick bar asleep, the chair's `sleep`; 0x1002b972 then
+              # clears her flag 4 and shows the chair's `look`, and
+              # 0x1002b72a counts 360 ticks, 0x168 at 0x1002b73f, before the
+              # chair's `sleep_pillow`, her flag 4 set, and the 720 again):
+              # the mobile's second-use set, the nine sleeps the 720 and the
+              # two looks the 360 (TutorialPC206 gives her first visit the
+              # sit alone)
+              206: {'DeckChair': ('Mother', {'MotherSitPillow': ('topleft_deckchair', 'enter', 'step'),
+                                             'MotherSleepLoop': ('bar', 0x1002b9fe, 9),
+                                             'MotherLook': ('ticks', 180)})},
               # 213's Olga on the bull (her step 0x10039078: the walk to it, the
               # latch her `bull` handler sets — his controls step posts it as
               # he arrives, 0x10037f5e — and bottomleft/bullride_olga's `use`,

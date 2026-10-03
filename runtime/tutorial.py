@@ -2175,7 +2175,10 @@ class TutorialPC206(Tutorial):
         # (the mobile's surgery once the pillows are tricked, Hold2,
         # TutorialScriptCameraNFH2206.cs:112-126: her throw's stands, her
         # chair's look a single — the loop's own chair visits go on to the
-        # second use's sleep)
+        # second use's sleep; the PC's 0x1002b9fe sits her down and puts her
+        # to sleep at once, the look after the 720-tick bar: her first visit
+        # the sit alone, the second use's set her loop, paced by her script,
+        # PCClipSecondsRole)
         its = self.level.items
         if len(m.actions) > 3:
             it0 = its.get(m.actions[0]['item']) if m.actions[0]['item'] else None
@@ -2183,7 +2186,7 @@ class TutorialPC206(Tutorial):
                 it0.use_anim['Mother'] = ['MotherStandDownSingle'] * 8
             it3 = its.get(m.actions[3]['item']) if m.actions[3]['item'] else None
             if it3 is not None:
-                it3.use_anim['Mother'] = ['MotherSitPillow', 'MotherLook']
+                it3.use_anim['Mother'] = ['MotherSitPillow']
         if self.rott is not None:
             self.rott.deck_chair_aux = True
         m.index = 3
