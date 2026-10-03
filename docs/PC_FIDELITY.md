@@ -1656,7 +1656,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   waits for it: the gong's `use` is the Elvis's with behavior="gong"
   behavioractor="neighbor" (cn_c1 objects.xml), and the idle step after
   it (0x10031b70) waits on its latch — its camera tick and its 44 ticks
-  stay his. A walk that starts inside a hideout leaves it first: the
+  stay his. A step can also build a sequence for another actor with the
+  builder API: fcn.1000ee93 set up with the actor fcn.1004ba02 found, its
+  elements appended by the builder's calls and pushed onto that actor's
+  queue by fcn.1000eec6 — 214's pistol step builds the Mother's the deck
+  chair's `die` (the `shot` of her in it, 125 ticks; 0x1003ab70-
+  0x1003ab98, 0x1003ad04-0x1003ad3f): his tricked stand is the pistol's
+  crash alone, 8.42 s where it had been 18.83. A co-actor's fight starts
+  with her first move two ticks after his part posts her behaviour (the
+  offer's tick; her step pushes the GoTo without a first run), where the
+  port had started her run at his stand's end: PCHitAfter 0.08 s for 204's
+  rickshaw and 214's shower and bouquet, 0.17 for 214's pistol (the post
+  the crash's end, the stand's own). A walk that starts inside a hideout leaves it first: the
   route's first update finds the actor's hideout (fcn.10049190) and
   pushes the hideout's leave with a first run (fcn.10006c2e,
   0x1000a840-0x1000a87e), the path from its next update — the leave's job

@@ -1157,3 +1157,11 @@ actors' job pass the update calls at 0x100445f8.
   `cont` of every 'fight' continuation a tick, and the offer's), where
   the port had shouted as the hit ended — 204's rickshaw, 207's shell,
   210's elephant, 213's picnic, 214's shower, bouquet and pistol.
+- `tools/pcref/lap_model_s2.py`, `levels/pc/Level204.overlay.json`,
+  `levels/pc/Level214.overlay.json` (2026-10-03): a builder set up for
+  another actor (fcn.1000ee93 with fcn.1004ba02's actor, pushed by
+  fcn.1000eec6) builds that actor's sequence — 214's pistol: the Mother's
+  `die` in her deck chair off his stand (8.42 s, 18.83 before); a
+  co-actor's first move two ticks after his part posts her behaviour
+  (PCHitAfter: 204's rickshaw 0.08, 214's shower and bouquet 0.08, its
+  pistol 0.17).
