@@ -143,6 +143,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
     seq_vars = {}         # locals holding a sequence built for another queue
                           # (fcn.1000aeb8) -> the indices of the events appended
     last_elem = None      # the index of the last element event built
+    other_builders = set()  # builder locals set up for another actor (fcn.1000ee93)
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -361,11 +362,25 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 else:
                     ev.append((kind, args, imms))
                 last_elem = len(ev) - 1
+                if lea_ecx is not None and lea_ecx in other_builders:
+                    # appended to a builder of another actor's (214's pistol
+                    # step: the deck chair's `die` into the Mother's)
+                    ev[-1] = ('O' + ev[-1][0],) + tuple(ev[-1][1:])
                 al = None
             elif nxt is not None and fn == 'fcn.%x' % nxt:
                 # the step runs its next one itself, in its own tick (208's
                 # fakir step 0x1001eff3, 210's 0x100197ac)
                 ev.append(('CALLNEXT',))
+            elif fn == 'fcn.1000ee93' and lea_ecx:
+                # a sequence builder set up for an actor (its argument): one
+                # found by name (fcn.1004ba02's out) is another actor's, its
+                # elements that actor's and pushed onto its queue
+                # (fcn.1000eec6: 214's pistol step builds the Mother's the
+                # deck chair's `die`, 0x1003ad04-0x1003ad3f)
+                if arg_vars and arg_vars[-1] in actor_vars:
+                    other_builders.add(lea_ecx)
+                else:
+                    other_builders.discard(lea_ecx)
             elif fn == 'fcn.1004ba02' and pushed_lea:
                 # an actor found by its name (its out argument): a job pushed
                 # onto its queue is that actor's (208's fakir, 202's kid)
@@ -2293,6 +2308,20 @@ def code_stays_tricked(n):
                                 ha = _hit_after(n, d, lvh, byi, ev2, own_of(item, i),
                                                 LAP_WALKS.get(n, {}).get(lap[i][0], True), spec)
                                 e['hit_after'] = {spec[1]: _secs(ha)}
+                            else:
+                                # her step reads his part's behaviour on the
+                                # tick after its post and pushes her GoTo
+                                # without a first run: her first move two
+                                # ticks after the post, where the port starts
+                                # her run at his stand's end
+                                fl = _flow(d, ev2, own_i, LAP_WALKS.get(n, {}).get(
+                                    lap[rows_v[0] if prefix else i][0], True))
+                                post = next((t + x[2] for t, kind, x in fl if kind == 'part'
+                                             and x[2] is not None
+                                             and (d._record(x[0], x[1]) or (0, {}))[1].get('behavioractor') == actor),
+                                            None)
+                                if post is not None and post + 2 - fl[-1][0] > 0:
+                                    e['hit_after'] = {actor: _secs(post + 2 - fl[-1][0])}
                     # a tricked step with no SHOUT whose flow goes on to the
                     # lap's next step plays no reaction at all
                     lvj = Level(n); lvj.present = (set(lvi.present) - trick[item][1]) | trick[item][0]
