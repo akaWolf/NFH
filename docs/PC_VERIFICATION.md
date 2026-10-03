@@ -464,7 +464,16 @@ actors' job pass the update calls at 0x100445f8.
   distance 0.38 s (0.52); the widest left are 109's bed to the alarm clock
   +1.9, 114's polish to the phonograph +1.2 (the dog's alarm in between)
   and 111's drier to the vacuum −0.9 (case 22's take to the carpet: E11's
-  1.7 s against the model's 0.8).
+  1.7 s against the model's 0.8). Again on 2026-10-03 (runs/near2_s1,
+  the floor tricks' nearobj notice in): 109's bed to the alarm clock
+  38.1 s against 38.0 since the four-argument fire's ready step; every
+  pair within 0.6 s of Badinfos' but 114's polish to the phonograph +1.2
+  (80.7 against 79.5), 111's drier to the vacuum −0.9 (25.4 / 26.3) and
+  110's steak chair to the wine +0.8 (19.5 / 18.7); 103's first two
+  swapped (the port's microwave before the candle); case 22's message
+  before the carpet's GOTO is the vacuum's OBJ1 (fcn.00451e80, vtable
+  0x4e1bdc: its slot 2 fcn.00438c80 — no gait), so its 0.7 s lie in the
+  GOTO's legs, not read against E11's frames.
 - The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
