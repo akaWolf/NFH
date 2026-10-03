@@ -324,6 +324,14 @@ actors' job pass the update calls at 0x100445f8.
   `chili_shout` icon, the GoTo to the pet and `shout0_light` (26 ticks,
   PCAlarmShoutSeconds: the remaster's AngryHard at that pace; the mobile's
   run already ends at the pet), else the icon and `shout2` where he stands.
+  Corrected 2026-10-03: the remaster's run ends at the pet's zone, and
+  its SameZone choreography walks him on to the pet after the surprise and
+  yells there (ActionManager.cs:459-481) — the list's GoTo and its
+  `shout0_light` —, so the AngryHard played after the search had doubled
+  the shout (114's dog: the search at the bedroom door, the shout there,
+  the walk of 3.8 u, the yell: 2.2 s long); the yell is the shout now, at
+  its PC pace (Routine._pc_yell_secs, _same_zone_yell): 114's polish to
+  the phonograph 78.4 s against Badinfos' 79.5 (80.7 before).
   game.exe
   tests the nearobj triggers every tick wherever he stands (fcn.00472390
   over fcn.00471bc0); the port notices on the walk's frames and, under
@@ -1137,4 +1145,6 @@ actors' job pass the update calls at 0x100445f8.
   level start at the kart without the walk to it (the port's 92.5 with
   it); 205's skis 37.5 (36), chef 17.8 (17), rockets 18.7 (18), sand lion
   13.1 (12) — its "102 s" the first lap, without the mat's talk and wait
-  that the code's lap has (111.9; the port's 112.0).
+  that the code's lap has (111.9; the port's 112.0). The Mother's rounds
+  by her script (role_lap and walk_span for her records) against the same
+  idle runs: 212's 37.33 s (the port's 37.33), 213's 70.5 (70.0-70.2).
