@@ -2685,9 +2685,15 @@ class TutorialPCS1(Tutorial):
 
     def _stop_woody_walk(self):
         """the trigger handler's stop (0x45b54a-0x45b5a7): a walking Woody gets a
-        GoTo to where he stands in place of his jobs"""
+        GoTo to where he stands in place of his jobs; in a door's pass (the
+        port's pass is one piece) the path after it goes and he stands at the
+        far door as it ends"""
         w = self.world.woody
-        if w is not None and w.state in w.MOVING:
+        if w is None:
+            return
+        if w.is_warping:
+            w.steps = []
+        elif w.state in w.MOVING:
             self._stop_woody()
 
     # -- the neighbour's GoTo -------------------------------------------------

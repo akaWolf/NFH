@@ -79,7 +79,7 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0.0,
     "PCFireBefore": true,
-    "PCSlipSeconds": 2.75,
+    "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
     "PCReactTail": 1

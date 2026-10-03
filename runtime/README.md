@@ -223,6 +223,13 @@ movement vector, and the stand pose keeps the last facing, as `Pawn` and
 Every zone of all 28 playable levels is reachable from Woody's start. The three
 intro scenes are not — they are cutscenes, and two declare no Woody zone at all.
 
+Under the PC profile a door's pass puts the pawn in the far room as its
+clips start (game.exe's door step places the actor at the far door's
+point, 0x474590), so a path given in mid-pass is built from the far room;
+`Pawn._route` then leaves the door step running and the pass's enter clip
+(`_enter_played`) walks the new path — replacing the step had left Woody
+hidden and `is_warping` for good, out of the catch's sight.
+
 ## The neighbour's routine
 
 `Routine` in `world.py` is `ActionManager` from §4: a cyclic list of actions,

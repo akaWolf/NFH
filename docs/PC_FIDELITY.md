@@ -2206,6 +2206,24 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the profile's pet model has him hear the bark as the wake-up ends (0.83 s
   after the whistle against the video's 2.0); E11's dog, woken by Woody,
   has him react about 4 ticks after its wake-up (2708.15 / 2708.50).
+- *A click in a door's pass (2026-10-04, fixed).* The profile's pass puts
+  the pawn in the far room as its clips start (the door step's placement,
+  game.exe 0x474590; `Pawn._warp_through` at the clip's start), so a path
+  Woody was given in mid-pass started in the far room and replaced the door
+  step: he walked on hidden, with the pass never closed — `is_warping` stood
+  for good and the catch never saw him again (Level101's porch door: the
+  click at 2.10 s, Woody idle at the target, still passing and hidden). A
+  path built in the pass now waits for it: the pass completes and its enter
+  clip's end walks the new path (`Pawn._route`); the mobile keeps the pawn
+  in the near room until the clip ends and walks the door again, which it
+  still does. The PC tutorials' trigger stop in a pass drops the path after
+  it (he stands at the far door as it ends), as the PC's stop replaces
+  Woody's jobs.
+- *The slips' fall (2026-10-04, fixed).* The levels' PCSlipSeconds had the
+  fall at slip1/slip3's 31 frames; as an ACTION step it lasts the Loader's
+  time (`auto`: the frames less one, 30) + 2 — 32 ticks, as the doubletake's
+  16 already did: PCSlipSeconds 2.833 (2.75) on the twelve levels' floor
+  tricks (tools/pcref/pc_reactions.py SLIP).
 - *The Season 1 level's end (2026-10-03, carried).* game.exe's state
   function (fcn.00436bb0) turns the level to success (state 5) on the tick
   a StopMsg sets its check flag +0x8a with every trick fired: the StopMsg

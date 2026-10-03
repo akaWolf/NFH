@@ -1353,6 +1353,17 @@ class Pawn:
         H['step_index'] = len(steps)                # FindPath's StepIndex stamp
         self._move_index = -1
         self.steps = steps
+        if self._warped and self.is_warping and self._step is not None \
+                and self._step.get('kind') == 'door':
+            # the PC profile's pass put him in the far room as its clips
+            # started (the door step's placement, game.exe 0x474590 — the
+            # port's _warp_through at the clip's start): a path built now
+            # starts there, and the pass in flight completes first — its
+            # enter clip's end (_enter_played) walks it; replacing the door
+            # step left him hidden and passing for good. The mobile keeps
+            # him in the near room until the clip ends, its path takes the
+            # door again
+            return True
         self._next_step()
         return True
 

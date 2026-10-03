@@ -17,7 +17,7 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       (its ACTION step, 16 ticks), the skate's fall out of
                       the window, the electric shock
   PCFireBefore        the fire before that clip (the slips, the trap)
-  PCSlipSeconds       a slip's fall, slip1/slip3 (31 frames)
+  PCSlipSeconds       a slip's fall, slip1/slip3 (the ACTION step: 30 + 2 ticks)
   PCGrabSeconds       a fixing tool's take (the mobile's grab), and at the
   PCFixUseSeconds     target the use after the repair (the mobile's redo of
   PCReturnSeconds     the fixing use; 0 = the case plays none) and the give on
@@ -67,7 +67,10 @@ import trick_branches as TB   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
 FPS = 12.0
-SLIP = 31 / FPS          # slip1 / slip3
+# slip1 / slip3 as the ACTION step of the fall plays them: time="auto" over
+# their 31-frame oneshot, less one, + 2 (lap_model.job_ticks; until 2026-10-04
+# the frames themselves, a tick short) — read per level (TB.Level.action)
+SLIP = 32 / FPS
 # the fire step's own two ticks before its list's first element (0x47bd00:
 # the fire and the push of its list with the run-now flag 0; the list's first
 # update pushes the element, run-now 0 again — runtime/pcprofile.py
@@ -397,7 +400,7 @@ def specs(n):
             # the fall is the five-argument step's own clip: its list's first
             # element, two ticks after the fire (FIRE_LEAD)
             keys = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True,
-                    'PCSlipSeconds': round(SLIP + FIRE_LEAD, 3), 'PCFireLead': True,
+                    'PCSlipSeconds': round((lv.action('neighbor', 'slip1') or SLIP) + FIRE_LEAD, 3), 'PCFireLead': True,
                     'PCReactLead': REACT_LEAD, 'PCReactTail': REACT_TAIL}
             floor = SLIP_CLEAN.get(base) or ('groundbanana' if n in BANANA_LEVELS else None)
             if floor:
