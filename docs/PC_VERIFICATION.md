@@ -1121,4 +1121,11 @@ actors' job pass the update calls at 0x100445f8.
   video's 86), 209 108.0-108.2 (107.6), 211 85.7-85.8 (85.7), 212
   128.2-128.3 (128.2), 213 122.7-122.8 (122.2; 124.0 with the tub's
   repair), 214 90.8 (90.8); 202 78.0 (73.2 and his wait at the shore for
-  Olga's sub, which the model does not time).
+  Olga's sub, which the model does not time). The open laps against the
+  videos span by span (a span the walk in and the stay): 204's karate
+  10.5 s (the video's first lap 9-10), gong 21.8 (22), hot dog 17.0
+  (15-16), jade 23.5 (23-24) — its "81 s" lap is the first one, from the
+  level start at the kart without the walk to it (the port's 92.5 with
+  it); 205's skis 37.5 (36), chef 17.8 (17), rockets 18.7 (18), sand lion
+  13.1 (12) — its "102 s" the first lap, without the mat's talk and wait
+  that the code's lap has (111.9; the port's 112.0).
