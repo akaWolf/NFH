@@ -2200,12 +2200,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   message box: 104.00 less its 16 ticks), tut_laugh1 +7.17 (+7.33), the
   picture back +12.8 (+12.91), parked at sign 1 +16.38 (+16.5), off to
   sign 2 +24.42 (+24.58). Open: the dog's alarm reaches him 12 ticks after
-  its wake-up ends on the PC (the neighbour's noise icon at 151.92, the
-  dog awake from 150.92 with no bark to be seen before the icon; the
-  whistle's bark is the pet class's +0x1d flag in state 4, 0x45c2ae) where
-  the profile's pet model has him hear the bark as the wake-up ends (0.83 s
-  after the whistle against the video's 2.0); E11's dog, woken by Woody,
-  has him react about 4 ticks after its wake-up (2708.15 / 2708.50).
+  its wake-up ends on the PC (the neighbour's noise icon at 151.92, tick 39;
+  the whistle's bark is the pet class's +0x1d flag in state 4, 0x45c2ae)
+  where the profile's pet model has him hear the bark as the wake-up ends
+  (0.83 s after the whistle against the video's 2.0); E11's dog, woken by
+  Woody, has him answer on the wake-up's end (2707.63 / 2708.42, 9.5 ticks)
+  as the model does — the tutorial's wait is his script's own late start,
+  the levels' open 37 ticks (runtime/README.md "the Season 1 start").
 - *A click in a door's pass (2026-10-04, fixed).* The profile's pass puts
   the pawn in the far room as its clips start (the door step's placement,
   game.exe 0x474590; `Pawn._warp_through` at the clip's start), so a path

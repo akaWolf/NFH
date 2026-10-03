@@ -1983,7 +1983,19 @@ the level selection menu, LevelLoader, not modelled).
   (fcn.10011eb0, fcn.10011f20, fcn.10011fc0); what creates that object ~37
   ticks into the level is not read yet, so the port keeps the mobile's
   delay. (Season 2 has no such wait: its scripts' icons are up on the first
-  frame, and the profile starts them there.)
+  frame, and the profile starts them there.) Read 2026-10-04: the intro
+  object is the `presents` card (GFXEngine vtable 0x100a3584, the dialogs
+  intro_medium / intro_big); its limit stays 0 and any key but the
+  modifiers or a click posts at once (0x10011f20), and the clock ticks from
+  the card's end (E02: 4:59 at 371.3, 4:57 at 373.55) — the level runs,
+  only the neighbour's script is late. tutorial_3 agrees: its director
+  (HAL) speaks on tick 15 (149.92, the card gone at 148.75) and whistles the
+  dog awake (it stirs at 150.17, barks from about 150.92), yet the
+  neighbour's handler answers the dog's alarm only at 151.92 — tick 39,
+  as the levels' first icons come on tick 37 — where the pets' alarm on a
+  level (E11: the dog stirs at 2707.63, his noise icon at 2708.42) takes
+  the wake-up's 9 ticks and one more; his script, not the alarm, waits.
+  The source of that wait is still not read.
 - Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
   `OnTrickDone` paths die in the parked ride — README above), L113's
   ElectricTrap 8 (its collider sits inside and behind the basement door's,
