@@ -1364,7 +1364,10 @@ def lap_estimate(n, verbose=False):
         return None
     ctx = {'geom': g, 'data': d}
     pos = None; total = 0; walks = 0; stays = 0; unknown = []
-    order = steps[loop:] + steps[:loop] + steps[loop:loop + 1]    # the lap, closed on its first step
+    # the lap, closed on its first step: the steps from the loop's (the walk
+    # up to it — 213's tub repair, 206's reling — is the level's start, not
+    # the lap's; rotated in until 2026-10-03)
+    order = steps[loop:] + steps[loop:loop + 1]
     for k, (cur, ev, nxt) in enumerate(order):
         parts = station_ticks(d, ev, ctx)
         rl = ctx.pop('route_leave', None)
@@ -2682,7 +2685,7 @@ def _paired_parts(n):
     rows, loop = lap_steps(n)
     if loop is None and n not in OPEN_LAPS:
         return [], {}
-    lap = rows if loop is None else rows[loop:] + rows[:loop]
+    lap = rows if loop is None else rows[loop:]
     used = set(); out = {}
 
     def match(sels):
