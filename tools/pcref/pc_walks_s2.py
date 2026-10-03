@@ -737,22 +737,24 @@ def passes(n):
 # the actors placed where level.xml puts them — but 201's neighbour, whom the
 # lesson's director moves (TutorialPC201), and 206's Olga, an object the
 # neighbour's steps act on (`marvel`) with no script of her own on the PC
-START_SKIP = {201: ('Rottweiler',), 206: ('Olga',)}
-START_OBJECT = {'Rottweiler': 'Rottweiler2', 'Mother': 'Mother', 'Olga': 'Olga'}
+START_SKIP = {201: ('Rottweiler', 'Woody'), 206: ('Olga', 'Woody')}
+START_OBJECT = {'Rottweiler': 'Rottweiler2', 'Mother': 'Mother', 'Olga': 'Olga', 'Woody': 'Player2'}
 
 
 def starts(n):
     """[(object, component, {'zone', 'x', 'px'})]: per scripted actor its
     level.xml position — the zone of its room, x in px of the PC scene and
     its height against the room's floor line (the first walk comes down to
-    the floor from there, fcn.10009177, as from a station's hotspot)"""
+    the floor from there, fcn.10009177, as from a station's hotspot) — and
+    Woody's (his x on the room's floor; the lessons of 201 and 206 place
+    him themselves)"""
     g = S.Geometry(n)
     doors, zones = mobile_doors(n)
     zmap = room_map(n, g, doors, zones)
     lvx = S.canon.read('%s/nfh2/x/%s/level.xml' % (S.canon.ROOT, S.canon.pc_level(n)['folder']))
     out = []
     for rm in re.finditer(r'<room name="(\w+)"[^>]*>(.*?)</room>', lvx, re.S):
-        for a in re.finditer(r'<(?:actor|object) name="(neighbor|mother|olga)" position="(-?\d+)/(-?\d+)"',
+        for a in re.finditer(r'<(?:actor|object) name="(neighbor|mother|olga|woody)" position="(-?\d+)/(-?\d+)"',
                              rm.group(2)):
             role = dict(ROLES)[a.group(1)]
             room = rm.group(1)

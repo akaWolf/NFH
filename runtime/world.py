@@ -11228,6 +11228,14 @@ class World:
             z = self.level.zone_by_pid(self.level.start_zone)
             if z is not None:
                 p.zone = z
+            st = spec.get('pc_start')
+            pr = getattr(z, 'pc_room', None) if z is not None else None
+            if st and pr and pcprofile.is_pc() and pcprofile.SEASON2 \
+                    and st.get('zone') == z.name:
+                # the PC profile's Season 2 start: Woody at level.xml's x of
+                # his start room (PCStart), on the mobile's floor
+                w = (pr['x2'] - pr['x1']) or 1.0
+                p.sprite.x = z.left + (float(st['x']) - pr['x1']) * (z.right - z.left) / w
             p.input_locked = not p.finished_entrance
             if not p.finished_entrance:
                 self._entrance_timer = 0.5

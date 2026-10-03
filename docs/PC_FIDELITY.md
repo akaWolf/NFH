@@ -2140,7 +2140,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   video 12.76, the model's 154 ticks 12.83; 13.98 before), 211's sleeps
   from 1.32 s (the video 1.0; 3.32 before). Plan 208 takes its chalk before
   the cable and rushes its first rat (v3): he crosses the bazar 1.5 s
-  sooner.
+  sooner. Woody too starts at level.xml's x of his room (up to 190 px of the
+  PC scene from the mobile's StartLocation: 202's shop 480 against 294,
+  212's 300 against 414, 214's 1074 against 1200); the mobile's greeting
+  (HelloAnimationNFH2, a second with the input locked) stays — the video
+  does not show his first frames.
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

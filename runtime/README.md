@@ -659,6 +659,8 @@ predicate, then the all-tricks win.
   of the PC x, the height against the floor), their first walk leaving from
   there as from a station's hotspot (`_pc_departure_step`). 201's
   neighbour (the lesson's) and 206's Olga (an object on the PC) keep theirs.
+  Woody starts at level.xml's x of his start room (PCStart on Player2, in
+  `spawn_pawn`'s StartLocation branch; 201's and 206's lessons place him).
 - **The PC profile's per-clip uses** (`Routine._pc_clip_use`,
   `_pc_wait_tick`, `AnimPlayer.clip_pace` / `hold_clip`,
   `World.pc_s2_credit`): a station whose PC timing is not one stay plays

@@ -1605,6 +1605,17 @@
      "px": 0
     }
    }
+  },
+  {
+   "object": "Player2",
+   "component": "Woody",
+   "set": {
+    "PCStart": {
+     "zone": "Zone02",
+     "x": 1074,
+     "px": 49
+    }
+   }
   }
  ]
 }
