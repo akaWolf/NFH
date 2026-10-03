@@ -1165,3 +1165,12 @@ actors' job pass the update calls at 0x100445f8.
   co-actor's first move two ticks after his part posts her behaviour
   (PCHitAfter: 204's rickshaw 0.08, 214's shower and bouquet 0.08, its
   pistol 0.17).
+- Read 2026-10-03, nothing to carry: the watch predicate fcn.1003f573
+  also asks the watched actor's flag 0x20 (0x1003f610: cleared, the
+  actor counts as absent, 0x1003f6e1) — the shown bit the hide element
+  clears (fcn.10042b9e, 0x10042c26) and the show sets (fcn.10043b9e,
+  0x10043c34); Woody is hidden only in the catch fiber and the respawn,
+  when the port tests no catch. 210's elephant: Fifi's attack (59 ticks
+  from 17), the bat's hide and her `fall` (36) post `crash` to the Mother
+  at 113, her first move at 115 — a tick after his stand's end (114),
+  not carried (PCHitAfter 0).
