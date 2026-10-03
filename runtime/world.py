@@ -3450,6 +3450,7 @@ class Routine:
         # IsAlarmPostponed reads off it (None while a routine action runs)
         self._urgent_action = None
         self.was_alerted = None          # Rottweiler.WasAlerted + RottAlerter
+        self._pc_near_in = set()         # the floor tricks in his nearobj range at the last standing tick
         # the two parked runs are separate slots: the alerter/notice run
         # (Rottweiler.ShouldStartSurpriseActionFar + SurpriseActionFar.Item,
         # cs:88, 271, 305) and the phone alarm (PendingAlarm/PendingAlarmItem,
@@ -6413,8 +6414,38 @@ class Routine:
         for it in list(w.near_items.get(self.pawn.zone.pid, ())):
             if it.tricked and \
                     abs(self.pawn.sprite.x - it.target_x) \
-                    < self.pawn.notice_near_distance:
+                    < self._notice_distance(it):
                 self._on_surprise_near(it)
+
+    def _notice_distance(self, it):
+        """the walk-by notice's reach: the pawn's NoticeWhenNearTrickedDistance
+        (0.1 u), under the profile a Season 1 floor trick's nearobj trigger —
+        15 px (pcprofile.S1_NEAROBJ_PX, fcn.00471bc0)"""
+        if pcprofile.is_pc() and not self.pawn.nfh2 and it.is_floor:
+            return pcprofile.S1_NEAROBJ_PX / pcprofile.PX_PER_UNIT
+        return self.pawn.notice_near_distance
+
+    def _pc_notice_standing(self):
+        """game.exe tests its nearobj triggers on every tick wherever he
+        stands (fcn.00472390 over fcn.00471bc0), not only on a walk's: a
+        Season 1 floor trick laid or lying within reach of him standing is
+        noticed as the condition turns true (the trigger's flag 2: once until
+        he is out of reach again) — not in his hideout (flag 4: 109's bed)"""
+        w = self.pawn.world
+        if w is None or self.pawn.zone is None or self.pawn.pc_bed:
+            self._pc_near_in = set()
+            return
+        inside = set()
+        hit = None
+        for it in list(w.near_items.get(self.pawn.zone.pid, ())):
+            if it.is_floor and it.tricked and \
+                    abs(self.pawn.sprite.x - it.target_x) < self._notice_distance(it):
+                inside.add(id(it))
+                if hit is None and id(it) not in self._pc_near_in:
+                    hit = it
+        self._pc_near_in = inside
+        if hit is not None:
+            self._on_surprise_near(hit)
 
     def _on_surprise_near(self, it):
         """Rottweiler.OnSurpriseNear / OnFall -> StartUrgentAction ->
@@ -6812,6 +6843,14 @@ class Routine:
             w.flag_aux = True
             olga.anim.anim.infinite = False
             self.anim_aux = olga.anim.anim
+        # game.exe's nearobj triggers (the level tick's pass before the
+        # actors'): a floor trick within reach of him standing (under the
+        # profile, Season 1; the walk's own frames run UpdateWalking)
+        if self.role == 'Rottweiler' and pcprofile.is_pc() and not self.pawn.nfh2 \
+                and self.pawn.state == self.pawn.IDLE and self._urgent_action is None:
+            self._pc_notice_standing()
+            if self._urgent_action is not None:
+                return
         # Rottweiler.Update: a deferred alert fires once he moves again
         if self.was_alerted is not None and self.state == self.MOVING:
             it, self.was_alerted = self.was_alerted, None

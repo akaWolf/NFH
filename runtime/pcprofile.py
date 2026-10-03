@@ -495,6 +495,13 @@ def s2_result(won, collapsed, completed, total):
 # laps within 12 % of the PC video.
 PX_PER_UNIT = 96.0
 TICKS_PER_SECOND = 12.0
+# game.exe's nearobj trigger, the Season 1 floor tricks' notice (fcn.00471bc0:
+# the actor in the object's room, not in a hideout — its flag 4, fcn.0043c2b0
+# at 0x471cee — and |its x - the object's `neighbor` hotspot x| < 15,
+# 0x471e13 `setl`), tested on every level tick wherever he stands
+# (fcn.00472390, before the actors' pass) and delivered as the condition turns
+# true (the trigger's flag 2: again only once it has turned false, its 0x200)
+S1_NEAROBJ_PX = 15
 WALK_PX_PER_TICK = {
     # role: (along the floor, up or down the room, up or down the stairs — Season 2's stair
     # gaits; Season 1 has no stairs to walk)
