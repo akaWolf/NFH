@@ -1707,7 +1707,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   its PCCreditAt was the remaster's until her script was read — read the
   same night: her step waits while she is `inv`, his `put1` shows her, and
   her sequence's first element is the attack, the tick after the offer's
-  (lap_model_s2 CREDIT_BY): PCCreditAt 1.83 s.
+  (lap_model_s2 CREDIT_BY): PCCreditAt 1.83 s. The same sequence's `fall`
+  posts `crash` to the Mother as its job ends, 98 ticks after his `put1`'s
+  end: her first move a tick after his stand's (POST_BY, PCHitAfter 0.08).
 - *206's lap by code (2026-10-03, read in GameLogic.dll and carried).* The
   level script's constructor (fcn.1002f1bb) starts at 0x1002f15a: the
   camera on him, then 0x1002f11d waits for the Mother's `call` (the latch

@@ -1173,7 +1173,7 @@ actors' job pass the update calls at 0x100445f8.
   when the port tests no catch. 210's elephant: Fifi's attack (59 ticks
   from 17), the bat's hide and her `fall` (36) post `crash` to the Mother
   at 113, her first move at 115 — a tick after his stand's end (114),
-  not carried (PCHitAfter 0).
+  not carried (PCHitAfter 0) — carried later the same day (below).
 - `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
   `tools/pcref/pc_walks_s2.py`, `levels/pc/Level206.overlay.json`,
   `runtime/scene.py`, `runtime/world.py` (2026-10-03): 206's lap by code
@@ -1239,3 +1239,11 @@ actors' job pass the update calls at 0x100445f8.
   the port walked straight — the only GOTO of the fourteen laps with no
   action before the next one in its room but 107's statue on the way to
   the footstool. Carried (PCWalkVia): 107's lap 57.3 s (runs/idle107v).
+- `tools/pcref/lap_model_s2.py`, `levels/pc/Level210.overlay.json`
+  (2026-10-03): a co-actor's fight whose behaviour her own job posts, his
+  flow's parts posting none (POST_BY): 210's elephant — Fifi's sequence
+  0x10018239 with the bat in the scene, its first update the tick after
+  the offer of his `put1`'s end: dogattack_bat 59, the bat hidden, her
+  `fall` 36, whose record posts `crash` to the Mother as its job ends;
+  the Mother's first move two ticks after that post, a tick after his
+  stand's end: PCHitAfter 0.08 s (0 before). Plan 210 at 100.

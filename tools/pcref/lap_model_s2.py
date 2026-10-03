@@ -1800,6 +1800,12 @@ FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_ma
 # update the tick after the offer's (the sequence pushed without a first
 # run), the record its `time` into it
 CREDIT_BY = {210: {'Elephant': (('fifi', 'put1'), 'fifi', ('bar_elefant', 'dogattack_bat'))}}
+# ... and the job of hers whose record posts the fighter her behaviour, where
+# his flow's own parts post none: {level: {item: her step}} — 210's
+# elephant: Fifi's sequence (0x10018239: the attack, the bat hidden, her
+# `fall`, whose record posts `crash` to the Mother as its job ends), her
+# first update the tick after the offer of his `put1`'s end
+POST_BY = {210: {'Elephant': 0x10018239}}
 
 
 # the gap fcn.1000e601 leaves between a fighter and the actor she walks to:
@@ -2422,6 +2428,26 @@ def code_stays_tricked(n):
                                              and x[2] is not None
                                              and (d._record(x[0], x[1]) or (0, {}))[1].get('behavioractor') == actor),
                                             None)
+                                if post is None and item in POST_BY.get(n, {}) \
+                                        and item in CREDIT_BY.get(n, {}):
+                                    # posted by the co-actor's own job his part
+                                    # starts (POST_BY): her sequence from the
+                                    # tick after the offer of his part's end
+                                    (po, pa), who, _h = CREDIT_BY[n][item]
+                                    endp = next((t + x[2] for t, kind, x in fl
+                                                 if kind == 'part' and x[0] == po and x[1] == pa
+                                                 and x[2] is not None), None)
+                                    lvf = Level(n)
+                                    lvf.present = (set(lvi.present) - h1) | s1
+                                    evf, _nf = run_step(lvf, POST_BY[n][item], dict(byi), latch=1)
+                                    flf = _flow(d, evf, walked=False, actor=who)
+                                    first = next((t for t, kind, _x in flf if kind == 'part'), None)
+                                    pend = next((t + x[2] for t, kind, x in flf if kind == 'part'
+                                                 and x[2] is not None
+                                                 and (d._record(x[0], x[1], who) or (0, {}))[1].get('behavioractor') == actor),
+                                                None)
+                                    if endp is not None and first is not None and pend is not None:
+                                        post = endp + 2 + (pend - first)
                                 if post is not None and post + 2 - fl[-1][0] > 0:
                                     e['hit_after'] = {actor: _secs(post + 2 - fl[-1][0])}
                     # a tricked step with no SHOUT whose flow goes on to the

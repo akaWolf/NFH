@@ -22,6 +22,9 @@
     "PCHitSeconds": {
      "Mother": 3.33
     },
+    "PCHitAfter": {
+     "Mother": 0.08
+    },
     "PCCreditAt": 1.83,
     "PCUseSeconds": 2.5
    }
