@@ -1282,3 +1282,15 @@ actors' job pass the update calls at 0x100445f8.
   mobile's walk had 4.3). Plans 208 and 211 at 100 unchanged; 209 at 100
   with its two Zone02 takes moved to her next Hide_In (v3, runs/g209b:
   432.2 s). Mobile 270/270.
+- `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_others.py`,
+  `levels/pc/Level204.overlay.json`, `Level210.overlay.json` (2026-10-03):
+  the go-and-enter helper fcn.1000ea30 read as a GoTo and the hideout's
+  `enter` unless inside (lap_model_s2 `EA30`): of the neighbour's laps only
+  204's changes — the gong's `enter` (time 0: two ticks, and the walking
+  step's own) with its `use`, 3.92 s (3.67); tricked 5.75, credit 3.58.
+  Plan 204 at 100 (runs/g204a). 210's Olga by her script (runs/olga210idle):
+  the mat 11.67-11.83 s (the model's 142 ticks, 11.83), the shower
+  14.17-14.33 (173, 14.42), walks 2.0-2.3 (25 ticks), the cycle 30.5-30.67
+  (the model's 30.4; the mobile stands' 36.2-36.3); the bra's water loop
+  19.3-29.3, 49.8-59.8, 80.3-90.3. Plan 210 at 100 with the bra at her
+  second shower (v26, runs/p210olge: 407.7 s).

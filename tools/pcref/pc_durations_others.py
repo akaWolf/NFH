@@ -62,15 +62,21 @@ ALIAS = {
 # deck chair 0x1003a0b8, the reling 0x10039f34)
 # 209's Mother: the fakir's shop 0x1001f729 <-> the dressing room's bar
 # 0x1001f564 (the script registry's in_c2 `mother`, 0x1001f87a: her first step)
-ROLE_LAPS = {209: {'Mother': 0x1001f729}, 212: {'Mother': 0x10035048}, 213: {'Mother': 0x100372f0},
-             214: {'Mother': 0x1003a0b8}}
+# 210's Olga: her mat's bar 0x1001bced, the leave 0x1001bb8d, the shower
+# 0x1001ba35 (its go-and-enter), the bra put and the wait 0x1001b8c3, the bra
+# taken and the leave 0x1001b5e1 (in_b2's `olga`, 0x1001bea9)
+ROLE_LAPS = {209: {'Mother': 0x1001f729}, 210: {'Olga': 0x1001bced}, 212: {'Mother': 0x10035048},
+             213: {'Mother': 0x100372f0}, 214: {'Mother': 0x1003a0b8}}
 # level -> role -> the mobile item her script's first step stands for, where
 # the mobile list starts elsewhere: the ActionManager starts there and wraps to
 # 0 (ActionStartIndex, LoopFromStartIndex off — AdvanceActionIndex's third
 # arm, ActionManager.cs:566-584). 209's Mother goes to the fakir's shop first
 # (her constructor's step 0x1001f821 stores 0x1001f729), the mobile to the
 # dressing room
-ROLE_START = {209: {'Mother': 'MotherStart'}}
+ROLE_START = {209: {'Mother': 'MotherStart'},
+              # 210's Olga lies on her mat first (0x1001bced), the mobile's
+              # list starts at the shower (ActionStartIndex 1)
+              210: {'Olga': 'OlgaMatBeach'}}
 # level -> mobile item -> (the Mother script's sleep step, the chair) — the step
 # whose fcn.1000e7f2 bar holds her in the chair (lap_model_s2.run_step reads the
 # pushed ticks)
@@ -110,7 +116,15 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
                                                    'MotherLookLoop': ('bar', 0x100187d8),
                                                    'MotherGetUpPillow': ('pool_deckchair', 'leave')}),
                     'CallRTMother': ('Mother', {'MotherCall': ('mother', 'callneighbor'),
-                                                'MotherOrder': ('mother', 'order')})},
+                                                'MotherOrder': ('mother', 'order')}),
+                    # 210's Olga in the shower (her lap, ROLE_LAPS: the go-and-
+                    # enter's `enter`, the bra put, the 120-tick wait, the bra
+                    # taken, the `leave`) — the mobile's water loop the wait
+                    'OlgaShower': ('Olga', {'OlgaShowerEnter': ('part', 'beachleft_shower_guarded', 'enter'),
+                                            'OlgaShowerPutBra': ('part', 'beachleft_shower_guarded', 'putbra'),
+                                            'OlgaShowerWater': ('part', '-', 'wait'),
+                                            'OlgaShowerTakeBra': ('part', 'beachleft_shower_guarded', 'takebra'),
+                                            'OlgaShowerLeave': ('part', 'beachleft_shower_guarded', 'leave')})},
               202: {'OlgaMat': ('Olga', {'BeachLayDown': ('beachleft_mat_olga_guarded', 'enter', 'step'),
                                          'TowelSleep': ('anim', 'beachleft/mat_olga_guarded', 'sun'),
                                          'TowelLaydown': ('beachleft_mat_olga_guarded', 'wakeup'),
@@ -166,7 +180,12 @@ CLIPS_ROLE = {207: {'DeckChair': ('Mother', {'MotherSitPillow': ('pool_deckchair
 ITEM_CLIPS = {205: {'OlgaMatBeach': ('Olga', {'N2TrickItemExtra1': ('beachright_mat_guarded', 'enter', 'step'),
                                               'N2TrickItemUseNormal': ('anim', 'beachright/mat', 'sun'),
                                               'N2TrickItemExtra3': ('beachright_mat_guarded', 'wakeup'),
-                                              'N2TrickItemExtra2': ('beachright_mat_guarded', 'leave')})}}
+                                              'N2TrickItemExtra2': ('beachright_mat_guarded', 'leave')})},
+              # 210's mat under Olga: her lap's `enter`, the 120-tick bar
+              # asleep and the `leave` (0x1001bced, 0x1001bb8d)
+              210: {'OlgaMatBeach': ('Olga', {'N2TrickItemExtra1': ('part', 'beachleft_mat_olga_guarded', 'enter'),
+                                              'N2TrickItemUseNormal': ('part', 'beachleft_mat_olga_guarded', 'bar'),
+                                              'N2TrickItemExtra2': ('part', 'beachleft_mat_olga_guarded', 'leave')})}}
 # level -> mobile item -> (role, wait): another actor's clip held until a role
 # has used an item or begun to (PCWaitForRole, the runtime's PCWaitFor for that
 # role): 210's Mother waits at her chair after the call until he stands there
@@ -195,6 +214,11 @@ def role_clips(n, tables=CLIPS_ROLE):
                 t = d.frames.get((src[1], src[2]))
             elif src[0] == 'ticks':
                 t = src[1]
+            elif src[0] == 'part':
+                # a part of her lap by code (ROLE_LAPS, lap_model_s2.role_lap):
+                # its ticks with the step's own that go with it
+                t = next((pt for _c, ps in lap_model_s2.role_lap(n, ROLE_LAPS[n][role], role.lower())
+                          for o, a, pt in ps if (o, a) == (src[1], src[2])), None)
             elif src[0] == 'step':
                 # a stand the step plays nothing at: its own ticks (a GoTo's
                 # done tick, the next step's first)
@@ -241,7 +265,9 @@ def bar_secs(n, step, chair):
     sys.path.insert(0, HERE)
     import lap_model_s2
     lap = lap_model_s2.role_lap(n, ROLE_LAPS[n]['Mother'], 'mother')
-    parts = {(o, a): t for cur, ps in lap if cur == step for o, a, t in ps}
+    # the chair's parts wherever her lap has them (214's `enter` is the
+    # go-and-enter step's before the bar step, 0x10039e6c)
+    parts = {(o, a): t for cur, ps in lap for o, a, t in ps if o == chair}
     sit, sleep, leave = parts[(chair, 'enter')], parts[(chair, 'bar')], parts[(chair, 'leave')]
     return round(sit / 12.0, 2), round(sleep / 12.0, 2), round(leave / 12.0, 2)
 

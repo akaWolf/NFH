@@ -2032,6 +2032,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   hotspot). Her cycles: 208 43.8-44.0 s, 209 54.3, 211 38.7-38.8 (the
   mobile stands' 41.5, 41.2 and 33.8) — the video's 43.7-43.8, 54.2 and
   38.6-38.7 (docs/PC_VERIFICATION.md).
+  The go-and-enter helper (fcn.1000ea30: the GoTo, then on the arrival the
+  hideout's `enter` job unless the actor is in it already, 0x1000ea90-
+  0x1000eac2) had been read as neither — the lap model walks it since
+  2026-10-03 (lap_model_s2 `EA30`): 204's gong step goes to the gong and
+  enters it (time 0, its job two ticks) before the strike — his stand 3.92 s
+  (3.67 before), the tricked one 5.75 (5.5), its credit at 3.58 (3.33);
+  202's beer step finds him on the mat already (no second enter). A
+  co-actor's lap is walked as a cycle, a first round setting where the last
+  step leaves her (lap_model_s2.role_lap): 214's chair entered by the
+  go-and-enter step 0x10039e6c before the bar step finds her in it, 210's
+  and 206's Mother never leaving hers between two bars.
+  210's Olga by her script (in_b2's `olga`, 0x1001bea9): the mat first
+  (0x1001bced: its `enter`, fcn.1000e7f2's 120-tick bar asleep, the `leave`
+  of 0x1001bb8d — 11.83 s), then the shower (0x1001ba35's go-and-enter, the
+  bra put, a 120-tick wait with the bra on the rail, the bra taken, the
+  `leave` — 14.42 s), 25-tick walks between: a 30.4-s cycle where the
+  mobile's was 36.3 (its shower 21.2 s with a 16-s water loop, the mat's
+  own sun loop 13.3) — ITEM_CLIPS the mat's own clips, CLIPS_ROLE her
+  shower's, her list started at the mat (ROLE_START). The bra's window is
+  the wait's 10 s: her first one falls after his wake in the chair (flag 4
+  off at 14.8 s), so plan 210 takes it at her second and its chain pays a
+  lap later (100 at 407.7 s).
 - *111 under the PC scores.* Badinfos' E11 chains the eight in one lap
   (the thermometer's jumps, tools/pcref/thermo_jumps.py, and his bubbles:
   the trap on the basement walk-in 155.8, the washer 179.5, the drier

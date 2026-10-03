@@ -314,6 +314,17 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 if not gn and edx_names:
                     gn = edx_names[-1:]
                 ev.append(('GO', gn[-1] if gn else (names[-1] if names else None))); al = 0
+            elif fn == 'fcn.1000ea30':
+                # the go-and-enter helper: its GoTo (fcn.1000e3e0), and on the
+                # arrival the hideout's `enter` job (fcn.10006bd4, pushed by
+                # fcn.10049216) unless the actor is in it already (fcn.10049190
+                # and the name compare, 0x1000ea90-0x1000eac2); 0 once inside
+                # (210's Olga into the shower, 0x1001bb5d)
+                gn = [s2[1] for i2, s2 in enumerate(slots) if s2[0] in ('g', 'v') and i2 != this_k]
+                if not gn and edx_names:
+                    gn = edx_names[-1:]
+                obj = gn[-1] if gn else (names[-1] if names else None)
+                ev.append(('GO', obj)); ev.append(('EA30', [obj] if obj else [], [])); al = 0
             elif fn == 'fcn.1000e7f2':
                 # a timed stay (the bar): fcn.1000b154's object (vtable 0x100ab710,
                 # update 0x1000b312) counts its +0xc up to the pushed ticks +8 a
@@ -864,6 +875,16 @@ def _station_parts(d, ev, ctx):
             else:
                 parts.append((names[0] if names else '?', '?', None))
                 ctx['pos'] = None
+        elif k == 'EA30':
+            # fcn.1000ea30's enter: none when the actor is in the hideout
+            # already (202's beer step on the mat he lies on)
+            names = [x for x in e[1] if not x.startswith('$')]
+            if names and ctx.get('inside') != names[0]:
+                who = ctx.get('actor', 'neighbor')
+                parts.append((names[0], 'enter', d.action_ticks(names[0], 'enter', who)))
+                ctx['pos'] = None
+            if names:
+                ctx['hideout'] = names[0]; ctx['inside'] = names[0]
         elif k in ('E6bd4', 'E6c2e'):
             names = [x for x in e[1] if not x.startswith('$')]
             if not names and ctx.get('hideout'):
@@ -1027,20 +1048,32 @@ def role_lap(n, start, actor):
     a hideout starting with the route's leave of it (the last step's part)"""
     d = Data(n)
     steps, loop = walk(Level(n), start)
-    out = []; walks = []
     ctx = {'geom': Geometry(n), 'data': d, 'actor': actor}
+    if loop is not None:
+        # the lap is a cycle: a first round sets where the last step leaves
+        # her (inside a hideout — 214's chair, entered by 0x10039e6c's
+        # go-and-enter, so the bar step after it finds her in it) and the
+        # ticks a step hands on; the second is the lap's
+        steps = steps[loop:]
+        for _cur, ev, _nxt in steps:
+            station_ticks(d, ev, ctx)
+            ctx.pop('route_leave', None)
+    out = []; lead = None
     for cur, ev, _nxt in steps:
         parts = station_ticks(d, ev, ctx)
         hid = ctx.pop('route_leave', None)
-        if hid and out:
-            out[-1][1].append((hid, 'leave', d.action_ticks(hid, 'leave', actor)))
+        if hid:
+            leave = (hid, 'leave', d.action_ticks(hid, 'leave', actor))
+            if out:
+                out[-1][1].append(leave)
+            else:
+                # the first step's walk leaves the hideout the lap's last
+                # row left her in (209's dressing room, on the way to the
+                # fakir's shop)
+                lead = leave
         out.append((cur, parts))
-        walks.append(ctx.get('walks', False))
-    hid = ctx.get('inside')
-    if loop is not None and out and hid and walks[loop]:
-        # (the lap's last step left her inside and the loop's first walks:
-        # 209's dressing room, left on the way to the fakir's shop — lap_steps)
-        out[-1][1].append((hid, 'leave', d.action_ticks(hid, 'leave', actor)))
+    if lead is not None and out:
+        out[-1][1].append(lead)
     return out
 
 
@@ -1590,7 +1623,9 @@ PAIRS = {
           'JadeNecklace': [(None, 'jadedummy', 'look')],
           'PullKart': [(None, 'rickshaw', 'use')],
           'Karate': [(None, 'headbanging', 'use')],
-          'GongDrumstick': [(None, 'gong', 'use')]},
+          # the gong step goes to it and enters it (fcn.1000ea30: the
+          # `enter`, time 0, before the strike's `use`)
+          'GongDrumstick': [(None, 'gong', 'enter'), (None, 'gong', 'use')]},
     207: {'Bartender': [(None, 'keeper', 'order_drink')],
           'Elephant': [('elefant', 'neighbor', 'lookaround'), (None, 'elefant', 'spit_at_elefant')],
           'Shell': [(None, 'beachright_mat_guarded', 'shell')],

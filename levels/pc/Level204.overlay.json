@@ -63,11 +63,11 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSecondsTricked": 5.5,
+    "PCUseSecondsTricked": 5.75,
     "PCShout": 3,
     "PCFixSeconds": 1.83,
-    "PCCreditAt": 3.33,
-    "PCUseSeconds": 3.67
+    "PCCreditAt": 3.58,
+    "PCUseSeconds": 3.92
    }
   },
   {
