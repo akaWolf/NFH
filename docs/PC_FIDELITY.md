@@ -1592,7 +1592,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   water exit at 1155/1094, 265 px left of the cliff and 44 below the floor
   (the model's lap 128.2 s); 209's hot coal's tricked visit 293 px right
   of the coal (read as 0 until then); 212's tricked bench 75 px right of
-  the bench; 210's hedgehog chair 47 px left; 209's curtain puts him 1 px
+  the bench; 210's hedgehog chair 47 px left (back at the chair since
+  2026-10-04: the GoTo element before its repair); 209's curtain puts him 1 px
   off the shoe mat, 213's picnic 5 px left and 10 up (the model's lap
   124.0 s). 213's tricked picnic was left out until the picnic was read
   (the entry below): out of the water at its `beat`, 200 px right.
@@ -2630,6 +2631,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   repair, the bench back to black at 221.1 on the episode's clock — the
   model's 220.9-221.0. The bench's credit to the bull's 27.7 s against
   E12's gauge 28.0 (23.2 before); 212's plan ends 4.5 s later, at 100.
+  And a GoTo element the walker had not read: fcn.10007950 builds the
+  same GoTo as fcn.10007a10 (vtable 0x100ab3b4, its job fcn.10007718's)
+  with the hotspot's name empty — the actor's — and two level steps
+  append it before a repair. 208's tap (0x1001d608, the `electrify`
+  behaviour's handler step, trigger.xml's nearobj within 15 px of the
+  electrified tap's hotspot at 179 px, which only his walk to the statue
+  passes — at 188 px from the elephant door): the `electrify`, SHOUT 0,
+  then the GoTo to the plain tap (0x1001d71b, elephant/tap's hotspot at
+  249 px and 59 above the floor: 8 ticks along, 20 up), its `repair`, the
+  switch back, and his saved step's GoTo down to the statue; the port had
+  repaired where he stood. SCENE_AT starts the flow at the statue (the
+  same 8 ticks as from 188) -> PCFixSeconds 3.67 (1.33), PCFixDepart
+  [249, -59]. E08 at 4 fps: the shock at 162.6 on the episode's clock,
+  the SHOUT to ~166, the walk right and up to the tap, its repair facing
+  the wall (~168.3-169.5), the walk back, the lookaround and the snake
+  taken, its coin at 177.0 — the model's 176.8 (the tap's coin to the
+  snake's 13.9 s against the gauge's 13.75; the port's 9.3 before). 210's
+  hedgehog chair (0x10019a0f): after the `leave` (47 px left of the
+  chair) and the SHOUT, the GoTo back into the chair (15 ticks) before
+  its repair -> PCFixSeconds and PCFixSecondsLinked 2.5 (1.25), PCApproach
+  `txt` 0 and `dpxt` -10 (-47, -15: he leaves from the chair); E10's
+  linked visit (the electrified chair's coin at 238.25 on the gauge) has
+  the bubble leave the chair at 246.9, 8.6-8.75 s on, the model 8.67 (the
+  credit on the electrify's ticks to the next step), 7.42 without the
+  walk.
   The whip's credit to the cigars' stays 26.2 s against E12's 29.8, and
   the 3.6 s are the door: the icon moves to the cigars 11.2 s after the
   whip's credit in both, and in E12 the Mother takes the midright/midleft

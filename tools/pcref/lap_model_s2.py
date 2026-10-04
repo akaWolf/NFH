@@ -309,11 +309,14 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 if outs: vars_[outs[-1][1]] = pick
                 ev.append(('IFVAR', cands, pick))
                 al = None
-            elif fn == 'fcn.10007a10':
+            elif fn in ('fcn.10007a10', 'fcn.10007950'):
                 # a GoTo the step builds and appends to its sequence
                 # (fcn.1000ef28): its object and hotspot name, the
                 # arguments pushed last-first (213's picnic 0x10038516:
-                # the water's `beat`; 211's toilet 0x1003102b: wcright's)
+                # the water's `beat`; 211's toilet 0x1003102b: wcright's);
+                # fcn.10007950 the same GoTo (vtable 0x100ab3b4, its job
+                # fcn.10007718's) with the hotspot's name empty — the
+                # actor's (208's tap step 0x1001d71b: elephant/tap)
                 ev.append(('GOEL', list(reversed(names))))
                 al = None
             elif fn == 'fcn.1000ec67':
@@ -2195,6 +2198,16 @@ SCENE_LINKED_CONT = {207: {'PoolBoard': ('fight', 'mother', (0x100171ee,))}}
 # no SHOUT: the stand is the controls' step, the scene held to the fight's
 # reaction)
 SCENE_CONT = {213: {'MechanicalBullControls': ('fight', 'olga', (0x10037d3b,))}}
+# where a SCENE_STEPS flow starts when no GoTo of its own places him: {level:
+# {item: the object at whose `<actor>` hotspot he stands}} — 208's tap is a
+# nearobj trigger (trigger.xml: `electrify` within 15 px of the electrified
+# tap's hotspot, 179 px, on the floor; the handler 0x1001e50f saves his step
+# and runs 0x1001d608), which only his walk to the statue passes: from the
+# elephant door it fires at 188 px, a step short of the statue's 186, and
+# the flow's GoTo element to the plain tap (0x1001d71b: elephant/tap's
+# hotspot, 249 px and 59 above the floor) takes the same 8 ticks along the
+# floor from either
+SCENE_AT = {208: {'ElectricTap': 'altar_statue'}}
 
 
 def _scene_step_events(n, item, linked=None):
@@ -2222,6 +2235,11 @@ def _scene_step_events(n, item, linked=None):
         evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1,
                             streq=streq)
         ev += ([('STEP',)] if ev else []) + evs
+    at = SCENE_AT.get(n, {}).get(item)
+    if at is not None:
+        # where he stands as the flow starts (a GoTo element's walk leaves
+        # from there)
+        ev = [('AT', at)] + ev
     return ev
 
 
@@ -2399,6 +2417,34 @@ def _repair_walk(n, d, ev):
     return t, (q[0], q[1] - g.floor(g.room_of(b)))
 
 
+def _goel_depart(n, d, ev):
+    """(x, px) | None: where a GoTo element before a flow's repair leaves
+    him — the element's object's hotspot (its named one, else the actor's)
+    and its height against the room's floor — whose walk the flow's repair
+    has on its clock (_flow; 208's tap: back up to the plain tap, 249 px and
+    59 above the floor; 210's chair: back into it after its `leave`), his
+    next walk from there; None without one"""
+    goel = None
+    for e in ev or []:
+        if e[0] == 'GOEL':
+            names = [x for x in e[1] if not str(x).startswith('$')]
+            goel = names or None
+        elif e[0] == 'DO' and e[1]:
+            names = [x for x in e[1] if not str(x).startswith('$')]
+            if len(names) >= 2 and names[1] == 'repair':
+                break
+    else:
+        return None
+    if goel is None:
+        return None
+    g = Geometry(n)
+    obj = d.real.get(goel[0], goel[0])
+    q = g.point(obj, goel[1], exact=True) if len(goel) > 1 else g.point(obj)
+    if q is None or g.room_of(obj) not in g.rooms:
+        return None
+    return (q[0], q[1] - g.floor(g.room_of(obj)))
+
+
 def _waits_on(d, e, who='neighbor'):
     """another actor's job (ODO) whose record posts `who` a behaviour — the
     step after it waits for it (204's gong: the Elvis's `use`)"""
@@ -2458,14 +2504,16 @@ def _flow(d, ev, own=None, walked=True, actor='neighbor'):
             started, go, elems = False, False, 0
             if e[0] == 'STEP':
                 continue
-        if e[0] == 'GO':
-            go = True
+        if e[0] in ('GO', 'AT'):
             # the step's GoTo leaves him at the object's `<actor>` hotspot
-            # (fcn.1000e3e0): where a GoTo element of the flow walks from
+            # (fcn.1000e3e0): where a GoTo element of the flow walks from —
+            # and a flow that starts where he stands (SCENE_AT) there
             g = d.geom()
             obj = d.real.get(e[1], e[1]) if len(e) > 1 and e[1] else None
             q = g.point(obj, actor) if obj else None
             ctx['pos'] = (g.room_of(obj), q[0], q[1]) if q is not None else None
+            if e[0] == 'GO':
+                go = True
             continue
         instant = _is_instant(e) or (ie in waited and e[0][1:] in TICK_ELEMENTS)
         parts = [] if (instant or e[0] == 'SHOUT') else _station_parts(d, [e], ctx)
@@ -3174,6 +3222,11 @@ def code_stays_tricked(n):
         e = entry(ev)
         if e is not None and item not in out:
             e['rejoins'] = True
+            dep = _goel_depart(n, d, ev)
+            if dep is not None:
+                # the repair's GoTo element leaves him at its object (208's
+                # tap): his next walk from there (PCFixDepart)
+                e['fix_depart'] = dep
             cont = SCENE_CONT.get(n, {}).get(item)
             if cont is not None:
                 # the reaction the flow hands on: the co-actor's fight, then
@@ -3339,7 +3392,9 @@ def code_places_tricked(n):
     IsVariant pairs shown (_tricked_move's), where it leaves a hideout
     (209's hot coal: out at 1365 px, 293 right of the coal; 213's tricked
     picnic out of the water at its `beat`, 1175 px; 212's tricked bench 75
-    right; 210's hedgehog chair 47 left); items without such a variant left
+    right — its repair's step walks him back, PCFixDepart —; 210's hedgehog
+    chair back at its hotspot: 47 left out of it, and the GoTo element
+    before its repair takes him back in); items without such a variant left
     out"""
     d = Data(n); g = Geometry(n)
     lap, pairs = _paired_parts(n)
@@ -3381,7 +3436,8 @@ def code_places_tricked(n):
 # variant shown, the one hidden)}} — 212's bench: its leave step 0x1003613a
 # with bank_manip present leaves it (then the bull's crash and SHOUT 1);
 # 210's chair: 0x1001964b with the hedgehog's picks it, enters and leaves it
-# (SHOUT 0, the repair). (213's tricked picnic is the lap row's own step,
+# (SHOUT 0, then its GoTo element back to the chair and the repair). (213's
+# tricked picnic is the lap row's own step,
 # its latch set: out of the water at its `neighbor_out` and on to its `beat`)
 TRICKED_PLACES = {212: {'SleepBench': (0x1003613a, 'midleft_bank_manip', 'midleft_bank')},
                   210: {'DeckChair': (0x1001964b, 'beachleft_deckchair_hedgehog', 'beachleft_deckchair')}}

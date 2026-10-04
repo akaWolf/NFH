@@ -1131,7 +1131,8 @@ actors' job pass the update calls at 0x100445f8.
   entered from the shoe mat), and a hideout's leave placing him at its
   `<actor>_out` (fcn.10006c2e -> 0x1000690a: 212's ledge leaves the water
   exit, 265 px left of the cliff; 209's tricked hot coal 293 px right,
-  212's tricked bench 75 right, 210's hedgehog chair 47 left — PCApproach
+  212's tricked bench 75 right, 210's hedgehog chair 47 left (back at
+  the chair by its GoTo element since 2026-10-04) — PCApproach
   `tx`/`dpx`, `txt`/`dpxt`). All 14 Season 2 at 100, the mobile
   regression byte-identical.
 - `runtime/pcprofile.py` (2026-09-27): Season 2's SHOUT element lasts its

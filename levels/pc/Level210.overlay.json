@@ -123,13 +123,13 @@
      3.75
     ],
     "PCShout": 0,
-    "PCFixSeconds": 1.25,
+    "PCFixSeconds": 2.5,
     "PCSceneLinked": [
      0.17,
      4.83
     ],
     "PCShoutLinked": 1,
-    "PCFixSecondsLinked": 1.25,
+    "PCFixSecondsLinked": 2.5,
     "PCJingle": true
    }
   },
@@ -1020,8 +1020,8 @@
         "Zone04"
        ]
       },
-      "txt": -47,
-      "dpxt": -15
+      "txt": 0,
+      "dpxt": -10
      },
      "Woody": {
       "obj": "beachleft/deckchair",
