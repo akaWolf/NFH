@@ -33,14 +33,14 @@
     "PCShout": 1,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
-    "PCCreditAt": 3.33,
+    "PCCreditAt": 3.25,
     "PCJingleAt": [
-     3.33
+     3.25
     ],
     "PCJingleAtLinked": [
-     3.33
+     3.25
     ],
-    "PCCreditAtLinked": 3.33,
+    "PCCreditAtLinked": 3.25,
     "PCShoutLinked": 3,
     "PCFixSecondsLinked": 1.83,
     "PCLinkedPaysAt": 4.75,

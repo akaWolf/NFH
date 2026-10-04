@@ -699,11 +699,12 @@ predicate, then the all-tricks win.
   each clip at its PC seconds (PCClipSeconds; another role's,
   PCClipSecondsRole), holds a clip until another role has used an item
   and then the listed seconds more (PCWaitFor: 202's swim until Olga's
-  sub), and pays a tricked use's record as the named clip ends
-  (PCCreditAfter: 202's shark on the sea's `enter`, the overflow's tick
-  counted there, the tantrum at the use's end not paying again) or so many
-  seconds into the clip that plays the record's action (PCCreditInClip:
-  202's crab on the mat, 205's egg on the table, 210's hedgehog chair) —
+  sub), and pays a tricked use's record so many seconds into the clip
+  that plays the record's action (PCCreditInClip: 202's crab on the mat
+  and its shark — the record's 144 clamped by the Loader to the sea's
+  `enter` of 36 —, 205's egg on the table, 210's hedgehog chair; the
+  overflow's tick counted there, the tantrum at the use's end not paying
+  again) —
   the linked trick's own record likewise in the linked variant's clip
   (PCLinkedCreditInClip, `_pc_credit_linked`: 210's pole as the chair's
   ChairElectrify starts, `World.pc_s2_linked_credit`). Only

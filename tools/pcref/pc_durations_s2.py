@@ -128,18 +128,16 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
 # the items whose per-visit stays stand beside their clips: the clips time a
 # visit whose stay is 0
 KEEP_STAYS = {}
-# the tricked use's clip after which the PC's trick action has ended
-# (PCCreditAfter): the record's action (objects.xml) pays as it completes —
-# the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
-# sea's `enter` (entersea), before the 119-tick bar the mobile's SeeShark plays
-CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', 'shark')}}
 # the tricked use's clip its record pays inside (PCCreditInClip): the clip
 # plays the record's action from its first tick, and fcn.1000140b credits the
 # record on the tick its `time` equals the action's count — so many seconds
 # into the clip (202's crab on the mat: crayfish 21 ticks into the manipulated
 # mat's `use`, BeachCrabGetBeer; 205's egg: pingpong_egg 17 into the egg
-# table's `play`, TennisEgg)
-CREDIT_IN = {202: {'BeerMat': ('BeachCrabGetBeer', 'beachright_mat_hn_guarded_manip', 'use', 'crayfish')},
+# table's `play`, TennisEgg; 202's shark: its 144 clamped by the Loader to
+# the shark sea's `enter` of 36, before the 119-tick bar the mobile's
+# SeeShark plays — Data.tricks)
+CREDIT_IN = {202: {'BeerMat': ('BeachCrabGetBeer', 'beachright_mat_hn_guarded_manip', 'use', 'crayfish'),
+                   'Swimming': ('EnterSea', 'beachright_theocean_shark', 'enter', 'shark')},
              205: {'TabbleTennis': ('TennisEgg', 'beachright_pingpong_egg_guarded', 'play', 'pingpong_egg')},
              # 210's hedgehog chair: deckchair_hedgehog 9 ticks into the
              # chair's `enter`, ChairHedgehogEnter (a 'step' clip: the
@@ -376,14 +374,6 @@ def clip_secs(n):
             if t is not None:
                 out[clip] = round(t / 12.0, 2)
         clips[item] = out
-    for item, (clip, obj, act, rec) in CREDIT.get(n, {}).items():
-        # the record must sit on that action in the level's objects.xml
-        text = lap_model_s2.canon.read('%s/nfh2/x/%s/objects.xml' % (
-            lap_model_s2.canon.ROOT, lap_model_s2.canon.pc_level(n)['folder']))
-        m = re.search(r'<object name="%s"[^>]*>(.*?)</object>' % re.escape(obj), text, re.S)
-        am = m and re.search(r'<action name="%s"[^>]*>(.*?)</action>' % act, m.group(1), re.S)
-        assert am and 'name="%s"' % rec in am.group(1), (obj, act, rec)
-        clips.setdefault(item, {})['@credit'] = clip
     for key, table in (('@credit_in', CREDIT_IN), ('@linked_credit_in', LINKED_CREDIT_IN)):
         for item, (clip, obj, act, rec) in table.get(n, {}).items():
             t = next((tm for nm, tm in d.tricks(obj, act) if nm == rec), None)
@@ -522,7 +512,7 @@ def write_tricked_keys(ov, n, clips):
             # (lap_model_s2.FIGHT_BEFORE: 213's Olga out of the boat)
             _set_key(ov['patches'], item, 'PCHitAfter',
                      {ROLE[a]: v for a, v in tr['hit_after'].items() if v is not None})
-        if tr['credit'] is not None and item not in CREDIT.get(n, {}):
+        if tr['credit'] is not None:
             _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
             if tr.get('jingles'):
                 # the flow's jingle_joke records on the same clock — each
@@ -636,23 +626,19 @@ def write_code_stays(ov, n, clips):
 
 def write_code_keys(n):
     """the keys read from the code and the level data alone (PCClipSeconds,
-    PCWaitFor, PCCreditAfter, PCBehaviourAt) into the level's overlay — the
+    PCWaitFor, PCCreditInClip, PCBehaviourAt) into the level's overlay — the
     --write path's, without the video pairing's idle visits"""
     p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(p))
     clips, waits = clip_secs(n)
-    for k in ('PCClipSeconds', 'PCWaitFor', 'PCCreditAfter', 'PCCreditInClip', 'PCLinkedCreditInClip',
-              'PCBehaviourAt'):
+    for k in ('PCClipSeconds', 'PCWaitFor', 'PCCreditInClip', 'PCLinkedCreditInClip', 'PCBehaviourAt'):
         ov['patches'] = _strip_key(ov['patches'], k)
     for item, cl in clips.items():
         cl = dict(cl)
-        credit = cl.pop('@credit', None)
         credit_in = cl.pop('@credit_in', None)
         linked_in = cl.pop('@linked_credit_in', None)
         if cl:
             _set_key(ov['patches'], item, 'PCClipSeconds', cl)
-        if credit:
-            _set_key(ov['patches'], item, 'PCCreditAfter', credit)
         if credit_in:
             _set_key(ov['patches'], item, 'PCCreditInClip', credit_in)
         if linked_in:
@@ -726,18 +712,14 @@ def main(argv):
                 ov['patches'] = _strip_key(ov.get('patches', []), 'PCUseSeconds')
                 for k in ('PCClipSeconds', 'PCWaitFor'):
                     ov['patches'] = _strip_key(ov['patches'], k)
-                ov['patches'] = _strip_key(ov['patches'], 'PCCreditAfter')
                 ov['patches'] = _strip_key(ov['patches'], 'PCCreditInClip')
                 ov['patches'] = _strip_key(ov['patches'], 'PCLinkedCreditInClip')
                 for item, cl in clips.items():
                     cl = dict(cl)
-                    credit = cl.pop('@credit', None)
                     credit_in = cl.pop('@credit_in', None)
                     linked_in = cl.pop('@linked_credit_in', None)
                     if cl:
                         _set_key(ov['patches'], item, 'PCClipSeconds', cl)
-                    if credit:
-                        _set_key(ov['patches'], item, 'PCCreditAfter', credit)
                     if credit_in:
                         _set_key(ov['patches'], item, 'PCCreditInClip', credit_in)
                     if linked_in:

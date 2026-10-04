@@ -677,27 +677,40 @@ class Data:
         a = (e.get('act') or {}).get((actor, name)) or {}
         return a.get('_tr', (0, 0))
 
-    def tricks(self, obj, name, actor='neighbor'):
-        """the action's named trick records [(name, time)] — by the actor's
-        record, else the object's own action of that name"""
-        e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
+    def _records(self, obj, name, actor, key):
+        """an action's <trick> records of one kind ('_tricks' or '_jingles')
+        — by the actor's record, else the object's own action of that name
+        — each `time` clamped to the action's: Loader.dll's <trick> parser
+        stores clamp(time, 0, the action's time) (0x10009bc9-0x10009c0a:
+        the `time` attribute, 0x100080d8 the clamp, the action's time at
+        [ebx+0x1c] from 0x10009866), so a record past its action's end pays
+        on its last count — 202's shark 144 on the shark sea's `enter` of
+        36, 207's divingboard_spring 20 on the dive's 17, 208's
+        platform_crash 39 on the crash's 38, 213's bullride 43 on the
+        manipulated controls' `use` of 27"""
+        o = self.real.get(obj, obj)
+        e = self.objects.get(o) or self.generic.get(obj) or {}
         acts = e.get('act') or {}
         a = acts.get((actor, name))
         if a is None:
             a = next((v for (ac, nm), v in acts.items() if nm == name), None)
-        return list((a or {}).get('_tricks') or [])
+        if a is None:
+            return []
+        cap = self._time(e, a, o)
+        clamp = (lambda t: t) if cap is None else (lambda t: max(0, min(t, cap)))
+        if key == '_tricks':
+            return [(nm, clamp(t)) for nm, t in a.get('_tricks') or ()]
+        return [clamp(t) for t in a.get('_jingles') or ()]
+
+    def tricks(self, obj, name, actor='neighbor'):
+        """the action's named trick records [(name, time)] (_records)"""
+        return self._records(obj, name, actor, '_tricks')
 
     def jingles(self, obj, name, actor='neighbor'):
         """the action's jingle_joke ticks: the `time` of each of its <trick>
         records with jingle="true", named or not (fcn.1000140b,
-        0x10001528-0x1000153f) — by the actor's record, else the object's
-        own action of that name"""
-        e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
-        acts = e.get('act') or {}
-        a = acts.get((actor, name))
-        if a is None:
-            a = next((v for (ac, nm), v in acts.items() if nm == name), None)
-        return list((a or {}).get('_jingles') or [])
+        0x10001528-0x1000153f; _records)"""
+        return self._records(obj, name, actor, '_jingles')
 
     def _record(self, obj, name, actor='neighbor'):
         """(the owner's entry, the action record, the owner's name) of an
@@ -775,7 +788,10 @@ class Data:
         r = self._record(obj, name, actor)
         if r is None:
             return None
-        e, a, o = r
+        return self._time(*r)
+
+    def _time(self, e, a, o):
+        """an action record's time as the Loader stores it (loader_time)"""
         t = a.get('time', 'auto')
         if t.isdigit():
             return int(t)

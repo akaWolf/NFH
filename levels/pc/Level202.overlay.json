@@ -39,7 +39,9 @@
      "SeeShark": 9.92,
      "LeaveSea": 1.75
     },
-    "PCCreditAfter": "EnterSea",
+    "PCCreditInClip": {
+     "EnterSea": 3.0
+    },
     "PCWaitFor": {
      "clip": "WaitSea",
      "role": "Olga",

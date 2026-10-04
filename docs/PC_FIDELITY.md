@@ -2375,7 +2375,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   208's platform, read the same day: its trick is the fakir's balloon
   (combine.xml amusement/fakir_balloon; the mobile's chips are no PC
   ingredient — PRESENT), and the platform step (0x1001ea59) plays the
-  platform's `crash` (platform_crash on its tick 40, with its jingle),
+  platform's `crash` (platform_crash on its tick 39 — its record's 39
+  clamped to the crash's 38 —, with its jingle),
   then the seesaw's `crash` — its object the IsVariant pick of the seesaw
   (0x1001ebc3), the shovel's variant or the plain one — and holds the pick
   against the plain seesaw's name (0x1001ec34): SHOUT 1 for the plain
@@ -2385,7 +2386,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   out, var_20h_4 for the crash's object, both [ebp - 0x14]), and the
   walker now reads the displacement from the instruction's ModRM byte —
   no other flow of the fourteen levels changes (the carried keys stay as
-  they were). The platform alone: 7.75 s, SHOUT 1, its record 3.33 s in;
+  they were). The platform alone: 7.75 s, SHOUT 1, its record 3.25 s in
+  (3.33 until the record's clamp);
   with the shovel (the linked variant, SeeSaw): 10.17 s, SHOUT 3, the
   1.83-s repair, seesaw_shovel at 4.75 (PCLinkedPaysAt). 208's plan ends
   2.5 s earlier, at 100.
@@ -2519,6 +2521,26 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
+- *A trick record past its action's end (2026-10-04, carried).*
+  Loader.dll stores a `<trick>` record's `time` clamped to its action's:
+  the trick parser reads the attribute by name (its global 0x1003c14c
+  holds "time", 0x10024e84) and keeps clamp(time, 0, the action's time)
+  (0x10009bc9-0x10009c0a; 0x100080d8 is max, then min; the action's time
+  at [ebx+0x1c], from its record's +0x28, 0x10009866), so a record written
+  past its action's end pays — and plays its jingle — on the action's
+  last count (fcn.1000140b's equality with the job's count, fcn.100011f2).
+  Four records are: 202's shark (144 on the shark sea's `enter` of 36),
+  207's divingboard_spring (20 on the dive's 17), 208's platform_crash
+  (39 on the crash's 38) and 213's bullride (43 on the manipulated
+  controls' `use` of 27). The lap model reads them clamped
+  (lap_model_s2.Data.tricks / jingles, `_records`): 208's platform pays
+  and plays its jingle 3.25 s into its stand where 3.33 had stood
+  (PCCreditAt, PCJingleAt and the linked variant's); 202's shark 3.0 s
+  into EnterSea (PCCreditInClip, pc_durations_s2 CREDIT_IN) where the
+  clip's end, 3.17 s, had stood — PCCreditAfter (the record paid as its
+  clip ended) is withdrawn from the runtime and the tools. 207's spring
+  and 213's bullride stay stand-ins, their flows unread and their credit
+  at the tantrum.
 - *The trick's jingle (2026-10-04, carried).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
@@ -3190,9 +3212,10 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   as his, 62 ticks each by the kid's play_remote loop); its
   continuation is the rail, whose GoTo leaves the sea (leavesea). The
   tricked sea is the shark's (0x10021fb9, 119 ticks), and its record
-  `shark` sits on the shark sea's `enter`: the coin and the rage come as
-  that action ends (the action step's end, fcn.1000140b), ten seconds
-  before the bar is over. The mobile plays the same clips — [WaitSea,
+  `shark` sits on the shark sea's `enter` at 144, which the Loader clamps
+  to the action's 36 ("A trick record past its action's end"): the coin
+  and the rage come on the action's last count (fcn.1000140b), ten
+  seconds before the bar is over. The mobile plays the same clips — [WaitSea,
   EnterSea, SeeSub, LeaveSea], her [BeachLayDown, TowelSleep,
   TowelLaydown, BeachGetUp] and OlgaPutSub, frame for frame the PC's at 8
   or 10 a second — with a fixed WaitSea, and its kid cries at his Rake
@@ -3202,8 +3225,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   5.33, the get-up 0.42) and the swim per clip (EnterSea 3.08, SeeSub
   8.08, SeeShark 9.92, LeaveSea 1.67) with WaitSea held until Olga's
   Submarine use has ended (PCWaitFor; and 10.33 s more until 2026-09-25,
-  the kid's dive read as his), the shark paid as
-  EnterSea ends (PCCreditAfter, World.pc_s2_credit — the overflow's tick
+  the kid's dive read as his), the shark paid 3.0 s
+  into EnterSea (PCCreditInClip; at the clip's end, PCCreditAfter, until
+  2026-10-04; World.pc_s2_credit — the overflow's tick
   counted there), Olga's clips at the PC's (PCClipSecondsRole: lay-down
   0.67, wake-up 2.92, get-up 0.67, the sub's take 1.5) and her sleep loop
   cut at once on the kid's cry (the PC's handler wakes her on the next

@@ -3505,7 +3505,7 @@ class Routine:
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
         self._pc_wait_spent = None       # the action index whose hold has released (_pc_wait_tick)
-        self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
+        self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditInClip)
         self._pc_credit_linked = None    # the linked trick's own, in its clip (PCLinkedCreditInClip)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
@@ -4518,11 +4518,7 @@ class Routine:
                     self.pawn.anim.time_scale = mobile / pc
             elif pcprofile.is_pc():
                 self._pc_clip_use(it)
-            if pcprofile.is_pc() and it.pc_credit_after \
-                    and it.pc_credit_after in seq and it.is_tricked(self.level.items):
-                # the trick's record pays as its PC action ends (PCCreditAfter)
-                self._pc_credit = {'clip': it.pc_credit_after, 'seen': False}
-            elif pcprofile.is_pc() and it.pc_credit_in_clip and it.is_tricked(self.level.items):
+            if pcprofile.is_pc() and it.pc_credit_in_clip and it.is_tricked(self.level.items):
                 # the record pays so far into the clip that plays its PC
                 # action (PCCreditInClip: fcn.1000140b on the tick its `time`
                 # equals the action's count, the clip at the action's pace)
@@ -7242,9 +7238,10 @@ class Routine:
         if self.state == self.USING and self._pc_wait is not None:
             self._pc_wait_tick(dt)
         if self.state == self.USING and self._pc_credit is not None:
-            # the credit clip has played and the next one started: the PC's
-            # trick action has ended — its record pays now (fcn.1000140b at
-            # the action step's end), the reaction still waits for the use
+            # the record pays so far into its clip (PCCreditInClip), the
+            # reaction still waiting for the use; a clip paced short of that
+            # second pays as it ends (the Loader clamps a record to its
+            # action's time, fcn.1000140b's last count)
             cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
             if cur == self._pc_credit['clip']:
                 self._pc_credit['seen'] = True
@@ -8330,10 +8327,10 @@ class World:
         return overflow
 
     def pc_s2_credit(self, pawn, item):
-        """the Season 2 trick paid as its PC action ends, before the rest of
-        the tricked use (PCCreditAfter: 202's shark on the sea's `enter`,
-        its 119-tick bar still to come): the meter's credit and the coin now,
-        the tantrum at the use's end plays without paying again
+        """the Season 2 trick paid on its record's tick, before the rest of
+        the tricked use (PCCreditAt, PCCreditInClip: 202's shark in the sea's
+        `enter`, its 119-tick bar still to come): the meter's credit and the
+        coin now, the tantrum at the use's end plays without paying again
         (play_angry)"""
         if self.game is None or item.pc_credited:
             return
@@ -8341,7 +8338,7 @@ class World:
         item.pc_credited = True
         if item.pc_jingle:
             # a stand-in's record with its jingle on its tick (PCJingle:
-            # 202's shark on the sea's `enter`, PCCreditAfter)
+            # 202's shark in the sea's `enter`, PCCreditInClip)
             self.pc_trick_jingle()
         if item.pc_credit_overflow:
             # the gauge fills as the record pays: the overflow's tick (the
