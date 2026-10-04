@@ -13,6 +13,10 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSeconds": 1.33
    }
   },

@@ -6563,6 +6563,16 @@ class Routine:
             if cur is not None and cur.name != 'Bed':   # cs:285-289
                 self.was_alerted = alerter_item     # consumed when he moves
             if self.pawn.animal_tutorial:
+                w = self.pawn.world
+                ls = getattr(w, 'level_script', None) if w is not None else None
+                wait = getattr(ls, 'pc_nb_wait', None)
+                left = wait() if wait is not None else 0.0
+                if left > 0.0:
+                    # the PC's tutorial_3: his start job heads his queue
+                    # (pcprofile.S1_START_TICKS) — the dog's alarm reaches his
+                    # script in the pass after it (TutorialPCS1.pc_nb_wait)
+                    w.call_later(left, lambda: self.hear_alerter(alerter_item, triggered_by_woody))
+                    return
                 # Intro103's frozen tutorial neighbour: Unfreeze and run
                 # (Rottweiler.cs:290-295; CheckHiddenItem is a no-op here,
                 # HideObjectDuringUse being unported)

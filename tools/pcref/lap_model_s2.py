@@ -1997,11 +1997,17 @@ TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
 # SHOUT, the wrapper), 211's cabin phone (0x1002fcbe: crash, SHOUT 1, the
 # wrapper), 213's bull controls (0x10037de6: Ef51a, the `use`; 0x10037d3b:
 # the hurt icon, Eebbf — no SHOUT)
-SCENE_STEPS = {205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
+SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
+               205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
                                       {'beachright_pingpong', 'beachright_pingpong_guarded'})},
                208: {'Rake': ((0x1001d828,), set(), set())},
+               209: {'FireFakir': ((0x10020e3e,), {'fire_fakir_groove_fuel'}, {'fire_fakir_groove'})},
                211: {'CabinPhone': ((0x1002fcbe,), set(), set())},
-               213: {'MechanicalBullControls': ((0x10037de6, 0x10037d3b), None, None)}}
+               212: {'BoatCoinSlot': ((0x10035388,), None, None),
+                     'AztecThrone2': ((0x10036bb2,), None, None)},
+               213: {'MechanicalBullControls': ((0x10037de6, 0x10037d3b), None, None),
+                     # (the beehive's combination: tricked_presence pairs no inventory)
+                     'Pinata': ((0x1003809b,), {'bottomleft_pinata_manip'}, {'bottomleft_pinata'})}}
 
 
 def scene_steps(n):

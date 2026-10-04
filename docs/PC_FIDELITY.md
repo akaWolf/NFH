@@ -2199,14 +2199,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   neighbour from `start`: the doubletake +5.85 s (the PC's +6.0 by the
   message box: 104.00 less its 16 ticks), tut_laugh1 +7.17 (+7.33), the
   picture back +12.8 (+12.91), parked at sign 1 +16.38 (+16.5), off to
-  sign 2 +24.42 (+24.58). Open: the dog's alarm reaches him 12 ticks after
-  its wake-up ends on the PC (the neighbour's noise icon at 151.92, tick 39;
-  the whistle's bark is the pet class's +0x1d flag in state 4, 0x45c2ae)
-  where the profile's pet model has him hear the bark as the wake-up ends
-  (0.83 s after the whistle against the video's 2.0); E11's dog, woken by
-  Woody, has him answer on the wake-up's end (2707.63 / 2708.42, 9.5 ticks)
-  as the model does — the tutorial's wait is his script's own late start,
-  the levels' 37 ticks (carried 2026-10-04, below).
+  sign 2 +24.42 (+24.58). The dog's alarm reaches him 12 ticks after its
+  wake-up ends on the PC (the neighbour's noise icon at 151.92, tick 39;
+  the whistle's bark is the pet class's +0x1d flag in state 4, 0x45c2ae),
+  where E11's dog, woken by Woody, has him answer on the wake-up's end
+  (2707.63 / 2708.42, 9.5 ticks) as the model does: the tutorial's wait is
+  his start job's (below, "The Season 1 start") — his script's first
+  update on tick 38, the alarm pending until the pass after it. Carried
+  2026-10-04 (TutorialPCS1._level_tick and pc_nb_wait, World's
+  hear_alerter deferring to it): his run from tick 39, 2.02 s after the
+  whistle (the video's 2.0; 0.83 before); the neighbour's scripts of
+  tutorial_2 and tutorial_3 take nothing before it.
 - *The Season 1 start (2026-10-04, carried).* The neighbour's bubble stays
   empty for 3.07-3.10 s after the level card gives way on E01-E06 (102:
   370.57 to the sofa sliding in at 373.633) while the clock runs. The card
@@ -2348,6 +2351,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   besides SCENE_STEPS — 207's awning dive, 208's elephant, tap, platform
   and seesaw, 211's lifeboat (its ladder step's SHOUT and Eebbf,
   0x1003059d), 205's chef — close it after the SHOUT, as the default has.
+  Read on 2026-10-04 by the steps that name the items' objects (the model
+  run on each with the trick in the scene): 202's beer mat (0x1002299f),
+  212's boat coin slot (0x10035388) and empty throne (0x10036bb2), 209's
+  fire fakir (0x10020e3e, the fuelled groove's `burn`) and 213's piñata
+  (0x1003809b, its beehive combination) close it after their SHOUT too,
+  rising two ticks in (the wrapper's list's first element) — SCENE_STEPS
+  now, PCScene [0.17, shout]; 201's rail and 206's deck chair are the
+  tutorials' (their camera writes the flag); 204's vase, 207's and 210's
+  diving board, 209's coal, gully and trough, 210's pole and 211's kid
+  (their tricked variants' `crash_long`, `dive`, `walk_fuel`, `jump`,
+  `fall_water`, `shout`) are not reached by the model from the steps naming
+  their objects or those steps' successors — not read, the default
+  standing.
 - *The Season 2 catcher's approach (2026-10-04, carried).* Of the 23 gait-2
   writes in GameLogic's scripts (the run before a walk), 21 were carried
   (below, "Season 2's runs"); the other two are the engine's: the `fight`

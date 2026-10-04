@@ -112,6 +112,10 @@
     "PCMinigameFailed": "",
     "PCMinigameLift": -79,
     "PCMinigameFailedTicks": 10,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
     "PCUseSeconds": 7.08
    }
   },

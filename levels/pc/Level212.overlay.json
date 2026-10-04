@@ -104,14 +104,22 @@
    "object": "BoatCoinSlot",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ]
    }
   },
   {
    "object": "AztecThrone2",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 3
+    "PCLaugh": 3,
+    "PCScene": [
+     0.17,
+     "shout"
+    ]
    }
   },
   {

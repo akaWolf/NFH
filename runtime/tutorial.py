@@ -2509,16 +2509,26 @@ class TutorialPCS1(Tutorial):
 
     def _level_tick(self):
         """one level tick: the trigger pass (the posts due, the triggers), then
-        the scripts' updates"""
+        the scripts' updates. The neighbour's start job (fcn.004718b0 at his
+        queue's head, its wait of 36: pcprofile.S1_START_TICKS) holds his
+        script — its first update on the 38th tick (37 after the first), what
+        comes for him before pending until the pass after it"""
+        import pcprofile
         self.tick_n += 1
         due = [p for p in self.posts if p[0] <= self.tick_n]
         self.posts = [p for p in self.posts if p[0] > self.tick_n]
+        held = self.tick_n < pcprofile.S1_START_TICKS + 2
         for _t, who, name in due:
+            if held and who == 'neighbor':
+                self.posts.append((self.tick_n + 1, who, name))
+                continue
             self._deliver(who, name)
         for who, name in self._triggers():
+            if held and who == 'neighbor':
+                continue
             self._deliver(who, name)
         getattr(self, '_d%d' % self.state, lambda: None)()
-        if self._nb_idle():
+        if self._nb_idle() and self.tick_n >= pcprofile.S1_START_TICKS + 1:
             if self._goto_to is not None:
                 # the GoTo's mover clamps him on the target (0x47cc9f-0x47cd59):
                 # his next walk leaves the PC point itself
@@ -2530,6 +2540,14 @@ class TutorialPCS1(Tutorial):
         """a message to a script (fcn.00424150 + fcn.004728d0), or an action's
         behaviour record: the next tick's pass delivers it"""
         self.posts.append((self.tick_n + 1, who, name))
+
+    def pc_nb_wait(self):
+        """the seconds before a trigger reaches the neighbour's script: none
+        while his start job heads his queue (the level tick's pass after it,
+        the 39th — _level_tick); World's pet alarm defers to it"""
+        import pcprofile
+        left = pcprofile.S1_START_TICKS + 2 - self.tick_n
+        return max(0.0, left * self.TICK - self._acc) if left > 0 else 0.0
 
     def _deliver(self, who, name):
         if who == 'HAL':
