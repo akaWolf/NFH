@@ -139,10 +139,27 @@
      0.17,
      "shout"
     ],
-    "PCShout": 1,
+    "PCSceneLinked": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 7.25,
+    "PCUseSecondsLinked": 5.92,
+    "PCShout": 0,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.17,
-    "PCJingle": true
+    "PCCreditAt": 3.42,
+    "PCJingleAt": [
+     3.42
+    ],
+    "PCJingleAtLinked": [
+     2.33
+    ],
+    "PCCreditAtLinked": 2.33,
+    "PCShoutLinked": 1,
+    "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.17,
+    "PCLinkedPaysAt": 2.75
    }
   },
   {

@@ -4503,47 +4503,7 @@ class Routine:
                 w.s1_fire(self.pawn, ft)
         if pcprofile.is_pc() and pcprofile.SEASON2 and self.role == 'Rottweiler' \
                 and it is not None and it.is_tricked(self.level.items):
-            # Season 2: the trick's record pays on the tick its `time`
-            # equals the action's elapsed count (fcn.1000140b, the cmp at
-            # 0x10001455), this far into the tricked stand (PCCreditAt; the
-            # linked trick's own, PCCreditAtLinked) — the paced use makes the
-            # PC seconds wall seconds
-            target = self._tricked_item(it)
-            linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
-            both = linked is not None and linked.tricked and it.tricked \
-                and bool(it.use_tricked_linked)
-            # (a station tricked through its DependsOn pays its dependency's
-            # record: 206's pad shooting the rubber bear, the harpoon's)
-            at = it.pc_credit_at_linked if (it.pc_credit_at_linked is not None and both) \
-                else getattr(self._pc_trick_item(it), 'pc_credit_at', None)
-            if at is not None and target is not None and not target.pc_credited:
-                self.pc_credit_timer = float(at)
-                self.pc_credit_item = target
-            if both and it.pc_linked_pays_at is not None and target is not None:
-                # the linked trick's own record, its own tick of the linked
-                # step (fcn.1000140b credits each named record at its `time`:
-                # 202's bridge_electrify 22 ticks after bridge_crash)
-                target.pc_linked_due = True
-                self.pc_credit2_timer = float(it.pc_linked_pays_at)
-                self.pc_credit2_item = target
-            if both and it.pc_extra_pays_at_linked is not None and it.extra_coin_206 \
-                    and target is not None:
-                # the linked shot's third record at its own tick (206's
-                # rubberrabbit, the ExtraCoin206)
-                self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
-                self.pc_credit3_item = target
-            js = it.pc_jingle_at_linked if (it.pc_jingle_at_linked is not None and both) \
-                else getattr(self._pc_trick_item(it), 'pc_jingle_at', None)
-            if js:
-                # the flow's jingle records, each on its own second of the
-                # stand (PCJingleAt / PCJingleAtLinked, the credits' clock:
-                # fcn.1000140b plays each on its tick, 0x10001528-0x1000153f)
-                self.pc_jingles = [float(x) for x in js]
-                self._pc_jingle_tick(0.0)
-            if w is not None and target is not None:
-                # the reaction's scene: the level's flag +0x6e, which holds
-                # the completion check (World.pc_scene_start)
-                w.pc_scene_start(self, it, self._pc_trick_item(it), both)
+            self._pc_s2_arm(it)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -5205,6 +5165,52 @@ class Routine:
         anim.hold_clip = None
         if anim.anim is not None and anim.anim.name == wt['clip']:
             anim._stop_single()
+
+    def _pc_s2_arm(self, it):
+        """Season 2: the tricked flow on its stand's clock — a use's
+        (`_use`), an alarm run's (`_alarm_use`: 211's cabin phone) and a
+        tricked walk-by's (`_on_surprise_near`: 208's tap). The trick's
+        record pays on the tick its `time` equals the action's elapsed count
+        (fcn.1000140b, the cmp at 0x10001455), this far into the tricked
+        stand (PCCreditAt; the linked trick's own, PCCreditAtLinked) — the
+        paced stand makes the PC seconds wall seconds"""
+        w = self.pawn.world
+        target = self._tricked_item(it)
+        linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
+        both = linked is not None and linked.tricked and it.tricked \
+            and bool(it.use_tricked_linked)
+        # (a station tricked through its DependsOn pays its dependency's
+        # record: 206's pad shooting the rubber bear, the harpoon's)
+        at = it.pc_credit_at_linked if (it.pc_credit_at_linked is not None and both) \
+            else getattr(self._pc_trick_item(it), 'pc_credit_at', None)
+        if at is not None and target is not None and not target.pc_credited:
+            self.pc_credit_timer = float(at)
+            self.pc_credit_item = target
+        if both and it.pc_linked_pays_at is not None and target is not None:
+            # the linked trick's own record, its own tick of the linked
+            # step (fcn.1000140b credits each named record at its `time`:
+            # 202's bridge_electrify 22 ticks after bridge_crash)
+            target.pc_linked_due = True
+            self.pc_credit2_timer = float(it.pc_linked_pays_at)
+            self.pc_credit2_item = target
+        if both and it.pc_extra_pays_at_linked is not None and it.extra_coin_206 \
+                and target is not None:
+            # the linked shot's third record at its own tick (206's
+            # rubberrabbit, the ExtraCoin206)
+            self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
+            self.pc_credit3_item = target
+        js = it.pc_jingle_at_linked if (it.pc_jingle_at_linked is not None and both) \
+            else getattr(self._pc_trick_item(it), 'pc_jingle_at', None)
+        if js:
+            # the flow's jingle records, each on its own second of the
+            # stand (PCJingleAt / PCJingleAtLinked, the credits' clock:
+            # fcn.1000140b plays each on its tick, 0x10001528-0x1000153f)
+            self.pc_jingles = [float(x) for x in js]
+            self._pc_jingle_tick(0.0)
+        if w is not None and target is not None:
+            # the reaction's scene: the level's flag +0x6e, which holds
+            # the completion check (World.pc_scene_start)
+            w.pc_scene_start(self, it, self._pc_trick_item(it), both)
 
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
@@ -5918,6 +5924,15 @@ class Routine:
                     self.pc_fire_item = ft
                 elif w is not None:
                     w.s1_fire(self.pawn, ft)
+            if pcprofile.is_pc() and pcprofile.SEASON2 and self.role == 'Rottweiler' \
+                    and it.is_tricked(self.level.items) \
+                    and not getattr(self, '_toilet_run', False):
+                # the alarm's step is the item's tricked flow (211's cabin
+                # phone, the `phone` behaviour's 0x1002fcbe): its records,
+                # jingles and scene as a use's; the toilet rush is the
+                # sweets' flow going on (its record PCToiletPaysAt above,
+                # its scene the sweets')
+                self._pc_s2_arm(it)
             if os.environ.get('NFH_ROUTINE_LOG'):
                 print('routine %s t=%.1f use sequence (rush) item=%s seq=%s pc=%s mobile=%.2f' % (
                     self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -6744,13 +6759,7 @@ class Routine:
 
         def surprise():
             if s2:
-                if it.pc_credit_at is not None and not it.pc_credited:
-                    self.pc_credit_timer = float(it.pc_credit_at)
-                    self.pc_credit_item = it
-                if it.pc_jingle_at:
-                    self.pc_jingles = [float(x) for x in it.pc_jingle_at]
-                    self._pc_jingle_tick(0.0)
-                w.pc_scene_start(self, it, it, False)
+                self._pc_s2_arm(it)
             if seq:
                 pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
                       or ((it.pc_use_secs_tricked or 0.0) - float(it.pc_fire_at) if station else None)

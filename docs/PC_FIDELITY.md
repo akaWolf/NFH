@@ -2368,8 +2368,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   diving board pay in their partner's linked flow (the jade's, the hot
   shoe's, the dog basket's), whose scene is the partner's; 207's diving
   board (its step 0x100169c5 polls for the Mother), 210's pole (the
-  hedgehog chair's linked variant, a visit timed per clip) and 211's kid
-  (the cabin phone's linked `crash`) stay unread, the default standing.
+  hedgehog chair's linked variant, a visit timed per clip) stay unread,
+  the default standing; 211's kid pays in the cabin phone's linked
+  `crash` since (below).
   208's platform, read the same day: its trick is the fakir's balloon
   (combine.xml amusement/fakir_balloon; the mobile's chips are no PC
   ingredient — PRESENT), and the platform step (0x1001ea59) plays the
@@ -2457,17 +2458,34 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   later, at 100. The trigger's moment stays the mobile's walk-by: the
   PC's nearobj is the same room and floor record, less than 15 apart
   vertically (fcn.1003f573), and when the handler's step change cuts
-  the walk he is on is unread. The other SCENE_STEPS
+  the walk he is on is unread. 211's cabin phone likewise, with its
+  linked variant: the `phone` behaviour's step (0x1002fcbe) walks him to
+  the phone and tests kid_manip — the kid's tank on (the mobile's linked
+  OlgaChild), the phone's `crash`: 5.92 s to SHOUT 1, phone_normal and its
+  jingle 2.33 s in, the kid's phone_loud at 2.75; alone its `use`: 7.25
+  s to SHOUT 0, phone_normal and its jingle 3.42 s in; no repair, the
+  manipulated phone switched back (lap_model_s2: the TRICKED_SCENE
+  item's steps run with the mobile linked trick's scene too, the
+  linked keys as the lap's linked variants have them; the table's poll
+  rule had taken the absent kid as there and read SHOUT 1 for both).
+  The mobile runs him to it as an alarm (the pay phone's CauseAlarm):
+  that use now arms the flow's records, jingles and scene as a use does
+  (`Routine._pc_s2_arm`, the toilet rush left to the sweets' flow), where
+  both had paid at the tantrum; the linked `crash` at the paced
+  AnswerPhoneNFH2TrickedNFH2, the kid's coin overflowing the gauge 2.75 s
+  in and the freakout held in the scene: 211's plan ends 5.2 s later, at
+  100. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
-  step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
-  slot are walk-bys and alarms with no tricked use of the mobile's to
-  pace, 213's bull controls a two-visit station — but their reaction is
+  step, not the visit), 208's rake and 212's boat coin slot are a walk-by
+  and an alarm with no tricked use of the mobile's to pace, 213's bull
+  controls a two-visit station — but their reaction is
   their flow's since the same morning (lap_model_s2.scene_step_reactions
   -> PCShout, PCFixSeconds, PCShoutTail in the record laugh's stead): the
   beer mat SHOUT 0 and the mat's 1.83-s repair (202's plan ends 1.8 s
   later), the table 0, 208's rake 0 and its 1.33-s repair, the cabin
-  phone 1, the boat coin slot 2 (shout2_hard), the bull controls none
+  phone 1 (a tricked flow since, above), the boat coin slot 2
+  (shout2_hard), the bull controls none
   (-1) — all at 100. The two timed per clip pay inside the clip that
   plays their record's action since (PCCreditInClip, pc_durations_s2
   CREDIT_IN; `Routine` counts the clip's seconds): crayfish 1.75 s into
@@ -2489,7 +2507,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
-- *The trick's jingle (2026-10-04, carried; one stand-in open).* The
+- *The trick's jingle (2026-10-04, carried).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
   fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
@@ -2529,10 +2547,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the hands' `hit`), whose jingle PCJingleAtLinked plays; 202's weeded
   rake (rake_ground_weed `crash`: the jingle on tick 0, rake_ground on 4)
   and 208's tap (tap_electricity `electrify`: 0, electrify on 4) are
-  tricked flows read since (PCJingleAt). Open: 211's Olga's child, whose
-  action plays its jingle off its record's tick (phone `crash`: 26 with
-  phone_normal's, phone_loud on 31): with its flow unread and its credit
-  at the tantrum the port does not play it.
+  tricked flows read since (PCJingleAt), and 211's Olga's child pays in
+  the cabin phone's linked `crash`, whose jingle rides phone_normal's
+  tick (26, phone_loud on 31: PCJingleAtLinked, PCLinkedPaysAt).
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.

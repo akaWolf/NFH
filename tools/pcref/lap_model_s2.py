@@ -2040,9 +2040,10 @@ TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
 # their scene alone (scene_steps): the steps in order and the objects shown
 # and hidden for the trick — 205's egg on the table (0x100254d5: Ef51a before
 # the `play`; 0x1002577a: SHOUT 0, Eebbf), 208's rake (0x1001d828: crash,
-# SHOUT, the wrapper), 211's cabin phone (0x1002fcbe: crash, SHOUT 1, the
-# wrapper), 213's bull controls (0x10037de6: Ef51a, the `use`; 0x10037d3b:
-# the hurt icon, Eebbf — no SHOUT)
+# SHOUT, the wrapper), 211's cabin phone (0x1002fcbe: `use`, SHOUT 0 — with
+# the kid's tank on `crash`, SHOUT 1 —, the wrapper), 213's bull controls
+# (0x10037de6: Ef51a, the `use`; 0x10037d3b: the hurt icon, Eebbf — no
+# SHOUT)
 SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                      # the weeded rake on his walk-by (0x10022589: the rake's
                      # `crash`, SHOUT 0, the repair; combine.xml: the weed on
@@ -2076,7 +2077,12 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                                    {'beachleft_deckchair'}, 0)},
                # 211's cork-less boat (0x100306eb: the lookaround and the boat's
                # `use`, then the ladder step 0x1003059d: `climb`, SHOUT 1)
-               211: {'CabinPhone': ((0x1002fcbe,), set(), set()),
+               # 211's cabin phone (0x1002fcbe, the `phone` behaviour's: the
+               # walk to it, then kid_manip tested — the kid's tank on, the
+               # phone's `crash`, SHOUT 1; else its `use`, SHOUT 0 —, the
+               # manipulated phone switched back); no poll rule: the kid's
+               # scene is the linked variant's
+               211: {'CabinPhone': ((0x1002fcbe,), set(), set(), 0),
                      'LifeBoat': ((0x100306eb, 0x1003059d), {'bottomleft_boat_manip'},
                                   {'bottomleft_boat'}, 0)},
                212: {'BoatCoinSlot': ((0x10035388,), None, None),
@@ -2099,7 +2105,7 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
 TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap'), 209: ('FireFakir',),
-                 211: ('LifeBoat',), 213: ('Pinata',)}
+                 211: ('LifeBoat', 'CabinPhone'), 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loop of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's
@@ -2109,13 +2115,16 @@ LINKED_PRESENT = {212: {'AztecThrone': ({'topright_throne_full'},
                                          'topright_throne_half_2', 'topright_throne_half_right'})}}
 
 
-def _scene_step_events(n, item):
+def _scene_step_events(n, item, linked=None):
     """the events of an item's SCENE_STEPS steps, run with its trick in the
-    scene (tricked_presence, else the table's)"""
+    scene (tricked_presence, else the table's) — and the linked trick's,
+    `linked` (shown, hidden), for the linked variant"""
     steps, shown, hidden = SCENE_STEPS[n][item][:3]
     unknown = SCENE_STEPS[n][item][3] if len(SCENE_STEPS[n][item]) > 3 else 1
     if shown is None:
         shown, hidden = tricked_presence(n).get(item, (set(), set()))
+    if linked is not None:
+        shown, hidden = set(shown) | set(linked[0]), set(hidden) | set(linked[1])
     lv = Level(n)
     lv.present = (set(lv.present) - set(hidden)) | set(shown)
     ev = []
@@ -2992,21 +3001,10 @@ def code_stays_tricked(n):
             continue
         own = own_of(item, i)
         wk_i = LAP_WALKS.get(n, {}).get(lap[i][0], True)
-        stand, level, repair, _first = _step_parts_split(d, ev2, own, wk_i)
-        if stand is None:
+        e = _linked_entry(d, ev1, ev2, own, wk_i)
+        if e is None:
             continue
-        # the item's own records are the ones its variant alone plays
-        mine = set(nm for nm, _t in _step_records(d, ev1, own, wk_i))
-        recs = _step_records(d, ev2, own, wk_i)
-        credit = next((t for nm, t in recs if nm in mine), None)
-        pays = next((t for nm, t in recs if nm not in mine), None)
-        e = {'linked': round(stand / 12.0, 2), 'linked_shout': level,
-             'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
-             'linked_tail': _secs(_shout_tail(d, ev2, own, wk_i)),
-             'linked_scene': _scene_secs(_scene_span(d, ev2, own, wk_i)),
-             'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
-             'linked_jingles': [_secs(t) for t in _step_jingles(d, ev2, own, wk_i)],
-             'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
+        level = e['linked_shout']
         cont = LINKED_CONT.get(n, {}).get(item)
         if cont is not None and level == -1:
             # the poll step after it: the co-actor's action the poll waits
@@ -3031,7 +3029,43 @@ def code_stays_tricked(n):
                           'linked_extra_at': round(crecs[0][1] / 12.0, 2),
                           'linked_scene': _scene_secs(_scene_span(d, ev2 + [('STEP',)] + evc, own, wk_i))})
         out[item].update(e)
+    # a TRICKED_SCENE item's linked variant: its steps run with the mobile
+    # linked trick's scene too (211's cabin phone: the step tests kid_manip,
+    # 0x1002fcbe — with the kid's tank on the phone's `crash`, SHOUT 1,
+    # phone_loud after phone_normal; alone its `use`, SHOUT 0)
+    for item in TRICKED_SCENE.get(n, ()):
+        lnk = mobile_linked(n).get(item)
+        if item not in out or 'linked' in out[item] or lnk not in trick:
+            continue
+        ev1 = _scene_step_events(n, item)
+        ev2 = _scene_step_events(n, item, trick[lnk])
+        if dos(ev2) == dos(ev1):
+            continue
+        e = _linked_entry(d, ev1, ev2)
+        if e is not None:
+            out[item].update(e)
     return out
+
+
+def _linked_entry(d, ev1, ev2, own=None, walked=True):
+    """the linked variant's keys from its flow `ev2` against the item's own
+    `ev1`: its stand, SHOUT, repair, tail, scene and jingles, the item's own
+    record (a record the item's variant alone plays) and the linked trick's
+    (the first it does not: _step_records); None without a stand"""
+    stand, level, repair, _first = _step_parts_split(d, ev2, own, walked)
+    if stand is None:
+        return None
+    mine = set(nm for nm, _t in _step_records(d, ev1, own, walked))
+    recs = _step_records(d, ev2, own, walked)
+    credit = next((t for nm, t in recs if nm in mine), None)
+    pays = next((t for nm, t in recs if nm not in mine), None)
+    return {'linked': round(stand / 12.0, 2), 'linked_shout': level,
+            'linked_repair': round(repair / 12.0, 2) if repair is not None else None,
+            'linked_tail': _secs(_shout_tail(d, ev2, own, walked)),
+            'linked_scene': _scene_secs(_scene_span(d, ev2, own, walked)),
+            'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
+            'linked_jingles': [_secs(t) for t in _step_jingles(d, ev2, own, walked)],
+            'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
 
 
 def code_moves_tricked(n):
