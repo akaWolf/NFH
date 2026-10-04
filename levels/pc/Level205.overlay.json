@@ -15,7 +15,11 @@
     "PCLaugh": 3,
     "PCRunTo": true,
     "PCClipSeconds": {
-     "Tennis": 4.33
+     "Tennis": 4.33,
+     "TennisEgg": 3.33
+    },
+    "PCCreditInClip": {
+     "TennisEgg": 1.42
     },
     "PCWaitFor": {
      "clip": "Tennis",

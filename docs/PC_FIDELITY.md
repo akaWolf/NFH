@@ -2433,7 +2433,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   beer mat SHOUT 0 and the mat's 1.83-s repair (202's plan ends 1.8 s
   later), the table 0, 208's rake 0 and its 1.33-s repair, the cabin
   phone 1, the boat coin slot 2 (shout2_hard), the bull controls none
-  (-1) — all at 100. 212's second throne is no station of its own: the
+  (-1) — all at 100. The two timed per clip pay inside the clip that
+  plays their record's action since (PCCreditInClip, pc_durations_s2
+  CREDIT_IN; `Routine` counts the clip's seconds): crayfish 1.75 s into
+  the crab's BeachCrabGetBeer (the manipulated mat's `use`, 21 ticks),
+  pingpong_egg 1.42 s into TennisEgg (the egg table's `play`, 17 ticks),
+  which plays at the PC's 3.33 s since (CLIPS; the mobile's pace before)
+  — their credits and jingles 1.95 and 2.4 s earlier, both plans at 100. 212's second throne is no station of its own: the
   mobile's AztecThrone2 is AztecThrone's linked trick, and the throne's
   step (0x10036bb2) checks throne_half, throne_half_2 and throne_full
   (0x10036c42-0x10036c9d; half_right's result is dropped) — a half plays

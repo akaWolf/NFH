@@ -4561,6 +4561,14 @@ class Routine:
                     and it.pc_credit_after in seq and it.is_tricked(self.level.items):
                 # the trick's record pays as its PC action ends (PCCreditAfter)
                 self._pc_credit = {'clip': it.pc_credit_after, 'seen': False}
+            elif pcprofile.is_pc() and it.pc_credit_in_clip and it.is_tricked(self.level.items):
+                # the record pays so far into the clip that plays its PC
+                # action (PCCreditInClip: fcn.1000140b on the tick its `time`
+                # equals the action's count, the clip at the action's pace)
+                clip = next((c for c in it.pc_credit_in_clip if c in seq), None)
+                if clip is not None:
+                    self._pc_credit = {'clip': clip, 'seen': False,
+                                       'at': float(it.pc_credit_in_clip[clip]), 't': 0.0}
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
         elif pc:
             # a station the remaster only walks by is an action on the PC (the
@@ -7198,6 +7206,13 @@ class Routine:
             cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
             if cur == self._pc_credit['clip']:
                 self._pc_credit['seen'] = True
+                if self._pc_credit.get('at') is not None:
+                    self._pc_credit['t'] += dt
+                    if self._pc_credit['t'] >= self._pc_credit['at'] - pcprofile.TIMER_EPS:
+                        self._pc_credit = None
+                        w = self.pawn.world
+                        if w is not None and self.item is not None:
+                            w.pc_s2_credit(self.pawn, self.item)
             elif self._pc_credit['seen']:
                 self._pc_credit = None
                 w = self.pawn.world

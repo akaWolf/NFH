@@ -701,7 +701,9 @@ predicate, then the all-tricks win.
   and then the listed seconds more (PCWaitFor: 202's swim until Olga's
   sub), and pays a tricked use's record as the named clip ends
   (PCCreditAfter: 202's shark on the sea's `enter`, the overflow's tick
-  counted there, the tantrum at the use's end not paying again). Only
+  counted there, the tantrum at the use's end not paying again) or so many
+  seconds into the clip that plays the record's action (PCCreditInClip:
+  202's crab on the mat, 205's egg on the table). Only
   items carrying those keys take the path. A clip of 0 s is skipped on
   the next tick (`AnimPlayer.skip_clip`: 210's stands at the Mother's
   call); a wait `at` start releases when the other role's use of the

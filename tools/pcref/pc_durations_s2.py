@@ -112,7 +112,9 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
               'CallRTMother': {'Stand_Left': ('job', 'mother', 'order', 'mother', 3)}},
         # 205's table (his table step 0x100254d5: `play` on the guarded table
         # once Olga is there)
-        205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play')}},
+        205: {'TabbleTennis': {'Tennis': ('beachright_pingpong_guarded', 'play'),
+                               # tricked, the egg's table (0x100254d5)
+                               'TennisEgg': ('beachright_pingpong_egg_guarded', 'play')}},
         # 207's board (his board step 0x100169c5: the `dive` once the Mother
         # sits in her deck chair, the pool's `enter`, 0 ticks, and its `leave`
         # as the bar step walks him out; the wait before is the Mother's —
@@ -127,6 +129,14 @@ KEEP_STAYS = {}
 # the action step's end, fcn.1000140b — and 202's `shark` sits on the shark
 # sea's `enter` (entersea), before the 119-tick bar the mobile's SeeShark plays
 CREDIT = {202: {'Swimming': ('EnterSea', 'beachright/theocean_shark', 'enter', 'shark')}}
+# the tricked use's clip its record pays inside (PCCreditInClip): the clip
+# plays the record's action from its first tick, and fcn.1000140b credits the
+# record on the tick its `time` equals the action's count — so many seconds
+# into the clip (202's crab on the mat: crayfish 21 ticks into the manipulated
+# mat's `use`, BeachCrabGetBeer; 205's egg: pingpong_egg 17 into the egg
+# table's `play`, TennisEgg)
+CREDIT_IN = {202: {'BeerMat': ('BeachCrabGetBeer', 'beachright_mat_hn_guarded_manip', 'use', 'crayfish')},
+             205: {'TabbleTennis': ('TennisEgg', 'beachright_pingpong_egg_guarded', 'play', 'pingpong_egg')}}
 # a clip held until another role has used an item (PCWaitFor), then `then` —
 # the (object, action) parts after it: 202's swim step polls for the `sub`
 # (0x100224a8-0x10022563) that Olga's Submarine use switches into the sea,
@@ -359,6 +369,10 @@ def clip_secs(n):
         am = m and re.search(r'<action name="%s"[^>]*>(.*?)</action>' % act, m.group(1), re.S)
         assert am and 'name="%s"' % rec in am.group(1), (obj, act, rec)
         clips.setdefault(item, {})['@credit'] = clip
+    for item, (clip, obj, act, rec) in CREDIT_IN.get(n, {}).items():
+        t = next((tm for nm, tm in d.tricks(obj, act) if nm == rec), None)
+        assert t is not None, (obj, act, rec)
+        clips.setdefault(item, {})['@credit_in'] = {clip: round(t / 12.0, 2)}
     waits = {}
 
     def part(p):
@@ -600,15 +614,18 @@ def write_code_keys(n):
     p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(p))
     clips, waits = clip_secs(n)
-    for k in ('PCClipSeconds', 'PCWaitFor', 'PCCreditAfter', 'PCBehaviourAt'):
+    for k in ('PCClipSeconds', 'PCWaitFor', 'PCCreditAfter', 'PCCreditInClip', 'PCBehaviourAt'):
         ov['patches'] = _strip_key(ov['patches'], k)
     for item, cl in clips.items():
         cl = dict(cl)
         credit = cl.pop('@credit', None)
+        credit_in = cl.pop('@credit_in', None)
         if cl:
             _set_key(ov['patches'], item, 'PCClipSeconds', cl)
         if credit:
             _set_key(ov['patches'], item, 'PCCreditAfter', credit)
+        if credit_in:
+            _set_key(ov['patches'], item, 'PCCreditInClip', credit_in)
     for item, wt in waits.items():
         _set_key(ov['patches'], item, 'PCWaitFor', wt)
     for item, secs in behaviour_at(n).items():
@@ -679,13 +696,17 @@ def main(argv):
                 for k in ('PCClipSeconds', 'PCWaitFor'):
                     ov['patches'] = _strip_key(ov['patches'], k)
                 ov['patches'] = _strip_key(ov['patches'], 'PCCreditAfter')
+                ov['patches'] = _strip_key(ov['patches'], 'PCCreditInClip')
                 for item, cl in clips.items():
                     cl = dict(cl)
                     credit = cl.pop('@credit', None)
+                    credit_in = cl.pop('@credit_in', None)
                     if cl:
                         _set_key(ov['patches'], item, 'PCClipSeconds', cl)
                     if credit:
                         _set_key(ov['patches'], item, 'PCCreditAfter', credit)
+                    if credit_in:
+                        _set_key(ov['patches'], item, 'PCCreditInClip', credit_in)
                 for item, wt in waits.items():
                     _set_key(ov['patches'], item, 'PCWaitFor', wt)
                 ov['patches'] = _strip_key(ov['patches'], 'PCBehaviourAt')
