@@ -11855,6 +11855,9 @@ class World:
         # HitWoody's StopCurrentAction (Rottweiler.cs:1088) drops the move
         # in progress with its arrival — the routine's use must not start
         # under the hit
+        was_running = catcher._pc_gait() == 'run'
+        saved_run = catcher.pc_run
+        pc_approach = self._pc_catch_approach(catcher, was_running)
         catcher.steps = []
         catcher.on_arrive = None
         catcher.in_urgent = False         # HitWoodyAction.Urgent = false
@@ -11862,6 +11865,10 @@ class World:
         def hit():
             self._hit_watches = [w for w in self._hit_watches
                                  if w[4] is not hit]
+            if pc_approach is not None:
+                # the fight fiber's case 1 puts his gait back (0x10007034)
+                catcher.pc_run = saved_run
+                catcher.in_urgent = False
             # RoutineActionHitWoody.OnActionStarted (cs:24-33) opens with
             # Owner.PauseMovement: nothing integrates or arrives from here
             # on — a door descent in progress would otherwise land on the
@@ -11904,6 +11911,17 @@ class World:
                 self._after_hit()
         # HitWoodyAction serializes Urgent=false — the catcher walks over
         catcher.in_urgent = False
+        if pc_approach is not None:
+            # the PC's approach (the fight fiber's case 0): to the point 70 px
+            # short of Woody, at the run when it lies more than 80 px off
+            x, run = pc_approach
+            if run:
+                catcher.in_urgent = True
+                catcher.pc_run = True
+            if abs(x - catcher.sprite.x) < 1e-6 \
+                    or not catcher.goto_zone(woody.zone, x, on_arrive=hit):
+                hit()
+            return
         # StartAction (ActionManager.cs:146-155) walks only when the action
         # is not already at its location: RoutineActionHitWoody's test is
         # the x distance to Woody against MaximumPawnDistanceToAction
@@ -11919,6 +11937,34 @@ class World:
             self._hit_watches.append((catcher, woody, maxd, False, hit))
         else:
             hit()
+
+    def _pc_catch_approach(self, catcher, was_running):
+        """the Season 2 catcher's walk to Woody under the profile, (x, run)
+        or None: the `fight` behaviour's start (0x1003d4d3 -> fcn.10007238)
+        pushes a fiber on the catcher (vtable 0x100ab36c, its step
+        0x10006e9f) whose case 0 keeps his gait (+0x3c into +0x10) and walks
+        him (fcn.10006d0a) to 70 px short of Woody on the side he comes from,
+        inside the room's path (0x10006da1-0x10006de1), on the gait 2 when
+        that point lies more than 80 px off and his gait was the walk
+        (0x10006dec-0x10006df6); case 1 puts the gait back and the fight
+        follows. None off the profile's Season 2 or across rooms"""
+        woody = self.woody
+        if not pcprofile.is_pc() or woody is None or not pcprofile.s2_respawn(woody.nfh2):
+            return None
+        z = catcher.zone
+        if z is None or woody.zone is None or z.pid != woody.zone.pid \
+                or getattr(z, 'pc_room', None) is None:
+            return None
+        pr = z.pc_room
+        cx = pc_room_x(z, catcher.sprite.x)
+        wx = pc_room_x(z, woody.sprite.x)
+        if cx < wx:
+            tx = max(pr['x1'] + 70, wx) - 70
+        else:
+            tx = min(pr['x2'] - 70, wx) + 70
+        w = (pr['x2'] - pr['x1']) or 1.0
+        x = z.left + (tx - pr['x1']) * (z.right - z.left) / w
+        return x, (was_running or abs(tx - cx) > 80)
 
     def _move_to_empty_space(self, catcher):
         """Rottweiler.MoveToEmptySpace (Rottweiler.cs:1156-1203); Mother's

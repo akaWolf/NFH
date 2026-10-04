@@ -2348,6 +2348,26 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   besides SCENE_STEPS — 207's awning dive, 208's elephant, tap, platform
   and seesaw, 211's lifeboat (its ladder step's SHOUT and Eebbf,
   0x1003059d), 205's chef — close it after the SHOUT, as the default has.
+- *The Season 2 catcher's approach (2026-10-04, carried).* Of the 23 gait-2
+  writes in GameLogic's scripts (the run before a walk), 21 were carried
+  (below, "Season 2's runs"); the other two are the engine's: the `fight`
+  behaviour's start (0x1003d4d3 -> fcn.10007238) pushes a fiber on the
+  catcher (vtable 0x100ab36c, its step 0x10006e9f) whose case 0 keeps his
+  gait and walks him (fcn.10006d0a) to 70 px short of Woody on the side he
+  comes from, inside the room's path — on gait 2 (0x10006df6) when that
+  point lies more than 80 px off and he was walking — and whose case 1
+  puts the gait back and plays the fight. The second (0x10007f07) is a
+  walk job's own: its first update keeps the gait and, with its flag +0xd
+  set, writes 2 before its walk (the step at 0x10007ea1, the constructor
+  fcn.10007df9: +0xd its second argument, +4 its third). fcn.1000807f makes
+  it with the flag clear — the scripts' walks to an actor (fcn.1000eb19 ->
+  fcn.1000e601), 0x1003c61f, 0x1003db6c — and fcn.100080e1 with it set, its
+  one caller in the level's message handlers (0x10046b7b, beside the
+  GoToPos handler 0x10046adc): a commanded walk's run, not read further
+  (open). The port walked the
+  catcher over at the walk until the mobile's 0.8 u; under the profile he
+  runs to the PC's point (`World._pc_catch_approach`: 202's neighbour
+  forced from 3 u reaches the hit 1.25 s after the catch, 2.3 s before).
 - *The Season 2 end against a catch (2026-10-04, carried).* The level
   update runs its watch walker (fcn.1003fc90 at 0x100445f1: the sights,
   the catch) and then, on its own, the completion check (0x100447f8) —
