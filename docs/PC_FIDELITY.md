@@ -2370,6 +2370,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   board (its step 0x100169c5 polls for the Mother), 210's pole (the
   hedgehog chair's linked variant, a visit timed per clip) and 211's kid
   (the cabin phone's linked `crash`) stay unread, the default standing.
+  208's platform, read the same day and not carried: its trick is the
+  fakir's balloon (combine.xml amusement/fakir_balloon; the mobile's chips
+  are no PC ingredient), and the platform step (0x1001ea59) — IsVariant
+  on the fakir, its pick held against the balloon's name (0x1001eaf5) —
+  plays the platform's `crash` (platform_crash on its tick 40) and SHOUT
+  1; with the shovel on the seesaw the step's second test (0x1001ebc3)
+  takes the branch of a `crash` whose object is the test's pick, which
+  the walker does not resolve (its SHOUT 3 read, the seesaw's record
+  not), and the plan plays the two together — the linked variant, not
+  read whole.
 - *209's fire fakir and 213's piñata (2026-10-04, carried).* Of the
   stand-ins whose flow SCENE_STEPS reads (the scene alone until now), two
   are their station's own tricked step whole: 209's fuelled groove
