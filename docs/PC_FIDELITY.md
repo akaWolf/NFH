@@ -2325,8 +2325,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   port started the mobile's 2.5 s wait at the last credit (the clock and
   the catches dead from it) and scored the time there. Under the profile
   the reaction's scene is PCScene ([its rise into the tricked stand, the
-  SHOUT's end, or the stand's end for 213's bull controls, whose flow has
-  none]; tools/pcref/pc_durations_s2.py from the model, SCENE_STEPS for four
+  SHOUT's end, or the stand's end for a flow with none and no co-actor
+  after it — 210's dog basket alone; 213's bull controls until
+  2026-10-04, whose flow waits for Olga's fight];
+  tools/pcref/pc_durations_s2.py from the model, SCENE_STEPS for four
   flows off its lap; the Season 2 tutorials' neighbour camera — 201's, 206's
   lesson — writes it with its own Ef51a and Eebbf), the level runs on until
   it drops (World.pc_scene_start, _pc_s2_success), Woody's win clip lasts the 25 ticks and the score is
@@ -2455,6 +2457,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   opens on a poll clip (202's WaitSea, 207's WaitWatch) rises from the
   visit's start, the PC's with the step's list after the poll — a credit
   falling in the wait completes the level later than the PC would.
+  213's manipulated bull controls likewise, a tricked flow with a
+  continuation (lap_model_s2 TRICKED_SCENE, SCENE_CONT): the controls'
+  step (0x10037de6: the poll for Olga on the bull passed, the camera's
+  tick and the controls' `use`, bullride on its count 27 — its 43 clamped
+  by the Loader) and the hurt step (0x10037d3b: the o_hurt_n icon, the
+  step waiting on its olga_fight latch while Olga, thrown off, runs to
+  him and fights, then the camera back — no SHOUT). The tricked stand is
+  the controls' step's 2.67 s where the untricked visit's seconds (1.0 or
+  0.08) had paced it, bullride and its jingle 2.5 s in where they had
+  waited for the tantrum, Olga's hit at her `fight`'s 3.58 s (PCHitSeconds;
+  the mobile's PawnToAffectWhenTricked), no reaction (PCShout -1), and the
+  scene held until her fight's end ([0.17, shout]) where it had dropped
+  with the stand: 213's plan ends 7.5 s later, at 100.
   209's hot coals likewise, by the lap's own step (0x10020124) once their
   scene is named (lap_model_s2 PRESENT: the mobile's tongs are no PC
   ingredient — the hot coal is the coal and the air pump — and the fuel
@@ -2525,16 +2540,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
   step, not the visit), 212's boat coin slot is an alarm with no tricked
-  use of the mobile's to pace, 213's bull controls a two-visit station —
-  but their reaction is
+  use of the mobile's to pace — but their reaction is
   their flow's since the same morning (lap_model_s2.scene_step_reactions
   -> PCShout, PCFixSeconds, PCShoutTail in the record laugh's stead): the
   beer mat SHOUT 0 and the mat's 1.83-s repair (202's plan ends 1.8 s
   later), the table 0, 208's rake 0 and its 1.33-s repair (a tricked
   walk-by since, above), the cabin
   phone 1 (a tricked flow since, above), the boat coin slot 2
-  (shout2_hard), the bull controls none
-  (-1) — all at 100. The two timed per clip pay inside the clip that
+  (shout2_hard), the bull controls none (-1; a tricked flow since, above)
+  — all at 100. The two timed per clip pay inside the clip that
   plays their record's action since (PCCreditInClip, pc_durations_s2
   CREDIT_IN; `Routine` counts the clip's seconds): crayfish 1.75 s into
   the crab's BeachCrabGetBeer (the manipulated mat's `use`, 21 ticks),

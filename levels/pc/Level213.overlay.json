@@ -144,14 +144,21 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCJingle": true,
     "PCBehaviourAt": 0.08,
     "PCScene": [
      0.17,
-     "use"
+     "shout"
     ],
+    "PCUseSecondsTricked": 2.67,
     "PCShout": -1,
     "PCFixSeconds": 0,
+    "PCHitSeconds": {
+     "Olga": 3.58
+    },
+    "PCCreditAt": 2.5,
+    "PCJingleAt": [
+     2.5
+    ],
     "PCUseSeconds": [
      1.0,
      0.08

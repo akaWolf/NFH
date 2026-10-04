@@ -8414,7 +8414,8 @@ class World:
 
     def pc_scene_use_end(self, routine):
         """the tricked stand is over: the scene that drops with it ends
-        (213's bull controls: the hurt step's Eebbf after the `use`)"""
+        (210's dog basket alone: its flow has no SHOUT, the camera back as
+        it ends)"""
         r, station, tok = self._pc_scene_use
         if r is routine and tok == self._pc_scene_token \
                 and station in (routine.item, routine.urgent_item):

@@ -2123,7 +2123,14 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                      'AztecThrone2': ((0x10036bb2,), {'topright_throne_full'},
                                       {'topright_throne_empty', 'topright_throne_half',
                                        'topright_throne_half_2', 'topright_throne_half_right'}, 0)},
-               213: {'MechanicalBullControls': ((0x10037de6, 0x10037d3b), None, None),
+               # 213's manipulated bull controls (0x10037de6: the poll for
+               # Olga on the bull passed, the camera's tick and the
+               # controls' `use`, bullride on its count 27 — the record's 43
+               # clamped —; then the hurt step 0x10037d3b, SCENE_CONT: the
+               # o_hurt_n icon, its olga_fight latch, the camera back, no
+               # SHOUT)
+               213: {'MechanicalBullControls': ((0x10037de6,), {'bottomleft_bullride_controls_manip'},
+                                                {'bottomleft_bullride_controls'}),
                      # (the beehive's combination: tricked_presence pairs no inventory)
                      'Pinata': ((0x1003809b,), {'bottomleft_pinata_manip'}, {'bottomleft_pinata'})}}
 
@@ -2133,7 +2140,8 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
 TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap', 'Rake'),
-                 209: ('FireFakir',), 211: ('LifeBoat', 'CabinPhone'), 213: ('Pinata',)}
+                 209: ('FireFakir',), 211: ('LifeBoat', 'CabinPhone'),
+                 213: ('Pinata', 'MechanicalBullControls')}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loops of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's
@@ -2151,6 +2159,12 @@ LINKED_PRESENT = {207: {'PoolBoard': ({'pool_divingboard_spring', 'pool_awning_c
 # (behavior= on the chair's `enter`), her `fight` posts mother_fight, and
 # his handler (0x10017321) picks 0x100171ee: SHOUT 1, the camera back
 SCENE_LINKED_CONT = {207: {'PoolBoard': ('fight', 'mother', (0x100171ee,))}}
+# ... and a TRICKED_SCENE item's own flow's (213's bull controls: the hurt
+# step 0x10037d3b shows the o_hurt_n icon and waits on its olga_fight latch
+# — Olga thrown off the bull runs to him and fights — then the camera back,
+# no SHOUT: the stand is the controls' step, the scene held to the fight's
+# reaction)
+SCENE_CONT = {213: {'MechanicalBullControls': ('fight', 'olga', (0x10037d3b,))}}
 
 
 def _scene_step_events(n, item, linked=None):
@@ -2183,10 +2197,16 @@ def _scene_step_events(n, item, linked=None):
 
 def scene_steps(n):
     """{mobile item: PCScene} of SCENE_STEPS (_scene_span over the steps'
-    events with the trick in the scene: tricked_presence, else the table's)"""
+    events with the trick in the scene: tricked_presence, else the table's;
+    a flow handing its reaction on, SCENE_CONT, holds it to that reaction)"""
     d = Data(n)
-    return {item: _scene_secs(_scene_span(d, _scene_step_events(n, item)))
-            for item in SCENE_STEPS.get(n, {})}
+    out = {}
+    for item in SCENE_STEPS.get(n, {}):
+        sc = _scene_secs(_scene_span(d, _scene_step_events(n, item)))
+        if sc and item in SCENE_CONT.get(n, {}):
+            sc = [sc[0], 'shout']
+        out[item] = sc
+    return out
 
 
 def scene_step_reactions(n):
@@ -3055,9 +3075,31 @@ def code_stays_tricked(n):
         if e is not None and item not in out:
             out[item] = e
     for item in TRICKED_SCENE.get(n, ()):
-        e = entry(_scene_step_events(n, item))
+        ev = _scene_step_events(n, item)
+        e = entry(ev)
         if e is not None and item not in out:
             e['rejoins'] = True
+            cont = SCENE_CONT.get(n, {}).get(item)
+            if cont is not None:
+                # the reaction the flow hands on: the co-actor's fight, then
+                # the step his handler (or latch) picks for it — its SHOUT
+                # (-1 none) and tail; the scene held to that reaction
+                kind, actor, steps = cont
+                lvc = Level(n)
+                evc = []
+                for stp in steps:
+                    evc += [('STEP',)] + run_step(lvc, stp, dict(LAP_BYTES.get(n) or {}),
+                                                  unknown=1, streq=1, latch=1)[0]
+                _cs, clevel, crepair, _c = _step_parts_split(d, evc)
+                e.update({'shout': clevel,
+                          'repair': round(crepair / 12.0, 2) if crepair is not None else None,
+                          'tail': _secs(_shout_tail(d, evc)),
+                          'cont': 0.0})
+                if e.get('scene'):
+                    e['scene'] = [e['scene'][0], 'shout']
+                if kind == 'fight':
+                    ft = d.action_ticks('neighbor', 'fight', actor=actor)
+                    e['hit'] = {actor: _secs(ft)}
             out[item] = e
     for item, step in LINKED_STEP.get(n, {}).items():
         lv2 = Level(n)
