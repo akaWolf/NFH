@@ -746,11 +746,10 @@ predicate, then the all-tricks win.
   arms its records, jingles and scene on that clock as a use does
   (`_pc_s2_arm`), and so does an alarm run's use (`_alarm_use`: 211's
   cabin phone, the `phone` behaviour's step; not the toilet rush, the
-  sweets' flow going on). Open:
-  the walk-by's moment (the mobile's NoticeWhenWalkNearby; the PC's
-  trigger is nearobj, the same room and floor, under 15 apart
-  vertically, and when the handler's step change cuts his walk is
-  unread); the scene of a visit that opens on a poll clip (202's WaitSea,
+  sweets' flow going on); the tap's walk-by is the PC's nearobj trigger
+  (the same room, the floor's y, under 15 px across from the tap's
+  hotspot: fcn.1003f573, fcn.10049e01; `_notice_distance`). Open: the
+  scene of a visit that opens on a poll clip (202's WaitSea,
   207's WaitWatch) rising from the visit's start where the PC's rises
   with the step's list after the poll (a credit in the wait completes the
   level later). 202's laid rake without the weed (combine.xml

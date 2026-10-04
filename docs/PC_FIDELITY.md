@@ -2514,10 +2514,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   and scene as `_use` arms a stand's); a tricked walk-by's scene is held
   over its SHOUT since (World.pc_scene_start), so 208's rake on the
   Mother's call keeps it through its freakout and 208's plan ends 3.0 s
-  later, at 100. The trigger's moment stays the mobile's walk-by: the
-  PC's nearobj is the same room and floor record, less than 15 apart
-  vertically (fcn.1003f573), and when the handler's step change cuts
-  the walk he is on is unread. 208's rake on the Mother's call likewise
+  later, at 100. The trigger's moment is the PC's: nearobj is the same
+  room, the actor on the floor's y and less than 15 px across from the
+  object's hotspot (fcn.1003f573 at 0x1003f77f-0x1003f7d3, fcn.10049e01:
+  the object's position plus its named hotspot) — the port's walk-by at
+  15 px from the tap (pcprofile.S2_NEAROBJ_ITEMS, since 2026-10-03) —,
+  the walk cut as the behaviour arrives: E08 (pc_nfh2_all_720 1939-1946 s,
+  the level clock's 2:03-2:09) has him walk up to the tap and take the
+  shock standing at it, the coin flying at 2:09. 208's rake on the
+  Mother's call likewise
   (the handler's `call` branch runs 0x1001d828: the laid rake tested —
   combine.xml bazar/rake_ground, the trick —, the walk to it, its `crash`
   with rake_ground and its jingle on tick 4, SHOUT 0, the 1.33-s repair,
