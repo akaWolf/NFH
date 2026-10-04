@@ -334,10 +334,29 @@ def item_kind_hide(n, name):
     return None
 
 
+def woody_start(n):
+    """Woody's PCStart: where level.xml puts him (the street `fro`, 380/218 on
+    every level) — the point his start job's walk leaves from, on the room's
+    floor line — and the ticks of that job's `start` ACTION (generic/
+    objects.xml: `auto` over the triumph's last nine frames, the Loader's 8,
+    a job of 10). The job itself is game.exe's (fcn.004718b0 pushed at the
+    head of his queue by the AddActor handler, 0x43a207; its Woody branch
+    fcn.00471960): a tick, the walk to the room `anc` (0x4e0c80; tutorial_1's
+    `kit`), `start`, `normal`; None for a tutorial"""
+    if isinstance(n, str):
+        return None
+    L = lap_model.Level(n)
+    at = L.placed.get('woody')
+    if at is None or at[0] not in L.rooms:
+        return None
+    return {'room': at[0], 'x': at[1], 'y': at[2], 'floor': L.rooms[at[0]]['y'],
+            'start': L.job_ticks('woody', 'start', actor='woody')}
+
+
 def write(n, rooms, doors, points, own, vias):
     p = os.path.join(ROOT, 'levels', 'pc', scene_name(n) + '.overlay.json')
     ov = json.load(open(p))
-    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia')
+    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia', 'PCStart')
     for e in ov['patches']:
         for k in keys:
             (e.get('set') or {}).pop(k, None)
@@ -364,6 +383,12 @@ def write(n, rooms, doors, points, own, vias):
             st['PCWalkVia'] = vias[item]
         ov['patches'].append({'object': item, 'component': kind, 'set': st,
                               'source': src})
+    ws = woody_start(n)
+    if ws is not None:
+        ov['patches'].append({'object': 'Player', 'component': 'Woody', 'set': {'PCStart': ws},
+                              'source': "Woody's start (tools/pcref/pc_walks_s1.py woody_start: "
+                                        "level.xml's position, game.exe's start job fcn.004718b0 — "
+                                        "the walk to `anc`, then `start`, a job of its time + 2)"})
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
     open(p, 'a').write('\n')
 

@@ -1980,11 +1980,16 @@ class Pawn:
         with no move at all (the walk job done inside the GOTO's first update,
         the GOTO on its second)"""
         z = self.zone
-        if z is None or getattr(z, 'pc_walk_room', None) is None:
+        if z is None:
             return
         start = self._pc1_here()
         if start is None:
             return
+        # a room with no PC room to map a place into (the porch — tools/pcref/
+        # pc_walks_s1.py) walks by the PC only from a point stood on: Woody's
+        # level.xml start, on the street's floor line (PCStart)
+        wr0 = getattr(z, 'pc_walk_room', None)
+        floor0 = wr0['floor'] if wr0 is not None else start[1]
         gait = self._pc_gait()
         v_floor = pcprofile.walk_speed(self.role, self.sneaking, 1.0, 0.0, gait=gait)
         v_vert = pcprofile.walk_speed(self.role, self.sneaking, 0.0, 1.0, climbing=True, gait=gait)
@@ -1992,7 +1997,7 @@ class Pawn:
             return
         x, y = self.sprite.x, self.sprite.y
         zone = z
-        leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': z.pc_walk_room['floor']}
+        leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': floor0}
         legs = [leg]
         n = len(steps)
         for i, st in enumerate(steps):
@@ -7928,6 +7933,8 @@ class World:
         self._pc_landing = None          # the `respawn` action's run (_pc_landing_tick)
         self.snake_aux_208 = False       # GameInfo.SnakeAux208 (the L208 chain)
         self._entrance_timer = None      # Woody's walk-in countdown
+        self._pc_s1_entrance = None      # the PC's Season 1 start (PCStart), its job's walk
+        self._pc_s1_armed = False
         self.time = 0.0                  # Time.time for the alarm intervals
         self._woody_show_after = []      # Woody.ItemToShowAfterAnim queue
         self._woody_layer_restore = []   # (pawn, depth) from the hide layers
@@ -11438,6 +11445,16 @@ class World:
             p.input_locked = not p.finished_entrance
             if not p.finished_entrance:
                 self._entrance_timer = 0.5
+            if st and st.get('room') and pcprofile.is_pc() and not pcprofile.SEASON2 \
+                    and not p.finished_entrance:
+                # the PC profile's Season 1 start (PCStart): level.xml puts
+                # him in the street (fro 380/218), which the mobile's porch
+                # zone does not reach — his start job's walk leaves from that
+                # point (Pawn._pc1_marks) on its third tick
+                # (pcprofile.S1_WOODY_WALK_TICKS), armed on the first
+                p.pc1_stand_at((st['x'], st['y']))
+                self._entrance_timer = None
+                self._pc_s1_entrance = st
             if p.nfh2:
                 # IntroAnimation.StartGame (cs:300-304): the NFH2Path Woody
                 # starts locked and plays HelloAnimationNFH2 (Entrance); its
@@ -12486,7 +12503,13 @@ class World:
         # the entrance walk (Woody.cs:223-229): the timer runs down, he walks
         # to Level.EntranceLocation, and arrival unlocks the input
         # (OnFinishedEntrance)
-        if self._entrance_timer is not None and self.woody is not None:
+        pc_s1 = self._pc_s1_entrance
+        if pc_s1 is not None and not self._pc_s1_armed and self.woody is not None:
+            # the PC's Season 1 start job: this first tick of play idles it,
+            # the walk moves on its third (pcprofile.S1_WOODY_WALK_TICKS)
+            self._pc_s1_armed = True
+            self._entrance_timer = pcprofile.S1_WOODY_WALK_TICKS / pcprofile.TICKS_PER_SECOND
+        elif self._entrance_timer is not None and self.woody is not None:
             # EntranceTimer -= Time.deltaTime in Woody.Update (Woody.cs:225):
             # 0.5 s runs out on the 30th frame (a double's countdown would
             # leave +1e-16 for a 31st)
@@ -12509,8 +12532,18 @@ class World:
                         w.input_locked = False
                         w.finished_entrance = True
                         self._entrance_hello = False
+                        w.anim.time_scale = 1.0
                     if name and w.anim.has(name):
                         self._entrance_hello = True
+                        if pc_s1 is not None and pc_s1.get('start'):
+                            # the PC's start job: the walk done, his `start`
+                            # ACTION (PCStart `start`, 10 ticks) and `normal`
+                            # — the remaster's greeting at the pace that
+                            # lasts it
+                            mobile = w.anim.sequence_seconds([name])
+                            if mobile > 0.0:
+                                w.anim.time_scale = mobile * pcprofile.TICKS_PER_SECOND \
+                                    / float(pc_s1['start'])
                         w.anim.play_sequence([name], on_end=_unlock,
                                              as_sequence=False)
                     else:

@@ -522,6 +522,15 @@ TICKS_PER_SECOND = 12.0
 # 0 — 37 steps — so the class's case 0 (the first icon, 0x46f96a) runs on the
 # 37th tick after the first: 3.08 s, the video's 3.07-3.10 s (E01-E06)
 S1_START_TICKS = 37
+# Woody's own start job (the same fcn.004718b0, pushed at the head of his queue at
+# 0x43a207; its Woody branch fcn.00471960): its first tick idles, its second pushes
+# the walk to the room `anc` (fcn.004716f0 -> fcn.004764b0, the string 0x4e0c80 — the
+# hall, where the front door leads; tutorial_1's `kit`) without a first run, and on
+# the third that walk's first update pushes the walk job and its mover with the
+# run-now flag 1: his first move from level.xml's point (PCStart) on the third tick
+# of play. The walk done, the job pushes his `start` ACTION (PCStart `start`, 10
+# ticks) and ends on `normal` — only then does his queue take a command
+S1_WOODY_WALK_TICKS = 2
 # game.exe's nearobj trigger, the Season 1 floor tricks' notice (fcn.00471bc0:
 # the actor in the object's room, not in a hideout — its flag 4, fcn.0043c2b0
 # at 0x471cee — and |its x - the object's `neighbor` hotspot x| < 15,

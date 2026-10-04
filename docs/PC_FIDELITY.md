@@ -2226,7 +2226,21 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   first move 3.117 s, 1.517 before), the bubble is empty until then, and
   the catch no longer waits for his script — the state function's test is
   the rooms, the pause byte and flag 4 (fcn.00436bb0, 0x436cc7-0x436d31).
-  The 28 plans hold at 100.
+  The 28 plans hold at 100. Woody's start job (the same fcn.004718b0 at
+  his queue's head, 0x43a207; its Woody branch fcn.00471960) idles a tick,
+  pushes the walk to the room `anc` (the string 0x4e0c80, written into the
+  handler's dead third argument; tutorial_1's `kit`) and moves on the
+  third tick from level.xml's point — the street, fro 380/218, 324 px from
+  the front door's standing point: 19 moves, the pass (25 ticks) — then
+  plays `start` (the triumph's last nine frames: `auto` 8, a job of 10) and
+  ends on `normal`, his queue taking commands from tick 55 (4.58 s). E01:
+  Woody on the porch from the view's edge at 231.87, the door at 232.5, the
+  pass to ~234.6, his first walk to the chest at 235.4 — 4.57 s after the
+  card. The port walked the mobile's entrance (0.5 s, the porch's last
+  0.8 u, the Hello 0.7 s: input at 3.65 s); under the profile (PCStart on
+  Player, tools/pcref/pc_walks_s1.py) the walk moves on the third tick, the
+  porch leg lasts the PC's 18 ticks from the stood PC point, the pass the
+  PC's, the greeting the `start`'s 10 ticks — input 4.55 s on 101.
 - *A click in a door's pass (2026-10-04, fixed).* The profile's pass puts
   the pawn in the far room as its clips start (the door step's placement,
   game.exe 0x474590; `Pawn._warp_through` at the clip's start), so a path

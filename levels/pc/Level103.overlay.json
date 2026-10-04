@@ -691,6 +691,20 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
+   "object": "Player",
+   "component": "Woody",
+   "set": {
+    "PCStart": {
+     "room": "fro",
+     "x": 380,
+     "y": 218,
+     "floor": 218,
+     "start": 10
+    }
+   },
+   "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
   }
  ]
 }

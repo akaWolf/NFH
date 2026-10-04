@@ -2022,14 +2022,26 @@ the level selection menu, LevelLoader, not modelled).
   the pause byte and the hideout flag only (fcn.00436bb0, 0x436cc7-
   0x436d31), from the first tick of play. (Season 2 has no such wait: its
   scripts' icons are up on the first frame, and the profile starts them
-  there.) Woody's own start job is not carried: its Woody branch
-  (fcn.00471960) idles a tick, then pushes a walk job (fcn.004716f0 ->
-  fcn.004764b0: vtable 0x4e5400 over the AddActor's room argument, whose
-  step pushes fcn.00475850's walk), then his `start` action (generic/
-  objects.xml: the triumph's last nine frames) and `normal` — the port
-  keeps the mobile's entrance walk (0.5 s, EntranceLocation, Hello); the
-  walk's target is not read yet (E02: Woody walks onto the porch from the
-  right at 371.6, a second after the card).
+  there.) Woody's own start job, carried the same day (`World.spawn_pawn`,
+  the entrance in `World.tick`, `Pawn._pc1_marks`; PCStart on Player from
+  tools/pcref/pc_walks_s1.py): its Woody branch (fcn.00471960) idles its
+  first tick, pushes on its second the walk to the room `anc` (fcn.004716f0
+  -> fcn.004764b0: vtable 0x4e5400; the handler writes the string 0x4e0c80
+  into its dead third argument's slot, tutorial_1 `kit` 0x4e0c88), whose
+  first update on the third tick pushes the walk job and its mover with the
+  run-now flag 1, then his `start` ACTION (generic/objects.xml: the
+  triumph's last nine frames, `auto` 8, a job of 10) and `normal` — his
+  queue takes a command only then. level.xml starts him in the street,
+  fro 380/218 on every level, 324 px from the front door's standing point
+  (56): 19 moves, the pass (25 ticks) in the last, `start` from the tick
+  after it, his input on tick 55 (4.58 s). E01: on the porch at 231.87
+  (from the view's right edge), at the door 232.5, the pass to ~234.6, his
+  first walk to the chest 235.4 — 4.57 s after the card. The port walked
+  the mobile's entrance (0.5 s, the porch's last 0.8 u, Hello 0.7 s: his
+  input at 3.65 s); under the profile the walk moves on the third tick, the
+  porch leg lasts the PC's 18 ticks from level.xml's point (a stood point,
+  the porch having no PC room), the pass the PC's, and the greeting the
+  `start`'s 10 ticks (his input 4.55 s, the first walk 4.567 on 101).
 - Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
   `OnTrickDone` paths die in the parked ride — README above), L113's
   ElectricTrap 8 (its collider sits inside and behind the basement door's,
