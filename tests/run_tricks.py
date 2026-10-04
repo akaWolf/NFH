@@ -463,8 +463,8 @@ class Driver(Recorder):
 
     def _pc_held(self, door):
         """a door of a pair another pawn holds under the PC profile (its
-        door-pass step set off for it, Pawn._pc_claim_marks) — Woody would
-        stand where he is until it is free"""
+        door-pass step started at its near door, Pawn._pc_claim_marks) —
+        Woody would stand at the door until it is free"""
         holder = getattr(door, 'pc_claim', None)
         return holder is not None and holder is not self.v.woody \
             and holder._pc_holds(door)
@@ -1197,8 +1197,8 @@ class Driver(Recorder):
         # catcher walking in meanwhile catches him there
         leave = None
         if path and pcprofile.is_pc():
-            # (a pair another pawn has set off for is its to hold: Woody would
-            # stand where he is until it is free — Pawn._pc_claim_marks)
+            # (a pair another pawn's pass holds is its to hold: Woody would
+            # stand at the door until it is free — Pawn._pc_claim_marks)
             first = path[0][1]
             if any(self._pc_held(d) for d in (first, self.v.level.door_by_pid(first.link_to))
                    if d is not None):
@@ -2045,8 +2045,8 @@ class Driver(Recorder):
                    and p._exit_door in (first, pair)
                    for p in self.catchers()):
                 continue
-            # (under the PC profile a pair another pawn has set off for is
-            # its to hold: Woody would stand where he is until it is free —
+            # (under the PC profile a pair another pawn's pass holds is its
+            # to hold: Woody would stand at the door until it is free —
             # Pawn._pc_claim_marks)
             if any(self._pc_held(d) for d in (first, pair) if d is not None):
                 continue

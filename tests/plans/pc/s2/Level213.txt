@@ -1,4 +1,7 @@
-# Level213 under the PC profile (v10, the Season 2 walks, routes and catch by code): Badinfos' pile on
+# Level213 under the PC profile (v11, 2026-10-04: a door pair is held from the pass's start at the
+# door — Olga's ride starts later and he leaves the beach at 243, Olga's pass holds the beach door
+# until 246 and the Mother walks into Zone02 at 249: Woody waits at the door and rushes the
+# controls through it as Olga lets it go; 100 at 408.0 s. v10, the Season 2 walks, routes and catch by code): Badinfos' pile on
 # his lap 3 — the cement at the end of his lap 2 (~245), then the bull (~258), the
 # plant (~277), the tortilla (~288), the picnic (~305), the pinata (~333) and the
 # bull ride (~344), where the gauge tops. His lap is ~127 s and the Mother's round
@@ -34,7 +37,9 @@ usewith PlantCarnivore IT2_Piranha
 usewith Tortilla IT2_Tequila           # Z03: his lap-3 tortilla (288)
 usewith Tortilla IT2_Chili
 usewith BoatPicnic IT2_Termites        # Z02, the Mother gone at 210, Olga away 204-237: his lap-3 picnic (305)
-usewith MechanicalBullControls IT2_Hand   # Z01, free 241-327: his lap-3 ride (344), the pile's top
+walk 1.82 -4.40                        # Z02, down from the picnic toward the beach door
+whenin Olga Zone02                     # (246) back from her ride: her pass lets the beach door go
+usewith! MechanicalBullControls IT2_Hand  # Z01, free 244-327, through the door before the Mother comes into Z02 (249): his lap-3 ride (344), the pile's top
 whenusing LiveBull                     # (258) the bull's coin frees the wasp
 take Wasp IT2_Beehive                  # Z04, free 270-368
 unlock Pinata IT2_Beehive              # Z01: his lap-3 pinata (333)

@@ -1457,11 +1457,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   walk to the near door's `<actor>_in` comes after — and clears it when
   the far room is set at `<actor>_out` (fcn.10003454 -> 0x100033d4; the
   step's cleanup 0x10004169 too). So a pair is held from the moment an
-  actor sets off for it, and the next actor stands where it is — not at
-  the door — until it is free; every actor's GoTo, Woody's included.
+  actor's pass starts — at the near door: the route pushes the pass only
+  once its movement to the door's `<actor>` hotspot is done (0x1000aac2
+  tests the point; fcn.1000901b at 0x1000ab8d, else fcn.10003d50 at
+  0x1000ab17) — and the next actor stands at the door until it is free;
+  every actor's GoTo, Woody's included. (Read until 2026-10-04 as held
+  from the moment an actor sets off, the next standing where it was: E12
+  has him walk from the whip to midright's door and stand behind the
+  Mother there, 180.5-185.25, and E13 has him follow Olga from the picnic
+  to the bottom door.)
   Carried (`Pawn._pc_claim_marks`, `_pc_claim_pair`, `_pc_release`;
-  `Door.pc_claim`): the first step of the stretch that leads to a door
-  with a PC pass claims its pair or stands, the transfer (a back door's
+  `Door.pc_claim`): the step that brings the pawn to a door with a PC
+  pass claims its pair at its arrival or stands there (the stretch's first
+  step did until 2026-10-04), the transfer (a back door's
   placement) lets it go, a new path aborts it, and a pair whose holder
   has dropped its path is free; the mobile's IsOtherPawnPassing waits
   (Door.PassingPawnTransitionNFH2, Door.PassingPawn) give way to it on

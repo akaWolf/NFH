@@ -1661,26 +1661,26 @@ class Pawn:
         carries flag 8 (0x10003c54: fcn.100450dc), sets it on both doors of
         the pair as it starts (0x1000339d) — before the walk to the near
         door's `<actor>_in` — and clears it when the far room is set at
-        `<actor>_out` (fcn.10003454 -> 0x100033d4). The first step of the
-        stretch that leads to a door with a PC pass carries its door
-        (`pc_claim`, _walk_on_path)"""
-        start = 0
-        for k, st in enumerate(steps):
+        `<actor>_out` (fcn.10003454 -> 0x100033d4). The route pushes the
+        pass once its movement to the near door's `<actor>` hotspot is done
+        (fcn.1000901b, then fcn.10003d50 at 0x1000ab17): the step that brings
+        the pawn to a door with a PC pass carries its door (`pc_claim`),
+        taken or waited for at its arrival (_walk_on_path) — a pawn behind
+        another stands at the door (E12: behind the Mother at midright's
+        door, 180.5-185.25; E13: after Olga from the picnic)"""
+        for st in steps:
             hold = st.get('pc_hold_run')
             door = None
             if hold is not None and hold[0] == 'in':
                 door = hold[1]
             elif st.get('kind') == 'door' and st['door'].pc_pass.get(self.role):
                 door = st['door']
-            if door is not None and start is not None and start < len(steps):
-                steps[start]['pc_claim'] = door
-                start = None
-            if 'transfer' in st or st.get('kind') == 'door':
-                start = k + 1
+            if door is not None:
+                st['pc_claim'] = door
 
     def _pc_claim_pair(self, door):
         """the door-pass step's first state: the pair taken, or False while
-        another pawn holds it (the pawn stands where it is)"""
+        another pawn holds it (the pawn stands at the near door)"""
         other = self.level.door_by_pid(door.link_to)
         pair = [d for d in (door, other) if d is not None]
         for d in pair:
@@ -2632,7 +2632,7 @@ class Pawn:
             elif cd.passing_nfh2 is not None and cd.passing_nfh2 is not self \
                     and not (pcprofile.is_pc() and cd.pc_pass.get(self.role)):
                 # (under the PC profile a pair with a PC pass is the PC's
-                # door-pass step's to hold, from the walk to the door on:
+                # door-pass step's to hold, from its start at the near door:
                 # _pc_claim_marks)
                 self.velocity = (0.0, 0.0)
                 self._stand()
@@ -2752,15 +2752,6 @@ class Pawn:
             if 'pc_prehold' in st0:
                 del st0['pc_prehold']
                 self._pc_hold_t = 0.0
-            door = st0.get('pc_claim')
-            if door is not None and not st0.get('pc_claimed'):
-                # the PC's door-pass step starts: its pair, or a stand where
-                # the pawn is while another holds it (_pc_claim_marks)
-                if not self._pc_claim_pair(door):
-                    self.velocity = (0.0, 0.0)
-                    self._stand()
-                    return
-                st0['pc_claimed'] = True
             tx, ty = self._step_target()
             dx, dy = tx - self.sprite.x, ty - self.sprite.y
             mag = (dx * dx + dy * dy) ** 0.5
@@ -2815,6 +2806,16 @@ class Pawn:
                     self.velocity = (0.0, 0.0)
                     self._stand()
                     return
+                door = s.get('pc_claim')
+                if door is not None and not s.get('pc_claimed'):
+                    # the PC's door-pass step starts at the near door: its
+                    # pair, or a stand there while another holds it
+                    # (_pc_claim_marks)
+                    if not self._pc_claim_pair(door):
+                        self.velocity = (0.0, 0.0)
+                        self._stand()
+                        return
+                    s['pc_claimed'] = True
                 run = s.get('pc_hold_run')
                 if run is not None:
                     # the `in` run of the hop this step brings the pawn to,
