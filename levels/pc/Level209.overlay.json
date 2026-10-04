@@ -853,8 +853,14 @@
         "Zone01"
        ]
       },
-      "tx": -1,
-      "dpx": -38
+      "tx": [
+       0,
+       -1
+      ],
+      "dpx": [
+       -37,
+       -38
+      ]
      },
      "Woody": {
       "obj": "tadj_mahal/shoe_mat",
