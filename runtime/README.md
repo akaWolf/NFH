@@ -636,7 +636,10 @@ predicate, then the all-tricks win.
   the success on the tick that StopMsg sets its check flag (fcn.00436bb0,
   fcn.0047bc90) — and the win plays then (`World._pc_s1_success`:
   `play_angry`'s `shouted` sets `_pc_end_check`; a last trick without its
-  StopMsg, PCStopSkip, keeps the mobile's wait). A Season 2 level under the
+  StopMsg, PCStopSkip, waits for its class's own — PCEndAfter,
+  `World.pc_end_after` on the rush's end, his next use of a station, the
+  reaction's end or a sound fixing tool's shout — 110's extinguish, whose
+  shout and repair the tool's tail plays: PCToolShout, PCToolRepair). A Season 2 level under the
   profile runs on past the last credit while the reaction's scene holds the
   level's flag +0x6e (GameLogic's completion check, fcn.10041086, tests the
   count only while it is clear): `World.pc_scene_start` raises it so far

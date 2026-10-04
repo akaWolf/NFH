@@ -65,7 +65,8 @@
     "PCUseSecondsTricked": 6.167,
     "PCFireAt": 2.25,
     "PCStopSkip": true,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCEndAfter": "Towel"
    }
   },
   {
@@ -103,7 +104,8 @@
     "PCUseSecondsTricked": 3.0,
     "PCFireAt": 1.083,
     "PCStopSkip": true,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCEndAfter": "rush"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candy <- candy#0 1.0 s; Candy <- candy#1 1.0 s"
   },
@@ -120,7 +122,8 @@
     "PCUseSecondsTricked": 7.917,
     "PCFireAt": 3.083,
     "PCStopSkip": true,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCEndAfter": "Towel"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BathTub <- bath#0 0.6 s; BathTub <- bath#1 3.0 s"
   },

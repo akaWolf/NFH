@@ -24,6 +24,11 @@ tools/pcref/fire_sites.py (the shout's index and the flags). The keys:
                       the way back (0 = the case keeps the tool: no walk back);
   PCToolUseSeconds    a sound tool's use at the target; the tool's tricked
                       use there is PCUseSecondsTricked
+  PCToolShout         what the case plays after the sound tool's use: the
+  PCToolRepair        state message and the shout, then the check StopMsg,
+                      the repair and the switch back (110's extinguish)
+  PCEndAfter          where the class's own check StopMsg ends a level whose
+                      last step skipped its own (END_AFTER)
   PCRunTo             the case runs to the object (the gait's run, RUNTO):
                       101/102's antenna shout, 110's extinguisher fetch and
                       113's valves — whose station is the switch alone
@@ -121,15 +126,18 @@ def wb(pc, site=None, fix=None):
     return dict(pc=pc, kind='wb', site=site, fix=fix)
 
 
-def tool(pc, back=None, use=None, site=None):
+def tool(pc, back=None, use=None, site=None, tail=None):
     """a fixing tool's case (the mobile's RoutineActionUseFixingItem chain): the
     take at the tool is the grab (inside the stand's cut or just before the walk
     to the target), the rest of the stand before the fire with the step's own clip
     the tricked use at the target, the actions after the repair the redo's use (0:
     the case has none), `use` = (object, action) the sound tool's action at the
     target, `back`'s give after the walk back the return (none: the case keeps
-    the tool, no walk back)"""
-    return dict(pc=pc, kind='tool', site=site, back=back, use=use)
+    the tool, no walk back), `tail` = ((actor, shout), (object, repair)) what
+    the case plays after the sound tool's use: its state message and the
+    shout, the check StopMsg, the repair and the switch back (PCToolShout,
+    PCToolRepair)"""
+    return dict(pc=pc, kind='tool', site=site, back=back, use=use, tail=tail)
 
 
 TABLE = {
@@ -183,7 +191,11 @@ TABLE = {
           # case 9: take the extinguisher, go to the burning barbecue, extinguish_explo,
           # repair_extinguisher, extinguish, the fire, the barbecue's repair — the
           # extinguisher is not taken back
-          'FireExtinguisher': tool('bed/extinguisher_knotted', use=('bal/barbecue_burn', 'extinguish')),
+          # the burning barbecue's case 9, sound branch (0x4605fe-0x46080b):
+          # extinguish, the `extinguished` state, shout0_medium, the check
+          # StopMsg (0x46076c), repair, the switch back to bal/barbecue
+          'FireExtinguisher': tool('bed/extinguisher_knotted', use=('bal/barbecue_burn', 'extinguish'),
+                                   tail=(('neighbor', 'shout0_medium'), ('bal/barbecue_burn', 'repair'))),
           'CarnivorPlantSpray': use('bal/growspray'),
           # the table's `give` is its own case before the chair's (the
           # tricked visit plays it); after the repair the case enters and eats
@@ -275,7 +287,25 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCSlipSeconds', 'PCSurpriseSeconds', 'PCGrabSeconds', 'PCFixUseSeconds', 'PCToolUseSeconds',
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
-        'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo')
+        'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair')
+# a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
+# flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
+# fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
+# 'rush' — the toilet case the rush runs to, its StopMsg after the business
+# (102 case 11, 0x470078-0x470427: shit_with_paper, grabpaper, 0x470241; 105
+# case 15, 0x46eac8-0x46ebe6: the puke, 0x46eb76; 106 case 17, 0x46d12a-
+# 0x46d236: the puke, 0x46d1cf); a station's name — the end of his next use
+# of it (106's towel case 15, 0x46ca77-0x46d0cc: the towel, the tub's switch,
+# 0x46d06a, after the bath's hair or the dirty towel; 114's hat handler:
+# putbackhat, give, the hat's switch, 0x465903, after the medal box's rat);
+# 'reaction' — the end of the trick's own reaction (112's skate handler: the
+# walk back in, wheeze, the shout, 0x463554); 'tool' — the sound fixing tool's
+# shout at the target (110's burning barbecue, case 9: extinguish, the state,
+# shout0_medium, 0x46076c, then the repair — the tool's tail, PCToolShout)
+END_AFTER = {102: {'Beer': 'rush'}, 105: {'PlantStink': 'rush'},
+             106: {'Candy': 'rush', 'BathTub': 'Towel', 'Towel': 'Towel'},
+             110: {'BBQ': 'tool'},
+             112: {'GroundSkates': 'reaction'}, 114: {'MedalBox': 'Hat'}}
 
 
 def slip_cleans(n, item, floor, lv):
@@ -435,6 +465,8 @@ def specs(n):
                 keys['PCShoutSkip'] = True
             if fl & 1:
                 keys['PCStopSkip'] = True
+                if base in END_AFTER.get(n, {}):
+                    keys['PCEndAfter'] = END_AFTER[n][base]
             # the stand's actions before the fire, and the list's instant
             # steps right before it (pre_fire: its start, a StopMsg, a message)
             before = (_sum(lv, spec['before'], sm) if spec.get('before') is not None
@@ -514,6 +546,12 @@ def specs(n):
                         keys['PCFixPoint'] = pt
                 if spec.get('use'):
                     keys['PCToolUseSeconds'] = round(_sum(lv, [spec['use']]), 3)
+                if spec.get('tail'):
+                    # the message step and the shout; the StopMsg, the repair
+                    # and the switch (instants a tick each, lap_model.py)
+                    (so, sa), (ro, ra) = spec['tail']
+                    keys['PCToolShout'] = round(1 / FPS + _sum(lv, [(so, sa)]), 3)
+                    keys['PCToolRepair'] = round(2 / FPS + _sum(lv, [(ro, ra)]), 3)
                 keys['PCReturnSeconds'] = round(_sum(lv, [(spec['back'], 'give')]), 3) \
                     if spec.get('back') else 0.0
             else:

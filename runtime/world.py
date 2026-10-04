@@ -5252,6 +5252,9 @@ class Routine:
         w = self.pawn.world
         if w is not None and w._pc_scene_use is not None:
             w.pc_scene_use_end(self)          # a scene the stand's end drops
+        if w is not None and w._pc_end_hook is not None and self.role == 'Rottweiler' \
+                and self.item is not None:
+            w.pc_end_after('use', self.item)  # a class's StopMsg after his use (PCEndAfter)
         if self.pawn.pc_bed and self.item is not None and self.item.name == 'AlarmClock':
             self.pawn.pc_bed = False      # the alarm clock's BedOut: the leave
         if pcprofile.is_pc() and self.item is not None \
@@ -6111,6 +6114,8 @@ class Routine:
             # Rottweiler.OnUseEnded ends the sickness (cs:879-892) and
             # OnActionStopped drops IsUsingToilet (cs:354-357)
             self._toilet_run = False
+            if w is not None and w._pc_end_hook is not None:
+                w.pc_end_after('rush')        # the toilet case's StopMsg (PCEndAfter)
             self.pawn.feel_sick = False
             self.pawn.is_using_toilet = False
             toilet_continue = bool(self.pawn.toilet_action.get(
@@ -6442,9 +6447,39 @@ class Routine:
             if secs is not None and float(secs) == 0.0:
                 seq = []
         self._pc_tool_pace(seq, secs)
+        tail = tool is not None and not redo and pcprofile.is_pc() \
+            and tool.pc_tool_shout is not None
+
+        def repaired():
+            self.pawn.anim.time_scale = 1.0
+            self._fixing_done()
+
+        def shouted():
+            # the check StopMsg (0x46076c) — a level whose last step skipped its
+            # own ends here (PCEndAfter 'tool') — then the repair and the switch
+            self.pawn.anim.time_scale = 1.0
+            w.pc_end_after('tool', tgt)
+            fix = [x for x in [tgt.fix_animation] if x and self.pawn.anim.has(x)]
+            self._pc_tool_pace(fix, tool.pc_tool_repair)
+            if fix:
+                self.pawn.anim.play_sequence(fix, on_end=repaired)
+            else:
+                self.pawn._stand()
+                w.call_later(float(tool.pc_tool_repair or 0.0), repaired)
 
         def used():
             self.pawn.anim.time_scale = 1.0
+            if tail:
+                # the case's shout after the sound tool's use (PCToolShout:
+                # the state message and shout0_medium) at the angry's pace
+                shout = [x for x in [tgt.angry_hard] if x and self.pawn.anim.has(x)]
+                self._pc_tool_pace(shout, tool.pc_tool_shout)
+                if shout:
+                    self.pawn.anim.play_sequence(shout, on_end=shouted)
+                else:
+                    self.pawn._stand()
+                    w.call_later(float(tool.pc_tool_shout), shouted)
+                return
             self._fixing_done()
         if seq:
             self.pawn.anim.play_sequence(seq, on_end=used)
@@ -7793,6 +7828,7 @@ class World:
         # state function on the same tick; the last fire's item
         self._pc_end_check = False
         self._pc_last_fire = None
+        self._pc_end_hook = None          # (item, PCEndAfter): a flag-1 step's later StopMsg
         # the PC's Season 2 scene flag, the level's +0x6e: the camera
         # callbacks store it first (fcn.10040137 from fcn.1000d31a / fcn.1000d559)
         # and the completion check (fcn.10041086) tests done == reachable only
@@ -8320,6 +8356,10 @@ class World:
             points, bonus, item.pc_shout_index, item.pc_shout_skip)
         item.pc_fire_points = points
         self._pc_last_fire = item
+        # a step without its StopMsg (flag 1) leaves the check flag to the
+        # class's own StopMsg further on (PCEndAfter, pc_end_after)
+        self._pc_end_hook = (item, item.pc_end_after) \
+            if (points > 0 and item.pc_stop_skip and item.pc_end_after) else None
         if not item.dont_get_angry:
             self._on_trick_done(item)              # cs:785-787, at the PC's fire
         if self.level_script is not None:
@@ -8358,6 +8398,7 @@ class World:
         rush = item.kind in TRICK_KINDS and item.cause_rush_to_toilet(items) \
             and routine is not None
         self._pc_scene_shout_end(item)         # no reaction to wait for
+        self.pc_end_after('reaction', item)
         fetch = self._try_fix(item, pawn)      # a fetch owns the resume
         if on_done and not fetch:
             on_done()
@@ -8569,8 +8610,10 @@ class World:
             the AngryWithoutAnimations branch below does (cs:721). A started
             fetch owns the resume"""
             pawn.anim.time_scale = 1.0             # (the profile's reaction pace, below)
-            # (the reaction's end: its scene's end callback has run)
+            # (the reaction's end: its scene's end callback has run; a
+            # class's StopMsg after it, PCEndAfter)
             self._pc_scene_shout_end(item)
+            self.pc_end_after('reaction', item)
             fetch = self._try_fix(item, pawn)
             pawn.can_decrease_angry = True         # Rottweiler.OnUseEnded
             if pcprofile.is_pc() and item.pc_fix_depart and played_angry:
@@ -12208,6 +12251,28 @@ class World:
         self._finish_animation_ended()
         return False
 
+    def pc_end_after(self, event, item=None):
+        """the StopMsg a level class posts after a step that skips its own
+        (flag 1, PCStopSkip) — fcn.0047c6c0 with the check callback
+        fcn.0047bc90, which sets the level's +0x8a (read by fcn.00436bb0 on the
+        tick): 'rush' as the toilet rush's business ends (102's grabpaper,
+        105's and 106's puke), 'use' as his use of the named station ends
+        (106's towel case after the bath or the towel, 114's hat after the
+        medal box), 'reaction' as the trick's own reaction ends (112's skate:
+        back in, wheeze, the shout), 'tool' as a sound fixing tool's shout at
+        the target ends (110's burning barbecue: the extinguish and
+        shout0_medium); tools/pcref/pc_reactions.py END_AFTER"""
+        hook = self._pc_end_hook
+        if hook is None:
+            return
+        it, spec = hook
+        if (event == 'rush' and spec == 'rush') \
+                or (event == 'reaction' and spec == 'reaction' and item is it) \
+                or (event == 'tool' and spec == 'tool') \
+                or (event == 'use' and item is not None and item.name == spec):
+            self._pc_end_hook = None
+            self._pc_end_check = True
+
     def _pc_s1_success(self, end_check):
         """the PC's Season 1 success (game.exe fcn.00436bb0, state 5; docs/
         PC_VERIFICATION.md "The level's end"): with every trick fired the
@@ -12215,16 +12280,15 @@ class World:
         function does — until a StopMsg sets the check flag +0x8a
         (fcn.0047bc90: the last fire's list after its shout, 0x47bfdd), and
         the win plays on that tick, where the mobile starts its 2.5 s wait at
-        the pay. False where the mobile's rule stays: the Season 2 profile,
-        the mobile one, a forced win, and a last trick whose step has no
-        StopMsg (PCStopSkip: its level class's own end-check StopMsgs —
-        0x46076c, 0x463554, 0x465903, 0x46d06a, 0x46d1cf, 0x46eb76,
-        0x470241 — not carried)"""
+        the pay; a last trick whose step has no StopMsg (PCStopSkip) waits
+        for its level class's own (PCEndAfter, pc_end_after). False where
+        the mobile's rule stays: the Season 2 profile, the mobile one and a
+        forced win"""
         if not pcprofile.is_pc() or self.woody is None or self.woody.nfh2 \
                 or self.game.win_immediate:
             return False
         last = self._pc_last_fire
-        if last is None or last.pc_stop_skip:
+        if last is None or (last.pc_stop_skip and not last.pc_end_after):
             return False
         if end_check:
             self.game.ending = True

@@ -97,7 +97,10 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   the target, the use after the repair or of a sound tool and the give back
   (PCGrabSeconds, PCFixUseSeconds, PCToolUseSeconds, PCReturnSeconds);
   RUNTO marks the objects the class runs to (PCRunTo: the gait set to 2
-  before the GoTo — 101/102's antenna, 110's extinguisher, 113's valves)
+  before the GoTo — 101/102's antenna, 110's extinguisher, 113's valves);
+  END_AFTER (2026-10-04) where a flag-1 step's level class posts its own
+  check StopMsg (PCEndAfter: 'rush', 'reaction' or the station whose next
+  use ends it — 102/105/106's rushes, 106's towel, 112's skate, 114's hat)
   and FIXRUN 113's valve stations after the flood and the hot heater (the
   switch alone); 111's machines leave their give to the prime leg.
   `--runs-s2` writes Season 2's RUNTO_S2 (PCRunTo) and RETURN_S2

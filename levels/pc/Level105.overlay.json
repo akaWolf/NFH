@@ -75,7 +75,8 @@
     "PCShoutSkip": true,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 2.667,
-    "PCStopSkip": true
+    "PCStopSkip": true,
+    "PCEndAfter": "rush"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PlantStink <- flower#0 3.9 s"
   },

@@ -51,7 +51,8 @@
     "PCUseSecondsTricked": 3.0,
     "PCStopSkip": true,
     "PCFireAt": 2.75,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCEndAfter": "tool"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.9 s; BBQ <- bbq#1 1.6 s"
   },
@@ -105,7 +106,9 @@
     "PCToolUseSeconds": 3.333,
     "PCReturnSeconds": 0.0,
     "PCRunTo": true,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCToolShout": 3.917,
+    "PCToolRepair": 2.25
    },
    "source": "Woody's trick action (level_barbecue's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- bed/extinguisher 13 ticks"
   },

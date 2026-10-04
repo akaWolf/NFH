@@ -2236,11 +2236,29 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   in the port. Under the profile the level runs on after the last pay
   (the catch on sight still tested first) until that StopMsg, and the win
   plays on its tick (World._pc_s1_success); tutorial_3: the win 5.50 s
-  after the fire and the board 9.7 s (the video 5.5 and 9.75). Not
-  carried: a last trick whose step skips its StopMsg (flag 1, PCStopSkip)
-  ends through its level class's own end-check StopMsgs (seven sites,
-  docs/PC_VERIFICATION.md "The level's end") — the mobile's wait stays for
-  it.
+  after the fire and the board 9.7 s (the video 5.5 and 9.75). A last
+  trick whose step skips its StopMsg (flag 1, PCStopSkip) ends through its
+  level class's own (2026-10-04, PCEndAfter; pc_reactions.py END_AFTER):
+  the toilet case the rush runs to, its StopMsg after the business (102's
+  case 11: shit_with_paper, grabpaper, 0x470241; 105's case 15 and 106's
+  case 17: the puke, 0x46eb76, 0x46d1cf), 106's towel case after the
+  bath's hair or the dirty towel (the towel, the tub's switch, 0x46d06a),
+  114's hat handler after the medal box (putbackhat, give, 0x465903), 112's
+  skate handler after the fall (back in, wheeze, the shout, 0x463554) —
+  World.pc_end_after on the rush's end, his next use of the station, the
+  reaction's end. Forced last in the plans: 105's plant with the toilet
+  untricked ends as the puke ends (3.63 s after the arrival), 114's medal
+  box as the hat's put-back and give end (1.75 s, the PC's 1.167 + 0.583),
+  106's towel and bath with the towel's end, 112's skate with the shout's.
+  110's fuel beer: the burning barbecue's case 9 — its sound branch plays
+  the extinguish, the `extinguished` state, shout0_medium, the check
+  StopMsg (0x46076c), the repair and the switch back, where the port's
+  sound extinguisher ended with the extinguish; the tool now carries the
+  case's shout and repair (PCToolShout 3.917 s, PCToolRepair 2.25 s: the
+  message, shout0_medium's 46 ticks; the StopMsg, the repair's 25, the
+  switch) and the level ends between them (forced last with the
+  extinguisher sound: the shout's end, 7.25 s after the arrival at the
+  barbecue).
 - *The Season 2 level's end (2026-10-04, carried).* GameLogic's level
   update calls the completion check (fcn.10041086, 0x100447f8) on every
   tick, and it tests done == reachable (status +0xc / +0x10, the credits'
@@ -2262,7 +2280,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   board, its time read then. The video: E02's last coin (the electrified
   rail, the statue lit at 496.5) to the cut to Woody 502.636 and the board
   504.705; E03's bicycle, 729.3 to 734.603 and 736.671 — each the stand's
-  rest and a freakout (39-40 ticks) after the credit, then 25 ticks. The
+  rest and a freakout (39-40 ticks) after the credit, then 25 ticks (E01
+  328.505 -> 330.608, E04 955.302 -> 957.404, E05 1221.870 -> 1223.972,
+  E06 1489.703 -> 1491.771: 2.07-2.10 s; where Woody sits in a hideout his
+  won step plays its `leave` first, fcn.1000f0f4 — E08's basket, 2074.802
+  -> 2077.805; E13's mine cart, 3467.936 -> 3471.106). The
   port started the mobile's 2.5 s wait at the last credit (the clock and
   the catches dead from it) and scored the time there. Under the profile
   the reaction's scene is PCScene ([its rise into the tricked stand, the
