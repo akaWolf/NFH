@@ -2019,7 +2019,13 @@ TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
 # the hurt icon, Eebbf — no SHOUT)
 SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
                205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
-                                      {'beachright_pingpong', 'beachright_pingpong_guarded'})},
+                                      {'beachright_pingpong', 'beachright_pingpong_guarded'}),
+                     # the blind chef's shop (0x10024929: the tube in the eel
+                     # basket — combine.xml shop/tube — his `cut_tyre`, the
+                     # neighbour's `eat_tyre`, SHOUT 2; the glasses gone to the
+                     # lion's head); the mobile's fuel is no PC ingredient
+                     'Chef': ((0x10024929,), {'shop_chef_blind', 'shop_tube'},
+                              {'shop_chef', 'shop_eelbasket'}, 0)},
                # 208's elephant line (0x1001e000: the lookaround and the line's
                # `fool`, SHOUT 1, the repair); the variants' objects named
                # (the cable's combinations give the tap's)
@@ -2055,7 +2061,8 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
 # station's own tricked step, its stand, SHOUT, repair and records — read as
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
-TRICKED_SCENE = {208: ('AngryElephant',), 209: ('FireFakir',), 211: ('LifeBoat',), 213: ('Pinata',)}
+TRICKED_SCENE = {205: ('Chef',), 208: ('AngryElephant',), 209: ('FireFakir',), 211: ('LifeBoat',),
+                 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loop of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's

@@ -14,7 +14,6 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
-    "PCJingle": true,
     "PCClipSeconds": {
      "Tennis": 4.33
     },
@@ -31,7 +30,8 @@
     ],
     "PCShout": 0,
     "PCFixSeconds": 0,
-    "PCShoutTail": 0.08
+    "PCShoutTail": 0.08,
+    "PCJingle": true
    }
   },
   {
@@ -64,7 +64,18 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCJingle": true,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 14.08,
+    "PCShout": 2,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
+    "PCCreditAt": 4.17,
+    "PCJingleAt": [
+     4.17
+    ],
     "PCUseSeconds": 4.92
    }
   },

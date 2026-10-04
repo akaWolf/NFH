@@ -2361,9 +2361,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tutorials' (their camera writes the flag); 204's vase, 207's and 210's
   diving board, 209's coal, gully and trough, 210's pole and 211's kid
   (their tricked variants' `crash_long`, `dive`, `walk_fuel`, `jump`,
-  `fall_water`, `shout`) are not reached by the model from the steps naming
-  their objects or those steps' successors — not read, the default
-  standing.
+  `fall_water`, `shout`) were not reached by the model from the steps naming
+  their objects or those steps' successors. Since the same morning 209's
+  coal and trough are the coal station's own flow and its linked variant
+  (PRESENT: their scene named), and 204's vase, 209's gully and 210's
+  diving board pay in their partner's linked flow (the jade's, the hot
+  shoe's, the dog basket's), whose scene is the partner's; 207's diving
+  board (its step 0x100169c5 polls for the Mother), 210's pole (the
+  hedgehog chair's linked variant, a visit timed per clip) and 211's kid
+  (the cabin phone's linked `crash`) stay unread, the default standing.
 - *209's fire fakir and 213's piñata (2026-10-04, carried).* Of the
   stand-ins whose flow SCENE_STEPS reads (the scene alone until now), two
   are their station's own tricked step whole: 209's fuelled groove
@@ -2401,7 +2407,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the trough's 1.92-s repair and hot_coal_fuel at 4.25 (the trough's
   record, its jingle hot_coal's). 209's plan, whose gauge window the
   longer visit broke (90), puts the fire channel in after the shoe
-  (tests/plans/pc/s2 v4): 100 at 360.2 s. The other SCENE_STEPS
+  (tests/plans/pc/s2 v4): 100 at 360.2 s. 205's blind chef (0x10024929:
+  the tube in the eel basket — combine.xml shop/tube, the mobile's fuel
+  no PC ingredient — his `cut_tyre` and the neighbour's `eat_tyre`, SHOUT
+  2): the tricked stand 14.08 s, eat_tyre 4.17 s in with its jingle,
+  shout2_hard where the record laugh had stood in with shout2_light;
+  205's plan ends 12 s later, at 100. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
   step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
@@ -2451,11 +2462,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
   — the tricked flow's jingle records in the seconds of the stand
   (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
-  _step_jingles on PCCreditAt's clock, 67 seconds over 54 items and 10
+  _step_jingles on PCCreditAt's clock, 68 seconds over 55 items and 10
   linked variants; `Routine.pc_jingles` counts them down as the credits),
   207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
   on the credit of the stand-ins (the flows not read, their credit at the
-  tantrum) whose record carries the jingle on its own tick (PCJingle, 11
+  tantrum) whose record carries the jingle on its own tick (PCJingle, 10
   items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
   the action it sits in). 202's plan: the beer mat's and the shark's with
   their credits (253.23, 274.72), the linked rail's 0.67 s before
