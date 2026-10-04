@@ -12,7 +12,18 @@
    "object": "Rake",
    "component": "Rake",
    "set": {
-    "AngerAmount": 20
+    "AngerAmount": 20,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 2.25,
+    "PCShout": 0,
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 0.5,
+    "PCJingleAt": [
+     0.17
+    ]
    },
    "note": "the rake's component is the Rake subclass (scene.py), not a plain TrickItem — the patch matched nothing until 2026-09-17"
   },

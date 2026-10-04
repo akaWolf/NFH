@@ -2429,7 +2429,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   no PC ingredient — his `cut_tyre` and the neighbour's `eat_tyre`, SHOUT
   2): the tricked stand 14.08 s, eat_tyre 4.17 s in with its jingle,
   shout2_hard where the record laugh had stood in with shout2_light;
-  205's plan ends 12 s later, at 100. The other SCENE_STEPS
+  205's plan ends 12 s later, at 100. 202's weeded rake on his walk-by
+  likewise (0x10022589; combine.xml's trick is the weed on the laid rake,
+  pond/rake_ground_weed — the laid rake alone, pond/rake_ground, is
+  trick="false"): the rake's `crash` (its jingle on the action's tick 0,
+  rake_ground on 4), SHOUT 0 and the repair — the tricked stand 2.25 s
+  over the mobile's RakeCrash, rake_ground 0.5 s in, the jingle 0.17 s
+  in, shout2_light and the 1.83-s repair where the mobile's angry had
+  stood at its own pace (AngryEasyUp, AngryHard, FixMid; the credit at the
+  tantrum); 202's plan ends 4.9 s earlier, at 100. The laid rake alone is
+  the step's other branch — its `use` 2.17 s and repair 1.67 s, no SHOUT
+  and no record — and stays the mobile's angry (AngryEasyUp 2.5 s, FixMid:
+  the keys are gated to the compound in `World.play_angry`): open. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
   step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
@@ -2461,7 +2472,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
-- *The trick's jingle (2026-10-04, carried; three stand-ins open).* The
+- *The trick's jingle (2026-10-04, carried; two stand-ins open).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
   fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
@@ -2492,18 +2503,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tantrum) whose record carries the jingle on its own tick (PCJingle, 9
   items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
   the action it sits in). 202's plan: the beer mat's and the shark's with
-  their credits (253.23, 274.72), the linked rail's 0.67 s before
-  bridge_crash and 0.42 s before bridge_electrify (310.30, 312.48).
+  their credits (251.28, 271.65), the weeded rake's 0.33 s before
+  rake_ground (260.40), the linked rail's 0.67 s before bridge_crash and
+  0.42 s before bridge_electrify (307.23, 309.42).
   204's vase, 209's trough, 210's diving board and 212's second throne
   pay in their partner's linked flow (PCLinkedPaysAt: vase_manip's
   `crash_long`, hot_coal's `walk_fuel`, divingboard_oil's `fall_water`,
-  the hands' `hit`), whose jingle PCJingleAtLinked plays. Open: three
-  stand-ins whose action plays its jingle off their record's tick — 202's
-  rake (rake_ground_weed `crash`: the jingle on tick 0, rake_ground on 4),
-  208's tap (tap_electricity `electrify`: 0, electrify on 4) and 211's
-  Olga's child (phone `crash`: 26 with phone_normal's, phone_loud on 31):
-  with their flows unread and their credit at the tantrum the port plays
-  none of these.
+  the hands' `hit`), whose jingle PCJingleAtLinked plays; 202's weeded
+  rake (rake_ground_weed `crash`: the jingle on tick 0, rake_ground on 4)
+  is a tricked flow read since (PCJingleAt). Open: two stand-ins whose
+  action plays its jingle off their record's tick — 208's tap
+  (tap_electricity `electrify`: 0, electrify on 4) and 211's Olga's child
+  (phone `crash`: 26 with phone_normal's, phone_loud on 31): with their
+  flows unread and their credit at the tantrum the port plays neither.
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.

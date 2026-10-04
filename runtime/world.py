@@ -8964,6 +8964,13 @@ class World:
                 level = item.pc_shout_linked
             elif level is None:
                 level = getattr(item, 'pc_shout', None)
+            if level is not None and item.kind == 'Rake' and not item.compound_tricked:
+                # 202's rake keys are the weeded rake's branch of his walk-by
+                # (0x10022589: rake_ground_weed's `crash`, SHOUT 0); the laid
+                # rake alone (combine.xml pond/rake_ground, trick="false") is
+                # its other branch, `use` and repair with no SHOUT — open
+                # (runtime/README.md), the mobile's angry as before
+                level = None
         if level is not None and seq:
             # the tricked step's own SHOUT and repair (fcn.1000f977: the level
             # picks the action, pcprofile.s2_reaction_seconds — the freakout

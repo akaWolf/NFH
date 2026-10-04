@@ -2043,7 +2043,13 @@ TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
 # SHOUT, the wrapper), 211's cabin phone (0x1002fcbe: crash, SHOUT 1, the
 # wrapper), 213's bull controls (0x10037de6: Ef51a, the `use`; 0x10037d3b:
 # the hurt icon, Eebbf — no SHOUT)
-SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
+SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
+                     # the weeded rake on his walk-by (0x10022589: the rake's
+                     # `crash`, SHOUT 0, the repair; combine.xml: the weed on
+                     # the laid rake, pond/rake_ground_weed, is the trick — the
+                     # laid rake alone, trick="false", his `use` and repair)
+                     'Rake': ((0x10022589,), {'pond_rake_ground_weed'},
+                              {'pond_rake', 'pond_rake_ground'}, 0)},
                205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
                                       {'beachright_pingpong', 'beachright_pingpong_guarded'}),
                      # the blind chef's shop (0x10024929: the tube in the eel
@@ -2087,8 +2093,8 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
 # station's own tricked step, its stand, SHOUT, repair and records — read as
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
-TRICKED_SCENE = {205: ('Chef',), 208: ('AngryElephant',), 209: ('FireFakir',), 211: ('LifeBoat',),
-                 213: ('Pinata',)}
+TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant',), 209: ('FireFakir',),
+                 211: ('LifeBoat',), 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loop of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's

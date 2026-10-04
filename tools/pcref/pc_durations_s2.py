@@ -220,12 +220,13 @@ def _set_key(patches, item, key, value):
     """set `key` on the item's TrickItem patch — or, for an item of another
     component, on a patch of that component another tool has written (a
     SearchItem's PCApproach: 206's FifiWeightsDrop and FifiWeightsGrab, the
-    Fifi put and take at the dumbbell) —, else add one"""
+    Fifi put and take at the dumbbell; 202's rake, the Rake subclass) —,
+    else add one"""
     for e in patches:
         if e.get('object') == item and e.get('component') == 'TrickItem' and isinstance(e.get('set'), dict):
             e['set'][key] = value; return
     for e in patches:
-        if e.get('object') == item and e.get('component') in ('SearchItem', 'HideItem') \
+        if e.get('object') == item and e.get('component') in ('SearchItem', 'HideItem', 'Rake') \
                 and isinstance(e.get('set'), dict):
             e['set'][key] = value; return
     patches.append({'object': item, 'component': 'TrickItem', 'set': {key: value}})

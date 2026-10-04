@@ -737,7 +737,13 @@ predicate, then the all-tricks win.
   the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
   fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
   -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
-  set is skipped.
+  set is skipped. Open: 202's laid rake without the weed (combine.xml
+  pond/rake_ground, trick="false") — the PC's walk-by plays its `use`
+  (2.17 s from the step's 0.17) and repair (1.67 s), no SHOUT and no
+  record, 4.17 s in all; the port plays the mobile's (the Rake subclass
+  straight to the stop, the DontGetAngry angry: AngryEasyUp 2.5 s and
+  FixMid), the rake's keys being the weeded branch's (`play_angry` gates
+  them to the compound).
 - **The PC profile's behaviours** (GameLogic's DoActions job, update
   0x100020c0): an action's behavior= is posted as its job ends (state 2,
   fcn.1004000a at 0x10002708) — the Loader's time + 2 ticks after the
@@ -1412,10 +1418,10 @@ Input, HUD, and timing:
   counted down with the credits), 207's lift from its start
   (PCHitJinglesLinked, `_hit_begin`) and a stand-in's credit where its
   record carries the jingle (PCJingle; GameLogic fcn.1000140b,
-  0x10001528). Open: three stand-ins whose action's jingle is off their
-  record's tick (202's rake and 208's tap 4 ticks before it; 211's Olga's
-  child on its partner's record) — none played (docs/PC_FIDELITY.md,
-  "The trick's jingle"). The PC's Season 1 level music (`World.
+  0x10001528). Open: two stand-ins whose action's jingle is off their
+  record's tick (208's tap 4 ticks before it; 211's Olga's child on its
+  partner's record) — neither played (docs/PC_FIDELITY.md, "The trick's
+  jingle"). The PC's Season 1 level music (`World.
   _pc_music_tick`, `play_clap`, `pc_music_override`; `SoundBank.pc_track`,
   `pc_tick`): the clap an intermezzo, the level's set drawn at random
   (ingame1 / ingame2, its own generator), every 12 ticks the override
