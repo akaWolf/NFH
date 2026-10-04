@@ -126,11 +126,14 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCJingle": true,
     "PCScene": [
      0.17,
      "shout"
     ],
-    "PCJingle": true
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.17
    }
   },
   {

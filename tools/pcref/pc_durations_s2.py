@@ -541,6 +541,13 @@ def write_tricked_keys(ov, n, clips):
     for item, sc in sorted(lap_model_s2.scene_steps(n).items()):
         # the scene of a tricked flow off the model's lap (SCENE_STEPS)
         _set_key(ov['patches'], item, 'PCScene', sc)
+    for item, (level, repair, tail) in sorted(lap_model_s2.scene_step_reactions(n).items()):
+        # and its SHOUT and repair (the flow's reaction, in the stand-in's
+        # record laugh's stead)
+        _set_key(ov['patches'], item, 'PCShout', level)
+        _set_key(ov['patches'], item, 'PCFixSeconds', repair or 0)
+        if tail:
+            _set_key(ov['patches'], item, 'PCShoutTail', tail)
 
 
 def write_code_stays(ov, n, clips):

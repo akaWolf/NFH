@@ -14,6 +14,7 @@
    "set": {
     "PCLaugh": 3,
     "PCRunTo": true,
+    "PCJingle": true,
     "PCClipSeconds": {
      "Tennis": 4.33
     },
@@ -28,7 +29,9 @@
      0.17,
      "shout"
     ],
-    "PCJingle": true
+    "PCShout": 0,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08
    }
   },
   {
@@ -61,8 +64,8 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 3,
-    "PCUseSeconds": 4.92,
-    "PCJingle": true
+    "PCJingle": true,
+    "PCUseSeconds": 4.92
    }
   },
   {

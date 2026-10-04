@@ -2379,11 +2379,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   where the stand-in reaction had been the record's laugh 3 (shout2_high); the
   credits no longer wait for the tantrum. 209's plan ends 4.9 s later
   (444.5 s), 213's where it did; both at 100. The other SCENE_STEPS
-  items stay stand-ins: 202's beer mat and 205's table are timed per clip
-  (the flow read is the beer's and the table's step, not the visit), 208's
-  rake, 211's cabin phone and 212's boat coin slot are walk-bys and alarms
-  with no tricked use of the mobile's to pace, 213's bull controls a
-  two-visit station. 212's second throne is no station of its own: the
+  items keep their stand-in stands and credits — 202's beer mat and 205's
+  table are timed per clip (the flow read is the beer's and the table's
+  step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
+  slot are walk-bys and alarms with no tricked use of the mobile's to
+  pace, 213's bull controls a two-visit station — but their reaction is
+  their flow's since the same morning (lap_model_s2.scene_step_reactions
+  -> PCShout, PCFixSeconds, PCShoutTail in the record laugh's stead): the
+  beer mat SHOUT 0 and the mat's 1.83-s repair (202's plan ends 1.8 s
+  later), the table 0, 208's rake 0 and its 1.33-s repair, the cabin
+  phone 1, the boat coin slot 2 (shout2_hard), the bull controls none
+  (-1) — all at 100. 212's second throne is no station of its own: the
   mobile's AztecThrone2 is AztecThrone's linked trick, and the throne's
   step (0x10036bb2) checks throne_half, throne_half_2 and throne_full
   (0x10036c42-0x10036c9d; half_right's result is dropped) — a half plays

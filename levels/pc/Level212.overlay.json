@@ -139,7 +139,10 @@
     "PCScene": [
      0.17,
      "shout"
-    ]
+    ],
+    "PCShout": 2,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.33
    }
   },
   {

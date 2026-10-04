@@ -20,8 +20,8 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 11.42,
-    "PCJingle": true
+    "PCJingle": true,
+    "PCUseSeconds": 11.42
    }
   },
   {
@@ -48,8 +48,8 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 5.92,
-    "PCJingle": true
+    "PCJingle": true,
+    "PCUseSeconds": 5.92
    }
   },
   {
@@ -807,11 +807,13 @@
       "routes": {}
      }
     },
+    "PCJingle": true,
     "PCScene": [
      0.17,
      "shout"
     ],
-    "PCJingle": true
+    "PCShout": 0,
+    "PCFixSeconds": 1.33
    }
   },
   {

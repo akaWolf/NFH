@@ -2076,6 +2076,28 @@ def scene_steps(n):
             for item in SCENE_STEPS.get(n, {})}
 
 
+def scene_step_reactions(n):
+    """{mobile item: (SHOUT level, repair s or None, tail s)} of the
+    SCENE_STEPS flows that are not TRICKED_SCENE's: the reaction the flow
+    plays after its tricked part (fcn.1000f977's level, -1 none; the repair
+    after it, _step_parts_split; the rest before the next step, _shout_tail)
+    — the SHOUT the stand-in's record laugh (PCLaugh) had stood in for"""
+    d = Data(n)
+    out = {}
+    # (a linked partner no station visits alone: 212's second ruby, played in
+    # its throne's linked variant, LINKED_PRESENT)
+    partners = {mobile_linked(n).get(it) for it in LINKED_PRESENT.get(n, {})}
+    for item in SCENE_STEPS.get(n, {}):
+        if item in TRICKED_SCENE.get(n, ()) or item in partners:
+            continue
+        ev = _scene_step_events(n, item)
+        _stand, level, repair, _credit = _step_parts_split(d, ev)
+        if level is None:
+            continue
+        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev)))
+    return out
+
+
 def _repair_walk(n, d, ev):
     """(ticks, (x, px) | None): the walk a tricked flow makes to its repair —
     from the station its last GoTo before the repair's took him to (the

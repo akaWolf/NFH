@@ -21,6 +21,7 @@
    "component": "TrickItem",
    "set": {
     "AngerAmount": 35,
+    "PCJingle": true,
     "PCClipSeconds": {
      "WaitSea": 6.17,
      "EnterSea": 3.17,
@@ -34,8 +35,7 @@
      "role": "Olga",
      "item": "Submarine",
      "then": 0.0
-    },
-    "PCJingle": true
+    }
    },
    "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"
   },
@@ -52,6 +52,7 @@
    "set": {
     "AngerAmount": 20,
     "PCLaugh": 3,
+    "PCJingle": true,
     "PCClipSeconds": {
      "BeachLayDown": 0.75,
      "BeachPinLayDown": 0.75,
@@ -65,7 +66,8 @@
      0.17,
      "shout"
     ],
-    "PCJingle": true
+    "PCShout": 0,
+    "PCFixSeconds": 1.83
    },
    "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
   },
