@@ -1988,40 +1988,48 @@ the level selection menu, LevelLoader, not modelled).
   (Pawn.cs:366-378 has no GameEnding gate — the original then plays two
   endings over each other), the UseDoorAtOnce carry-over, the parked-run
   edge cases above, and the two hidden-use timings of the routine section.
-- Open (2026-10-03): the Season 1 start under the PC profile. In Badinfos'
-  run (pc_s1_all_720 at 30 fps) the neighbour's bubble stays empty for
-  3.07 s after the level's first frame — 230.83 -> 233.90 (101), 370.57 ->
-  373.63 (102), 548.27 -> 551.37 (103), 712.83 -> 715.90 (104), 961.40 ->
-  964.47 (105), 1151.73 -> 1154.83 (106) — while Woody walks in; the port's
-  neighbour starts at 1.65 s (DelayStart's 1.5, Rottweiler.cs:153): 1.4 s
-  early on every Season 1 level. The PC's first case runs when the level
-  state's running flag is set (+0x88, 0x4417d9: game.exe's listener slot
-  37, the StartLevelMsg the relay 0x43deb0 re-sends), which GFXEngine.dll's
-  start object (fcn.10011c70: +0x3c done, +0x40 a limit the constructor
-  zeroes) posts on its first update past the limit or on a key or a click
-  (fcn.10011eb0, fcn.10011f20, fcn.10011fc0); what creates that object ~37
-  ticks into the level is not read yet, so the port keeps the mobile's
-  delay. (Season 2 has no such wait: its scripts' icons are up on the first
-  frame, and the profile starts them there.) Read 2026-10-04: the intro
-  object is the `presents` card (GFXEngine vtable 0x100a3584, the dialogs
-  intro_medium / intro_big); its limit stays 0 and any key but the
-  modifiers or a click posts at once (0x10011f20), and the clock ticks from
-  the card's end (E02: 4:59 at 371.3, 4:57 at 373.55) — the level runs,
-  only the neighbour's script is late. tutorial_3 agrees: its director
-  (HAL) speaks on tick 15 (149.92, the card gone at 148.75) and whistles the
-  dog awake (it stirs at 150.17, barks from about 150.92), yet the
-  neighbour's handler answers the dog's alarm only at 151.92 — tick 39,
-  as the levels' first icons come on tick 37 — where the pets' alarm on a
-  level (E11: the dog stirs at 2707.63, his noise icon at 2708.42) takes
-  the wake-up's 9 ticks and one more; his script, not the alarm, waits.
-  The source of that wait is still not read. Ruled out on 2026-10-04: the
-  class's job is pushed as the actor is created (the AddActor message's
-  listener slot 96, 0x43ea50 -> fcn.00439fe0 -> fcn.00444d30, run-now 0),
-  every actor ticks from the level's first pass (fcn.00439cd0: the state
-  function while the state is 0 or 1, then each actor's fcn.00444db0; the
-  pause byte +0x78 is toggled only by PauseActorMsg), and SetIcon posts its
-  message at once (fcn.00437f70, vtable 0x4e09e0); the neighbour stands in
-  his room from the level's first frame (E02 370.55).
+- The Season 1 start under the PC profile (open 2026-10-03, carried
+  2026-10-04: `Routine.tick`, `pcprofile.S1_START_TICKS`). In Badinfos' run
+  (pc_s1_all_720 at 30 fps) the neighbour's bubble stays empty for 3.07 s
+  after the level card gives way — 230.83 -> 233.90 (101), 370.57 -> 373.63
+  (102: the sofa slides in on 373.633), 548.27 -> 551.37 (103), 712.83 ->
+  715.90 (104), 961.40 -> 964.47 (105), 1151.73 -> 1154.83 (106) — while
+  Woody walks in and the clock runs (5:00 until 371.5, 4:59 at 372). The
+  card is GFXEngine's title object (vtable 0x100a39a4 over 0x100a3584, made
+  by fcn.1000eef0 -> fcn.10011ff0 with GetTickCount: its elements keyed at
+  +2.5 to +7.5 s, its limit +0x40 the tick plus 8000 ms); its update
+  (slot 10, 0x10011eb0) or any key but the modifiers or a click
+  (0x10011f20, 0x10011fc0) closes it (fcn.10011dd0) and the start message
+  sets the level's running byte +0x88 (0x4417d9), which game.exe's level
+  update (fcn.0043ab40) needs for the triggers, the actors' pass and the
+  rest (0x43b2d0-0x43b2fc) — the first tick of play. The neighbour's wait
+  is his own: the AddActor handler (fcn.00439fe0) pushes his level class's
+  job (0x43a35c for level_sofa, fcn.00470600: state 0) and then, at the
+  head of the queue (fcn.00444d30 -> fcn.00478f90), the start job
+  fcn.004718b0 (0x43a7cb, vtable 0x4e5260) — Woody gets one as well
+  (0x43a207). Its step for anyone but Woody (fcn.004715c0) pushes a wait of
+  36 on its first tick (fcn.00471410 -> fcn.0047e520 with 0x24) and, the
+  wait done, posts `normal` (fcn.00471570) and ends; the wait (0x47e500)
+  counts down and ends on the count 0, 37 steps, not breakable (+4 0). So
+  the class's case 0 — its SetIcon first (0x46f96a) — runs on the 37th
+  tick after the first: 3.08 s, and a trigger that came meanwhile waits
+  for it (tutorial_3's dog, answered on tick 39). The port held the
+  mobile's DelayStart (1.5 s, Rottweiler.cs:153) and showed the first
+  action's icon from the first frame; under the profile the neighbour's
+  first action starts 37 ticks after the first tick (his first move at
+  3.117 s against 1.517), the bubble stays empty until it starts, and the
+  catch no longer waits for it: game.exe's state function tests the rooms,
+  the pause byte and the hideout flag only (fcn.00436bb0, 0x436cc7-
+  0x436d31), from the first tick of play. (Season 2 has no such wait: its
+  scripts' icons are up on the first frame, and the profile starts them
+  there.) Woody's own start job is not carried: its Woody branch
+  (fcn.00471960) idles a tick, then pushes a walk job (fcn.004716f0 ->
+  fcn.004764b0: vtable 0x4e5400 over the AddActor's room argument, whose
+  step pushes fcn.00475850's walk), then his `start` action (generic/
+  objects.xml: the triumph's last nine frames) and `normal` — the port
+  keeps the mobile's entrance walk (0.5 s, EntranceLocation, Hello); the
+  walk's target is not read yet (E02: Woody walks onto the porch from the
+  right at 371.6, a second after the card).
 - Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
   `OnTrickDone` paths die in the parked ride — README above), L113's
   ElectricTrap 8 (its collider sits inside and behind the basement door's,

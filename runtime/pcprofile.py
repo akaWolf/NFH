@@ -512,6 +512,16 @@ def s2_result(won, collapsed, completed, total):
 # laps within 12 % of the PC video.
 PX_PER_UNIT = 96.0
 TICKS_PER_SECOND = 12.0
+# the Season 1 neighbour's first case, so many ticks into play: the AddActor
+# handler pushes his level class's job (0x43a35c: level_sofa's fcn.00470600)
+# and then, in front of it (fcn.00444d30 -> fcn.00478f90 pushes at the head),
+# the start job fcn.004718b0 (0x43a7cb, vtable 0x4e5260) — Woody's one plays
+# his `start`, the neighbour's (fcn.004715c0) pushes a wait of 36 on its first
+# tick (fcn.00471410 -> fcn.0047e520 with 0x24) and posts `normal` as it ends
+# (fcn.00471570). The wait's step (0x47e500) counts down and ends on the count
+# 0 — 37 steps — so the class's case 0 (the first icon, 0x46f96a) runs on the
+# 37th tick after the first: 3.08 s, the video's 3.07-3.10 s (E01-E06)
+S1_START_TICKS = 37
 # game.exe's nearobj trigger, the Season 1 floor tricks' notice (fcn.00471bc0:
 # the actor in the object's room, not in a hideout — its flag 4, fcn.0043c2b0
 # at 0x471cee — and |its x - the object's `neighbor` hotspot x| < 15,

@@ -1340,6 +1340,12 @@ class Hud:
         self._blit(self.d.get(tex_key), self.rect(rect_key))
         if routine is None:
             return
+        w = self.world.woody
+        if pcprofile.is_pc() and not routine.started and w is not None and not w.nfh2:
+            # the PC's Season 1 bubble stays empty until the level class's
+            # first SetIcon, its case 0 as the start job ends
+            # (pcprofile.S1_START_TICKS)
+            return
         it = routine.urgent_item or routine.item
         name = None
         pc = getattr(routine, 'pc_bubble', None)

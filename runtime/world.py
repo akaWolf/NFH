@@ -3507,6 +3507,7 @@ class Routine:
         self.pc_credit3_item = None
         self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
+        self._pc_start_job = False       # the PC's Season 1 start job has run its first step
         self.started = False             # ActionManager.CurrentAction != null
         self.on_use = None
         self.log = []
@@ -7033,9 +7034,18 @@ class Routine:
             # neighbour and Mother at 2088.6 s) — no 1.5 s before the first
             # action
             self.delay_start = 0.0
+        if self.delay_start > 0.0 and pcprofile.is_pc() and self.role == 'Rottweiler' \
+                and not self._pc_start_job:
+            # the PC's Season 1 neighbour: the start job in front of his
+            # level class's pushes its wait on this first tick of play, and
+            # the class's case 0 runs on the tick the wait ends, 37 later
+            # (pcprofile.S1_START_TICKS) — not the mobile's 1.5 s
+            self._pc_start_job = True
+            self.delay_start = pcprofile.S1_START_TICKS / pcprofile.TICKS_PER_SECOND
+            return
         if self.delay_start > 0.0:
             self.delay_start -= dt
-            if self.delay_start > 0.0:
+            if self.delay_start > (pcprofile.TIMER_EPS if pcprofile.is_pc() else 0.0):
                 return
         if self.frozen:
             return
@@ -11687,8 +11697,15 @@ class World:
         # never nulled again — so no detection during the 1.5 s DelayStart,
         # nor for a manager that never starts (no actions / frozen at start)
         routine = next((r for r in self.routines if r.pawn is rott), None)
-        if routine is None or not routine.actions or not routine.started:
+        if routine is None or not routine.actions:
             return False
+        if not routine.started and not (pcprofile.is_pc()
+                                        and pcprofile.sees_while_busy(woody.nfh2)):
+            return False
+        # (the PC's Season 1 catch is the state function's rooms test —
+        # fcn.00436bb0: Woody's and the neighbour's rooms, his pause byte
+        # +0x78, the hideout flag 4 by fcn.0043c2b0 — from the first tick of
+        # play, his script's start job or not)
         if pcprofile.is_pc() and pcprofile.s2_sight(woody.nfh2):
             return self._pc_s2_sees(rott)
         if not self._detect_common(rott):

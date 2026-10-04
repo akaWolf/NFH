@@ -2206,7 +2206,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (0.83 s after the whistle against the video's 2.0); E11's dog, woken by
   Woody, has him answer on the wake-up's end (2707.63 / 2708.42, 9.5 ticks)
   as the model does — the tutorial's wait is his script's own late start,
-  the levels' open 37 ticks (runtime/README.md "the Season 1 start").
+  the levels' 37 ticks (carried 2026-10-04, below).
+- *The Season 1 start (2026-10-04, carried).* The neighbour's bubble stays
+  empty for 3.07-3.10 s after the level card gives way on E01-E06 (102:
+  370.57 to the sofa sliding in at 373.633) while the clock runs. The card
+  (GFXEngine's title object, fcn.10011ff0: its limit the GetTickCount plus
+  8000 ms, a key or a click sooner) ends in the start message that sets the
+  level's running byte +0x88, which the level update needs for its actors'
+  pass (0x43b2d0) — the first tick of play. The wait is the neighbour's:
+  the AddActor handler pushes his level class's job and then, at the
+  queue's head, the start job fcn.004718b0 (0x43a7cb, vtable 0x4e5260),
+  whose step for anyone but Woody (fcn.004715c0) pushes a wait of 36 on its
+  first tick (fcn.00471410 -> fcn.0047e520) and posts `normal` when it
+  ends; the wait's step (0x47e500) ends on the count 0 — 37 steps, not
+  breakable — so the class's case 0, its SetIcon first, runs 37 ticks
+  after the first tick: 3.08 s (pcprofile.S1_START_TICKS). The port held
+  the mobile's DelayStart (1.5 s) with the first icon up from the first
+  frame; under the profile his first action starts on the 37th tick (the
+  first move 3.117 s, 1.517 before), the bubble is empty until then, and
+  the catch no longer waits for his script — the state function's test is
+  the rooms, the pause byte and flag 4 (fcn.00436bb0, 0x436cc7-0x436d31).
+  The 28 plans hold at 100.
 - *A click in a door's pass (2026-10-04, fixed).* The profile's pass puts
   the pawn in the far room as its clips start (the door step's placement,
   game.exe 0x474590; `Pawn._warp_through` at the clip's start), so a path
