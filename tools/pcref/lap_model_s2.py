@@ -2978,14 +2978,29 @@ def code_stays_tricked(n):
                                 lvc.present = (lvc.present - trick[other][1]) | trick[other][0]
                         run_step(lvc, lap[i][1], dict(byi), latch=lat)
                         evc = []
+                        nxc = None
                         for stp in steps:
-                            evc += [('STEP',)] + run_step(lvc, stp, dict(byi), unknown=1, streq=1)[0]
+                            evs, nxc = run_step(lvc, stp, dict(byi), unknown=1, streq=1)
+                            evc += [('STEP',)] + evs
                         cstand, clevel, crepair, _c = _step_parts_split(d, evc)
                         wk, dep = _repair_walk(n, d, evc) if crepair is not None else (0, None)
                         e.update({'shout': clevel,
                                   'tail': _secs(_shout_tail(d, evc)),
                                   'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
+                        if clevel is not None and clevel >= 0 and crepair is None and nxc is not None:
+                            # the step the reaction's hands on to repairs:
+                            # 204's rickshaw (0x10032b6f's SHOUT, then
+                            # 0x1003250a: the GoTo to the manipulated
+                            # rickshaw, its `repair` and the switch back) —
+                            # as a tricked step's off-lap handover (below)
+                            evr, _nr = run_step(lvc, nxc, dict(byi), unknown=1, streq=1)
+                            _s, _l, crepair, _c = _step_parts_split(d, evc + [('STEP',)] + evr)
+                            if crepair is not None and any(
+                                    e2[0] == 'DO' and len(e2[1]) > 1 and e2[1][1] == 'repair' for e2 in evr):
+                                wk, dep = _repair_walk(n, d, ev2 + evc + evr)
+                                e['repair'] = round((crepair + wk) / 12.0, 2)
+                                e['tail'] = _secs(_shout_tail(d, evc + [('STEP',)] + evr))
                         # the scene across the tricked step and its reaction's
                         e['scene'] = _scene_secs(_scene_span(
                             d, ev2 + [('STEP',)] + evc, own_i,
@@ -3054,11 +3069,17 @@ def code_stays_tricked(n):
                         # to off the lap (203's generator after the stage's
                         # crash, 0x100343a5: its walk, `repair` and switch back)
                         evr, _nr = run_step(lvj, nx2, dict(byi))
-                        rp = [t for _o, a, t in station_ticks(d, evr, {}) if a == 'repair']
-                        if rp and None not in rp:
+                        # (on the flow's clock from the SHOUT: the SHOUT's
+                        # step's own elements after it, the next step's
+                        # start, the repair and the instants after it —
+                        # station_ticks of the repair's step alone until
+                        # 2026-10-04, a tick or two short)
+                        _s, _l, crep, _c = _step_parts_split(d, ev2 + [('STEP',)] + evr)
+                        if crep is not None and any(
+                                e2[0] == 'DO' and len(e2[1]) > 1 and e2[1][1] == 'repair' for e2 in evr):
                             # (and the walk to it: 203's stage to the generator)
                             wk, dep = _repair_walk(n, d, ev2 + evr)
-                            e['repair'] = round((sum(rp) + wk) / 12.0, 2)
+                            e['repair'] = round((crep + wk) / 12.0, 2)
                             e['tail'] = _secs(_shout_tail(d, ev2 + [('STEP',)] + evr))
                             if dep is not None:
                                 e['fix_depart'] = dep

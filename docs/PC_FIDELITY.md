@@ -2671,6 +2671,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   27.0 s (the port's 27.0, 22.2 before), the plant to the tortilla 10.75
   (11.0), the tortilla to the picnic 27.5 (27.2); 213's plan ends 1.7 s
   later, at 100.
+  And 204's rickshaw: the reaction Olga's fight hands to (0x10032b6f: the
+  rickshaw icon, SHOUT 0, the camera back) goes on to 0x1003250a — the
+  GoTo to the manipulated rickshaw, its `repair` (20 ticks) and the switch
+  back — before the head-banging; the port had no repair there
+  (PCFixSeconds 0). The continuation's next step's repair is read as a
+  tricked step's off-lap one is (-> PCFixSeconds 2.0: the camera's tick,
+  the step's 2, the repair, the switch); and both on the flow's clock
+  from the SHOUT, where the off-lap repair had taken its step's ticks
+  alone, the SHOUT's step's elements after it lost (203's generator 4.58
+  -> 4.75, 212's bench 6.42 -> 6.5, 213's washing tub 1.92 -> 2.0). E04:
+  the bubble on the rickshaw again 104.0-108.3 after the fight's icon
+  (98.3-104.0); the kart's coin to the karate's 18.0 s against the
+  gauge's 19.25 (16.2 before). Open: the fight's icon 5.7 s in E04
+  against the port's 4.5 — Olga's way out of the rickshaw to him (her
+  step 0x1003340b takes the manipulated rickshaw for her hideout and runs
+  fcn.1000eb19 at gait 2) is not timed by the model (PCHitAfter 0.08).
   The whip's credit to the cigars' stays 26.2 s against E12's 29.8, and
   the 3.6 s are the door: the icon moves to the cigars 11.2 s after the
   whip's credit in both, and in E12 the Mother takes the midright/midleft

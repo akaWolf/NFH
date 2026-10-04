@@ -57,8 +57,7 @@
     ],
     "PCUseSecondsTricked": 4.0,
     "PCShout": 0,
-    "PCFixSeconds": 0,
-    "PCShoutTail": 0.08,
+    "PCFixSeconds": 2.0,
     "PCHitSeconds": {
      "Olga": 3.58
     },
