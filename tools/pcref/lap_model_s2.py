@@ -2159,7 +2159,14 @@ TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'Electri
 # pool/awning_closed from pool/awning_pole), the plain awning gone
 LINKED_PRESENT = {207: {'PoolBoard': ({'pool_divingboard_spring', 'pool_awning_closed'},
                                      {'pool_divingboard', 'pool_awning', 'pool_awning_pole'})},
-                  212: {'AztecThrone': ({'topright_throne_full'},
+                  # 212's whip over the opened spikes: the mobile's linked
+                  # WhipStonePlate is the crowbar's game (combine.xml
+                  # midright/spikes_open, trick="false"), no trick of its own
+                  # to name the scene — the dagger's whip_manip with the
+                  # spikes open, whose step plays the `crash` (swing_spikes)
+                  212: {'Whip': ({'midright_whip_manip', 'midright_spikes_open'},
+                                 {'midright_whip', 'midright_spikes'}),
+                        'AztecThrone': ({'topright_throne_full'},
                                         {'topright_throne_empty', 'topright_throne_half',
                                          'topright_throne_half_2', 'topright_throne_half_right'})}}
 # the flow a mobile tricked state plays that is no PC trick: {level: {item:
@@ -3183,10 +3190,11 @@ def code_stays_tricked(n):
     # tricks in the scene
     dos = lambda ev: [tuple(e[1]) for e in ev if e[0] in ('DO', 'ODO')]
     for item, lnk in sorted(mobile_linked(n).items()):
-        if item not in where or 'linked' in out[item] or lnk not in trick:
+        named = item in LINKED_PRESENT.get(n, {})
+        if item not in where or 'linked' in out[item] or (lnk not in trick and not named):
             continue
         i, ev1 = where[item]
-        (s1, h1), (s2, h2) = trick[item], trick[lnk]
+        (s1, h1), (s2, h2) = trick[item], trick.get(lnk, (set(), set()))
         lvi, byi = _row_level(n, snaps, lap[i][0])
         lv2 = Level(n)
         lv2.present = (set(lvi.present) - h1 - h2) | s1 | s2

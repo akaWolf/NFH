@@ -2606,7 +2606,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   alone — its step plays the flush after the chili paper and then SHOUT 0
   and the repair, where the port's paper, AngryWithoutAnimations, pays
   silently and its untricked flush visit plays no reaction (no plan
-  leaves the rice chute untricked).
+  leaves the rice chute untricked). The same evening E12 (212): the whip
+  pays with the spikes open (the crowbar's game, the mobile's linked
+  WhipStonePlate — a SearchItem, so no combination named its scene):
+  the whip step (0x100367f9) tests midright_spikes_open and plays the
+  dagger's whip_manip `crash` (swing_spikes: whip and spikes on its tick
+  47), SHOUT 2 and the repair where the spikes shut play its `use`, SHOUT
+  0 — LINKED_PRESENT names the scene, the linked loop takes a partner
+  without a trick of its own (-> PCUseSecondsLinked 6.17, PCShoutLinked
+  2, PCLinkedPaysAt 4.08): the whip's credit to his next station 11.2 s
+  in both (the port's 6.7 before), 212's plan ends 4.6 s later, at 100.
+  Open: 212's bench after its credit — the leave step (0x1003613a: the
+  bench's `leave` to its neighbor_out, 550 px, the red bull's `crash`,
+  SHOUT 1 pushed as a constant) hands on to 0x10035fdf, which walks him
+  back to the bench (75 px) before its repair; the port repairs where he
+  stands. E12 at 2 fps (pc_nfh2_all_720 3105.9-3116 s): the crash to
+  ~212.3 on the episode's clock, him standing and shouting at the right
+  from 212.5 to 216.5 (4 s where shout2 lasts 28 ticks, 2.33 s — no level
+  of 212's has its own neighbour animations), the walk back 216.5-218.0
+  and the repair 218.0-221.0 (3 s against its 20 ticks), the next icon
+  9.5 s after the credit against the port's 5.0 — the walk (~1 s) is
+  read, the other ~3.5 s not.
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c
