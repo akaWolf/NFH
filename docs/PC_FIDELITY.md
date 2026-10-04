@@ -2314,6 +2314,34 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   besides SCENE_STEPS — 207's awning dive, 208's elephant, tap, platform
   and seesaw, 211's lifeboat (its ladder step's SHOUT and Eebbf,
   0x1003059d), 205's chef — close it after the SHOUT, as the default has.
+- *The Season 2 end against a catch (2026-10-04, carried).* The level
+  update runs its watch walker (fcn.1003fc90 at 0x100445f1: the sights,
+  the catch) and then, on its own, the completion check (0x100447f8) —
+  a sight or a catch on the tick does not hold it, where the mobile's
+  chain (GameInfo.cs:212-236) reaches the win only past both sights. The
+  check's success looks at Woody first: with the catch's flag 0x10000 on
+  him (the catch's start to the fiber's case 5) it ends the level there
+  and then — vf34(1), 0x10041159-0x10041162, past the freeze and the
+  `won` step: the board, the beating's and the respawn's rest unrun, no
+  life taken; either way the level ends a success (vf34's byte, the end
+  message's +4 in fcn.1004256d), a catch before it or not. The last life
+  runs the same fiber: case 4 skips the fall (fcn.1004012a at 0x1000634d)
+  and sets state 5 without finishing, and case 5 a tick later takes the
+  life and ends the level a failure (fcn.10042471: vf34(0),
+  0x100424d8-0x100424dc) — the level, its clock and its check run on
+  through the beating. The port checked the win only without a sight (a
+  seen Woody at the last scene's drop was caught instead), played the
+  triumph over the beating when the scene dropped during one (then the
+  respawn under it), showed FAILURE after a catch that had cleared its
+  won, and ended a last-life catch at the catch (FinishGame there). Under
+  the profile now: `World._pc_s2_check` after either catch, the success
+  under a catch straight to the board (`_pc_s2_success`), won set at every
+  success, and a last-life catch on the fiber to case 5
+  (`_catch`, `_after_hit`, `_pc_lives_out`). A forced catch by the
+  Mother at 207's last credit (probe: the plan, lives 3 or 1): the hit
+  454.567, the scene's drop 454.767 the board, a success, no life gone;
+  a last-life catch at 300 s: the hit 306.567, the fight's 51 ticks, case
+  5 at 310.900 — FAILURE, no lives.
 - *209's fakir and shoes by code (2026-10-03).* The fakir's step pushes
   the fakir's `spit` (actor="fire_fakir/fakir": its own queue — his steps go
   on without it) and his own `burn` (time 12): his stand the burn's job and

@@ -11777,6 +11777,16 @@ class World:
                 self.woody.input_locked = True
             else:
                 self.game.lives -= 1
+        elif pcprofile.is_pc() and self.game.lives > 0 \
+                and pcprofile.s2_respawn(self.woody.nfh2):
+            # the Season 2 last life runs the same fiber: case 4 skips the
+            # fall (fcn.1004012a at 0x1000634d) and case 5 takes the life
+            # and ends the level (_pc_lives_out); the level runs on until
+            # then, its completion check with it (_pc_s2_check)
+            self._last_catcher = catcher
+            self._pc_catch_seq = True
+            self.woody.input_locked = True
+            self._play_jingle('caught')       # PlayCaughtMusic (cs:329/339)
         else:
             if pcprofile.is_pc() and self.game.lives > 0:
                 self.game.lives -= 1          # fcn.10042471 on the last life
@@ -11902,9 +11912,16 @@ class World:
 
     def _after_hit(self):
         """the beating's end: the ending in the mobile game, a respawn under
-        the PC profile's lives"""
+        the PC profile's lives; the Season 2 last life's case 4 skips the
+        fall and leaves case 5 to the next tick (the fiber's state 5 set at
+        0x10006405, its return not done). Nothing once the level has ended
+        under the beating (_pc_s2_success)"""
+        if self.game.ended:
+            return
         if getattr(self, '_respawning', False):
             self._respawn()
+        elif self._pc_catch_seq:
+            self.call_later(1.0 / pcprofile.S2_TICK_HZ, self._pc_lives_out)
         else:
             if self.woody is not None and pcprofile.s1_jingles(self.woody.nfh2):
                 # the PC's second jingle of a catch: the beating's state 1
@@ -12049,6 +12066,19 @@ class World:
         w = self.woody
         if w is not None:
             w.input_locked = False
+
+    def _pc_lives_out(self):
+        """the catch fiber's case 5 on the last life (0x10006274-0x100062c7):
+        the catch's flag 0x10000 off Woody and fcn.10042471 — status +0x14 at
+        1 (fcn.1004012a, 0x10042483), the life taken and vf34(0)
+        (0x100424d8-0x100424dc): the level ends a failure"""
+        if self.game.ending or self.game.ended:
+            return
+        self._pc_catch_seq = False
+        self.game.lives -= 1
+        self.game.won = False
+        self._finish_game()
+        self._finish_animation_ended()
 
     def _pc_catch_barred(self):
         """the Season 2 catch is the catchers' `fight` behaviour on Woody and
@@ -12295,6 +12325,15 @@ class World:
             self._win()
         return True
 
+    def _pc_s2_check(self):
+        """the PC's Season 2 level update runs its completion check
+        (fcn.10041086, 0x100447f8) after its watch walker (fcn.1003fc90,
+        0x100445f1) on every tick, a sight or a catch on that tick or not —
+        the mobile's chain (GameInfo.cs:212-236) reaches the win only past
+        both sights. A no-op off the PC's Season 2 (_pc_s2_success)"""
+        if not self.game.ending and self.game.all_done():
+            self._pc_s2_success()
+
     def _pc_s2_success(self):
         """the PC's Season 2 completion (GameLogic.dll): the level update's
         status tick (0x10044710-0x100447f1) calls fcn.10041086 at 0x100447f8
@@ -12305,14 +12344,32 @@ class World:
         with it (the status's count +0x24, 0x100447df). The success: the
         camera on Woody (the level's slot 0x40, `woody`), the neighbour and
         the Mother frozen (flag 0x100000, fcn.100450bf), Woody's `won`
-        (fcn.100409f8 / fcn.1004000a) — _win. False where the mobile's rule
-        stays: Season 1, the mobile profile, a forced win"""
+        (fcn.100409f8 / fcn.1004000a) — _win; with Woody under a catch (its
+        flag 0x10000, fcn.100450dc at 0x1004114b: from the catch to the
+        fiber's case 5) the level ends there and then instead — vf34(1)
+        (0x10041159-0x10041162) past the freeze and the `won`: the board, the
+        fiber's rest unrun. Either way the level ends a success, vf34's byte
+        (fcn.1004256d: the end message's +4, 0x100425ce-0x100425d1), a catch
+        before it or not. False where the mobile's rule stays: Season 1, the
+        mobile profile, a forced win"""
         if not pcprofile.is_pc() or self.woody is None or not self.woody.nfh2 \
                 or self.game.win_immediate:
             return False
         if self._pc_scene:
             return True
         self.game.ending = True
+        self.game.won = True
+        if self._pc_catch_seq:
+            self._pc_catch_seq = False
+            self._respawning = False
+            self._pc_landing = None
+            self._hit_watches = [x for x in self._hit_watches
+                                 if x[1] is not self.woody]
+            self._pc_board_score = True
+            self._finish_game()
+            self._play_jingle('success_perfect')   # as _win's
+            self._finish_animation_ended()
+            return True
         self._win()
         return True
 
@@ -12604,9 +12661,11 @@ class World:
         if self.can_rottweiler_see_woody():
             if not self.game.got_caught and not barred:
                 self._catch()             # cs:214-221
+            self._pc_s2_check()
         elif self.can_mother_see_woody():
             if not barred:
                 self._catch(self.pawns.get('Mother'))   # cs:222-225, no gotCaught guard
+            self._pc_s2_check()
         elif self.game.all_done():
             # cs:226-236: WinGameOnCompleteAllTricks sets GameEnding at once
             # and starts the 2.5 s coroutine (cs:292-302) — the clock, the

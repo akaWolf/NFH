@@ -649,6 +649,13 @@ predicate, then the all-tricks win.
   camera (201's, 206's lesson: `follow`, its Ef51a and Eebbf) writes it too. `World._pc_s2_success` wins on the first tick
   it is clear; Woody's win clip then lasts the PC's `triumph` (25 ticks,
   `pcprofile.S2_WON_TICKS`) and the score is read at its end, the board.
+  The check follows the catch's on every tick, a sight on it or not
+  (`World._pc_s2_check`: the level update's watch walker, fcn.1003fc90
+  at 0x100445f1, then the check at 0x100447f8); with Woody under a catch
+  (its flag 0x10000, from the catch to the fiber's case 5) the success is
+  the board at once (vf34(1), 0x10041159), and a last-life catch runs the
+  same fiber, the level on until its case 5 ends it a failure
+  (`World._pc_lives_out`: fcn.10042471, vf34(0)).
 - **Hiding** (`HideItem.InternalUse` → `Woody.Hide`, `Woody.Unhide` →
   `HideItem.Leave`): using a wardrobe hides Woody at once and plays `Hide_In`;
   any new move leaves it, restoring the wardrobe idle and playing its
