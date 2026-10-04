@@ -445,7 +445,7 @@ def write_tricked_keys(ov, n, clips):
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
               'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter',
-              'PCScene', 'PCSceneLinked'):
+              'PCScene', 'PCSceneLinked', 'PCJingleAt', 'PCJingleAtLinked', 'PCHitJinglesLinked'):
         ov['patches'] = _strip_key(ov['patches'], k)
     sys.path.insert(0, HERE)
     import lap_model_s2
@@ -488,6 +488,14 @@ def write_tricked_keys(ov, n, clips):
                      {ROLE[a]: v for a, v in tr['hit_after'].items() if v is not None})
         if tr['credit'] is not None and item not in CREDIT.get(n, {}):
             _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
+            if tr.get('jingles'):
+                # the flow's jingle_joke records on the same clock — each
+                # jingle="true" record, named or not, on its own tick
+                # (fcn.1000140b, 0x10001528-0x1000153f)
+                _set_key(ov['patches'], item, 'PCJingleAt', tr['jingles'])
+        if tr.get('linked_jingles') and (tr.get('linked_credit') is not None
+                                          or tr.get('linked_pays') is not None):
+            _set_key(ov['patches'], item, 'PCJingleAtLinked', tr['linked_jingles'])
         if tr.get('linked_credit') is not None:
             _set_key(ov['patches'], item, 'PCCreditAtLinked', tr['linked_credit'])
         if tr.get('linked_shout') is not None and tr['linked_shout'] >= 0:
@@ -504,6 +512,10 @@ def write_tricked_keys(ov, n, clips):
             # (207's bill: 30 ticks from the lift's start, the
             # lift's job 31)
             _set_key(ov['patches'], item, 'PCHitSecondsLinked', {'Olga': tr['linked_hit']})
+            hj = {ROLE[a]: v for a, v in (tr.get('linked_hit_jingles') or {}).items() if v}
+            if hj:
+                # the lift's own jingle records, from its start
+                _set_key(ov['patches'], item, 'PCHitJinglesLinked', hj)
             _set_key(ov['patches'], item, 'PCResumeHeadSeconds', tr['linked_after_hit'])
             _set_key(ov['patches'], item, 'PCExtraCoinLinked', rage.get(tr['linked_extra']))
         elif tr.get('linked_extra_at') is not None:

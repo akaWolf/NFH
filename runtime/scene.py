@@ -328,6 +328,7 @@ class Item:
                  'pc_credit_at', 'pc_credit_at_linked',
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'pc_shout_tail', 'pc_shout_tail_linked', 'pc_scene', 'pc_scene_linked',
+                 'pc_jingle_at', 'pc_jingle_at_linked', 'pc_hit_jingles_linked', 'pc_jingle',
                  'pc_hit_secs', 'pc_hit_after', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
                  'pc_fix_depart',
@@ -1037,6 +1038,18 @@ class Item:
         # reaction's own span (World.pc_scene_span)
         self.pc_scene = d.get('PCScene')
         self.pc_scene_linked = d.get('PCSceneLinked')
+        # the jingle records (fcn.1000140b plays jingle_joke on the tick of
+        # each jingle="true" record, named or not, 0x10001528-0x1000153f):
+        # the seconds of the tricked stand they fall on (PCJingleAt, the
+        # linked variant's PCJingleAtLinked — lap_model_s2._step_jingles on
+        # PCCreditAt's clock), the co-actor's linked action's from its start
+        # (PCHitJinglesLinked: 207's lift), and where the flow is not read
+        # the record's own jingle, which its credit plays (PCJingle,
+        # tools/pcref/coins.py STAND_IN)
+        self.pc_jingle_at = list(d.get('PCJingleAt') or []) or None
+        self.pc_jingle_at_linked = list(d.get('PCJingleAtLinked') or []) or None
+        self.pc_hit_jingles_linked = dict(d.get('PCHitJinglesLinked') or {}) or None
+        self.pc_jingle = bool(d.get('PCJingle'))
         # the co-actor's hit on him after the trick, by her role: the generic
         # `fight` she plays (Olga 42 ticks, the Mother 39; PCHitSecondsLinked
         # the co-actor's action the linked flow waits on — 207's n_lift),
@@ -1762,6 +1775,9 @@ class Level:
                 'success_perfect': clip(mp.get('SuccessPerfect')),
                 'caught': clip(mp.get('Caught')),
                 'failed': clip(mp.get('Failed')),
+                # the Joke clip (jingle_joke): no caller on the mobile, the
+                # PC's trick jingle (World._pc_trick_jingle)
+                'joke': clip(mp.get('Joke')),
                 # PlayLevelMusic: the first run waits 15 s (OneTime false)
                 'delay': 0.0 if mp.get('OneTime') else 15.0,
                 # PlayEntranceMusic (MusicPlayer.cs:122-130): the EntranceSound

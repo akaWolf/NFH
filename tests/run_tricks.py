@@ -178,6 +178,9 @@ class Driver(Recorder):
                'rating': rating, 'won': bool(won),
                'perfect': bool(won and rating >= 100), 'end': end,
                't': round(self.t, 1)}
+        if getattr(w, 'pc_jingle_log', None):
+            # the PC profile's trick jingles (World.pc_trick_jingle)
+            out['jingles'] = list(w.pc_jingle_log)
         if getattr(src, 'pc_points', None) is not None:
             # the PC profile's COLLAPSE! board (GameState.calculate_score)
             out['pc_points'] = src.pc_points

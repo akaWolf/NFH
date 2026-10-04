@@ -1400,6 +1400,21 @@ Input, HUD, and timing:
   (GameInfo.cs:304-390). `tools/fsb_to_ogg.py` rebuilds the FMOD-Vorbis
   banks (40 clips; python-fsb5). The whistle sound rides
   PlayWhistle (HUD.cs:1473-1481) from the compound tricks and S2 statues.
+  Under the PC profile the tricks play the jingle the mobile never calls
+  (MusicPlayer.Joke, jingle_joke: `World.pc_trick_jingle`) as SFXEngine's
+  intermezzo — on a reserved channel, the level track paused under it and
+  going on where it stood, a second one while it plays refused
+  (`SoundBank.play_intermezzo`, `tick_intermezzo`): Season 1's fire when it
+  pays (game.exe 0x47be4f), Season 2's jingle records on their seconds of
+  the tricked stand (PCJingleAt / PCJingleAtLinked, `Routine.pc_jingles`,
+  counted down with the credits), 207's lift from its start
+  (PCHitJinglesLinked, `_hit_begin`) and a stand-in's credit where its
+  record carries the jingle (PCJingle; GameLogic fcn.1000140b,
+  0x10001528). Open: seven stand-ins whose action's jingle is off their
+  record's tick (202's rake and 208's tap 4 ticks before it; 204's vase,
+  209's trough, 210's diving board, 211's Olga's child and 212's second
+  throne on their partner's record) — none played (docs/PC_FIDELITY.md,
+  "The trick's jingle").
 - **The camera is free**, per the desktop contract (UpdateWindowsInput,
   CameraMover.cs:110-165 — dead code on Android, but the desktop original
   is the reference): 5 px edge scroll and arrows at Speed*(Sensibility*3)

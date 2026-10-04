@@ -7,6 +7,7 @@ fcn.1000140b credits every named record of a playing action once, at its
 `time`: coins += tricks.xml coins, rage += tricks.xml rage).
 
   python3 tools/pcref/coins.py [--root ~/nfh-bench/pcref/pc] <level number ...>
+  python3 tools/pcref/coins.py --write-jingle <level number ...>   # PCJingle (STAND_IN)
 """
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,6 +19,68 @@ FLAGS = ('CompoundExtraCoin', 'ExtraCoin206', 'ExtraCoin210', 'PlantCarnivoreExt
          'ExtraCoinLinkedTrick', 'ExtraCoinAngerAmount')
 # the mobile ladder's hard-coded extras (Rottweiler.cs:613-639)
 MOBILE_EXTRA = {'CompoundExtraCoin': 20, 'ExtraCoin206': 15, 'ExtraCoin210': 10, 'PlantCarnivoreExtra': 10}
+
+
+# the Season 2 items whose tricked flow the lap model does not read
+# (lap_model_s2.code_stays_tricked leaves them out: the PCLaugh stand-ins,
+# their credit at the tantrum): the tricks.xml record each pays — the level's
+# trick list against the mobile TrickItems one to one, by the combination's
+# inventory where both name it (the crayfish, the rice, the spring …), else by
+# the object (202's shark sea, 205's chef, 206's deck chair, 208's platform
+# and elephant line, 211's phone, 212's hands and boat) — each record sits in
+# one action of objects.xml, or on the same tick of each (209's hot_coal,
+# 211's phone_normal)
+STAND_IN = {202: {'BeerMat': 'crayfish', 'Rake': 'rake_ground', 'Swimming': 'shark'},
+            204: {'Vase': 'vase'},
+            205: {'TabbleTennis': 'pingpong_egg', 'Chef': 'eat_tyre'},
+            206: {'DeckChair': 'fartbag'},
+            207: {'PoolBoard': 'divingboard_spring', 'PoolAwning': 'crash_mother'},
+            208: {'IndianPlatform': 'platform_crash', 'SeeSaw': 'seesaw_shovel', 'ElectricTap': 'electrify',
+                  'Rake': 'rake_ground', 'AngryElephant': 'elephant_line'},
+            209: {'FireFakir': 'fire_fakir/burn', 'Drain': 'gully_open', 'Coal': 'hot_coal',
+                  'Trough': 'hot_coal_fuel'},
+            210: {'DivingBoard': 'fall_water', 'DeckChair': 'deckchair_hedgehog', 'Pylon': 'electrify'},
+            211: {'CabinPhone': 'phone_normal', 'OlgaChild': 'phone_loud', 'LifeBoat': 'boat_manip'},
+            212: {'AztecThrone2': 'hand2', 'BoatCoinSlot': 'boat'},
+            213: {'Pinata': 'pinata', 'MechanicalBullControls': 'bullride'}}
+
+
+def stand_in_jingles(n):
+    """{stand-in item: (flag, [(object, actor, action, record tick, jingle
+    ticks)])}: flag — every action carrying the item's record plays a jingle
+    on the record's own tick (fcn.1000140b plays each jingle="true" record on
+    its tick, 0x10001528-0x1000153f), so the jingle rides the record's
+    credit; the actions for the ones it does not"""
+    import lap_model_s2
+    d = lap_model_s2.Data(n)
+    out = {}
+    for item, rec in STAND_IN.get(n, {}).items():
+        acts = []
+        for src in (d.objects, d.generic):
+            for obj, e in src.items():
+                for (actor, act), a in (e.get('act') or {}).items():
+                    for nm, t in a.get('_tricks') or ():
+                        if nm == rec:
+                            acts.append((obj, actor, act, t, list(a.get('_jingles') or [])))
+        assert acts, (n, item, rec)
+        out[item] = (all(t in js for _o, _a, _c, t, js in acts), acts)
+    return out
+
+
+def write_jingle(n):
+    """PCJingle on the stand-ins whose record carries the jingle (stand_in_jingles)"""
+    p = '%s/levels/pc/Level%d.overlay.json' % (REPO, n)
+    ov = json.load(open(p))
+    ov['patches'] = _strip_key(ov.get('patches', []), 'PCJingle')
+    for item, (flag, acts) in sorted(stand_in_jingles(n).items()):
+        if flag:
+            _set_key(ov['patches'], item, 'PCJingle', True)
+        elif any(js for *_x, js in acts):
+            print('   %d %s: the jingle off its record: %s' % (n, item, acts))
+    note = " The trick jingle (tools/pcref/coins.py --write-jingle): PCJingle on the items whose tricked flow is not read (their credit at the tantrum) whose tricks.xml record carries jingle=\"true\" on its own tick in its action; the read flows' jingles are PCJingleAt (tools/pcref/pc_durations_s2.py)."
+    if 'PCJingle on the items' not in ov['source']:
+        ov['source'] += note
+    json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
 
 
 def pc_actions(n):
@@ -186,4 +249,7 @@ def show(n, write_laugh=False):
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     for a in args:
+        if '--write-jingle' in sys.argv:
+            write_jingle(int(a))
+            continue
         show(int(a), write_laugh='--write-laugh' in sys.argv)

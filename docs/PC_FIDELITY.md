@@ -2364,6 +2364,55 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `fall_water`, `shout`) are not reached by the model from the steps naming
   their objects or those steps' successors — not read, the default
   standing.
+- *The trick's jingle (2026-10-04, carried; seven stand-ins open).* The
+  PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
+  it through the jingle message after the face when it scores (game.exe
+  fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
+  Season 2: an action's record list plays it on the tick of each `<trick>`
+  record flagged jingle="true", named or not and credited or not
+  (GameLogic.dll fcn.1000140b: the credit block, then the flag +0xc at
+  0x10001528, fcn.10041ffb); Loader.dll reads each record's attributes by
+  name (0x10009b8f-0x10009c9f: `jingle` a bool, false unless set — 211's
+  phone_normal carries it before `time`, which the lap model's record
+  regex had skipped; no stand changed). 87 of the 175 records carry it:
+  most on the tick of the named record beside them, some on the action's
+  tick 0 before it (201's cap and buffet, 202's rail and weeded rake,
+  208's tap). SFXEngine.dll plays a jingle as an intermezzo: the start
+  closes the music streams with their places kept (0x10003d70), the end
+  callback (`restoreVolumes`, 0x10002e10) reopens them there, and an
+  intermezzo while one plays is refused (0x10002fa4). The remaster ships
+  the clip (MusicPlayer.Joke) and never plays it (PlayJokeMusic has no
+  caller). Under the profile `World.pc_trick_jingle` plays it as that
+  intermezzo (`SoundBank.play_intermezzo` on a reserved channel, the level
+  track paused under it and resumed where it stood, a second refused):
+  Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
+  — the tricked flow's jingle records in the seconds of the stand
+  (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
+  _step_jingles on PCCreditAt's clock, 61 seconds over 50 items and 8
+  linked variants; `Routine.pc_jingles` counts them down as the credits),
+  207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
+  on the credit of the stand-ins (the flows not read, their credit at the
+  tantrum) whose record carries the jingle on its own tick (PCJingle, 16
+  items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
+  the action it sits in). 202's plan: the beer mat's and the shark's with
+  their credits (253.23, 274.72), the linked rail's 0.67 s before
+  bridge_crash and 0.42 s before bridge_electrify (310.30, 312.48).
+  Open: seven stand-ins whose action plays its jingle off their record's
+  tick — 202's rake (rake_ground_weed `crash`: the jingle on tick 0,
+  rake_ground on 4), 208's tap (tap_electricity `electrify`: 0, electrify
+  on 4), 204's vase (vase_manip `crash_long`: 12 with jade's record, vase
+  on 50 — the jade's linked flow plays it when both are in), 209's trough
+  (hot_coal `walk_fuel`: 27 with hot_coal's, hot_coal_fuel on 48), 210's
+  diving board (divingboard_oil `fall_water` / `fall_empty`: 2 with
+  fifi_bone's, fall_water on 20, fall_empty on 25), 211's Olga's child
+  (phone `crash`: 26 with phone_normal's, phone_loud on 31) and 212's
+  second throne (hands `hit`: 56 with hand1's, hand2 on 61): with their
+  flows unread and their credit at the tantrum the port plays none of
+  these, nor the jingle an action replays for a record already paid (209's
+  walk_fuel after the coal's walk, 212's hit after the throne's miss).
+  The variants no plan plays (210's octopus turban, 212's whip with the
+  spikes, 213's tequila tortilla and manipulated plant, 214's closed
+  hatch) have no flow read either.
 - *The Season 2 catcher's approach (2026-10-04, carried).* Of the 23 gait-2
   writes in GameLogic's scripts (the run before a walk), 21 were carried
   (below, "Season 2's runs"); the other two are the engine's: the `fight`

@@ -6,6 +6,7 @@ tools/extract_audio.py. Point NFH_AUDIO at those directories.
 """
 import os
 
+import pcprofile
 from base import asset_root
 
 
@@ -57,9 +58,10 @@ class SoundBank:
             if sdlmixer.Mix_OpenAudio(44100, sdl2.AUDIO_S16SYS, 2, 1024) != 0:
                 return None
             sdlmixer.Mix_AllocateChannels(16)
-            # the two music sources own the first channels; Mix_PlayChannel(-1)
-            # never lands an effect on a reserved one
-            sdlmixer.Mix_ReserveChannels(2)
+            # the two music sources own the first channels, and under the
+            # PC profile the intermezzo the third; Mix_PlayChannel(-1) never
+            # lands an effect on a reserved one
+            sdlmixer.Mix_ReserveChannels(3 if pcprofile.is_pc() else 2)
             return cls(sdlmixer, dirs)
         except Exception:
             return None
@@ -68,7 +70,11 @@ class SoundBank:
     ENTRANCE_CHANNEL = 1                  # MusicPlayer.EntranceSoundSource: its
                                           # own AudioSource, the level track
                                           # starts under it (MusicPlayer.cs:122-135)
-    EFFECT_CHANNELS = range(2, 16)        # Mix_PlayChannel(-1)'s pool
+    INTERMEZZO_CHANNEL = 2                # the PC's jingle slot (play_intermezzo)
+
+    @property
+    def EFFECT_CHANNELS(self):            # Mix_PlayChannel(-1)'s pool
+        return range(3 if pcprofile.is_pc() else 2, 16)
 
     def _load(self, name):
         """the clip named by an AnimationSound.FileName / MusicPlayer clip:
@@ -105,7 +111,8 @@ class SoundBank:
         (MusicPlayer.StartMusic cs:101, PlayEntranceMusic cs:125,
         PlayEffectsMusic cs:172)"""
         self.music_volume = max(0.0, min(1.0, float(volume)))
-        for ch in (self.MUSIC_CHANNEL, self.ENTRANCE_CHANNEL):
+        for ch in (self.MUSIC_CHANNEL, self.ENTRANCE_CHANNEL) + \
+                ((self.INTERMEZZO_CHANNEL,) if pcprofile.is_pc() else ()):
             self._mixer.Mix_Volume(ch, int(round(self.music_volume * 128)))
 
     def play(self, name):
@@ -135,6 +142,8 @@ class SoundBank:
         self._mixer.Mix_HaltChannel(self.MUSIC_CHANNEL)
         self._mixer.Mix_PlayChannel(self.MUSIC_CHANNEL, chunk,
                                     -1 if loop else 0)
+        # (a track started while an intermezzo holds the channel plays)
+        self._mixer.Mix_Resume(self.MUSIC_CHANNEL)
 
     def _sub_chunk(self, name, chunk, offset):
         """a Mix_Chunk over the decoded buffer from `offset` seconds on
@@ -175,6 +184,33 @@ class SoundBank:
     def stop_entrance(self):
         """StopEntranceMusic (MusicPlayer.cs:132-135)"""
         self._mixer.Mix_HaltChannel(self.ENTRANCE_CHANNEL)
+
+    def play_intermezzo(self, name):
+        """SFXEngine's intermezzo, the PC's jingles (its IntermezzoStart and
+        the end callback's restoreVolumes, SFXEngine.dll 0x10002f89-0x10003040,
+        0x10002e10): the music streams close with their places kept
+        (0x10003d70) and reopen there as the jingle ends — the level track
+        paused under it; a second one while it plays is refused ('intermezzo
+        Rejected Slot Playing', 0x10002fa4). The jingle has its own reserved
+        channel at the music's volume"""
+        if self._mixer.Mix_Playing(self.INTERMEZZO_CHANNEL):
+            return False
+        chunk = self._load(name)
+        if not chunk:
+            return False
+        if self._mixer.Mix_PlayChannel(self.INTERMEZZO_CHANNEL, chunk, 0) < 0:
+            return False
+        self._mixer.Mix_Pause(self.MUSIC_CHANNEL)
+        self._intermezzo = True
+        return True
+
+    def tick_intermezzo(self):
+        """the intermezzo's end: the level track goes on where it stood"""
+        if not getattr(self, '_intermezzo', False) \
+                or self._mixer.Mix_Playing(self.INTERMEZZO_CHANNEL):
+            return
+        self._intermezzo = False
+        self._mixer.Mix_Resume(self.MUSIC_CHANNEL)
 
     def stop_music(self):
         """LevelMusicSource.Stop (MusicPlayer.cs:143-166) on the reserved

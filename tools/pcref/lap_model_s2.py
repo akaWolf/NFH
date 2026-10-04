@@ -598,11 +598,19 @@ def _actions_of(text):
                     r'<translation object="false"[^>]*destination="(-?\d+/-?\d+)"', inner)]
                 if tr:
                     at['_tr'] = (sum(x for x, _y in tr), sum(y for _x, y in tr))
-                # its named <trick> records: fcn.1000140b credits each once, on
-                # the level tick its `time` equals the action's elapsed count
-                # (the cmp at 0x10001455)
-                at['_tricks'] = [(m.group(1), int(m.group(2))) for m in re.finditer(
-                    r'<trick name="([^"]+)" time="(\d+)"', inner)]
+                # its <trick> records, their attributes by name (Loader.dll
+                # reads each by its atom, 0x10009b8f-0x10009c9f: 211's
+                # phone_normal carries jingle before time): fcn.1000140b
+                # credits each named one once, on the level tick its `time`
+                # equals the action's elapsed count (the cmp at 0x10001455),
+                # and plays jingle_joke on that tick for each with
+                # jingle="true", named or not (0x10001528-0x1000153f)
+                recs = [dict(re.findall(r'(\w+)="([^"]*)"', m.group(1)))
+                        for m in re.finditer(r'<trick\b([^>]*)>', inner)]
+                at['_tricks'] = [(r['name'], int(r['time'])) for r in recs
+                                 if r.get('name') and r.get('time', '').isdigit()]
+                at['_jingles'] = [int(r['time']) for r in recs
+                                  if r.get('jingle') == 'true' and r.get('time', '').isdigit()]
             e['act'][(at.get('actor'), at.get('name'))] = at
     return out
 
@@ -652,6 +660,18 @@ class Data:
         if a is None:
             a = next((v for (ac, nm), v in acts.items() if nm == name), None)
         return list((a or {}).get('_tricks') or [])
+
+    def jingles(self, obj, name, actor='neighbor'):
+        """the action's jingle_joke ticks: the `time` of each of its <trick>
+        records with jingle="true", named or not (fcn.1000140b,
+        0x10001528-0x1000153f) — by the actor's record, else the object's
+        own action of that name"""
+        e = self.objects.get(self.real.get(obj, obj)) or self.generic.get(obj) or {}
+        acts = e.get('act') or {}
+        a = acts.get((actor, name))
+        if a is None:
+            a = next((v for (ac, nm), v in acts.items() if nm == name), None)
+        return list((a or {}).get('_jingles') or [])
 
     def _record(self, obj, name, actor='neighbor'):
         """(the owner's entry, the action record, the owner's name) of an
@@ -2435,6 +2455,22 @@ def _step_records(d, ev, own=None, walked=True):
     return out
 
 
+def _step_jingles(d, ev, own=None, walked=True):
+    """the flow's jingle_joke ticks before its SHOUT, in order: each
+    jingle="true" record's action start on the lap's clock (_flow) plus its
+    `time` (fcn.1000140b plays it on that tick, named record or not,
+    0x10001528-0x1000153f); up to a part of unknown length"""
+    out = []
+    for t, kind, x in _flow(d, ev, own, walked):
+        if kind == 'shout':
+            break
+        if kind == 'part' and x[1] not in ('-', '?', 'bar'):
+            out += [t + tm for tm in d.jingles(x[0], x[1])]
+        if kind == 'unknown':
+            break
+    return sorted(out)
+
+
 def code_stays_tricked(n):
     """{mobile item: {'tricked': s[, 'linked': s], 'shout': level,
     'repair': s|None, 'credit': s|None}}: a TRICKED visit of the lap's
@@ -2475,6 +2511,7 @@ def code_stays_tricked(n):
         return {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                 'repair': round(repair / 12.0, 2) if repair is not None else None,
                 'credit': round(credit / 12.0, 2) if credit is not None else None,
+                'jingles': [_secs(t) for t in _step_jingles(d, ev2, own, walked)],
                 'tail': _secs(_shout_tail(d, ev2, own, walked)),
                 'scene': _scene_secs(_scene_span(d, ev2, own, walked))}
     # the parts of each lap row the stations pair with: a tricked part is
@@ -2534,6 +2571,9 @@ def code_stays_tricked(n):
                     recs = d.tricks(ho, ha, who)
                     if end is not None and recs:
                         e['credit'] = _secs(end + 2 + recs[0][1])
+                        # (and the co-actor's action's jingles on its clock)
+                        e['jingles'] = sorted(e['jingles'] + [
+                            _secs(end + 2 + jt) for jt in d.jingles(ho, ha, who)])
                 if e is not None:
                     cont = TRICKED_CONT.get(n, {}).get(item)
                     if cont is not None and e['shout'] == -1:
@@ -2672,6 +2712,8 @@ def code_stays_tricked(n):
                     e['tricked'] = round((base + cstand) / 12.0, 2)
                     if e['credit'] is None and ccredit is not None:
                         e['credit'] = round((base + ccredit) / 12.0, 2)
+                    e['jingles'] = sorted(e['jingles'] + [
+                        _secs(base + t) for t in _step_jingles(d, evc)])
                 e['shout'] = clevel
                 e['repair'] = round(crepair / 12.0, 2) if crepair is not None else None
                 e['tail'] = _secs(_shout_tail(d, evc))
@@ -2717,6 +2759,7 @@ def code_stays_tricked(n):
         e = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
              'repair': round(repair / 12.0, 2) if repair is not None else None,
              'credit': round(credit / 12.0, 2) if credit is not None else None,
+             'jingles': [_secs(t) for t in _step_jingles(d, all1)],
              'hit': {actor: round(ft / 12.0, 2) if ft is not None else None},
              'tail': _secs(_shout_tail(d, all1)),
              'scene': _scene_secs(_scene_span(d, all1)),
@@ -2735,6 +2778,7 @@ def code_stays_tricked(n):
                       'linked_tail': _secs(_shout_tail(d, all2)),
                       'linked_scene': _scene_secs(_scene_span(d, all2)),
                       'linked_credit': round(credit2 / 12.0, 2) if credit2 is not None else None,
+                      'linked_jingles': [_secs(t) for t in _step_jingles(d, all2)],
                       'linked_pays': round(others[0][1] / 12.0, 2) if others else None})
             if len(others) > 1:
                 # the third record of the linked shot (206's rubberrabbit: the
@@ -2761,6 +2805,7 @@ def code_stays_tricked(n):
         out[item] = {'tricked': round(stand / 12.0, 2) if stand is not None else None, 'shout': level,
                      'repair': round(repair / 12.0, 2) if repair is not None else None,
                      'credit': round(credit / 12.0, 2) if credit is not None else None,
+                     'jingles': [_secs(t) for t in _step_jingles(d, ev2)],
                      'tail': _secs(_shout_tail(d, ev2)),
                      'scene': _scene_secs(_scene_span(d, ev2)),
                      'arm': [fire_v, drop_v], 'rejoins': True}
@@ -2802,6 +2847,7 @@ def code_stays_tricked(n):
         if stand is not None and item in out:
             out[item]['linked'] = round(stand / 12.0, 2)
             out[item]['linked_credit'] = round(credit / 12.0, 2) if credit is not None else None
+            out[item]['linked_jingles'] = [_secs(t) for t in _step_jingles(d, evl)]
             out[item]['linked_scene'] = _scene_secs(_scene_span(d, evl))
     # the linked trick in the same step: the station's step run with both
     # tricks in the scene
@@ -2832,6 +2878,7 @@ def code_stays_tricked(n):
              'linked_tail': _secs(_shout_tail(d, ev2, own, wk_i)),
              'linked_scene': _scene_secs(_scene_span(d, ev2, own, wk_i)),
              'linked_credit': round(credit / 12.0, 2) if credit is not None else None,
+             'linked_jingles': [_secs(t) for t in _step_jingles(d, ev2, own, wk_i)],
              'linked_pays': round(pays / 12.0, 2) if pays is not None else None}
         cont = LINKED_CONT.get(n, {}).get(item)
         if cont is not None and level == -1:
@@ -2845,6 +2892,9 @@ def code_stays_tricked(n):
             cstand, clevel, crepair, _c = _step_parts_split(d, evc)
             crecs = _step_records(d, evc)
             if lift is not None and cstand is not None and crecs:
+                # (the lift's own jingle records, on the co-actor's action
+                # from its start: 207's n_lift, jingle on its tick 0)
+                e['linked_hit_jingles'] = {actor: [_secs(t) for t in d.jingles(obj, anim, actor)]}
                 e.update({'linked_shout': clevel,
                           'linked_repair': round(crepair / 12.0, 2) if crepair is not None else None,
                           'linked_tail': _secs(_shout_tail(d, evc)),

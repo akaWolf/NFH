@@ -3509,6 +3509,7 @@ class Routine:
         self.pc_credit2_timer = 0.0      # the linked trick's own record, due later in the linked step (PCLinkedPaysAt)
         self.pc_credit2_item = None
         self.pc_credit3_timer = 0.0      # the linked shot's third record (206's ExtraCoin206, PCExtraPaysAtLinked)
+        self.pc_jingles = []             # Season 2: the flow's jingle records due so many seconds on (PCJingleAt)
         self.pc_credit3_item = None
         self.pc_fire_item = None
         self.delay_start = 1.5           # Rottweiler/Mother/Olga DelayStart
@@ -4527,6 +4528,14 @@ class Routine:
                 # rubberrabbit, the ExtraCoin206)
                 self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
                 self.pc_credit3_item = target
+            js = it.pc_jingle_at_linked if (it.pc_jingle_at_linked is not None and both) \
+                else getattr(self._pc_trick_item(it), 'pc_jingle_at', None)
+            if js:
+                # the flow's jingle records, each on its own second of the
+                # stand (PCJingleAt / PCJingleAtLinked, the credits' clock:
+                # fcn.1000140b plays each on its tick, 0x10001528-0x1000153f)
+                self.pc_jingles = [float(x) for x in js]
+                self._pc_jingle_tick(0.0)
             if w is not None and target is not None:
                 # the reaction's scene: the level's flag +0x6e, which holds
                 # the completion check (World.pc_scene_start)
@@ -5276,6 +5285,7 @@ class Routine:
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
+        self.pc_jingles = []
         it = self.item
         a = self.action
         self.timer = 0.0                  # Finished: no timeout can follow
@@ -5525,6 +5535,7 @@ class Routine:
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
+        self.pc_jingles = []
         if a is None or a.get('move_only'):
             return
         it = self.item
@@ -5690,6 +5701,7 @@ class Routine:
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
+        self.pc_jingles = []
         self.started = True              # StartUrgentAction: CurrentAction = the urgent one
         w = self.pawn.world
         if self.role == 'Mother' and w is not None:
@@ -6667,6 +6679,7 @@ class Routine:
         self.pc_credit_timer = 0.0; self.pc_credit_item = None
         self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
         self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
+        self.pc_jingles = []
         self.pawn.anim.time_scale = 1.0
         w = self.pawn.world
         # a station the mobile makes a walk-by: 111's rack, whose case 14
@@ -6855,6 +6868,17 @@ class Routine:
         # no other actor; _hit_begin)
         self._hit_begin()
 
+    def _pc_jingle_tick(self, dt):
+        """the tricked flow's jingle records that fall due (PCJingleAt): each
+        plays on its second of the stand, counted down as the credits' are
+        (pc_credit_timer)"""
+        self.pc_jingles = [x - dt for x in self.pc_jingles]
+        w = self.pawn.world
+        while self.pc_jingles and self.pc_jingles[0] <= 0.0:
+            self.pc_jingles.pop(0)
+            if w is not None:
+                w.pc_trick_jingle()
+
     def _hit_begin(self):
         """the hit's start: RoutineActionHitPawn.OnActionStarted's body"""
         target = getattr(self, '_hit_target', None)
@@ -6874,6 +6898,14 @@ class Routine:
         seq = [x for x in self.pawn.hit_pawn_action.get('sequence', ())
                if self.pawn.anim.has(x)]
         self.state = self.USING
+        js, self.pawn.pc_hit_jingles = getattr(self.pawn, 'pc_hit_jingles', None), None
+        for sec in js or ():
+            # the hit action's own jingle records, from its start
+            # (PCHitJinglesLinked, fcn.1000140b)
+            if sec <= 0.0:
+                w.pc_trick_jingle()
+            else:
+                w.call_later(sec, w.pc_trick_jingle)
         if seq:
             pc = getattr(self.pawn, 'pc_hit_secs', None)
             if pc:
@@ -7167,6 +7199,8 @@ class Routine:
                 w = self.pawn.world
                 if it is not None and w is not None:
                     w.pc_s2_linked_credit(self.pawn, it)
+        if self.state == self.USING and self.pc_jingles:
+            self._pc_jingle_tick(dt)
         if self.state == self.USING and self.pc_credit3_timer > 0.0:
             self.pc_credit3_timer -= dt
             if self.pc_credit3_timer <= 0.0:
@@ -7195,6 +7229,7 @@ class Routine:
                 self.pc_credit_timer = 0.0; self.pc_credit_item = None
                 self.pc_credit2_timer = 0.0; self.pc_credit2_item = None
                 self.pc_credit3_timer = 0.0; self.pc_credit3_item = None
+                self.pc_jingles = []
                 cb, self.pc_hold_cb = self.pc_hold_cb, None
                 if cb is not None:
                     cb()
@@ -7848,6 +7883,7 @@ class World:
         self.sound_sink = sound_sink
         self._last_input_time = 0.0      # Woody.LastInputTime
         self.pay_log = []                # (t, item, points, hot) per paid trick under the profile
+        self.pc_jingle_log = []          # the level time of each trick jingle (pc_trick_jingle)
         # the PC's Season 1 success check (game.exe fcn.00436bb0): the flag +0x8a
         # a trick's StopMsg sets (fcn.0047bc90), read and cleared by the level's
         # state function on the same tick; the last fire's item
@@ -8206,6 +8242,10 @@ class World:
             return
         item.pc_credit_overflow = self._s2_credit(pawn, item)
         item.pc_credited = True
+        if item.pc_jingle:
+            # a stand-in's record with its jingle on its tick (PCJingle:
+            # 202's shark on the sea's `enter`, PCCreditAfter)
+            self.pc_trick_jingle()
         if item.pc_credit_overflow:
             # the gauge fills as the record pays: the overflow's tick (the
             # collapse the PC scores) and its whistle now, not at the tantrum
@@ -8372,6 +8412,9 @@ class World:
             self._audience_laugh(pawn, 'medium')
         if points > 0:
             self._hud_angry(3 if bonus else 2 if points > 10 else 1)
+            # the jingle after the face (0x47be39 the face, 0x47be4f the
+            # jingle_joke message; the level track goes on under it)
+            self.pc_trick_jingle()
             pawn.rage_amount = pcprofile.s1_rage_fire(
                 before, item.pc_angry_time or pawn.rage_max)[0]
             pawn.rage_fire_t = self.time
@@ -8580,6 +8623,10 @@ class World:
                 overflow = item.pc_credit_overflow
             else:
                 overflow = self._s2_credit(pawn, item)
+                if item.pc_jingle and pcprofile.is_pc():
+                    # the stand-in's record carries the jingle on its tick
+                    # (PCJingle): its credit plays it
+                    self.pc_trick_jingle()
             if item.pc_linked_due and not item.pc_linked_paid:
                 # the linked record's tick not reached in the paced stand:
                 # it pays with the rest
@@ -8699,9 +8746,14 @@ class World:
                 # the PC's hit: the co-actor's `fight` ticks (PCHitSeconds; the
                 # linked flow's own action, PCHitSecondsLinked)
                 hs = item.pc_hit_secs
+                affected.pc_hit_jingles = None
                 if linked is not None and linked.tricked and item.tricked \
                         and item.use_tricked_linked and item.pc_hit_secs_linked:
                     hs = item.pc_hit_secs_linked
+                    # its own jingle records from its start (PCHitJinglesLinked:
+                    # 207's n_lift, jingle on its tick 0)
+                    affected.pc_hit_jingles = (item.pc_hit_jingles_linked or {}).get(affected.role) \
+                        if pcprofile.is_pc() else None
                 affected.pc_hit_secs = (hs or {}).get(affected.role) \
                     if pcprofile.is_pc() else None
                 # the shout two ticks after the fight's end: his handler's
@@ -12507,6 +12559,24 @@ class World:
         if audio_on and m.get('entrance'):
             music.play_entrance(m['entrance'])
 
+    def pc_trick_jingle(self):
+        """the PC's jingle of a trick, music/jingle_joke.mp3 (the remaster's
+        Joke clip, which MusicPlayer.PlayJokeMusic has no caller for): Season
+        1's fire posts it through the jingle message after its face when it
+        scores (game.exe fcn.00438690 at 0x47be4f; a fire of no points
+        leaves at 0x47bdcf first), Season 2's action plays it on the tick of
+        each of its trick records flagged jingle="true", named or not
+        (GameLogic.dll fcn.1000140b, 0x10001528-0x1000153f: fcn.10041ffb) —
+        Routine.pc_jingles, the stand-ins' credit (PCJingle), the co-actor's
+        lift (PCHitJinglesLinked); SFXEngine plays a jingle as an intermezzo,
+        the level track held under it (SoundBank.play_intermezzo)"""
+        self.pc_jingle_log.append(round(self.time, 2))
+        if self.music_bank is None or self.level.music is None:
+            return
+        name = self.level.music.get('joke')
+        if name:
+            self.music_bank.play_intermezzo(name)
+
     def _play_jingle(self, key):
         """MusicPlayer.PlayEffectsMusic: the jingle stops the level track
         (MusicPlayer.cs:143-176)"""
@@ -12534,6 +12604,8 @@ class World:
 
     def tick(self, dt):
         self.time += dt                  # Time.time
+        if self.music_bank is not None:
+            self.music_bank.tick_intermezzo()
         # PlayLevelMusic's first-run delay (MusicPlayer.cs:88-98); the
         # track loops per the serialized LevelMusicSource flag
         if self._music_timer is not None:
