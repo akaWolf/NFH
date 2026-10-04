@@ -2383,10 +2383,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (the flow read is the beer's and the table's step, not the visit), 208's
   rake, 211's cabin phone and 212's boat coin slot are walk-bys and alarms
   with no tricked use of the mobile's to pace, 213's bull controls a
-  two-visit station, and 212's second throne reads `miss` (hand1) with the
-  full throne too — the hands' `hit` (hand1 56, hand2 61) comes from a
-  branch of 0x10036bb2 the walker does not take, not read.
-- *The trick's jingle (2026-10-04, carried; seven stand-ins open).* The
+  two-visit station. 212's second throne is no station of its own: the
+  mobile's AztecThrone2 is AztecThrone's linked trick, and the throne's
+  step (0x10036bb2) checks throne_half, throne_half_2 and throne_full
+  (0x10036c42-0x10036c9d; half_right's result is dropped) — a half plays
+  the hands' `miss` (hand1 on 48), the full throne their `hit` (hand1 on
+  56, hand2 on 61), neither `sit` — where each ruby's combinations
+  (combine.xml: a half from the empty throne, the full from the other
+  half) had put a half and the full throne in both items' scenes, and
+  SCENE_STEPS's poll rule (an absent object taken as shown) had read
+  `miss` whatever the throne: the linked variant is the full throne
+  (lap_model_s2 LINKED_PRESENT) — the hands' `hit` 9.67 s, SHOUT 1, the
+  2.33-s repair, hand1 4.83 s in with its jingle, hand2 at 5.25
+  (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
+  PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
+  1.9 s later, at 100.
+- *The trick's jingle (2026-10-04, carried; four stand-ins open).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
   fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
@@ -2410,7 +2422,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
   — the tricked flow's jingle records in the seconds of the stand
   (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
-  _step_jingles on PCCreditAt's clock, 63 seconds over 52 items and 8
+  _step_jingles on PCCreditAt's clock, 64 seconds over 52 items and 9
   linked variants; `Routine.pc_jingles` counts them down as the credits),
   207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
   on the credit of the stand-ins (the flows not read, their credit at the
@@ -2419,19 +2431,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the action it sits in). 202's plan: the beer mat's and the shark's with
   their credits (253.23, 274.72), the linked rail's 0.67 s before
   bridge_crash and 0.42 s before bridge_electrify (310.30, 312.48).
-  Open: seven stand-ins whose action plays its jingle off their record's
-  tick — 202's rake (rake_ground_weed `crash`: the jingle on tick 0,
-  rake_ground on 4), 208's tap (tap_electricity `electrify`: 0, electrify
-  on 4), 204's vase (vase_manip `crash_long`: 12 with jade's record, vase
-  on 50 — the jade's linked flow plays it when both are in), 209's trough
-  (hot_coal `walk_fuel`: 27 with hot_coal's, hot_coal_fuel on 48), 210's
-  diving board (divingboard_oil `fall_water` / `fall_empty`: 2 with
-  fifi_bone's, fall_water on 20, fall_empty on 25), 211's Olga's child
-  (phone `crash`: 26 with phone_normal's, phone_loud on 31) and 212's
-  second throne (hands `hit`: 56 with hand1's, hand2 on 61): with their
-  flows unread and their credit at the tantrum the port plays none of
-  these, nor the jingle an action replays for a record already paid (209's
-  walk_fuel after the coal's walk, 212's hit after the throne's miss).
+  204's vase, 210's diving board and 212's second throne pay in their
+  partner's linked flow (PCLinkedPaysAt: vase_manip's `crash_long`,
+  divingboard_oil's `fall_water`, the hands' `hit`), whose jingle
+  PCJingleAtLinked plays. Open: four stand-ins whose action plays its
+  jingle off their record's tick — 202's rake (rake_ground_weed `crash`:
+  the jingle on tick 0, rake_ground on 4), 208's tap (tap_electricity
+  `electrify`: 0, electrify on 4), 209's trough (hot_coal `walk_fuel`: 27
+  with hot_coal's, hot_coal_fuel on 48) and 211's Olga's child (phone
+  `crash`: 26 with phone_normal's, phone_loud on 31): with their flows
+  unread and their credit at the tantrum the port plays none of these,
+  nor the jingle an action replays for a record already paid (209's
+  walk_fuel after the coal's walk).
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.

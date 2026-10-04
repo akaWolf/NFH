@@ -1410,11 +1410,10 @@ Input, HUD, and timing:
   counted down with the credits), 207's lift from its start
   (PCHitJinglesLinked, `_hit_begin`) and a stand-in's credit where its
   record carries the jingle (PCJingle; GameLogic fcn.1000140b,
-  0x10001528). Open: seven stand-ins whose action's jingle is off their
-  record's tick (202's rake and 208's tap 4 ticks before it; 204's vase,
-  209's trough, 210's diving board, 211's Olga's child and 212's second
-  throne on their partner's record) — none played (docs/PC_FIDELITY.md,
-  "The trick's jingle"). The PC's Season 1 level music (`World.
+  0x10001528). Open: four stand-ins whose action's jingle is off their
+  record's tick (202's rake and 208's tap 4 ticks before it; 209's trough
+  and 211's Olga's child on their partner's record) — none played
+  (docs/PC_FIDELITY.md, "The trick's jingle"). The PC's Season 1 level music (`World.
   _pc_music_tick`, `play_clap`, `pc_music_override`; `SoundBank.pc_track`,
   `pc_tick`): the clap an intermezzo, the level's set drawn at random
   (ingame1 / ingame2, its own generator), every 12 ticks the override

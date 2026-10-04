@@ -74,6 +74,11 @@ def write_jingle(n):
     ov['patches'] = _strip_key(ov.get('patches', []), 'PCJingle')
     read = {e.get('object') for e in ov['patches']
             if isinstance(e.get('set'), dict) and 'PCCreditAt' in e['set']}
+    # (and the linked partner whose record the linked flow pays, PCLinkedPaysAt:
+    # 212's second ruby in the full throne's `hit`)
+    pays = {e.get('object') for e in ov['patches']
+            if isinstance(e.get('set'), dict) and 'PCLinkedPaysAt' in e['set']}
+    read |= {it['linked'] for it in mobile_items(n) if it['name'] in pays and it['linked']}
     for item, (flag, acts) in sorted(stand_in_jingles(n).items()):
         if item in read:
             continue           # its tricked flow read: PCJingleAt carries it

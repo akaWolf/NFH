@@ -2024,7 +2024,15 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
                209: {'FireFakir': ((0x10020e3e,), {'fire_fakir_groove_fuel'}, {'fire_fakir_groove'})},
                211: {'CabinPhone': ((0x1002fcbe,), set(), set())},
                212: {'BoatCoinSlot': ((0x10035388,), None, None),
-                     'AztecThrone2': ((0x10036bb2,), None, None)},
+                     # the second ruby fills the throne (combine.xml: throne_half
+                     # or throne_half_2 with the other ruby -> throne_full), and
+                     # the step checks half, half_2 and full (0x10036c42-
+                     # 0x10036c9d, half_right's result dropped): full plays the
+                     # hands' `hit` (0x10036d42), half or half_2 `miss`, none
+                     # `sit`; no poll, so absent objects stay absent (unknown 0)
+                     'AztecThrone2': ((0x10036bb2,), {'topright_throne_full'},
+                                      {'topright_throne_empty', 'topright_throne_half',
+                                       'topright_throne_half_2', 'topright_throne_half_right'}, 0)},
                213: {'MechanicalBullControls': ((0x10037de6, 0x10037d3b), None, None),
                      # (the beehive's combination: tricked_presence pairs no inventory)
                      'Pinata': ((0x1003809b,), {'bottomleft_pinata_manip'}, {'bottomleft_pinata'})}}
@@ -2035,19 +2043,27 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
 TRICKED_SCENE = {209: ('FireFakir',), 213: ('Pinata',)}
+# the scene of a linked variant whose combination is not the union of the
+# two items' (the linked loop of code_stays_tricked): 212's two rubies fill
+# the throne — throne_full, the halves gone (combine.xml) — where each ruby's
+# own combinations show a half and the full throne both
+LINKED_PRESENT = {212: {'AztecThrone': ({'topright_throne_full'},
+                                        {'topright_throne_empty', 'topright_throne_half',
+                                         'topright_throne_half_2', 'topright_throne_half_right'})}}
 
 
 def _scene_step_events(n, item):
     """the events of an item's SCENE_STEPS steps, run with its trick in the
     scene (tricked_presence, else the table's)"""
-    steps, shown, hidden = SCENE_STEPS[n][item]
+    steps, shown, hidden = SCENE_STEPS[n][item][:3]
+    unknown = SCENE_STEPS[n][item][3] if len(SCENE_STEPS[n][item]) > 3 else 1
     if shown is None:
         shown, hidden = tricked_presence(n).get(item, (set(), set()))
     lv = Level(n)
     lv.present = (set(lv.present) - set(hidden)) | set(shown)
     ev = []
     for st in steps:
-        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=1, latch=1)
+        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1)
         ev += ([('STEP',)] if ev else []) + evs
     return ev
 
@@ -2876,6 +2892,9 @@ def code_stays_tricked(n):
         lvi, byi = _row_level(n, snaps, lap[i][0])
         lv2 = Level(n)
         lv2.present = (set(lvi.present) - h1 - h2) | s1 | s2
+        if item in LINKED_PRESENT.get(n, {}):
+            shown, hidden = LINKED_PRESENT[n][item]
+            lv2.present = (set(lvi.present) - set(hidden)) | set(shown)
         ev2, _nx = run_step(lv2, lap[i][1], dict(byi))
         if dos(ev2) == dos(ev1):
             continue
