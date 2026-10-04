@@ -741,7 +741,12 @@ predicate, then the all-tricks win.
   the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
   fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
   -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
-  set is skipped. A tricked walk-by (`_on_surprise_near`: 208's tap, the
+  set is skipped. A visit that ends a PC step two stations share takes
+  that step's reaction when the partner's trick played in the same visit
+  — his use before this one (PCPair: 203's toilet, SHOUT 2 with the chili
+  paper and the rice chute both, 0 for either alone); the paper alone's
+  SHOUT after its untricked flush is open (its AngryWithoutAnimations
+  pays silently). A tricked walk-by (`_on_surprise_near`: 208's tap, the
   handler 0x1001e50f's step) plays its surprise at the stand's seconds and
   arms its records, jingles and scene on that clock as a use does
   (`_pc_s2_arm`), and so does an alarm run's use (`_alarm_use`: 211's

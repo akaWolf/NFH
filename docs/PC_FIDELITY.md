@@ -2582,6 +2582,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
+- *Season 2's chains against Badinfos' gauge (2026-10-04, read and
+  carried).* The anger gauge's jumps (the bar at the frame's left,
+  tools/pcref/gauge.py at 4 fps) against the port's credits where the
+  plan's order is the run's showed two reactions the port had not read:
+  202's shark and 203's toilet pair. The shark's sea is the swim chain
+  (the swim step 0x10022410 finds the shark in the sea and raises the
+  scene, the dive step 0x10022046 shows the shark sea, 0x10021fb9 its
+  `enter` and 119-tick bar, 0x10021df5 its `leave`, SHOUT 1, the camera
+  back): SCENE_STEPS reads it (the swim timed per clip) -> PCShout 1,
+  PCShoutTail 0.17, PCScene [0.17, shout], where the mobile's angry had
+  played 7.5 s; E02's bubble turns to the bridge 13 s after the shark's
+  jump, the port's walk to the bridge now 12.7 s after its credit (15.9
+  before), and the shark to the pair's last record 33.5 s in both. 203's
+  toilet is one PC step for the mobile's two stations (0x10033e20: the
+  chili paper's `shit_chili` and the rice chute's `flush_rice`), SHOUT 0
+  for either alone and SHOUT 2 — shout2_hard, 7.08 s — with both
+  (lap_model_s2 PAIRED_STEP -> the flush's PCPair {ToiletPaper: shout 2,
+  repair 1.92}: `World.play_angry` takes it when his use before this one
+  was the tricked paper); the flush to the melon 35.0 s against E03's
+  34.75 (30.0 before), the melon to the bicycle 17.5 against 17.2. 202's
+  plan ends 5.0 s earlier, 203's 5.0 later, both at 100. Open: the paper
+  alone — its step plays the flush after the chili paper and then SHOUT 0
+  and the repair, where the port's paper, AngryWithoutAnimations, pays
+  silently and its untricked flush visit plays no reaction (no plan
+  leaves the rice chute untricked).
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

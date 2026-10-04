@@ -9052,6 +9052,17 @@ class World:
                 level = item.pc_shout_linked
             elif level is None:
                 level = getattr(item, 'pc_shout', None)
+        pair = None
+        if nfh2 and pcprofile.is_pc() and item.pc_pair and routine is not None \
+                and len(routine.log) >= 2:
+            # a step two stations share (203's toilet, 0x10033e20): the
+            # partner's trick played in this visit — his use just before
+            # this one — makes the step's other branch: its SHOUT and repair
+            # (PCPair), where each alone ends on the item's own
+            prev = routine.log[-2]
+            pair = item.pc_pair.get(prev[0]) if prev[1] else None
+            if pair is not None:
+                level = pair.get('shout')
         plain = None
         if nfh2 and pcprofile.is_pc() and item.kind == 'Rake' and not item.compound_tricked:
             # 202's rake keys are the weeded rake's branch of his walk-by
@@ -9077,6 +9088,8 @@ class World:
                 fix_secs = item.pc_fix_secs_linked     # PCFixSecondsLinked
             if plain:
                 fix_secs = plain.get('repair')         # PCPlain: the plain flow's repair
+            if pair is not None:
+                fix_secs = pair.get('repair')          # PCPair: the shared step's repair
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
             tail_secs = getattr(item, 'pc_shout_tail', None)
@@ -9084,6 +9097,8 @@ class World:
                 tail_secs = getattr(item, 'pc_shout_tail_linked', None)   # PCShoutTailLinked
             if plain:
                 tail_secs = plain.get('tail')          # its switch back
+            if pair is not None:
+                tail_secs = pair.get('tail')
 
             def tail_s2(played_angry=True):
                 # the rest of the SHOUT's step after the repair, or after

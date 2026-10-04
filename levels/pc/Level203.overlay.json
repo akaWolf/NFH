@@ -67,6 +67,13 @@
     "PCJingleAt": [
      1.92
     ],
+    "PCPair": {
+     "ToiletPaper": {
+      "shout": 2,
+      "repair": 1.92,
+      "tail": 0.0
+     }
+    },
     "PCUseSeconds": 5.0
    }
   },

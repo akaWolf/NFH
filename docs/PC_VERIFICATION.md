@@ -530,7 +530,14 @@ actors' job pass the update calls at 0x100445f8.
   PC's ~218.8 (2.92 s before its fire at 221.8) against the port's
   217.9: the walk to the vacuum, the take and the walk to the carpet
   (68 px, the take's 0.5 s, 79 px: 3.0 s) — the camera pans over him
-  in both, so neither is read closer. Case 22's message
+  in both, so neither is read closer. Season 2's chains the same evening
+  (the anger gauge's jumps, tools/pcref/gauge.py at 4 fps, against the
+  port's credits where the plan's order is the run's): 202 9.5 / 10.7 /
+  33.5 s against E02's 9.5 / 11.0 / 33.5 and 203 37.3 / 5.8 / 35.0 / 17.5
+  against E03's 37.5 / 5.5 / 34.75 / 17.2 — once the shark's SHOUT 1 and
+  the toilet pair's SHOUT 2 were read (38.3 and 30.0 before; docs/
+  PC_FIDELITY.md, "Season 2's chains against Badinfos' gauge"); the other
+  twelve plans run another order than the run's. Case 22's message
   before the carpet's GOTO is the vacuum's OBJ1 (fcn.00451e80, vtable
   0x4e1bdc: its slot 2 fcn.00438c80 — no gait), so its 0.7 s lie in the
   GOTO's legs, not read against E11's frames.

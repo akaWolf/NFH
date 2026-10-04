@@ -54,6 +54,13 @@
      "item": "Submarine",
      "then": 0.0
     },
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.17,
     "PCJingle": true
    },
    "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"

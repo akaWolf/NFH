@@ -600,6 +600,11 @@ def write_tricked_keys(ov, n, clips):
         _set_key(ov['patches'], item, 'PCFixSeconds', repair or 0)
         if tail:
             _set_key(ov['patches'], item, 'PCShoutTail', tail)
+    ov['patches'] = _strip_key(ov['patches'], 'PCPair')
+    for item, pair in sorted(lap_model_s2.paired_reactions(n).items()):
+        # the reaction of a visit that ends a step two stations share, the
+        # partner's trick played in the same visit (203's toilet: SHOUT 2)
+        _set_key(ov['patches'], item, 'PCPair', pair)
     ov['patches'] = _strip_key(ov['patches'], 'PCPlain')
     for item, plain in sorted(lap_model_s2.scene_plain(n).items()):
         # the flow a mobile tricked state plays that is no PC trick (202's

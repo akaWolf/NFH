@@ -2066,7 +2066,16 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                      # the laid rake, pond/rake_ground_weed, is the trick — the
                      # laid rake alone, trick="false", his `use` and repair)
                      'Rake': ((0x10022589,), {'pond_rake_ground_weed'},
-                              {'pond_rake', 'pond_rake_ground'}, 0)},
+                              {'pond_rake', 'pond_rake_ground'}, 0),
+                     # the shark's sea: the swim step (0x10022410) finds the
+                     # shark in the sea and raises the scene (its Ef51a), the
+                     # dive step (0x10022046) shows the shark sea and pushes
+                     # the kid's dive, the sea step (0x10021fb9) its `enter`
+                     # and 119-tick bar, 0x10021df5 its `leave`, SHOUT 1, the
+                     # camera back and the switch to the plain sea — the swim
+                     # timed per clip (pc_durations_s2 CLIPS)
+                     'Swimming': ((0x10022410, 0x10022046, 0x10021fb9, 0x10021df5),
+                                  {'beachleft_shark', 'shark'}, {'beachleft_sub', 'sub'}, 0)},
                205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
                                       {'beachright_pingpong', 'beachright_pingpong_guarded'}),
                      # the blind chef's shop (0x10024929: the tube in the eel
@@ -2161,6 +2170,12 @@ LINKED_PRESENT = {207: {'PoolBoard': ({'pool_divingboard_spring', 'pool_awning_c
 # repair, switches it back to the plain rake, no SHOUT and no record
 SCENE_PLAIN = {202: {'Rake': ((0x10022589,), {'pond_rake_ground'}, {'pond_rake', 'pond_rake_ground_weed'},
                               'SearchNFH2')}}
+# two mobile stations one PC step plays in one visit, no LinkedItemTrick of
+# the mobile's between them: {level: {the item whose visit ends the step
+# (partner, step)}} — 203's toilet (0x10033e20): the chili paper's
+# `shit_chili` and the rice chute's `flush_rice` in one step, SHOUT 2, where
+# each alone ends on SHOUT 0
+PAIRED_STEP = {203: {'ToiletFlush': ('ToiletPaper', 0x10033e20)}}
 # the reaction a TRICKED_SCENE item's linked flow hands to: {level: {item:
 # (kind, co-actor, steps)}}, TRICKED_CONT's 'fight' — 207's board over the
 # closed awning: his crash into the Mother's deck chair posts her `crash`
@@ -2276,6 +2291,26 @@ def scene_step_linked_reactions(n):
             continue
         out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)),
                      hit)
+    return out
+
+
+def paired_reactions(n):
+    """{mobile item: {partner: {shout, repair, tail}}} of PAIRED_STEP: the
+    step run with both stations' tricks in the scene (tricked_presence) —
+    the reaction that ends the partnered visit"""
+    d = Data(n)
+    out = {}
+    trick = tricked_presence(n)
+    for item, (partner, step) in PAIRED_STEP.get(n, {}).items():
+        lv = Level(n)
+        for it in (item, partner):
+            sh, hd = trick.get(it, (set(), set()))
+            lv.present = (set(lv.present) - set(hd)) | set(sh)
+        ev, _nx = run_step(lv, step, dict(LAP_BYTES.get(n) or {}), unknown=1, latch=1)
+        _s, level, repair, _c = _step_parts_split(d, ev)
+        if level is None:
+            continue
+        out[item] = {partner: {'shout': level, 'repair': _secs(repair), 'tail': _secs(_shout_tail(d, ev))}}
     return out
 
 
