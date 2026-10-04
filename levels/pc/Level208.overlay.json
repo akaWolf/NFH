@@ -116,7 +116,18 @@
    "object": "ElectricTap",
    "component": "TrickItem",
    "set": {
-    "PCLaugh": 0
+    "PCLaugh": 0,
+    "PCScene": [
+     0.08,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 1.25,
+    "PCShout": 0,
+    "PCFixSeconds": 1.33,
+    "PCCreditAt": 0.42,
+    "PCJingleAt": [
+     0.08
+    ]
    }
   },
   {

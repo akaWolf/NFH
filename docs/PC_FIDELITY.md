@@ -2440,7 +2440,24 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tantrum); 202's plan ends 4.9 s earlier, at 100. The laid rake alone is
   the step's other branch — its `use` 2.17 s and repair 1.67 s, no SHOUT
   and no record — and stays the mobile's angry (AngryEasyUp 2.5 s, FixMid:
-  the keys are gated to the compound in `World.play_angry`): open. The other SCENE_STEPS
+  the keys are gated to the compound in `World.play_angry`): open. 208's
+  electrified tap likewise, a walk-by the mobile plays as a surprise
+  (NoticeWhenWalkNearby, ElectricShockGeneric 3.0 s) and the PC as a
+  behaviour: trigger.xml gives him `electrify` near
+  elephant/tap_electricity (position nearobj), whose handler — the level
+  class's slot 2, 0x1001e50f — runs the tap's step 0x1001d608 in his
+  step's place: the tap's `electrify` (its jingle on the action's tick 0,
+  the record electrify on 4), SHOUT 0, the repair and the switch back to
+  the plain tap. The surprise plays at that stand's 1.25 s, electrify 0.42
+  s in and the jingle 0.08 s in, then shout2_light and the 1.33-s repair
+  (`Routine._on_surprise_near` arms a tricked walk-by's records, jingles
+  and scene as `_use` arms a stand's); a tricked walk-by's scene is held
+  over its SHOUT since (World.pc_scene_start), so 208's rake on the
+  Mother's call keeps it through its freakout and 208's plan ends 3.0 s
+  later, at 100. The trigger's moment stays the mobile's walk-by: the
+  PC's nearobj is the same room and floor record, less than 15 apart
+  vertically (fcn.1003f573), and when the handler's step change cuts
+  the walk he is on is unread. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
   step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
@@ -2472,7 +2489,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
-- *The trick's jingle (2026-10-04, carried; two stand-ins open).* The
+- *The trick's jingle (2026-10-04, carried; one stand-in open).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
   fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
@@ -2511,11 +2528,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `crash_long`, hot_coal's `walk_fuel`, divingboard_oil's `fall_water`,
   the hands' `hit`), whose jingle PCJingleAtLinked plays; 202's weeded
   rake (rake_ground_weed `crash`: the jingle on tick 0, rake_ground on 4)
-  is a tricked flow read since (PCJingleAt). Open: two stand-ins whose
-  action plays its jingle off their record's tick — 208's tap
-  (tap_electricity `electrify`: 0, electrify on 4) and 211's Olga's child
-  (phone `crash`: 26 with phone_normal's, phone_loud on 31): with their
-  flows unread and their credit at the tantrum the port plays neither.
+  and 208's tap (tap_electricity `electrify`: 0, electrify on 4) are
+  tricked flows read since (PCJingleAt). Open: 211's Olga's child, whose
+  action plays its jingle off its record's tick (phone `crash`: 26 with
+  phone_normal's, phone_loud on 31): with its flow unread and its credit
+  at the tantrum the port does not play it.
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.

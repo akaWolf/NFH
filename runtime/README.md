@@ -737,7 +737,13 @@ predicate, then the all-tricks win.
   the gauge has overflowed (`Pawn.pc_rage_full`, never cleared) — and the
   fix clips at the repair's (PCFixSeconds / PCFixSecondsLinked). PCShout
   -1 is a flow with no SHOUT anywhere (210's dog basket alone): the angry
-  set is skipped. Open: 202's laid rake without the weed (combine.xml
+  set is skipped. A tricked walk-by (`_on_surprise_near`: 208's tap, the
+  handler 0x1001e50f's step) plays its surprise at the stand's seconds and
+  arms its records, jingles and scene on that clock as a use does. Open:
+  the walk-by's moment (the mobile's NoticeWhenWalkNearby; the PC's
+  trigger is nearobj, the same room and floor, under 15 apart
+  vertically, and when the handler's step change cuts his walk is
+  unread); 202's laid rake without the weed (combine.xml
   pond/rake_ground, trick="false") — the PC's walk-by plays its `use`
   (2.17 s from the step's 0.17) and repair (1.67 s), no SHOUT and no
   record, 4.17 s in all; the port plays the mobile's (the Rake subclass
@@ -1418,9 +1424,8 @@ Input, HUD, and timing:
   counted down with the credits), 207's lift from its start
   (PCHitJinglesLinked, `_hit_begin`) and a stand-in's credit where its
   record carries the jingle (PCJingle; GameLogic fcn.1000140b,
-  0x10001528). Open: two stand-ins whose action's jingle is off their
-  record's tick (208's tap 4 ticks before it; 211's Olga's child on its
-  partner's record) — neither played (docs/PC_FIDELITY.md, "The trick's
+  0x10001528). Open: 211's Olga's child, whose action's jingle is on its
+  partner's record — not played (docs/PC_FIDELITY.md, "The trick's
   jingle"). The PC's Season 1 level music (`World.
   _pc_music_tick`, `play_clap`, `pc_music_override`; `SoundBank.pc_track`,
   `pc_tick`): the clap an intermezzo, the level's set drawn at random

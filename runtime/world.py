@@ -6732,10 +6732,29 @@ class Routine:
         self.state = self.USING
         seq = [a for a in seq if self.pawn.anim.has(a)]
 
+        # Season 2: a walk-by whose tricked step the lap model reads (208's
+        # tap: trigger.xml's `electrify` near the electrified tap, whose
+        # handler 0x1001e50f runs 0x1001d608 in his step's place — the tap's
+        # `electrify`, SHOUT 0, the repair) plays that step as a tricked
+        # stand's: the surprise at its stand's pace (PCUseSecondsTricked),
+        # its record and jingles on its clock (PCCreditAt, PCJingleAt), its
+        # scene (World.pc_scene_start) — as `_use` arms a use's
+        s2 = pcprofile.is_pc() and pcprofile.SEASON2 and w is not None \
+            and it.is_tricked(self.level.items)
+
         def surprise():
+            if s2:
+                if it.pc_credit_at is not None and not it.pc_credited:
+                    self.pc_credit_timer = float(it.pc_credit_at)
+                    self.pc_credit_item = it
+                if it.pc_jingle_at:
+                    self.pc_jingles = [float(x) for x in it.pc_jingle_at]
+                    self._pc_jingle_tick(0.0)
+                w.pc_scene_start(self, it, it, False)
             if seq:
                 pc = (getattr(it, 'pc_slip_secs', None) or getattr(it, 'pc_surprise_secs', None)
-                      or ((it.pc_use_secs_tricked or 0.0) - float(it.pc_fire_at) if station else None)) \
+                      or ((it.pc_use_secs_tricked or 0.0) - float(it.pc_fire_at) if station else None)
+                      or (it.pc_use_secs_tricked if s2 else None)) \
                     if pcprofile.is_pc() else None
                 if pc:
                     # the PC fall (slip1/slip3, 31 frames) or the doubletake
