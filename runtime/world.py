@@ -4719,6 +4719,8 @@ class Routine:
         w = self.pawn.world
         if w is None:
             return
+        if pcprofile.is_pc() and it.pc_extra_pays_at is not None:
+            return            # booked with its record (World.pc_s2_extra_credit)
         if it.name == 'Tortilla' and it.tricked and it.compound_extra_coin:
             w.game.trick_done(it.trick_score)
         elif it.name == 'PlantCarnivore' and it.tricked \
@@ -5126,6 +5128,12 @@ class Routine:
             return it
         return self._tricked_item(it) or it
 
+    def _pc_compound(self, it):
+        """the visit plays the compound-tricked use (RottweilerCompoundUse-
+        Tricked, the use selection's cs:824-830 arm) under the profile"""
+        return pcprofile.is_pc() and it is not None and it.compound \
+            and it.compound_tricked and it.tricked
+
     def _pc_clip_end(self):
         """the per-clip timing, the hold and the credit watch end with the use"""
         self.pawn.anim.clip_pace = None
@@ -5210,6 +5218,10 @@ class Routine:
         # record: 206's pad shooting the rubber bear, the harpoon's)
         at = it.pc_credit_at_linked if (it.pc_credit_at_linked is not None and both) \
             else getattr(self._pc_trick_item(it), 'pc_credit_at', None)
+        comp = self._pc_compound(it) and it.pc_credit_at_compound is not None
+        if comp:
+            # the compound-tricked visit's first record (PCCreditAtCompound)
+            at = it.pc_credit_at_compound
         if at is not None and target is not None and not target.pc_credited:
             self.pc_credit_timer = float(at)
             self.pc_credit_item = target
@@ -5226,8 +5238,17 @@ class Routine:
             # rubberrabbit, the ExtraCoin206)
             self.pc_credit3_timer = float(it.pc_extra_pays_at_linked)
             self.pc_credit3_item = target
+        if comp and it.pc_extra_pays_at is not None and target is not None \
+                and (it.compound_extra_coin or it.plant_carnivore_extra):
+            # the compound action's second record at its own tick (213's
+            # carnivore_bigmanip 4 ticks after carnivore_big, tortilla_tequila
+            # 10 after tortilla_sharp): the mobile's extra coin
+            self.pc_credit3_timer = float(it.pc_extra_pays_at)
+            self.pc_credit3_item = target
         js = it.pc_jingle_at_linked if (it.pc_jingle_at_linked is not None and both) \
             else getattr(self._pc_trick_item(it), 'pc_jingle_at', None)
+        if comp and it.pc_jingle_at_compound:
+            js = it.pc_jingle_at_compound
         if js:
             # the flow's jingle records, each on its own second of the
             # stand (PCJingleAt / PCJingleAtLinked, the credits' clock:
@@ -5281,6 +5302,11 @@ class Routine:
             # passes as any
             self._pc_visit_seconds(it)
             return float(it.pc_use_secs_linked)
+        if getattr(t, 'pc_use_secs_compound', None) is not None and self._pc_compound(it):
+            # the compound-tricked stand (PCUseSecondsCompound: the second
+            # combination's action — 213's carnivore_bigmanip `use`)
+            self._pc_visit_seconds(it)
+            return float(t.pc_use_secs_compound)
         if getattr(t, 'pc_use_secs_tricked', None) is not None \
                 and (it.is_tricked(self.level.items)
                      or (it.kind == 'SearchItem' and it.tricked)):
@@ -8283,6 +8309,21 @@ class World:
                 pawn.angry_meter = pawn.angry_max
                 pawn.pc_rage_full = True
             return overflow
+        if part == 'compound':
+            # 213's compound action's second record at its own tick
+            # (PCExtraPaysAt: carnivore_bigmanip, tortilla_tequila) — the
+            # ladder's cs:620-624 or cs:630-634 arm alone
+            if item.compound_extra_coin:
+                item.compound_extra_coin = False
+                pawn.angry_meter += self._pc_extra(item, 20.0)
+            elif item.plant_carnivore_extra:
+                item.plant_carnivore_extra = False
+                pawn.angry_meter += self._pc_extra(item, 10.0)
+            overflow = pawn.angry_meter > pawn.angry_max
+            if overflow:
+                pawn.angry_meter = pawn.angry_max
+                pawn.pc_rage_full = True
+            return overflow
         if part == 'linked':
             pass
         elif item.extra_coin_toilet_211 and not (pcprofile.is_pc()
@@ -8291,7 +8332,9 @@ class World:
             item.extra_coin_toilet_211 = False
             pawn.angry_meter += 20.0
         elif item.compound_extra_coin and aux is not None \
-                and aux.compound_tricked:      # cs:620-624
+                and aux.compound_tricked and not (pcprofile.is_pc()
+                                                  and item.pc_extra_pays_at is not None):  # cs:620-624
+            # (under the profile at its record's tick: the `compound` part)
             item.compound_extra_coin = False
             # the PC pays the record the extra stands for (tricks.xml
             # rage: 206's harpoon_fifi 30, 213's tortilla_tequila 20 —
@@ -8308,7 +8351,9 @@ class World:
             # of 30 through whichever branch fires (PCExtraCoin206 30)
             pawn.angry_meter += self._pc_extra(item, 15.0, 'pc_extra_coin_206')
         elif item.plant_carnivore_extra and aux is not None \
-                and aux.compound_tricked:      # cs:630-634
+                and aux.compound_tricked and not (pcprofile.is_pc()
+                                                  and item.pc_extra_pays_at is not None):  # cs:630-634
+            # (under the profile at its record's tick: the `compound` part)
             item.plant_carnivore_extra = False
             # 213: carnivore_bigmanip 20 in me_c2/tricks.xml
             pawn.angry_meter += self._pc_extra(item, 10.0)
@@ -8499,13 +8544,17 @@ class World:
         50 ticks into the ramp's rubberrabbit: the ExtraCoin206 the mobile
         pays with the ladder, PCExtraPaysAtLinked) or the rush's own in the
         wc (211's wcright, 27 ticks into the puke: the Toilet211 extra coin,
-        PCToiletPaysAt): its rage, the overflow's tick and whistle, and its
+        PCToiletPaysAt), or a compound action's second (213's
+        carnivore_bigmanip, tortilla_tequila: the ExtraCoinCompound,
+        PCExtraPaysAt): its rage, the overflow's tick and whistle, and its
         completion (the level's done count is its credited records,
         fcn.100522e6 — the mobile books it as the use starts,
-        Item.ExtraCoin206Calculation, Item.Toilet211Behavior)"""
+        Item.ExtraCoin206Calculation, Item.Toilet211Behavior,
+        Item.ExtraCoinCompound)"""
         if self.game is None:
             return
-        part = 'extra' if item.extra_coin_206 else 'toilet' if item.extra_coin_toilet_211 else None
+        part = 'extra' if item.extra_coin_206 else 'toilet' if item.extra_coin_toilet_211 \
+            else 'compound' if (item.compound_extra_coin or item.plant_carnivore_extra) else None
         if part is None:
             return
         was = pawn.angry_meter >= pawn.angry_max

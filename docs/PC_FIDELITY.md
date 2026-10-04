@@ -2656,6 +2656,21 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the bubble leave the chair at 246.9, 8.6-8.75 s on, the model 8.67 (the
   credit on the electrify's ticks to the next step), 7.42 without the
   walk.
+  And 213's compound tricks: the port paid the mobile's extra coin
+  (Item.ExtraCoinCompound, as the compound use starts) on his arrival at
+  the plant and the tortilla, 5.2 and 1.8 s before their records, and
+  timed the visit by the first combination's action. The PC's second
+  combination names both records in one action — carnivore_bigmanip's
+  `use` (bite_hard, 54 ticks) carnivore_big on tick 13 and
+  carnivore_bigmanip on 17, tortilla_sharp_tequila's (72 ticks)
+  tortilla_sharp on 20 and tortilla_tequila on 30; the tequila alone names
+  none (lap_model_s2.COMPOUND_PRESENT -> PCUseSecondsCompound 8.42 and
+  6.25, PCCreditAtCompound 4.92 and 1.83, PCJingleAtCompound,
+  PCExtraPaysAt 5.25 and 2.67: the extra's coin and rage on its record's
+  tick, World.pc_s2_extra_credit). E13's gauge: the bull to the plant
+  27.0 s (the port's 27.0, 22.2 before), the plant to the tortilla 10.75
+  (11.0), the tortilla to the picnic 27.5 (27.2); 213's plan ends 1.7 s
+  later, at 100.
   The whip's credit to the cigars' stays 26.2 s against E12's 29.8, and
   the 3.6 s are the door: the icon moves to the cigars 11.2 s after the
   whip's credit in both, and in E12 the Mother takes the midright/midleft

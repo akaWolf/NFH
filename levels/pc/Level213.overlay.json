@@ -47,6 +47,13 @@
     "PCJingleAt": [
      5.17
     ],
+    "PCUseSecondsCompound": 8.42,
+    "PCCreditAtCompound": 4.92,
+    "PCJingleAtCompound": [
+     4.92,
+     5.25
+    ],
+    "PCExtraPaysAt": 5.25,
     "PCUseSeconds": 8.5
    }
   },
@@ -68,6 +75,13 @@
     "PCJingleAt": [
      1.83
     ],
+    "PCUseSecondsCompound": 6.25,
+    "PCCreditAtCompound": 1.83,
+    "PCJingleAtCompound": [
+     1.83,
+     2.67
+    ],
+    "PCExtraPaysAt": 2.67,
     "PCUseSeconds": 1.75
    }
   },

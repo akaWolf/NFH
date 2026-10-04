@@ -2208,6 +2208,18 @@ SCENE_CONT = {213: {'MechanicalBullControls': ('fight', 'olga', (0x10037d3b,))}}
 # hotspot, 249 px and 59 above the floor) takes the same 8 ticks along the
 # floor from either
 SCENE_AT = {208: {'ElectricTap': 'altar_statue'}}
+# the compound-tricked scene of a station the mobile pays a second coin on
+# (Item.ExtraCoinCompound, Item.cs:2398-2409: the Tortilla and the
+# carnivorous plant): {level: {item: (shown, hidden)}} — combine.xml's second
+# combination, which takes the first's result: 213's carnivore_bigmanip from
+# carnivore_big (its `use`: carnivore_big on tick 13, carnivore_bigmanip on
+# 17), tortilla_sharp_tequila from either half (tortilla_sharp on 20,
+# tortilla_tequila on 30 — the tequila alone names no record)
+COMPOUND_PRESENT = {213: {'PlantCarnivore': ({'topright_carnivore_bigmanip'},
+                                             {'topright_carnivore', 'topright_carnivore_big'}),
+                          'Tortilla': ({'bottomright_tortilla_sharp_tequila'},
+                                       {'bottomright_tortilla', 'bottomright_tortilla_sharp',
+                                        'bottomright_tortilla_tequila'})}}
 
 
 def _scene_step_events(n, item, linked=None):
@@ -3259,6 +3271,28 @@ def code_stays_tricked(n):
             out[item]['linked_credit'] = round(credit / 12.0, 2) if credit is not None else None
             out[item]['linked_jingles'] = [_secs(t) for t in _step_jingles(d, evl)]
             out[item]['linked_scene'] = _scene_secs(_scene_span(d, evl))
+    # the compound-tricked visit (COMPOUND_PRESENT): the station's step run
+    # with the second combination shown — its stand, SHOUT and records, the
+    # first named one PCCreditAtCompound, the second the mobile's extra coin
+    # at its own tick (fcn.1000140b credits each on its `time`)
+    for item, (cs, ch) in COMPOUND_PRESENT.get(n, {}).items():
+        if item not in where:
+            continue
+        i, _ev1 = where[item]
+        lvi, byi = _row_level(n, snaps, lap[i][0])
+        lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
+        lvc = Level(n)
+        lvc.present = (set(lvi.present) - set(ch)) | set(cs)
+        evc, _nx = run_step(lvc, lap[i][1], dict(byi), latch=lat)
+        own = own_of(item, i)
+        wk_i = LAP_WALKS.get(n, {}).get(lap[i][0], True)
+        ec = entry(evc, own, wk_i)
+        recs = _step_records(d, evc, own, wk_i)
+        out[item].update({'compound': ec['tricked'], 'compound_shout': ec['shout'],
+                          'compound_repair': ec['repair'], 'compound_tail': ec['tail'],
+                          'compound_scene': ec['scene'], 'compound_credit': ec['credit'],
+                          'compound_jingles': ec['jingles'],
+                          'compound_extra': _secs(recs[1][1]) if len(recs) > 1 else None})
     # the linked trick in the same step: the station's step run with both
     # tricks in the scene
     dos = lambda ev: [tuple(e[1]) for e in ev if e[0] in ('DO', 'ODO')]

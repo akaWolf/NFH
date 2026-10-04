@@ -810,6 +810,13 @@ predicate, then the all-tricks win.
   shot's third record — the ExtraCoin206 — pays and books its completion
   at its own tick (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is
   off under the profile (the PC's shoot step asks nothing).
+- **The PC profile's compound visit** (PCUseSecondsCompound,
+  PCCreditAtCompound, PCJingleAtCompound, PCExtraPaysAt; `_pc_compound`):
+  213's compound-tricked plant and tortilla stand their second
+  combination's action and pay the mobile's extra coin
+  (Item.ExtraCoinCompound, Item.cs:2398-2409 — at the use's start there)
+  on its record's tick, its rage the ladder's cs:620-624 / cs:630-634 arm
+  alone (the `compound` part of `_s2_credit`).
 - **The PC profile's repair walk** (PCFixDepart, play_angry's `after_run`):
   a repair at another object (211's sign after the wc, 203's generator
   after the stage, 208's plain tap after the electrified one's shock) or

@@ -497,7 +497,8 @@ def write_tricked_keys(ov, n, clips):
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
               'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter',
-              'PCScene', 'PCSceneLinked', 'PCJingleAt', 'PCJingleAtLinked', 'PCHitJinglesLinked'):
+              'PCScene', 'PCSceneLinked', 'PCJingleAt', 'PCJingleAtLinked', 'PCHitJinglesLinked',
+              'PCUseSecondsCompound', 'PCCreditAtCompound', 'PCJingleAtCompound', 'PCExtraPaysAt'):
         ov['patches'] = _strip_key(ov['patches'], k)
     sys.path.insert(0, HERE)
     import lap_model_s2
@@ -545,6 +546,19 @@ def write_tricked_keys(ov, n, clips):
                 # jingle="true" record, named or not, on its own tick
                 # (fcn.1000140b, 0x10001528-0x1000153f)
                 _set_key(ov['patches'], item, 'PCJingleAt', tr['jingles'])
+        if tr.get('compound') is not None:
+            # the compound-tricked visit (lap_model_s2.COMPOUND_PRESENT):
+            # its stand, its first record and jingles, and the second record
+            # — the mobile's extra coin — on its own tick; its reaction is
+            # the tricked visit's (the same SHOUT, repair and scene)
+            if (tr['compound_shout'], tr['compound_repair'], tr['compound_scene']) != \
+                    (tr['shout'], tr['repair'], tr['scene']):
+                raise ValueError('%d %s: the compound reaction differs' % (n, item))
+            _set_key(ov['patches'], item, 'PCUseSecondsCompound', tr['compound'])
+            _set_key(ov['patches'], item, 'PCCreditAtCompound', tr['compound_credit'])
+            _set_key(ov['patches'], item, 'PCJingleAtCompound', tr['compound_jingles'])
+            if tr.get('compound_extra') is not None:
+                _set_key(ov['patches'], item, 'PCExtraPaysAt', tr['compound_extra'])
         if tr.get('linked_jingles') and (tr.get('linked_credit') is not None
                                           or tr.get('linked_pays') is not None):
             _set_key(ov['patches'], item, 'PCJingleAtLinked', tr['linked_jingles'])

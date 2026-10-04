@@ -331,7 +331,8 @@ class Item:
                  'pc_jingle_at', 'pc_jingle_at_linked', 'pc_hit_jingles_linked', 'pc_jingle',
                  'pc_hit_secs', 'pc_hit_after', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
-                 'pc_fix_depart',
+                 'pc_fix_depart', 'pc_use_secs_compound', 'pc_credit_at_compound',
+                 'pc_jingle_at_compound', 'pc_extra_pays_at',
                  'enable_anim_index_control', 'anims_to_control',
                  'current_sequence', 'current_seq_index',
                  'dexterity', 'dexterity_trick_item', 'dexterity_unlocker',
@@ -1061,6 +1062,16 @@ class Item:
         # tools/pcref/coins.py STAND_IN)
         self.pc_jingle_at = list(d.get('PCJingleAt') or []) or None
         self.pc_jingle_at_linked = list(d.get('PCJingleAtLinked') or []) or None
+        # the compound-tricked visit (213's plant with the piranha, tortilla
+        # with the tequila too: combine.xml's second combination, whose
+        # action names both records — lap_model_s2.COMPOUND_PRESENT): its
+        # stand, its first record's second and jingles, and the second
+        # record's, the mobile's extra coin (Item.ExtraCoinCompound,
+        # Item.cs:2398-2409), paid at its own tick
+        self.pc_use_secs_compound = d.get('PCUseSecondsCompound')
+        self.pc_credit_at_compound = d.get('PCCreditAtCompound')
+        self.pc_jingle_at_compound = list(d.get('PCJingleAtCompound') or []) or None
+        self.pc_extra_pays_at = d.get('PCExtraPaysAt')
         self.pc_hit_jingles_linked = dict(d.get('PCHitJinglesLinked') or {}) or None
         self.pc_jingle = bool(d.get('PCJingle'))
         # the co-actor's hit on him after the trick, by her role: the generic
