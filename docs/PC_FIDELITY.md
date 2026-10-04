@@ -2367,11 +2367,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PRESENT: their scene named), and 204's vase, 209's gully and 210's
   diving board pay in their partner's linked flow (the jade's, the hot
   shoe's, the dog basket's), whose scene is the partner's; 207's diving
-  board (its step 0x100169c5 polls for the Mother), 210's pole (the
-  hedgehog chair's linked variant, a visit timed per clip) stay unread,
-  the default standing; 211's kid pays in the cabin phone's linked
-  `crash` since (below) and 210's pole in the chair's linked variant
-  (above).
+  board (its step 0x100169c5 polls for the Mother) and 210's pole (the
+  hedgehog chair's linked variant, a visit timed per clip) had stayed
+  unread, the default standing — since the same afternoon 211's kid pays
+  in the cabin phone's linked `crash` (below), 210's pole in the chair's
+  linked variant and 207's board and awning by the board's step (above).
   208's platform, read the same day: its trick is the fakir's balloon
   (combine.xml amusement/fakir_balloon; the mobile's chips are no PC
   ingredient — PRESENT), and the platform step (0x1001ea59) plays the
@@ -2429,7 +2429,32 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   pole's electrify as ChairElectrify starts (PCLinkedCreditInClip,
   pc_durations_s2 LINKED_CREDIT_IN: the record on the `electrify`'s tick
   0), where both had paid at the tantrum; 210's plan ends 0.4 s earlier,
-  at 100.
+  at 100. 207's spring board the same way (0x100169c5, a visit timed per
+  clip): the step asks whether the Mother sits in her deck chair (her
+  place against pool_deckchair, fcn.100585c0 — the poll the port's
+  WaitWatch stands for, taken as passed: SCENE_STEPS' fifth element,
+  run_step's `streq`), then the spring's `dive` and the awning's variant
+  — the plain awning or the pole the first dive breaks it to: its
+  `crash`, a pose's tick and the pool's `enter` and `leave`, SHOUT 1, no
+  repair; the closed awning (the pedal on the pole, combine.xml
+  pool/awning_closed, the plain awning gone: LINKED_PRESENT): the
+  camera's tick and the Mother's deck chair's `enter` — crash_mother on
+  its tick 5, her `crash` behaviour posted as it ends — and `leave`, the
+  m_hurt_n icon; her `fight` (40 ticks) posts mother_fight, whose branch
+  of his handler (0x10017321) picks 0x100171ee: SHOUT 1, the camera back
+  (SCENE_LINKED_CONT, scene_step_linked_reactions). The port's clips at
+  the PC's (pc_durations_s2 CLIPS, a clip over several parts): PoolSpring
+  1.58 s with divingboard_spring 1.42 s in (its 20 clamped to the dive's
+  17; PCCreditInClip, the jingle with it), PoolAwningFall 2.92,
+  PoolGetOut 1.42, shout2 and no repair; linked, CrashMother 2.67 with
+  crash_mother 0.5 s in (PCLinkedCreditInClip), the Mother's hit at her
+  `fight`'s 3.33 s (PCHitSeconds; the mobile's PawnToAffectWhenTricked,
+  only when linked), then shout2 — where the mobile's clips and the
+  stand-ins' reactions had played and both had paid at the tantrum;
+  207's plan ends 4.9 s earlier, at 100. Open: the scene of a visit that
+  opens on a poll clip (202's WaitSea, 207's WaitWatch) rises from the
+  visit's start, the PC's with the step's list after the poll — a credit
+  falling in the wait completes the level later than the PC would.
   209's hot coals likewise, by the lap's own step (0x10020124) once their
   scene is named (lap_model_s2 PRESENT: the mobile's tongs are no PC
   ingredient — the hot coal is the coal and the air pump — and the fuel

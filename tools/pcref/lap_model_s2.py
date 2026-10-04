@@ -2075,6 +2075,13 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                      # lion's head); the mobile's fuel is no PC ingredient
                      'Chef': ((0x10024929,), {'shop_chef_blind', 'shop_tube'},
                               {'shop_chef', 'shop_eelbasket'}, 0)},
+               # 207's spring board (0x100169c5: the Mother in her deck chair
+               # asked — the poll the step waits in, taken as passed —, the
+               # spring's `dive`, then the awning's variant: the plain one or
+               # the pole his dive breaks it to, its `crash` and the pool, SHOUT
+               # 1; the closed awning, the Mother's deck chair's `enter` —
+               # crash_mother, her `crash` behaviour —, the m_hurt_n icon)
+               207: {'PoolBoard': ((0x100169c5,), {'pool_divingboard_spring'}, {'pool_divingboard'}, 0, 1)},
                # 208's elephant line (0x1001e000: the lookaround and the line's
                # `fool`, SHOUT 1, the repair); the variants' objects named
                # (the cable's combinations give the tap's)
@@ -2125,32 +2132,51 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
 # station's own tricked step, its stand, SHOUT, repair and records — read as
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
-TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap', 'Rake'), 209: ('FireFakir',),
-                 211: ('LifeBoat', 'CabinPhone'), 213: ('Pinata',)}
+TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap', 'Rake'),
+                 209: ('FireFakir',), 211: ('LifeBoat', 'CabinPhone'), 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
-# two items' (the linked loop of code_stays_tricked): 212's two rubies fill
+# two items' (the linked loops of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's
-# own combinations show a half and the full throne both
-LINKED_PRESENT = {212: {'AztecThrone': ({'topright_throne_full'},
+# own combinations show a half and the full throne both; 207's pedal closes
+# the pole the first dive has broken the awning to (combine.xml
+# pool/awning_closed from pool/awning_pole), the plain awning gone
+LINKED_PRESENT = {207: {'PoolBoard': ({'pool_divingboard_spring', 'pool_awning_closed'},
+                                     {'pool_divingboard', 'pool_awning', 'pool_awning_pole'})},
+                  212: {'AztecThrone': ({'topright_throne_full'},
                                         {'topright_throne_empty', 'topright_throne_half',
                                          'topright_throne_half_2', 'topright_throne_half_right'})}}
+# the reaction a TRICKED_SCENE item's linked flow hands to: {level: {item:
+# (kind, co-actor, steps)}}, TRICKED_CONT's 'fight' — 207's board over the
+# closed awning: his crash into the Mother's deck chair posts her `crash`
+# (behavior= on the chair's `enter`), her `fight` posts mother_fight, and
+# his handler (0x10017321) picks 0x100171ee: SHOUT 1, the camera back
+SCENE_LINKED_CONT = {207: {'PoolBoard': ('fight', 'mother', (0x100171ee,))}}
 
 
 def _scene_step_events(n, item, linked=None):
     """the events of an item's SCENE_STEPS steps, run with its trick in the
     scene (tricked_presence, else the table's) — and the linked trick's,
-    `linked` (shown, hidden), for the linked variant"""
-    steps, shown, hidden = SCENE_STEPS[n][item][:3]
-    unknown = SCENE_STEPS[n][item][3] if len(SCENE_STEPS[n][item]) > 3 else 1
+    `linked` (shown, hidden), for the linked variant, or LINKED_PRESENT's
+    scene where the level names it; an entry's fifth element 1 takes a name
+    compare the walker cannot resolve as holding (run_step's `streq`: 207's
+    board step asks whether the Mother is in her deck chair, the poll the
+    step waits in)"""
+    spec = SCENE_STEPS[n][item]
+    steps, shown, hidden = spec[:3]
+    unknown = spec[3] if len(spec) > 3 else 1
+    streq = spec[4] if len(spec) > 4 else 0
     if shown is None:
         shown, hidden = tricked_presence(n).get(item, (set(), set()))
     if linked is not None:
         shown, hidden = set(shown) | set(linked[0]), set(hidden) | set(linked[1])
+        if item in LINKED_PRESENT.get(n, {}):
+            shown, hidden = LINKED_PRESENT[n][item]
     lv = Level(n)
     lv.present = (set(lv.present) - set(hidden)) | set(shown)
     ev = []
     for st in steps:
-        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1)
+        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1,
+                            streq=streq)
         ev += ([('STEP',)] if ev else []) + evs
     return ev
 
@@ -2186,11 +2212,14 @@ def scene_step_reactions(n):
 
 
 def scene_step_linked_reactions(n):
-    """{mobile item: (SHOUT level, repair s or None, tail s, scene)} of the
-    SCENE_STEPS flows scene_step_reactions reads, run with the mobile linked
-    trick's scene too where that changes their DoActions (210's hedgehog
-    chair over the damaged pole: the chair's `electrify` between its
-    `enter` and `leave`, SHOUT 1, 0x1001964b's PRESENT pole_damaged)"""
+    """{mobile item: (SHOUT level, repair s or None, tail s, scene, hit)} of
+    the SCENE_STEPS flows scene_step_reactions reads, run with the mobile
+    linked trick's scene too where that changes their DoActions (210's
+    hedgehog chair over the damaged pole: the chair's `electrify` between
+    its `enter` and `leave`, SHOUT 1, 0x1001964b's PRESENT pole_damaged);
+    where the flow hands its reaction on (SCENE_LINKED_CONT: 207's board
+    over the closed awning) the co-actor's `fight` — hit {actor: seconds} —
+    and the SHOUT of the step his handler picks for it"""
     d = Data(n)
     out = {}
     trick = tricked_presence(n)
@@ -2203,10 +2232,22 @@ def scene_step_linked_reactions(n):
         ev2 = _scene_step_events(n, item, trick[lnk])
         if dos(ev2) == dos(ev1):
             continue
+        hit = None
+        cont = SCENE_LINKED_CONT.get(n, {}).get(item)
+        if cont is not None:
+            kind, actor, steps = cont
+            lvc = Level(n)
+            for stp in steps:
+                ev2 = ev2 + [('STEP',)] + run_step(lvc, stp, dict(LAP_BYTES.get(n) or {}),
+                                                   unknown=1, streq=1)[0]
+            if kind == 'fight':
+                ft = d.action_ticks('neighbor', 'fight', actor=actor)
+                hit = {actor: _secs(ft)}
         _stand, level, repair, _credit = _step_parts_split(d, ev2)
         if level is None:
             continue
-        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)))
+        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)),
+                     hit)
     return out
 
 

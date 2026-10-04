@@ -15,7 +15,33 @@
     "PCLaugh": 0,
     "PCClipSeconds": {
      "PoolDive": 4.58,
-     "PoolGetOut": 1.42
+     "PoolGetOut": 1.42,
+     "PoolSpring": 1.58,
+     "PoolAwningFall": 2.92,
+     "CrashMother": 2.67
+    },
+    "PCCreditInClip": {
+     "PoolSpring": 1.42
+    },
+    "PCLinkedCreditInClip": {
+     "CrashMother": 0.5
+    },
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
+    "PCSceneLinked": [
+     1.75,
+     "shout"
+    ],
+    "PCShoutLinked": 1,
+    "PCFixSecondsLinked": 0,
+    "PCShoutTailLinked": 0.08,
+    "PCHitSeconds": {
+     "Mother": 3.33
     },
     "PCJingle": true
    }

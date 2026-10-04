@@ -750,7 +750,10 @@ predicate, then the all-tricks win.
   the walk-by's moment (the mobile's NoticeWhenWalkNearby; the PC's
   trigger is nearobj, the same room and floor, under 15 apart
   vertically, and when the handler's step change cuts his walk is
-  unread); 202's laid rake without the weed (combine.xml
+  unread); the scene of a visit that opens on a poll clip (202's WaitSea,
+  207's WaitWatch) rising from the visit's start where the PC's rises
+  with the step's list after the poll (a credit in the wait completes the
+  level later); 202's laid rake without the weed (combine.xml
   pond/rake_ground, trick="false") — the PC's walk-by plays its `use`
   (2.17 s from the step's 0.17) and repair (1.67 s), no SHOUT and no
   record, 4.17 s in all; the port plays the mobile's (the Rake subclass

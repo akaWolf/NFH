@@ -124,7 +124,18 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
         # as the bar step walks him out; the wait before is the Mother's —
         # Level207MotherBehavior holds his WaitWatch)
         207: {'PoolBoard': {'PoolDive': ('pool_divingboard', 'dive'),
-                            'PoolGetOut': ('pool_pool', 'leave')}}}
+                            'PoolGetOut': ('pool_pool', 'leave'),
+                            # tricked, the spring board's (the same step):
+                            # its `dive`, the awning's `crash` (the plain one
+                            # or the pole), the E2f40 pose's tick and the
+                            # pool's `enter`; over the closed awning the
+                            # Ef51a's tick, the Mother's deck chair's `enter`
+                            # and `leave` (lap_model_s2 SCENE_STEPS)
+                            'PoolSpring': ('pool_divingboard_spring', 'dive'),
+                            'PoolAwningFall': ('parts', (('pool_awning', 'crash'), ('ticks', 1),
+                                                         ('pool_pool', 'enter'))),
+                            'CrashMother': ('parts', (('ticks', 1), ('pool_deckchair', 'enter'),
+                                                      ('pool_deckchair', 'leave')))}}}
 # the items whose per-visit stays stand beside their clips: the clips time a
 # visit whose stay is 0
 KEEP_STAYS = {}
@@ -143,12 +154,18 @@ CREDIT_IN = {202: {'BeerMat': ('BeachCrabGetBeer', 'beachright_mat_hn_guarded_ma
              # chair's `enter`, ChairHedgehogEnter (a 'step' clip: the
              # step's own ticks first)
              210: {'DeckChair': ('ChairHedgehogEnter', 'beachleft_deckchair_hedgehog', 'enter',
-                                 'deckchair_hedgehog')}}
+                                 'deckchair_hedgehog')},
+             # 207's spring board: divingboard_spring on the `dive`'s 17 (its 20
+             # clamped by the Loader), PoolSpring
+             207: {'PoolBoard': ('PoolSpring', 'pool_divingboard_spring', 'dive', 'divingboard_spring')}}
 # the linked trick's own record so far into the clip that plays the linked
 # variant's action carrying it (PCLinkedCreditInClip: 210's pole, electrify
 # on the chair's `electrify` tick 0, ChairElectrify)
 LINKED_CREDIT_IN = {210: {'DeckChair': ('ChairElectrify', 'beachleft_deckchair_hedgehog', 'electrify',
-                                        'electrify')}}
+                                        'electrify')},
+                    # 207's closed awning: crash_mother 5 ticks into the Mother's
+                    # deck chair's `enter`, a tick into CrashMother
+                    207: {'PoolBoard': ('CrashMother', 'pool_deckchair', 'enter', 'crash_mother')}}
 # a clip held until another role has used an item (PCWaitFor), then `then` —
 # the (object, action) parts after it: 202's swim step polls for the `sub`
 # (0x100224a8-0x10022563) that Olga's Submarine use switches into the sea,
@@ -359,6 +376,11 @@ def clip_secs(n):
                 t = d.frames.get((src[1], src[2])) or d.gframes.get((src[1], src[2]))
             elif src[0] == 'none':
                 t = 0                          # the PC plays nothing there
+            elif src[0] == 'parts':
+                # a clip over several of the step's parts in turn (207's
+                # PoolAwningFall: the awning's `crash`, a pose's tick, the
+                # pool's `enter`)
+                t = sum(p[1] if p[0] == 'ticks' else (d.action_ticks(*p) or 0) for p in src[1])
             elif src[0] == 'job':
                 # another actor's action whose job posts the behaviour the
                 # stand waits for, and the offer's tick, over so many clips
@@ -379,7 +401,11 @@ def clip_secs(n):
             t = next((tm for nm, tm in d.tricks(obj, act) if nm == rec), None)
             assert t is not None, (obj, act, rec)
             src = CLIPS.get(n, {}).get(item, {}).get(clip)
-            if src is not None and len(src) > 2 and src[2] == 'step':
+            if src is not None and src[0] == 'parts':
+                # the clip's parts before the record's action
+                k = next(i for i, p in enumerate(src[1]) if tuple(p[:2]) == (obj, act))
+                t += sum(p[1] if p[0] == 'ticks' else (d.action_ticks(*p) or 0) for p in src[1][:k])
+            elif src is not None and len(src) > 2 and src[2] == 'step':
                 t += lap_model_s2.WALK_STEP_TICKS     # the clip opens with the step's ticks
             clips.setdefault(item, {})[key] = {clip: round(t / 12.0, 2)}
     waits = {}
@@ -574,14 +600,20 @@ def write_tricked_keys(ov, n, clips):
         _set_key(ov['patches'], item, 'PCFixSeconds', repair or 0)
         if tail:
             _set_key(ov['patches'], item, 'PCShoutTail', tail)
-    for item, (level, repair, tail, sc) in sorted(lap_model_s2.scene_step_linked_reactions(n).items()):
+    for item, (level, repair, tail, sc, hit) in sorted(lap_model_s2.scene_step_linked_reactions(n).items()):
         # the linked variant's (210's hedgehog chair over the damaged pole:
-        # the chair's `electrify`, SHOUT 1)
+        # the chair's `electrify`, SHOUT 1; 207's board over the closed
+        # awning: the Mother's `fight`, then SHOUT 1)
         _set_key(ov['patches'], item, 'PCSceneLinked', sc)
         _set_key(ov['patches'], item, 'PCShoutLinked', level)
         _set_key(ov['patches'], item, 'PCFixSecondsLinked', repair or 0)
         if tail:
             _set_key(ov['patches'], item, 'PCShoutTailLinked', tail)
+        if hit:
+            # the co-actor's `fight` (the generic action's ticks), where the
+            # mobile's affected pawn hits him (PawnToAffectWhenTricked)
+            _set_key(ov['patches'], item, 'PCHitSeconds',
+                     {ROLE[a]: v for a, v in hit.items() if v is not None})
 
 
 def write_code_stays(ov, n, clips):
