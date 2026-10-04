@@ -2007,7 +2007,14 @@ the level selection menu, LevelLoader, not modelled).
   as the levels' first icons come on tick 37 — where the pets' alarm on a
   level (E11: the dog stirs at 2707.63, his noise icon at 2708.42) takes
   the wake-up's 9 ticks and one more; his script, not the alarm, waits.
-  The source of that wait is still not read.
+  The source of that wait is still not read. Ruled out on 2026-10-04: the
+  class's job is pushed as the actor is created (the AddActor message's
+  listener slot 96, 0x43ea50 -> fcn.00439fe0 -> fcn.00444d30, run-now 0),
+  every actor ticks from the level's first pass (fcn.00439cd0: the state
+  function while the state is 0 or 1, then each actor's fcn.00444db0; the
+  pause byte +0x78 is toggled only by PauseActorMsg), and SetIcon posts its
+  message at once (fcn.00437f70, vtable 0x4e09e0); the neighbour stands in
+  his room from the level's first frame (E02 370.55).
 - Dead by the data, confirmed by the plans: L112's GroundSkates 14 (both
   `OnTrickDone` paths die in the parked ride — README above), L113's
   ElectricTrap 8 (its collider sits inside and behind the basement door's,

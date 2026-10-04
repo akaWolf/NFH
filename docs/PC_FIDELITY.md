@@ -2300,9 +2300,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   through it — was off in the reference run: GFXEngine draws the new
   target's `camera` string on every change (fcn.10003df0 drops the old
   label, fcn.10004e90 draws it, its gate +0x131 set by the reset
-  fcn.10008dd0 and never cleared), 201's director shows `Neighbor camera`
-  at 79.3 s, yet no scene of a regular level does (E02's rail 470-500 s,
-  E03's bicycle 706-734 s: the view stays where the player scrolled, and
+  fcn.10008dd0 and never cleared); 201's tutorial forces its camera — its
+  Ef51a push the bool 1 with flags 0, no freeze (0x10029982, 0x10029fb2,
+  0x1002a41f, 0x1002aa85) — and shows `Neighbor camera` at 79.3, 105.6,
+  118, 142.6 and 199.6 s, while a regular level passes the option's byte
+  (fcn.1000e116: 202's shark, 0x100224ff) and no scene of one shows a
+  label (E02 393-423 s — the first two tricks' scene ends and the second's
+  start — and 470-500 s, the rail's start; E03's bicycle 706-734 s: the
+  view stays where the player scrolled or jumped with the focus keys, and
   the one label is the success's `Woody camera`). The profile plays it
   off. The items the model reads no tricked flow of (PCLaugh's stand-ins)
   hold their scene over the stand-in reaction; the flows read by hand
