@@ -518,7 +518,19 @@ actors' job pass the update calls at 0x100445f8.
   26.3), 110's steak chair to the wine −0.1 (18.6 / 18.7) and its first
   three −0.6, −0.7, +0.5 (14.3 / 14.9, 14.8 / 15.5, 17.1 / 16.6), the
   rest within 0.5 s (114's hat and horn read through the full tube, ~8.1
-  and ~20.4 against 8.6 and 20.0). Case 22's message
+  and ~20.4 against 8.6 and 20.0). Localized the same evening by the
+  HUD bubble (bubble.py at 4 fps against the port's stations on the
+  video's clock): 114 — the reaction to 220 (the port 220.4), the polish
+  from 221 (220.6), the pipe 239 (239.6), the phonograph 250 (250.1), the
+  CDs 256 (255.7), the alarm's `?!` 258 (the run 258.7), the dog to 271
+  (271.6), the CDs 271-286 (at the rack 283 on the frames, the port's
+  283.1, its 25-tick search_record to 285.2), the phonograph from 286
+  (285.2) — the −0.9 s lie at the rack; 111 — the vacuum's icon from
+  215.0 (the port's walk from its search 214.9) to the vacuum clip, the
+  PC's ~218.8 (2.92 s before its fire at 221.8) against the port's
+  217.9: the walk to the vacuum, the take and the walk to the carpet
+  (68 px, the take's 0.5 s, 79 px: 3.0 s) — the camera pans over him
+  in both, so neither is read closer. Case 22's message
   before the carpet's GOTO is the vacuum's OBJ1 (fcn.00451e80, vtable
   0x4e1bdc: its slot 2 fcn.00438c80 — no gait), so its 0.7 s lie in the
   GOTO's legs, not read against E11's frames.
