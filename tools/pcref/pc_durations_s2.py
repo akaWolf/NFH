@@ -496,7 +496,7 @@ def write_tricked_keys(ov, n, clips):
               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter',
+              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter', 'PCHitRun',
               'PCScene', 'PCSceneLinked', 'PCJingleAt', 'PCJingleAtLinked', 'PCHitJinglesLinked',
               'PCUseSecondsCompound', 'PCCreditAtCompound', 'PCJingleAtCompound', 'PCExtraPaysAt'):
         ov['patches'] = _strip_key(ov['patches'], k)
@@ -539,6 +539,11 @@ def write_tricked_keys(ov, n, clips):
             # (lap_model_s2.FIGHT_BEFORE: 213's Olga out of the boat)
             _set_key(ov['patches'], item, 'PCHitAfter',
                      {ROLE[a]: v for a, v in tr['hit_after'].items() if v is not None})
+        if tr.get('hit_run'):
+            # her run to him from her hideout's leave, the PC's seconds
+            # (lap_model_s2.HIT_FROM: 204's Olga out of the rickshaw)
+            _set_key(ov['patches'], item, 'PCHitRun',
+                     {ROLE[a]: v for a, v in tr['hit_run'].items() if v is not None})
         if tr['credit'] is not None:
             _set_key(ov['patches'], item, 'PCCreditAt', tr['credit'])
             if tr.get('jingles'):

@@ -62,7 +62,10 @@
      "Olga": 3.58
     },
     "PCHitAfter": {
-     "Olga": 0.08
+     "Olga": 0.25
+    },
+    "PCHitRun": {
+     "Olga": 1.92
     },
     "PCCreditAt": 2.17,
     "PCJingleAt": [

@@ -657,6 +657,7 @@ class Pawn:
         self.in_urgent = False           # Pawn.InUrgentMove
         self.pc_run = False              # the PC case's run gait (Routine._pc_runs)
         self.pc_run_hit = False          # the next hit-pawn run is the PC script's run
+        self.pc_hit_run_secs = None      # ... lasting the PC's seconds (the trick item's PCHitRun)
         self.movement_paused = False     # Pawn.MovementPaused
         self.exit_confirmation_shown = False   # Pawn.ExitConfirmationShown
         self.waiting_for_exit_confirmation = False  # WaitingforExitConfirmation
@@ -1654,6 +1655,34 @@ class Pawn:
             pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
             self._pc_pass = cur = (near, pace)
         return cur[1]
+
+    def pc_time_path(self, secs, short=0.0):
+        """the path the pawn is about to walk timed to `secs` in all — up to
+        `short` before its end, where a watch stops the walk (the hit's
+        MaximumPawnDistanceToAction) —: each step its share of the path's
+        length (`pc_secs`, _pc_pace)"""
+        steps = ([self._step] if self._step is not None else []) + list(self.steps)
+        x, y = self.sprite.x, self.sprite.y
+        lens = []
+        for st in steps:
+            tx, ty = self._step_target(st)
+            lens.append(((tx - x) ** 2 + (ty - y) ** 2) ** 0.5)
+            x, y = tx, ty
+        total = sum(lens)
+        if total <= 1e-6 or total - short <= 1e-6:
+            return
+        secs = secs * total / (total - short)
+        for st, ln in zip(steps, lens):
+            st['pc_secs'] = secs * ln / total
+            # (the stands the PC walk would add — the run down from her
+            # station, a hop's `in` and `out` runs — are in `secs` already)
+            for k in ('pc_prehold', 'pc_hold_run', 'pc_after_run'):
+                st.pop(k, None)
+        if self._step is not None and 'pc_secs' in self._step:
+            # (the step under way takes its length from here)
+            tx, ty = self._step_target()
+            self._step['pc_len'] = ((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5
+            self._pc_step_t = 0.0
 
     def _pc_claim_marks(self, steps):
         """the PC profile's Season 2 door claim: GameLogic.dll's door-pass
@@ -6976,6 +7005,12 @@ class Routine:
                 on_arrive=self._hit_pawn_arrived):
             self._hit_pawn_arrived()
         elif self.pawn.world is not None:
+            secs, self.pawn.pc_hit_run_secs = self.pawn.pc_hit_run_secs, None
+            if secs:
+                # the PC's run from her hideout's `<actor>_out` to the point
+                # beside him (PCHitRun): the path's steps timed to it by
+                # their share of its length (`pc_secs`)
+                self.pawn.pc_time_path(float(secs), maxd)
             # the move ends by distance inside the target's zone
             # (RoutineActionHitPawn.IsAtActionLocation, cs:13-18, read by
             # RoutineActionMove.Finished every frame)
@@ -8943,6 +8978,10 @@ class World:
                 # it sets her gait to 2 first (the item's PCRunTo:
                 # pc_reactions.py RUNTO_S2)
                 affected.pc_run_hit = bool(getattr(item, 'pc_run_to', False))
+                # her run from the hideout she leaves at the PC's seconds
+                # (PCHitRun: 204's Olga from the rickshaw's olga_out)
+                affected.pc_hit_run_secs = (item.pc_hit_run or {}).get(affected.role) \
+                    if pcprofile.is_pc() else None
                 # the PC's hit: the co-actor's `fight` ticks (PCHitSeconds; the
                 # linked flow's own action, PCHitSecondsLinked)
                 hs = item.pc_hit_secs

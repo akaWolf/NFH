@@ -1414,7 +1414,7 @@ def walk_ticks(g, frm, to, actor='neighbor', data=None, detail=None):
     return t + t3, (r2, p2[0], p2[1])
 
 
-def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None):
+def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None, gait='mg'):
     """(room, x, y) -> an object's `<actor>` hotspot — or the one the GoTo
     names (`hotspot`: its +0xc, fcn.10049e01 at 0x1000744d; the actor's
     name where it has none, fcn.1003cc45 at 0x10007430) — as GameLogic.dll
@@ -1472,12 +1472,12 @@ def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None
         if nb is None or a is None or b is None:
             return None, frm
         t0 = t
-        s = g.leg(x, y, nb[0], nb[1], g.floor(room), actor)
+        s = g.leg(x, y, nb[0], nb[1], g.floor(room), actor, gait)
         if s:
             t += s - 1            # to the `<actor>` hotspot
         if detail is not None:
             detail.append(('room', t - t0)); t0 = t
-        s = g.leg_direct(nb[0], nb[1], a[0], a[1], actor)
+        s = g.leg_direct(nb[0], nb[1], a[0], a[1], actor, gait)
         t += s - 1 if s else 1    # state 0: to `<actor>_in`
         if actor in g.door_acts.get(din, ()):
             je = data.action_ticks(din, 'enter', actor) if data is not None else None
@@ -1486,20 +1486,20 @@ def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None
                 return None, frm
             t += je + jl          # states 2 and 3: the enter, the leave
         else:
-            s = g.leg(a[0], a[1], b[0], b[1], a[1], actor)
+            s = g.leg(a[0], a[1], b[0], b[1], a[1], actor, gait)
             t += s - 1 if s else 1
         room = g.room_of(dout)
         if room not in g.rooms:
             return None, frm
         fr = g.rooms[room]
         cx, cy = min(max(b[0], fr['x1']), fr['x2']), fr['y']
-        s = g.leg_direct(b[0], b[1], cx, cy, actor)
+        s = g.leg_direct(b[0], b[1], cx, cy, actor, gait)
         t += s if s else 1        # state 4's movement, from the next tick
         x, y = cx, cy
         if detail is not None:
             detail.append(('pass %s' % din, t - t0))
     t0 = t
-    s = g.leg(x, y, p2[0], p2[1], g.floor(room), actor)
+    s = g.leg(x, y, p2[0], p2[1], g.floor(room), actor, gait)
     if s:
         t += s - 1
     if detail is not None:
@@ -1912,6 +1912,15 @@ TRICKED_CONT = {204: {'GongDrumstick': ('steps', None, (0x10032f52,), 'stand'),
 # fcn.1000e601: a GoTo to his x less or plus FIGHT_GAP on her side) and on to
 # the fight
 FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_manip', 'leave'))}}
+# the co-actor's way to him from the hideout she sits in: {level: {item:
+# (her hideout, her gait)}} — her fight step's fcn.1000eb19 pushes a GoTo
+# whose route leaves the hideout first (0x1000a840: fcn.10006c2e, its
+# `leave` to its `<actor>_out`) and runs her to the point beside him. 204's
+# kart: his crash's `use` carries behavior="hurt_neighbor" for Olga (cn_c1
+# objects.xml), her step 0x1003340b takes the manipulated rickshaw for her
+# hideout (fcn.10049168) and sets her gait to 2 (0x10033486) — the
+# rickshaw_manip's olga_out 38 px, 170 left of her seat
+HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')}}
 # a tricked visit that pays in another actor's job her own script starts on
 # his part: {level: {item: ((his object, action), the actor, (her object,
 # action))}} — 210's elephant: Fifi's step 0x10018239 waits while she is
@@ -1969,6 +1978,38 @@ def _hit_after(n, d, lv, bytes0, ev, own, walked, spec):
     if t is None:
         return None
     return her_end + t + 2 - end
+
+
+def _hit_run(n, d, ev, actor, spec):
+    """(ticks of her hideout's `leave`, ticks of her GoTo's movement and the
+    two to the fight's first update) for HIT_FROM: her GoTo's route leaves
+    the hideout first (fcn.10006c2e with a first run: its `leave` job) and
+    moves her at her gait from the leave's place to his x less or plus
+    FIGHT_GAP on her side (walk_span); the fight runs two ticks after her
+    arrival's. None where a part is unknown"""
+    hideout, gait = spec
+    lv = d.action_ticks(hideout, 'leave', actor)
+    g = d.geom()
+    q = _leave_place(g, d, hideout, actor)
+    # where his flow leaves him: its GoTo's hotspot and the translations
+    # after it (_flow's tracking)
+    ctx = {'actor': 'neighbor'}
+    for e in ev or []:
+        if e[0] in ('GO', 'AT'):
+            obj = d.real.get(e[1], e[1]) if len(e) > 1 and e[1] else None
+            p = g.point(obj, 'neighbor') if obj else None
+            ctx['pos'] = (g.room_of(obj), p[0], p[1]) if p is not None else None
+        else:
+            _station_parts(d, [e], ctx)
+    his = ctx.get('pos')
+    if lv is None or q is None or his is None:
+        return None
+    frm = (g.room_of(d.real.get(hideout, hideout)), q[0], q[1])
+    x = his[1] - FIGHT_GAP if frm[1] < his[1] else his[1] + FIGHT_GAP
+    t, _p = walk_span(g, frm, (his[0], x, his[2]), actor, d, gait=gait)
+    if t is None:
+        return None
+    return lv, t + 2
 
 
 # the scene a tricked continuation needs besides the item's own trick: 211's
@@ -3054,7 +3095,14 @@ def code_stays_tricked(n):
                                                 None)
                                     if endp is not None and first is not None and pend is not None:
                                         post = endp + 2 + (pend - first)
-                                if post is not None and post + 2 - fl[-1][0] > 0:
+                                hr = HIT_FROM.get(n, {}).get(item)
+                                hrun = _hit_run(n, d, ev2, actor, hr) if hr is not None else None
+                                if post is not None and hrun is not None:
+                                    # her way out of her hideout, then her
+                                    # run to him (PCHitAfter, then PCHitRun)
+                                    e['hit_after'] = {actor: _secs(post + 2 - fl[-1][0] + hrun[0])}
+                                    e['hit_run'] = {actor: _secs(hrun[1])}
+                                elif post is not None and post + 2 - fl[-1][0] > 0:
                                     e['hit_after'] = {actor: _secs(post + 2 - fl[-1][0])}
                     # a tricked step with no SHOUT whose flow goes on to the
                     # lap's next step plays no reaction at all

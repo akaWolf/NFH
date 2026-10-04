@@ -2691,10 +2691,21 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   -> 4.75, 212's bench 6.42 -> 6.5, 213's washing tub 1.92 -> 2.0). E04:
   the bubble on the rickshaw again 104.0-108.3 after the fight's icon
   (98.3-104.0); the kart's coin to the karate's 18.0 s against the
-  gauge's 19.25 (16.2 before). Open: the fight's icon 5.7 s in E04
-  against the port's 4.5 — Olga's way out of the rickshaw to him (her
-  step 0x1003340b takes the manipulated rickshaw for her hideout and runs
-  fcn.1000eb19 at gait 2) is not timed by the model (PCHitAfter 0.08).
+  gauge's 19.25 (16.2 before). The fight's icon lasted 5.7 s in E04
+  against the port's 4.5: Olga's way out of the rickshaw to him — her
+  step 0x1003340b takes the manipulated rickshaw for her hideout
+  (fcn.10049168), sets her gait to 2 (0x10033486) and runs fcn.1000eb19,
+  whose GoTo's route leaves the hideout first (0x1000a840: fcn.10006c2e,
+  the rickshaw_manip's `leave`, 2 ticks, placing her at its olga_out, 38
+  px — 170 left of her seat, where E04 has her thrown out at the crash and
+  back in sight at 98.5) and runs her down to the floor, 230 px along it
+  and up to the point beside him (21 ticks at mr), the fight two ticks
+  after her arrival. Carried (lap_model_s2.HIT_FROM, _hit_run ->
+  PCHitAfter 0.25, PCHitRun 1.92; Pawn.pc_time_path times her run's path
+  to it up to the hit's stopping distance, the walk's own stands — the
+  run down from her station, a hop's `in` and `out` runs — inside it):
+  her fight from his stand's end 5.92 s against E04's 5.7 (the port's 4.5
+  before), the kart's coin to the karate's 19.5 against 19.25.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

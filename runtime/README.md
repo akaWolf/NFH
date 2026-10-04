@@ -812,6 +812,10 @@ predicate, then the all-tricks win.
   shot's third record — the ExtraCoin206 — pays and books its completion
   at its own tick (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is
   off under the profile (the PC's shoot step asks nothing).
+- **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
+  co-actor's run to him from the hideout she leaves lasts the PC's
+  seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
+  by their share of its length, up to the hit's stopping distance).
 - **The PC profile's per-record coins** (`Game.pc_record_coin`,
   `World.pc_s2_credit`): a fresh linked pair whose linked record pays later
   in the step (PCLinkedPaysAt) books its first coin on its own record's

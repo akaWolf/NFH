@@ -329,7 +329,7 @@ class Item:
                  'pc_shout_linked', 'pc_fix_secs_linked', 'pc_linked_pays_at',
                  'pc_shout_tail', 'pc_shout_tail_linked', 'pc_scene', 'pc_scene_linked',
                  'pc_jingle_at', 'pc_jingle_at_linked', 'pc_hit_jingles_linked', 'pc_jingle',
-                 'pc_hit_secs', 'pc_hit_after', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
+                 'pc_hit_secs', 'pc_hit_after', 'pc_hit_run', 'pc_hit_secs_linked', 'pc_resume_head_secs', 'pc_extra_coin_linked',
                  'pc_extra_pays_at_linked', 'pc_trick_arm', 'pc_trick_fire', 'pc_toilet_pays_at',
                  'pc_fix_depart', 'pc_use_secs_compound', 'pc_credit_at_compound',
                  'pc_jingle_at_compound', 'pc_extra_pays_at',
@@ -1085,6 +1085,10 @@ class Item:
         # fight (PCHitAfter: 213's Olga leaves the boat, jumps into the
         # water and out and walks to him — lap_model_s2 FIGHT_BEFORE)
         self.pc_hit_after = dict(d.get('PCHitAfter') or {}) or None
+        # ... and her run to him the PC's seconds, from the hideout she
+        # leaves (PCHitRun: 204's Olga out of the rickshaw — lap_model_s2
+        # HIT_FROM)
+        self.pc_hit_run = dict(d.get('PCHitRun') or {}) or None
         self.pc_hit_secs_linked = dict(d.get('PCHitSecondsLinked') or {}) or None
         self.pc_resume_head_secs = d.get('PCResumeHeadSeconds')
         self.pc_extra_coin_linked = d.get('PCExtraCoinLinked')
