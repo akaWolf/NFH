@@ -4386,6 +4386,21 @@ class Routine:
             self._pc_use_tricked = bool(tricked)
             if self.on_use:
                 self.on_use(it, tricked)
+            plain = it.pc_plain if (pcprofile.is_pc() and pcprofile.SEASON2 and it.tricked) else None
+            clip = plain.get('clip') if plain else None
+            if clip and self.pawn.anim.has(clip):
+                # the laid rake without the weed is no PC trick (combine.xml
+                # pond/rake_ground, trick="false"): his walk-by step plays its
+                # `use` — the neighbour's `search` — up to the repair
+                # (0x10022589's rake_ground branch, PCPlain), which the
+                # reaction plays with no SHOUT (World.play_angry); the step
+                # times it, no mobile Duration
+                self.timer = 0.0
+                mobile = self.pawn.anim.sequence_seconds([clip])
+                if mobile > 0.0 and plain.get('stand'):
+                    self.pawn.anim.time_scale = mobile / float(plain['stand'])
+                self.pawn.anim.play_sequence([clip], on_end=self._finish)
+                return
             self._finish()
             return
         # the Drawing subclass cycles its smears (Drawing.cs:44-68)
@@ -9015,13 +9030,15 @@ class World:
                 level = item.pc_shout_linked
             elif level is None:
                 level = getattr(item, 'pc_shout', None)
-            if level is not None and item.kind == 'Rake' and not item.compound_tricked:
-                # 202's rake keys are the weeded rake's branch of his walk-by
-                # (0x10022589: rake_ground_weed's `crash`, SHOUT 0); the laid
-                # rake alone (combine.xml pond/rake_ground, trick="false") is
-                # its other branch, `use` and repair with no SHOUT — open
-                # (runtime/README.md), the mobile's angry as before
-                level = None
+        plain = None
+        if nfh2 and pcprofile.is_pc() and item.kind == 'Rake' and not item.compound_tricked:
+            # 202's rake keys are the weeded rake's branch of his walk-by
+            # (0x10022589: rake_ground_weed's `crash`, SHOUT 0); the laid
+            # rake alone (combine.xml pond/rake_ground, trick="false") is its
+            # other branch, `use` and repair with no SHOUT (PCPlain; the
+            # mobile's angry where it has none)
+            plain = item.pc_plain
+            level = -1 if plain else None
         if level is not None and seq:
             # the tricked step's own SHOUT and repair (fcn.1000f977: the level
             # picks the action, pcprofile.s2_reaction_seconds — the freakout
@@ -9036,11 +9053,15 @@ class World:
             fix_secs = getattr(item, 'pc_fix_secs', None)
             if both and getattr(item, 'pc_fix_secs_linked', None) is not None:
                 fix_secs = item.pc_fix_secs_linked     # PCFixSecondsLinked
+            if plain:
+                fix_secs = plain.get('repair')         # PCPlain: the plain flow's repair
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
             tail_secs = getattr(item, 'pc_shout_tail', None)
             if both and getattr(item, 'pc_shout_linked', None) is not None:
                 tail_secs = getattr(item, 'pc_shout_tail_linked', None)   # PCShoutTailLinked
+            if plain:
+                tail_secs = plain.get('tail')          # its switch back
 
             def tail_s2(played_angry=True):
                 # the rest of the SHOUT's step after the repair, or after

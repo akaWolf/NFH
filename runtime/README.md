@@ -753,13 +753,13 @@ predicate, then the all-tricks win.
   unread); the scene of a visit that opens on a poll clip (202's WaitSea,
   207's WaitWatch) rising from the visit's start where the PC's rises
   with the step's list after the poll (a credit in the wait completes the
-  level later); 202's laid rake without the weed (combine.xml
-  pond/rake_ground, trick="false") — the PC's walk-by plays its `use`
-  (2.17 s from the step's 0.17) and repair (1.67 s), no SHOUT and no
-  record, 4.17 s in all; the port plays the mobile's (the Rake subclass
-  straight to the stop, the DontGetAngry angry: AngryEasyUp 2.5 s and
-  FixMid), the rake's keys being the weeded branch's (`play_angry` gates
-  them to the compound).
+  level later). 202's laid rake without the weed (combine.xml
+  pond/rake_ground, trick="false") plays the walk-by's other branch
+  (PCPlain: `Routine._use`'s Rake path plays SearchNFH2 — the neighbour's
+  `search` — to the repair's 2.33 s, `play_angry` the reaction with no
+  SHOUT, FixMid at the repair's 1.67 s and the switch back's 0.17) where
+  the mobile's DontGetAngry angry had played; the rake's other PC keys
+  are the weeded branch's (`play_angry` gates them to the compound).
 - **The PC profile's behaviours** (GameLogic's DoActions job, update
   0x100020c0): an action's behavior= is posted as its job ends (state 2,
   fcn.1004000a at 0x10002708) — the Loader's time + 2 ticks after the

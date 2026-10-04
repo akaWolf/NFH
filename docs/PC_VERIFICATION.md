@@ -512,7 +512,13 @@ actors' job pass the update calls at 0x100445f8.
   pair within 0.6 s of Badinfos' but 114's polish to the phonograph +1.2
   (80.7 against 79.5), 111's drier to the vacuum −0.9 (25.4 / 26.3) and
   110's steak chair to the wine +0.8 (19.5 / 18.7); 103's first two
-  swapped (the port's microwave before the candle); case 22's message
+  swapped (the port's microwave before the candle). On 2026-10-04
+  (runs/plain202v_pc, thermo_jumps.py E10 E11 E14): 114's polish to the
+  phonograph −0.9 (78.6 / 79.5), 111's drier to the vacuum −0.9 (25.4 /
+  26.3), 110's steak chair to the wine −0.1 (18.6 / 18.7) and its first
+  three −0.6, −0.7, +0.5 (14.3 / 14.9, 14.8 / 15.5, 17.1 / 16.6), the
+  rest within 0.5 s (114's hat and horn read through the full tube, ~8.1
+  and ~20.4 against 8.6 and 20.0). Case 22's message
   before the carpet's GOTO is the vacuum's OBJ1 (fcn.00451e80, vtable
   0x4e1bdc: its slot 2 fcn.00438c80 — no gait), so its 0.7 s lie in the
   GOTO's legs, not read against E11's frames.

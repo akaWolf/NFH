@@ -23,7 +23,13 @@
     "PCCreditAt": 0.5,
     "PCJingleAt": [
      0.17
-    ]
+    ],
+    "PCPlain": {
+     "stand": 2.33,
+     "clip": "SearchNFH2",
+     "repair": 1.67,
+     "tail": 0.17
+    }
    },
    "note": "the rake's component is the Rake subclass (scene.py), not a plain TrickItem — the patch matched nothing until 2026-09-17"
   },

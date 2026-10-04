@@ -600,6 +600,11 @@ def write_tricked_keys(ov, n, clips):
         _set_key(ov['patches'], item, 'PCFixSeconds', repair or 0)
         if tail:
             _set_key(ov['patches'], item, 'PCShoutTail', tail)
+    ov['patches'] = _strip_key(ov['patches'], 'PCPlain')
+    for item, plain in sorted(lap_model_s2.scene_plain(n).items()):
+        # the flow a mobile tricked state plays that is no PC trick (202's
+        # laid rake without the weed: `use` and repair, no SHOUT)
+        _set_key(ov['patches'], item, 'PCPlain', plain)
     for item, (level, repair, tail, sc, hit) in sorted(lap_model_s2.scene_step_linked_reactions(n).items()):
         # the linked variant's (210's hedgehog chair over the damaged pole:
         # the chair's `electrify`, SHOUT 1; 207's board over the closed

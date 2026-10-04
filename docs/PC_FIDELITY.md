@@ -2493,9 +2493,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   in, shout2_light and the 1.83-s repair where the mobile's angry had
   stood at its own pace (AngryEasyUp, AngryHard, FixMid; the credit at the
   tantrum); 202's plan ends 4.9 s earlier, at 100. The laid rake alone is
-  the step's other branch — its `use` 2.17 s and repair 1.67 s, no SHOUT
-  and no record — and stays the mobile's angry (AngryEasyUp 2.5 s, FixMid:
-  the keys are gated to the compound in `World.play_angry`): open. 208's
+  the step's other branch — its `use` (the neighbour's `search`) and
+  repair, no SHOUT and no record, the rake switched back — and plays it
+  since the same afternoon (lap_model_s2.SCENE_PLAIN -> PCPlain; the Rake
+  subclass's stop path under the profile, the reaction with no SHOUT in
+  `World.play_angry`): the remaster's SearchNFH2 (the same N_Search sheet)
+  to the repair's 2.33 s, FixMid at its 1.67 s and the switch back's 0.17
+  — where the mobile's DontGetAngry angry (AngryEasyUp 2.5 s, FixMid) had
+  played; no plan leaves the rake laid without the weed. 208's
   electrified tap likewise, a walk-by the mobile plays as a surprise
   (NoticeWhenWalkNearby, ElectricShockGeneric 3.0 s) and the PC as a
   behaviour: trigger.xml gives him `electrify` near

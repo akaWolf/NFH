@@ -2153,6 +2153,14 @@ LINKED_PRESENT = {207: {'PoolBoard': ({'pool_divingboard_spring', 'pool_awning_c
                   212: {'AztecThrone': ({'topright_throne_full'},
                                         {'topright_throne_empty', 'topright_throne_half',
                                          'topright_throne_half_2', 'topright_throne_half_right'})}}
+# the flow a mobile tricked state plays that is no PC trick: {level: {item:
+# ((steps), shown, hidden, remaster clip of its first part)}} — 202's laid
+# rake without the weed (combine.xml pond/rake_ground, trick="false"): his
+# walk-by step 0x10022589 plays the laid rake's `use` (the neighbour's
+# `search`, the remaster's SearchNFH2 on the same N_Search sheet) and its
+# repair, switches it back to the plain rake, no SHOUT and no record
+SCENE_PLAIN = {202: {'Rake': ((0x10022589,), {'pond_rake_ground'}, {'pond_rake', 'pond_rake_ground_weed'},
+                              'SearchNFH2')}}
 # the reaction a TRICKED_SCENE item's linked flow hands to: {level: {item:
 # (kind, co-actor, steps)}}, TRICKED_CONT's 'fight' — 207's board over the
 # closed awning: his crash into the Mother's deck chair posts her `crash`
@@ -2268,6 +2276,31 @@ def scene_step_linked_reactions(n):
             continue
         out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)),
                      hit)
+    return out
+
+
+def scene_plain(n):
+    """{mobile item: {stand, clip, repair, tail}} of SCENE_PLAIN: the plain
+    flow's stand up to its repair (the step's own ticks and the first part,
+    at the clip's pace), the repair and what follows it (the switch back)"""
+    d = Data(n)
+    out = {}
+    for item, (steps, shown, hidden, clip) in SCENE_PLAIN.get(n, {}).items():
+        lv = Level(n)
+        lv.present = (set(lv.present) - set(hidden)) | set(shown)
+        ev = []
+        for st in steps:
+            evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=0, latch=1)
+            ev += ([('STEP',)] if ev else []) + evs
+        fl = _flow(d, ev)
+        parts = [(t, x) for t, kind, x in fl if kind == 'part']
+        rep = next(((t, x) for t, x in parts if x[1] == 'repair'), None)
+        if not parts or rep is None:
+            continue
+        end = fl[-1][0]
+        out[item] = {'stand': _secs(rep[0]), 'clip': clip,
+                     'repair': _secs(rep[1][2]) if rep[1][2] is not None else None,
+                     'tail': _secs(end - rep[0] - (rep[1][2] or 0))}
     return out
 
 
