@@ -2472,9 +2472,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   later, at 100. The trigger's moment stays the mobile's walk-by: the
   PC's nearobj is the same room and floor record, less than 15 apart
   vertically (fcn.1003f573), and when the handler's step change cuts
-  the walk he is on is unread. 211's cabin phone likewise, with its
-  linked variant: the `phone` behaviour's step (0x1002fcbe) walks him to
-  the phone and tests kid_manip — the kid's tank on (the mobile's linked
+  the walk he is on is unread. 208's rake on the Mother's call likewise
+  (the handler's `call` branch runs 0x1001d828: the laid rake tested —
+  combine.xml bazar/rake_ground, the trick —, the walk to it, its `crash`
+  with rake_ground and its jingle on tick 4, SHOUT 0, the 1.33-s repair,
+  the switch back): the port's walk-by surprise (RakeBazarCrash on the
+  MotherRott run) at the stand's 2.25 s where the mobile's 2.83 had
+  played, the record and jingle 0.5 s in where they had waited for the
+  tantrum; 208's plan ends 0.6 s earlier, at 100. 211's cabin phone
+  likewise, with its linked variant: the `phone` behaviour's step
+  (0x1002fcbe) walks him to the phone and tests kid_manip — the kid's
+  tank on (the mobile's linked
   OlgaChild), the phone's `crash`: 5.92 s to SHOUT 1, phone_normal and its
   jingle 2.33 s in, the kid's phone_loud at 2.75; alone its `use`: 7.25
   s to SHOUT 0, phone_normal and its jingle 3.42 s in; no repair, the
@@ -2491,13 +2499,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   100. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
-  step, not the visit), 208's rake and 212's boat coin slot are a walk-by
-  and an alarm with no tricked use of the mobile's to pace, 213's bull
-  controls a two-visit station — but their reaction is
+  step, not the visit), 212's boat coin slot is an alarm with no tricked
+  use of the mobile's to pace, 213's bull controls a two-visit station —
+  but their reaction is
   their flow's since the same morning (lap_model_s2.scene_step_reactions
   -> PCShout, PCFixSeconds, PCShoutTail in the record laugh's stead): the
   beer mat SHOUT 0 and the mat's 1.83-s repair (202's plan ends 1.8 s
-  later), the table 0, 208's rake 0 and its 1.33-s repair, the cabin
+  later), the table 0, 208's rake 0 and its 1.33-s repair (a tricked
+  walk-by since, above), the cabin
   phone 1 (a tricked flow since, above), the boat coin slot 2
   (shout2_hard), the bull controls none
   (-1) — all at 100. The two timed per clip pay inside the clip that

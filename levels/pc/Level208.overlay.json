@@ -855,9 +855,13 @@
      0.17,
      "shout"
     ],
+    "PCUseSecondsTricked": 2.25,
     "PCShout": 0,
     "PCFixSeconds": 1.33,
-    "PCJingle": true
+    "PCCreditAt": 0.5,
+    "PCJingleAt": [
+     0.5
+    ]
    }
   },
   {

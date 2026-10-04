@@ -2078,7 +2078,12 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
                # 208's elephant line (0x1001e000: the lookaround and the line's
                # `fool`, SHOUT 1, the repair); the variants' objects named
                # (the cable's combinations give the tap's)
-               208: {'Rake': ((0x1001d828,), set(), set()),
+               # 208's rake on the Mother's call (the `call` behaviour's
+               # handler 0x1001e50f runs 0x1001d828: the laid rake tested —
+               # combine.xml bazar/rake_ground, the trick —, the walk to it,
+               # its `crash`, SHOUT 0, the repair, the switch back)
+               208: {'Rake': ((0x1001d828,), {'bazar_rake_ground'},
+                              {'bazar_rake_primary', 'bazar_rake_secondary'}, 0),
                      'AngryElephant': ((0x1001e000,), {'elephant_elephant_line'},
                                        {'elephant_elephant', 'elephant_elephant_gone'}, 0),
                      # the electrified tap (trigger.xml: his `electrify`
@@ -2120,7 +2125,7 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None),
 # station's own tricked step, its stand, SHOUT, repair and records — read as
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
-TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap'), 209: ('FireFakir',),
+TRICKED_SCENE = {202: ('Rake',), 205: ('Chef',), 208: ('AngryElephant', 'ElectricTap', 'Rake'), 209: ('FireFakir',),
                  211: ('LifeBoat', 'CabinPhone'), 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loop of code_stays_tricked): 212's two rubies fill
