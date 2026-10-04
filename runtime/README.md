@@ -748,11 +748,11 @@ predicate, then the all-tricks win.
   cabin phone, the `phone` behaviour's step; not the toilet rush, the
   sweets' flow going on); the tap's walk-by is the PC's nearobj trigger
   (the same room, the floor's y, under 15 px across from the tap's
-  hotspot: fcn.1003f573, fcn.10049e01; `_notice_distance`). Open: the
-  scene of a visit that opens on a poll clip (202's WaitSea,
-  207's WaitWatch) rising from the visit's start where the PC's rises
-  with the step's list after the poll (a credit in the wait completes the
-  level later). 202's laid rake without the weed (combine.xml
+  hotspot: fcn.1003f573, fcn.10049e01; `_notice_distance`). A visit that
+  opens on a poll clip (202's WaitSea, the PCWaitFor clip; 207's
+  WaitWatch, untimed by its per-clip table) starts its scene as that clip
+  ends (`_pc_scene_defer`): the PC's step builds its list, the scene's
+  wrapper first, once the poll passes. 202's laid rake without the weed (combine.xml
   pond/rake_ground, trick="false") plays the walk-by's other branch
   (PCPlain: `Routine._use`'s Rake path plays SearchNFH2 — the neighbour's
   `search` — to the repair's 2.33 s, `play_angry` the reaction with no

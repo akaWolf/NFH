@@ -2453,10 +2453,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `fight`'s 3.33 s (PCHitSeconds; the mobile's PawnToAffectWhenTricked,
   only when linked), then shout2 — where the mobile's clips and the
   stand-ins' reactions had played and both had paid at the tantrum;
-  207's plan ends 4.9 s earlier, at 100. Open: the scene of a visit that
-  opens on a poll clip (202's WaitSea, 207's WaitWatch) rises from the
-  visit's start, the PC's with the step's list after the poll — a credit
-  falling in the wait completes the level later than the PC would.
+  207's plan ends 4.9 s earlier, at 100. The scene of a visit that opens
+  on a poll clip (202's WaitSea, the PCWaitFor clip; 207's WaitWatch, a
+  clip its per-clip table leaves untimed) had risen from the visit's
+  start; the PC's step builds its list — and the wrapper that raises the
+  scene — only once the poll passes, and since the same afternoon the
+  scene waits for the poll clip's end (`Routine._pc_s2_arm`,
+  `_pc_scene_defer`); no plan's last credit falls in such a wait.
   213's manipulated bull controls likewise, a tricked flow with a
   continuation (lap_model_s2 TRICKED_SCENE, SCENE_CONT): the controls'
   step (0x10037de6: the poll for Olga on the bull passed, the camera's

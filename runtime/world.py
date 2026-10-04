@@ -3507,6 +3507,7 @@ class Routine:
         self._pc_wait_spent = None       # the action index whose hold has released (_pc_wait_tick)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditInClip)
         self._pc_credit_linked = None    # the linked trick's own, in its clip (PCLinkedCreditInClip)
+        self._pc_scene_defer = None      # a scene held until the visit's poll clip is over
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
@@ -4519,7 +4520,7 @@ class Routine:
                 w.s1_fire(self.pawn, ft)
         if pcprofile.is_pc() and pcprofile.SEASON2 and self.role == 'Rottweiler' \
                 and it is not None and it.is_tricked(self.level.items):
-            self._pc_s2_arm(it)
+            self._pc_s2_arm(it, seq)
         if os.environ.get('NFH_ROUTINE_LOG'):
             print('routine %s t=%.1f use sequence item=%s seq=%s pc=%s mobile=%.2f' % (
                 self.role, getattr(self.pawn.world, 'time', 0.0), it.name, list(seq or []), pc,
@@ -5131,6 +5132,7 @@ class Routine:
         self.pawn.anim.skip_clip = False
         self._pc_credit = None
         self._pc_credit_linked = None
+        self._pc_scene_defer = None
         if self._pc_wait is not None:
             self._pc_wait = None
             self.pawn.anim.hold_clip = None
@@ -5191,7 +5193,7 @@ class Routine:
         if anim.anim is not None and anim.anim.name == wt['clip']:
             anim._stop_single()
 
-    def _pc_s2_arm(self, it):
+    def _pc_s2_arm(self, it, seq=None):
         """Season 2: the tricked flow on its stand's clock — a use's
         (`_use`), an alarm run's (`_alarm_use`: 211's cabin phone) and a
         tricked walk-by's (`_on_surprise_near`: 208's tap). The trick's
@@ -5234,8 +5236,19 @@ class Routine:
             self._pc_jingle_tick(0.0)
         if w is not None and target is not None:
             # the reaction's scene: the level's flag +0x6e, which holds
-            # the completion check (World.pc_scene_start)
-            w.pc_scene_start(self, it, self._pc_trick_item(it), both)
+            # the completion check (World.pc_scene_start) — from the list
+            # the step builds once its poll has passed where the visit opens
+            # on the poll's clip (202's WaitSea, the PCWaitFor clip; 207's
+            # WaitWatch, a clip its per-clip table leaves untimed): the list
+            # and its wrapper come after the poll (0x100224a8's re-runs;
+            # 0x100169c5's the Mother in her chair)
+            head = seq[0] if seq else None
+            poll = head is not None and bool(it.pc_clip_secs) and self.role == 'Rottweiler' \
+                and (head not in it.pc_clip_secs or (it.pc_wait_for or {}).get('clip') == head)
+            if poll:
+                self._pc_scene_defer = (head, it, self._pc_trick_item(it), both)
+            else:
+                w.pc_scene_start(self, it, self._pc_trick_item(it), both)
 
     def _pc_use_seconds(self, it):
         """the PC station's seconds for this visit of the neighbour's routine under the
@@ -7272,6 +7285,15 @@ class Routine:
                 w = self.pawn.world
                 if w is not None and self.item is not None:
                     w.pc_s2_credit(self.pawn, self.item)
+        if self.state == self.USING and self._pc_scene_defer is not None:
+            # the visit's poll clip is over: the step's list, its scene
+            head, st, ti, both = self._pc_scene_defer
+            cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
+            if cur is not None and cur != head:
+                self._pc_scene_defer = None
+                w = self.pawn.world
+                if w is not None:
+                    w.pc_scene_start(self, st, ti, both)
         if self.state == self.USING and self._pc_credit_linked is not None:
             # the linked trick's record in its clip (PCLinkedCreditInClip)
             cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
