@@ -812,7 +812,8 @@ predicate, then the all-tricks win.
   off under the profile (the PC's shoot step asks nothing).
 - **The PC profile's repair walk** (PCFixDepart, play_angry's `after_run`):
   a repair at another object (211's sign after the wc, 203's generator
-  after the stage) plays where he stands for the walk and the repair
+  after the stage) or back from where a hideout's leave put him (212's
+  bench) plays where he stands for the walk and the repair
   (PCFixSeconds) and his next walk leaves that object's hotspot
   (`Pawn._pc_depart`).
 - **The PC profile's 211 rush** (the after-toilet angry in

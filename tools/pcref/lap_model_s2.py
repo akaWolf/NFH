@@ -2349,12 +2349,17 @@ def scene_plain(n):
 def _repair_walk(n, d, ev):
     """(ticks, (x, px) | None): the walk a tricked flow makes to its repair —
     from the station its last GoTo before the repair's took him to (the
-    object of the first action after that GoTo) to the repaired object's
-    `neighbor` hotspot (walk_ticks), and where it leaves him (the hotspot's x
+    object of the first action after that GoTo), or from where a hideout's
+    `leave` after it put him (_station_parts: its `<actor>_out`, the
+    translations of the actions after it), to the repaired object's
+    `neighbor` hotspot (walk_span), and where it leaves him (the hotspot's x
     and height against the room's floor); (0, None) when the repair is where
-    he stands or no GoTo placed him before it (211's sign after the women's
-    wc: 34 ticks; 203's generator after the stage)"""
+    he stands or neither placed him before it (211's sign after the women's
+    wc: 34 ticks; 203's generator after the stage; 212's bench: out of it at
+    643 px, 64 above the floor, and back to its 568 — down to the floor, 75
+    px along it and up, 54 ticks)"""
     pos, go, target = None, False, None
+    ctx, left = {'actor': 'neighbor'}, None
     for e in ev or []:
         if e[0] == 'GO':
             go = True
@@ -2365,15 +2370,30 @@ def _repair_walk(n, d, ev):
                 target = names[0]
                 break
             if go and names and names[0] != 'neighbor':
-                pos, go = names[0], False
-    if target is None or pos is None:
+                pos, go, left = names[0], False, None
+        _station_parts(d, [e], ctx)
+        if e[0] == 'E6c2e':
+            # the leave places him (the GoTo before it took him to the
+            # hideout it leaves)
+            left, go = ctx.get('pos'), False
+        elif left is not None and e[0] == 'DO':
+            left = ctx.get('pos')
+    if target is None or (pos is None and left is None):
         return 0, None
     g = Geometry(n)
-    a, b = d.real.get(pos, pos), d.real.get(target, target)
-    p, q = g.point(a), g.point(b)
-    if a == b or p is None or q is None:
+    b = d.real.get(target, target)
+    q = g.point(b)
+    if left is not None:
+        frm = left
+    else:
+        a = d.real.get(pos, pos)
+        p = g.point(a)
+        if a == b or p is None:
+            return 0, None
+        frm = (g.room_of(a), p[0], p[1])
+    if q is None:
         return 0, None
-    t, _pos = walk_span(g, (g.room_of(a), p[0], p[1]), b, data=d)
+    t, _pos = walk_span(g, frm, b, data=d)
     if not t:
         return 0, None
     return t, (q[0], q[1] - g.floor(g.room_of(b)))

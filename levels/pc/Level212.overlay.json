@@ -179,10 +179,14 @@
     ],
     "PCUseSecondsTricked": 10.92,
     "PCShout": 1,
-    "PCFixSeconds": 1.92,
+    "PCFixSeconds": 6.42,
     "PCCreditAt": 10.08,
     "PCJingleAt": [
      10.08
+    ],
+    "PCFixDepart": [
+     568,
+     -64
     ],
     "PCUseSeconds": 13.0
    }

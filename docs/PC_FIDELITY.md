@@ -2616,17 +2616,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   without a trick of its own (-> PCUseSecondsLinked 6.17, PCShoutLinked
   2, PCLinkedPaysAt 4.08): the whip's credit to his next station 11.2 s
   in both (the port's 6.7 before), 212's plan ends 4.6 s later, at 100.
-  Open: 212's bench after its credit — the leave step (0x1003613a: the
-  bench's `leave` to its neighbor_out, 550 px, the red bull's `crash`,
-  SHOUT 1 pushed as a constant) hands on to 0x10035fdf, which walks him
-  back to the bench (75 px) before its repair; the port repairs where he
-  stands. E12 at 2 fps (pc_nfh2_all_720 3105.9-3116 s): the crash to
-  ~212.3 on the episode's clock, him standing and shouting at the right
-  from 212.5 to 216.5 (4 s where shout2 lasts 28 ticks, 2.33 s — no level
-  of 212's has its own neighbour animations), the walk back 216.5-218.0
-  and the repair 218.0-221.0 (3 s against its 20 ticks), the next icon
-  9.5 s after the credit against the port's 5.0 — the walk (~1 s) is
-  read, the other ~3.5 s not.
+  Then 212's bench after its credit: the leave step (0x1003613a: the
+  bench's `leave` to its neighbor_out, 643 px and 64 above the floor
+  line at 730, the red bull's `crash`, SHOUT 1 pushed as a constant)
+  hands on to 0x10035fdf, whose GoTo takes him back to the bench's
+  `neighbor` hotspot (568 px, the same height) before its `repair` — by
+  fcn.10009177's waypoints down to the floor (64 px at mg2's 3 a tick,
+  22 ticks), 75 px along it (10) and up (22): 54 ticks, where the port
+  had repaired where he stood. `_repair_walk` starts a repair's walk from
+  where a hideout's leave put him (-> PCFixSeconds 6.42, PCFixDepart
+  [568, -64]). E12 at 4 fps (pc_nfh2_all_720 3107-3117 s): the SHOUT,
+  him sinking to the floor, the walk left, rising at the bench and the
+  repair, the bench back to black at 221.1 on the episode's clock — the
+  model's 220.9-221.0. The bench's credit to the bull's 27.7 s against
+  E12's gauge 28.0 (23.2 before); 212's plan ends 4.5 s later, at 100.
+  The whip's credit to the cigars' stays 26.2 s against E12's 29.8, and
+  the 3.6 s are the door: the icon moves to the cigars 11.2 s after the
+  whip's credit in both, and in E12 the Mother takes the midright/midleft
+  pair just ahead of him (her pass from ~182.5 on the episode's clock,
+  out in the bench's room at 185.25) while he stands at its near door
+  behind her — the pass step's flag 8 (0x10003c54, carried); the port's
+  Mother is elsewhere at that point of its plan, and his walk there is
+  the model's 135 ticks.
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c
@@ -3236,7 +3247,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   20 had been dropped from the overlays by the stays writer of 2026-09-12
   (it replaced its patches' sets) and are back. The repair's walk:
   211's sign after the women's wc (34 ticks, then its `repair` 24: 4.83,
-  PCFixSeconds) and 203's generator after the stage (32 and 19: 4.25) —
+  PCFixSeconds), 203's generator after the stage (32 and 19: 4.25) and,
+  since 2026-10-04, 212's bench from its leave's neighbor_out (54 and 23:
+  6.42) —
   the repair plays where he stands for the walk and the repair, and his
   next walk leaves the repaired object's hotspot (PCFixDepart,
   lap_model_s2._repair_walk); a station tricked through its DependsOn
