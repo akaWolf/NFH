@@ -17,8 +17,14 @@
      0.17,
      "shout"
     ],
-    "PCUseSeconds": 1.33,
-    "PCJingle": true
+    "PCUseSecondsTricked": 4.33,
+    "PCShout": 0,
+    "PCFixSeconds": 1.83,
+    "PCCreditAt": 0.83,
+    "PCJingleAt": [
+     0.83
+    ],
+    "PCUseSeconds": 1.33
    }
   },
   {

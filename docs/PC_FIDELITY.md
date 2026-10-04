@@ -2364,6 +2364,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `fall_water`, `shout`) are not reached by the model from the steps naming
   their objects or those steps' successors — not read, the default
   standing.
+- *209's fire fakir and 213's piñata (2026-10-04, carried).* Of the
+  stand-ins whose flow SCENE_STEPS reads (the scene alone until now), two
+  are their station's own tricked step whole: 209's fuelled groove
+  (0x10020e3e: `burn` 50 ticks, SHOUT 0, the repair 22 ticks, the record
+  fire_fakir/burn on its tick 8) and 213's beehive over the piñata
+  (0x1003809b: the manipulated piñata's `use` 81 ticks, SHOUT 1, the
+  record pinata on its tick 11). They are read as the lap's tricked visits
+  are (lap_model_s2 TRICKED_SCENE -> PCUseSecondsTricked, PCShout,
+  PCFixSeconds, PCCreditAt, PCJingleAt): the fakir's tricked stand 4.33 s
+  where the port had played the untricked 1.33 over FireChannelBurn, the
+  record paid 0.83 s in, the shout2_light and the 1.83-s repair; the
+  piñata's 6.92 s with its record 1.08 s in and the SHOUT's level 1 (shout2)
+  where the stand-in reaction had been the record's laugh 3 (shout2_high); the
+  credits no longer wait for the tantrum. 209's plan ends 4.9 s later
+  (444.5 s), 213's where it did; both at 100. The other SCENE_STEPS
+  items stay stand-ins: 202's beer mat and 205's table are timed per clip
+  (the flow read is the beer's and the table's step, not the visit), 208's
+  rake, 211's cabin phone and 212's boat coin slot are walk-bys and alarms
+  with no tricked use of the mobile's to pace, 213's bull controls a
+  two-visit station, and 212's second throne reads `miss` (hand1) with the
+  full throne too — the hands' `hit` (hand1 56, hand2 61) comes from a
+  branch of 0x10036bb2 the walker does not take, not read.
 - *The trick's jingle (2026-10-04, carried; seven stand-ins open).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
@@ -2388,11 +2410,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
   — the tricked flow's jingle records in the seconds of the stand
   (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
-  _step_jingles on PCCreditAt's clock, 61 seconds over 50 items and 8
+  _step_jingles on PCCreditAt's clock, 63 seconds over 52 items and 8
   linked variants; `Routine.pc_jingles` counts them down as the credits),
   207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
   on the credit of the stand-ins (the flows not read, their credit at the
-  tantrum) whose record carries the jingle on its own tick (PCJingle, 16
+  tantrum) whose record carries the jingle on its own tick (PCJingle, 14
   items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
   the action it sits in). 202's plan: the beer mat's and the shark's with
   their credits (253.23, 274.72), the linked rail's 0.67 s before

@@ -2030,23 +2030,34 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
                      'Pinata': ((0x1003809b,), {'bottomleft_pinata_manip'}, {'bottomleft_pinata'})}}
 
 
+# the SCENE_STEPS flows that are the item's whole tricked visit — the
+# station's own tricked step, its stand, SHOUT, repair and records — read as
+# code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
+# `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
+TRICKED_SCENE = {209: ('FireFakir',), 213: ('Pinata',)}
+
+
+def _scene_step_events(n, item):
+    """the events of an item's SCENE_STEPS steps, run with its trick in the
+    scene (tricked_presence, else the table's)"""
+    steps, shown, hidden = SCENE_STEPS[n][item]
+    if shown is None:
+        shown, hidden = tricked_presence(n).get(item, (set(), set()))
+    lv = Level(n)
+    lv.present = (set(lv.present) - set(hidden)) | set(shown)
+    ev = []
+    for st in steps:
+        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=1, latch=1)
+        ev += ([('STEP',)] if ev else []) + evs
+    return ev
+
+
 def scene_steps(n):
     """{mobile item: PCScene} of SCENE_STEPS (_scene_span over the steps'
     events with the trick in the scene: tricked_presence, else the table's)"""
-    out = {}
     d = Data(n)
-    trick = tricked_presence(n)
-    for item, (steps, shown, hidden) in SCENE_STEPS.get(n, {}).items():
-        lv = Level(n)
-        if shown is None:
-            shown, hidden = trick.get(item, (set(), set()))
-        lv.present = (set(lv.present) - set(hidden)) | set(shown)
-        ev = []
-        for st in steps:
-            evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=1, latch=1)
-            ev += ([('STEP',)] if ev else []) + evs
-        out[item] = _scene_secs(_scene_span(d, ev))
-    return out
+    return {item: _scene_secs(_scene_span(d, _scene_step_events(n, item)))
+            for item in SCENE_STEPS.get(n, {})}
 
 
 def _repair_walk(n, d, ev):
@@ -2838,6 +2849,11 @@ def code_stays_tricked(n):
             ev += run_step(lv2, step, dict(LAP_BYTES.get(n) or {}), unknown=1)[0]
         e = entry(ev)
         if e is not None and item not in out:
+            out[item] = e
+    for item in TRICKED_SCENE.get(n, ()):
+        e = entry(_scene_step_events(n, item))
+        if e is not None and item not in out:
+            e['rejoins'] = True
             out[item] = e
     for item, step in LINKED_STEP.get(n, {}).items():
         lv2 = Level(n)

@@ -72,7 +72,11 @@ def write_jingle(n):
     p = '%s/levels/pc/Level%d.overlay.json' % (REPO, n)
     ov = json.load(open(p))
     ov['patches'] = _strip_key(ov.get('patches', []), 'PCJingle')
+    read = {e.get('object') for e in ov['patches']
+            if isinstance(e.get('set'), dict) and 'PCCreditAt' in e['set']}
     for item, (flag, acts) in sorted(stand_in_jingles(n).items()):
+        if item in read:
+            continue           # its tricked flow read: PCJingleAt carries it
         if flag:
             _set_key(ov['patches'], item, 'PCJingle', True)
         elif any(js for *_x, js in acts):
