@@ -2164,6 +2164,31 @@ def scene_step_reactions(n):
     return out
 
 
+def scene_step_linked_reactions(n):
+    """{mobile item: (SHOUT level, repair s or None, tail s, scene)} of the
+    SCENE_STEPS flows scene_step_reactions reads, run with the mobile linked
+    trick's scene too where that changes their DoActions (210's hedgehog
+    chair over the damaged pole: the chair's `electrify` between its
+    `enter` and `leave`, SHOUT 1, 0x1001964b's PRESENT pole_damaged)"""
+    d = Data(n)
+    out = {}
+    trick = tricked_presence(n)
+    dos = lambda ev: [tuple(e[1]) for e in ev if e[0] in ('DO', 'ODO')]
+    for item in scene_step_reactions(n):
+        lnk = mobile_linked(n).get(item)
+        if lnk not in trick:
+            continue
+        ev1 = _scene_step_events(n, item)
+        ev2 = _scene_step_events(n, item, trick[lnk])
+        if dos(ev2) == dos(ev1):
+            continue
+        _stand, level, repair, _credit = _step_parts_split(d, ev2)
+        if level is None:
+            continue
+        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)))
+    return out
+
+
 def _repair_walk(n, d, ev):
     """(ticks, (x, px) | None): the walk a tricked flow makes to its repair —
     from the station its last GoTo before the repair's took him to (the

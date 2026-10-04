@@ -99,10 +99,17 @@
      "ChairEnter": 0.83,
      "ChairHedgehogEnter": 1.25,
      "ChairHedgeHogLeave": 2.5,
+     "ChairElectrify": 1.08,
      "ChairSun": 2.5,
      "ChairWakeup": 0.42,
      "ChairAwake": 6.0,
      "ChairLeave": 1.5
+    },
+    "PCCreditInClip": {
+     "ChairHedgehogEnter": 0.92
+    },
+    "PCLinkedCreditInClip": {
+     "ChairElectrify": 0.0
     },
     "PCWaitFor": {
      "clip": "ChairAwake",
@@ -117,6 +124,12 @@
     ],
     "PCShout": 0,
     "PCFixSeconds": 1.25,
+    "PCSceneLinked": [
+     0.17,
+     4.83
+    ],
+    "PCShoutLinked": 1,
+    "PCFixSecondsLinked": 1.25,
     "PCJingle": true
    }
   },

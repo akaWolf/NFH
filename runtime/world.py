@@ -3506,6 +3506,7 @@ class Routine:
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
         self._pc_wait_spent = None       # the action index whose hold has released (_pc_wait_tick)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditAfter)
+        self._pc_credit_linked = None    # the linked trick's own, in its clip (PCLinkedCreditInClip)
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
@@ -4529,6 +4530,18 @@ class Routine:
                 if clip is not None:
                     self._pc_credit = {'clip': clip, 'seen': False,
                                        'at': float(it.pc_credit_in_clip[clip]), 't': 0.0}
+            linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
+            if pcprofile.is_pc() and it.pc_linked_credit_in_clip and it.is_tricked(self.level.items) \
+                    and linked is not None and linked.tricked and it.tricked and it.use_tricked_linked:
+                # the linked trick's own record so far into the clip of the
+                # linked variant's action that carries it (PCLinkedCreditInClip:
+                # 210's pole, electrify on the chair's `electrify` tick 0), the
+                # pair's completion booked with it (pc_s2_linked_credit)
+                clip = next((c for c in it.pc_linked_credit_in_clip if c in seq), None)
+                if clip is not None:
+                    it.pc_linked_due = True
+                    self._pc_credit_linked = {'clip': clip, 'seen': False,
+                                              'at': float(it.pc_linked_credit_in_clip[clip]), 't': 0.0}
             self.pawn.anim.play_sequence(list(seq), on_end=self._finish)
         elif pc:
             # a station the remaster only walks by is an action on the PC (the
@@ -5106,6 +5119,7 @@ class Routine:
         self.pawn.anim.clip_pace = None
         self.pawn.anim.skip_clip = False
         self._pc_credit = None
+        self._pc_credit_linked = None
         if self._pc_wait is not None:
             self._pc_wait = None
             self.pawn.anim.hold_clip = None
@@ -7246,6 +7260,17 @@ class Routine:
                 w = self.pawn.world
                 if w is not None and self.item is not None:
                     w.pc_s2_credit(self.pawn, self.item)
+        if self.state == self.USING and self._pc_credit_linked is not None:
+            # the linked trick's record in its clip (PCLinkedCreditInClip)
+            cur = self.pawn.anim.anim.name if self.pawn.anim.anim is not None else None
+            cl = self._pc_credit_linked
+            if cur == cl['clip']:
+                cl['t'] += dt
+                if cl['t'] >= cl['at'] - pcprofile.TIMER_EPS:
+                    self._pc_credit_linked = None
+                    w = self.pawn.world
+                    if w is not None and self.item is not None:
+                        w.pc_s2_linked_credit(self.pawn, self.item)
         if self.state == self.USING and self.pc_credit_timer > 0.0:
             self.pc_credit_timer -= dt
             if self.pc_credit_timer <= 0.0:

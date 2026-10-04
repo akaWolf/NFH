@@ -252,7 +252,7 @@ class Item:
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
                  'pc_put', 'pc_began', 'pc_mark_index', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
-                 'pc_credit_after', 'pc_credit_in_clip', 'pc_credited', 'pc_credit_overflow',
+                 'pc_credit_after', 'pc_credit_in_clip', 'pc_linked_credit_in_clip', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
                  'pc_done_due', 'pc_extra_due', 'pc_masked',
                  'pc_fired', 'pc_shout_secs', 'sprite',
@@ -689,6 +689,11 @@ class Item:
         # it} (PCCreditInClip, pc_durations_s2.py CREDIT_IN: 202's crab on the
         # mat, 205's egg on the table)
         self.pc_credit_in_clip = dict(d.get('PCCreditInClip') or {}) or None
+        # the linked trick's own record so far into the clip that plays the
+        # linked variant's action carrying it (PCLinkedCreditInClip,
+        # pc_durations_s2.py LINKED_CREDIT_IN: 210's pole in the hedgehog
+        # chair's `electrify`)
+        self.pc_linked_credit_in_clip = dict(d.get('PCLinkedCreditInClip') or {}) or None
         self.pc_credited = False
         self.pc_credit_overflow = False
         # the linked trick's own record in the linked step (PCLinkedPaysAt):

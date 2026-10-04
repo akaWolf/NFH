@@ -2370,7 +2370,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   board (its step 0x100169c5 polls for the Mother), 210's pole (the
   hedgehog chair's linked variant, a visit timed per clip) stay unread,
   the default standing; 211's kid pays in the cabin phone's linked
-  `crash` since (below).
+  `crash` since (below) and 210's pole in the chair's linked variant
+  (above).
   208's platform, read the same day: its trick is the fakir's balloon
   (combine.xml amusement/fakir_balloon; the mobile's chips are no PC
   ingredient — PRESENT), and the platform step (0x1001ea59) plays the
@@ -2416,6 +2417,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   3.75] and its tricked clips at the PC's (ChairHedgehogEnter 1.25 s with
   the step's own ticks, ChairHedgeHogLeave 2.5 — the visit is timed per
   clip). 208's plan ends 4.6 s later, 211's 1.8, 210's where it did.
+  Since the same afternoon its linked variant over the damaged pole too
+  (the step's PRESENT pole_damaged: the chair's `electrify` between the
+  `enter` and the `leave`, SHOUT 1; lap_model_s2.scene_step_linked_reactions
+  -> PCSceneLinked [0.17, 4.83], PCShoutLinked, PCFixSecondsLinked):
+  ChairElectrify at the PC's 1.08 s, shout2 and the 1.25-s repair; the
+  chair's deckchair_hedgehog pays 0.92 s into ChairHedgehogEnter with its
+  jingle (PCCreditInClip: the step's two ticks and the record's 9) and the
+  pole's electrify as ChairElectrify starts (PCLinkedCreditInClip,
+  pc_durations_s2 LINKED_CREDIT_IN: the record on the `electrify`'s tick
+  0), where both had paid at the tantrum; 210's plan ends 0.4 s earlier,
+  at 100.
   209's hot coals likewise, by the lap's own step (0x10020124) once their
   scene is named (lap_model_s2 PRESENT: the mobile's tongs are no PC
   ingredient — the hot coal is the coal and the air pump — and the fuel
