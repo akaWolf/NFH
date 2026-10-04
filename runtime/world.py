@@ -3447,6 +3447,18 @@ class GameState:
             self.rating = pcprofile.s1_result(self.won, self.time_up,
                                               self.final_viewer_rating)
 
+    def pc_record_coin(self):
+        """the PC's done count is its trick table's credited records
+        (fcn.1000140b -> fcn.100522e6, the count fcn.1005225b): a linked
+        pair's first record books its coin on its own tick (E09: the hot
+        shoe's and the drain's coins 1.5 s apart), the pair's TrickDone the
+        other (World._on_trick_done)"""
+        if self.on_trick_done is not None:
+            self.on_trick_done()
+        self.completed += 1
+        if self.completed >= self.winning:
+            self.won = True
+
     def trick_done(self, score):
         """GameInfo.TrickDone (GameInfo.cs:467): Woody.PlayTrickDone leads"""
         if self.on_trick_done is not None:
@@ -8435,8 +8447,14 @@ class World:
             # the pair is done with its last record: the level's done count
             # is its trick table's credited records (fcn.1000140b ->
             # fcn.100522e6, the count fcn.1005225b), so the linked record
-            # completes it after its rage (pc_s2_linked_credit)
+            # completes it after its rage (pc_s2_linked_credit) — this
+            # record's coin now
             item.pc_done_due = True
+            lk = self.level.items.get(item.linked_item_trick) if item.linked_item_trick else None
+            if not item.pc_coin_booked and not item.already_tricked                     and lk is not None and not lk.already_tricked:
+                # (a fresh pair: its TrickDone books the two coins)
+                item.pc_coin_booked = True
+                self.game.pc_record_coin()
             return
         self._pc_trick_done(item)
 
@@ -9344,6 +9362,9 @@ class World:
         score = self.trick_score(item)
         linked = self.level.items.get(item.linked_item_trick) \
             if item.linked_item_trick else None
+        # (a pair whose first record booked its coin on its tick under the
+        # profile: pc_s2_credit, Game.pc_record_coin)
+        booked, item.pc_coin_booked = item.pc_coin_booked, False
         if linked is not None and linked.tricked and item.tricked:
             if item.already_tricked and not linked.already_tricked:
                 linked.already_tricked = True
@@ -9356,7 +9377,7 @@ class World:
             elif not item.already_tricked and not linked.already_tricked:
                 item.already_tricked = True
                 linked.already_tricked = True
-                self.game.linked_trick = True
+                self.game.linked_trick = not booked
                 self.game.trick_done(score)
                 if item.extra_coin_linked:                # Item.cs:2143-2146
                     if not item.pc_extra_due:

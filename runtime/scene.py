@@ -254,7 +254,7 @@ class Item:
                  'pc_put', 'pc_began', 'pc_mark_index', 'pc_item_clip_secs', 'pc_cut_pending', 'pc_trick_return',
                  'pc_credit_in_clip', 'pc_linked_credit_in_clip', 'pc_plain', 'pc_pair', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
-                 'pc_done_due', 'pc_extra_due', 'pc_masked',
+                 'pc_done_due', 'pc_extra_due', 'pc_masked', 'pc_coin_booked',
                  'pc_fired', 'pc_shout_secs', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
@@ -708,6 +708,7 @@ class Item:
         self.pc_linked_overflow = False
         self.pc_linked_amount = None     # the ladder's linked arm, settled by the first part
         self.pc_done_due = False         # the pair's completion, booked with its last record
+        self.pc_coin_booked = False      # the pair's first record's coin, booked on its tick
         self.pc_extra_due = False        # the linked flow's extra record, paid as his parked angry resumes
         self.pc_masked = False           # this visit plays untricked under the profile (206's pad: Level206RoutineBehavior)
         # the Season 1 trick step's own data under the profile (levels/pc

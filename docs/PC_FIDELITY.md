@@ -2695,6 +2695,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   against the port's 4.5 — Olga's way out of the rickshaw to him (her
   step 0x1003340b takes the manipulated rickshaw for her hideout and runs
   fcn.1000eb19 at gait 2) is not timed by the model (PCHitAfter 0.08).
+  And the linked pairs' coins: the level's done count is its trick
+  table's credited records (fcn.1000140b -> fcn.100522e6), so each record
+  shows its coin on its own tick — E09's coin bar takes the hot shoe's
+  coin at ~142.75 and the drain's at ~144.25, 1.5 s apart as their
+  records (the gauge's 142.0 and 143.5), E04's necklace and vase 3 s
+  apart. The port booked a fresh pair's two coins at its last record;
+  under the profile the first record's coin now comes on its tick
+  (Game.pc_record_coin, pc_s2_credit) and the pair's TrickDone books the
+  other — the rage was per record already (PCCreditAtLinked,
+  PCLinkedPaysAt). The twelve pairs with a later linked record (202's
+  rail, 204's necklace, 206's pad, 207's castle, 208's platform, 209's
+  shoe and coal, 210's basket, 211's phone, 212's thrones, whip and
+  ledge) show their first coin 0-3.5 s sooner; no rating or end moves.
   The whip's credit to the cigars' stays 26.2 s against E12's 29.8, and
   the 3.6 s are the door: the icon moves to the cigars 11.2 s after the
   whip's credit in both, and in E12 the Mother takes the midright/midleft

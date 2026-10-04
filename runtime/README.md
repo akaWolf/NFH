@@ -812,6 +812,12 @@ predicate, then the all-tricks win.
   shot's third record — the ExtraCoin206 — pays and books its completion
   at its own tick (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is
   off under the profile (the PC's shoot step asks nothing).
+- **The PC profile's per-record coins** (`Game.pc_record_coin`,
+  `World.pc_s2_credit`): a fresh linked pair whose linked record pays later
+  in the step (PCLinkedPaysAt) books its first coin on its own record's
+  tick and the pair's TrickDone (Item.OnTrickDone's linked arm) the other —
+  the PC's done count is its credited records (fcn.100522e6); the mobile
+  books both at once.
 - **The PC profile's compound visit** (PCUseSecondsCompound,
   PCCreditAtCompound, PCJingleAtCompound, PCExtraPaysAt; `_pc_compound`):
   213's compound-tricked plant and tortilla stand their second
