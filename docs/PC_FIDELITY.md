@@ -2474,9 +2474,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   fcn.10007df9: +0xd its second argument, +4 its third). fcn.1000807f makes
   it with the flag clear — the scripts' walks to an actor (fcn.1000eb19 ->
   fcn.1000e601), 0x1003c61f, 0x1003db6c — and fcn.100080e1 with it set, its
-  one caller in the level's message handlers (0x10046b7b, beside the
-  GoToPos handler 0x10046adc): a commanded walk's run, not read further
-  (open). The port walked the
+  one caller the player's walk: GoToPosMsg (by name from the input or
+  the log, fcn.1004f5cc: position, room, sneaking, door; the handler
+  0x10046adc -> fcn.1003de33) makes a job whose step (0x1003dec1) builds
+  the leave of a hideout and the walk at 0x1003e007 — so Woody's commanded
+  walks write gait 2, `mr`, which he has no record of (generic/objects.xml:
+  mg, sn, stair); the mover's lookup fcn.1004999f copies a record only
+  where the actor has one (0x100499ea), and the reference's Woody walks at
+  mg1's 17 px a tick (the walking speed) — no run of his (read
+  2026-10-04). The port walked the
   catcher over at the walk until the mobile's 0.8 u; under the profile he
   runs to the PC's point (`World._pc_catch_approach`: 202's neighbour
   forced from 3 u reaches the hit 1.25 s after the catch, 2.3 s before).
