@@ -2020,9 +2020,22 @@ TRICKED_STEP = {201: {'Buffet': (0x10029c4a, 0x10029a6c)}}
 SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
                205: {'TabbleTennis': ((0x100254d5, 0x1002577a), {'beachright_pingpong_egg_guarded'},
                                       {'beachright_pingpong', 'beachright_pingpong_guarded'})},
-               208: {'Rake': ((0x1001d828,), set(), set())},
+               # 208's elephant line (0x1001e000: the lookaround and the line's
+               # `fool`, SHOUT 1, the repair); the variants' objects named
+               # (the cable's combinations give the tap's)
+               208: {'Rake': ((0x1001d828,), set(), set()),
+                     'AngryElephant': ((0x1001e000,), {'elephant_elephant_line'},
+                                       {'elephant_elephant', 'elephant_elephant_gone'}, 0)},
                209: {'FireFakir': ((0x10020e3e,), {'fire_fakir_groove_fuel'}, {'fire_fakir_groove'})},
-               211: {'CabinPhone': ((0x1002fcbe,), set(), set())},
+               # 210's hedgehog in his beach chair (0x1001964b: its `enter` and
+               # `leave`, SHOUT 0, the repair)
+               210: {'DeckChair': ((0x1001964b,), {'beachleft_deckchair_hedgehog'},
+                                   {'beachleft_deckchair'}, 0)},
+               # 211's cork-less boat (0x100306eb: the lookaround and the boat's
+               # `use`, then the ladder step 0x1003059d: `climb`, SHOUT 1)
+               211: {'CabinPhone': ((0x1002fcbe,), set(), set()),
+                     'LifeBoat': ((0x100306eb, 0x1003059d), {'bottomleft_boat_manip'},
+                                  {'bottomleft_boat'}, 0)},
                212: {'BoatCoinSlot': ((0x10035388,), None, None),
                      # the second ruby fills the throne (combine.xml: throne_half
                      # or throne_half_2 with the other ruby -> throne_full), and
@@ -2042,7 +2055,7 @@ SCENE_STEPS = {202: {'BeerMat': ((0x1002299f,), None, None)},
 # station's own tricked step, its stand, SHOUT, repair and records — read as
 # code_stays_tricked reads a lap's (209's fire fakir: the fuelled groove's
 # `burn`, SHOUT 0, the repair; 213's pinata: the beehive's `use`, SHOUT 1)
-TRICKED_SCENE = {209: ('FireFakir',), 213: ('Pinata',)}
+TRICKED_SCENE = {208: ('AngryElephant',), 209: ('FireFakir',), 211: ('LifeBoat',), 213: ('Pinata',)}
 # the scene of a linked variant whose combination is not the union of the
 # two items' (the linked loop of code_stays_tricked): 212's two rubies fill
 # the throne — throne_full, the halves gone (combine.xml) — where each ruby's
@@ -2327,6 +2340,14 @@ def _scene_span(d, ev, own=None, walked=True):
     return (rise, None) if rise is not None else None
 
 
+# the scene of a trick whose mobile inventory the PC's combinations do not
+# name, or name for another object too (tricked_presence pairs by it): 209's
+# hot coals (the mobile's tongs, the PC's air pump: coal_area/hot_coal) and
+# its trough (the fuel is the fakir's groove's ingredient as well)
+PRESENT = {209: {'Coal': ({'coal_area_hot_coal'}, {'coal_area_coal'}),
+                 'Trough': ({'coal_area_trough_fuel'}, {'coal_area_trough'})}}
+
+
 def tricked_presence(n):
     """{mobile item: (shown, hidden)}: what the item's trick leaves in the
     PC scene — the combine.xml combinations that take the inventory the
@@ -2360,6 +2381,8 @@ def tricked_presence(n):
         if shown:
             out.setdefault(name, (set(), set()))
             out[name][0].update(shown); out[name][1].update(hidden)
+    for name, pair in PRESENT.get(n, {}).items():
+        out[name] = (set(pair[0]), set(pair[1]))
     for name, (shown, hidden) in out.items():
         # the aux update's doing on the tricked scene (AUX_UPDATE)
         for fn in AUX_UPDATE.get(n, ()):

@@ -76,8 +76,31 @@
     "PCMinigameFailed": "neighbor",
     "PCMinigameLift": 0,
     "PCMinigameFailedTicks": 10,
-    "PCUseSeconds": 4.5,
-    "PCJingle": true
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCSceneLinked": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 6.58,
+    "PCUseSecondsLinked": 8.25,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.17,
+    "PCCreditAt": 2.5,
+    "PCJingleAt": [
+     2.5
+    ],
+    "PCJingleAtLinked": [
+     2.5
+    ],
+    "PCCreditAtLinked": 2.5,
+    "PCShoutLinked": 2,
+    "PCFixSecondsLinked": 1.92,
+    "PCLinkedPaysAt": 4.25,
+    "PCUseSeconds": 4.5
    }
   },
   {

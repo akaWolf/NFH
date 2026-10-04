@@ -97,6 +97,8 @@
     "PCLaugh": 4,
     "PCClipSeconds": {
      "ChairEnter": 0.83,
+     "ChairHedgehogEnter": 1.25,
+     "ChairHedgeHogLeave": 2.5,
      "ChairSun": 2.5,
      "ChairWakeup": 0.42,
      "ChairAwake": 6.0,
@@ -109,6 +111,12 @@
      "then": 1.83,
      "at": "start"
     },
+    "PCScene": [
+     0.17,
+     3.75
+    ],
+    "PCShout": 0,
+    "PCFixSeconds": 1.25,
     "PCJingle": true
    }
   },

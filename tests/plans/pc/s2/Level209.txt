@@ -10,7 +10,12 @@
 # 100 at 327.4 s). v3 (2026-10-03): the Mother by her script — the fakir's shop first
 # (10.3 s), then the dressing room's 30-s bar, a 54.3-s cycle (41.2 before) — so the two
 # Zone02 takes wait for her next Hide_In; the knife on the cow and the rest a lap later
-# (runs/g209b: 100 at 432.2 s).
+# (runs/g209b: 100 at 432.2 s). v4 (2026-10-04): the coal read as a tricked
+# visit (the hot coal walk 6.58 s, with the trough's fuel 8.25 s, SHOUT 2 and the
+# trough's repair) puts his ice cream and cow 10 s later, past the gauge's window
+# from the fakir's coin — the fire channel goes in after the shoe instead, with no
+# wait for his lap-2 fakir, so the chain runs a lap earlier and his next fakir
+# pays last (runs/coal_probe2: 100 at 360.2 s).
 # Level209 — GameInfo total=7 / winning=5 (S2: TrickScore 0 everywhere). Woody
 # starts WITH the pen knife (InventoryManager.InventoryItems = [IT2_Knife],
 # InventoryManager.cs:5 — the port loads it since the s2_plans fix).
@@ -35,8 +40,6 @@ take CowCrap IT2_Crap                  # Zone01
 whenanim Mother Hide_In                # her next dressing room: the bar's 30 s for the two takes in Zone02
 take AsbestosNappies IT2_Pants         # Zone02 (RequirePrimingOnlyWhenTricked: primes on the TRICKED coal, PrimingItem Coal)
 take PairOfBellows IT2_Air_pump        # Zone02
-whenusing FireFakir                    # his lap-2 fakir
-usewith FireChannel IT2_Fuel           # Zone04 (KeepAfterUse): ActivateItemTrick -> FireFakir — his lap-3 fakir, the pile's first coin
 whenusing Coal                         # his lap-2 coal
 unlock Coal IT2_Air_pump               # Zone03 once he has left it: the dexterity trick item (unlocker the bellows, DexterityKeepItem) -> Coal tricked (hot)
 prime Coal IT2_Pants                   # Zone03, same visit -> IT2_Pants_coal
@@ -46,11 +49,12 @@ whenzone Zone01                        # his lap-2 ride: the ice cream is behind
 usewith IceCream IT2_Crap              # Zone02 (the Mother's sleep window)
 whenusing TadjMahal                    # Zone05: his lap-3 stay between the two shoe uses (the second un-primes it)
 usewith! HotShoe IT2_Pants_coal        # Zone05: RottweilerUseTogglesPrime — primed by the first shoe use of his visit
+usewith FireChannel IT2_Fuel           # Zone04 (KeepAfterUse): ActivateItemTrick -> FireFakir — his lap-4 fakir, the pile's last coin
 usewith Cow IT2_Knife                  # Zone01: the knife trick (KeepAfterUse; TrickItem.cs:319 wakes the crap's controller) — his lap-3 ride
-await FireFakir 0
 await HotShoe 0
 await Drain 0
 await Coal 0
 await Trough 0
 await IceCream 0
-await Cow 0                            # the overflow
+await Cow 0
+await FireFakir 0                      # the overflow

@@ -95,6 +95,9 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
         # chair's `wakeup` and the awake loop he waits in for the Mother's
         # call, 0x10018f4a; the call's step leaves it, 0x1001911e)
         210: {'DeckChair': {'ChairEnter': ('beachleft_deckchair_guarded', 'enter', 'step'),
+                            # tricked, the hedgehog chair's (0x1001964b)
+                            'ChairHedgehogEnter': ('beachleft_deckchair_hedgehog', 'enter', 'step'),
+                            'ChairHedgeHogLeave': ('beachleft_deckchair_hedgehog', 'leave'),
                             'ChairSun': ('bar', 0x100195a4, 4),
                             'ChairWakeup': ('beachleft_deckchair_guarded', 'wakeup'),
                             'ChairAwake': ('anim', 'beachleft/deckchair', 'awake'),

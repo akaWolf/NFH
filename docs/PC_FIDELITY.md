@@ -2378,7 +2378,30 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   piñata's 6.92 s with its record 1.08 s in and the SHOUT's level 1 (shout2)
   where the stand-in reaction had been the record's laugh 3 (shout2_high); the
   credits no longer wait for the tantrum. 209's plan ends 4.9 s later
-  (444.5 s), 213's where it did; both at 100. The other SCENE_STEPS
+  (444.5 s), 213's where it did; both at 100. The same morning, by the
+  steps that name their variants (the objects' globals in the code, run
+  with the variant shown and no poll rule): 208's elephant line
+  (0x1001e000: the lookaround and the line's `fool` — the tricked stand
+  8.58 s where the untricked is 5.92, SHOUT 1, the 1.92-s repair,
+  elephant_line 4.58 s in with its jingle; the cable's combinations had
+  given it the tap's scene) and 211's cork-less boat (0x100306eb and the
+  ladder step 0x1003059d: the lookaround, the boat's `use`, the `climb`,
+  SHOUT 1 at 13.83 s where the untricked stay is 9.17, boat_manip 5.75 s
+  in) as tricked visits; 210's hedgehog chair (0x1001964b: `enter` and
+  `leave`, SHOUT 0, the 1.25-s repair) for its reaction, scene [0.17,
+  3.75] and its tricked clips at the PC's (ChairHedgehogEnter 1.25 s with
+  the step's own ticks, ChairHedgeHogLeave 2.5 — the visit is timed per
+  clip). 208's plan ends 4.6 s later, 211's 1.8, 210's where it did.
+  209's hot coals likewise, by the lap's own step (0x10020124) once their
+  scene is named (lap_model_s2 PRESENT: the mobile's tongs are no PC
+  ingredient — the hot coal is the coal and the air pump — and the fuel
+  is the fakir's groove's as well as the trough's): the walk over them
+  6.58 s where the untricked is 4.5, SHOUT 1, hot_coal 2.5 s in with its
+  jingle; with the trough's fuel the linked `walk_fuel` 8.25 s, SHOUT 2,
+  the trough's 1.92-s repair and hot_coal_fuel at 4.25 (the trough's
+  record, its jingle hot_coal's). 209's plan, whose gauge window the
+  longer visit broke (90), puts the fire channel in after the shoe
+  (tests/plans/pc/s2 v4): 100 at 360.2 s. The other SCENE_STEPS
   items keep their stand-in stands and credits — 202's beer mat and 205's
   table are timed per clip (the flow read is the beer's and the table's
   step, not the visit), 208's rake, 211's cabin phone and 212's boat coin
@@ -2404,7 +2427,7 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
-- *The trick's jingle (2026-10-04, carried; four stand-ins open).* The
+- *The trick's jingle (2026-10-04, carried; three stand-ins open).* The
   PC plays music/jingle_joke.mp3 on its tricks. Season 1: the fire posts
   it through the jingle message after the face when it scores (game.exe
   fcn.00438690 at 0x47be4f; a fire of no points leaves at 0x47bdcf).
@@ -2428,27 +2451,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
   — the tricked flow's jingle records in the seconds of the stand
   (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
-  _step_jingles on PCCreditAt's clock, 64 seconds over 52 items and 9
+  _step_jingles on PCCreditAt's clock, 67 seconds over 54 items and 10
   linked variants; `Routine.pc_jingles` counts them down as the credits),
   207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
   on the credit of the stand-ins (the flows not read, their credit at the
-  tantrum) whose record carries the jingle on its own tick (PCJingle, 14
+  tantrum) whose record carries the jingle on its own tick (PCJingle, 11
   items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
   the action it sits in). 202's plan: the beer mat's and the shark's with
   their credits (253.23, 274.72), the linked rail's 0.67 s before
   bridge_crash and 0.42 s before bridge_electrify (310.30, 312.48).
-  204's vase, 210's diving board and 212's second throne pay in their
-  partner's linked flow (PCLinkedPaysAt: vase_manip's `crash_long`,
-  divingboard_oil's `fall_water`, the hands' `hit`), whose jingle
-  PCJingleAtLinked plays. Open: four stand-ins whose action plays its
-  jingle off their record's tick — 202's rake (rake_ground_weed `crash`:
-  the jingle on tick 0, rake_ground on 4), 208's tap (tap_electricity
-  `electrify`: 0, electrify on 4), 209's trough (hot_coal `walk_fuel`: 27
-  with hot_coal's, hot_coal_fuel on 48) and 211's Olga's child (phone
-  `crash`: 26 with phone_normal's, phone_loud on 31): with their flows
-  unread and their credit at the tantrum the port plays none of these,
-  nor the jingle an action replays for a record already paid (209's
-  walk_fuel after the coal's walk).
+  204's vase, 209's trough, 210's diving board and 212's second throne
+  pay in their partner's linked flow (PCLinkedPaysAt: vase_manip's
+  `crash_long`, hot_coal's `walk_fuel`, divingboard_oil's `fall_water`,
+  the hands' `hit`), whose jingle PCJingleAtLinked plays. Open: three
+  stand-ins whose action plays its jingle off their record's tick — 202's
+  rake (rake_ground_weed `crash`: the jingle on tick 0, rake_ground on 4),
+  208's tap (tap_electricity `electrify`: 0, electrify on 4) and 211's
+  Olga's child (phone `crash`: 26 with phone_normal's, phone_loud on 31):
+  with their flows unread and their credit at the tantrum the port plays
+  none of these.
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.

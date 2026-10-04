@@ -20,8 +20,8 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCJingle": true,
-    "PCUseSeconds": 11.42
+    "PCUseSeconds": 11.42,
+    "PCJingle": true
    }
   },
   {
@@ -48,7 +48,17 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCJingle": true,
+    "PCScene": [
+     0.17,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 8.58,
+    "PCShout": 1,
+    "PCFixSeconds": 1.92,
+    "PCCreditAt": 4.58,
+    "PCJingleAt": [
+     4.58
+    ],
     "PCUseSeconds": 5.92
    }
   },
@@ -807,13 +817,13 @@
       "routes": {}
      }
     },
-    "PCJingle": true,
     "PCScene": [
      0.17,
      "shout"
     ],
     "PCShout": 0,
-    "PCFixSeconds": 1.33
+    "PCFixSeconds": 1.33,
+    "PCJingle": true
    }
   },
   {
