@@ -1769,6 +1769,11 @@ class Level:
             self.music = {
                 # GetLevelMusic returns index 1, the 'normal' track
                 'level': clip(tracks[1]) if len(tracks) > 1 else None,
+                # both sets, [slow, normal, fast]: the PC's Season 1 level
+                # draws one and plays its moods (World._pc_music_tick)
+                'sets': {k: [clip(v) for v in (mp.get(f) or [])]
+                         for k, f in ((1, 'LevelSounds'), (2, 'AlternateLevelSounds'))
+                         if len(mp.get(f) or []) == 3},
                 'loop': bool(lmd.get('loop', True)),
                 'clap': clip(mp.get('EntranceClap')),
                 'success': clip(mp.get('SuccessNormal')),

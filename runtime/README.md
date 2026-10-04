@@ -1414,7 +1414,16 @@ Input, HUD, and timing:
   record's tick (202's rake and 208's tap 4 ticks before it; 204's vase,
   209's trough, 210's diving board, 211's Olga's child and 212's second
   throne on their partner's record) — none played (docs/PC_FIDELITY.md,
-  "The trick's jingle").
+  "The trick's jingle"). The PC's Season 1 level music (`World.
+  _pc_music_tick`, `play_clap`, `pc_music_override`; `SoundBank.pc_track`,
+  `pc_tick`): the clap an intermezzo, the level's set drawn at random
+  (ingame1 / ingame2, its own generator), every 12 ticks the override
+  (`fast`: the neighbour's run to a pet) or the mood (`slow` while Woody's
+  walk sneaks, else `normal`) crossfaded in over 500 ms at the playing
+  clip's place on a second reserved channel, the track held under an
+  intermezzo and opened at its place — or the clip asked for meanwhile —
+  as it ends (game.exe fcn.00438280, SFXEngine fcn.10002e90;
+  docs/PC_FIDELITY.md, "The Season 1 music").
 - **The camera is free**, per the desktop contract (UpdateWindowsInput,
   CameraMover.cs:110-165 — dead code on Android, but the desktop original
   is the reference): 5 px edge scroll and arrows at Speed*(Sensibility*3)

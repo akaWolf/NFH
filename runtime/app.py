@@ -346,6 +346,12 @@ class InGameMenuScene(Menu):
             self.sounds.stop_entrance()
             if world is not None:
                 world._music_timer = None
+                world._pc_music_on = False
+        elif world is not None and world._pc_music_s1(world.level):
+            # the PC's Season 1 music: the level's posts carry it (the next
+            # one plays the track from the top where none plays)
+            if not world.game.ending:
+                world._pc_music_on = True
         elif world is not None and world.level.music and \
                 world.level.music.get('level') and \
                 not self.sounds._mixer.Mix_Playing(self.sounds.MUSIC_CHANNEL) \
@@ -557,7 +563,7 @@ class App:
             m = w.level.music or {}
             if w.music_bank is not None and m.get('clap') \
                     and st.audio_enabled and st.music_enabled:
-                w.music_bank.play_music(m['clap'], loop=False)
+                w.play_clap()
         else:
             st = self.igm.settings
             w.start_music(0.0, clap=True,

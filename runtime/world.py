@@ -20,6 +20,10 @@ import struct as _struct
 import os, sys
 import random
 import pcprofile
+
+# the PC's Season 1 music draws its set on a generator of its own
+# (World._pc_music_set): the world's random stream stays the harness's
+_PC_MUSIC_RNG = random.Random()
 _f32_pack, _f32_unpack = _struct.Struct('<f').pack, _struct.Struct('<f').unpack
 
 
@@ -5747,6 +5751,15 @@ class Routine:
         self.pawn.steps = []
         self.pawn.in_urgent = bool(urgent)
         self.pawn.pc_run = self._pc_runs(item, kind, name)
+        w = self.pawn.world
+        self._pc_music_fast = bool(
+            pcprofile.is_pc() and self.role == 'Rottweiler' and w is not None
+            and kind == 'surprise_far' and item is not None and item.pid in w.alerters
+            and not getattr(self.level, '_season2', False))
+        if self._pc_music_fast:
+            # the pets' alarm: the level's `noise` case sets the music
+            # override `fast` before his run to the pet (World.pc_music_override)
+            w.pc_music_override('fast')
         self.state = self.MOVING
         # a new MoveAction target: RoutineActionMove.SameZone() is asked on
         # every ActionManager.Update while the urgent move toward a Dog/Chili
@@ -5840,6 +5853,13 @@ class Routine:
         """RoutineActionSurpriseFar.OnActionStarted"""
         if self._manager_dead:
             return                        # MoveAction.Finished is never asked
+        if getattr(self, '_pc_music_fast', False):
+            # at the pet the class's next case clears the override (the
+            # alarm's list, fcn.0047a690 at 0x47a6d5)
+            self._pc_music_fast = False
+            w = self.pawn.world
+            if w is not None:
+                w.pc_music_override(None)
         handler, self._urgent_handler = self._urgent_handler, None
         if handler is not None:
             handler()
@@ -7913,6 +7933,17 @@ class World:
         self.should_play_finish = False  # Woody.ShouldPlayFinish
         self.is_playing_finish = False   # Woody.IsPlayingFinish
         self._music_timer = None
+        # the PC's Season 1 level music (_pc_music_tick): the set the level
+        # drew (game.exe fcn.0040eef0(2) on the app's Mersenne Twister ->
+        # fcn.0040ef50: ingame1 or ingame2 — the scene's LevelSounds or
+        # AlternateLevelSounds; its own generator, the world's draws
+        # untouched), the posts' clock and the override (fast: the pets'
+        # alarm run)
+        self._pc_music_on = False
+        self._pc_music_poll = 0.0
+        self._pc_music_override = None
+        self._pc_music_set = _PC_MUSIC_RNG.choice((1, 2)) \
+            if self._pc_music_s1(level) else None
         # the exit door's confirmation (Pawn.cs:1378-1383 ->
         # Woody.ShowExitConfirmation, Woody.cs:552-556): the application
         # hangs its ExitConfirmation dialog here; without one (the bare
@@ -7934,9 +7965,7 @@ class World:
             # The application runs the title cards itself and calls
             # start_music(elapsed) at StartGame instead.
             intro = level.music.get('intro_total') or 0.0
-            if level.music.get('clap'):
-                music.play_music(level.music['clap'], loop=False,
-                                 offset=intro)
+            self.play_clap(intro)
             self.start_music(intro, clap=False)
         self.hud = None                  # set by the viewer; the description
                                          # bubble and whistle land here
@@ -12553,11 +12582,76 @@ class World:
         if music is None or m is None:
             return
         if clap and music_on and m.get('clap'):
-            music.play_music(m['clap'], loop=False, offset=elapsed)
-        if music_on and m.get('level'):
+            self.play_clap(elapsed)
+        if self._pc_music_s1(self.level):
+            # the PC's level posts its music from its first update on
+            # (_pc_music_tick); the clap holds it as an intermezzo and the
+            # track opens as the clap ends
+            self._pc_music_on = bool(music_on)
+            self._pc_music_poll = 0.0
+        elif music_on and m.get('level'):
             self._music_timer = max(0.0, (m.get('delay') or 0.0) - elapsed)
         if audio_on and m.get('entrance'):
             music.play_entrance(m['entrance'])
+
+    def play_clap(self, offset=0.0):
+        """MusicPlayer.Start's clap, jingle_levelstart (cs:43-47) `offset`
+        seconds in; under the profile's Season 1 the level's first update
+        stops the music and posts it as a jingle (game.exe 0x43b245-0x43b259:
+        the level's slot 10, fcn.00438690), SFXEngine's intermezzo"""
+        m = self.level.music
+        if self.music_bank is None or not m or not m.get('clap'):
+            return
+        if self._pc_music_s1(self.level):
+            self.music_bank.stop_music()
+            self.music_bank.play_intermezzo(m['clap'], offset=offset)
+        else:
+            self.music_bank.play_music(m['clap'], loop=False, offset=offset)
+
+    @staticmethod
+    def _pc_music_s1(level):
+        """the PC's Season 1 music system under the profile"""
+        return pcprofile.is_pc() and not getattr(level, '_season2', False) \
+            and bool((level.music or {}).get('sets'))
+
+    def pc_music_override(self, name):
+        """the level's music override (game.exe: vf20(name, 1) on the level
+        state +0x40): `fast` from the pets' alarm on — every level class's
+        `noise` case sets it with the noise icon before the run to the pet
+        (0x454253, 0x4563c6, 0x458e5c, 0x459b9d, 0x45e430, 0x461597,
+        0x46507f, 0x468334, 0x46b4f8, 0x46ece3) — and None as the next case
+        comes at the pet (the alarm's list fcn.0047a690 at 0x47a6d5; 105's
+        own at 0x46ed53)"""
+        self._pc_music_override = name
+
+    def _pc_music_mood(self):
+        """the level's mood (+0x3c): `slow` while Woody's walk sneaks — the
+        player's walk step sets it with the actor's gait 1 on its first
+        update (0x472e90: the job's sneak flag +0x16, 0x472ef2) — and
+        `normal` as a walk of his stops (fcn.00472cb0, 0x472d8c), at the
+        level's start (0x43bafd) and at the start job's end (fcn.00471570)"""
+        wd = self.woody
+        if wd is not None and wd.sneaking and wd.state != wd.IDLE:
+            return 'slow'
+        return 'normal'
+
+    def _pc_music_tick(self, dt):
+        """the level update's music post (fcn.00438280): every 12 ticks the
+        override, else the mood, as the set's clip with a 500 ms crossfade
+        (the message 0x4e0a10, +8 = 500, to the app's music listener)"""
+        bank = self.music_bank
+        if not self._pc_music_on or bank is None:
+            return
+        bank.pc_tick()
+        self._pc_music_poll -= dt
+        if self._pc_music_poll > pcprofile.TIMER_EPS:
+            return
+        self._pc_music_poll += 12.0 / pcprofile.TICKS_PER_SECOND
+        tracks = (self.level.music.get('sets') or {}).get(self._pc_music_set) or []
+        mood = self._pc_music_override or self._pc_music_mood()
+        i = {'slow': 0, 'normal': 1, 'fast': 2}[mood]
+        if i < len(tracks) and tracks[i]:
+            bank.pc_track(tracks[i], 500)
 
     def pc_trick_jingle(self):
         """the PC's jingle of a trick, music/jingle_joke.mp3 (the remaster's
@@ -12583,6 +12677,7 @@ class World:
         if self.music_bank is None or self.level.music is None:
             return
         self._music_timer = None
+        self._pc_music_on = False        # the level's posts end with it
         name = self.level.music.get(key)
         if name:
             self.music_bank.play_music(name, loop=False)
@@ -12606,6 +12701,7 @@ class World:
         self.time += dt                  # Time.time
         if self.music_bank is not None:
             self.music_bank.tick_intermezzo()
+            self._pc_music_tick(dt)
         # PlayLevelMusic's first-run delay (MusicPlayer.cs:88-98); the
         # track loops per the serialized LevelMusicSource flag
         if self._music_timer is not None:

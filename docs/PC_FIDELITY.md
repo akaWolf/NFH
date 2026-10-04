@@ -2413,6 +2413,53 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   The variants no plan plays (210's octopus turban, 212's whip with the
   spikes, 213's tequila tortilla and manipulated plant, 214's closed
   hatch) have no flow read either.
+- *The Season 1 music (2026-10-04, carried).* game.exe keeps a mood
+  (+0x3c) and an override (+0x40) on the level state (vf20(name, 0 / 1),
+  0x436b20): the mood `normal` at the start, `slow` as the player's walk
+  step starts with the job's sneak flag (0x472e90: the actor's gait 1,
+  0x472ef2), `normal` as a walk of his stops (fcn.00472cb0, 0x472d8c) —
+  the step's jobs are the input handlers' (fcn.0043ef40, fcn.004410b0) —;
+  the override `fast` from each pet class's `noise` case, set with the
+  noise icon before the run to the pet, cleared as the next case comes at
+  the pet (the alarm's list fcn.0047a690 at 0x47a6d5; 105's own at
+  0x46ed53). Every 12 ticks the level update posts the override, else the
+  mood (fcn.00438280, +8 = 500 ms) to the app's music listener, which maps
+  it to the level's set — ingame1 or ingame2 at random (fcn.0040eef0(2),
+  fcn.0040ef50) — and SFXEngine crossfades (fcn.10002e90): the same clip
+  plays on, another opens on the free slot at the playing one's place
+  (fcn.100041d0 -> fcn.100041a0, the three moods one piece at three
+  tempos) and fades in over 500 ms while the old fades out, the first from
+  its top without a fade (0x1000344f); under an intermezzo the slot takes
+  the new clip closed (0x10003129) and it opens at the kept place as the
+  intermezzo ends (fcn.10004400 -> fcn.10003d70(1)). The level's first
+  update stops the music and posts jingle_levelstart as a jingle
+  (0x43b245-0x43b259), so the track opens from its top as that
+  intermezzo ends. The reference (tools/pcref/music_tracks.py over the
+  fourteen episodes' audio): each level one set (ingame1: E01, E04, E06,
+  E07, E08, E13; ingame2: E02, E03, E05, E09-E12, E14), the slow clip at
+  the normal clip's place through E08-E14's sneaking walks (E09: normal
+  @11.5 -> slow @17.5, @20.5 -> normal @29.5), the fast clip in E11 and
+  E13's alarms, the track's top as the clap's 15.0 s end (E09 15.04, E10
+  15.02, E11 14.87, E13 15.03 s after its start), each trick's jingle
+  holding the track 2.4-2.6 s (E02's five). The options' `dynamicmusic`
+  (+0x12, 0 in their reset, gameoptions.xml, copied into the options
+  message 0x4e8c94 at +0x15 by fcn.00401840) has no reader located and the
+  reference plays the moods. Under the profile's Season 1: `World.
+  play_clap` plays the clap as the intermezzo, `World._pc_music_tick` posts
+  every 12 ticks from StartGame (the override, `World.pc_music_override`
+  from `Routine.start_urgent`'s pet run to `_urgent_arrived`; the mood,
+  `slow` while Woody's walk sneaks), `SoundBank.pc_track` crossfades on
+  the MusicPlayer channel and a second reserved one with the place kept
+  by the track's clock (a clip started mid-way plays its rest, then loops
+  whole), and an intermezzo closes the track with its place and opens it —
+  or the clip asked for meanwhile — there; the set drawn on a generator of
+  the port's own. Season 2's levels have one track each (leveldata.xml
+  `music`, the remaster's LevelSounds[1]) and keep the mobile's. Open:
+  E02 opened its clip 5.6 s in at the clap's end — a slot's stale kept
+  place (fcn.10003d70(1) opens at +0x40), not carried; the PC's
+  jingle_joke.mp3 is not in the copy — the reference holds the track
+  2.4-2.6 s a jingle where the remaster's clip is 3.68 s (its last 1.58 s
+  silence), which the port holds.
 - *The Season 2 catcher's approach (2026-10-04, carried).* Of the 23 gait-2
   writes in GameLogic's scripts (the run before a walk), 21 were carried
   (below, "Season 2's runs"); the other two are the engine's: the `fight`
