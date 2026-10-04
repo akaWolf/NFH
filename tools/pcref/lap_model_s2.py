@@ -87,6 +87,32 @@ from tools.pcref import canon
 DUMP = os.path.expanduser('~/nfh-bench/pcref/r2/nfh2_gamelogic_text.txt')
 G2 = json.load(open(os.path.join(HERE, 'exe', 'nfh2_gamelogic_globals.json')))
 L = open(DUMP).read().split('\n')
+
+
+def _ebp_operand(line):
+    """radare2 names a function's stack slots where it analysed its frame
+    (`[var_20h_4]`, and two names for one slot where the stack pointer moves
+    between them): the walker keys its variables by the ebp displacement,
+    which the instruction's own bytes give — a mod 01 / rm 101 ModRM byte
+    after the opcode, [ebp + disp8] (208's platform step 0x1001ea59: the
+    IsVariant's out `lea eax, [ebp - 0x14]` and the crash's object
+    `mov ecx, [ebp - 0x14]`, named var_20h_5 and var_20h_4)"""
+    m = re.match(r'(\s*0x[0-9a-f]{8}\s+)([0-9a-f]+)(\s+)(.*)$', line)
+    if not m or '[var_' not in m.group(4):
+        return line
+    b = bytes.fromhex(m.group(2)) if len(m.group(2)) % 2 == 0 else b''
+    for i in range(len(b) - 1):
+        modrm = b[i + 1] if b[i] not in (0x0f,) else None
+        if i >= 2:
+            break
+        if modrm is not None and modrm >> 6 == 1 and modrm & 7 == 5 and i + 2 < len(b):
+            d = b[i + 2] - 256 if b[i + 2] > 127 else b[i + 2]
+            opnd = '[ebp - 0x%x]' % -d if d < 0 else '[ebp + 0x%x]' % d
+            return m.group(1) + m.group(2) + m.group(3) + re.sub(r'\[var_[0-9a-z_]+\]', opnd, m.group(4), count=1)
+    return line
+
+
+L = [_ebp_operand(l) for l in L]
 addr = {}
 for i, l in enumerate(L):
     m = re.match(r'(0x[0-9a-f]{8}) ', l)
@@ -2348,10 +2374,13 @@ def _scene_span(d, ev, own=None, walked=True):
 
 
 # the scene of a trick whose mobile inventory the PC's combinations do not
-# name, or name for another object too (tricked_presence pairs by it): 209's
-# hot coals (the mobile's tongs, the PC's air pump: coal_area/hot_coal) and
-# its trough (the fuel is the fakir's groove's ingredient as well)
-PRESENT = {209: {'Coal': ({'coal_area_hot_coal'}, {'coal_area_coal'}),
+# name, or name for another object too (tricked_presence pairs by it): 208's
+# platform (the mobile's chips, the PC's balloon on the fakir who holds it
+# up: amusement/fakir_balloon), 209's hot coals (the mobile's tongs, the PC's
+# air pump: coal_area/hot_coal) and its trough (the fuel is the fakir's
+# groove's ingredient as well)
+PRESENT = {208: {'IndianPlatform': ({'amusement_fakir_balloon'}, {'amusement_fakir'})},
+           209: {'Coal': ({'coal_area_hot_coal'}, {'coal_area_coal'}),
                  'Trough': ({'coal_area_trough_fuel'}, {'coal_area_trough'})}}
 
 

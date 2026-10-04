@@ -2370,16 +2370,23 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   board (its step 0x100169c5 polls for the Mother), 210's pole (the
   hedgehog chair's linked variant, a visit timed per clip) and 211's kid
   (the cabin phone's linked `crash`) stay unread, the default standing.
-  208's platform, read the same day and not carried: its trick is the
-  fakir's balloon (combine.xml amusement/fakir_balloon; the mobile's chips
-  are no PC ingredient), and the platform step (0x1001ea59) — IsVariant
-  on the fakir, its pick held against the balloon's name (0x1001eaf5) —
-  plays the platform's `crash` (platform_crash on its tick 40) and SHOUT
-  1; with the shovel on the seesaw the step's second test (0x1001ebc3)
-  takes the branch of a `crash` whose object is the test's pick, which
-  the walker does not resolve (its SHOUT 3 read, the seesaw's record
-  not), and the plan plays the two together — the linked variant, not
-  read whole.
+  208's platform, read the same day: its trick is the fakir's balloon
+  (combine.xml amusement/fakir_balloon; the mobile's chips are no PC
+  ingredient — PRESENT), and the platform step (0x1001ea59) plays the
+  platform's `crash` (platform_crash on its tick 40, with its jingle),
+  then the seesaw's `crash` — its object the IsVariant pick of the seesaw
+  (0x1001ebc3), the shovel's variant or the plain one — and holds the pick
+  against the plain seesaw's name (0x1001ec34): SHOUT 1 for the plain
+  one, SHOUT 3 and the shovel seesaw's repair for the shovel's
+  (seesaw_shovel on its tick 57). The walker had lost that object:
+  radare2 names this function's stack slots (var_20h_5 for the IsVariant's
+  out, var_20h_4 for the crash's object, both [ebp - 0x14]), and the
+  walker now reads the displacement from the instruction's ModRM byte —
+  no other flow of the fourteen levels changes (the carried keys stay as
+  they were). The platform alone: 7.75 s, SHOUT 1, its record 3.33 s in;
+  with the shovel (the linked variant, SeeSaw): 10.17 s, SHOUT 3, the
+  1.83-s repair, seesaw_shovel at 4.75 (PCLinkedPaysAt). 208's plan ends
+  2.5 s earlier, at 100.
 - *209's fire fakir and 213's piñata (2026-10-04, carried).* Of the
   stand-ins whose flow SCENE_STEPS reads (the scene alone until now), two
   are their station's own tricked step whole: 209's fuelled groove
@@ -2478,11 +2485,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Season 1 from `s1_fire` when it pays; Season 2 on the read flows' clock
   — the tricked flow's jingle records in the seconds of the stand
   (PCJingleAt, the linked variant's PCJingleAtLinked: lap_model_s2.
-  _step_jingles on PCCreditAt's clock, 68 seconds over 55 items and 10
+  _step_jingles on PCCreditAt's clock, 70 seconds over 56 items and 11
   linked variants; `Routine.pc_jingles` counts them down as the credits),
   207's lift from its start (PCHitJinglesLinked: n_lift's tick 0) —, and
   on the credit of the stand-ins (the flows not read, their credit at the
-  tantrum) whose record carries the jingle on its own tick (PCJingle, 10
+  tantrum) whose record carries the jingle on its own tick (PCJingle, 9
   items: tools/pcref/coins.py STAND_IN, each item's tricks.xml record and
   the action it sits in). 202's plan: the beer mat's and the shark's with
   their credits (253.23, 274.72), the linked rail's 0.67 s before

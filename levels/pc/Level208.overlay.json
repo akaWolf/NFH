@@ -20,8 +20,31 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
-    "PCUseSeconds": 11.42,
-    "PCJingle": true
+    "PCScene": [
+     0.08,
+     "shout"
+    ],
+    "PCSceneLinked": [
+     0.08,
+     "shout"
+    ],
+    "PCUseSecondsTricked": 7.75,
+    "PCUseSecondsLinked": 10.17,
+    "PCShout": 1,
+    "PCFixSeconds": 0,
+    "PCShoutTail": 0.08,
+    "PCCreditAt": 3.33,
+    "PCJingleAt": [
+     3.33
+    ],
+    "PCJingleAtLinked": [
+     3.33
+    ],
+    "PCCreditAtLinked": 3.33,
+    "PCShoutLinked": 3,
+    "PCFixSecondsLinked": 1.83,
+    "PCLinkedPaysAt": 4.75,
+    "PCUseSeconds": 11.42
    }
   },
   {
