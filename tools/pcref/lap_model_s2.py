@@ -3718,6 +3718,38 @@ def _place_of(d, g, ev):
     return (pos[1], pos[2]) if pos else None
 
 
+def code_targets_tricked(n):
+    """{mobile item: (x, y), or a list per visit}: the hotspot a TRICKED
+    visit's GoTo walks to where the step's IsVariant picks the trick's
+    object and its `neighbor` hotspot is another than the untricked one's
+    (214's bouquet_manip 8 px right and 5 down, the hatch_open_manip 5 up,
+    the bridge behind the opened captain door 20 up); None for the visits
+    where it is the same"""
+    d = Data(n); g = Geometry(n)
+    lap, pairs = _paired_parts(n)
+    snaps = lap_state(n)
+    trick = tricked_presence(n)
+    go = lambda ev: next((e[1] for e in ev if e[0] == 'GO'), None)
+    out = {}
+    for item, (many, visits) in pairs.items():
+        if item not in trick or any(v is None for v in visits):
+            continue
+        per = []
+        for v in (visits if many else visits[:1]):
+            i = min(i for i, _j, _p in v)
+            lvi, byi = _row_level(n, snaps, lap[i][0])
+            lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
+            ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi, latch=lat)
+            ev1, _nx = run_step(lvi, lap[i][1], dict(byi), latch=lat)
+            g1, g2 = go(ev1), (go(ev2) if ev2 else None)
+            p1 = g.point(d.real.get(g1, g1), 'neighbor', exact=True) if g1 else None
+            p2 = g.point(d.real.get(g2, g2), 'neighbor', exact=True) if g2 else None
+            per.append(p2 if (p1 is not None and p2 is not None and p2 != p1) else None)
+        if any(x is not None for x in per):
+            out[item] = per if many else per[0]
+    return out
+
+
 def code_places_linked(n):
     """{mobile item: (x, y), or a list per visit}: code_places_tricked for
     the linked variant — the visit's step run with the mobile linked trick's

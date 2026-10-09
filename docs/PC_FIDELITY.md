@@ -2763,7 +2763,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   GoTo's the buffet over and over), so her run to the fight leaves its
   hotspot (585/-35), not her level.xml start (633/+13) — 201's plan 0.2 s
   later, at 100 —, and the soaped puddle's crash_short leaves him at its
-  `txt` +200 (read as the untricked +80 until then). Open: 207's shell — the `shell_crayfish` on her mat posts
+  `txt` +200 (read as the untricked +80 until then). And the tricked
+  visits whose step's IsVariant sends its GoTo to the trick's own object
+  where that object's hotspot is another: 214's hatch_open_manip 5 px
+  above the open hatch's, the bouquet_manip 8 right and 5 down, the bridge
+  behind the opened captain door 20 up (lap_model_s2.code_targets_tricked
+  -> PCApproach `xt`/`pxt`, world.pc_ap_tricked: the walk there and the
+  departure from there; the mobile never visits the opened door, its next
+  station is the wheel) — 214's plan 0.3 s later, at 100. Open: 207's
+  shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
   takes the point 50 px beside him at his y (1267/575, the left side for
@@ -2774,7 +2782,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   within the mobile's reach), and the floor-line waypoints of
   fcn.10009177 (down 81 px, along 50, up 25: 43 ticks) would make it 4.5
   — the movement's waypoints for a point off the floor line, or her
-  start, not settled.
+  start, not settled. At 30 fps: she is put behind him at 194.25 (the
+  mat's `leave` over, ms3), goes down behind him at the walk's 3 px a tick
+  for ~13 ticks (35-40 px), along to his left from ~195.47 at the walk's 8
+  (50 px, 7 ticks), faces the camera from 196.07 and the fight's cloud
+  shows at 196.67: 29 ticks from the placement, where the floor route
+  (fcn.1000901b: +0x31 clear, the floor line the room's path1 y 600 through
+  fcn.1004c945 / fcn.1000889d) takes 46 and the direct one (+0x31 set: x
+  first) goes along first, which the frames do not show. Olga's speed
+  records are the neighbour's (generic/objects.xml: mg 3/8, mr 9/18), no
+  gait is written on her way (0x10017606 sets 2 for the castle only and
+  0x10017646 clears it there). The frames fit a floor line near 560 —
+  nothing in the room (path 600, floor 500-800) gives it.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

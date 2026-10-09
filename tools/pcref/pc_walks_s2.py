@@ -479,6 +479,7 @@ def approaches(n):
     places = S.code_places(n)
     places_t = S.code_places_tricked(n)
     places_l = S.code_places_linked(n)
+    targets_t = S.code_targets_tricked(n)
     out = []
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
@@ -543,6 +544,23 @@ def approaches(n):
                 pxs = per[role]['px'] if isinstance(per[role]['px'], list) else [per[role]['px']] * len(dps)
                 if any(a != b for a, b in zip(dps, pxs)):
                     per[role]['dpx'] = dps[0] if one else dps
+            if role == 'Rottweiler' and name in targets_t:
+                # a tricked visit's GoTo to the trick's object where its
+                # hotspot is another (214's bouquet_manip: 8 px right, 5 down)
+                # — `xt` and its height against the floor, `pxt`, per visit
+                # where the station has several (the untricked visits' own)
+                q = targets_t[name]
+                if name in places_t or name in tricked:
+                    # (a tricked move is read from the untricked hotspot)
+                    raise NotImplementedError('%d %s: txt beside xt' % (n, name))
+                if not isinstance(q, list):
+                    per[role]['xt'], per[role]['pxt'] = q[0], q[1] - g.floor(r)
+                else:
+                    xs = per[role]['x'] if isinstance(per[role]['x'], list) else [per[role]['x']]
+                    pxs = per[role]['px'] if isinstance(per[role]['px'], list) else [per[role]['px']]
+                    per[role]['xt'] = [qk[0] if qk is not None else xs[k % len(xs)] for k, qk in enumerate(q)]
+                    per[role]['pxt'] = [(qk[1] - g.floor(r)) if qk is not None else pxs[k % len(pxs)]
+                                        for k, qk in enumerate(q)]
             for src, kx, kp in ((places_t, 'txt', 'dpxt'), (places_l, 'txtl', 'dpxtl')):
                 if role != 'Rottweiler' or name not in src:
                     continue

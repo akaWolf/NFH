@@ -140,13 +140,22 @@ class _PCStartPoint:
         self.pc_approach = {}
 
 
+def pc_ap_tricked(ap, it):
+    """the station's tricked target applies (Item.pc_approach `xt`/`pxt`):
+    the step's IsVariant picks the trick's object for its GoTo while the
+    trick is in the scene (214's bouquet_manip, 8 px right of the bouquet
+    and 5 down; the hatch_open_manip 5 up)"""
+    return 'xt' in ap and it is not None and it.tricked and not it.pc_masked
+
+
 def pc_ap_x(ap, it):
     """a station's PC hotspot x (Item.pc_approach `x`): one value, or one
     per visit where the GoTo takes another hotspot of the object each visit
     (201's puddle: its `neighbor` hotspot for the slip, `neighborleft` for
     the left slip — GameLogic 0x1002847f, 0x10028ea6) — the visit about to
-    play, the item's PCUseSeconds slot"""
-    x = ap.get('x')
+    play, the item's PCUseSeconds slot; the tricked target's (`xt`) while
+    the trick is in the scene (pc_ap_tricked)"""
+    x = ap.get('xt') if pc_ap_tricked(ap, it) else ap.get('x')
     if isinstance(x, list):
         return x[it.pc_use_visit % len(x)] if x else None
     return x
@@ -157,8 +166,9 @@ def pc_ap_px(ap, it):
     `px`): one value, or one per visit where the visits' GoTos take other
     objects (205's skis: the ride's step walks to beachleft/waterski, the put
     step to the guarded skis, 5 px higher — pc_walks_s2.VISIT_OBJECTS), the
-    visit about to play, the item's PCUseSeconds slot"""
-    px = ap.get('px')
+    visit about to play, the item's PCUseSeconds slot; the tricked target's
+    (`pxt`) while the trick is in the scene (pc_ap_tricked)"""
+    px = ap.get('pxt') if pc_ap_tricked(ap, it) else ap.get('px')
     if isinstance(px, list):
         return px[it.pc_use_visit % len(px)] if px else 0
     return px

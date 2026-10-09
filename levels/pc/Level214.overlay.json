@@ -684,7 +684,9 @@
         "Zone03",
         "Zone02"
        ]
-      }
+      },
+      "xt": 960,
+      "pxt": -67
      },
      "Woody": {
       "obj": "topright/door_closed",
@@ -945,7 +947,9 @@
         "Zone01",
         "Zone02"
        ]
-      }
+      },
+      "xt": 367,
+      "pxt": -22
      },
      "Woody": {
       "obj": "topleft/bouquet",
@@ -984,7 +988,9 @@
         "Zone02",
         "Zone03"
        ]
-      }
+      },
+      "xt": 875,
+      "pxt": -69
      },
      "Woody": {
       "obj": "bottomright/hatch_closed",

@@ -855,7 +855,10 @@ predicate, then the all-tricks win.
   walk) arrives at its PC station all the same, and a use that reads its
   item tricked once RottweilerUseTogglesPrime's put has cleared WasPriming
   (Item.cs:835) takes the tricked departure then (209's shoe take after
-  the curtain, `Routine._use`).
+  the curtain, `Routine._use`). `xt`/`pxt`: the tricked visit's GoTo target
+  where the step's IsVariant walks to the trick's own object
+  (`pc_ap_tricked`: 214's bouquet_manip, 8 px right, 5 down; the
+  hatch_open_manip 5 up) — the approach and the departure both.
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
