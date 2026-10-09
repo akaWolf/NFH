@@ -2706,6 +2706,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   run down from her station, a hop's `in` and `out` runs — inside it):
   her fight from his stand's end 5.92 s against E04's 5.7 (the port's 4.5
   before), the kart's coin to the karate's 19.5 against 19.25.
+  And 207's castle over the hedgehog's towel: the destroyed castle's
+  `fall` carries behavior="kid_cry" for Olga (in_b1 objects.xml); her
+  handler (0x10017b44) runs 0x10017960 — asleep on her mat, its `wakeup`
+  (35 ticks) and `leave` (9, to its olga_out) — and 0x100175f0 sets her
+  gait to 2 (0x10017606) and runs her across the pass to the castle (65
+  ticks at mr) for its n_lift, which his poll step waits for before the
+  billboard's `enter` (its record `bill` on tick 30). The port ran her at
+  once from her station (5.3 s to the lift). Carried
+  (lap_model_s2.HIT_STEPS, _hit_steps_run -> PCHitAfter 3.92, PCHitRun
+  5.58): E07's castle coin to the bill's 17.25 s on the gauge (221.25,
+  238.5 — the jump the amounts' note had put on the awning; the bubble
+  shows the fight's icon from 226.2 on, Olga coming into sight from the
+  right at 234 and lifting him), the port's 17.5 (13.2 before).
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

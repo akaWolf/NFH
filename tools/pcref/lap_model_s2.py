@@ -1921,6 +1921,16 @@ FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_ma
 # hideout (fcn.10049168) and sets her gait to 2 (0x10033486) — the
 # rickshaw_manip's olga_out 38 px, 170 left of her seat
 HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')}}
+# ... and her own steps before her GoTo to the object her action is on:
+# {level: {item: (the actor, her steps, her gait, the object, his part that
+# posts her behaviour)}} — 207's castle over the hedgehog's towel: the
+# destroyed castle's `fall` carries behavior="kid_cry" for Olga (in_b1
+# objects.xml), her handler (0x10017b44) runs 0x10017960 — asleep on her
+# mat: its `wakeup` (35 ticks) and `leave` (9, to its olga_out) —, then
+# 0x100175f0 sets her gait to 2 (0x10017606) and runs her to the castle for
+# its n_lift, which the neighbour's poll step waits for
+HIT_STEPS = {207: {'SandCastle': ('olga', (0x10017960,), 'mr', 'beachleft_sandcastle_destroyed',
+                                  ('beachleft_sandcastle_destroyed', 'fall'))}}
 # a tricked visit that pays in another actor's job her own script starts on
 # his part: {level: {item: ((his object, action), the actor, (her object,
 # action))}} — 210's elephant: Fifi's step 0x10018239 waits while she is
@@ -2010,6 +2020,42 @@ def _hit_run(n, d, ev, actor, spec):
     if t is None:
         return None
     return lv, t + 2
+
+
+def _hit_steps_run(n, d, ev, own, walked, spec):
+    """(ticks from the end of his flow to the first update of her GoTo's
+    movement, ticks of that movement and the two to her action's first
+    update) for HIT_STEPS: his part posts her behaviour as its job ends, her
+    step reads it the tick after and plays her own parts (_flow for her
+    records: 207's `wakeup` and the mat's `leave`), the next step pushes her
+    GoTo at her gait from where her leave put her to the object's
+    `<actor>` hotspot (walk_span), and her action's first update comes two
+    ticks after her arrival's. None where a part is unknown"""
+    actor, steps, gait, obj, (po, pa) = spec
+    fl = _flow(d, ev, own, walked)
+    post = next((t + x[2] for t, kind, x in fl
+                 if kind == 'part' and x[0] == po and x[1] == pa and x[2] is not None), None)
+    if post is None or any(kind == 'unknown' for _t, kind, _x in fl):
+        return None
+    end = fl[-1][0]
+    lvh = Level(n)
+    evh = []
+    for stp in steps:
+        evs, _nx = run_step(lvh, stp, dict(LAP_BYTES.get(n) or {}), unknown=1, streq=1, latch=1)
+        evh += ([('STEP',)] if evh else []) + evs
+    flh = _flow(d, evh, walked=False, actor=actor)
+    if any(kind == 'unknown' for _t, kind, _x in flh):
+        return None
+    her_end = post + 1 + flh[-1][0]
+    ctxh = {'actor': actor}
+    _station_parts(d, evh, ctxh)
+    frm = ctxh.get('pos')
+    if frm is None:
+        return None
+    t, _p = walk_span(d.geom(), frm, d.real.get(obj, obj), actor, d, gait=gait)
+    if t is None:
+        return None
+    return her_end - end, t + 2
 
 
 # the scene a tricked continuation needs besides the item's own trick: 211's
@@ -3409,6 +3455,14 @@ def code_stays_tricked(n):
                           'linked_extra': crecs[0][0],
                           'linked_extra_at': round(crecs[0][1] / 12.0, 2),
                           'linked_scene': _scene_secs(_scene_span(d, ev2 + [('STEP',)] + evc, own, wk_i))})
+            hs = HIT_STEPS.get(n, {}).get(item)
+            if hs is not None:
+                # her own steps and her run to the object of her action
+                # (PCHitAfter, then PCHitRun)
+                hrun = _hit_steps_run(n, d, ev2, own, wk_i, hs)
+                if hrun is not None:
+                    e['hit_after'] = {hs[0]: _secs(hrun[0])}
+                    e['hit_run'] = {hs[0]: _secs(hrun[1])}
         out[item].update(e)
     # a TRICKED_SCENE item's linked variant: its steps run with the mobile
     # linked trick's scene too (211's cabin phone: the step tests kid_manip,

@@ -109,6 +109,12 @@
     "PCShout": 0,
     "PCFixSeconds": 0,
     "PCShoutTail": 0.08,
+    "PCHitAfter": {
+     "Olga": 3.92
+    },
+    "PCHitRun": {
+     "Olga": 5.58
+    },
     "PCCreditAt": 4.5,
     "PCJingleAt": [
      4.5
