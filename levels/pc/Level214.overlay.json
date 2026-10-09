@@ -47,17 +47,23 @@
     ],
     "PCUseSecondsTricked": 8.42,
     "PCShout": 0,
-    "PCFixSeconds": 0,
-    "PCShoutTail": 0.08,
+    "PCFixSeconds": 6.08,
     "PCHitSeconds": {
      "Mother": 3.33
     },
     "PCHitAfter": {
-     "Mother": 0.17
+     "Mother": 3.67
+    },
+    "PCHitRun": {
+     "Mother": 1.42
     },
     "PCCreditAt": 5.75,
     "PCJingleAt": [
      5.75
+    ],
+    "PCFixDepart": [
+     805,
+     -30
     ],
     "PCUseSeconds": 8.5
    }

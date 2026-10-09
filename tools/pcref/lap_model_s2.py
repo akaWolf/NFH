@@ -1923,7 +1923,12 @@ FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_ma
 # the Mother in her deck chair, her step 0x10018d76 sets gait 2 (0x10018dd9)
 # — the chair's `leave`, 17 ticks, to its mother_out
 HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')},
-            210: {'Elephant': ('pool_deckchair', 'mr')}}
+            210: {'Elephant': ('pool_deckchair', 'mr')},
+            # 214's pistol: the Mother in her deck chair, her step
+            # 0x1003a21c sets gait 2 (0x1003a27f) — the chair's `leave`, 17
+            # ticks (and first its `die` his step has put on her queue:
+            # _busy_until)
+            214: {'Pistol': ('topright_deckchair', 'mr')}}
 # ... and her own steps before her GoTo to the object her action is on:
 # {level: {item: (the actor, her steps, her gait, the object, his part that
 # posts her behaviour)}} — 207's castle over the hedgehog's towel: the
@@ -1993,6 +1998,81 @@ def _hit_after(n, d, lv, bytes0, ev, own, walked, spec):
     return her_end + t + 2 - end
 
 
+def _restore(n, d, lv, nx, bytes0, ev, evc):
+    """(ticks from the SHOUT of the reaction `evc` to the end of the steps
+    it hands on to before the lap resumes, where they leave him — (x, px)
+    or None at his station) — the steps off the lap (lap_steps' and the
+    paired lap's rows), each on the flow's clock with the walk of its GoTo
+    from where the one before left him (walk_span; his tricked flow `ev`
+    places him first); None without such a step or a SHOUT"""
+    lap, _pairs = _paired_parts(n)
+    rows, _loop = lap_steps(n)
+    lapset = {r[1] for r in lap} | {r[1] for r in rows}
+    evr, k = [], 0
+    while nx and nx not in lapset and k < 4:
+        evs, nx = run_step(lv, nx, dict(bytes0), unknown=1, streq=1)
+        evr += [('STEP',)] + evs
+        k += 1
+    if not evr:
+        return None
+    fl = _flow(d, evc + evr)
+    shout = next((t for t, kind, _x in fl if kind == 'shout'), None)
+    if shout is None or any(kind == 'unknown' for _t, kind, _x in fl):
+        return None
+    g = d.geom()
+    ctx = {'actor': 'neighbor'}
+    for e in ev or []:
+        if e[0] in ('GO', 'AT'):
+            obj = d.real.get(e[1], e[1]) if len(e) > 1 and e[1] else None
+            p = g.point(obj, 'neighbor') if obj else None
+            ctx['pos'] = (g.room_of(obj), p[0], p[1]) if p is not None else None
+        else:
+            _station_parts(d, [e], ctx)
+    start = ctx.get('pos')
+    walks = 0
+    for e in evr:
+        if e[0] == 'GO' and len(e) > 1 and e[1]:
+            obj = d.real.get(e[1], e[1])
+            if ctx.get('pos') is None:
+                return None
+            t, pos = walk_span(g, ctx['pos'], obj, data=d)
+            if t is None:
+                return None
+            walks += t
+            ctx['pos'] = pos
+        else:
+            _station_parts(d, [e], ctx)
+    end = ctx.get('pos')
+    dep = None
+    if end is not None and start is not None and (end[1], end[2]) != (start[1], start[2]):
+        dep = (end[1], end[2] - g.floor(end[0]))
+    return fl[-1][0] - shout + walks, dep
+
+
+def _busy_until(d, ev, actor, own=None, walked=True):
+    """the tick of his flow's clock the co-actor's queue is busy until
+    with a job his step has put on it (an `O` element of hers: 214's pistol
+    step builds the Mother's deck chair `die`, 125 ticks, with his own
+    sequence and pushes both as it ends — its first update the step's
+    first element's tick), None without one"""
+    fl = _flow(d, ev, own, walked)
+    start = next((t for t, kind, _x in fl if kind in ('part', 'instant')), None)
+    out = None
+    for e in ev or []:
+        if e[0] != 'ODO':
+            continue
+        names = [x for x in e[1] if not str(x).startswith('$')]
+        if len(names) < 2:
+            continue
+        r = d._record(names[0], names[1], actor)
+        if r is None or r[1].get('actor') != actor:
+            continue
+        t = d.action_ticks(names[0], names[1], actor)
+        if t is not None and start is not None:
+            out = max(out or 0, start + t)
+    return out
+
+
 def _hit_run(n, d, ev, actor, spec):
     """(ticks of her hideout's `leave`, ticks of her GoTo's movement and the
     two to the fight's first update) for HIT_FROM: her GoTo's route leaves
@@ -2005,13 +2085,16 @@ def _hit_run(n, d, ev, actor, spec):
     g = d.geom()
     q = _leave_place(g, d, hideout, actor)
     # where his flow leaves him: its GoTo's hotspot and the translations
-    # after it (_flow's tracking)
+    # after it (_flow's tracking; a DoAction the walker could not name
+    # taken as moving him nowhere: 214's shower step)
     ctx = {'actor': 'neighbor'}
     for e in ev or []:
         if e[0] in ('GO', 'AT'):
             obj = d.real.get(e[1], e[1]) if len(e) > 1 and e[1] else None
             p = g.point(obj, 'neighbor') if obj else None
             ctx['pos'] = (g.room_of(obj), p[0], p[1]) if p is not None else None
+        elif e[0] == 'DO' and len([x for x in e[1] if not str(x).startswith('$')]) < 2:
+            continue
         else:
             _station_parts(d, [e], ctx)
     his = ctx.get('pos')
@@ -3079,18 +3162,20 @@ def code_stays_tricked(n):
                                   'repair': round((crepair + wk) / 12.0, 2) if crepair is not None else None,
                                   'cont': round(cstand / 12.0, 2) if cstand is not None else None})
                         if clevel is not None and clevel >= 0 and crepair is None and nxc is not None:
-                            # the step the reaction's hands on to repairs:
+                            # the steps the reaction hands on to before the
+                            # lap resumes restore the station (_restore):
                             # 204's rickshaw (0x10032b6f's SHOUT, then
                             # 0x1003250a: the GoTo to the manipulated
-                            # rickshaw, its `repair` and the switch back) —
-                            # as a tricked step's off-lap handover (below)
-                            evr, _nr = run_step(lvc, nxc, dict(byi), unknown=1, streq=1)
-                            _s, _l, crepair, _c = _step_parts_split(d, evc + [('STEP',)] + evr)
-                            if crepair is not None and any(
-                                    e2[0] == 'DO' and len(e2[1]) > 1 and e2[1][1] == 'repair' for e2 in evr):
-                                wk, dep = _repair_walk(n, d, ev2 + evc + evr)
-                                e['repair'] = round((crepair + wk) / 12.0, 2)
-                                e['tail'] = _secs(_shout_tail(d, evc + [('STEP',)] + evr))
+                            # rickshaw, its `repair` and the switch back),
+                            # 214's pistol (0x1003b328's SHOUT, then
+                            # 0x1003b0b5: the walk to the pistol on the
+                            # ground and its `use`, and 0x1003adf2: back to
+                            # the stand, its `give` and the switch back)
+                            rs = _restore(n, d, lvc, nxc, dict(byi), ev2, evc)
+                            if rs is not None:
+                                e['repair'], e['tail'] = _secs(rs[0]), 0.0
+                                if rs[1] is not None:
+                                    e['fix_depart'] = rs[1]
                         # the scene across the tricked step and its reaction's
                         e['scene'] = _scene_secs(_scene_span(
                             d, ev2 + [('STEP',)] + evc, own_i,
@@ -3146,6 +3231,12 @@ def code_stays_tricked(n):
                                         post = endp + 2 + (pend - first)
                                 hr = HIT_FROM.get(n, {}).get(item)
                                 hrun = _hit_run(n, d, ev2, actor, hr) if hr is not None else None
+                                busy = _busy_until(d, ev2, actor, own_i, LAP_WALKS.get(n, {}).get(
+                                    lap[rows_v[0] if prefix else i][0], True))
+                                if post is not None and busy is not None and busy + 1 > post + 2:
+                                    # her queue busy with his step's job for
+                                    # her: her GoTo after it
+                                    post = busy - 1
                                 if post is not None and hrun is not None:
                                     # her way out of her hideout, then her
                                     # run to him (PCHitAfter, then PCHitRun)

@@ -2724,7 +2724,21 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   leaves it first (its `leave`, 17 ticks, to its mother_out) — HIT_FROM
   -> PCHitAfter 1.5 (0.08), PCHitRun 5.0: E10's fight icon (197.5) to the
   Fifi icon of his next station (210.7) 13.2 s, the port's 13.5 (11.8
-  before). Open: 207's shell — the `shell_crayfish` on her mat posts
+  before). And 214's pistol: his tricked step builds the Mother's deck
+  chair `die` (125 ticks) with his own sequence and pushes both as it
+  ends, so her queue is busy until 26 ticks after his stand; the `crash`
+  his `use` posts her runs 0x1003a21c after it — gait 2 (0x1003a27f), the
+  chair's `leave` (17 ticks) and her run to him (_busy_until, HIT_FROM ->
+  PCHitAfter 3.67, PCHitRun 1.42). After his SHOUT (0x1003b328) the steps
+  off the lap restore the station before the hatch's (0x1003a4fe): the
+  walk to the pistol on the ground and its `use` (0x1003b0b5, the
+  Mother's `standup`), back to the stand, its `give` and the switch back
+  (0x1003adf2) — lap_model_s2._restore reads the steps a reaction hands
+  on to until the lap resumes, 204's rickshaw repair among them ->
+  PCFixSeconds 6.08. E14 at 1 fps: her `die` in the chair to ~259.6, up
+  at ~261, the fight ~262-265.5, the bubble back on the pistol at 268.5
+  (the model's 268.4) and on the shower at 274.5 (274.4); the port had
+  gone on 5.9 s sooner. 214's plan ends 2.8 s later, at 100. Open: 207's shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
   takes the point 50 px beside him at his y (1267/575, the left side for
