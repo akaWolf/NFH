@@ -1927,8 +1927,11 @@ HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')},
             # 214's pistol: the Mother in her deck chair, her step
             # 0x1003a21c sets gait 2 (0x1003a27f) — the chair's `leave`, 17
             # ticks (and first its `die` his step has put on her queue:
-            # _busy_until)
-            214: {'Pistol': ('topright_deckchair', 'mr')}}
+            # _busy_until); 214's shower: Olga in the guarded shower, her
+            # step 0x1003bf93 sets gait 2 (0x1003c035) — its `leave`, 39
+            # ticks
+            214: {'Pistol': ('topright_deckchair', 'mr'),
+                  'Shower': ('bottomleft_shipshower_guarded', 'mr')}}
 # ... and her own steps before her GoTo to the object her action is on:
 # {level: {item: (the actor, her steps, her gait, the object, his part that
 # posts her behaviour)}} — 207's castle over the hedgehog's towel: the

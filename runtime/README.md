@@ -815,7 +815,9 @@ predicate, then the all-tricks win.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
-  by their share of its length, up to the hit's stopping distance).
+  by their share of its length, up to the hit's stopping distance); where
+  the mobile scene has her in reach already the hit waits those seconds
+  (214's Olga out of the shower).
 - **The PC profile's per-record coins** (`Game.pc_record_coin`,
   `World.pc_s2_credit`): a fresh linked pair whose linked record pays later
   in the step (PCLinkedPaysAt) books its first coin on its own record's

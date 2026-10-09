@@ -6999,7 +6999,15 @@ class Routine:
         maxd = self.pawn.hit_pawn_action.get('max_distance') or 0.03
         if self.pawn.zone is target_pawn.zone and \
                 abs(self.pawn.sprite.x - target_pawn.sprite.x) < maxd:
-            self._hit_pawn_arrived()
+            secs, self.pawn.pc_hit_run_secs = self.pawn.pc_hit_run_secs, None
+            if secs and self.pawn.world is not None:
+                # the PC's run from her hideout's `<actor>_out` to the point
+                # beside him where the mobile scene has her there already
+                # (214's shower: its olga_out, then 40 px along): its
+                # seconds before the hit (PCHitRun)
+                self.pawn.world.call_later(float(secs), self._hit_pawn_arrived)
+            else:
+                self._hit_pawn_arrived()
         elif target_pawn.zone is None or not self.pawn.goto_zone(
                 target_pawn.zone, target_pawn.sprite.x,
                 on_arrive=self._hit_pawn_arrived):

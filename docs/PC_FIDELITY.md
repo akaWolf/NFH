@@ -2738,7 +2738,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   PCFixSeconds 6.08. E14 at 1 fps: her `die` in the chair to ~259.6, up
   at ~261, the fight ~262-265.5, the bubble back on the pistol at 268.5
   (the model's 268.4) and on the shower at 274.5 (274.4); the port had
-  gone on 5.9 s sooner. 214's plan ends 2.8 s later, at 100. Open: 207's shell — the `shell_crayfish` on her mat posts
+  gone on 5.9 s sooner. 214's plan ends 2.8 s later, at 100. And 214's
+  shower: the bucket's crash posts Olga her fight in the guarded shower,
+  whose `leave` (39 ticks) her route plays first; her step 0x1003bf93 sets
+  gait 2 (0x1003c035) and runs her 40 px to the point beside him — HIT_FROM
+  -> PCHitAfter 3.33, PCHitRun 1.75, the hit waiting the run's seconds
+  where the mobile scene has her in reach already (Routine.run_to_hit_pawn):
+  E14's fight icon 398.0 to the wheel's 409.0, 11.0 s; the port's 11.3 (6.3
+  before). Open: 207's shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
   takes the point 50 px beside him at his y (1267/575, the left side for
