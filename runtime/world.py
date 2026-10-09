@@ -1834,6 +1834,15 @@ class Pawn:
                 # slip's side)
                 tx = visit(ap['txt']) or 0
                 dpx = visit(ap.get('dpxt'))
+                linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
+                if 'txtl' in ap and linked is not None and linked.tricked and it.tricked \
+                        and it.use_tricked_linked:
+                    # the linked variant's (PCApproach `txtl`: the visit plays
+                    # RottweilerUseLinkedTricked, TrickItem.cs:804-817 —
+                    # 209's hot shoe with the gully open, its `jump` 30 px
+                    # down into it, lap_model_s2.code_places_linked)
+                    tx = visit(ap['txtl']) or 0
+                    dpx = visit(ap.get('dpxtl'))
             self._pc_depart = (pc_ap_x(ap, it) + tx, dpx if dpx is not None else pc_ap_px(ap, it),
                                self.sprite.x, self.sprite.y, it)
         else:
@@ -4132,6 +4141,12 @@ class Routine:
             self.state = self.IDLE
             return
         if self.pawn.at_use_range(it):
+            if pcprofile.is_pc() and it.pc_approach.get(self.pawn.role):
+                # used where he stands: the PC visit's step still leaves him
+                # where its own actions put him (Pawn._pc_arrived, PCApproach
+                # per visit — 209's shoe take after the curtain, the tricked
+                # one's `burn` 69 px on, lap_model_s2.code_places_tricked)
+                self.pawn._pc_arrived(it)
             self._use()
         else:
             if self.routine_behavior is not None:
@@ -4376,6 +4391,13 @@ class Routine:
                 if r.role in ('Mother', 'Rottweiler'):
                     r.add_in_game_actions()
         tricked = it.is_tricked(self.level.items)
+        if pcprofile.is_pc() and tricked and self.role == 'Rottweiler' \
+                and 'txt' in (it.pc_approach.get('Rottweiler') or {}):
+            # the arrival read the station before RottweilerUse cleared its
+            # WasPriming (Item.cs:835): 209's shoes, primed by the put and
+            # tricked for the take — the visit's tricked departure
+            # (Pawn._pc_arrived, PCApproach `txt`)
+            self.pawn._pc_arrived(it)
         # Item.RottweilerUse opens with the raw-Tricked GotTricked mark
         # (Item.cs:836-838) — before any animation concern; the sink/valve
         # chains hang off it — and IgnoreWoodyWhenUse (cs:827-830)

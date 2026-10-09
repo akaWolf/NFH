@@ -849,7 +849,13 @@ predicate, then the all-tricks win.
   (PCHitSeconds 6.33: `puke` is posted as the puke's job ends).
 - **The PC profile's per-visit move**: PCApproach `txt` may be a list,
   one move per visit (201's soaped puddle, [200, -100], the slips' two
-  sides; `Routine._pc_arrived`).
+  sides; `Routine._pc_arrived`); `txtl`/`dpxtl` the linked variant's,
+  where the visit plays RottweilerUseLinkedTricked (209's hot shoe with
+  the gully open). A station used where he stands (`at_use_range`, no
+  walk) arrives at its PC station all the same, and a use that reads its
+  item tricked once RottweilerUseTogglesPrime's put has cleared WasPriming
+  (Item.cs:835) takes the tricked departure then (209's shoe take after
+  the curtain, `Routine._use`).
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the

@@ -1595,8 +1595,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   `<actor>_out`, not from the station's hotspot (a hideout without one
   would place him at its own position, fcn.10049a08's (0, 0): none of the
   neighbour's in a lap). Carried (lap_model_s2 `_leave_place`,
-  `code_places`, `code_places_tricked`, `TRICKED_PLACES` -> PCApproach
-  `tx`/`dpx`, `txt`/`dpxt`; world `_pc_arrived`): 212's ledge leaves the
+  `code_places`, `code_places_tricked`, `code_places_linked`,
+  `TRICKED_PLACES` -> PCApproach `tx`/`dpx`, `txt`/`dpxt`, `txtl`/`dpxtl`;
+  world `_pc_arrived`): 212's ledge leaves the
   water exit at 1155/1094, 265 px left of the cliff and 44 below the floor
   (the model's lap 128.2 s); 209's hot coal's tricked visit 293 px right
   of the coal (read as 0 until then); 212's tricked bench 75 px right of
@@ -2745,7 +2746,24 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   -> PCHitAfter 3.33, PCHitRun 1.75, the hit waiting the run's seconds
   where the mobile scene has her in reach already (Routine.run_to_hit_pawn):
   E14's fight icon 398.0 to the wheel's 409.0, 11.0 s; the port's 11.3 (6.3
-  before). Open: 207's shell — the `shell_crayfish` on her mat posts
+  before). And 209's hot shoe: the take step 0x10020806 leaves the curtain
+  and, with the coal in the shoes (its PRESENT test's other branch), plays
+  the `burn` (+70/-15) and the gully's `jump` — 0/0 alone, +30 into the
+  open gully (its IsVariant, the drain's linked trick) — so his walk to
+  the coal leaves 874/422 or 874/452, not the shoe mat's 804/437
+  (code_places_tricked through the trick's own objects, code_places_linked
+  -> PCApproach `txt`/`dpxt` per visit, `txtl`/`dpxtl`). The port had it
+  twice off: the mobile takes the shoes where he stands (no arrival, the
+  put's departure kept) and reads the shoes untricked until RottweilerUse
+  clears the put's WasPriming (Item.cs:835) — the in-place use now arrives
+  at its station and the use re-reads the tricked departure. E09's coal
+  icon 152.0 to the coal's coin 160.25, 8.25 s; the port's 8.17 (9.17
+  before); 209's plan ends 1.1 s sooner, at 100. The same two readings
+  carry 201: Olga eats at the buffet where she stands (her step 0x1002abfa
+  GoTo's the buffet over and over), so her run to the fight leaves its
+  hotspot (585/-35), not her level.xml start (633/+13) — 201's plan 0.2 s
+  later, at 100 —, and the soaped puddle's crash_short leaves him at its
+  `txt` +200 (read as the untricked +80 until then). Open: 207's shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
   takes the point 50 px beside him at his y (1267/575, the left side for

@@ -478,6 +478,7 @@ def approaches(n):
     tricked = S.code_moves_tricked(n)
     places = S.code_places(n)
     places_t = S.code_places_tricked(n)
+    places_l = S.code_places_linked(n)
     out = []
     for pid, o in sorted(raw['objects'].items(), key=lambda kv: int(kv[0])):
         d = o.get('data') or {}
@@ -542,13 +543,34 @@ def approaches(n):
                 pxs = per[role]['px'] if isinstance(per[role]['px'], list) else [per[role]['px']] * len(dps)
                 if any(a != b for a, b in zip(dps, pxs)):
                     per[role]['dpx'] = dps[0] if one else dps
-            if role == 'Rottweiler' and name in places_t:
-                # ... and after a tricked visit (209's hot coal: out 293 px on)
-                q = places_t[name]
+            for src, kx, kp in ((places_t, 'txt', 'dpxt'), (places_l, 'txtl', 'dpxtl')):
+                if role != 'Rottweiler' or name not in src:
+                    continue
+                # ... and after a tricked visit (209's hot coal: out 293 px
+                # on), per visit where the station has several (209's hot
+                # shoe: the second's, 69 px on and 53 up; the untricked
+                # visit's own elsewhere) — `txtl` its linked variant's (the
+                # shoe with the gully open: 23 up, in it)
+                q = src[name]
                 if not isinstance(q, list):
                     x0 = per[role]['x'][0] if isinstance(per[role]['x'], list) else per[role]['x']
-                    per[role]['txt'] = q[0] - x0
-                    per[role]['dpxt'] = q[1] - g.floor(r)
+                    per[role][kx] = q[0] - x0
+                    per[role][kp] = q[1] - g.floor(r)
+                    continue
+                xs = per[role]['x'] if isinstance(per[role]['x'], list) else [per[role]['x']]
+                # (a visit without its own: the untricked visit's move — the
+                # linked variant's, the tricked one's)
+                txs = per[role].get('txt' if kx == 'txtl' and 'txt' in per[role] else 'tx', 0)
+                dps = per[role].get('dpxt' if kx == 'txtl' and 'dpxt' in per[role] else 'dpx',
+                                    per[role]['px'])
+                one = lambda v, k: (v[k % len(v)] if isinstance(v, list) else v)
+                vx = [(qk[0] - xs[k % len(xs)]) if qk is not None else one(txs, k)
+                      for k, qk in enumerate(q)]
+                vp = [(qk[1] - g.floor(r)) if qk is not None else one(dps, k)
+                      for k, qk in enumerate(q)]
+                if vx == [one(txs, k) for k in range(len(q))] and vp == [one(dps, k) for k in range(len(q))]:
+                    continue              # (where the untricked visits leave him: 202's beer mat)
+                per[role][kx], per[role][kp] = vx, vp
         obj = WOODY.get(n, {}).get(name)
         if obj is not None:
             # Woody's run up or down to the object's `woody` hotspot (his clicks

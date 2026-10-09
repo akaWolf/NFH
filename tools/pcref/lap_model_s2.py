@@ -3659,6 +3659,7 @@ def code_places_tricked(n):
     snaps = []
     steps, _loop = walk(lv, st, bytes0=LAP_BYTES.get(n), snaps=snaps)
     events = {cur: ev for cur, ev, _nxt in steps}
+    trick = tricked_presence(n)
     out = {}
     for item, (many, visits) in pairs.items():
         if any(v is None for v in visits):
@@ -3666,7 +3667,14 @@ def code_places_tricked(n):
         per = []
         for v in (visits if many else visits[:1]):
             i = max(i for i, _j, _p in v)
-            per.append(_tricked_place(n, d, g, lap, events, snaps, i))
+            q = _tricked_place(n, d, g, lap, events, snaps, i)
+            if q is None and item in trick:
+                # a trick whose own objects the step tests (the tricked
+                # presence, _tricked_run): 209's hot shoe — the coal in the
+                # shoes, the PRESENT test's other branch out of the curtain,
+                # the `burn` 70 px on and the gully's `jump`
+                q = _presence_place(n, d, g, lap, snaps, i, (item,), trick)
+            per.append(q)
         if any(x is not None for x in per):
             out[item] = per if many else per[0]
     for item, (stp, shown, hidden) in TRICKED_PLACES.get(n, {}).items():
@@ -3708,6 +3716,52 @@ def _place_of(d, g, ev):
     _station_parts(d, ev, ctx)
     pos = ctx.get('pos')
     return (pos[1], pos[2]) if pos else None
+
+
+def code_places_linked(n):
+    """{mobile item: (x, y), or a list per visit}: code_places_tricked for
+    the linked variant — the visit's step run with the mobile linked trick's
+    objects in the scene too (as code_stays_tricked's linked stand), where it
+    leaves the actor elsewhere than the item's trick alone: 209's hot shoe
+    with the gully open, its `jump` 30 px down into it (0x10020806's IsVariant
+    gully / gully_open); None for the visits where it does not"""
+    d = Data(n); g = Geometry(n)
+    lap, pairs = _paired_parts(n)
+    snaps = lap_state(n)
+    trick = tricked_presence(n)
+    alone = code_places_tricked(n)
+    out = {}
+    for item, lnk in sorted(mobile_linked(n).items()):
+        if item not in pairs or item not in alone or lnk not in trick or item not in trick:
+            continue
+        many, visits = pairs[item]
+        mine = alone[item] if many else [alone[item]]
+        per = []
+        for k, v in enumerate(visits if many else visits[:1]):
+            i = max(i for i, _j, _p in v)
+            q = _presence_place(n, d, g, lap, snaps, i, (item, lnk), trick)
+            per.append(q if q != mine[k] else None)
+        if any(x is not None for x in per):
+            out[item] = per if many else per[0]
+    return out
+
+
+def _presence_place(n, d, g, lap, snaps, i, items, trick):
+    """the placement after the lap row i's step run with the tricks of
+    `items` in the scene (tricked_presence: the objects each shows and
+    hides), where it leaves a hideout; None where the first's trick changes
+    none of the step's actions (_tricked_run) or it leaves none"""
+    lv, byi = _row_level(n, snaps, lap[i][0])
+    lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
+    if _tricked_run(n, lv, items[0], lap[i][1], trick, byi, latch=lat) is None:
+        return None
+    lv2 = Level(n)
+    lv2.present = set(lv.present)
+    for it in items:
+        shown, hidden = trick[it]
+        lv2.present = (lv2.present - hidden) | shown
+    ev2, _nx = run_step(lv2, lap[i][1], dict(byi), latch=lat)
+    return _place_of(d, g, ev2)
 
 
 def _tricked_place(n, d, g, lap, events, snaps, i):
