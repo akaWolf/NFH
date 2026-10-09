@@ -2719,6 +2719,23 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   238.5 — the jump the amounts' note had put on the awning; the bubble
   shows the fight's icon from 226.2 on, Olga coming into sight from the
   right at 234 and lifting him), the port's 17.5 (13.2 before).
+  And 210's elephant: the Mother's step 0x10018d76 sets her gait to 2
+  (0x10018dd9) and runs fcn.1000eb19 from her deck chair, so her route
+  leaves it first (its `leave`, 17 ticks, to its mother_out) — HIT_FROM
+  -> PCHitAfter 1.5 (0.08), PCHitRun 5.0: E10's fight icon (197.5) to the
+  Fifi icon of his next station (210.7) 13.2 s, the port's 13.5 (11.8
+  before). Open: 207's shell — the `shell_crayfish` on her mat posts
+  `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
+  its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
+  takes the point 50 px beside him at his y (1267/575, the left side for
+  an equal x, 0x1000e701-0x1000e70e) and walks her there whenever she is
+  not on it (fcn.100072b1 compares the points). E07 at 4 fps: she gets
+  up 193.5-194.75, comes round to his left 195.0-196.5 and fights from
+  ~196.75, 3.25 s after his stand; the port fights at once (she stands
+  within the mobile's reach), and the floor-line waypoints of
+  fcn.10009177 (down 81 px, along 50, up 25: 43 ticks) would make it 4.5
+  — the movement's waypoints for a point off the floor line, or her
+  start, not settled.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

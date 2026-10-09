@@ -1919,8 +1919,11 @@ FIGHT_BEFORE = {213: {'BoatPicnic': (0x100391cc, 'olga', ('bottomright_picnic_ma
 # kart: his crash's `use` carries behavior="hurt_neighbor" for Olga (cn_c1
 # objects.xml), her step 0x1003340b takes the manipulated rickshaw for her
 # hideout (fcn.10049168) and sets her gait to 2 (0x10033486) — the
-# rickshaw_manip's olga_out 38 px, 170 left of her seat
-HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')}}
+# rickshaw_manip's olga_out 38 px, 170 left of her seat; 210's elephant:
+# the Mother in her deck chair, her step 0x10018d76 sets gait 2 (0x10018dd9)
+# — the chair's `leave`, 17 ticks, to its mother_out
+HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')},
+            210: {'Elephant': ('pool_deckchair', 'mr')}}
 # ... and her own steps before her GoTo to the object her action is on:
 # {level: {item: (the actor, her steps, her gait, the object, his part that
 # posts her behaviour)}} — 207's castle over the hedgehog's towel: the

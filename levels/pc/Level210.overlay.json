@@ -27,7 +27,10 @@
      "Mother": 3.33
     },
     "PCHitAfter": {
-     "Mother": 0.08
+     "Mother": 1.5
+    },
+    "PCHitRun": {
+     "Mother": 5.0
     },
     "PCCreditAt": 1.83,
     "PCJingleAt": [
