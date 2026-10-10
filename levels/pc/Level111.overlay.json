@@ -1231,7 +1231,12 @@
       420,
       "lir"
      ]
-    }
+    },
+    "PCToolPoint": [
+     310,
+     420,
+     "lir"
+    ]
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
   },

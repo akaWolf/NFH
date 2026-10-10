@@ -2788,7 +2788,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   mobile place mapped to 244) — his walk to the vacuum 28 ticks, to the
   carpet 8. The drier's fire to the vacuum's 25.9 s against E11's 26.3
   (25.4 before), the vacuum to the marbles 27.4 against 27.6 (27.2); 107's
-  plan 0.8 s sooner, 111's 0.8 s later, both at 100. Open: 207's
+  plan 0.8 s sooner, 111's 0.8 s later, both at 100. And 110's
+  extinguisher the same way: the fuel beer's case 8 list goes on after the
+  fire with the GOTO to bed/extinguisher (0x460083) and case 9 walks back
+  with it to bal/barbecue_burn (0x4602f6: 485/420, 20 px below the
+  barbecue's own hotspot) — pc_walks_s1 REACTION_TARGETS and TOOL_TARGETS
+  -> PCWalkPoint, PCToolPoint (the point a carried tool's use walks to,
+  `Pawn._pc1_item_point`; the mobile's walk goes to the item it fixes, the
+  fuel beer) —; and the plant spray after it, used where the mobile stands
+  him, is case 12's GOTO to bal/plant (0x4609e2) from the burnt barbecue's
+  point, 3 px along and 20 up, 8 ticks (`Routine._pc1_inplace_walk`: a
+  station used in place whose PC point is off his; a station's own visit
+  again stays — 105's piano replayed after its repair, case 4's ENTER finds
+  him seated). E10: the fuel beer to the extinguisher 14.7 s against 14.9
+  (14.35 before), the extinguisher to the spray 15.5 against 15.5 (14.8);
+  the spray to the slip 17.1 against 16.6 — the slip's place the player's
+  banana. Open: 207's
   shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601

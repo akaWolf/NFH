@@ -2198,6 +2198,15 @@ class Pawn:
         the PC's station lies in another room than the item's zone (the leg is
         then the mobile's own, mapped into its room)"""
         p = it.pc_walk.get(self.role) if it is not None else None
+        tool = self.fixing_item
+        if it is not None and tool is not None and tool.pc_tool_point and it is not tool:
+            # carrying the tool: its case walks him with it to its own point
+            # before the use there (PCToolPoint: 110's extinguisher to
+            # bal/barbecue_burn, 20 px below the barbecue's hotspot — case
+            # 9's GOTO, 0x4602f6; the mobile's walk goes to the item it
+            # fixes, 110's fuel beer); the walk back to give it is the
+            # tool's own (111's vacuum)
+            p = tool.pc_tool_point
         if not p:
             return None
         if isinstance(p[0], list):
@@ -4174,6 +4183,8 @@ class Routine:
                 # per visit — 209's shoe take after the curtain, the tricked
                 # one's `burn` 69 px on, lap_model_s2.code_places_tricked)
                 self.pawn._pc_arrived(it)
+            if pcprofile.is_pc() and not self.pawn.nfh2 and self._pc1_inplace_walk(it):
+                return
             self._use()
         else:
             if self.routine_behavior is not None:
@@ -4197,6 +4208,38 @@ class Routine:
             if not self.pawn.goto_item(it, on_arrive=self._use):
                 self._pending = 'advance'
                 self.state = self.IDLE
+
+    def _pc1_inplace_walk(self, it):
+        """the PC profile's Season 1: a station used where he stands whose PC
+        point is off the one he stands on — its case's GOTO walks there (110's
+        plant spray after the extinguisher: case 12's GOTO to bal/plant,
+        0x4609e2, from bal/barbecue_burn — 3 px along, 20 up): he stands the
+        walk's ticks (Pawn.pc1_goto_ticks), then the use. A station's own
+        visit again goes on where he stands (105's piano after its repair at
+        the smeared score: case 4's ENTER finds him seated, no GOTO). True
+        when held"""
+        p = self.pawn
+        if self.log and self.log[-1][0] == it.name:
+            return False
+        pt = p._pc1_item_point(it)
+        here = p._pc1_here()
+        r = getattr(p.zone, 'pc_walk_room', None) if p.zone is not None else None
+        if pt is None or here is None or r is None or tuple(here) == tuple(pt):
+            return False
+        got = p.pc1_goto_ticks([pt[0], pt[1], r['room']])
+        if not got or not got[0]:
+            return False
+        ticks, to = got
+        self.state = self.USING
+        self.timer = 0.0
+        p._stand()
+
+        def go():
+            p.pc1_stand_at(to)
+            self._use()
+        self.pc_hold = ticks / pcprofile.TICKS_PER_SECOND
+        self.pc_hold_cb = go
+        return True
 
     def _use(self):
         it = self.item

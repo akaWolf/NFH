@@ -33,7 +33,10 @@ The overlay entries, in px of the PC scene (the room's own coordinates):
                           anc/fro's `enter` 18 where a right door has 15, fro/anc's
                           `leave` 23 or 25 where a left door has 24 (107 and 112
                           the type's)
-  items      PCWalkPoint  {'Rottweiler': [x, y, room], 'Woody': [x, y, room]}: the
+  items      PCToolPoint  [x, y, room]: where a fixing tool's case walks it to
+                          before its use there (TOOL_TARGETS: 110's extinguisher to
+                          bal/barbecue_burn, 111's vacuum to lir/dirtycarpet)
+             PCWalkPoint  {'Rottweiler': [x, y, room], 'Woody': [x, y, room]}: the
                           hotspot of the PC object the neighbour's station walks to
                           (the lap model's GOTO of the station tools/pcref/
                           pc_durations.py pairs the item with) — a list of them
@@ -176,7 +179,18 @@ def station_targets(n):
 # GOTO to lir/vacuum (0x45654d, fcn.00479da0) for the take, case 22's to
 # lir/dirtycarpet (0x456704, fcn.0044ac80 — the GOTO step itself, which
 # fcn.00479da0 makes and pushes) before its vacuum_hole
-REACTION_TARGETS = {111: {'Vacuum': 'lir/vacuum', 'DirtyCarpet': 'lir/dirtycarpet'}}
+REACTION_TARGETS = {111: {'Vacuum': 'lir/vacuum', 'DirtyCarpet': 'lir/dirtycarpet'},
+                    # 110's burning barbecue: the fuel beer's case 8 list goes
+                    # on after the fire with the GOTO to bed/extinguisher
+                    # (0x460083, fcn.0044ac80)
+                    110: {'FireExtinguisher': 'bed/extinguisher'}}
+# the object a fixing tool's case walks it to before its use there (the
+# mobile's RoutineActionUseFixingItem walk): {level: {tool item: PC object}}
+# — 110's extinguisher: case 9's take, then its GOTO to bal/barbecue_burn
+# (0x4602f6), 20 px lower than the barbecue's own hotspot; 111's vacuum:
+# case 22's GOTO to lir/dirtycarpet (0x456704) -> PCToolPoint
+TOOL_TARGETS = {110: {'FireExtinguisher': 'bal/barbecue_burn'},
+                111: {'Vacuum': 'lir/dirtycarpet'}}
 
 
 def station_vias(n):
@@ -325,6 +339,10 @@ def level_data(n):
         p = L.object_point(obj)
         if p is not None and item not in points:
             points[item] = {'Rottweiler': list(p[1:]) + [p[0]]}
+    for item, obj in TOOL_TARGETS.get(n, {}).items():
+        p = L.object_point(obj)
+        if p is not None:
+            points.setdefault(item, {})['tool'] = list(p[1:]) + [p[0]]
     for item, obj in woody_targets(n).items():
         p = L.object_point(obj, actor='woody')
         if p is not None:
@@ -369,7 +387,7 @@ def woody_start(n):
 def write(n, rooms, doors, points, own, vias):
     p = os.path.join(ROOT, 'levels', 'pc', scene_name(n) + '.overlay.json')
     ov = json.load(open(p))
-    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia', 'PCStart')
+    keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia', 'PCStart', 'PCToolPoint')
     for e in ov['patches']:
         for k in keys:
             (e.get('set') or {}).pop(k, None)
@@ -391,7 +409,11 @@ def write(n, rooms, doors, points, own, vias):
                               "from its type's, pcprofile.DOOR_TICKS)"})
     for item, v in sorted(points.items()):
         kind = pc_durations.item_kind(n, item) or item_kind_hide(n, item) or 'TrickItem'
-        st = {'PCWalkPoint': v}
+        v = dict(v)
+        tool = v.pop('tool', None)
+        st = {'PCWalkPoint': v} if v else {}
+        if tool is not None:
+            st['PCToolPoint'] = tool      # TOOL_TARGETS: the tool's use walks there
         if item in vias:
             st['PCWalkVia'] = vias[item]
         ov['patches'].append({'object': item, 'component': kind, 'set': st,

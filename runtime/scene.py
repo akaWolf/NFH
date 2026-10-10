@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk', 'pc_walk_via', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
+                 'pc_hideout', 'pc_walk', 'pc_walk_via', 'pc_tool_point', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
@@ -429,6 +429,10 @@ class Item:
         # station's own (PCWalkVia: 107's dove before the painting,
         # tools/pcref/pc_walks_s1.py station_vias)
         self.pc_walk_via = d.get('PCWalkVia') or {}
+        # ... and a fixing tool's case's walk with it to its use (PCToolPoint:
+        # 110's extinguisher to bal/barbecue_burn, tools/pcref/pc_walks_s1.py
+        # TOOL_TARGETS)
+        self.pc_tool_point = d.get('PCToolPoint')
         # the PC profile's Season 1 look reaction and repair (tools/pcref/
         # pc_reactions.py): the walk-by's CreateGoToObjXJob to the tricked
         # object's hotspot x (fcn.0047a4a0), and the repair's walk to that

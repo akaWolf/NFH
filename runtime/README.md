@@ -866,6 +866,14 @@ predicate, then the all-tricks win.
   that goes on with its path leaves it to the path's legs); and the
   carpet's case sends him to the vacuum first (Level_Laundry's case 21),
   not to the carpet.
+- **The PC profile's Season 1 tools and in-place stations**: a carried
+  fixing tool's walk to its use goes to the tool's PCToolPoint
+  (`Pawn._pc1_item_point`: 110's extinguisher to bal/barbecue_burn, where
+  the mobile's walk heads for the fuel beer it fixes; the walk back to give
+  a tool is the tool's own); a station used where the mobile stands him
+  whose PC point is off his stands the PC GOTO's ticks first
+  (`Routine._pc1_inplace_walk`: 110's plant spray after the extinguisher),
+  a station's repeat visit not (105's piano after its repair).
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
