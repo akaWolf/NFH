@@ -7654,6 +7654,13 @@ class Routine:
             if self.pc_icon_at <= 0.0:
                 self.pc_icon_at = 0.0
                 self.pc_bubble_next = self._pc_next_icon()
+        it = self.item
+        if self.state == self.USING and self.pc_bubble_next is None and it is not None \
+                and getattr(it, 'pc_icon_clip', None) and not self._pc_use_tricked:
+            sp = self.pawn.anim.sprite
+            cur = sp.anims[sp.current].name if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
+            if cur == it.pc_icon_clip:
+                self.pc_bubble_next = self._pc_next_icon()
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,

@@ -3002,9 +3002,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   Routine.pc_icon_at / pc_bubble_next, the HUD's bubble): 101's and 102's
   sofa 0.5 s, 103's mailbox 0.25, 106's towel 0.58, 110's table 0.92, a
   tick at 105's piano, 107's wheel and 113's ladder — 101's binoculars
-  icon at 18.58 s against E01's 18.47. (Season 2's hideout leaves are not
-  one rule: 207's pool and 209's curtain show the next icon before the
-  leave, 212's bench and 213's picnic after it — left as they are.)
+  icon at 18.58 s against E01's 18.47. Season 2 the same way where the
+  next step's route plays the leave (the step's icon, fcn.100422a5,
+  before its GoTo): lap_model_s2.ROUTE_LEAVES / code_icon_leads — in the
+  walked laps 208's platform alone, 2.92 s (its second visit's shoe
+  machine icon at 96.6 s against E08's 95.9) — and 207's pool, timed per
+  clip, from its leave's clip on (PCIconClip PoolGetOut: the bar icon at
+  18.15 against E07's 18.4); a step that plays its own leave (E6c2e: 212's
+  bench, 213's picnic) shows the next icon after it, as the port did.
+  Open: 208's first platform visit, from the level's start, has the shoe
+  machine's icon at 5.4 s where the port's comes at 10.4; 209's Taj Mahal
+  span reads 1 s over E09's and the hot shoe's after it 1 s under (its
+  curtain's leave is the Taj step's own, E6c2e).
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

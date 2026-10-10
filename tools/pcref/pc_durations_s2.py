@@ -801,6 +801,19 @@ def main(argv):
                 for item, secs in behaviour_at_end(n).items():
                     _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
                 write_tricked_keys(ov, n, clips)
+                # the next station's icon before a route's leave of the
+                # hideout a visit ends in (lap_model_s2.code_icon_leads: 208's
+                # platform) — or, timed per clip, at the clip of that leave
+                # (HIDEOUT_AFTER: 207's board, the pool's `leave`)
+                ov['patches'] = _strip_key(ov['patches'], 'PCIconLead')
+                ov['patches'] = _strip_key(ov['patches'], 'PCIconClip')
+                for item, lead in lap_model_s2.code_icon_leads(n).items():
+                    _set_key(ov['patches'], item, 'PCIconLead', lead)
+                for item, hid in lap_model_s2.HIDEOUT_AFTER.get(n, {}).items():
+                    clip = next((c for c, v in CLIPS.get(n, {}).get(item, {}).items()
+                                 if isinstance(v, tuple) and tuple(v) == (hid, 'leave')), None)
+                    if clip is not None:
+                        _set_key(ov['patches'], item, 'PCIconClip', clip)
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])

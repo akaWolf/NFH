@@ -1135,9 +1135,11 @@ def lap_steps(n):
         hid = ctx.pop('route_leave', None)
         if hid and out:
             # the route's leave of the hideout the last step left him in
-            # (station_ticks): its time and placement the last row's
+            # (station_ticks): its time and placement the last row's — after
+            # this step's icon (fcn.100422a5 before its GoTo: ROUTE_LEAVES)
             out[-1][4].append((hid, 'leave', d.action_ticks(hid, 'leave')))
             LAP_LEAVES.setdefault(n, {})[out[-1][0]] = hid
+            ROUTE_LEAVES.setdefault(n, {})[out[-1][0]] = hid
         out.append((i, cur, (ic[0][0] if ic and ic[0] else '-'), objs, parts))
         LAP_WALKS.setdefault(n, {})[i] = ctx.get('walks', False)
         LAP_GOS.setdefault(n, {})[i] = _lap_target(ev, ctx.get('inside_before'))
@@ -1194,6 +1196,9 @@ LAP_WALKS = {}
 # {level: {lap row: the hideout its step leaves}} (lap_steps): the leave places
 # him at the hideout's `<actor>_out` (_leave_place, code_places)
 LAP_LEAVES = {}
+# {level: {lap row: the hideout the next step's route leaves}} (lap_steps):
+# that leave plays after the next step's icon (PCIconLead)
+ROUTE_LEAVES = {}
 # {level: {lap row: the object its step walks to}} (lap_steps, _lap_target): a
 # visit whose parts span steps walks between them (_visit_walks, code_places)
 LAP_GOS = {}
@@ -1929,6 +1934,33 @@ def code_moves(n):
 # 17 ticks) the bar step's route plays before the walk from its
 # neighbor_out, 432/286 (the board's hotspot 649/236)
 HIDEOUT_AFTER = {207: {'PoolBoard': 'pool_pool'}}
+
+
+def code_icon_leads(n):
+    """{mobile item: [seconds per visit]}: the route leave that ends a visit
+    (ROUTE_LEAVES: the next step's GoTo leaves the hideout, after that step's
+    icon — fcn.100422a5 comes before its fcn.1000e3e0) — the next station's
+    icon is up that far before the stay's end (PCIconLead); items with none
+    left out"""
+    lap, pairs = _paired_parts(n)
+    d = Data(n)
+    rl = ROUTE_LEAVES.get(n, {})
+    out = {}
+    for item, (many, visits) in pairs.items():
+        if any(v is None for v in visits):
+            continue
+        per = []
+        for v in visits:
+            i = max(i for i, _j, _p in v)
+            row = lap[i]
+            parts = row[4]
+            hid = rl.get(row[0])
+            last = parts[-1] if parts else None
+            per.append(round(last[2] / 12.0, 3) if hid and last and last[0] == hid
+                       and last[1] == 'leave' and last[2] else 0.0)
+        if any(per):
+            out[item] = per if many else per[0]
+    return out
 
 
 def code_places(n):

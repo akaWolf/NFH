@@ -43,7 +43,8 @@
     "PCHitSeconds": {
      "Mother": 3.33
     },
-    "PCJingle": true
+    "PCJingle": true,
+    "PCIconClip": "PoolGetOut"
    }
   },
   {
