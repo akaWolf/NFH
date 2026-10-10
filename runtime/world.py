@@ -3590,6 +3590,7 @@ class Routine:
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
+        self.pc_pair_pending = None      # a partner's reaction the shared step plays after the next station (PCPairNext)
         self._pc_wait = None             # the PC profile's held clip of this use (_pc_clip_use)
         self._pc_wait_spent = None       # the action index whose hold has released (_pc_wait_tick)
         self._pc_credit = None           # the PC profile's early credit of this tricked use (PCCreditInClip)
@@ -5533,7 +5534,16 @@ class Routine:
             # Drawing (L107) and the Rake (L202) go angry like any TrickItem
             if it.kind in TRICK_KINDS and it.is_tricked(self.level.items):
                 target = self._tricked_item(it)
+                if target is not None and self.pc_pair_pending is not None \
+                        and it.name == self.pc_pair_pending.pc_pair_next:
+                    # the partner tricked meanwhile: the shared step's pair
+                    # reaction plays here (PCPair); the deferred partner's own
+                    # ends silently, its repair with it
+                    p, self.pc_pair_pending = self.pc_pair_pending, None
+                    w._angry_without_animations(self.pawn, p, None, None, self.pawn.nfh2)
                 if target is not None and self._pc_defer_angry(it, target):
+                    return
+                if target is not None and self._pc_pair_defer(it, target):
                     return
                 hook = getattr(w.level_script, 'pc_trick_hook', None)
                 if target is not None and hook is not None and hook(self, it, target):
@@ -5542,6 +5552,16 @@ class Routine:
                     self._angry_target = target
                     w.play_angry(self.pawn, target, on_done=self._angry_done)
                     return
+        if self.pc_pair_pending is not None and self.role == 'Rottweiler' and it is not None \
+                and w is not None and it.name == self.pc_pair_pending.pc_pair_next:
+            # the shared step's partner alone: after this station's own
+            # part, its SHOUT and repair (PCPairNext: 203's chili paper — the
+            # flush, then SHOUT 0 and the repair, 0x10033e20)
+            target, self.pc_pair_pending = self.pc_pair_pending, None
+            target.pc_pair_play = True
+            self._angry_target = target
+            w.play_angry(self.pawn, target, on_done=self._angry_done)
+            return
         if it is not None and it.pc_masked:
             it.pc_masked = False           # the untricked visit is over
         self._action_stopped()
@@ -5564,6 +5584,30 @@ class Routine:
         if not target.pc_credited:
             w.pc_s2_credit(self.pawn, target)
         self.pc_return = target
+        self._action_stopped()
+        self._pending = 'advance'
+        self._check_parked_runs()
+        return True
+
+    def _pc_pair_defer(self, it, target):
+        """a station of a step two stations share, tricked alone (PCPairNext:
+        203's chili paper, whose step 0x10033e20 plays the flush after the
+        `shit_chili` and then SHOUT 0 and the repair): the coin now, the
+        reaction after the partner station's visit that ends the step —
+        where the mobile's AngryWithoutAnimations pays silently. The
+        partner tricked too plays the pair's (PCPair) at its own stop"""
+        if not pcprofile.is_pc() or not pcprofile.SEASON2 or target is not it \
+                or not it.pc_pair_next or not self.actions:
+            return False
+        nxt = self.actions[self._next_index(self.index)]
+        partner = self.level.items.get(nxt.get('item')) if nxt.get('item') is not None else None
+        if partner is None or partner.name != it.pc_pair_next \
+                or partner.is_tricked(self.level.items):
+            return False
+        w = self.pawn.world
+        if not target.pc_credited:
+            w.pc_s2_credit(self.pawn, target)
+        self.pc_pair_pending = target
         self._action_stopped()
         self._pending = 'advance'
         self._check_parked_runs()
@@ -9054,8 +9098,9 @@ class World:
                 pawn.can_decrease_angry = False
                 routine.move_to_toilet(item.cause_sickness)
 
+        pair_play, item.pc_pair_play = item.pc_pair_play, False
         if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0) \
-                and fire_pre + fire_post > 0.0:
+                and not pair_play and fire_pre + fire_post > 0.0:
             # the PC fire step's own ticks before the stop (_s1_fire_stands:
             # a step without a shout — 102's laxative beer, flags 3)
             pawn._stand()
@@ -9065,7 +9110,8 @@ class World:
             self.call_later(fire_pre + fire_post,
                             lambda: self._angry_without_animations(pawn, item, on_done, routine, nfh2))
             return
-        if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0):   # cs:719-736
+        if item.angry_without_animations and not (pc_s1 and pc_shout > 0.0) \
+                and not pair_play:                  # cs:719-736
             self._angry_without_animations(pawn, item, on_done, routine, nfh2)
             return
         affected = self.pawn_by_pid(item.pawn_to_affect) \

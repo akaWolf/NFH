@@ -2612,11 +2612,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   repair 1.92}: `World.play_angry` takes it when his use before this one
   was the tricked paper); the flush to the melon 35.0 s against E03's
   34.75 (30.0 before), the melon to the bicycle 17.5 against 17.2. 202's
-  plan ends 5.0 s earlier, 203's 5.0 later, both at 100. Open: the paper
-  alone — its step plays the flush after the chili paper and then SHOUT 0
-  and the repair, where the port's paper, AngryWithoutAnimations, pays
-  silently and its untricked flush visit plays no reaction (no plan
-  leaves the rice chute untricked). The same evening E12 (212): the whip
+  plan ends 5.0 s earlier, 203's 5.0 later, both at 100. The paper alone
+  (carried 2026-09-30): its step plays the flush after the chili paper and
+  then SHOUT 0 and the repair (22 ticks), where the port's paper,
+  AngryWithoutAnimations, paid silently and its untricked flush visit
+  played no reaction — the paper now pays at its record and its reaction
+  waits for the flush's visit (PCPairNext, `Routine._pc_pair_defer`: its
+  angry set at SHOUT 0's pace, FixMid for the repair; the flush tricked
+  meanwhile plays the pair's). No plan of the sweep leaves the rice chute
+  untricked; the 203 plan without its flush trick shows the paper's stand
+  (15.1 s, the coin at 11.2), the flush (5.0) and the reaction. The same evening E12 (212): the whip
   pays with the spikes open (the crowbar's game, the mobile's linked
   WhipStonePlate — a SearchItem, so no combination named its scene):
   the whip step (0x100367f9) tests midright_spikes_open and plays the

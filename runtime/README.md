@@ -874,6 +874,13 @@ predicate, then the all-tricks win.
   whose PC point is off his stands the PC GOTO's ticks first
   (`Routine._pc1_inplace_walk`: 110's plant spray after the extinguisher),
   a station's repeat visit not (105's piano after its repair).
+- **The PC profile's shared step, one trick** (`Routine._pc_pair_defer`,
+  PCPairNext): a station of a step two mobile stations share, tricked
+  alone, pays at its record and plays its SHOUT and repair after the
+  partner station's visit, as the step does (203's chili paper: the flush,
+  then SHOUT 0 and the repair) — the mobile's AngryWithoutAnimations pays
+  silently; with the partner tricked too the partner's visit plays the
+  pair's reaction (PCPair).
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the
