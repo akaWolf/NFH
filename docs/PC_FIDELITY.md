@@ -2972,8 +2972,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   pillows, the give: 41, 70, 70 ticks in E06 against 39, 68, 68), -0.82
   by the hide (23.8 s); 202 -0.21..-0.37 before the player's swim.
   Season 1's: 101, 102 and 114 within 0.1-0.4 s over 120 s; 103, 106,
-  109, 110, 112 and 113 ahead by 0.3-0.6 s at 100-140 s, a tick a case
-  (runtime/README.md, "a Season 1 case runs a tick longer"); 105's first
+  109, 110, 112 and 113 ahead by 0.3-0.6 s at 100-140 s, a tick a case —
+  read on 2026-10-01 as the GOTO's done tick (runtime/README.md, "The
+  Season 1 GOTO's done tick"): with it and the world's steps five a tick
+  the bubble segments of the idle laps run 0.18 tick short of the
+  videos' a segment (32 segments, mean |d| 0.75; 0.64 and 1.00 before);
+  107's potter's wheel and statue had run 5.9 and 4.6 ticks short — the
+  case's ENTER enters the wheel (fcn.0047a0b0's variant name at 0x457c7a,
+  ENTER 0x457d22 / 0x457ec3: `sit_down` 6 ticks and its leave `get_up`
+  6, the model had taken the stool of the IsVariant before it, 2 and 1),
+  0.8 and 2.0 since — and its painting 4.6-6.5 long (the model's 216
+  ticks from the painting's icon to the camera's against E07's 208:
+  open; 105's first
   span +0.9 s (the piano from the start to the football's icon: 11.63 s
   against E05's 10.76), its later spans within 0.1 s; 104, 107, 108 and
   111 the player's from their second station on, the first within 0.2 s.

@@ -55,7 +55,7 @@ PAIRS = {
           ('PhotoAlbum', 'photo_album', 1), ('Candy', 'candy', 1), ('Pudding', 'milk_bottle', 1), ('BathTub', 'bath', 1),
           ('Towel', 'towel', 0)],
     107: [('Drawing', 'painting', 1), ('Camera', 'camera', 0), ('MagnesiumBottle', 'magnesium', 0), ('Camera', 'camera', 1),
-          ('DieselChair', 'potterswheel', 0, ('enter',)), ('DieselGenerator', 'potterswheel', 0, ('potter',)),
+          ('DieselChair', 'potterswheel', 0, ('enter',)), ('DieselGenerator', 'potterswheel', 0, ('potter+leave',)),
           ('MumStatueFootStool', 'statue', 1)],
     108: [('ToothBrush', 'toothbrush', 0), ('CoffeeMaker', 'coffee', 0), ('Shezlong', 'foldingchair', 0),
           ('WateringCan', 'ewer', 1), ('Plant', 'flower', 0), ('WateringCan', 'ewer', 2)],
@@ -235,14 +235,19 @@ def main(argv):
         centers = {}
         crooms = {}
         opened = set()
-        for pr in pairs:
+        # a station split over items: its closing leave, after the next ICON,
+        # ends its last item's visit (107's wheel: the generator's, not the
+        # chair's)
+        last_of = {(pr[1], pr[2]): i for i, pr in enumerate(pairs)}
+        for i, pr in enumerate(pairs):
             item, icon, k = pr[0], pr[1], pr[2]
             share = pr[3] if len(pr) > 3 else 1
             vals = by.get(icon, [])
             if k >= len(vals):
                 print('%d: no PC station %s #%d for %s' % (n, icon, k, item)); continue
             nv = len(share) if isinstance(share, tuple) else share
-            ld = round((leads.get(icon) or [0.0] * (k + 1))[k], 3) if k < len(leads.get(icon) or []) else 0.0
+            ld = round((leads.get(icon) or [0.0] * (k + 1))[k], 3) \
+                if k < len(leads.get(icon) or []) and last_of[(icon, k)] == i else 0.0
             icon_leads.setdefault(item, []).extend([0.0] * (nv - 1) + [ld])
             first = (icon, k) not in opened
             opened.add((icon, k))

@@ -673,9 +673,11 @@
    "set": {
     "NoticeWhenWalkNearby": false,
     "PCCaseHandler": true,
-    "PCUseSeconds": 8.333
+    "PCUseSeconds": 8.333,
+    "PCCaseGoto": true,
+    "PCCaseEnter": true
    },
-   "source": "level_sofa's toilet cases (game.exe 0x470015-0x470570): the GOTO and ENTER (fcn.00479f10, enter 0: 2 ticks), the list's first update, shit_with_paper (neighbor_shit 86 frames: auto 85, 87 ticks), grabpaper (6 frames: 7), the StopMsg, LEAVE (2) — 100 ticks; with the holder empty the paper's case instead (ToiletPaper); then IsVariant(toi/toiletstuffed) at 0x4704e7 runs the look handler fcn.0047d9e0 (0x470532) — level_sofa's trigger.xml has no nearobj trigger on the bowl"
+   "source": "level_sofa's toilet cases (game.exe 0x470015-0x470570): the GOTO and ENTER (fcn.00479f10: the ENTER in the GOTO's arrival tick, PCCaseGoto, PCCaseEnter; enter 0: 2 ticks), the list's first update, shit_with_paper (neighbor_shit 86 frames: auto 85, 87 ticks), grabpaper (6 frames: 7), the StopMsg, LEAVE (2) — 100 ticks; with the holder empty the paper's case instead (ToiletPaper); then IsVariant(toi/toiletstuffed) at 0x4704e7 runs the look handler fcn.0047d9e0 (0x470532) — level_sofa's trigger.xml has no nearobj trigger on the bowl"
   },
   {
    "object": "ToiletPaper",

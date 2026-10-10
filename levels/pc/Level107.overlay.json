@@ -219,20 +219,19 @@
    "object": "DieselChair",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.25,
-    "PCCaseGoto": true,
-    "PCIconLead": 0.083
+    "PCUseSeconds": 0.58,
+    "PCCaseGoto": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.25 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.58 s"
   },
   {
    "object": "DieselGenerator",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.83,
-    "PCIconLead": 0.083
+    "PCUseSeconds": 5.25,
+    "PCIconLead": 0.417
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter 4.83 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter+leave 5.25 s"
   },
   {
    "object": "Chili",
@@ -996,11 +995,11 @@
       "bal"
      ]
     },
-    "PCFireAt": 0.333,
-    "PCUseSecondsTricked": 0.5,
+    "PCFireAt": 0.417,
+    "PCUseSecondsTricked": 0.583,
     "PCFireLead": true
    },
-   "source": "level_art's dove case (game.exe 0x45860d-0x45878f): the GoTo to bal/dove_free (its neighbor hotspot 530/420), the free dove's list — its first update, the StopMsg, the GOTO there (in place, 2 ticks), OBJ2 bal/dove_free — no far look; level_art's trigger.xml has no room trigger on the dove"
+   "source": "level_art's dove case (game.exe 0x45860d-0x45878f): the GoTo to bal/dove_free (its neighbor hotspot 530/420), the free dove's list — its first update, the StopMsg, the GOTO there (in place: the walk job inside its first update, the arrival read on its second, done on its third — 3 ticks), OBJ2 bal/dove_free — no far look; level_art's trigger.xml has no room trigger on the dove"
   },
   {
    "object": "Drawing",

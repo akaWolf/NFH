@@ -826,9 +826,10 @@
    "set": {
     "NoticeWhenWalkNearby": false,
     "PCCaseHandler": true,
-    "PCUseSeconds": 2.833
+    "PCUseSeconds": 2.833,
+    "PCCaseGoto": true
    },
-   "source": "level_piano's toilet case (game.exe 0x46ea7b-0x46ec75): the GoTo to toi/toilet, the list's first update, neighbor.puke (31 frames: auto 30, 32 ticks), the StopMsg — 34 ticks; then IsVariant(toi/toiletstuffed) at 0x46ec14 runs the look handler fcn.0047d9e0 (0x46ec54) — level_piano's trigger.xml has no nearobj trigger on the bowl"
+   "source": "level_piano's toilet case (game.exe 0x46ea7b-0x46ec75): the GoTo to toi/toilet (PCCaseGoto), the list's first update, neighbor.puke (31 frames: auto 30, 32 ticks), the StopMsg — 34 ticks; then IsVariant(toi/toiletstuffed) at 0x46ec14 runs the look handler fcn.0047d9e0 (0x46ec54) — level_piano's trigger.xml has no nearobj trigger on the bowl"
   }
  ]
 }

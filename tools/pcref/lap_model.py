@@ -476,6 +476,13 @@ def _lap(L, toks, start):
                 elif current: enter(current)
                 continue
             if kind == 'ENTER':
+                # the step's object is the one it enters, the one with an
+                # `enter` record (107's potter's wheel: the variant name of
+                # fcn.0047a0b0 at 0x457c7a, ENTER at 0x457d22 and 0x457ec3;
+                # the stools are the IsVariant's before it, 0x457cb0)
+                rec = [o for o in objs if o not in L.tricks and L.has_action(o, 'enter')]
+                if rec:
+                    obj = rec[-1]
                 # an ENTER step of the case's own (fcn.00473e20) walks nowhere:
                 # in the object already it is done on its first update (the
                 # occupied object set: 0x47388a-0x4738a4 -> 0x473a44, 105's
