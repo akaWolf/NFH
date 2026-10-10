@@ -859,6 +859,13 @@ predicate, then the all-tricks win.
   where the step's IsVariant walks to the trick's own object
   (`pc_ap_tricked`: 214's bouquet_manip, 8 px right, 5 down; the
   hatch_open_manip 5 up) — the approach and the departure both.
+- **The PC profile's Season 1 door exit** (`Pawn._enter_played`): the
+  door step places the actor at the far door's standing point (PCWalkDoor
+  `far`), where a walk the pass does not go on with starts (`_pc1_at`:
+  111's carpet case after its `search`, 107's dove on the balcony; a pass
+  that goes on with its path leaves it to the path's legs); and the
+  carpet's case sends him to the vacuum first (Level_Laundry's case 21),
+  not to the carpet.
 - **The PC profile's 205 table**: a MutexAction whose item carries a PC
   stay is timed by it and goes on (`Routine.pc_mutex_left`; the other
   role's PawnToAbortMutexOnFinish then leaves it alone): his mat, the

@@ -2548,6 +2548,18 @@ class Pawn:
         self.last_exit_door = d
         if self.role == 'Rottweiler':
             self.rott_last_door = d       # Pawn.cs:1645-1648
+        far_at = None
+        if pcprofile.is_pc() and not self.nfh2 and self.zone is not None:
+            # game.exe's door step placed him at the far door's standing
+            # point (0x474590): a walk the pass does not go on with — a room
+            # trigger's case taking him there, 111's carpet, or a path that
+            # ends at the door — leaves from it (PCWalkDoor `far` of the
+            # pair's near door; Pawn._pc1_here)
+            near = self.level.door_by_pid(d.link_to)
+            pw = near.pc_walk.get(self.role) if near is not None else None
+            if pw and pw.get('far'):
+                far_at = (tuple(pw['far']), self.zone.pid, self.sprite.x, self.sprite.y)
+                self._pc1_at = far_at
         if not hooked and self.world is not None \
                 and old_zone != (self.zone.pid if self.zone else None):
             if self.world.on_pawn_zone_changed(self, old_zone):
@@ -2556,6 +2568,11 @@ class Pawn:
                 if self.world is not None:
                     self.world.door_exit_catch()
                 return
+        if far_at is not None and self.steps and self._pc1_at is far_at:
+            # the pass goes on with its path, whose legs leave the far point
+            # already: a walk begun later (after a slip on the way) is
+            # mapped from where the pawn is by then
+            self._pc1_at = None
         if d.exit_anim and self.anim.has(d.exit_anim):
             self.anim.play_looping(d.exit_anim)
         if d.should_walk_up and self.steps:
@@ -7229,6 +7246,13 @@ class Routine:
 
                         def searched(i=it):
                             self.pawn.anim.time_scale = 1.0
+                            if self.role == 'Rottweiler' and self._fixing_dispatch(i):
+                                # case 21's GOTO takes him to the tool, not
+                                # to the carpet (0x45654d: lir/vacuum; its
+                                # take, then case 22's GOTO to lir/dirty
+                                # carpet, 0x456704) — the mobile runs to the
+                                # carpet first and dispatches there
+                                return
                             self.start_urgent(i)
                         self.pawn.anim.play_sequence(
                             [startle], on_end=searched, as_sequence=False)

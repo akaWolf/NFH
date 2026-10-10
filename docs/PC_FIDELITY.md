@@ -2770,7 +2770,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   behind the opened captain door 20 up (lap_model_s2.code_targets_tricked
   -> PCApproach `xt`/`pxt`, world.pc_ap_tricked: the walk there and the
   departure from there; the mobile never visits the opened door, its next
-  station is the wheel) — 214's plan 0.3 s later, at 100. Open: 207's
+  station is the wheel) — 214's plan 0.3 s later, at 100. And 111's
+  glued vacuum: after the carpet room's `search` (case 20) Level_Laundry's
+  case 21 sets the vacuum icon and GOTOs lir/vacuum (0x45654d), case 22
+  takes it and GOTOs lir/dirtycarpet (0x456704 — fcn.0044ac80, the GOTO
+  step itself, which fcn.00479da0 builds and pushes: tools/pcref/
+  exe_scripts.py had not read it) before its vacuum_hole; the mobile runs
+  to the carpet first and dispatches the fetch there, and the port's walks
+  kept the mobile's geometry (the stations had no PC points). Now the
+  search dispatches the fetch (the carpet's case, `Routine.on_zone_changed`),
+  the vacuum and the carpet carry their hotspots (pc_walks_s1
+  REACTION_TARGETS -> PCWalkPoint: 380/420 and 310/420), and a walk that
+  starts where a door's pass left him — the pass taken over by the room's
+  handler, or the path ending at the door — leaves the far door's standing
+  point (`_enter_played` -> `_pc1_at`: 463/370 in lir, 50 px over the
+  floor; 107's walk to the dove from the balcony's door, 402 px, where the
+  mobile place mapped to 244) — his walk to the vacuum 28 ticks, to the
+  carpet 8. The drier's fire to the vacuum's 25.9 s against E11's 26.3
+  (25.4 before), the vacuum to the marbles 27.4 against 27.6 (27.2); 107's
+  plan 0.8 s sooner, 111's 0.8 s later, both at 100. Open: 207's
   shell — the `shell_crayfish` on her mat posts
   `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
   its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601

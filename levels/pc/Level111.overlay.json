@@ -1090,6 +1090,20 @@
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
   },
   {
+   "object": "DirtyCarpet",
+   "component": "TrickItem",
+   "set": {
+    "PCWalkPoint": {
+     "Rottweiler": [
+      310,
+      420,
+      "lir"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
    "object": "Drawer",
    "component": "SearchItem",
    "set": {
@@ -1207,6 +1221,11 @@
    "component": "TrickItem",
    "set": {
     "PCWalkPoint": {
+     "Rottweiler": [
+      380,
+      420,
+      "lir"
+     ],
      "Woody": [
       380,
       420,

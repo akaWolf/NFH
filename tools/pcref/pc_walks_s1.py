@@ -170,6 +170,15 @@ def station_targets(n):
     return out
 
 
+# the GOTOs of a level class's cases off the lap — a reaction's walks to a
+# fixing tool and back to its object: {level: {mobile item: PC object}} —
+# 111's dirty carpet (the room trigger's cases, Level_Laundry): case 21's
+# GOTO to lir/vacuum (0x45654d, fcn.00479da0) for the take, case 22's to
+# lir/dirtycarpet (0x456704, fcn.0044ac80 — the GOTO step itself, which
+# fcn.00479da0 makes and pushes) before its vacuum_hole
+REACTION_TARGETS = {111: {'Vacuum': 'lir/vacuum', 'DirtyCarpet': 'lir/dirtycarpet'}}
+
+
 def station_vias(n):
     """mobile item -> the PC objects its station's walk passes through: the
     GOTOs of the level class in the station's room from the last door to the
@@ -312,6 +321,10 @@ def level_data(n):
         # (107's camera: the posing spot, then the camera) — the
         # visits cycle as PCUseSeconds' do (Routine._pc_visit_seconds)
         points[item] = {'Rottweiler': pts[0] if all(p == pts[0] for p in pts) else pts}
+    for item, obj in REACTION_TARGETS.get(n, {}).items():
+        p = L.object_point(obj)
+        if p is not None and item not in points:
+            points[item] = {'Rottweiler': list(p[1:]) + [p[0]]}
     for item, obj in woody_targets(n).items():
         p = L.object_point(obj, actor='woody')
         if p is not None:
