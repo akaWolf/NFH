@@ -15,6 +15,21 @@ PC laps after the first are often stretched by the run's tricks (angry
 bursts, toilet rushes), so the CLEAN lap is the first undisturbed one.
 Confidence: ±2 s on PC boundaries, ±1 s on mobile.
 
+> Read again 2026-09-30: a lap measured from the level start is not a whole
+> lap — the neighbour starts at or near his first station and never walks
+> back to it — so the first "lap" of 101 (32) and 102 (28) was ~10 s short
+> of the whole one (41 and 36, from the second station); matched by a model
+> that sat him once on the sofa where the class plays five sits
+> (docs/PC_FIDELITY.md "The sofa's five sits"). Against the port's idle runs
+> station by station, before each run's first trick (the bubble tables of
+> docs/PC_LAPS_DETAIL.md, whose 1-fps sampling lags the PC's steps by up to
+> a second and whose clock starts 1-3 s before the first icon), every Season
+> 1 level agrees within ~1 s of the start's offset but where the run was
+> disturbed (108's first coffee: a surprise; 110's second meat bowl: a 12-s
+> gap with no icon), and Season 2's within ~2 s once 210's elephant waits
+> for Fifi (docs/PC_FIDELITY.md, 210's elephant). The medians below keep
+> the tricked laps they were taken from.
+
 ## Season 1
 
 | ep | PC order (bubble) | PC lap | mobile order (ActionManager) | mobile lap | Δ |
