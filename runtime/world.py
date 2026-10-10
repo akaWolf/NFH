@@ -1803,11 +1803,15 @@ class Pawn:
                 st['pc_after_run'] = ('out', door)
         return steps
 
-    def _pc_run_secs(self, run):
-        """seconds of a hop's `in` or `out` run at the pawn's gait"""
+    def _pc_run_secs(self, run, nb_only=False):
+        """seconds of a hop's `in` or `out` run at the pawn's gait; `nb_only`:
+        the `in` run's part to the near door's `<actor>` hotspot (`nb`), the
+        route's own movement before the pass (fcn.1000901b at 0x1000ab8d)"""
         p = run[1].pc_pass.get(self.role) or {}
-        ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(),
-                                        pc_pass_piece(p, run[0]), self.sneaking)
+        piece = pc_pass_piece(p, run[0])
+        if nb_only:
+            piece = {'in': piece.get('nb', 0)}
+        ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), piece, self.sneaking)
         return (ticks or 0) / pcprofile.TICKS_PER_SECOND
 
     def _pc_station_ticks(self, it):
@@ -2881,23 +2885,39 @@ class Pawn:
                     self._stand()
                     return
                 door = s.get('pc_claim')
+                run = s.get('pc_hold_run')
                 if door is not None and not s.get('pc_claimed'):
-                    # the PC's door-pass step starts at the near door: its
+                    # the PC's door-pass step starts at the near door's
+                    # `<actor>` hotspot — the route pushes it once its
+                    # movement there is done (0x1000aac2, fcn.10003d50 at
+                    # 0x1000ab17): the `in` run's part to it first, then the
                     # pair, or a stand there while another holds it
                     # (_pc_claim_marks)
+                    if run is not None:
+                        if not s.get('pc_holding'):
+                            s['pc_holding'] = True
+                            s['pc_nb'] = self._pc_run_secs(run, nb_only=True)
+                            self._pc_hold_t = 0.0
+                        if self._pc_hold_t < s['pc_nb'] - 1e-9:
+                            self.velocity = (0.0, 0.0)
+                            self._stand()
+                            return
                     if not self._pc_claim_pair(door):
+                        s['pc_waited'] = True
                         self.velocity = (0.0, 0.0)
                         self._stand()
                         return
                     s['pc_claimed'] = True
-                run = s.get('pc_hold_run')
+                    if s.get('pc_waited') and run is not None:
+                        self._pc_hold_t = s['pc_nb']   # the pass from here
                 if run is not None:
                     # the `in` run of the hop this step brings the pawn to,
                     # stood out at the near door (_pc_hop_steps)
-                    if not s.get('pc_holding'):
+                    if 'pc_hold' not in s:
                         s['pc_holding'] = True
                         s['pc_hold'] = self._pc_run_secs(run)
-                        self._pc_hold_t = 0.0
+                        if 'pc_nb' not in s:
+                            self._pc_hold_t = 0.0
                     if self._pc_hold_t < s['pc_hold'] - 1e-9:
                         self.velocity = (0.0, 0.0)
                         self._stand()

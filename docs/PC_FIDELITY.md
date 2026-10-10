@@ -2695,6 +2695,24 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (371.0), and he stands at the door from 368.5 and then his own `in` run
   (to 373.2) — the PC's claim order as carried (0x1000339d, fcn.10003454);
   E13's frames (2 fps, the camera on Woody) do not settle their order.
+  Closed the same day: at 4 fps E13 has her go first too — along the beach
+  to the transition from 17.5 s after the picnic's coin, down it at ~20.3,
+  in the pinata's room from ~22.5 — and him wait at its jetty post from
+  ~23 to ~25.5 and pass; the pinata's `crash` (the stick taken, the swing,
+  the bees on its record's tick 11) from ~36.2. By the code the waiting
+  actor has come down to the door's `<actor>` hotspot before its pass
+  waits (the route's movement, fcn.1000901b at 0x1000ab8d; the pass
+  pushed after it, 0x1000ab17), where the port stood the whole `in` run
+  after the wait — 10 ticks more (the hotspot 30 px below bottomright's
+  floor). The model's chain (walk_span: her walk 49 ticks, her pass held
+  ~56 to her `olga_out`, his SHOUT — 2.33 s in the port — and walk 56,
+  his pass 65, the room to the pinata 60, the credit 13 ticks into the
+  stand) puts the pinata's coin ~37.4 s after the picnic's; the port's `in` run now splits at `nb` (`Pawn._pc_run_secs`
+  nb_only: the part to the hotspot before the claim, the rest after it):
+  37.7 s against E13's 37.2 (38.5 before). The claim moves with it — taken
+  at the hotspot, `nb` later than at the stretch's end — and so does
+  every lap where one waits (213's first lap: Olga behind him from the
+  picnic, the bull 0.83 s sooner).
   And 204's rickshaw: the reaction Olga's fight hands to (0x10032b6f: the
   rickshaw icon, SHOUT 0, the camera back) goes on to 0x1003250a — the
   GoTo to the manipulated rickshaw, its `repair` (20 ticks) and the switch
