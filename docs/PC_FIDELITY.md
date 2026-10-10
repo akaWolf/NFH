@@ -2962,7 +2962,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   PCUseSeconds is the PC's within 0.2 s. Plan 102 v7 waits for his second
   sit after his first beer (100 at 189.1 s); 101 unchanged (100 at 129.5).
   The walker found no other counter of the kind in the level classes
-  (0x450000-0x472000: an increment compared against a bound).
+  (0x450000-0x472000: an increment compared against a bound). Open, with
+  the numbers: the sofa's span from its icon (the walk back) to the next
+  station's reads 23.7 s at 30 fps on both videos (E01 266.2 -> 289.9, E02
+  401.5 -> 425.2) where the model has 24.25 and 24.42 — 7 and 9 ticks
+  more, the rounds each an ACTION step of its time + 2 (the step's first
+  update, then the timer job's t + 1 pushed with run-now 0 — fcn.00479c70
+  -> fcn.00444d30(step, 0); the runner fcn.00444db0 goes on to the next
+  job in the tick one is done, 0x444e05-0x444e7c, so the class job re-runs
+  in the tick its round ends and the next round's step starts on the
+  next); a round of time + 1 would fit within two ticks.
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c
