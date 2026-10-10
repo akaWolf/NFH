@@ -2139,7 +2139,7 @@ class TutorialPC206(_SceneFollow, Tutorial):
             ch.tricked = False
 
     def _m_bd04(self, s):
-        self._icon(s, '')        # m_hurt_n: no remaster texture, none shown
+        self._icon(s, 'being_hit')   # m_hurt_n: the remaster's being_hit (E06 at 73 s)
         # fcn.1000eb19: to him (fcn.1000e601, his x less or plus 50 px on
         # her side), then the generic `fight` (fight_neighbor, him `inv`)
         if not s.walking and s.arrived != 'fight':
@@ -2302,7 +2302,7 @@ class TutorialPC206(_SceneFollow, Tutorial):
         self._n_give(s, 'e926', False)
 
     def _n_e926(self, s):
-        self._icon(s, '')        # m_hurt_n: no remaster texture, none shown
+        self._icon(s, 'being_hit')   # m_hurt_n: the remaster's being_hit (E06 at 73 s)
         if not s.take('mother_fight'):
             return
         import pcprofile

@@ -1453,3 +1453,13 @@ actors' job pass the update calls at 0x100445f8.
   icon 18.48 against E07's 18.50 (18.13), the elephant 36.65 / 36.60, the
   shell 50.98 / 50.94, the sandcastle 70.90 / 70.64; 202's mat hidden
   5.75 / 5.94 (5.50), the beer 15.78 / 15.97. Plans 202 and 207 at 100.
+- `runtime/world.py`, `runtime/scene.py`, `runtime/tutorial.py`,
+  `tools/pcref/lap_model_s2.py`, `tools/pcref/pc_durations_s2.py`,
+  `levels/pc/Level204/207/210/213/214.overlay.json` (2026-09-30): the fight
+  icons after a trick (PCHurtIcon). E04 (level clock): the rickshaw icon to
+  99, Olga's fight icon 100-104 (5.7 s), the rickshaw's again from 105; the
+  port's plan 204: olgafight 303.98-309.82 between two rickshaw spans. Plan
+  214: olgafight over the bouquet's fight and SHOUT (496.48-503.48), the
+  shower's SHOUT after its wait under the bouquet's icon (577.65-579.98),
+  being_hit from the pistol's wait (735.48). Plans 204 and 214 at 100 (the
+  same scores).

@@ -734,6 +734,12 @@ def mobile_icons(n):
     return out
 
 
+# the PC's icon names the remaster ships under another name (its bubble
+# textures by their pictures: E06's m_hurt_n is the Mother hitting him,
+# being_hit; E04's o_hurt_n Olga at him, olgafight)
+REMASTER_ICON = {'m_hurt_n': 'being_hit', 'o_hurt_n': 'olgafight'}
+
+
 def _texture(icon):
     """the remaster's bubble texture of a PC icon name ('' and None pass)"""
     return not icon or os.path.exists(os.path.join(ROOT, 'textures', 's2', 'textures_nfh2_bubbles_%s.png' % icon))
@@ -818,6 +824,16 @@ def icon_keys(n):
                 keys['PCIconAt'] = sched if many else sched[0]
         if keys:
             out[item] = keys
+    # through a co-actor's fight after a trick: the icon he waits under and
+    # his SHOUT's (lap_model_s2.code_hurt_icons)
+    for item, hi in lap_model_s2.code_hurt_icons(n).items():
+        own = mob.get(item)
+        hv = {}
+        for k in ('wait', 'shout'):
+            ic = REMASTER_ICON.get(hi[k], hi[k])
+            hv[k] = ic if (ic is not None and ic != own and _texture(ic)) else None
+        if any(hv.values()):
+            out.setdefault(item, {})['PCHurtIcon'] = hv
     # the stays timed per clip the pairing has no visit for (202's swim: its
     # bar hides the bubble, and the sea's leave after it; 210's deck chair)
     for item in CLIPS.get(n, {}):
@@ -837,7 +853,7 @@ def write_icon_keys(ov, n):
     script's own icons where they are not the mobile item's (icon_keys)"""
     sys.path.insert(0, HERE)
     import lap_model_s2
-    for k in ('PCIcon', 'PCIconTail', 'PCIconAt', 'PCIconClips', 'PCIconLead', 'PCIconClip'):
+    for k in ('PCIcon', 'PCIconTail', 'PCIconAt', 'PCIconClips', 'PCIconLead', 'PCIconClip', 'PCHurtIcon'):
         ov['patches'] = _strip_key(ov['patches'], k)
     for item, lead in lap_model_s2.code_icon_leads(n).items():
         if item in CLIPS.get(n, {}):
@@ -857,7 +873,7 @@ def write_icon_keys(ov, n):
             ' fcn.100422a5) along its lap (tools/pcref/lap_model_s2.py code_icons) where'
             ' they are not the mobile items\' — \'\' no bubble: a null icon, and a bar'
             ' (fcn.1000e7f2) until the next icon.')
-    if any(k in ('PCIcon', 'PCIconAt', 'PCIconClips') for keys in keys_all.values() for k in keys) \
+    if any(k in ('PCIcon', 'PCIconAt', 'PCIconClips', 'PCHurtIcon') for keys in keys_all.values() for k in keys) \
             and note not in ov.get('source', ''):
         ov['source'] = ov.get('source', '') + note
 

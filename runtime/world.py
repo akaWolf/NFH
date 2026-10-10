@@ -3660,6 +3660,7 @@ class Routine:
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
         self._pc_icon_sched = None       # the visit's icon changes to come (PCIconAt): [(t, icon)]
+        self.pc_hurt = None              # a fight's bubble after a trick: (item, 'wait' | 'shout')
         self._pc_icon_t = 0.0
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
         self.pc_credit_item = None
@@ -3885,6 +3886,18 @@ class Routine:
         next or the tail's icon once up (PCIconLead, PCIconTail, PCIconClip),
         a clip's (PCIconClips), the visit's own (PCIcon) — '' no bubble —;
         None where the item's own shows as on the mobile"""
+        if self.pc_hurt is not None and pcprofile.is_pc():
+            # a co-actor's fight after a trick: the step he waits in, then
+            # his handler's SHOUT (PCHurtIcon); a repair after it is the
+            # station's (204's rickshaw, 214's pistol)
+            hit, phase = self.pc_hurt
+            sp = self.pawn.anim.sprite
+            cur = sp.anims[sp.current].name \
+                if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
+            fix = set(hit.fix_sequence or ()) | ({hit.fix_animation} if hit.fix_animation else set())
+            ic = hit.pc_hurt_icon.get(phase)
+            if ic is not None and not (phase == 'shout' and cur in fix):
+                return ic
         it = self.item
         if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
             return None
@@ -9297,6 +9310,10 @@ class World:
         if affect_live:                            # cs:737-753
             pawn.item_to_ignore_next_time = item
             self._start_wait_in_fear(pawn, on_done)
+            if pcprofile.is_pc() and nfh2 and item.pc_hurt_icon:
+                rt = next((r for r in self.routines if r.pawn is pawn), None)
+                if rt is not None:
+                    rt.pc_hurt = (item, 'wait')
             afr = next((r for r in self.routines if r.pawn is affected), None)
             if afr is not None:
                 # on PC the co-actor's walk to him is her script's run where
@@ -9662,6 +9679,9 @@ class World:
             resume, routine._wait_in_fear_done = \
                 routine._wait_in_fear_done, None
 
+        if routine is not None and routine.pc_hurt is not None:
+            routine.pc_hurt = (routine.pc_hurt[0], 'shout')
+
         def stopped():
             """RoutineActionWaitInFear.OnActionStopped (cs:21-27) fires when
             the resumed action starts, i.e. after the parked angry has run
@@ -9670,6 +9690,8 @@ class World:
             OriginalAction to the WaitInFear itself, ActionManager.cs:715-
             718, and replays the fear loop for good afterwards; the port
             resumes the routine.)"""
+            if routine is not None:
+                routine.pc_hurt = None
             if resume:
                 resume()
             pawn.movement_paused = False

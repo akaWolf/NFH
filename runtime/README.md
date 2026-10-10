@@ -838,7 +838,9 @@ predicate, then the all-tricks win.
   TutorialPC206) hides the bubble the same way. Another role's —
   the Mother's — at an item: PCIconRole (role -> icon) and
   PCIconClipsRole (role -> {clip: icon}); the neighbour's keys are his
-  alone.
+  alone. Through a co-actor's fight after a trick, PCHurtIcon
+  ({'wait', 'shout'}: the wait in fear's and the angry's, a fix clip
+  the station's; `Routine.pc_hurt`).
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed

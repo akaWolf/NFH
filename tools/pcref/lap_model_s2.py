@@ -2100,6 +2100,39 @@ def code_icons(n):
     return out
 
 
+def code_hurt_icons(n):
+    """{item: {'wait': icon, 'shout': icon}}: the bubble through a 'fight'
+    flow (TRICKED_CONT) — the step his tricked station hands over to sets
+    the icon he waits for the co-actor's fight under (204's 0x10031b2c,
+    207's 0x10014937, 213's 0x10038221, 214's 0x1003a413 / 0x1003a49c:
+    o_hurt_n; 210's 0x100192b0: m_hurt_n; 214's shower hands over to the
+    bouquet's step), and the fight's handler the one of his SHOUT (its own,
+    or the wait's where it sets none: 207's 0x1001596a; 204's 0x10032b6f
+    the rickshaw's again)"""
+    lap, pairs = _paired_parts(n)
+    if not lap:
+        return {}
+    trick = tricked_presence(n)
+    out = {}
+    for item, spec in TRICKED_CONT.get(n, {}).items():
+        if spec[0] != 'fight' or item not in pairs:
+            continue
+        visits = pairs[item][1]
+        v = next((v for v in visits if v), None)
+        if not v:
+            continue
+        row = lap[v[0][0]]
+        shown, hidden = trick.get(item, (set(), set()))
+        lv = Level(n)
+        lv.present = (set(lv.present) - hidden) | shown
+        _ev, nxt = run_step(lv, row[1], {}, latch=1)
+        wait = step_icon(n, nxt) if nxt else None
+        handler = spec[2][0] if spec[2] else None
+        shout = step_icon(n, handler) if handler else None
+        out[item] = {'wait': wait, 'shout': shout if shout is not None else wait}
+    return out
+
+
 def code_places(n):
     """{mobile item: [(x, y) or None per visit]}: where the next walk leaves
     from after a visit whose step leaves a hideout (_leave_place) — the

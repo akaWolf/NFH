@@ -123,7 +123,11 @@
     "PCJingleAt": [
      4.08
     ],
-    "PCUseSeconds": 12.83
+    "PCUseSeconds": 12.83,
+    "PCHurtIcon": {
+     "wait": "olgafight",
+     "shout": "olgafight"
+    }
    }
   },
   {

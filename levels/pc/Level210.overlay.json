@@ -42,7 +42,11 @@
       1.25,
       "fifi"
      ]
-    ]
+    ],
+    "PCHurtIcon": {
+     "wait": "being_hit",
+     "shout": "being_hit"
+    }
    }
   },
   {

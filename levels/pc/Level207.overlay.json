@@ -93,6 +93,10 @@
     },
     "PCHitRun": {
      "Olga": 2.33
+    },
+    "PCHurtIcon": {
+     "wait": "olgafight",
+     "shout": "olgafight"
     }
    }
   },

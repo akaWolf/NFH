@@ -3087,6 +3087,21 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   prime leg of a stay timed per clip plays at its PC seconds (202's mat:
   the lay-down, the mobile's prime, 0.75 s where the mobile's 0.5 played
   — the hide 5.75 against E02's 5.94, 5.50 before).
+  The fights after a trick (2026-09-30): the step his tricked station
+  hands over to sets the icon he waits for the co-actor under — o_hurt_n
+  for Olga's (204's 0x10031b2c, 207's 0x10014937, 213's 0x10038221,
+  214's bouquet 0x1003a413), m_hurt_n for the Mother's (210's
+  0x100192b0, 214's pistol 0x1003a49c), 214's shower the bouquet's step
+  it walks on to — and the fight's handler the one of his SHOUT (its
+  own, or the wait's where it sets none; 204's 0x10032b6f the
+  rickshaw's again, its repair under it): E04's fight icon 5.7 s
+  between two rickshaw spans, the port's 5.84 (plan 204, 303.98-
+  309.82 s; the station's icon throughout before). The remaster ships
+  both pictures, unused by the mobile, as being_hit and olgafight
+  (E06's m_hurt_n at 73 s is the Mother hitting him); PCHurtIcon
+  {'wait', 'shout'} from lap_model_s2.code_hurt_icons, the port's wait
+  in fear and its angry (Routine.pc_hurt), and the 206 lesson's two
+  m_hurt_n icons show being_hit (an empty bubble before).
   The Mother's bubble the same way (her HUD portrait's cloud against
   hud.think_m, 2026-09-30): her scripts' icons where they are not the
   mobile items' (tools/pcref/pc_durations_others.py ICON_ROLE,

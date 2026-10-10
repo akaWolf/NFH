@@ -247,7 +247,7 @@ class Item:
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
-                 'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role',
+                 'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role', 'pc_hurt_icon',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
@@ -682,6 +682,11 @@ class Item:
         # (PCIconRole, PCIconClipsRole; tools/pcref/pc_durations_others.py)
         self.pc_icon_role = d.get('PCIconRole') or {}
         self.pc_icon_clips_role = d.get('PCIconClipsRole') or {}
+        # the bubble through a co-actor's fight after this item's trick
+        # (PCHurtIcon: {'wait': icon, 'shout': icon} — the step he waits
+        # in and his handler's, o_hurt_n / m_hurt_n the remaster's
+        # olgafight / being_hit; lap_model_s2.code_hurt_icons)
+        self.pc_hurt_icon = d.get('PCHurtIcon') or {}
         # the other actors' stays under the profile (PCUseSecondsRole: role ->
         # seconds or one per visit, the PC data's `time` ticks / 12 — the
         # Mother's stands of 212 and 213)
