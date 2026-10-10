@@ -897,6 +897,24 @@ predicate, then the all-tricks win.
   that goes on with its path leaves it to the path's legs); and the
   carpet's case sends him to the vacuum first (Level_Laundry's case 21),
   not to the carpet.
+- **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
+  one pace spreads its PC seconds over the mobile path as the pawn walks
+  it — each step, straight at its target, ends within its MinDistToNextMove
+  (`_min_dist`: an item's use distance, a walk-up item's or door's use
+  height), and a back door's descent comes down at the near door's x where
+  the far placement lies past it (the DESCEND state's snap, Pawn.cs:1735-
+  1738). 103: the mailbox leg (0.39 u short of its x) ran 0.5 s fast and
+  the bedroom's leg after the back door (0.17 u) 0.3 s slow. The pace is
+  the path still to walk over the leg's PC time still to run
+  (`Pawn._pc1_pace`, `_pc1_left`; the time counted in `Pawn.tick` on the
+  leg's moving frames): the step machine's frames with no move — a step's
+  arrival, the last frame's share of a step's walk — come out of it, where
+  one fixed pace ran 103's legs 2-4 frames over their ticks (109 frames
+  against 105, 234 against 230); a gait changed on the way (Woody's sneak
+  toggled mid-leg) stretches the time still to run by the path's natural
+  time at the new records over the old, as the fixed pace did — 110's
+  sneaked descent from the bedroom's back door 2.8 s, the PC's 50 px down
+  at 2 a tick and 35 along at 5.
 - **The PC profile's Season 1 tools and in-place stations**: a carried
   fixing tool's walk to its use goes to the tool's PCToolPoint
   (`Pawn._pc1_item_point`: 110's extinguisher to bal/barbecue_burn, where

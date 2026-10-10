@@ -1891,7 +1891,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   move) and its mobile steps — the floor, a back door's climb and the
   descent after it, an item's climb — run at the one pace that lasts it,
   from the PC point the pawn stood at (the station it came to, the door it
-  came through) or its place mapped into the room. A walk through the
+  came through) or its place mapped into the room; the pace is spread over
+  the mobile path as walked (since 2026-10-10: each step ends within its
+  MinDistToNextMove, a back door's descent comes down at the near door's
+  x where the placement lies past it — 103's mailbox leg ran 0.5 s fast and
+  its bedroom leg 0.3 s slow before) and set each frame from the path
+  still to walk over the leg's time still to run, so the frames the mobile
+  step machine stands (a step's arrival) come out of it: the legs last
+  their ticks to the frame (2-4 frames over before). A walk through the
   front door keeps the mobile's pace: the porch is the PC's `fro`, the
   street's whole path, and anc/fro has no `neighbor` hotspot. The port's
   idle laps (the neighbour alone, runs/idlefloor1, 108 with Woody in the
