@@ -455,14 +455,54 @@ def _lap(L, toks, start):
         current = obj
         return True
 
-    for kind, strs in toks:
+    def actor_action(strs):
+        """(actor, ticks) of an ACTION another actor of the level plays with
+        its own record (105's football: `inv`, `fly_into_kitchen`, actor=
+        kit/football), else None"""
+        for a in strs:
+            if a in L.actors and a not in ('neighbor', 'woody'):
+                for nm in strs:
+                    if nm != a and '/' not in nm and L.has_action(a, nm, a) \
+                            and (a, nm) in (L.actors[a]['act'] or {}):
+                        return a, L.job_ticks(a, nm, a)
+        return None
+
+    def now():
+        return sum(t for _k, _x, t in legs)
+
+    list_start = None      # the tick the neighbour's current list starts (its SUBSEQ)
+    par = None             # another actor's list of the same case: (its end tick, actor)
+    i = -1
+    toks = list(toks)
+    while i + 1 < len(toks):
+        i += 1
+        kind, strs = toks[i]
         objs = [s for s in strs if '/' in s]
         if not objs and kind in ('GOTO', 'GOTOENTER'):     # an actor target (109's parrot)
             objs = [s for s in strs if s in L.actors and s != 'neighbor' and L.object_point(s)]
         if kind == 'ICON':
             legs.append(('icon', ' '.join(strs), 0)); continue
         if kind == 'TRICK': continue
+        if kind == 'SUBSEQ' and i + 1 < len(toks) and toks[i + 1][0] == 'ACTION' \
+                and actor_action(toks[i + 1][1]):
+            # another actor's list, pushed by the same case to that actor's
+            # queue (105's case 4: the football's `inv` and
+            # `fly_into_kitchen`, 0x46dd16-0x46de40, beside the neighbour's
+            # list of the piano): it runs beside his, its first update in the
+            # tick his starts, and his next case polls for its end
+            # (case 5: fcn.00445040 on the football, then `look_angry`,
+            # 0x46ded6-0x46df98) — the next element a tick after its last
+            dur = 1
+            while i + 1 < len(toks) and toks[i + 1][0] == 'ACTION' and actor_action(toks[i + 1][1]):
+                i += 1
+                who, t = actor_action(toks[i][1])
+                dur += t
+            start = list_start if list_start is not None else now()
+            par = (start + dur, who)
+            continue
         if kind in ('SUBSEQ', 'MSG', 'STOPMSG'):
+            if kind == 'SUBSEQ':
+                list_start = now()
             # an instant step of the case's list (routine_order.py INSTANT): the
             # list's own first update (pushed by the case with the run-now flag
             # 0, it only pushes its first element — the sequence update
@@ -526,6 +566,12 @@ def _lap(L, toks, start):
             else:
                 legs.append(('?', 'GOTO2 %s' % ' + '.join(strs), 0))
         elif kind == 'ACTION':
+            if par is not None:
+                end, who = par
+                par = None
+                wait = end - now()
+                if wait > 0:
+                    legs.append(('action', 'step wait %s' % who, wait))
             # the walker's pushes around the call: the action's name is the
             # string that names an action record of one of the objects (a room
             # name or an icon may precede it), the object the one that has it —

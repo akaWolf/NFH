@@ -2987,7 +2987,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   ticks from the painting's icon to the camera's against E07's 208:
   open; 105's first
   span +0.9 s (the piano from the start to the football's icon: 11.63 s
-  against E05's 10.76), its later spans within 0.1 s; 104, 107, 108 and
+  against E05's 10.76), its later spans within 0.1 s — the football's
+  `inv` and `fly_into_kitchen` are the football actor's own list, pushed
+  by the piano's case beside his (0x46dd16-0x46de40) and polled for by
+  the next case before his `look_angry` (fcn.00445040, 0x46ded6-
+  0x46df98): 6 ticks of wait after his play where the model had 19 of the
+  football's in his own line, the piano's stay 8.75 s (9.83), the span
+  10.64 s since (2026-10-01); 104, 107, 108 and
   111 the player's from their second station on, the first within 0.2 s.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
