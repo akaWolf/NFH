@@ -384,6 +384,18 @@ def woody_start(n):
             'start': L.job_ticks('woody', 'start', actor='woody')}
 
 
+def neighbour_start(n):
+    """the neighbour's PCStart: where level.xml puts him (lap_model.Level.start:
+    101's `lir` 500/420, not the sofa's 335/410) — the point his first case's
+    GOTO walks from; None for a tutorial"""
+    if isinstance(n, str):
+        return None
+    L = lap_model.Level(n)
+    if L.start is None or L.start[0] not in L.rooms:
+        return None
+    return {'room': L.start[0], 'x': L.start[1], 'y': L.start[2], 'floor': L.rooms[L.start[0]]['y']}
+
+
 def write(n, rooms, doors, points, own, vias):
     p = os.path.join(ROOT, 'levels', 'pc', scene_name(n) + '.overlay.json')
     ov = json.load(open(p))
@@ -418,6 +430,11 @@ def write(n, rooms, doors, points, own, vias):
             st['PCWalkVia'] = vias[item]
         ov['patches'].append({'object': item, 'component': kind, 'set': st,
                               'source': src})
+    ns = neighbour_start(n)
+    if ns is not None:
+        ov['patches'].append({'object': 'Rottweiler', 'component': 'Rottweiler', 'set': {'PCStart': ns},
+                              'source': "the neighbour's start (tools/pcref/pc_walks_s1.py neighbour_start: "
+                                        "level.xml's position, where his first case's GOTO walks from)"})
     ws = woody_start(n)
     if ws is not None:
         ov['patches'].append({'object': 'Player', 'component': 'Woody', 'set': {'PCStart': ws},

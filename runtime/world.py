@@ -11961,6 +11961,14 @@ class World:
         st = spec.get('pc_start')
         if st and pcprofile.is_pc() and pcprofile.SEASON2 and role != 'Woody':
             self._pc_place_start(p, st)
+        elif st and st.get('room') and pcprofile.is_pc() and not pcprofile.SEASON2 \
+                and role != 'Woody' and p.zone is not None \
+                and (getattr(p.zone, 'pc_walk_room', None) or {}).get('room') == st['room']:
+            # the PC profile's Season 1 start (PCStart): level.xml's place,
+            # which his first case's GOTO walks from (tools/pcref/
+            # pc_walks_s1.py neighbour_start: 101's 500/420, not the sofa's
+            # 335/410) — the mobile start stood on it
+            p.pc1_stand_at((st['x'], st['y']))
         if role == 'Woody':
             # Woody.OnSingleAnimationEnded restores the hidden-during-anim
             # items, and OnBlockingAnimationEnded the swapped layers

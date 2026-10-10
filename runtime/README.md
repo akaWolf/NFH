@@ -2132,7 +2132,11 @@ the level selection menu, LevelLoader, not modelled).
   the pause byte and the hideout flag only (fcn.00436bb0, 0x436cc7-
   0x436d31), from the first tick of play. (Season 2 has no such wait: its
   scripts' icons are up on the first frame, and the profile starts them
-  there.) Woody's own start job, carried the same day (`World.spawn_pawn`,
+  there.) His first walk leaves from level.xml's place (PCStart on the
+  Rottweiler, tools/pcref/pc_walks_s1.py neighbour_start; `Pawn.pc1_stand_at`
+  at the spawn), the mobile start stood on it: 101's GOTO from 500/420 to
+  the sofa's 335/410 is 24 ticks (since 2026-09-30; the mobile start mapped
+  into the room before, a second longer on 101-103). Woody's own start job, carried the same day (`World.spawn_pawn`,
   the entrance in `World.tick`, `Pawn._pc1_marks`; PCStart on Player from
   tools/pcref/pc_walks_s1.py): its Woody branch (fcn.00471960) idles its
   first tick, pushes on its second the walk to the room `anc` (fcn.004716f0

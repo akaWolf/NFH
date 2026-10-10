@@ -947,6 +947,19 @@
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
   },
   {
+   "object": "Rottweiler",
+   "component": "Rottweiler",
+   "set": {
+    "PCStart": {
+     "room": "bed",
+     "x": 500,
+     "y": 420,
+     "floor": 420
+    }
+   },
+   "source": "the neighbour's start (tools/pcref/pc_walks_s1.py neighbour_start: level.xml's position, where his first case's GOTO walks from)"
+  },
+  {
    "object": "Player",
    "component": "Woody",
    "set": {
