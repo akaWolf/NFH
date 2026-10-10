@@ -3659,6 +3659,8 @@ class Routine:
         # stay less its PCIconLead), and the icon the bubble shows from then
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
+        self._pc_icon_sched = None       # the visit's icon changes to come (PCIconAt): [(t, icon)]
+        self._pc_icon_t = 0.0
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
         self.pc_credit_item = None
         self.pc_credit2_timer = 0.0      # the linked trick's own record, due later in the linked step (PCLinkedPaysAt)
@@ -3855,12 +3857,49 @@ class Routine:
 
     def _pc_next_icon(self):
         """the icon of the routine's next action's item (the bubble's, under
-        the profile's PCIconLead); None for a move or no item"""
+        the profile's PCIconLead) — its PCIcon for the visit to come where it
+        has one; None for a move or no item"""
         if not self.actions:
             return None
         name = self.actions[self._next_index(self.index)]['item']
         nxt = self.level.items.get(name) if name else None
-        return (nxt.bubble_icon_active or nxt.bubble_icon) if nxt is not None else None
+        if nxt is None:
+            return None
+        ic = self._pc_visit_icon(nxt, nxt.pc_use_visit)
+        return ic if ic is not None else (nxt.bubble_icon_active or nxt.bubble_icon)
+
+    def _pc_icon_tick(self, dt):
+        """the visit's icon schedule (PCIconAt) so far into the stay"""
+        self._pc_icon_t += dt
+        while self._pc_icon_sched and self._pc_icon_sched[0][0] <= self._pc_icon_t + 1e-9:
+            self.pc_bubble_next = self._pc_icon_sched.pop(0)[1]
+
+    @staticmethod
+    def _pc_visit_icon(it, visit):
+        """the item's PCIcon for a visit (cycling); None where it has none"""
+        icons = getattr(it, 'pc_icon', None)
+        return icons[visit % len(icons)] if icons else None
+
+    def pc_think_icon(self):
+        """the PC script's bubble for the routine's action (the HUD's): the
+        next or the tail's icon once up (PCIconLead, PCIconTail, PCIconClip),
+        a clip's (PCIconClips), the visit's own (PCIcon) — '' no bubble —;
+        None where the item's own shows as on the mobile"""
+        it = self.item
+        if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
+            return None
+        if self.state == self.USING:
+            if self.pc_bubble_next is not None:
+                return self.pc_bubble_next
+            if it.pc_icon_clips:
+                sp = self.pawn.anim.sprite
+                cur = sp.anims[sp.current].name \
+                    if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
+                if cur in it.pc_icon_clips:
+                    return it.pc_icon_clips[cur]
+            # the visit is counted as its stay starts (_pc_visit_seconds)
+            return self._pc_visit_icon(it, max(it.pc_use_visit - 1, 0))
+        return self._pc_visit_icon(it, it.pc_use_visit)
 
     def _advance(self):
         self._override = None
@@ -3868,6 +3907,7 @@ class Routine:
         self._pc_wait_spent = None
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
+        self._pc_icon_sched = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -4705,7 +4745,17 @@ class Routine:
         pc = self._pc_use_seconds(it)
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
-        if pc and it.pc_icon_lead and not self._pc_use_tricked and not self.pc_zero_visit:
+        self._pc_icon_sched = None
+        self._pc_icon_t = 0.0
+        sched = it.pc_icon_sched[(max(it.pc_use_visit, 1) - 1) % len(it.pc_icon_sched)] \
+            if pc and it.pc_icon_sched and not self._pc_use_tricked and not self.pc_zero_visit else None
+        if sched:
+            # the stay's parts run in steps of other icons, or a bar hides
+            # the bubble (fcn.100422a5 at each step's start, fcn.1000e7f2's
+            # stay): the icon changes so far into the stay (PCIconAt)
+            self._pc_icon_sched = [(float(t), ic) for t, ic in sched]
+            self._pc_icon_tick(0.0)
+        elif pc and it.pc_icon_lead and not self._pc_use_tricked and not self.pc_zero_visit:
             # the next case's ICON comes before the leave its walk job plays
             # (game.exe 0x475ce6: the GOTO pushes the LEAVE after the case's
             # SetIcon): the bubble takes the next station's icon that many
@@ -7654,6 +7704,8 @@ class Routine:
             if self.pc_icon_at <= 0.0:
                 self.pc_icon_at = 0.0
                 self.pc_bubble_next = self._pc_next_icon()
+        if self.state == self.USING and self._pc_icon_sched:
+            self._pc_icon_tick(dt)
         it = self.item
         if self.state == self.USING and self.pc_bubble_next is None and it is not None \
                 and getattr(it, 'pc_icon_clip', None) and not self._pc_use_tricked:

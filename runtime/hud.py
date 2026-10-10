@@ -1147,8 +1147,11 @@ class Hud:
                 min(self.rott_active.frame, len(self.rott_faces) - 1)],
                 self.rect('RottweilerFaceRect'))
         self._face_fill('Rottweiler', 'RottweilerFaceRect')
-        # DisableRottweilerThinkBubble skips the whole bubble (HUD.cs:1155)
-        if rott is None or not rott.hud_disable_think:
+        # DisableRottweilerThinkBubble skips the whole bubble (HUD.cs:1155);
+        # the PC's Season 2 bubble goes by the script's icons alone, its
+        # bars' included (Routine.pc_think_icon: PCIcon, PCIconAt,
+        # PCIconClips — '' from a bar's start to the next icon)
+        if rott is None or not rott.hud_disable_think or self.pc_s2_bubble():
             routine = next((r for r in self.world.routines
                             if r.role == 'Rottweiler'), None)
             self._think_bubble(routine, 'RottweilerThinkBubble',
@@ -1336,30 +1339,43 @@ class Hud:
             self._text('%d%%' % int(round(p * 100)), (x, y, w, h), small=True,
                        align=4, style_key=skey if skey in self.d else None)
 
-    def _think_bubble(self, routine, tex_key, rect_key, icon_rect_key):
-        self._blit(self.d.get(tex_key), self.rect(rect_key))
+    def pc_s2_bubble(self):
+        """the neighbour's bubble is the PC script's (Season 2 under the
+        profile)"""
+        w = self.world.woody
+        return pcprofile.is_pc() and w is not None and w.nfh2
+
+    def think_icon(self, routine):
+        """the think bubble of a routine: (shown, icon name or None)"""
         if routine is None:
-            return
+            return True, None
         w = self.world.woody
         if pcprofile.is_pc() and not routine.started and w is not None and not w.nfh2:
             # the PC's Season 1 bubble stays empty until the level class's
             # first SetIcon, its case 0 as the start job ends
             # (pcprofile.S1_START_TICKS)
-            return
+            return True, None
         it = routine.urgent_item or routine.item
         name = None
         pc = getattr(routine, 'pc_bubble', None)
-        nxt = getattr(routine, 'pc_bubble_next', None) \
-            if routine.urgent_item is None and routine.state == routine.USING else None
-        if pc is None and nxt:
-            # the next station's icon, up before the stay's walk leave
-            # (PCIconLead, Routine._pc_next_icon)
-            name = nxt
-        elif pc is not None:
+        th = routine.pc_think_icon() if hasattr(routine, 'pc_think_icon') else None
+        if pc is not None:
             # a PC script's icon element (fcn.100422a5) while the profile's
             # lesson drives the actor (206's TutorialPC206: `mother`,
-            # `get_pillow`, `bring_pillow`; '' clears the bubble)
-            name = pc or None
+            # `get_pillow`, `bring_pillow`; '' the null icon, no bubble at
+            # all — E06's neighbour has none until the Mother's call)
+            if pc == '':
+                return False, None
+            name = pc
+        elif th is not None:
+            # the PC script's icon (Routine.pc_think_icon): the next station's,
+            # up before the stay's walk leave (PCIconLead), a later step's
+            # (PCIconTail, PCIconClips) or the visit's own (PCIcon); a null
+            # icon shows no bubble at all (E12: none from the bench on to the
+            # bull ride's icon)
+            if th == '':
+                return False, None
+            name = th
         elif it is not None:
             # Alerter actions show BubbleIconMad (RoutineActionUse.BubbleIcon
             # override); actives win over the plain icon
@@ -1379,6 +1395,13 @@ class Hud:
             icons = self.level.bubble_icons.get(zone_go) if zone_go else None
             if icons:
                 name = icons.get('active') or icons.get('icon')
+        return True, name
+
+    def _think_bubble(self, routine, tex_key, rect_key, icon_rect_key):
+        shown, name = self.think_icon(routine)
+        if not shown:
+            return
+        self._blit(self.d.get(tex_key), self.rect(rect_key))
         if name:
             r = self.rect(icon_rect_key)
             for base in BUBBLE_BASES:

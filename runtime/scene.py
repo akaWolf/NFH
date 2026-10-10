@@ -247,7 +247,7 @@ class Item:
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
-                 'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip',
+                 'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
@@ -657,6 +657,25 @@ class Item:
         # ... or, on a use timed per clip, the clip of that leave the icon is
         # up from (PCIconClip: 207's board, PoolGetOut — the pool's `leave`)
         self.pc_icon_clip = d.get('PCIconClip') or None
+        # the PC script's own icon per visit where it is another than the
+        # item's (PCIcon: fcn.100422a5's icon of the steps the visit runs in,
+        # tools/pcref/lap_model_s2.py code_icons; one value or one per
+        # visit, cycling; '' the null icon — no bubble —, null the item's
+        # own): 209's first shoe visit under the Taj Mahal's, 212's bench
+        # under none
+        v = d.get('PCIcon')
+        self.pc_icon = (v if isinstance(v, list) else [v]) if 'PCIcon' in d else []
+        # the icon's changes along the stay, the steps its parts run in
+        # (PCIconAt: [[seconds into the stay, icon], ...], or one such list
+        # per visit — 208's platform: none from its bar on, the shoe
+        # cleaner's over the leave the next step's route plays)
+        v = d.get('PCIconAt')
+        self.pc_icon_sched = [] if not v else \
+            ([v] if isinstance(v[0], list) and v[0] and isinstance(v[0][0], (int, float)) else list(v))
+        # per clip of a stay timed per clip, the icon while it plays
+        # (PCIconClips: clip -> icon, '' none — a bar the mobile has no
+        # sleep bar for, 202's swim)
+        self.pc_icon_clips = d.get('PCIconClips') or {}
         # the other actors' stays under the profile (PCUseSecondsRole: role ->
         # seconds or one per visit, the PC data's `time` ticks / 12 — the
         # Mother's stands of 212 and 213)

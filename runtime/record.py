@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import sdl2
 
+import pcprofile  # noqa: E402
 from viewer import Viewer, WIDTH, HEIGHT
 
 DT = 1.0 / 60.0
@@ -225,6 +226,13 @@ class Recorder:
                    'bubble': v.hud.desc_string if v.hud.show_description
                    else None,
                    'cursor': v.hud.cursor_tex}
+            if pcprofile.is_pc() and w.woody is not None and w.woody.nfh2:
+                # the neighbour's think bubble under the profile: its icon,
+                # '' none shown (a sleep bar's or a null icon's)
+                rott = w.pawns.get('Rottweiler')
+                rt = next((r for r in w.routines if r.role == 'Rottweiler'), None)
+                shown, name = v.hud.think_icon(rt)
+                hud['think'] = '' if (not shown or rott is None) else name
         return {
             't': round(t, 3),
             'woody': None if wd is None else {

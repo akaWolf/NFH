@@ -148,7 +148,7 @@ class Level:
                 self.present.add(a['name'].replace('/', '_'))
     def is_present(self, name):
         return name.replace('/', '_') in self.present
-def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, latch=0):
+def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, latch=0, walking=0):
     """one step: returns (events, next); `unknown` takes a poll's awaited
     object as shown, `streq` a name compare the walker cannot resolve (an
     object's animation against a name, fcn.1004948f) as holding — the poll
@@ -156,7 +156,9 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
     latches (fcn.10013269: the byte fcn.10013319 sets when a behaviour of
     the latch's name reaches the script) as set, the scene's tests left to
     the scene (213's picnic waits for Olga's `boat`, then asks which
-    picnic is shown)"""
+    picnic is shown); `walking` has the GoTo (fcn.1000e3e0, fcn.1000ea30)
+    return 1, its walk under way — the branch a step takes on its first
+    run, before the arrival (step_icons)"""
     k = at(start); seen = set(); ev = []; nxt = None
     slots = []; al = None; vars_ = {}; regs = {}; zf = None
     this_k = None         # the slot of an ecx load no argument took (the thiscall's this)
@@ -178,6 +180,9 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                           # (fcn.1000aeb8) -> the indices of the events appended
     last_elem = None      # the index of the last element event built
     other_builders = set()  # builder locals set up for another actor (fcn.1000ee93)
+    icon_names = []       # the names in the slots when fcn.1003cc45 copied the level's
+                          # string for the icon element: the icon's own global, pushed
+                          # before it (209's shoe step 0x10020c8b: tadj_mahal)
     for _ in range(maxn):
         a, t = ins(k)
         if t is None: k += 1; continue
@@ -193,6 +198,12 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
         if m and m.group(1) in regs: nxt = regs[m.group(1)]
         m = re.match(r'mov ecx, dword \[(0x100[de][0-9a-f]{4})\]$', t)
         if m: slots.append(('g', gname(m.group(1))))
+        if (t == 'mov dword [eax], ebx' and regs.get('ebx0')) or t == 'and dword [eax], 0':
+            # a null string put in its argument's slot (the zeroed ebx of the
+            # prologue, or an `and` with 0): fcn.100422a5's icon cleared —
+            # 212's bench on the arrival (0x10036504), 206's harpoon put
+            # (0x1002d597), 210's deck chair step (0x100195bc)
+            slots.append(('z', ''))
         m = re.match(r'mov edx, dword \[(0x100[de][0-9a-f]{4})\]$', t)
         if m:
             edx_g = gname(m.group(1))
@@ -342,7 +353,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 gn = [s2[1] for i2, s2 in enumerate(slots) if s2[0] in ('g', 'v') and i2 != this_k]
                 if not gn and edx_names:
                     gn = edx_names[-1:]
-                ev.append(('GO', gn[-1] if gn else (names[-1] if names else None))); al = 0
+                ev.append(('GO', gn[-1] if gn else (names[-1] if names else None))); al = 1 if walking else 0
             elif fn == 'fcn.1000ea30':
                 # the go-and-enter helper: its GoTo (fcn.1000e3e0), and on the
                 # arrival the hideout's `enter` job (fcn.10006bd4, pushed by
@@ -353,7 +364,7 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                 if not gn and edx_names:
                     gn = edx_names[-1:]
                 obj = gn[-1] if gn else (names[-1] if names else None)
-                ev.append(('GO', obj)); ev.append(('EA30', [obj] if obj else [], [])); al = 0
+                ev.append(('GO', obj)); ev.append(('EA30', [obj] if obj else [], [])); al = 1 if walking else 0
             elif fn == 'fcn.1000e7f2':
                 # a timed stay (the bar): fcn.1000b154's object (vtable 0x100ab710,
                 # update 0x1000b312) counts its +0xc up to the pushed ticks +8 a
@@ -367,7 +378,15 @@ def run_step(lv, start, bytevars, maxn=4000, trace=False, unknown=0, streq=0, la
                     ticks = after[0] if after else None
                 ev.append(('WAITEVENT', names, ticks)); al = None
             elif fn == 'fcn.100422a5':
-                ev.append(('IC', names)); al = None
+                # fcn.100422a5(actor, icon): the actor's name at +8 of the
+                # GUI message, the icon resolved (fcn.1004bc95) at +4 — the
+                # icon pushed first; '' a null one (the bubble hidden)
+                args = [s2[1] for s2 in slots if s2[0] in ('g', 'v', 'z')] or icon_names
+                ev.append(('IC', args[:1])); al = None; icon_names = []
+            elif fn == 'fcn.1003cc45':
+                # the actor's name fcn.100422a5 takes after the icon's
+                # (fcn.1003cc45 copies [ecx+4] into its out)
+                icon_names = [s2[1] for s2 in slots if s2[0] in ('g', 'v', 'z')]; al = unknown
             elif fn == 'fcn.10042b9e':
                 # the level hides an object (the shoe mat's empty variant, 209)
                 nm = names[-1] if names else None
@@ -1117,10 +1136,22 @@ def lap_steps(n):
     st = LAP_START.get(n) or level_start(n); lv = Level(n)
     for hid, shown in LAP_PRESENT.get(n, ()):
         lv.present.discard(hid); lv.present.add(shown)
-    steps, loop = walk(lv, st, bytes0=LAP_BYTES.get(n))
+    snaps = []
+    steps, loop = walk(lv, st, bytes0=LAP_BYTES.get(n), snaps=snaps)
     out = []; ctx = {'geom': Geometry(n), 'data': d}
     for i, (cur, ev, nxt) in enumerate(steps):
         ic = [e[1] for e in ev if e[0] == 'IC']
+        stay = ic[-1][0] if ic and ic[-1] else None
+        walk_ic = stay
+        if any(e[0] == 'GO' for e in ev) and i < len(snaps):
+            # the first run, the GoTo under way: the icon the walk shows
+            keep = set(lv.present)
+            lv.present = set(snaps[i][0])
+            evw, _nw = run_step(lv, cur, dict(snaps[i][1]), walking=1)
+            lv.present = keep
+            icw = [e[1] for e in evw if e[0] == 'IC']
+            walk_ic = icw[-1][0] if icw and icw[-1] else None
+        LAP_ICONS.setdefault(n, {})[i] = (walk_ic, stay)
         objs = set()
         for e in ev:
             if len(e) < 2:
@@ -1147,9 +1178,12 @@ def lap_steps(n):
             LAP_LEAVES.setdefault(n, {})[i] = ctx.get('hideout')
     hid = ctx.get('inside')
     if loop is not None and out and hid and LAP_WALKS[n].get(loop):
-        # (the lap's last step left him inside and the loop's first walks)
+        # (the lap's last step left him inside and the loop's first walks:
+        # its route's leave, after its icon — 202's sea, left on the way
+        # to the bridge under the bridge's icon, E02)
         out[-1][4].append((hid, 'leave', d.action_ticks(hid, 'leave')))
         LAP_LEAVES.setdefault(n, {})[out[-1][0]] = hid
+        ROUTE_LEAVES.setdefault(n, {})[out[-1][0]] = hid
     return out, loop
 
 
@@ -1202,6 +1236,12 @@ ROUTE_LEAVES = {}
 # {level: {lap row: the object its step walks to}} (lap_steps, _lap_target): a
 # visit whose parts span steps walks between them (_visit_walks, code_places)
 LAP_GOS = {}
+# {level: {lap row: (walk icon, stay icon)}} (lap_steps): fcn.100422a5's icon
+# on the step's first run, its GoTo under way (run_step walking=1), and on
+# the run that goes on — the arrival's; '' a null icon (the bubble hidden:
+# 212's bench on its arrival, 0x10036504; 206's harpoon put, 0x1002d597),
+# None where the step sets none and the last one stays (code_icons)
+LAP_ICONS = {}
 
 
 def _lap_target(ev, inside=None):
@@ -1960,6 +2000,103 @@ def code_icon_leads(n):
                        and last[1] == 'leave' and last[2] else 0.0)
         if any(per):
             out[item] = per if many else per[0]
+    return out
+
+
+def _icon_parts(n, lap):
+    """({lap row: the icon in effect on its walk}, {(lap row, part index): the
+    icon in effect while the part plays}): the last icon set (LAP_ICONS) —
+    '' from a bar on (fcn.1000e7f2's stay hides the bubble, and it stays
+    hidden until a step sets an icon again: E10's awake wait after the deck
+    chair's bar, E02's sea leave after the swim's, up to the next step's) —
+    and a route's leave (ROUTE_LEAVES) under the next step's icon, which that
+    step sets before its GoTo; the lap's start carrying its end's"""
+    icons = LAP_ICONS.get(n, {})
+    walks = LAP_WALKS.get(n, {})
+    rl = ROUTE_LEAVES.get(n, {})
+    cur = None; at_walk = {}; part = {}
+    for _lap in (0, 1):
+        for k, r in enumerate(lap):
+            i = r[0]
+            w, st = icons.get(i, (None, None))
+            if walks.get(i) and w is not None:
+                cur = w
+            at_walk[i] = cur
+            if st is not None:
+                cur = st
+            parts = r[4]
+            route = 1 if (rl.get(i) and parts and parts[-1][1] == 'leave'
+                          and parts[-1][0] == rl[i]) else 0
+            for j, (o, a, _t) in enumerate(parts):
+                if j >= len(parts) - route:
+                    nx = lap[(k + 1) % len(lap)][0]
+                    nw = icons.get(nx, (None, None))[0]
+                    part[(i, j)] = cur if nw is None else nw
+                    continue
+                if a == 'bar':
+                    cur = ''
+                part[(i, j)] = cur
+    return at_walk, part
+
+
+def step_icon(n, step, walking=0):
+    """the icon a step sets (fcn.100422a5's last on its run; walking: on its
+    first, the GoTo under way) — None where it sets none"""
+    ev, _nxt = run_step(Level(n), step, {}, walking=walking)
+    ic = [e[1] for e in ev if e[0] == 'IC']
+    return ic[-1][0] if ic and ic[-1] else None
+
+
+def part_icons(n):
+    """{(object, action): the icon in effect while the lap plays that part
+    (_icon_parts; '' from a bar on)} — for the clips of a stay timed per clip
+    (pc_durations_s2.py CLIPS -> PCIconClips)"""
+    lap, _pairs = _paired_parts(n)
+    if not lap:
+        rows, loop = lap_steps(n)
+        lap = rows if loop is None else rows[loop:]
+    _w, part = _icon_parts(n, lap)
+    out = {}
+    for r in lap:
+        for j, (o, a, _t) in enumerate(r[4]):
+            out.setdefault((o, a), part[(r[0], j)])
+    return out
+
+
+def code_icons(n):
+    """{mobile item: {'icon': [per visit], 'at': [per visit [(seconds into the
+    stay, icon)]]}}: the bubble along each paired visit by the steps' icons
+    (_icon_parts; fcn.100422a5 sets the icon, '' a null one — the bubble
+    hidden —, a step without one keeps the last, a bar hides it until the
+    next) — the icon from the visit's start (the walk of its first row's
+    step, or its first part's where the visit does not start with that
+    step's walk) and its changes along the stay's parts (208's platform
+    bar, then the shoe cleaner's icon over the platform's leave its route
+    plays; 210's Fifi round in 0x10019ddb — fifi)"""
+    lap, pairs = _paired_parts(n)
+    walks = LAP_WALKS.get(n, {})
+    at_walk, part = _icon_parts(n, lap)
+    out = {}
+    for item, (many, visits) in pairs.items():
+        per = {'icon': [], 'at': []}
+        for v in visits:
+            if not v:
+                for k in per: per[k].append(None)
+                continue
+            li0, j0, _p0 = v[0]
+            first = lap[li0][0]
+            start = at_walk[first] if walks.get(first) and j0 == 0 else part[(first, j0)]
+            cur = start; t = 0; at = []
+            for li, j, p in v:
+                ic = part[(lap[li][0], j)]
+                if ic != cur:
+                    at.append((round(t / 12.0, 3), ic)); cur = ic
+                if p[2] is None:
+                    break
+                t += p[2]
+            per['icon'].append(start)
+            per['at'].append(at)
+        out[item] = per if many else {k: vv[0] for k, vv in per.items()}
     return out
 
 

@@ -90,6 +90,13 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                            'BeachGetBeer': ('beachright_mat_hn_guarded', 'use'),
                            'BeachCrabGetBeer': ('beachright_mat_hn_guarded_manip', 'use'),
                            'BeachGetUp': ('beachright_mat_hn_guarded', 'leave')}},
+        # 209's Taj Mahal (the curtain's bar step 0x10020bc6: its own tick at
+        # the place of the last, fcn.1000e7f2's 120 ticks behind the curtain;
+        # then the take step, 0x10020806, its own tick and the curtain's
+        # `leave` under its icon — the slippers, PCIconClips): the mobile's
+        # bar ends with the PC's
+        209: {'TadjMahal': {'TadjMahalStay': ('parts', (('ticks', 1), ('bar', 0x10020bc6))),
+                            'TadjMahalLeave': ('parts', (('ticks', 1), ('tadj_mahal_curtain', 'leave')))}},
         # 210's deck chair (his chair step 0x100195a4: the hideout's `enter`,
         # the bar of 120 ticks over the mobile's four sun clips; then the
         # chair's `wakeup` and the awake loop he waits in for the Mother's
@@ -355,6 +362,19 @@ def pair(n):
     return out
 
 
+# the clips of a stay played under the icon of a step the lap's rows do not
+# hold (a handler another actor's behaviour runs): 210's call step 0x1001911e
+# sets the Mother's icon, then its route leaves the deck chair
+ICON_STEPS = {210: {'DeckChair': {'ChairLeave': 0x1001911e}}}
+
+
+def _bar_ticks(n, step):
+    """the ticks a step's bar (fcn.1000e7f2) counts (0 where none is read)"""
+    import lap_model_s2
+    ev, _nxt = lap_model_s2.run_step(lap_model_s2.Level(n), step, {})
+    return next((e[2] for e in ev if e[0] == 'WAITEVENT' and isinstance(e[2], int)), 0)
+
+
 def clip_secs(n):
     """({item: {clip: seconds}}, {item: wait}) of CLIPS and WAITS, read from the
     level data and the code (tools/pcref/lap_model_s2.py)"""
@@ -380,7 +400,8 @@ def clip_secs(n):
                 # a clip over several of the step's parts in turn (207's
                 # PoolAwningFall: the awning's `crash`, a pose's tick, the
                 # pool's `enter`)
-                t = sum(p[1] if p[0] == 'ticks' else (d.action_ticks(*p) or 0) for p in src[1])
+                t = sum(p[1] if p[0] == 'ticks' else _bar_ticks(n, p[1]) if p[0] == 'bar'
+                        else (d.action_ticks(*p) or 0) for p in src[1])
             elif src[0] == 'job':
                 # another actor's action whose job posts the behaviour the
                 # stand waits for, and the offer's tick, over so many clips
@@ -692,6 +713,149 @@ def write_code_stays(ov, n, clips):
                 put(item, [round(t / 12.0, 2)])
 
 
+def mobile_icons(n):
+    """{mobile item: its bubble icon (BubbleIconActivePath over
+    BubbleIconPath, as the HUD's)}"""
+    objs = json.load(open(os.path.join(ROOT, 'levels', 's2', 'Level%d.json' % n)))['objects']
+    out = {}
+    for o in objs.values():
+        d = o.get('data') or {}
+        if 'BubbleIconPath' not in d:
+            continue
+        name = (d.get('m_GameObject') or {}).get('name')
+        if name:
+            out[name] = d.get('BubbleIconActivePath') or d.get('BubbleIconPath') or None
+    return out
+
+
+def _texture(icon):
+    """the remaster's bubble texture of a PC icon name ('' and None pass)"""
+    return not icon or os.path.exists(os.path.join(ROOT, 'textures', 's2', 'textures_nfh2_bubbles_%s.png' % icon))
+
+
+def _clip_icons(n, item, base, parts):
+    """{clip: icon} of a stay timed per clip (CLIPS), where another than
+    `base`: a clip's part's icon in the lap (lap_model_s2.part_icons: '' from
+    a bar on), a tricked variant's `_manip` object's in the same step, a clip
+    over several parts its bar's or its first action's; a clip of a step's
+    wait or pose, or of a part the lap does not play, the icon of the clips
+    before it (in their order); ICON_STEPS a step off the lap's rows"""
+    import lap_model_s2
+    cl = {}; prev = base
+    for clip, spec in CLIPS[n][item].items():
+        if not isinstance(spec, tuple) or not spec:
+            continue
+        ic = None
+        if clip in ICON_STEPS.get(n, {}).get(item, {}):
+            ic = lap_model_s2.step_icon(n, ICON_STEPS[n][item][clip])
+        else:
+            if spec[0] == 'parts':
+                subs = [q for q in spec[1] if q[0] != 'ticks']
+                spec = ('bar',) if any(q[0] == 'bar' for q in subs) else (tuple(subs[0]) if subs else spec)
+            if spec[0] == 'bar':
+                ic = ''
+            elif len(spec) >= 2 and (spec[0], spec[1]) in parts:
+                ic = parts[(spec[0], spec[1])]
+            elif len(spec) >= 2 and isinstance(spec[0], str) \
+                    and (spec[0].replace('_manip', ''), spec[1]) in parts:
+                # a tricked variant's clip: the object's `_manip` in the
+                # same step (IsVariant's pick — 202's crab beer)
+                ic = parts[(spec[0].replace('_manip', ''), spec[1])]
+        if ic is None:
+            ic = prev
+        if ic != base and _texture(ic):
+            cl[clip] = ic
+        prev = ic
+    return cl
+
+
+def icon_keys(n):
+    """{item: {PCIcon, PCIconAt, PCIconClips}} — the PC script's bubble where
+    it is another than the mobile item's (lap_model_s2.code_icons: the steps'
+    fcn.100422a5 icons along the paired visits, a bar hiding the bubble until
+    the next; _clip_icons for the clips of a stay timed per clip, CLIPS). A
+    PC icon the remaster has no texture of is the mobile's own under another
+    name (203's melons, the remaster's splitmelons)"""
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    mob = mobile_icons(n)
+    code = lap_model_s2.code_icons(n)
+    parts = lap_model_s2.part_icons(n)
+    out = {}
+    for item, c in code.items():
+        many = isinstance(c['icon'], list)
+        icons = c['icon'] if many else [c['icon']]
+        ats = c['at'] if many else [c['at']]
+        own = mob.get(item)
+        vis = [ic if (ic is not None and ic != own and _texture(ic)) else None for ic in icons]
+        keys = {}
+        if item in CLIPS.get(n, {}):
+            # one visit a lap, its clips' icons after its start's
+            if vis[0] is not None:
+                keys['PCIcon'] = vis[0]
+            cl = _clip_icons(n, item, own if vis[0] is None else vis[0], parts)
+            if cl:
+                keys['PCIconClips'] = cl
+        else:
+            if any(v is not None for v in vis):
+                keys['PCIcon'] = vis if many and len(set(vis)) > 1 else vis[0]
+            sched = []
+            for k, at in enumerate(ats):
+                cur = vis[k] if vis[k] is not None else own
+                seg = []
+                for secs, ic in (at or []):
+                    ic = ic if _texture(ic) else own
+                    if ic != cur:
+                        seg.append([secs, ic]); cur = ic
+                sched.append(seg or None)
+            if any(sched):
+                keys['PCIconAt'] = sched if many else sched[0]
+        if keys:
+            out[item] = keys
+    # the stays timed per clip the pairing has no visit for (202's swim: its
+    # bar hides the bubble, and the sea's leave after it; 210's deck chair)
+    for item in CLIPS.get(n, {}):
+        if item in out or item in code:
+            continue
+        cl = _clip_icons(n, item, mob.get(item), parts)
+        if cl:
+            out[item] = {'PCIconClips': cl}
+    return out
+
+
+def write_icon_keys(ov, n):
+    """the bubble's keys: the next station's icon before a route's leave
+    of the hideout a visit ends in (lap_model_s2.code_icon_leads — 208's
+    platform until it was timed per clip) or, timed per clip, at the clip
+    of that leave (HIDEOUT_AFTER: 207's board, the pool's `leave`); the
+    script's own icons where they are not the mobile item's (icon_keys)"""
+    sys.path.insert(0, HERE)
+    import lap_model_s2
+    for k in ('PCIcon', 'PCIconTail', 'PCIconAt', 'PCIconClips', 'PCIconLead', 'PCIconClip'):
+        ov['patches'] = _strip_key(ov['patches'], k)
+    for item, lead in lap_model_s2.code_icon_leads(n).items():
+        if item in CLIPS.get(n, {}):
+            continue      # timed per clip: PCIconClips
+        _set_key(ov['patches'], item, 'PCIconLead', lead)
+    for item, hid in lap_model_s2.HIDEOUT_AFTER.get(n, {}).items():
+        clip = next((c for c, v in CLIPS.get(n, {}).get(item, {}).items()
+                     if isinstance(v, tuple) and tuple(v) == (hid, 'leave')), None)
+        if clip is not None:
+            _set_key(ov['patches'], item, 'PCIconClip', clip)
+    keys_all = icon_keys(n)
+    for item, keys in keys_all.items():
+        for k, v in keys.items():
+            _set_key(ov['patches'], item, k, v)
+    note = (' The bubble (tools/pcref/pc_durations_s2.py --icons): PCIcon, PCIconAt and'
+            ' PCIconClips from the level script\'s icon elements (GameLogic.dll'
+            ' fcn.100422a5) along its lap (tools/pcref/lap_model_s2.py code_icons) where'
+            ' they are not the mobile items\' — \'\' no bubble: a null icon, and a bar'
+            ' (fcn.1000e7f2) until the next icon.')
+    if any(k in ('PCIcon', 'PCIconAt', 'PCIconClips') for keys in keys_all.values() for k in keys) \
+            and note not in ov.get('source', ''):
+        ov['source'] = ov.get('source', '') + note
+
+
 def write_code_keys(n):
     """the keys read from the code and the level data alone (PCClipSeconds,
     PCWaitFor, PCCreditInClip, PCBehaviourAt) into the level's overlay — the
@@ -720,6 +884,7 @@ def write_code_keys(n):
         _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
     write_tricked_keys(ov, n, clips)
     write_code_stays(ov, n, clips)
+    write_icon_keys(ov, n)
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     print('   written', p)
 
@@ -729,6 +894,17 @@ def main(argv):
     if '--code-keys' in argv:
         for n in [int(a) for a in argv if a.isdigit()]:
             write_code_keys(n)
+        return
+    if '--icons' in argv:
+        # the icon keys alone: printed, or written with --write
+        for n in [int(a) for a in argv if a.isdigit()] or list(range(201, 215)):
+            keys = icon_keys(n)
+            print(n, json.dumps(keys, ensure_ascii=False))
+            if write:
+                p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
+                ov = json.load(open(p))
+                write_icon_keys(ov, n)
+                json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
         return
     levels = [int(a) for a in argv if a.isdigit()] or list(range(201, 215))   # or 101-114 with the Season 1 idle visits
     for n in levels:
@@ -801,19 +977,8 @@ def main(argv):
                 for item, secs in behaviour_at_end(n).items():
                     _set_key(ov['patches'], item, 'PCBehaviourAtEnd', secs)
                 write_tricked_keys(ov, n, clips)
-                # the next station's icon before a route's leave of the
-                # hideout a visit ends in (lap_model_s2.code_icon_leads: 208's
-                # platform) — or, timed per clip, at the clip of that leave
-                # (HIDEOUT_AFTER: 207's board, the pool's `leave`)
-                ov['patches'] = _strip_key(ov['patches'], 'PCIconLead')
-                ov['patches'] = _strip_key(ov['patches'], 'PCIconClip')
-                for item, lead in lap_model_s2.code_icon_leads(n).items():
-                    _set_key(ov['patches'], item, 'PCIconLead', lead)
-                for item, hid in lap_model_s2.HIDEOUT_AFTER.get(n, {}).items():
-                    clip = next((c for c, v in CLIPS.get(n, {}).get(item, {}).items()
-                                 if isinstance(v, tuple) and tuple(v) == (hid, 'leave')), None)
-                    if clip is not None:
-                        _set_key(ov['patches'], item, 'PCIconClip', clip)
+                # the script's icons (write_icon_keys)
+                write_icon_keys(ov, n)
             for item, vals in per.items():
                 vals = [0] * LEAD_MOBILE.get(n, {}).get(item, 0) + vals
                 _set_key(ov['patches'], item, 'PCUseSeconds', vals if len(vals) > 1 else vals[0])

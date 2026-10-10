@@ -2942,7 +2942,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   drifting by up to 0.5-0.8 s over 90-100 s, 208's shoe machine and 209's
   Taj and hot shoe splitting a station's time differently (the totals
   agree), 210's call icon 1.1-1.6 s ahead of the port's (the chair's
-  leave after it).
+  leave after it) — read again on the level's clock and the bubble's
+  other states in "The Season 2 bubble by the script's icons".
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's
@@ -3006,14 +3007,76 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   next step's route plays the leave (the step's icon, fcn.100422a5,
   before its GoTo): lap_model_s2.ROUTE_LEAVES / code_icon_leads — in the
   walked laps 208's platform alone, 2.92 s (its second visit's shoe
-  machine icon at 96.6 s against E08's 95.9) — and 207's pool, timed per
-  clip, from its leave's clip on (PCIconClip PoolGetOut: the bar icon at
-  18.15 against E07's 18.4); a step that plays its own leave (E6c2e: 212's
+  machine icon at 96.5 s against E08's 96.0, the level's clock) — and
+  207's pool, timed per clip, from its leave's clip on (PCIconClip
+  PoolGetOut: the bar icon at 18.13 against E07's 18.50); a step that plays its own leave (E6c2e: 212's
   bench, 213's picnic) shows the next icon after it, as the port did.
-  Open: 208's first platform visit, from the level's start, has the shoe
-  machine's icon at 5.4 s where the port's comes at 10.4; 209's Taj Mahal
-  span reads 1 s over E09's and the hot shoe's after it 1 s under (its
-  curtain's leave is the Taj step's own, E6c2e).
+  (The two opens left here — 208's first platform visit and 209's Taj
+  Mahal against the hot shoe — were the bubble's other states: "The
+  Season 2 bubble by the script's icons" below.)
+- *The Season 2 bubble by the script's icons (2026-09-30, carried).*
+  GameLogic.dll's icon element fcn.100422a5(actor, icon) posts the GUI
+  message that sets an actor's bubble — the actor's name at the
+  message's +8, the icon resolved (fcn.1004bc95) at +4; the icon is the
+  argument pushed first. A step that pushes a null one (`mov [eax], ebx`
+  with the prologue's zeroed ebx, or `and [eax], 0`) clears it, and the
+  PC shows no bubble at all: E12 none from the bench on to the bull
+  ride's icon, E06's neighbour none until the Mother's call. A bar
+  (fcn.1000e7f2's object, vtable 0x100ab710, update 0x1000b312: a
+  progress message, counter x 100 / ticks, a level tick at a time up to
+  its ticks) puts the portrait's progress bar in the bubble's place
+  (menuleft.xml's `neighbor_sleep`, HN_dis_001 drained top-down; the
+  green is gone some 0.6 s before the end), and the bubble stays away
+  after it until a step sets an icon again: E10's awake wait after the
+  deck chair's bar (14 s, until the call step 0x1001911e sets the
+  Mother's), E02's sea leave after the swim's bar (the rail step's
+  route plays it under the bridge's icon). The steps' icons
+  (lap_model_s2 LAP_ICONS: the walk's — the step's first run, its GoTo
+  under way, run_step(walking=1) — and the arrival's) along the paired
+  visits against the mobile items' (code_icons, part_icons): 209's shoe
+  step shows the Taj Mahal's (0x10020c72; the mobile's first shoe visit
+  showed the slippers — E09's Taj icon 9.13 s in, the port's 9.15), its
+  bar step hides the bubble and the take step sets the slippers before
+  the curtain's leave (0x10020806); 212's bench step, at the cigars'
+  spot, clears it on the arrival (0x10036504) and its leave step again
+  (0x1003613a); 213's limberwall step shows the limberwall (the
+  mobile's LiveBull the bull's head); 201's second slip runs in the cap
+  step (captncap); 202's mat step shows the mat before the beer step's
+  beer; 206's harpoon put clears it (0x1002d597), the Fifi take after
+  the shot shows fifi and the one after the weights the workout; 208's
+  platform bar hides it until the shoe cleaner's step sets its icon;
+  210's chair step clears it (0x100195bc) through the `enter`, the bar
+  and the awake wait, the call step sets the Mother's before the chair's
+  leave, and the elephant's Fifi round runs in a fifi step (0x10019ddb).
+  Carried under the profile (tools/pcref/pc_durations_s2.py --icons):
+  PCIcon per visit (the icon from the visit's start, '' none), PCIconAt
+  (its changes so far into a stay timed in seconds: 207's towel none from
+  its bar on, 208's platform none over its bar and the shoe cleaner's
+  over the leave, 210's elephant fifi after the put) and PCIconClips (per
+  clip of a stay timed per clip: 202's mat and swim, 210's deck chair —
+  ICON_STEPS its leave under the call step's icon —, 209's Taj Mahal,
+  timed per clip since: its bar's 121 ticks, the leave's 12);
+  Routine.pc_think_icon; the Season 2 bubble goes by these alone, the
+  mobile sleep bars' think-bubble disable aside (202's mobile bar starts
+  on the second visit's lay-down, the PC's with its bar). 203's `melons`
+  has no remaster texture — the remaster's splitmelons stands for it.
+  The videos' clocks: the HUD clock's second ticks (the last digit's
+  white mask) put the level's zero 0.10 s before the HUD shows — level
+  time = episode time + 1.37 (E02), 1.57 (E03), 1.40 (E04), 1.17 (E05),
+  1.57 (E06), 0.97 (E07), 1.30 (E08), 1.55 (E09), 1.07 (E10), 1.28
+  (E11), 0.00 (E12), 0.60 (E13), 0.97 (E14); E01's clock stands at 0:00
+  for 5.2 s after the HUD shows (its tutorial box), -3.30. The frame
+  comparisons before took the HUD's appearance for the zero (0.10 s
+  off). The first lap's bubble events since, port against video (the
+  show, the icon changes, the hide): 203 -0.02..+0.37, 204 -0.27..0,
+  205 -0.30..+0.36, 207 -0.37 (the bar's icon 18.13 / 18.50) back to
+  +0.05 at the towel, 208 -0.19..+0.48, 209 0..+0.43, 210 -0.09..-0.46,
+  211 -0.11..+0.37, 212 -0.10..+0.28, 213 -0.13..+0.11, 214 -0.04..+0.10;
+  208's shoe machine icon at 5.4 s was the bar's hide (5.53 against the
+  port's 5.38, the shoe cleaner's icon 10.57 / 10.38), 209's Taj span
+  the Taj's icon over the shoe visit. Open: 202's swim — the rake's icon
+  to the sea's bar 14.5 s against the port's 13.4 (the wait at the shore
+  for Olga's sub), the laps after it 1.6-1.9 s ahead.
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

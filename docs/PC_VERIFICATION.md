@@ -1412,3 +1412,21 @@ actors' job pass the update calls at 0x100445f8.
   runs/ff209bidle: the fakir 7.82-8.98, the shoes 18.15-20.98, the Taj
   21.15-31.98, the take 32.15-33.98; the lap 106.83-107.0 (the model
   106.0). Plan 209 at 100 (runs/ff209bplan, 426.2 s).
+- `runtime/hud.py`, `runtime/world.py`, `runtime/scene.py`,
+  `runtime/record.py`, `tools/pcref/lap_model_s2.py`,
+  `tools/pcref/pc_durations_s2.py`, `levels/pc/Level201/202/206-210/212/
+  213.overlay.json` (2026-09-30): the Season 2 bubble by the script's icons
+  (PCIcon, PCIconAt, PCIconClips; a null icon and a bar hide it). The
+  videos on the level's clock (the HUD clock's second ticks; E09 +1.55),
+  the port's fine idle laps (a state row a tick, hud.think): 209 the Taj
+  icon 9.13 / 9.15, hidden 20.85 / 21.03, the slippers 30.88 / 31.12, the
+  coals 33.82 / 34.05, the ice cream 44.92 / 45.35; 212 hidden from the
+  bench 51.23 / 51.33, the bull ride's icon 64.30 / 64.37; 210 hidden
+  from the chair step 1.57 / 1.37, the Mother's icon 25.94 / 25.85 (the
+  port's deck chair icon to 27.35 before), hidden again 117.97 / 117.55;
+  208 hidden for the platform's bar 5.53 / 5.38, the shoe cleaner's icon
+  10.57 / 10.38; 202 the swim's hide 36.54 / 34.87 and the bridge's icon
+  44.70 / 42.95 (the open wait at the shore); 213 the limberwall at the
+  start, then 8.13 / 8.03 ... 100.27 / 100.38. All 28 plans at 100 as
+  before (runs/icons1_pc: the same legs and scores), mobile 270/270, both
+  tutorials ALL OK.

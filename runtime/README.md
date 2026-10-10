@@ -825,6 +825,17 @@ predicate, then the all-tricks win.
   Season 1 stations he leaves by that walk (the sofa, the table, the
   mailbox, the towel) the bubble shows the next station's icon the leave's
   seconds before the stay's end; the mobile's changes with the next action.
+- **The PC profile's Season 2 bubble** (PCIcon, PCIconAt, PCIconClips;
+  `Routine.pc_think_icon`, `HUD.think_icon`): the level script's icon
+  element (fcn.100422a5) along each visit — the visit's own icon where it
+  is not the mobile item's (209's first shoe visit under the Taj Mahal's,
+  213's limberwall), its changes so far into a stay or per clip, and ''
+  for none: a null icon (212's bench) and a bar (fcn.1000e7f2) hide the
+  whole bubble until a step sets an icon again. The neighbour's Season 2
+  bubble goes by these alone under the profile; the mobile sleep bars'
+  think-bubble disable (ProgressBar.SetSleeping) keeps the Season 1
+  bubble and the Mother's. The profile's lesson's '' (206's
+  TutorialPC206) hides the bubble the same way.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
