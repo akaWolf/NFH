@@ -2684,7 +2684,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   tick, World.pc_s2_extra_credit). E13's gauge: the bull to the plant
   27.0 s (the port's 27.0, 22.2 before), the plant to the tortilla 10.75
   (11.0), the tortilla to the picnic 27.5 (27.2); 213's plan ends 1.7 s
-  later, at 100.
+  later, at 100. Open (2026-09-30, the port's 27.0 there since): the
+  picnic to the pinata 37.2 s against the port's 38.5 — after Olga's fight
+  both walk to the beach door (her bull, his pinata); in the port she goes
+  as her fight ends and he after his SHOUT 1 (2.2 s), so she takes the pair
+  first (365.5), stands her `in` run and has it till her `<actor>_out`
+  (371.0), and he stands at the door from 368.5 and then his own `in` run
+  (to 373.2) — the PC's claim order as carried (0x1000339d, fcn.10003454);
+  E13's frames (2 fps, the camera on Woody) do not settle their order.
   And 204's rickshaw: the reaction Olga's fight hands to (0x10032b6f: the
   rickshaw icon, SHOUT 0, the camera back) goes on to 0x1003250a — the
   GoTo to the manipulated rickshaw, its `repair` (20 ticks) and the switch
