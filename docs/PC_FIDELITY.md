@@ -2846,8 +2846,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   every walk past a visible actor of the room (one in a hideout plays
   `inv`, which the check skips); the lap model applies it on the
   co-actors' runs to him only — his own walks past a standing Olga or
-  Mother are not modelled (no lap's timing against the videos has shown
-  one).
+  Mother are not modelled. Their scope, read off the port's own runs
+  (case1v, the mobile scene's places, 15 px and 50 px as 0.16 and 0.52 of
+  its units): frames of his walks heading at a visible co-actor within the
+  box — 201 4, 204 10, 205 12, 207 1, 211 21, 212 37, 213 40, 214 56, the
+  rest 0; the chains of 212, 213 and 214 against the gauges stay within
+  0.5 s where comparable (213's picnic to the pinata aside, above), so a
+  run the check would lengthen has not shown in them.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's
