@@ -86,7 +86,13 @@
     "PCJingleAt": [
      4.08
     ],
-    "PCUseSeconds": 6.08
+    "PCUseSeconds": 6.08,
+    "PCHitAfter": {
+     "Olga": 0.75
+    },
+    "PCHitRun": {
+     "Olga": 2.42
+    }
    }
   },
   {

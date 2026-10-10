@@ -1361,6 +1361,59 @@ class Geometry:
         t += self.run(ty - y, v if ty < y else vd)
         return t
 
+    def leg_avoid(self, x, y, tx, ty, fy, other, room, actor='neighbor', gait='mg'):
+        """leg's ticks with the step's check against another actor of the
+        room (fcn.10009889: the step fcn.10009215 computes the next place,
+        fcn.10009489 tests it): a step that heads at an actor standing within
+        15 px across and 50 along it is not taken — a tick without a move —
+        and a vertical one sets the movement a detour to 50 px beside that
+        actor at the mover's own height, on the side the room's path allows
+        and else the target's (0x1000975d-0x100097c9); the waypoints of
+        fcn.10009177 go on from there. 207's Olga down from her mat onto his
+        point stops 15 px above him and goes round him"""
+        sp = self.speed[actor]
+        v = sp[gait + '0'][0]; vd = sp[gait + '2'][0]
+        h = sp[gait + '1'][0]
+        ox, oy = other
+        x1, x2 = self.rooms[room]['x1'], self.rooms[room]['x2']
+        t = 0
+        detour = None
+        for _ in range(4000):
+            if detour is not None and (x, y) == detour:
+                detour = None
+            if detour is None and (x, y) == (tx, ty):
+                return t
+            if detour is not None:
+                wx, wy = detour
+            elif y != fy and x != tx:
+                wx, wy = x, fy
+            elif x != tx:
+                wx, wy = tx, fy
+            else:
+                wx, wy = tx, ty
+            nx, ny = x, y
+            if wy != y:
+                s = v if wy < y else vd
+                ny = y + max(-s, min(s, wy - y))
+            else:
+                nx = x + max(-h, min(h, wx - x))
+            t += 1
+            if abs(ox - nx) < 50 and abs(oy - ny) < 15 \
+                    and ((ox - nx) * (nx - x) > 0 or (oy - ny) * (ny - y) > 0):
+                if nx == x and detour is None:
+                    left, right = ox - 50, ox + 50
+                    if x1 > left:
+                        side = right
+                    elif x2 < right:
+                        side = left
+                    else:
+                        side = right if tx >= x else left
+                    detour = (side, y)
+                    continue          # the blocked tick: no move
+                return None           # (a horizontal block: not modelled)
+            x, y = nx, ny
+        return None
+
     def door_pass(self, din, dout, actor='neighbor', gait='mg', data=None):
         """the door-pass step (vtable 0x100ab1b8, fcn.1000340b / 0x10003a19)
         after the walk to the near door's `<actor>_in`: the near door's `enter`
@@ -1414,7 +1467,7 @@ def walk_ticks(g, frm, to, actor='neighbor', data=None, detail=None):
     return t + t3, (r2, p2[0], p2[1])
 
 
-def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None, gait='mg'):
+def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None, gait='mg', avoid=None):
     """(room, x, y) -> an object's `<actor>` hotspot — or the one the GoTo
     names (`hotspot`: its +0xc, fcn.10049e01 at 0x1000744d; the actor's
     name where it has none, fcn.1003cc45 at 0x10007430) — as GameLogic.dll
@@ -1499,7 +1552,14 @@ def walk_span(g, frm, to, actor='neighbor', data=None, detail=None, hotspot=None
         if detail is not None:
             detail.append(('pass %s' % din, t - t0))
     t0 = t
-    s = g.leg(x, y, p2[0], p2[1], g.floor(room), actor, gait)
+    if avoid is not None and avoid[0] == room:
+        # the actor it walks to stands in the room (fcn.10009489's check:
+        # leg_avoid)
+        s = g.leg_avoid(x, y, p2[0], p2[1], g.floor(room), (avoid[1], avoid[2]), room, actor, gait)
+    else:
+        s = g.leg(x, y, p2[0], p2[1], g.floor(room), actor, gait)
+    if s is None:
+        return None, frm
     if s:
         t += s - 1
     if detail is not None:
@@ -1931,7 +1991,13 @@ HIT_FROM = {204: {'PullKart': ('groundleft_rickshaw_manip', 'mr')},
             # step 0x1003bf93 sets gait 2 (0x1003c035) — its `leave`, 39
             # ticks
             214: {'Pistol': ('topright_deckchair', 'mr'),
-                  'Shower': ('bottomleft_shipshower_guarded', 'mr')}}
+                  'Shower': ('bottomleft_shipshower_guarded', 'mr')},
+            # 207's shell: Olga on her guarded mat, her step 0x100176b2
+            # leaves it (9 ticks, to its olga_out right above his point)
+            # and runs fcn.1000eb19 at her walk (no gait written) — down
+            # onto him until his box stops her, round him to his left
+            # (leg_avoid)
+            207: {'Shell': ('beachright_mat_guarded', 'mg')}}
 # ... and her own steps before her GoTo to the object her action is on:
 # {level: {item: (the actor, her steps, her gait, the object, his part that
 # posts her behaviour)}} — 207's castle over the hedgehog's towel: the
@@ -1994,8 +2060,10 @@ def _hit_after(n, d, lv, bytes0, ev, own, walked, spec):
     frm, his = ctxh.get('pos'), ctx.get('pos')
     if frm is None or his is None:
         return None
-    x = his[1] - FIGHT_GAP if frm[1] < his[1] else his[1] + FIGHT_GAP
-    t, _p = walk_span(d.geom(), frm, (his[0], x, his[2]), actor, d)
+    # (fcn.1000e601: his x plus the gap where he stands left of her, else
+    # less it — an equal x takes the left side, 0x1000e6fe-0x1000e714)
+    x = his[1] + FIGHT_GAP if his[1] < frm[1] else his[1] - FIGHT_GAP
+    t, _p = walk_span(d.geom(), frm, (his[0], x, his[2]), actor, d, avoid=his)
     if t is None:
         return None
     return her_end + t + 2 - end
@@ -2104,8 +2172,10 @@ def _hit_run(n, d, ev, actor, spec):
     if lv is None or q is None or his is None:
         return None
     frm = (g.room_of(d.real.get(hideout, hideout)), q[0], q[1])
-    x = his[1] - FIGHT_GAP if frm[1] < his[1] else his[1] + FIGHT_GAP
-    t, _p = walk_span(g, frm, (his[0], x, his[2]), actor, d, gait=gait)
+    # (fcn.1000e601's side: an equal x takes the left, 0x1000e6fe-0x1000e714;
+    # the walk goes round him where it heads at him, walk_span's avoid)
+    x = his[1] + FIGHT_GAP if his[1] < frm[1] else his[1] - FIGHT_GAP
+    t, _p = walk_span(g, frm, (his[0], x, his[2]), actor, d, gait=gait, avoid=his)
     if t is None:
         return None
     return lv, t + 2

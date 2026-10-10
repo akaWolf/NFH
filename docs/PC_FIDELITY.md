@@ -2808,30 +2808,31 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   him seated). E10: the fuel beer to the extinguisher 14.7 s against 14.9
   (14.35 before), the extinguisher to the spray 15.5 against 15.5 (14.8);
   the spray to the slip 17.1 against 16.6 — the slip's place the player's
-  banana. Open: 207's
-  shell — the `shell_crayfish` on her mat posts
-  `crayfish` to Olga, whose step 0x100176b2 leaves the mat (9 ticks, to
-  its olga_out 1317/519) and runs fcn.1000eb19 at her walk; fcn.1000e601
-  takes the point 50 px beside him at his y (1267/575, the left side for
-  an equal x, 0x1000e701-0x1000e70e) and walks her there whenever she is
-  not on it (fcn.100072b1 compares the points). E07 at 4 fps: she gets
-  up 193.5-194.75, comes round to his left 195.0-196.5 and fights from
-  ~196.75, 3.25 s after his stand; the port fights at once (she stands
-  within the mobile's reach), and the floor-line waypoints of
-  fcn.10009177 (down 81 px, along 50, up 25: 43 ticks) would make it 4.5
-  — the movement's waypoints for a point off the floor line, or her
-  start, not settled. At 30 fps: she is put behind him at 194.25 (the
-  mat's `leave` over, ms3), goes down behind him at the walk's 3 px a tick
-  for ~13 ticks (35-40 px), along to his left from ~195.47 at the walk's 8
-  (50 px, 7 ticks), faces the camera from 196.07 and the fight's cloud
-  shows at 196.67: 29 ticks from the placement, where the floor route
-  (fcn.1000901b: +0x31 clear, the floor line the room's path1 y 600 through
-  fcn.1004c945 / fcn.1000889d) takes 46 and the direct one (+0x31 set: x
-  first) goes along first, which the frames do not show. Olga's speed
-  records are the neighbour's (generic/objects.xml: mg 3/8, mr 9/18), no
-  gait is written on her way (0x10017606 sets 2 for the castle only and
-  0x10017646 clears it there). The frames fit a floor line near 560 —
-  nothing in the room (path 600, floor 500-800) gives it.
+  banana. And 207's shell (carried 2026-09-30): the `shell_crayfish` on
+  her mat posts `crayfish` to Olga, whose step 0x100176b2 leaves the mat
+  (9 ticks, to its olga_out 1317/519, right above his point) and runs
+  fcn.1000eb19 at her walk; fcn.1000e601 takes the point 50 px beside him at his y (1267/575,
+  the left side for an equal x, 0x1000e6fe-0x1000e714 — the model had
+  taken the right) and walks her there. The walk step checks the place it
+  computes against the room's other actors (fcn.10009889 -> fcn.10009489):
+  a step heading at an actor within 15 px across and 50 along is not taken
+  — a tick without a move — and a vertical one sets the movement a detour
+  to 50 px beside him at the mover's height, the side the room's path
+  allows and else the target's (0x1000975d-0x100097c9). So her descent to
+  the floor line stops at 558, 17 px above him, and goes round him to his
+  left and down to the point: 27 ticks where the floor route is 43
+  (lap_model_s2 Geometry.leg_avoid, walk_span's `avoid`, HIT_FROM 207 ->
+  PCHitAfter 0.75, PCHitRun 2.42). E07 at 30 fps: she is put behind him at
+  194.25, goes down behind him ~13 ticks, along to his left from ~195.47,
+  faces the camera from 196.07, the fight's cloud at 196.67 — 3.25 s after
+  his stand; the port's 3.17 (0 before). The 207 plan's pile fell 0.3 short
+  of the collapse with the 3.2 s; v9 moves the second spring after the
+  castle (the board on his lap 5): 100 at 497.0 s. The check applies to
+  every walk past a visible actor of the room (one in a hideout plays
+  `inv`, which the check skips); the lap model applies it on the
+  co-actors' runs to him only — his own walks past a standing Olga or
+  Mother are not modelled (no lap's timing against the videos has shown
+  one).
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's
