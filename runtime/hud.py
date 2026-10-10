@@ -1349,7 +1349,13 @@ class Hud:
         it = routine.urgent_item or routine.item
         name = None
         pc = getattr(routine, 'pc_bubble', None)
-        if pc is not None:
+        nxt = getattr(routine, 'pc_bubble_next', None) \
+            if routine.urgent_item is None and routine.state == routine.USING else None
+        if pc is None and nxt:
+            # the next station's icon, up before the stay's walk leave
+            # (PCIconLead, Routine._pc_next_icon)
+            name = nxt
+        elif pc is not None:
             # a PC script's icon element (fcn.100422a5) while the profile's
             # lesson drives the actor (206's TutorialPC206: `mother`,
             # `get_pillow`, `bring_pillow`; '' clears the bubble)

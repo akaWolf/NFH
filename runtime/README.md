@@ -819,6 +819,12 @@ predicate, then the all-tricks win.
   shot's third record — the ExtraCoin206 — pays and books its completion
   at its own tick (PCExtraPaysAtLinked, `pc_credit3_timer`). harpoonAux is
   off under the profile (the PC's shoot step asks nothing).
+- **The PC profile's next icon** (PCIconLead, `Routine.pc_icon_at`,
+  `Routine._pc_next_icon`, the HUD's bubble): game.exe's next case sets its
+  icon before the leave its GOTO's walk job pushes (0x475ce6), so on the
+  Season 1 stations he leaves by that walk (the sofa, the table, the
+  mailbox, the towel) the bubble shows the next station's icon the leave's
+  seconds before the stay's end; the mobile's changes with the next action.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed

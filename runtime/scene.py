@@ -247,7 +247,7 @@ class Item:
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
-                 'pc_return_secs',
+                 'pc_return_secs', 'pc_icon_lead',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
                  'pc_minigame_failed', 'pc_minigame_failed_ticks', 'pc_behaviour_at', 'pc_behaviour_at_end', 'pc_minigame_failed_clip', 'pc_minigame_lift', 'pc_sit_secs', 'pc_sleep_secs', 'pc_getup_secs',
                  'pc_clip_secs', 'pc_clip_secs_role', 'pc_wait_for', 'pc_wait_for_role',
@@ -649,6 +649,11 @@ class Item:
         v = d.get('PCUseSeconds')
         self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         self.pc_use_visit = 0
+        # the seconds before a visit's end the next station's icon is up
+        # (PCIconLead: the leave the next case's walk plays after its ICON,
+        # tools/pcref/pc_durations.py; one value or one per visit)
+        v = d.get('PCIconLead')
+        self.pc_icon_lead = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         # the other actors' stays under the profile (PCUseSecondsRole: role ->
         # seconds or one per visit, the PC data's `time` ticks / 12 — the
         # Mother's stands of 212 and 213)

@@ -3655,6 +3655,10 @@ class Routine:
         self._pc_scene_defer = None      # a scene held until the visit's poll clip is over
         self.pc_run_next = False         # the next urgent runs: a lost PC game's `run` (_dex_surprise)
         self.pc_fire_at = 0.0            # the PC fire due so many seconds into a tricked use (PCFireAt)
+        # the PC profile's next icon: up so many seconds into the use (the
+        # stay less its PCIconLead), and the icon the bubble shows from then
+        self.pc_icon_at = 0.0
+        self.pc_bubble_next = None
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
         self.pc_credit_item = None
         self.pc_credit2_timer = 0.0      # the linked trick's own record, due later in the linked step (PCLinkedPaysAt)
@@ -3849,10 +3853,21 @@ class Routine:
                 index = 0
         return index
 
+    def _pc_next_icon(self):
+        """the icon of the routine's next action's item (the bubble's, under
+        the profile's PCIconLead); None for a move or no item"""
+        if not self.actions:
+            return None
+        name = self.actions[self._next_index(self.index)]['item']
+        nxt = self.level.items.get(name) if name else None
+        return (nxt.bubble_icon_active or nxt.bubble_icon) if nxt is not None else None
+
     def _advance(self):
         self._override = None
         self._active = None
         self._pc_wait_spent = None
+        self.pc_icon_at = 0.0
+        self.pc_bubble_next = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -4688,6 +4703,16 @@ class Routine:
         if self.on_use:
             self.on_use(it, tricked)
         pc = self._pc_use_seconds(it)
+        self.pc_icon_at = 0.0
+        self.pc_bubble_next = None
+        if pc and it.pc_icon_lead and not self._pc_use_tricked and not self.pc_zero_visit:
+            # the next case's ICON comes before the leave its walk job plays
+            # (game.exe 0x475ce6: the GOTO pushes the LEAVE after the case's
+            # SetIcon): the bubble takes the next station's icon that many
+            # seconds before the stay's end (PCIconLead)
+            lead = it.pc_icon_lead[(max(it.pc_use_visit, 1) - 1) % len(it.pc_icon_lead)]
+            if 0.0 < lead < pc:
+                self.pc_icon_at = pc - lead
         if self.pc_zero_visit:
             # the PC plays nothing at this visit (_pc_use_seconds): no pose,
             # no clip — the stand ends at once, StopAction's side effects kept
@@ -7624,6 +7649,11 @@ class Routine:
                 w = self.pawn.world
                 if it is not None and w is not None:
                     w.pc_s2_extra_credit(self.pawn, it)
+        if self.state == self.USING and self.pc_icon_at > 0.0:
+            self.pc_icon_at -= dt
+            if self.pc_icon_at <= 0.0:
+                self.pc_icon_at = 0.0
+                self.pc_bubble_next = self._pc_next_icon()
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,

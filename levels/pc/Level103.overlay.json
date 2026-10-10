@@ -49,7 +49,8 @@
     "PCUseSecondsTricked": 3.667,
     "PCFireAt": 1.917,
     "PCFireLead": true,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCIconLead": 0.25
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 6.0 s"
   },

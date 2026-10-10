@@ -45,6 +45,13 @@ CYCLE = {106: 2}
 # while <= 4, reset to 0 as the sofa is entered; fcn.004707e0: sit_remo on
 # 1 and 3, sit on the rest) and 102's (0x46fa46-0x46fa5c; fcn.0046f4c0:
 # sit_beer on 0 and 4, sit_remo on 1, sit on 2 and 3)
+class WalkLeave(str):
+    """a leg's text for the leave a walk's own job plays (the next case's
+    GOTO, 0x475ce6): the next case's ICON is up before it
+    (pc_durations.py PCIconLead)"""
+    walk_leave = True
+
+
 CASE_ROUNDS = {101: ('lir/sofa', ('sit', 'sit_remo', 'sit', 'sit_remo', 'sit')),
                102: ('lir/sofa', ('sit_beer', 'sit_remo', 'sit', 'sit', 'sit_beer'))}
 
@@ -387,7 +394,8 @@ def _lap(L, toks, start):
             i = len(legs)
             while implicit and i > 0 and legs[i - 1][0] == 'icon':
                 i -= 1
-            legs.insert(i, ('action', '%s leave' % obj, t)); occupied = None
+            text = '%s leave' % obj
+            legs.insert(i, ('action', WalkLeave(text) if implicit else text, t)); occupied = None
 
     def enter(obj):
         nonlocal occupied

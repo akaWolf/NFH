@@ -2996,8 +2996,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   ICON is set before the leave its GOTO's walk job pushes (0x475ce6), and
   the model hands the implicit leave (6 ticks) to the station it closes.
   The port pairs it the same way (the sofa's PCUseSeconds ends with the
-  get-up), so its bubble takes the next icon half a second after the PC's
-  on the stations left by a walk's own leave.
+  get-up), and since the same day its bubble takes the next station's icon
+  that far before the stay's end (PCIconLead from pc_durations.py: the
+  closing leave the model's legs mark as the walk's, lap_model.WalkLeave;
+  Routine.pc_icon_at / pc_bubble_next, the HUD's bubble): 101's and 102's
+  sofa 0.5 s, 103's mailbox 0.25, 106's towel 0.58, 110's table 0.92, a
+  tick at 105's piano, 107's wheel and 113's ladder — 101's binoculars
+  icon at 18.58 s against E01's 18.47. (Season 2's hideout leaves are not
+  one rule: 207's pool and 209's curtain show the next icon before the
+  leave, 212's bench and 213's picnic after it — left as they are.)
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

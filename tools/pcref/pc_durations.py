@@ -103,10 +103,12 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks, walks=None):
+def pc_stations(n, toks, walks=None, leads=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
-    moves, doors and no-move ticks, 0 where the case has no GOTO])"""
+    moves, doors and no-move ticks, 0 where the case has no GOTO]; into
+    `leads` icon -> [the seconds of the leave the next case's walk plays at
+    the station's end, after the next ICON — lap_model.WalkLeave — per visit])"""
     L = lap_model.Level(n)
     legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
@@ -136,11 +138,23 @@ def pc_stations(n, toks, walks=None):
         st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
     by = {}; parts = {}
-    for (icon, ta, tw), aa in zip(st, acts):
+    # each station's closing walk leave (the legs' last action of the station)
+    closing = []
+    cur = None
+    for kind, text, t in legs:
+        if kind == 'icon':
+            closing.append(0.0)
+        elif kind == 'action' and closing:
+            closing[-1] = t / lap_model.TICK if getattr(text, 'walk_leave', False) else 0.0
+    if len(closing) > len(st):
+        closing = closing[:len(st)]
+    for i, ((icon, ta, tw), aa) in enumerate(zip(st, acts)):
         by.setdefault(icon.split()[-1], []).append(ta / lap_model.TICK)
         parts.setdefault(icon.split()[-1], []).append(aa)
         if walks is not None:
             walks.setdefault(icon.split()[-1], []).append(tw)
+        if leads is not None:
+            leads.setdefault(icon.split()[-1], []).append(closing[i] if i < len(closing) else 0.0)
     return by, parts
 
 
@@ -161,7 +175,12 @@ def main(argv):
         if not pairs:
             continue
         walks = {}
-        by, parts = pc_stations(n, toks, walks)
+        leads = {}
+        by, parts = pc_stations(n, toks, walks, leads)
+        # per visit, the seconds before the stay's end the next case's icon is
+        # up: the leave the next case's walk job plays (0x475ce6), after that
+        # case's ICON (PCIconLead; the last of a pair's visits)
+        icon_leads = {}
         secs = {}
         notes = []
         spent = {}
@@ -180,6 +199,8 @@ def main(argv):
             if k >= len(vals):
                 print('%d: no PC station %s #%d for %s' % (n, icon, k, item)); continue
             nv = len(share) if isinstance(share, tuple) else share
+            ld = round((leads.get(icon) or [0.0] * (k + 1))[k], 3) if k < len(leads.get(icon) or []) else 0.0
+            icon_leads.setdefault(item, []).extend([0.0] * (nv - 1) + [ld])
             first = (icon, k) not in opened
             opened.add((icon, k))
             goes = bool((walks.get(icon) or [0] * (k + 1))[k])
@@ -323,6 +344,11 @@ def main(argv):
                 e['set']['PCCaseGoto'] = cg if len(cg) > 1 else cg[0]
             else:
                 e['set'].pop('PCCaseGoto', None)
+            il = icon_leads.get(item) or []
+            if any(il) and len(il) == len(vals):
+                e['set']['PCIconLead'] = il if len(il) > 1 else il[0]
+            else:
+                e['set'].pop('PCIconLead', None)
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     return 0
 

@@ -277,7 +277,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 1.5,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCIconLead": 0.083
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.50 s"
   },
@@ -285,7 +286,8 @@
    "object": "LadderDrill",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.0
+    "PCUseSeconds": 4.0,
+    "PCIconLead": 0.083
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.00 s"
   },
