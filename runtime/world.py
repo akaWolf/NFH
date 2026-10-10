@@ -2069,9 +2069,10 @@ class Pawn:
         mover of one move — and his walk's job adds its own ticks after it
         (pcprofile.s1_arrive, s1_goto_ticks: a GOTO done on the update after
         the arrival and its case's next job a tick later, three ticks with no
-        move; a GOTOENTER's ENTER in the arrival's tick); Woody's legs and a
-        visit inside a case keep the earlier count — the GOTO done in the tick
-        of its last move, two ticks with no move (_pc1_close)"""
+        move; a GOTOENTER's ENTER in the arrival's tick); Woody's the same,
+        his click's follow-up in the arrival's tick (_pc1_kind). A visit
+        inside a case keeps the earlier count — the GOTO done in the tick of
+        its last move, two ticks with no move (_pc1_close)"""
         z = self.zone
         if z is None:
             return
@@ -2100,7 +2101,7 @@ class Pawn:
         # tick later — that leg its walk's first, not a leg after a pass
         fin = steps[-1] if steps else None
         room_zone = None
-        if fin is not None and fin.get('kind') == 'item' and self._pc1_kind('goto') is not None:
+        if fin is not None and fin.get('kind') == 'item' and self.role != 'Woody':
             fit = fin['item']
             cr = fit.pc_case_room
             if (cr[fit.pc_use_visit % len(cr)] if cr else False) if isinstance(cr, list) else bool(cr):
@@ -2142,7 +2143,7 @@ class Pawn:
                     if end is None:
                         self._pc1_unmark(steps)
                         return
-                    self._pc1_close(leg, end, gait, True, self._pc1_kind('room'))
+                    self._pc1_close(leg, end, gait, True, self._pc1_kind('room', 'walk'))
             elif kind == 'door':
                 d = st['door']
                 other = self.level.door_by_pid(d.link_to)
@@ -2162,7 +2163,7 @@ class Pawn:
                     return
                 st['pc1'] = leg
                 near = pw['near']
-                self._pc1_close(leg, near, gait, False, self._pc1_kind('room'))
+                self._pc1_close(leg, near, gait, False, self._pc1_kind('room', 'walk'))
                 zone = self.level.zone_by_pid(other.zone) or zone
                 far = pw['far']
                 wr = getattr(zone, 'pc_walk_room', None)
@@ -2192,7 +2193,7 @@ class Pawn:
                     y = ffloor
                 st['pc1_out'] = leg
                 if last:
-                    self._pc1_close(leg, far, gait, True, self._pc1_kind('room'))
+                    self._pc1_close(leg, far, gait, True, self._pc1_kind('room', 'walk'))
             elif kind == 'item':
                 it = st['item']
                 floor = self.floor_y(zone)
@@ -2211,7 +2212,7 @@ class Pawn:
                 if end is None:
                     self._pc1_unmark(steps)
                     return
-                self._pc1_close(leg, end, gait, last, self._pc1_kind(self._pc1_case(it)))
+                self._pc1_close(leg, end, gait, last, self._pc1_kind(self._pc1_case(it), 'enter'))
             else:
                 self._pc1_unmark(steps)
                 return
@@ -2285,12 +2286,14 @@ class Pawn:
                 nat += d[0] / v_floor + d[1] / v_vert
         return nat
 
-    def _pc1_kind(self, kind):
-        """the job a Season 1 walk of the pawn ends in (pcprofile.S1_GOTO_TAIL),
-        None where its ticks keep the count of the mover alone: Woody's (his
-        click's jobs are not read) and a visit inside a PC case (no GOTO of
-        the PC's: a split case's later visits, another item's share of it)"""
-        return None if self.role == 'Woody' else kind
+    def _pc1_kind(self, kind, woody=None):
+        """the job a Season 1 walk of the pawn ends in (pcprofile.S1_GOTO_TAIL):
+        the neighbour's `kind`, Woody's `woody` (his click's: the GOTO with his
+        action, the door step or the hideout's ENTER as its follow-up, a walk
+        job alone on the floor); None where the walk's ticks keep the mover's
+        count alone — a visit inside a PC case (no GOTO of the PC's: a split
+        case's later visits, another item's share of it)"""
+        return woody if self.role == 'Woody' else kind
 
     def _pc1_case(self, it):
         """the job the neighbour's PC case for the coming visit to `it` walks

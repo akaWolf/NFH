@@ -941,13 +941,17 @@ predicate, then the all-tricks win.
   idle laps' bubble segments ran 0.64 tick short of the videos a segment
   (E01-E14, 32 segments, mean |d| 1.00), 0.18 with the tick (|d| 0.75;
   110's balcony stays 26.4, 44.3 and 22.3 ticks against E10's 26.0, 43.9
-  and 22.0, 25.1, 43.1 and 21.1 before). Open: Woody's walks and a visit
-  inside a case (a split case's later visits, another item's share: no
-  GOTO of the PC's) keep the earlier count — Woody's click builds his GOTO
-  with the action as its follow-up (fcn.0043f5b0 -> fcn.0044ad10, wrapped
-  by fcn.00472dc0), which starts it in the arrival's tick, a tick before
-  the port's; a visit inside a case walks the mobile's way between its
-  items, where the PC walks none (104's deodorant give, 2 ticks).
+  and 22.0, 25.1, 43.1 and 21.1 before). Woody's click builds his GOTO
+  with what it does there as the follow-up — his action, the door step,
+  his hideout's ENTER (fcn.0043f5b0 -> fcn.0044ad10 at 0x43f90d, wrapped
+  by the walk's mode step fcn.00472dc0) — so his action starts in the
+  tick of his last move (a tick sooner than the port had it; one tick
+  where he stands, two before), and a floor click a walk job alone
+  (fcn.004757a0 at 0x43fbdf): `Pawn._pc1_kind`. Open: a visit inside a
+  case (a split case's later visits, another item's share: no GOTO of the
+  PC's) and the neighbour's reaction walks keep the earlier count — the
+  mover's ticks, two in place: 35 such legs over the 14 plans, two ticks
+  each at 104's basin (4), 109's alarm clock (3) and 114's hat (4).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:

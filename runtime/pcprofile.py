@@ -826,8 +826,11 @@ def s1_arrive(moves, after=False):
 # 0. A room's GoTo (fcn.004764b0, update 0x4762e0) is done under its walk job (+0x10:
 # 0x476335 -> 0x476407): 'room' 1. CreateGoToObjXJob's (vtable 0x4e1a48, update
 # 0x44b750) reads the point before it walks (0x44b7ac-0x44b82e -> 0x44b8c9) and is done
-# on its next update (+0x1c: 0x44b786 -> 0x44b7a4): 'x' 2, with no walk 2 in all.
-S1_GOTO_TAIL = {'goto': 2, 'enter': 0, 'room': 1, 'x': 2}
+# on its next update (+0x1c: 0x44b786 -> 0x44b7a4): 'x' 2, with no walk 2 in all. Woody's
+# click (fcn.0043f5b0) builds a GOTO whose follow-up is his action, the door step or his
+# hideout's ENTER (fcn.0044ad10 at 0x43f90d): 'enter'; on the floor a walk job alone
+# (fcn.004757a0 at 0x43fbdf), his walk's end the arrival: 'walk' 0.
+S1_GOTO_TAIL = {'goto': 2, 'enter': 0, 'room': 1, 'x': 2, 'walk': 0}
 
 
 def s1_goto_ticks(kind, moves, after=False, own=False):
@@ -836,7 +839,7 @@ def s1_goto_ticks(kind, moves, after=False, own=False):
     ends inside the GOTO's first update (no door, no move: the GOTO pushes it
     with the run-now flag 1 and returns not done, 0x44a9e6-0x44aa3b) — the
     arrival on the GOTO's second update, a tick on"""
-    return s1_arrive(moves, after) + S1_GOTO_TAIL[kind] + (1 if own and kind != 'x' else 0)
+    return s1_arrive(moves, after) + S1_GOTO_TAIL[kind] + (1 if own and kind not in ('x', 'walk') else 0)
 
 
 def clip_fps(name, fps, frames=0):
