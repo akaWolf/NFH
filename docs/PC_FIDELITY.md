@@ -1340,7 +1340,10 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   walk the port's geometry does not have: the PC's walk step
   (fcn.10009215, one axis a tick, the vertical first at mg0 / mg2 3 px)
   runs over the level.xml geometry through door pairs whose points the
-  path builder fcn.10009489 lays and which is not read yet. The switch to
+  path builder fcn.10009489 lays and which is not read yet (read
+  2026-09-30: fcn.10009489 is the walk step's check against the room's
+  other actors, the door pairs the route's, fcn.1000a421 — "207's
+  shell" below). The switch to
   the code's stays waits for that walk: carried alone they would shorten
   every Season 2 lap by about a fifth. — Done 2026-09-23 with the walk
   (the entry below): the profile takes the code's stays on 203, 208, 209,
@@ -2830,17 +2833,29 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the left side for an equal x, 0x1000e6fe-0x1000e714 — the model had
   taken the right) and walks her there. The walk step checks the place it
   computes against the room's other actors (fcn.10009889 -> fcn.10009489):
-  a step heading at an actor within 15 px across and 50 along is not taken
-  — a tick without a move — and a vertical one sets the movement a detour
-  to 50 px beside him at the mover's height, the side the room's path
-  allows and else the target's (0x1000975d-0x100097c9). So her descent to
-  the floor line stops at 558, 17 px above him, and goes round him to his
-  left and down to the point: 27 ticks where the floor route is 43
-  (lap_model_s2 Geometry.leg_avoid, walk_span's `avoid`, HIT_FROM 207 ->
-  PCHitAfter 0.75, PCHitRun 2.42). E07 at 30 fps: she is put behind him at
-  194.25, goes down behind him ~13 ticks, along to his left from ~195.47,
-  faces the camera from 196.07, the fight's cloud at 196.67 — 3.25 s after
-  his stand; the port's 3.17 (0 before). The 207 plan's pile fell 0.3 short
+  a step heading at a standing actor within 15 px across and 50 along,
+  the movement's target outside that box (0x10009676-0x1000969d: a target
+  inside it walks on), sets the movement a detour — a vertical one to 50
+  px beside him at the mover's height, the side the room's path allows
+  and else the target's (0x1000975d-0x100097c9; on the way up with the
+  way back over to the blocked place, 0x100097a5-0x100097c6) — and takes
+  the step it recomputes at once (fcn.10009215 at 0x10009807, the check
+  returning 0); a walking actor (the flag 0x80000 the step sets on each
+  move, 0x1000991b, and the arrival clears, 0x10009a49) stops the step
+  instead: a tick without a move, and a movement off a route (+0x2f
+  clear) ends there, its target the mover's place (0x10009851-0x1000986d).
+  So her descent to the floor line stops at 558, 17 px above him, and
+  goes round him to his left and down to the point: 26 ticks where the
+  floor route is 43 (lap_model_s2 Geometry.leg_avoid, walk_span's
+  `avoid`, HIT_FROM 207 -> PCHitAfter 0.75, PCHitRun 2.33; the same day's
+  first reading had taken the detour's tick for a stop: 27, 2.42). E07 at
+  30 fps: she is put behind him at 194.25, goes down behind him ~13
+  ticks, along to his left from ~195.47, faces the camera from 196.07,
+  the fight's cloud at 196.67 — 3.25 s after his stand; the port's 3.08
+  (0 before), the video's legs 1-2 ticks behind the model's from the
+  leave on (the side step from 195.47 against 195.33, the descent from
+  196.07 against 195.92) — the frame pacer's open question ("The frame
+  pacer", docs/PC_VERIFICATION.md). The 207 plan's pile fell 0.3 short
   of the collapse with the 3.2 s; v9 moves the second spring after the
   castle (the board on his lap 5): 100 at 497.0 s. The check applies to
   every walk past a visible actor of the room (one in a hideout plays
@@ -3183,7 +3198,8 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   450) and waypoint2 (bottomright 1000) reached — fcn.1000e2bd, the
   actor's y the sign's and |dx| within the dword at 0x100cc814, 50 px;
   each MSG step first waits for Woody to move, fcn.10008874 = his flag
-  0x80000, set through a movement (fcn.10009489) — the chest opened
+  0x80000, set through a movement (fcn.10009489; the walk step sets it on
+  each move, 0x1000991b, and clears it on arrival, 0x10009a49) — the chest opened
   (soapchest_closed hidden, 0x10027df6), the soap taken (fcn.10049cec),
   waypoint3 (1200) reached: TUTENTRY(neighbor) — his demo lap from the
   bridge (the entry's neighbor_entry, -150): the hat (lookaround 43 +

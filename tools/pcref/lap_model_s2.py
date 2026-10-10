@@ -1364,54 +1364,61 @@ class Geometry:
     def leg_avoid(self, x, y, tx, ty, fy, other, room, actor='neighbor', gait='mg'):
         """leg's ticks with the step's check against another actor of the
         room (fcn.10009889: the step fcn.10009215 computes the next place,
-        fcn.10009489 tests it): a step that heads at an actor standing within
-        15 px across and 50 along it is not taken — a tick without a move —
-        and a vertical one sets the movement a detour to 50 px beside that
-        actor at the mover's own height, on the side the room's path allows
-        and else the target's (0x1000975d-0x100097c9); the waypoints of
-        fcn.10009177 go on from there. 207's Olga down from her mat onto his
-        point stops 15 px above him and goes round him"""
+        fcn.10009489 tests it): a step that heads at a standing actor within
+        15 px across and 50 along it, the movement's target outside that box
+        (0x10009676-0x1000969d), sets the movement a detour — a vertical one
+        to 50 px beside that actor at the mover's own height, on the side the
+        room's path allows and else the target's (0x1000975d-0x100097c9), and
+        on the way up back over to the blocked place 0x100097a5-0x100097c6 —
+        and takes the step it recomputes at once (fcn.10009215 at 0x10009807,
+        the check returning 0); the waypoints of fcn.10009177 go on from
+        there. A walking actor (flag 0x80000) stops the step instead — not
+        met here. 207's Olga down from her mat onto his point stops 15 px
+        above him and goes round him"""
         sp = self.speed[actor]
         v = sp[gait + '0'][0]; vd = sp[gait + '2'][0]
         h = sp[gait + '1'][0]
         ox, oy = other
         x1, x2 = self.rooms[room]['x1'], self.rooms[room]['x2']
+        inside = abs(ox - tx) < 50 and abs(oy - ty) < 15
         t = 0
-        detour = None
-        for _ in range(4000):
-            if detour is not None and (x, y) == detour:
-                detour = None
-            if detour is None and (x, y) == (tx, ty):
-                return t
-            if detour is not None:
-                wx, wy = detour
+        detour = []
+
+        def step(x, y):
+            if detour:
+                wx, wy = detour[0]
             elif y != fy and x != tx:
                 wx, wy = x, fy
             elif x != tx:
                 wx, wy = tx, fy
             else:
                 wx, wy = tx, ty
-            nx, ny = x, y
             if wy != y:
                 s = v if wy < y else vd
-                ny = y + max(-s, min(s, wy - y))
-            else:
-                nx = x + max(-h, min(h, wx - x))
+                return x, y + max(-s, min(s, wy - y))
+            return x + max(-h, min(h, wx - x)), y
+
+        for _ in range(4000):
+            if not detour and (x, y) == (tx, ty):
+                return t
+            nx, ny = step(x, y)
             t += 1
-            if abs(ox - nx) < 50 and abs(oy - ny) < 15 \
+            if not inside and abs(ox - nx) < 50 and abs(oy - ny) < 15 \
                     and ((ox - nx) * (nx - x) > 0 or (oy - ny) * (ny - y) > 0):
-                if nx == x and detour is None:
-                    left, right = ox - 50, ox + 50
-                    if x1 > left:
-                        side = right
-                    elif x2 < right:
-                        side = left
-                    else:
-                        side = right if tx >= x else left
-                    detour = (side, y)
-                    continue          # the blocked tick: no move
-                return None           # (a horizontal block: not modelled)
+                if nx != x:
+                    return None           # (a horizontal block: not modelled)
+                left, right = ox - 50, ox + 50
+                if x1 > left:
+                    side = right
+                elif x2 < right:
+                    side = left
+                else:
+                    side = right if tx >= x else left
+                detour[:] = [(side, y)] + ([(side, ny), (nx, ny)] if ny < y else [])
+                nx, ny = step(x, y)
             x, y = nx, ny
+            if detour and (x, y) == detour[0]:
+                detour.pop(0)
         return None
 
     def door_pass(self, din, dout, actor='neighbor', gait='mg', data=None):
