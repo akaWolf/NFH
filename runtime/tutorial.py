@@ -1688,6 +1688,7 @@ class _PCScript:
         self.age = 0
         self.walking = False
         self.arrived = None               # the target the last GoTo reached
+        self.arrived_tick = 0             # the level tick of its walk's last move
         self.latches = set()
         self.icon = None
 
@@ -1906,11 +1907,15 @@ class TutorialPC206(_SceneFollow, Tutorial):
             r.pc_bubble = name
 
     def _goto(self, s, pawn, item, run=False):
-        """fcn.1000e3e0: the GoTo pushed with a first run, the step run again
-        each tick until it returns 0 — at the object's hotspot the GoTo
-        finds the actor there and returns at once"""
+        """fcn.1000e3e0: the GoTo pushed without a first run (0x1001e0ce-
+        0x1001e0d5; its first update the walk's first step, tools/pcref/
+        lap_model_s2.walk_span) — the step runs again once it is done, on
+        its update after the walk's last move (that move sets its +0x14,
+        0x10007670; done at 0x10007409), and each tick until it returns 0;
+        at the object's hotspot the GoTo finds the actor there and returns
+        at once"""
         if s.arrived is item:
-            return True
+            return self.tick_n > s.arrived_tick
         if s.walking:
             return False
         pawn.pc_run = run
@@ -1919,11 +1924,15 @@ class TutorialPC206(_SceneFollow, Tutorial):
         def arrive(s=s, item=item, pawn=pawn):
             s.walking = False
             s.arrived = item
+            # the tick of the walk's last move: the world's frames before
+            # the level's tick (_level_tick) are its
+            s.arrived_tick = self.tick_n + 1
             pawn.pc_run = False
             pawn.in_urgent = False
         s.walking = True
         if not pawn.goto_item(item, on_arrive=arrive):
             arrive()
+            s.arrived_tick = self.tick_n  # no walk: the step's next run goes on
         return False
 
     def _leave_station(self, s):

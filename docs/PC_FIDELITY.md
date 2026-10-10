@@ -2999,7 +2999,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (102.5 s), -0.64 by 117 s; 213 -0.12..-0.19 at every icon to the tub
   (100 s); 206's errands three ticks short each (39, 67, 67 — the walks
   walk_span's 50 where they had run a tick over), -0.99 by the hide; the
-  rest within 0.05 s of the above.
+  rest within 0.05 s of the above. 206's lesson steps go on at the GoTo's
+  done tick since (TutorialPC206._goto: the GoTo, pushed without a first
+  run, is done on its update after the walk's last move, 0x10007409, and
+  the step pushes its sequence there — the take and the give a tick
+  later): -0.27 at the call, -0.43, -0.59, -0.74 by the hide, the errands
+  39, 68, 68 against E06's 41, 70, 70 — the two ticks each by no reading
+  of the code so far (the runner goes on past a done job in its tick,
+  fcn.100492a8; the walk step, fcn.10009215, has no tick of its own for
+  the run's records), and 210's call to Fifi 0.12 s short the same way.
   Season 1's: 101, 102 and 114 within 0.1-0.4 s over 120 s; 103, 106,
   109, 110, 112 and 113 ahead by 0.3-0.6 s at 100-140 s, a tick a case —
   read on 2026-10-01 as the GOTO's done tick (runtime/README.md, "The
