@@ -175,7 +175,9 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None):
             walks.setdefault(icon.split()[-1], []).append(tw + carry)
         if rooms is not None:
             rooms.setdefault(icon.split()[-1], []).append(room)
-        alone = not ta and not aa
+        # its instant steps and empty cases are no actions (107's statue case,
+        # 109's bed: the next case a tick on)
+        alone = not aa
         carry = tw if alone else 0
         room = alone and i < len(rgo) and rgo[i]
         if leads is not None:

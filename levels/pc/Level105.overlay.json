@@ -39,7 +39,7 @@
    "object": "Piano",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 9.75,
+    "PCUseSeconds": 9.83,
     "PCFixSeconds": 2.083,
     "PCUseSecondsTricked": 3.833,
     "PCFixPoint": [

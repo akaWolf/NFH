@@ -15,7 +15,9 @@ level.xml places the objects, each SWITCH (fcn.00451de0, the new object and
 the old) swaps one for the other (113's valve: bas/valve_on placed, case 2
 switches it off, case 6 on again; 111's board: case 8 puts the clothes on
 it, case 16 irons them) — and a case that returns without yielding is a
-poll whose condition is assumed to flip. The stations are the ICON names of the cases, else the object
+poll whose condition is assumed to flip. A case that pushes no job is an
+EMPTY token of the laps (its tick: the next case runs on the tick after).
+The stations are the ICON names of the cases, else the object
 walked to or acted on. The switch tables are read from the binary, the
 class is matched to a level by the object names it uses.
 
@@ -55,7 +57,7 @@ def at(a):
 def ins(k):
     t = L[k].strip(); m = re.match(r'(0x[0-9a-f]{8})\s+[0-9a-f.]+\s+(.*)', t)
     return (int(m.group(1), 16), m.group(2)) if m else (None, None)
-LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2', 'fcn.0047a960': 'GOTO', 'fcn.0047a4a0': 'GOTO'}
+LABEL = {'fcn.00437f70': 'ICON', 'fcn.00479da0': 'GOTO', 'fcn.0044ac80': 'GOTO', 'fcn.00479f10': 'GOTOENTER', 'fcn.00479e30': 'GOTOENTER', 'fcn.00473e20': 'ENTER', 'fcn.00473ea0': 'LEAVE', 'fcn.0047c3b0': 'TRICK', 'fcn.00457610': 'STATE', 'fcn.00451e80': 'STATE', 'fcn.00448bf0': 'LOOKUP', 'fcn.00446020': 'INV', 'fcn.00477f60': 'ACTION', 'fcn.00479c70': 'ACTION', 'fcn.00479ba0': 'ACTION', 'fcn.0047a130': 'IFVARIANT', 'fcn.00479ff0': 'OBJ3', 'fcn.00451de0': 'SWITCH', 'fcn.004764b0': 'GOTO2', 'fcn.00479d10': 'GOTO2', 'fcn.0047a960': 'GOTO', 'fcn.0047a4a0': 'GOTO'}
 # the instant steps a case's list carries (tools/pcref/lap_model.py counts a
 # tick each): the list itself (fcn.00476770 — the case pushes it with the
 # run-now flag 0, its first update only pushes its first element, the
@@ -331,6 +333,9 @@ def run_level(sw):
         if icons & KW[best]: level, score = best, len(icons & KW[best])
     seq = []; c = 0; visited = []; objflags = {}; states = set()
     lx = os.path.join(X, level, 'level.xml')
+    # the objects level.xml places (an actor is no object: isObjectPresent's
+    # lookup, fcn.00448bf0, does not find 107's `aux`, the tied dove of its
+    # case 15 — "Object not found", false)
     present = set(re.findall(r'<object name="([^"]+)"', canon.read(lx))) if os.path.exists(lx) else None
     for _ in range(120):
         key = (c, tuple(sorted(objflags.items())), tuple(sorted(present or ())))
@@ -421,5 +426,14 @@ for lv in order:
                 seen_c.add(c)
                 if n == 0 and c == wrap and c != seq[0][0]:
                     toks.append('WRAP')
-                toks += ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK') + INSTANT]
+                got = ['%s %s' % (k, ' + '.join(v)) for k, v in labels if k in ('ICON', 'GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK') + INSTANT]
+                if not any(t.split()[0] in ('GOTO', 'GOTOENTER', 'GOTO2', 'ENTER', 'LEAVE', 'ACTION', 'TRICK') + INSTANT for t in got):
+                    # a case that pushes no job: the level class's job runs it
+                    # in the tick the last job ends (the actor's tick updates
+                    # the next job once one is done) and returns not done
+                    # (fcn.0045c600, `xor al, al`), its next case on the tick
+                    # after (107's case 15 between the room's GoTo and the
+                    # painting's)
+                    got.append('EMPTY ')
+                toks += got
             if toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks)))

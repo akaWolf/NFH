@@ -951,7 +951,14 @@ predicate, then the all-tricks win.
   case (a split case's later visits, another item's share: no GOTO of the
   PC's) and the neighbour's reaction walks keep the earlier count — the
   mover's ticks, two in place: 35 such legs over the 14 plans, two ticks
-  each at 104's basin (4), 109's alarm clock (3) and 114's hat (4).
+  each at 104's basin (4), 109's alarm clock (3) and 114's hat (4). A
+  case that pushes no job costs a tick: the level class's job returns not
+  done once it has stored the next case (fcn.0045c600, `xor al, al`) and
+  the next case runs on the tick after (tools/pcref/routine_order.py's
+  EMPTY: the stays of 105's piano, 108's folding chair — two —, 109's
+  bed, pig and parrot, 113's ladder); one between two walks is not
+  carried (open, a tick each: 101's sofa after the room's GoTo, 107's
+  statue and its painting's dove case).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:

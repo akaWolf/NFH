@@ -40,7 +40,7 @@
    "object": "Shezlong",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.33,
+    "PCUseSeconds": 2.5,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 1.833,
     "PCFixPoint": [
@@ -51,7 +51,7 @@
     "PCReactTail": 1,
     "PCCaseGoto": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.3 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.5 s"
   },
   {
    "object": "WateringCan",

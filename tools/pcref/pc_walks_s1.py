@@ -213,8 +213,8 @@ def station_vias(n):
             continue
         vias = []
         for k, text, _t in reversed(legs[:idx[0]]):
-            if k in ('goto', 'icon'):
-                continue
+            if k in ('goto', 'icon') or (k == 'action' and str(text).startswith('step ')):
+                continue                  # a case's instant step or its empty case: no walk
             if k != 'walk':
                 break                     # an action or a door ends the chain
             o = text.split(' -> ')[-1].split()[0]

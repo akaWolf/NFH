@@ -469,6 +469,11 @@ def _lap(L, toks, start):
             # 0x476530), a message step or a StopMsg (update 0x47c550, done on
             # its first call) — the next element starts a tick later
             legs.append(('action', 'step %s' % kind.lower(), 1)); continue
+        if kind == 'EMPTY':
+            # a case that pushes no job (routine_order.py): the level class's
+            # job returns not done after storing the next case (fcn.0045c600,
+            # `xor al, al`), which runs on the tick after
+            legs.append(('action', 'step empty', 1)); continue
         if kind in ('GOTO', 'GOTOENTER', 'ENTER'):
             obj = base_of(objs)
             if obj is None:
