@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
+                 'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
@@ -424,6 +424,10 @@ class Item:
         # object the walk goes to, px of the PC room — one point, or one a
         # visit (PCWalkPoint, tools/pcref/pc_walks_s1.py)
         self.pc_walk = d.get('PCWalkPoint') or {}
+        # where the level class's IsVariant walks him to the tricked object's own
+        # hotspot instead (PCWalkPointTricked: 109's case 17, GoTo anc/pigout
+        # while the pig is out, 0x46a4fc)
+        self.pc_walk_tricked = d.get('PCWalkPointTricked') or {}
         # ... and the points that walk passes through first: the level class's
         # GOTOs in the station's room with no action between them and the
         # station's own (PCWalkVia: 107's dove before the painting,

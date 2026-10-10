@@ -1110,6 +1110,22 @@
     }
    },
    "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
+  },
+  {
+   "object": "Pig",
+   "component": "TrickItem",
+   "set": {
+    "NoticeWhenWalkNearby": false,
+    "PCUseSecondsTricked": 0.167,
+    "PCWalkPointTricked": {
+     "Rottweiler": [
+      521,
+      420,
+      "anc"
+     ]
+    }
+   },
+   "source": "Level_Pig::run (game.exe class 468c8c): case 17's IsVariant(anc/pigout of anc/pig) walks him to anc/pigout (0x46a4fc; its neighbor hotspot 521/420, anc/pig's 567/420), case 18 the list's first update and its StopMsg, then OBJ2 anc/pigout (0x46a5cc) — no doubletake, level_pig's trigger.xml has no nearobj trigger on the pig"
   }
  ]
 }

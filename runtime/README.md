@@ -937,9 +937,14 @@ predicate, then the all-tricks win.
   fcn.0047d9e0: the StopMsg, the GoToObjX, the doubletake, the fire, the
   shout, the clean. 102's laxative to the paper 15.85 s (E02: 15.9, the
   walk-by's surprise had fired the bowl 10.0 s after it, then the sitting,
-  the paper 18.6 s later). Open: 109's pig is a walk-by of the mobile with
-  no trigger either (case 18 fires it), carried as a reaction handler's
-  stand.
+  the paper 18.6 s later). 109's pig, a walk-by of the mobile with no
+  trigger either, is its station's tricked visit: case 17's IsVariant
+  walks him to anc/pigout (PCWalkPointTricked, 521/420 against the pig's
+  567/420; `Pawn._pc1_item_point`), case 18 fires it after its list's
+  first update and StopMsg — no doubletake (0x46a542-0x46a5cc), the port
+  had stood the walk-by's 1.5 s FindRight before it. The chain after it
+  runs 0.85 s sooner, 0.8-1.6 s ahead of E09's thermometer where it had
+  matched within 0.35 s — the case tick above.
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove

@@ -2313,6 +2313,10 @@ class Pawn:
         the PC's station lies in another room than the item's zone (the leg is
         then the mobile's own, mapped into its room)"""
         p = it.pc_walk.get(self.role) if it is not None else None
+        if it is not None and it.tricked and it.pc_walk_tricked.get(self.role):
+            # the case's IsVariant walks to the tricked object's own hotspot
+            # (PCWalkPointTricked: 109's case 17, GoTo anc/pigout, 0x46a4fc)
+            p = it.pc_walk_tricked[self.role]
         tool = self.fixing_item
         if it is not None and tool is not None and tool.pc_tool_point and it is not tool:
             # carrying the tool: its case walks him with it to its own point
