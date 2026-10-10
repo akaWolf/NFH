@@ -2941,6 +2941,28 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   behind her — the pass step's flag 8 (0x10003c54, carried); the port's
   Mother is elsewhere at that point of its plan, and his walk there is
   the model's 135 ticks.
+- *The sofa's five sits (2026-09-30, carried).* 101's and 102's sofa
+  case plays its sit and runs again while a counter of the class's (+0x14,
+  reset to 0 as the sofa is entered) is at most 4 — it returns without a
+  yield (101 0x470b7e-0x470b93, 102 0x46fa46-0x46fa5c) — so the ACTION
+  plays five times, its name by the counter (101's picker fcn.004707e0:
+  sit_remo on 1 and 3, sit on the rest; 102's fcn.0046f4c0: sit_beer on 0
+  and 4, sit_remo on 1, sit on 2 and 3; sit 32 frames, sit_remo 27,
+  sit_beer 32). The walker had taken the case once (a case returning
+  without a yield read as a poll), and the lap model sat him one sit —
+  3.8 s where he sits 14.0 (101) and 14.4 (102) with the enter and the
+  leave (lap_model.CASE_ROUNDS -> PCUseSeconds). The videos had agreed
+  with the short laps by chance: their "32" and "28" were the Sofa icon's
+  first span from the level start, where he walks to no sofa; the full
+  laps are 41 (E01: the binoculars at 19 and 60, the sofa 36-60 — the walk
+  back and ~14 s sat) and 36 s (E02: the beer at 20 and 56), the model's
+  now 40.6 and 35.8, the port's idle laps 40.2 and 35.7. 102's broken
+  sofa goes back through the sofa's case (case 14 -> 6: the enter again,
+  the counter reset) into the five sits: the mobile's redo at the stay's
+  PCUseSeconds is the PC's within 0.2 s. Plan 102 v7 waits for his second
+  sit after his first beer (100 at 189.1 s); 101 unchanged (100 at 129.5).
+  The walker found no other counter of the kind in the level classes
+  (0x450000-0x472000: an increment compared against a bound).
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

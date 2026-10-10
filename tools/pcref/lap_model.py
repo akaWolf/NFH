@@ -38,6 +38,15 @@ TICK = 12.0
 # filled on one lap (case 8's give) and bathed in on the next (cases 14-15:
 # Level_Bath::isBathFilled, fcn.0046bc90) — the video's lap is the whole cycle
 CYCLE = {106: 2}
+# a case the level class runs again until a counter of its own passes a
+# bound — it returns without yielding while the counter is at most 4, so its
+# one ACTION plays five times, the picker choosing each round's by the
+# counter: 101's sofa (0x470b7e-0x470b93: [this+0x14] + 1, the case again
+# while <= 4, reset to 0 as the sofa is entered; fcn.004707e0: sit_remo on
+# 1 and 3, sit on the rest) and 102's (0x46fa46-0x46fa5c; fcn.0046f4c0:
+# sit_beer on 0 and 4, sit_remo on 1, sit on 2 and 3)
+CASE_ROUNDS = {101: ('lir/sofa', ('sit', 'sit_remo', 'sit', 'sit_remo', 'sit')),
+               102: ('lir/sofa', ('sit_beer', 'sit_remo', 'sit', 'sit', 'sit_beer'))}
 
 
 def xy(s):
@@ -476,7 +485,12 @@ def _lap(L, toks, start):
                 name = acts[0]
                 used = next((o for o in cands if L.action_ticks(o, name) is not None), None)
                 t = L.job_ticks(used, name) if used else None
-            if t is None:
+            rounds = CASE_ROUNDS.get(L.n)
+            if t is not None and rounds and used == rounds[0] and name in rounds[1]:
+                # the case's rounds (CASE_ROUNDS): each its own ACTION
+                for nm in rounds[1]:
+                    legs.append(('action', '%s %s' % (used, nm), L.job_ticks(used, nm)))
+            elif t is None:
                 legs.append(('?', 'ACTION %s on %s: no time' % (name, ' + '.join(objs) or current), 0))
             else:
                 legs.append(('action', '%s %s' % (used, name), t))

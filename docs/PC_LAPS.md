@@ -19,8 +19,8 @@ Confidence: ±2 s on PC boundaries, ±1 s on mobile.
 
 | ep | PC order (bubble) | PC lap | mobile order (ActionManager) | mobile lap | Δ |
 |---|---|---|---|---|---|
-| 101 The First Trick | Sofa/TV → Binoculars | 32 (then 59 with the tricks) | Sofa → Binoculars | 48-52 | mobile +50 % |
-| 102 TV Time | Sofa → Beer (→ Toilet on the laxative) | 28-36 | Sofa → Beer | 38-43 | mobile +25 % |
+| 101 The First Trick | Sofa/TV → Binoculars | 41 (the binoculars 19 → 60; the Sofa's 32 from the level start has no walk back to the sofa) | Sofa → Binoculars | 48-52 | mobile +20 % |
+| 102 TV Time | Sofa → Beer (→ Toilet on the laxative) | 36 (the beer 20 → 56; the Sofa's first 28 from the level start) | Sofa → Beer | 38-43 | mobile +10 % |
 | 103 Birthday Surprises | LetterBox → Cake+Candle | 32 | Candle → Cake → Cake → LetterBox | 33 | same |
 | 104 The Apple Pie | Sink(shave) → Pie → Microwave → Deodorant | 62-80 | Pie → Microwave → Cream → Pie → Deodorant → AfterShave → Sink ×2 → AfterShave → Deodorant | 92 (27+65) | mobile +15-30 % |
 | 105 The Old Spoilsport | Piano → Football → Plant (Phone, Toilet on tricks) | 40 | Piano → Football → Window → PlantStink | 50 | mobile +25 % |
@@ -92,8 +92,8 @@ more.
 
 | level | PC | mobile | Δ | where |
 |---|---|---|---|---|
-| 101 | 32 | 40 | +25 % | Sofa 15/21 |
-| 102 | 28 | 31 | +10 % | |
+| 101 | 41 | 40 | −2 % | Sofa 24/21 (the PC's sofa: five sits, 2026-09-30) |
+| 102 | 36 | 31 | −14 % | the PC's sofa: five sits |
 | 103 | 42 | 39 | −8 % | Candle+Cake 10/17, LetterBox 23/14 |
 | 104 | 36-80 | 64 | ≈ | the PC's first lap is cut by the intro (Sink 2 s), its second carries tricks; the shaving chain 17/34 |
 | 105 | 40 | 39 | −2 % | |

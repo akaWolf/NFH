@@ -6,9 +6,11 @@
 # microwave before the binoculars' fire sends him back to the window first
 # (the mobile skipped the fired station; docs/PC_VERIFICATION.md). Badinfos'
 # E01 pays microwave > binoculars > TV > sofa (17.7, 17.4, 16.2 s) off a
-# 23-s sofa stay the port's lap (14 s) does not give. The glue goes on from
-# the hall as he leaves the window for the sofa (the kitchen is his for 15 s
-# of every 30-s lap: 13-28 s, 43-58 s …).
+# 24-s sofa span: since 2026-09-30 the port's too — the sofa's five rounds
+# (the case again while its counter is at most 4: sit, sit_remo, sit,
+# sit_remo, sit), 14 s sat, a 40-s lap: the sofa 6-20 > the kitchen 25-36 >
+# the sofa 46-60 > …; the plan unchanged, 100 at 129.5 s. The glue goes on
+# from the hall as he leaves the window for the sofa.
 take Fridge IT_Egg
 take Drawer IT_Fartbag
 take FirstAid IT_Superglue
