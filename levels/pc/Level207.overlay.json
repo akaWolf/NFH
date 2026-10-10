@@ -14,14 +14,14 @@
    "set": {
     "PCLaugh": 0,
     "PCClipSeconds": {
-     "PoolDive": 4.58,
+     "PoolDive": 4.92,
      "PoolGetOut": 1.42,
-     "PoolSpring": 1.58,
+     "PoolSpring": 1.75,
      "PoolAwningFall": 2.92,
      "CrashMother": 2.67
     },
     "PCCreditInClip": {
-     "PoolSpring": 1.42
+     "PoolSpring": 1.58
     },
     "PCLinkedCreditInClip": {
      "CrashMother": 0.5

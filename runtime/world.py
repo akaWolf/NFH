@@ -4536,6 +4536,11 @@ class Routine:
                         mobile = self.pawn.anim.sequence_seconds(seq)
                         if mobile > 0.0:
                             self.pawn.anim.time_scale = mobile / pc
+                    elif it.pc_clip_secs:
+                        # a stay timed per clip: the prime leg's clips at
+                        # their PC seconds too (202's mat: its lay-down,
+                        # the hideout's `enter` with the step's ticks)
+                        self.pawn.anim.clip_pace = dict(it.pc_clip_secs)
                 if a.get('hide_owner'):
                     self.pawn.set_hidden(True)   # cs:213-216
                 self._after_use_side_effects(a, it)

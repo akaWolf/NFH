@@ -1445,3 +1445,11 @@ actors' job pass the update calls at 0x100445f8.
   bull 32.27 / 32.20, 52.47 / 52.52, 69.43 / 69.53, 89.67 / 89.85; 211
   none throughout (bring_pillow and scold_kid before); 213 and 214's
   water. Plan 212 at 100 (PC 17539); all 28 at 100 (runs/mom1_pc).
+- `tools/pcref/pc_durations_s2.py`, `levels/pc/Level207.overlay.json`,
+  `runtime/world.py` (2026-09-30): 207's PoolDive 4.92 s (the step's 2
+  ticks, the dive's 55, the pool's enter 2; PoolSpring 1.75 with the
+  step's ticks, its credit 1.58 into it) and 202's lay-down, the prime
+  leg, at the PC's 0.75 s. Fine idle laps (runs/fineP, fineQ202): 207's bar
+  icon 18.48 against E07's 18.50 (18.13), the elephant 36.65 / 36.60, the
+  shell 50.98 / 50.94, the sandcastle 70.90 / 70.64; 202's mat hidden
+  5.75 / 5.94 (5.50), the beer 15.78 / 15.97. Plans 202 and 207 at 100.

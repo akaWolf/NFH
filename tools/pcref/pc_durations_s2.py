@@ -127,10 +127,14 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                                # tricked, the egg's table (0x100254d5)
                                'TennisEgg': ('beachright_pingpong_egg_guarded', 'play')}},
         # 207's board (his board step 0x100169c5: the `dive` once the Mother
-        # sits in her deck chair, the pool's `enter`, 0 ticks, and its `leave`
-        # as the bar step walks him out; the wait before is the Mother's —
+        # sits in her deck chair — the step's own ticks after his walk
+        # first —, the pool's `enter`, 0 ticks by the data and its job's 2,
+        # and its `leave` as the bar step walks him out: E07's bar icon
+        # 18.50 s in, the model's walk 162 ticks, 2, the dive's 55 and the
+        # enter's 2 before the bar step's; the wait before is the Mother's —
         # Level207MotherBehavior holds his WaitWatch)
-        207: {'PoolBoard': {'PoolDive': ('pool_divingboard', 'dive'),
+        207: {'PoolBoard': {'PoolDive': ('parts', (('step',), ('pool_divingboard', 'dive'),
+                                                   ('pool_pool', 'enter'))),
                             'PoolGetOut': ('pool_pool', 'leave'),
                             # tricked, the spring board's (the same step):
                             # its `dive`, the awning's `crash` (the plain one
@@ -138,7 +142,7 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
                             # pool's `enter`; over the closed awning the
                             # Ef51a's tick, the Mother's deck chair's `enter`
                             # and `leave` (lap_model_s2 SCENE_STEPS)
-                            'PoolSpring': ('pool_divingboard_spring', 'dive'),
+                            'PoolSpring': ('pool_divingboard_spring', 'dive', 'step'),
                             'PoolAwningFall': ('parts', (('pool_awning', 'crash'), ('ticks', 1),
                                                          ('pool_pool', 'enter'))),
                             'CrashMother': ('parts', (('ticks', 1), ('pool_deckchair', 'enter'),
@@ -401,6 +405,7 @@ def clip_secs(n):
                 # PoolAwningFall: the awning's `crash`, a pose's tick, the
                 # pool's `enter`)
                 t = sum(p[1] if p[0] == 'ticks' else _bar_ticks(n, p[1]) if p[0] == 'bar'
+                        else lap_model_s2.WALK_STEP_TICKS if p[0] == 'step'
                         else (d.action_ticks(*p) or 0) for p in src[1])
             elif src[0] == 'job':
                 # another actor's action whose job posts the behaviour the
@@ -425,7 +430,8 @@ def clip_secs(n):
             if src is not None and src[0] == 'parts':
                 # the clip's parts before the record's action
                 k = next(i for i, p in enumerate(src[1]) if tuple(p[:2]) == (obj, act))
-                t += sum(p[1] if p[0] == 'ticks' else (d.action_ticks(*p) or 0) for p in src[1][:k])
+                t += sum(p[1] if p[0] == 'ticks' else lap_model_s2.WALK_STEP_TICKS if p[0] == 'step'
+                         else (d.action_ticks(*p) or 0) for p in src[1][:k])
             elif src is not None and len(src) > 2 and src[2] == 'step':
                 t += lap_model_s2.WALK_STEP_TICKS     # the clip opens with the step's ticks
             clips.setdefault(item, {})[key] = {clip: round(t / 12.0, 2)}
@@ -750,7 +756,7 @@ def _clip_icons(n, item, base, parts):
             ic = lap_model_s2.step_icon(n, ICON_STEPS[n][item][clip])
         else:
             if spec[0] == 'parts':
-                subs = [q for q in spec[1] if q[0] != 'ticks']
+                subs = [q for q in spec[1] if q[0] not in ('ticks', 'step')]
                 spec = ('bar',) if any(q[0] == 'bar' for q in subs) else (tuple(subs[0]) if subs else spec)
             if spec[0] == 'bar':
                 ic = ''

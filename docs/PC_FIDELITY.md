@@ -3074,9 +3074,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   211 -0.11..+0.37, 212 -0.10..+0.28, 213 -0.13..+0.11, 214 -0.04..+0.10;
   208's shoe machine icon at 5.4 s was the bar's hide (5.53 against the
   port's 5.38, the shoe cleaner's icon 10.57 / 10.38), 209's Taj span
-  the Taj's icon over the shoe visit. Open: 202's swim — the rake's icon
-  to the sea's bar 14.5 s against the port's 13.4 (the wait at the shore
-  for Olga's sub), the laps after it 1.6-1.9 s ahead.
+  the Taj's icon over the shoe visit. 202's swim — the rake's icon to
+  the sea's bar 14.5 s against the port's 13.4 — is the player's: E02's
+  Woody walks through Olga's way to the sub at 26.5-27.5 s (a walking
+  actor in her box: her step not taken, fcn.10009489), her walk 5.5 s
+  where the model's is 56 ticks; the port's idle has him elsewhere.
+  Two tick counts since (2026-09-30): 207's dive clip takes the board
+  step's own two ticks after his walk and the pool's `enter` (its job's
+  2, the data's 0) — E07's bar icon 18.50 s in, the port's 18.48 (18.13
+  before; his walk from level.xml's 362/583 is the model's 162 ticks, the
+  door pass's stand the `in` run, not a wait for the Mother) —, and a
+  prime leg of a stay timed per clip plays at its PC seconds (202's mat:
+  the lay-down, the mobile's prime, 0.75 s where the mobile's 0.5 played
+  — the hide 5.75 against E02's 5.94, 5.50 before).
   The Mother's bubble the same way (her HUD portrait's cloud against
   hud.think_m, 2026-09-30): her scripts' icons where they are not the
   mobile items' (tools/pcref/pc_durations_others.py ICON_ROLE,
