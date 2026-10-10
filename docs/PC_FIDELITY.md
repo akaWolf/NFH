@@ -2808,7 +2808,15 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   him seated). E10: the fuel beer to the extinguisher 14.7 s against 14.9
   (14.35 before), the extinguisher to the spray 15.5 against 15.5 (14.8);
   the spray to the slip 17.1 against 16.6 — the slip's place the player's
-  banana. And 207's shell (carried 2026-09-30): the `shell_crayfish` on
+  banana. A station used in place whose visit opens its PC case (its
+  ICON and GOTO) stands that GOTO's two no-move ticks where the points
+  agree (the walk job done inside its first update, the GOTO on its
+  second): 110's barbecue after the plant, 1.67 s from its icon to the
+  table's against E10's ~1.77 (the frames at 12 fps: up from the plant's
+  shout at 199.33, off to the table at ~201.1) — pc_durations PCCaseGoto
+  per visit (False on a split case's later visits and on another item's
+  share of a case: 111's machines, 113's drill after the ladder, 107's
+  generator after the chair). And 207's shell (carried 2026-09-30): the `shell_crayfish` on
   her mat posts `crayfish` to Olga, whose step 0x100176b2 leaves the mat
   (9 ticks, to its olga_out 1317/519, right above his point) and runs
   fcn.1000eb19 at her walk; fcn.1000e601 takes the point 50 px beside him at his y (1267/575,

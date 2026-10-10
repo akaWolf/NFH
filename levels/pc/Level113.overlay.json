@@ -47,7 +47,8 @@
      "lir"
     ],
     "PCFireLead": true,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.6 s"
   },
@@ -65,7 +66,8 @@
      "bal"
     ],
     "PCFireLead": true,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 7.0 s"
   },
@@ -83,7 +85,11 @@
     "PCRunTo": true,
     "PCGrabSeconds": 0.417,
     "PCToolUseSeconds": 0.0,
-    "PCReturnSeconds": 0.0
+    "PCReturnSeconds": 0.0,
+    "PCCaseGoto": [
+     true,
+     true
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.6 s; ValveMain <- valve#1 0.6 s"
   },
@@ -91,7 +97,8 @@
    "object": "Radiator",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 4.67
+    "PCUseSeconds": 4.67,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.7 s"
   },
@@ -102,7 +109,8 @@
     "PCUseSeconds": 3.58,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.333
+    "PCUseSecondsTricked": 5.333,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.6 s"
   },
@@ -116,7 +124,11 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 8.583
+    "PCUseSecondsTricked": 8.583,
+    "PCCaseGoto": [
+     true,
+     true
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.6 s; FuseBox <- fuse#1 0.6 s"
   },
@@ -264,7 +276,8 @@
    "object": "Ladder",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.5
+    "PCUseSeconds": 1.5,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.50 s"
   },

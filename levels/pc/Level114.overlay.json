@@ -113,7 +113,11 @@
      390,
      "wor"
     ],
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCCaseGoto": [
+     true,
+     true
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.6 s; Polish <- polish#1 1.6 s"
   },
@@ -121,7 +125,8 @@
    "object": "GoldCup",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.17
+    "PCUseSeconds": 2.17,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): GoldCup <- cups#0 2.2 s"
   },
@@ -132,6 +137,10 @@
     "PCUseSeconds": [
      0.58,
      5.92
+    ],
+    "PCCaseGoto": [
+     true,
+     true
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pipe <- smoke#0 0.6 s; Pipe <- smoke#1 5.9 s"
@@ -144,6 +153,11 @@
      0.58,
      0.83,
      0.58
+    ],
+    "PCCaseGoto": [
+     true,
+     true,
+     true
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.6 s; Gramaphone <- phonograph#1 0.8 s; Gramaphone <- phonograph#2 0.6 s"
@@ -152,7 +166,8 @@
    "object": "CDs",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.08
+    "PCUseSeconds": 2.08,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CDs <- records#0 2.1 s"
   },
@@ -164,7 +179,8 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 6.083,
     "PCFireAt": 5.417,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.3 s"
   },
@@ -180,7 +196,11 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 4.833,
     "PCFireAt": 4.083,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCCaseGoto": [
+     true,
+     false
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 take+takehat 4.83 s; Hat <- hat#0 putbackhat+give 1.75 s"
   },
@@ -192,7 +212,8 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 5.417,
     "PCFireAt": 4.75,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 6.2 s"
   },

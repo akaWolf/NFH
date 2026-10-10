@@ -26,7 +26,8 @@
    "object": "SteakMeat",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 1.42
+    "PCUseSeconds": 1.42,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakMeat <- meatbowl#0 1.4 s"
   },
@@ -34,7 +35,8 @@
    "object": "Beer",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.83
+    "PCUseSeconds": 0.83,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 0.8 s"
   },
@@ -52,7 +54,11 @@
     "PCStopSkip": true,
     "PCFireAt": 2.75,
     "PCFireLead": true,
-    "PCEndAfter": "tool"
+    "PCEndAfter": "tool",
+    "PCCaseGoto": [
+     true,
+     true
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BBQ <- bbq#0 1.9 s; BBQ <- bbq#1 1.6 s"
   },
@@ -65,7 +71,8 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 7.333,
     "PCFireAt": 4.5,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CarnivorPlantSpray <- plant#0 3.4 s"
   },
@@ -76,7 +83,8 @@
     "PCUseSeconds": 6.75,
     "PCFixSeconds": 1.083,
     "PCUseSecondsTricked": 3.167,
-    "PCRedoSeconds": 5.417
+    "PCRedoSeconds": 5.417,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.8 s"
   },
@@ -87,7 +95,8 @@
     "PCUseSeconds": 1.42,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.083,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakWine <- wine#0 1.4 s"
   },

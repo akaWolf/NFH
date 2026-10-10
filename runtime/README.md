@@ -873,7 +873,10 @@ predicate, then the all-tricks win.
   a tool is the tool's own); a station used where the mobile stands him
   whose PC point is off his stands the PC GOTO's ticks first
   (`Routine._pc1_inplace_walk`: 110's plant spray after the extinguisher),
-  a station's repeat visit not (105's piano after its repair).
+  and where the points agree the GOTO's two no-move ticks, on a visit that
+  opens its PC case (PCCaseGoto: 110's barbecue after the plant); a
+  station's repeat visit and a split case's later visits stand none (105's
+  piano after its repair, 111's machines, 113's drill).
 - **The PC profile's shared step, one trick** (`Routine._pc_pair_defer`,
   PCPairNext): a station of a step two mobile stations share, tricked
   alone, pays at its record and plays its SHOUT and repair after the

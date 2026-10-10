@@ -30,7 +30,8 @@
    "object": "Sofa",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 3.83
+    "PCUseSeconds": 3.83,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 3.8 s"
   },
@@ -41,7 +42,8 @@
     "PCUseSeconds": 6.08,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 7.75
+    "PCUseSecondsTricked": 7.75,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Binoculars <- binoculars#0 6.1 s"
   },

@@ -103,8 +103,10 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks):
-    """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]"""
+def pc_stations(n, toks, walks=None):
+    """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
+    (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
+    moves, doors and no-move ticks, 0 where the case has no GOTO])"""
     L = lap_model.Level(n)
     legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
@@ -131,12 +133,14 @@ def pc_stations(n, toks):
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)
     if len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
-        st[0][1] += st[-1][1]; st = st[:-1]
+        st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
     by = {}; parts = {}
     for (icon, ta, tw), aa in zip(st, acts):
         by.setdefault(icon.split()[-1], []).append(ta / lap_model.TICK)
         parts.setdefault(icon.split()[-1], []).append(aa)
+        if walks is not None:
+            walks.setdefault(icon.split()[-1], []).append(tw)
     return by, parts
 
 
@@ -156,16 +160,30 @@ def main(argv):
     for n, pairs in sorted(PAIRS.items()):
         if not pairs:
             continue
-        by, parts = pc_stations(n, toks)
+        walks = {}
+        by, parts = pc_stations(n, toks, walks)
         secs = {}
         notes = []
         spent = {}
+        # per visit, whether it opens its PC case with the case's own GOTO:
+        # the first visit of the case (a split case's later ones, another
+        # item's share of it, go on where the first left him) and a case
+        # that walks (PCCaseGoto: where the mobile uses the station in
+        # place, the GOTO's ticks stand — two with no move,
+        # Routine._pc1_inplace_walk)
+        cases = {}
+        opened = set()
         for pr in pairs:
             item, icon, k = pr[0], pr[1], pr[2]
             share = pr[3] if len(pr) > 3 else 1
             vals = by.get(icon, [])
             if k >= len(vals):
                 print('%d: no PC station %s #%d for %s' % (n, icon, k, item)); continue
+            nv = len(share) if isinstance(share, tuple) else share
+            first = (icon, k) not in opened
+            opened.add((icon, k))
+            goes = bool((walks.get(icon) or [0] * (k + 1))[k])
+            cases.setdefault(item, []).extend([first and goes] + [False] * (nv - 1))
             if isinstance(share, tuple):
                 # the station split by its actions, one mobile visit each (a
                 # name joined by '+' sums its actions into one visit); each of
@@ -298,7 +316,13 @@ def main(argv):
                 e['set']['PCUseSeconds'] = v
                 e['source'] = src
             else:
-                ov['patches'].append({'object': item, 'component': kind, 'set': {'PCUseSeconds': v}, 'source': src})
+                e = {'object': item, 'component': kind, 'set': {'PCUseSeconds': v}, 'source': src}
+                ov['patches'].append(e)
+            cg = cases.get(item) or []
+            if any(cg) and len(cg) == len(vals):
+                e['set']['PCCaseGoto'] = cg if len(cg) > 1 else cg[0]
+            else:
+                e['set'].pop('PCCaseGoto', None)
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     return 0
 

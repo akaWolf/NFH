@@ -40,7 +40,11 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.333
+    "PCUseSecondsTricked": 4.333,
+    "PCCaseGoto": [
+     true,
+     true
+    ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Camera <- camera#0 3.7 s; Camera <- camera#1 0.4 s"
   },
@@ -48,7 +52,8 @@
    "object": "MagnesiumBottle",
    "component": "SearchItem",
    "set": {
-    "PCUseSeconds": 0.42
+    "PCUseSeconds": 0.42,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MagnesiumBottle <- magnesium#0 0.4 s"
   },
@@ -58,7 +63,8 @@
    "set": {
     "PCUseSeconds": 5.5,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.917
+    "PCUseSecondsTricked": 3.917,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MumStatueFootStool <- statue#1 5.5 s"
   },
@@ -204,7 +210,8 @@
    "object": "Drawing",
    "component": "Drawing",
    "set": {
-    "PCUseSeconds": 3.58
+    "PCUseSeconds": 3.58,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.6 s"
   },
@@ -212,7 +219,8 @@
    "object": "DieselChair",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 0.25
+    "PCUseSeconds": 0.25,
+    "PCCaseGoto": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselChair <- potterswheel#0 enter 0.25 s"
   },

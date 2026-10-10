@@ -4211,26 +4211,37 @@ class Routine:
                 self.state = self.IDLE
 
     def _pc1_inplace_walk(self, it):
-        """the PC profile's Season 1: a station used where he stands whose PC
-        point is off the one he stands on — its case's GOTO walks there (110's
-        plant spray after the extinguisher: case 12's GOTO to bal/plant,
-        0x4609e2, from bal/barbecue_burn — 3 px along, 20 up): he stands the
-        walk's ticks (Pawn.pc1_goto_ticks), then the use. A station's own
-        visit again goes on where he stands (105's piano after its repair at
-        the smeared score: case 4's ENTER finds him seated, no GOTO). True
-        when held"""
+        """the PC profile's Season 1: a station used where the mobile stands
+        him whose visit opens its PC case (PCCaseGoto) — the case's GOTO:
+        where the station's PC point is off the one he stands on it walks
+        there (110's plant spray after the extinguisher: case 12's GOTO to
+        bal/plant, 0x4609e2, from bal/barbecue_burn — 3 px along, 20 up),
+        else it ends with no move, two ticks (the walk job inside its first
+        update, the GOTO on its second: 110's barbecue after the plant): he
+        stands the GOTO's ticks (Pawn.pc1_goto_ticks), then the use. A visit
+        that goes on inside a case (a split case's later ones: 111's washer,
+        113's drill after the ladder) and a station's own visit again (105's
+        piano after its repair at the smeared score: case 4's ENTER finds him
+        seated) stand none. True when held"""
         p = self.pawn
         if self.log and self.log[-1][0] == it.name:
+            return False
+        cg = it.pc_case_goto
+        goto = (cg[it.pc_use_visit % len(cg)] if cg else False) if isinstance(cg, list) else bool(cg)
+        if not goto:
             return False
         pt = p._pc1_item_point(it)
         here = p._pc1_here()
         r = getattr(p.zone, 'pc_walk_room', None) if p.zone is not None else None
-        if pt is None or here is None or r is None or tuple(here) == tuple(pt):
+        if pt is None or here is None or r is None:
             return False
-        got = p.pc1_goto_ticks([pt[0], pt[1], r['room']])
-        if not got or not got[0]:
-            return False
-        ticks, to = got
+        if tuple(here) == tuple(pt):
+            ticks, to = 2, tuple(pt)    # no move: the GOTO's two ticks
+        else:
+            got = p.pc1_goto_ticks([pt[0], pt[1], r['room']])
+            if not got or not got[0]:
+                return False
+            ticks, to = got
         self.state = self.USING
         self.timer = 0.0
         p._stand()
