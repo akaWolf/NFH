@@ -71,7 +71,7 @@ or 5.
 | the map's perfect episode | rating ≥ 100 | rating ≥ 90 (leveldata state 4) | **fixed 2026-09-16**: `pcprofile.s1_perfect` under the profile (`app.py`'s score save) |
 | the minimum ratings | `pcprofile.S1_MIN_RATING` | leveldata.xml `minquota` 50/55/60/65/70/75, 60/65/70/75, 60/65/70/75 | agrees (data) |
 | the time limits | the mobile's TimeMinutes | leveldata.xml `time` 3600/4320/5040/7200 ticks at 12 Hz = 5:00, 6:00, 7:00, 10:00 | agrees on all 14 levels (data) |
-| the clock | 12 Hz ticks, the HUD's minutes | fcn.00438a80: elapsed++ per tick, clamped at the limit; the GUI divides by 12 | agrees (docs/PC_ROUTINES.md) |
+| the clock | 12 Hz ticks, the HUD's minutes | fcn.00438a80: elapsed++ per tick, clamped at the limit; the GUI divides by 12; the tick every 83 ms — the pacer 0x408e68-0x408e85 over .data's [0x513cc4] = 83, 1000 / 12 in whole ms (NFH2 0x40976a-0x40978f over [0x464660] = 83): twelve ticks are 996 ms, the videos' HUD seconds 0.99600 of theirs (S1 103/109/113, S2 205/213) | the tick carried 2026-10-10 (`pcprofile.TICK_MS`, `game_dt`: the profile's game clock runs 1000/996 of the frames'); the HUD's minutes agree (docs/PC_ROUTINES.md) |
 
 ### The catch
 
@@ -541,13 +541,26 @@ actors' job pass the update calls at 0x100445f8.
   before the carpet's GOTO is the vacuum's OBJ1 (fcn.00451e80, vtable
   0x4e1bdc: its slot 2 fcn.00438c80 — no gait), so its 0.7 s lie in the
   GOTO's legs, not read against E11's frames.
-- The frame pacer: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
+- The frame pacer, found 2026-10-10: the frame's tick gate at
+  0x408e68-0x408e85 runs a tick once `[obj+0x48] + [0x513cc4]` is below
+  the clock and moves +0x48 on by the interval (to the clock itself when
+  it still lags one more); .data holds the rate 12 at [0x513cc0] and the
+  interval 83 at [0x513cc4] — fcn.00408210 sets them, the interval as
+  `1000 / rate` in whole ms, the rate clamped to 1-96 and stepped by the
+  debug keys `speed_inc` / `speed_dec` (0x408ae7-0x408b39). NFH2's
+  game.exe has the same gate at 0x40976a-0x40978f over [0x464660] = 83
+  (the rate [0x46465c] = 12, 0x407217). Twelve ticks are 996 ms: the HUD
+  clocks of both videos run 0.99600 of their seconds (the last digit's
+  changes, S1 103/109/113 and S2 205/213 over 150 s, residuals under
+  0.06 s) — the profile runs its game clock 1000/996 of the frames'
+  (`pcprofile.game_dt` in `App._tick_level`, the recorder and the
+  viewer). The searches before missed it: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
   binaries (GFXEngine fcn.10003420, `GetTickCount`) is a button widget's
   auto-repeat interval, its 1000 ms the hold timer, and fcn.100092a0's
-  167 ms the caret blink — what makes the level tick 12 Hz is not
-  located. The 12 Hz itself stands on the clock, the GUI's
+  167 ms the caret blink — what made the level tick was not located
+  then. The 12 Hz itself stands on the clock, the GUI's
   divisions by 12 and the mercury (docs/PC_ROUTINES.md). Read further on
   2026-09-17: the app's timer is built for 60 (`push 0x3c` at 0x0040eed2
   into fcn.00402cc0; fcn.00402da0 is QueryPerformanceCounter with a

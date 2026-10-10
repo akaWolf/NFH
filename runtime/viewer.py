@@ -529,7 +529,7 @@ class Viewer:
                 # step; the original runs on Time.deltaTime, which Unity
                 # itself only caps at Time.maximumDeltaTime (1/3 s by
                 # default) — a tighter cap than the engine's, no game rule
-                self.world.tick(min(dt, 0.1))
+                self.world.tick(min(pcprofile.game_dt(dt), 0.1))
                 # the stored click replays once the block lifts
                 # (OnBlockingAnimationEnded / OnDoorEnterAnimationFinished —
                 # Woody.cs:336-341, 484-488)

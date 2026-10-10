@@ -512,6 +512,23 @@ def s2_result(won, collapsed, completed, total):
 # laps within 12 % of the PC video.
 PX_PER_UNIT = 96.0
 TICKS_PER_SECOND = 12.0
+# game.exe's pacer runs a tick once the clock has passed the last tick's time
+# + the interval in .data and steps that time on by the interval (to the clock
+# itself when it lags two): NFH1 0x408e68-0x408e85 over [0x513cc4], NFH2
+# 0x40976a-0x40978f over [0x464660] — 83 in both, 1000 / 12 in whole
+# milliseconds (fcn.00408210 sets it from the rate [0x513cc0], 12, which the
+# debug keys speed_inc / speed_dec step; NFH2 0x407217). Twelve ticks are 996
+# ms: the HUD clock's second is 0.99600 of the videos' (S1 103, 109, 113 and
+# S2 205, 213, 150 s each). The profile runs the game's clock that much ahead
+# of the frames' (game_dt).
+TICK_MS = 83
+
+
+def game_dt(dt):
+    """a frame's real seconds as the game's: TICKS_PER_SECOND ticks of TICK_MS"""
+    if is_pc() and rule('tick'):
+        return dt * 1000.0 / (TICK_MS * TICKS_PER_SECOND)
+    return dt
 # the Season 1 neighbour's first case, so many ticks into play: the AddActor
 # handler pushes his level class's job (0x43a35c: level_sofa's fcn.00470600)
 # and then, in front of it (fcn.00444d30 -> fcn.00478f90 pushes at the head),

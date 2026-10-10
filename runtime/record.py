@@ -291,7 +291,7 @@ class Recorder:
         v._frame_dt = DT
         if not self.paused and not v.world.menu_open:
             v.t += DT
-            v.world.tick(DT)
+            v.world.tick(pcprofile.game_dt(DT))
             # the stored click replays once the block lifts
             w = v.woody
             if w is not None and w.stored_input is not None \

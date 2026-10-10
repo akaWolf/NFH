@@ -897,6 +897,27 @@ predicate, then the all-tricks win.
   that goes on with its path leaves it to the path's legs); and the
   carpet's case sends him to the vacuum first (Level_Laundry's case 21),
   not to the carpet.
+- **The PC profile's game clock** (`pcprofile.game_dt`: `App._tick_level`
+  for the world, the tutorial and its camera, the recorder, the viewer):
+  the PC's tick is 83 ms, not 1/12 s — game.exe's pacer (0x408e68-0x408e85,
+  NFH2 0x40976a-0x40978f) steps by .data's `1000 / 12` in whole ms — so the
+  world runs 1000/996 of the frames' seconds and every tick count of the
+  profile (TICKS_PER_SECOND 12 a game second) keeps its seconds; the
+  videos' HUD clocks run 0.99600 of their seconds, 0.5 s over a 2-minute
+  stretch the port ran behind them before.
+- **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
+  whose PC object carries no `nearobj` trigger (the level's trigger.xml)
+  fires in its level class's case instead, the overlay clearing the flag:
+  107's smeared picture (level_art's triggers are the four bananas; the
+  painting case fires it, OBJ2 bal/picture_smeared after the GoTo to
+  bal/picture_empty, 0x45883e-0x458931, after the dove case's OBJ2
+  bal/dove_free at the way point) — the port had fired it as he walked by
+  on his way to the dove's point, before the dove case (107's plan: the
+  picture, then the freed dove 7.05 s later, where the code fires the dove
+  at its point first — dove 137.0, picture 147.6, camera 166.8 now). Open:
+  102's and 105's toilets and 109's pig are walk-bys of the
+  mobile with no trigger either (their cases fire them: 102 0x4704e7,
+  109 case 18), carried as the reaction handlers' stands.
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove

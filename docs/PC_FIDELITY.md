@@ -876,7 +876,10 @@ HUD digit read one second before and five after every trick of
 Badinfos' fourteen runs agrees with the bracket that reading gives
 (ticks for every gap whose decay is 18 s or shorter, never for 25 s or
 longer). The tick is 12 Hz, not 20 (docs/PC_ROUTINES.md: the clock
-unit, the HUD's division by 12, the raw column), so the hold is 5 s
+unit, the HUD's division by 12, the raw column) — 83 ms a tick, the
+pacer's `1000 / 12` in whole ms (docs/PC_VERIFICATION.md, "The frame
+pacer"; since 2026-10-10 the profile's game clock runs 1000/996 of the
+frames', `pcprofile.game_dt`) — so the hold is 5 s
 and the window 5 s + the amount over 12 — 18 s on the bath, 20 s on
 the 180 levels, 25 s on the 240 ones, 35 s after the hunter's marbles
 — and the drains above are the red-only reader's artifact: the column's
