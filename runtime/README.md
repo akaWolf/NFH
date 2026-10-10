@@ -869,6 +869,13 @@ predicate, then the all-tricks win.
   tick and the pair's TrickDone (Item.OnTrickDone's linked arm) the other —
   the PC's done count is its credited records (fcn.100522e6); the mobile
   books both at once.
+- **The PC profile's visit cycle** (PCVisitFrom, `world.pc_visit_ix`): a
+  station's per-visit lists go round from their end to the PCVisitFrom-th
+  entry, where the PC's laps run a cycle the first lap leads into — 107's
+  painting case counts its pictures ([this+0x1c] against 3, 0x458bca):
+  the first lap's on the empty easel, then paint2, paint3 and the clean
+  with paint1 (4.25, 4.17, 4.17, 6.25 s; tools/pcref/pc_durations.py
+  VISIT_FROM).
 - **The PC profile's compound visit** (PCUseSecondsCompound,
   PCCreditAtCompound, PCJingleAtCompound, PCExtraPaysAt; `_pc_compound`):
   213's compound-tricked plant and tortilla stand their second
@@ -972,7 +979,7 @@ predicate, then the all-tricks win.
   EMPTY: the stays of 105's piano, 108's folding chair — two —, 109's
   bed, pig and parrot, 113's ladder); one between two walks is not
   carried (open, a tick each: 101's sofa after the room's GoTo, 107's
-  statue and its painting's dove case).
+  statue and its painting's case 15 after the balcony's GoTo).
 - **The PC profile's Season 1 nearobj triggers on the PC's geometry**
   (`Routine._near_hit`, `Pawn.pc1_point_now`, `pcprofile.s1_leg_point`):
   game.exe tests a station's trigger as |the actor's x - the object's

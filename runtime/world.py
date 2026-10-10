@@ -148,6 +148,18 @@ def pc_ap_tricked(ap, it):
     return 'xt' in ap and it is not None and it.tricked and not it.pc_masked
 
 
+def pc_visit_ix(it, n, visit=None):
+    """the entry of a per-visit list of `n` the item's visit takes (its count,
+    or `visit`): round the list, and from its end back to its PCVisitFrom
+    entry (Item.pc_visit_from — 107's painting: the first lap's picture, then
+    paint2, paint3 and the clean with paint1 round)"""
+    v = it.pc_use_visit if visit is None else visit
+    f = getattr(it, 'pc_visit_from', 0) or 0
+    if v < n or not 0 < f < n:
+        return v % n
+    return f + (v - f) % (n - f)
+
+
 def pc_ap_x(ap, it):
     """a station's PC hotspot x (Item.pc_approach `x`): one value, or one
     per visit where the GoTo takes another hotspot of the object each visit
@@ -157,7 +169,7 @@ def pc_ap_x(ap, it):
     the trick is in the scene (pc_ap_tricked)"""
     x = ap.get('xt') if pc_ap_tricked(ap, it) else ap.get('x')
     if isinstance(x, list):
-        return x[it.pc_use_visit % len(x)] if x else None
+        return x[pc_visit_ix(it, len(x))] if x else None
     return x
 
 
@@ -170,7 +182,7 @@ def pc_ap_px(ap, it):
     (`pxt`) while the trick is in the scene (pc_ap_tricked)"""
     px = ap.get('pxt') if pc_ap_tricked(ap, it) else ap.get('px')
     if isinstance(px, list):
-        return px[it.pc_use_visit % len(px)] if px else 0
+        return px[pc_visit_ix(it, len(px))] if px else 0
     return px
 
 
@@ -1248,7 +1260,7 @@ class Pawn:
         vias = self._pc1_vias(it, dest)
         if vias:
             # the PC's GOTOs to the points the station's walk passes through
-            # first (PCWalkVia: 107's dove case before the painting's)
+            # first (PCWalkVia: 107's statue case before the footstool's)
             final = vias + (final if isinstance(final, list) else [final])
         return self._route(dest, final, on_arrive)
 
@@ -1928,7 +1940,7 @@ class Pawn:
         ap = it.pc_approach.get(self.role) if (it is not None and pcprofile.is_pc()) else None
         if ap:
             def visit(v):
-                return (v[it.pc_use_visit % len(v)] if v else None) if isinstance(v, list) else v
+                return (v[pc_visit_ix(it, len(v))] if v else None) if isinstance(v, list) else v
             tx = visit(ap.get('tx', 0)) or 0
             # the height he leaves from: the station's hotspot's, or where a
             # hideout's leave put him (PCApproach `dpx`: its `<actor>_out`,
@@ -2166,7 +2178,7 @@ class Pawn:
         if fin is not None and fin.get('kind') == 'item' and self.role != 'Woody':
             fit = fin['item']
             cr = fit.pc_case_room
-            if (cr[fit.pc_use_visit % len(cr)] if cr else False) if isinstance(cr, list) else bool(cr):
+            if (cr[pc_visit_ix(fit, len(cr))] if cr else False) if isinstance(cr, list) else bool(cr):
                 room_zone = fit.zone
 
         def reach(st, x, y, tx, ty):
@@ -2362,7 +2374,7 @@ class Pawn:
         in: 'goto' (the case's GOTO, PCCaseGoto), 'enter' (a GOTOENTER,
         PCCaseEnter), None (a visit inside a case)"""
         def visit(v):
-            return (v[it.pc_use_visit % len(v)] if v else False) if isinstance(v, list) else bool(v)
+            return (v[pc_visit_ix(it, len(v))] if v else False) if isinstance(v, list) else bool(v)
         if it is None or not visit(it.pc_case_goto):
             return None
         return 'enter' if visit(it.pc_case_enter) else 'goto'
@@ -2468,7 +2480,7 @@ class Pawn:
         if not p:
             return None
         if isinstance(p[0], list):
-            p = p[it.pc_use_visit % len(p)]
+            p = p[pc_visit_ix(it, len(p))]
         z = self.level.zone_by_pid(it.zone)
         r = getattr(z, 'pc_walk_room', None) if z is not None else None
         if r is None or (len(p) > 2 and p[2] != r['room']):
@@ -4144,7 +4156,7 @@ class Routine:
     def _pc_visit_icon(it, visit):
         """the item's PCIcon for a visit (cycling); None where it has none"""
         icons = getattr(it, 'pc_icon', None)
-        return icons[visit % len(icons)] if icons else None
+        return icons[pc_visit_ix(it, len(icons), visit)] if icons else None
 
     def pc_think_icon(self):
         """the PC script's bubble for the routine's action (the HUD's): the
@@ -5055,7 +5067,7 @@ class Routine:
         self.pc_bubble_next = None
         self._pc_icon_sched = None
         self._pc_icon_t = 0.0
-        sched = it.pc_icon_sched[(max(it.pc_use_visit, 1) - 1) % len(it.pc_icon_sched)] \
+        sched = it.pc_icon_sched[pc_visit_ix(it, len(it.pc_icon_sched), max(it.pc_use_visit, 1) - 1)] \
             if pc and it.pc_icon_sched and not self._pc_use_tricked and not self.pc_zero_visit else None
         if sched:
             # the stay's parts run in steps of other icons, or a bar hides
@@ -5068,7 +5080,7 @@ class Routine:
             # (game.exe 0x475ce6: the GOTO pushes the LEAVE after the case's
             # SetIcon): the bubble takes the next station's icon that many
             # seconds before the stay's end (PCIconLead)
-            lead = it.pc_icon_lead[(max(it.pc_use_visit, 1) - 1) % len(it.pc_icon_lead)]
+            lead = it.pc_icon_lead[pc_visit_ix(it, len(it.pc_icon_lead), max(it.pc_use_visit, 1) - 1)]
             if 0.0 < lead < pc:
                 self.pc_icon_at = pc - lead
         if self.pc_zero_visit:
@@ -5940,7 +5952,7 @@ class Routine:
         visit in the PC station order, cycling; 0 = none"""
         if not getattr(it, 'pc_use_secs', None):
             return 0.0
-        v = it.pc_use_secs[it.pc_use_visit % len(it.pc_use_secs)]
+        v = it.pc_use_secs[pc_visit_ix(it, len(it.pc_use_secs))]
         it.pc_use_visit += 1
         return float(v)
 

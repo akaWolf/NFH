@@ -46,7 +46,7 @@ The overlay entries, in px of the PC scene (the room's own coordinates):
              PCWalkVia    {'Rottweiler': [[x, y, room], ...]}: the points the
                           station's walk passes through first — the level class's
                           GOTOs in its room with no action between them and the
-                          station's own (`station_vias`: 107's dove, its statue)
+                          station's own (`station_vias`: 107's statue)
 The zones map to the rooms geometrically (the rooms' path centres against the
 zones', the house at 96 px a unit, one shift a level), the exit porch through the
 door graph; a door pair of the mobile scene is the PC door of its two rooms.
@@ -197,10 +197,10 @@ def station_vias(n):
     """mobile item -> the PC objects its station's walk passes through: the
     GOTOs of the level class in the station's room from the last door to the
     station's own GOTO with no action between them (lap_model's steady lap) —
-    107's dove case walks to bal/dove_free on every lap before the painting's
-    GOTO (an untricked dove plays nothing: game.exe 0x45d5xx's case, the
-    lap model's `walk 14 -> bal/dove_free`), its statue case to lir/statue
-    before the footstool"""
+    107's statue case walks to lir/statue before the footstool (its dove case,
+    the walk to bal/dove_free before the painting's, runs once Woody has
+    freed the dove: case 15 skips it while the tied dove `aux` is present,
+    0x45866d)"""
     L = lap_model.Level(n)
     toks = lap_model.tokens_of([n], SCRATCH, lap_model.CYCLE)
     legs = lap_model.model(L, toks[n], steady=True)

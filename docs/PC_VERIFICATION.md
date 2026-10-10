@@ -1324,6 +1324,12 @@ actors' job pass the update calls at 0x100445f8.
   the port walked straight — the only GOTO of the fourteen laps with no
   action before the next one in its room but 107's statue on the way to
   the footstool. Carried (PCWalkVia): 107's lap 57.3 s (runs/idle107v).
+  Read again on 2026-10-11: the dove case is off the idle lap — case 15
+  tests the tied dove `aux` (isObjectPresent finds the level's actors too:
+  a name it did not find would throw core::AssertionException, fatal at
+  fcn.004130d0) and goes to the painting while it sits tied, as E07's laps
+  walk from the balcony's door to the easel; case 18 paints its pictures
+  (paint1-3, the clean every fourth lap, PCVisitFrom).
 - `tools/pcref/lap_model_s2.py`, `levels/pc/Level210.overlay.json`
   (2026-10-03): a co-actor's fight whose behaviour her own job posts, his
   flow's parts posting none (POST_BY): 210's elephant — Fifi's sequence

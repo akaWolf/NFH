@@ -1909,9 +1909,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   visits walk to different objects, 107's camera) and the points that
   walk passes through first (PCWalkVia, since 2026-10-03: the level
   class's GOTOs in the station's room with no action between them and the
-  station's own — 107's dove case walks him to bal/dove_free on every lap
-  before the painting's GOTO, 120 px out of his way, and its statue case
-  to lir/statue before the footstool; `station_vias`, the route's point
+  station's own — 107's statue case walks him to lir/statue before the
+  footstool (its dove case, to bal/dove_free before the painting's, only
+  once Woody has freed the dove: case 15 skips it while the tied dove
+  `aux` sits on the balcony — read on 2026-10-11, every lap until then);
+  `station_vias`, the route's point
   steps ending legs of their own, `Pawn._pc1_vias`). A walk of the port is
   cut into the PC's legs at its door steps and its item; each leg lasts
   the mover's ticks between the PC's points (`pcprofile.s1_leg_ticks`; a
@@ -3019,8 +3021,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   ENTER 0x457d22 / 0x457ec3: `sit_down` 6 ticks and its leave `get_up`
   6, the model had taken the stool of the IsVariant before it, 2 and 1),
   0.8 and 2.0 since — and its painting 4.6-6.5 long (the model's 216
-  ticks from the painting's icon to the camera's against E07's 208:
-  open; 105's first
+  ticks from the painting's icon to the camera's against E07's 208),
+  +1.7 and +0.6 since 2026-10-11: case 15 tests the tied dove `aux`
+  (0x45866d; the lookup finds the level's actors — a name it missed would
+  throw core::AssertionException, which only fcn.004130d0's "Problem" box
+  catches) and goes to the painting while it sits tied, as E07's laps
+  walk from the balcony's door to the easel (68.0-69.1 s) — the dove
+  case's walk to bal/dove_free was the freed dove's; and case 18 paints
+  the pictures it counts ([this+0x1c] against 3, 0x458bca): the first
+  lap's on the empty easel (the SWITCH, a MsgStep, paint1), then paint2,
+  paint3 and the clean with paint1, round (`time` 47: 4.17 s, the clean
+  lap 6.25; PCVisitFrom 1) where the model had painted nonsense, 42
+  ticks (tools/pcref/routine_order.py: the level's actors present, a
+  class dword field counted along the walk); 105's first
   span +0.9 s (the piano from the start to the football's icon: 11.63 s
   against E05's 10.76), its later spans within 0.1 s — the football's
   `inv` and `fly_into_kitchen` are the football actor's own list, pushed

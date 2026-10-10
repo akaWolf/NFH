@@ -210,11 +210,27 @@
    "object": "Drawing",
    "component": "Drawing",
    "set": {
-    "PCUseSeconds": 3.58,
-    "PCCaseGoto": true,
-    "PCCaseRoom": true
+    "PCUseSeconds": [
+     4.25,
+     4.17,
+     4.17,
+     6.25
+    ],
+    "PCCaseGoto": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "PCCaseRoom": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "PCVisitFrom": 1
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 3.6 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 4.2 s; Drawing <- painting#3 4.2 s; Drawing <- painting#5 4.2 s; Drawing <- painting#7 6.2 s"
   },
   {
    "object": "DieselChair",
@@ -831,15 +847,6 @@
       470,
       420,
       "bal"
-     ]
-    },
-    "PCWalkVia": {
-     "Rottweiler": [
-      [
-       530,
-       420,
-       "bal"
-      ]
      ]
     }
    },

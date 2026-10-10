@@ -244,7 +244,7 @@ class Item:
                  'surprise_far_left', 'surprise_far_right', 'notice_enter',
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
-                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
+                 'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_visit_from', 'pc_use_secs_role', 'pc_use_visit_role',
                  'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
                  'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role', 'pc_hurt_icon',
@@ -430,7 +430,7 @@ class Item:
         self.pc_walk_tricked = d.get('PCWalkPointTricked') or {}
         # ... and the points that walk passes through first: the level class's
         # GOTOs in the station's room with no action between them and the
-        # station's own (PCWalkVia: 107's dove before the painting,
+        # station's own (PCWalkVia: 107's statue before the footstool,
         # tools/pcref/pc_walks_s1.py station_vias)
         self.pc_walk_via = d.get('PCWalkVia') or {}
         # ... and a fixing tool's case's walk with it to its use (PCToolPoint:
@@ -662,6 +662,10 @@ class Item:
         v = d.get('PCUseSeconds')
         self.pc_use_secs = [float(x) for x in (v if isinstance(v, list) else ([v] if v else []))]
         self.pc_use_visit = 0
+        # the entry the per-visit lists go round to at their end (PCVisitFrom:
+        # 107's painting — its first lap's picture, then three laps round,
+        # tools/pcref/pc_durations.py VISIT_FROM; 0 the whole list)
+        self.pc_visit_from = int(d.get('PCVisitFrom') or 0)
         # the seconds before a visit's end the next station's icon is up
         # (PCIconLead: the leave the next case's walk plays after its ICON,
         # tools/pcref/pc_durations.py; one value or one per visit)

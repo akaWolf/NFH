@@ -54,9 +54,14 @@ PAIRS = {
     106: [('PhotoAlbum', 'photo_album', 0), ('Candy', 'candy', 0), ('Pudding', 'milk_bottle', 0), ('BathTub', 'bath', 0),
           ('PhotoAlbum', 'photo_album', 1), ('Candy', 'candy', 1), ('Pudding', 'milk_bottle', 1), ('BathTub', 'bath', 1),
           ('Towel', 'towel', 0)],
+    # the painting's case 18 counts its pictures ([this+0x1c] against 3,
+    # 0x458bca): the first lap's picture (the easel's SWITCH, the MsgStep,
+    # paint1), then paint2, paint3 and the clean with paint1 round (VISIT_LAPS,
+    # VISIT_FROM)
     107: [('Drawing', 'painting', 1), ('Camera', 'camera', 0), ('MagnesiumBottle', 'magnesium', 0), ('Camera', 'camera', 1),
           ('DieselChair', 'potterswheel', 0, ('enter',)), ('DieselGenerator', 'potterswheel', 0, ('potter+leave',)),
-          ('MumStatueFootStool', 'statue', 1)],
+          ('MumStatueFootStool', 'statue', 1),
+          ('Drawing', 'painting', 3), ('Drawing', 'painting', 5), ('Drawing', 'painting', 7)],
     108: [('ToothBrush', 'toothbrush', 0), ('CoffeeMaker', 'coffee', 0), ('Shezlong', 'foldingchair', 0),
           ('WateringCan', 'ewer', 1), ('Plant', 'flower', 0), ('WateringCan', 'ewer', 2)],
     109: [('Teeth', 'teeth', 0), ('Bed', 'sleep', 0), ('AlarmClock', 'alarm_clock', 0), ('Teeth', 'teeth', 1),
@@ -81,6 +86,14 @@ PAIRS = {
 }
 
 
+# the laps a station's visits differ over, past lap_model.CYCLE's: 107's
+# painting counter runs four laps round before the walker's state repeats
+VISIT_LAPS = {107: 4}
+# the visit an item's per-visit lists go round to at their end (PCVisitFrom):
+# 107's first lap paints the empty easel, the cycle is the next three laps'
+VISIT_FROM = {107: {'Drawing': 1}}
+
+
 # a hideout the neighbour may leave off his lap: the object's `leave` (the
 # Loader's time) as PCLeaveSeconds — 109's bed, left on a noise (the pig
 # class's `wakeup`: the LEAVE of bed/bed_sleep at 0x468aff)
@@ -103,7 +116,7 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None):
+def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
     moves, doors and no-move ticks, 0 where the case has no GOTO]; into
@@ -146,7 +159,9 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None):
             ent[-1] = True
         elif kind == 'goto' and rgo and text == 'the room GoTo ends':
             rgo[-1] = True
-    if len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
+    if wrap and len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
+        # (the laps of VISIT_LAPS end inside the cycle, not at its first
+        # station: no wrap)
         st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
         if len(ent) > len(st):
@@ -207,7 +222,7 @@ def item_kind(n, name):
 
 def main(argv):
     show = '--show' in argv
-    toks = lap_model.tokens_of([], os.environ.get('LAP_TOKENS'), lap_model.CYCLE)
+    toks = lap_model.tokens_of([], os.environ.get('LAP_TOKENS'), {**lap_model.CYCLE, **VISIT_LAPS})
     for n, pairs in sorted(PAIRS.items()):
         if not pairs:
             continue
@@ -215,7 +230,7 @@ def main(argv):
         leads = {}
         gents = {}
         grooms = {}
-        by, parts = pc_stations(n, toks, walks, leads, gents, grooms)
+        by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS)
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -415,6 +430,11 @@ def main(argv):
                 e['set']['PCIconLead'] = il if len(il) > 1 else il[0]
             else:
                 e['set'].pop('PCIconLead', None)
+            vf = VISIT_FROM.get(n, {}).get(item)
+            if vf:
+                e['set']['PCVisitFrom'] = vf
+            else:
+                e['set'].pop('PCVisitFrom', None)
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     return 0
 

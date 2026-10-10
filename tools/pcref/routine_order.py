@@ -8,10 +8,12 @@ so the walk is the chain of `next` values from case 0. The chain is
 simulated over the radare2 listing of game.exe: string-compare, IFVARIANT
 (fcn.0047a130) and class-local helpers are taken as false (no trick has
 fired), the engine's waits as true, class byte fields as their current
-value (0 after the constructor, set along the walk), OBJ3 — isObjectPresent
+value (0 after the constructor, set along the walk; a dword field the cases
+compare, 107's painting counter, counted the same way), OBJ3 — isObjectPresent
 (fcn.00479ff0: the object looked up and its flag 0x20 tested, "isObjectPresent
 : Object not found") — as the object's presence along the lap: the level's
-level.xml places the objects, each SWITCH (fcn.00451de0, the new object and
+level.xml places the objects, objects.xml's actors are present (107's tied
+dove, `aux`), each SWITCH (fcn.00451de0, the new object and
 the old) swaps one for the other (113's valve: bas/valve_on placed, case 2
 switches it off, case 6 on again; 111's board: case 8 puts the clothes on
 it, case 16 irons them) — and a case that returns without yielding is a
@@ -133,6 +135,12 @@ def run_level(sw):
                 if tt and re.match(r'mov ecx, e', tt): tails.add(aa)
             hi = max(hi, a + 0x40)
     if not tails: return None
+    # the class's dword fields its cases compare (107's painting counter,
+    # [edi+0x1c] against 3): the only ones the walk counts
+    cmpd = set()
+    for k in range(at(lo), at(hi)):
+        a, t = ins(k)
+        if t and (mm := re.match(r'cmp dword \[e[ds]i \+ (0x[0-9a-f]+)\], ', t)): cmpd.add(mm.group(1))
     prologue = {}
     for j in range(at(a_sw) - 60, at(a_sw)):
         aa, tt = ins(j)
@@ -151,6 +159,7 @@ def run_level(sw):
     def simulate(start_a, objflags=None, flip=False, depth=0, present=None):
         objflags = {} if objflags is None else objflags
         labels = []; k = at(start_a); seen = set(); pred = False; regs = {}; lastcall = None; flags = {}; inverted = False
+        cmpv = None           # a class dword field less a value, the last cmp's
         trace = TRACE and int(TRACE, 16) == start_a
         # the string globals on the path since the last labelled call: a call's
         # arguments (the listing's order would cross into the branch not taken —
@@ -161,12 +170,31 @@ def run_level(sw):
             seen.add(k); a, t = ins(k)
             if t is None: k += 1; continue
             m = re.match(r'call (fcn\.[0-9a-f]+)', t)
-            if not (m and m.group(1) in LABEL):
+            if (mm := re.match(r'mov e[a-z]x, dword \[(e[a-z]x)\*4 \+ 0x(5[01][0-9a-f]{4})\]$', t)) and mm.group(1) in regs:
+                # a string table indexed by a counted register (107's paint1-3)
+                nm = G.get(hex(int(mm.group(2), 16) + 4 * regs[mm.group(1)]))
+                if nm: pstr.append(str(nm))
+            elif not (m and m.group(1) in LABEL):
                 pstr += line_strings(k)
             if trace and re.search(r'call|j[a-z]+ 0x|push|test', t): print('      trace %x %s pred=%s' % (a, t[:50], pred))
-            if (mm := re.match(r'mov (e[a-z]x|e[sd]i|ebp), (0x[0-9a-f]+|[0-9]+)$', t)): regs[mm.group(1)] = int(mm.group(2), 0)
+            # a class dword field counted along the walk (107's paintings,
+            # [edi+0x1c]: read, +1 through lea, stored back, reset to 0) and
+            # compared with a register the run method's prologue set (ebx 3)
+            if (mm := re.match(r'mov (e[a-z]x), dword \[e[ds]i \+ (0x[0-9a-f]+)\]$', t)) and mm.group(2) in cmpd:
+                regs[mm.group(1)] = objflags.get('d' + mm.group(2), 0)
+            elif (mm := re.match(r'lea (e[a-z]x), \[(e[a-z]x) \+ (0x[0-9a-f]+|[0-9]+)\]$', t)) and mm.group(2) in regs:
+                regs[mm.group(1)] = regs[mm.group(2)] + int(mm.group(3), 0)
+            elif (mm := re.match(r'mov (e[a-z]x|e[sd]i|ebp), (0x[0-9a-f]+|[0-9]+)$', t)): regs[mm.group(1)] = int(mm.group(2), 0)
             elif (mm := re.match(r'xor (e[a-z]x|e[sd]i|ebp), \1$', t)): regs[mm.group(1)] = 0
             elif (mm := re.match(r'(mov|lea|pop) (e[a-z]x|e[sd]i|ebp),', t)): regs.pop(mm.group(2), None)
+            if (mm := re.match(r'mov dword \[e[ds]i \+ (0x[0-9a-f]+)\], (e[a-z]x|0x[0-9a-f]+|[0-9]+)$', t)) and mm.group(1) in cmpd:
+                v = regs.get(mm.group(2)) if mm.group(2).startswith('e') else int(mm.group(2), 0)
+                if v is not None: objflags['d' + mm.group(1)] = v
+            if (mm := re.match(r'cmp dword \[e[ds]i \+ (0x[0-9a-f]+)\], (e[a-z]x|e[sd]i|ebp|0x[0-9a-f]+|[0-9]+)$', t)) and mm.group(1) in cmpd:
+                v = mm.group(2)
+                v = regs.get(v, prologue.get(v)) if v.startswith('e') else int(v, 0)
+                cmpv = None if v is None else objflags.get('d' + mm.group(1), 0) - v
+                k += 1; continue
             if a in tails or re.search(r'call fcn\.(0045c600|004706a0|0045e640)', t): return labels, yield_next(k, regs)
             if t.startswith('ret'): return labels, 'ret'
             m = re.match(r'call (fcn\.[0-9a-f]+)', t)
@@ -181,7 +209,9 @@ def run_level(sw):
                 if present is not None and fn in PRESENCE_FN:
                     lastcall = ('flag', 'true' if PRESENCE_FN[fn] in present else 'false')
                 if present is not None and fn in ('fcn.00479ff0', 'fcn.00451de0'):
-                    ss = [x for x in pstr if '/' in x]
+                    # (an object's name has its room; an actor's, 107's `aux`,
+                    # not — the level's actors are in `present` from the start)
+                    ss = [x for x in pstr if '/' in x or x in present]
                     if fn == 'fcn.00479ff0' and ss:
                         lastcall = ('flag', 'true' if ss[-1] in present else 'false')
                     elif fn == 'fcn.00451de0' and len(ss) >= 2:
@@ -205,6 +235,13 @@ def run_level(sw):
                 tgt = int(m.group(1), 16)
                 if tgt in tails: return labels, yield_next(k, regs)
                 k = at(tgt); continue
+            m = re.match(r'j(l|ge|g|le) (0x[0-9a-f]+)', t)
+            if m and cmpv is not None:
+                cc, tgt = m.group(1), int(m.group(2), 16)
+                take = {'l': cmpv < 0, 'ge': cmpv >= 0, 'g': cmpv > 0, 'le': cmpv <= 0}[cc]
+                cmpv = None
+                k = at(tgt) if take else k + 1
+                continue
             m = re.match(r'j(e|ne|z|nz) (0x[0-9a-f]+)', t)
             if m:
                 cc, tgt = m.group(1), int(m.group(2), 16)
@@ -333,10 +370,18 @@ def run_level(sw):
         if icons & KW[best]: level, score = best, len(icons & KW[best])
     seq = []; c = 0; visited = []; objflags = {}; states = set()
     lx = os.path.join(X, level, 'level.xml')
-    # the objects level.xml places (an actor is no object: isObjectPresent's
-    # lookup, fcn.00448bf0, does not find 107's `aux`, the tied dove of its
-    # case 15 — "Object not found", false)
-    present = set(re.findall(r'<object name="([^"]+)"', canon.read(lx))) if os.path.exists(lx) else None
+    # the objects level.xml places and the level's actors (objects.xml): the
+    # lookup finds both — a name it did not find would assert ("isObjectPresent
+    # : Object not found", fcn.00422c40 throws core::AssertionException, which
+    # only the game's outermost handler catches, fcn.004130d0's "Problem" box),
+    # and 107's case 15 tests `aux`, the tied dove, on every lap; present while
+    # it sits tied (E07: the case goes to the painting, no walk to the dove)
+    present = None
+    if os.path.exists(lx):
+        ox = os.path.join(X, level, 'objects.xml')
+        present = set(re.findall(r'<object name="([^"]+)"', canon.read(lx)))
+        if os.path.exists(ox):
+            present |= set(re.findall(r'<actor name="([^"]+)"', canon.read(ox))) - {'neighbor', 'woody'}
     for _ in range(120):
         key = (c, tuple(sorted(objflags.items())), tuple(sorted(present or ())))
         if key in states: break
@@ -420,7 +465,12 @@ for lv in order:
             # of one lap, no case repeated: the steady lap runs from there
             # (108's toothbrush, cases 0 and 2, is the first lap's only)
             toks = []; seen_c = set(); n = 0
-            wrap = seq[-1][2] if len({c for c, _, _ in seq}) == len(seq) else None
+            cs = [c for c, _, _ in seq]
+            wrap = seq[-1][2] if len(set(cs)) == len(cs) else None
+            if wrap is None:
+                # a walk of laps (107's painting counter): the steady lap from
+                # the case the second lap opens with
+                wrap = next(c for i, c in enumerate(cs) if c in cs[:i])
             for c, labels, nxt in seq:
                 if c in seen_c and toks: n += 1; print('LAP %d %d: %s' % (nums[lv], n, ' | '.join(toks))); toks = []; seen_c = set()
                 seen_c.add(c)
