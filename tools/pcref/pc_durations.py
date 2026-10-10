@@ -94,6 +94,16 @@ VISIT_LAPS = {107: 4}
 VISIT_FROM = {107: {'Drawing': 1}}
 
 
+# a case's other arm once another item has been tricked (PCWhenTricked): the
+# visit's stand — the list's first update and the action — and the repair's
+# after the fire. 107's painting once Woody has cut the dove loose (combine.xml's
+# `bal/dove_free` removes `aux`): case 18 paints nonsense on the easel's
+# picture (0x458d46-0x458dce), and on the smeared one after its fire with no
+# clean (StopMsg, OBJ2 0x458ac4, paint_nonsense 0x458b22)
+WHEN_TRICKED = {107: {'Drawing': ('Dove', ('bal/picture', 'paint_nonsense'),
+                                  ('bal/picture_smeared', 'paint_nonsense'))}}
+
+
 # a hideout the neighbour may leave off his lap: the object's `leave` (the
 # Loader's time) as PCLeaveSeconds — 109's bed, left on a noise (the pig
 # class's `wakeup`: the LEAVE of bed/bed_sleep at 0x468aff)
@@ -435,6 +445,17 @@ def main(argv):
                 e['set']['PCVisitFrom'] = vf
             else:
                 e['set'].pop('PCVisitFrom', None)
+            wt = WHEN_TRICKED.get(n, {}).get(item)
+            if wt:
+                other, (uo, ua), (fo, fa) = wt
+                L = lap_model.Level(n)
+                tu, tf = L.job_ticks(uo, ua), L.job_ticks(fo, fa)
+                e['set']['PCWhenTricked'] = {other: {'PCUseSeconds': round((1 + tu) / lap_model.TICK, 2),
+                                                     'PCFixSeconds': round(tf / lap_model.TICK, 2)}}
+                e['source'] += ("; with %s tricked the case's other arm: the list's first update and %s's "
+                                "%s (%d ticks), %s's %s after the fire (%d)" % (other, uo, ua, tu, fo, fa, tf))
+            else:
+                e['set'].pop('PCWhenTricked', None)
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
     return 0
 

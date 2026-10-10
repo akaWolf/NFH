@@ -148,6 +148,17 @@ def pc_ap_tricked(ap, it):
     return 'xt' in ap and it is not None and it.tricked and not it.pc_masked
 
 
+def pc_branch(items, it):
+    """the overlay keys of the item's PC case arm while another item has been
+    tricked (Item.pc_when_tricked: 107's painting with the dove cut loose),
+    None where no such item has"""
+    for name, keys in (getattr(it, 'pc_when_tricked', None) or {}).items():
+        o = items.get(name) if items is not None else None
+        if o is not None and (o.tricked or o.got_tricked or o.already_tricked):
+            return keys
+    return None
+
+
 def pc_visit_ix(it, n, visit=None):
     """the entry of a per-visit list of `n` the item's visit takes (its count,
     or `visit`): round the list, and from its end back to its PCVisitFrom
@@ -5940,6 +5951,12 @@ class Routine:
             # branch, then the chain's next case — so its slot passes
             self._pc_visit_seconds(it)
             return float(t.pc_use_secs_tricked)
+        br = pc_branch(self.level.items, it)
+        if br is not None and br.get('PCUseSeconds') is not None:
+            # the case's other arm (PCWhenTricked: 107's painting with the
+            # dove cut loose paints nonsense); its visit slot passes as any
+            self._pc_visit_seconds(it)
+            return float(br['PCUseSeconds'])
         v = self._pc_visit_seconds(it)
         # a visit the PC plays no action at: its value 0 (PCUseSeconds [0.0] —
         # 107's stool, whose ENTER pushes an `enter` the object has no record
@@ -9810,6 +9827,11 @@ class World:
             # PC action, none when the PC object has none) — two sequences
             fixes = [a for a in fix_seq if pawn.anim.has(a)]
             fix_secs = item.pc_fix_secs
+            br = pc_branch(self.level.items if self.level is not None else None, item)
+            if br is not None and br.get('PCFixSeconds') is not None:
+                # the case's other arm after the fire (PCWhenTricked: 107's
+                # smeared picture with the dove cut loose, paint_nonsense)
+                fix_secs = float(br['PCFixSeconds'])
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
             walk = [pawn.pc1_goto_ticks(getattr(item, 'pc_fix_point', None))

@@ -875,7 +875,12 @@ predicate, then the all-tricks win.
   painting case counts its pictures ([this+0x1c] against 3, 0x458bca):
   the first lap's on the empty easel, then paint2, paint3 and the clean
   with paint1 (4.25, 4.17, 4.17, 6.25 s; tools/pcref/pc_durations.py
-  VISIT_FROM).
+  VISIT_FROM). A case's other arm while another item has been tricked
+  (PCWhenTricked {item: {PCUseSeconds, PCFixSeconds}}, `world.pc_branch`):
+  107's painting once Woody has cut the dove loose (combine.xml's
+  `bal/dove_free` removes the tied dove `aux`) — nonsense painted on the
+  easel, 3.58 s, and on the smeared picture after its fire, 3.5 s, where
+  the tied dove's arm cleans it (1.5 s).
 - **The PC profile's compound visit** (PCUseSecondsCompound,
   PCCreditAtCompound, PCJingleAtCompound, PCExtraPaysAt; `_pc_compound`):
   213's compound-tricked plant and tortilla stand their second

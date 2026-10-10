@@ -228,9 +228,15 @@
      true,
      true
     ],
-    "PCVisitFrom": 1
+    "PCVisitFrom": 1,
+    "PCWhenTricked": {
+     "Dove": {
+      "PCUseSeconds": 3.58,
+      "PCFixSeconds": 3.5
+     }
+    }
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 4.2 s; Drawing <- painting#3 4.2 s; Drawing <- painting#5 4.2 s; Drawing <- painting#7 6.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Drawing <- painting#1 4.2 s; Drawing <- painting#3 4.2 s; Drawing <- painting#5 4.2 s; Drawing <- painting#7 6.2 s; with Dove tricked the case's other arm: the list's first update and bal/picture's paint_nonsense (42 ticks), bal/picture_smeared's paint_nonsense after the fire (42)"
   },
   {
    "object": "DieselChair",

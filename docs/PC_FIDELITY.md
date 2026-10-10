@@ -3033,7 +3033,18 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   paint3 and the clean with paint1, round (`time` 47: 4.17 s, the clean
   lap 6.25; PCVisitFrom 1) where the model had painted nonsense, 42
   ticks (tools/pcref/routine_order.py: the level's actors present, a
-  class dword field counted along the walk); 105's first
+  class dword field counted along the walk). And the freed dove's arms:
+  Woody's scissors are combine.xml's `bal/dove_free` combination, `aux`
+  and the scissors removed, so with the dove cut loose case 15 walks to
+  it (the trick's visit, PCWalkPoint 530/420) and case 18 takes its other
+  arm — the smeared picture fires (StopMsg, OBJ2 0x458ac4) and he paints
+  nonsense on it, 42 ticks, with no clean and no SWITCH, the picture left
+  smeared; an unsmeared one is painted nonsense on too (0x458d46, the
+  IsVariant of bal/picture_empty and bal/picture), 3.58 s a visit. The
+  tied dove's arm (the fire at 0x458931, the clean 1.5 s) had stood for
+  both; 107's plan, the dove cut before the picture is smeared, takes the
+  other (PCWhenTricked, `world.pc_branch`: its dove 135.25 s, the picture
+  140.27, at 100); 105's first
   span +0.9 s (the piano from the start to the football's icon: 11.63 s
   against E05's 10.76), its later spans within 0.1 s — the football's
   `inv` and `fly_into_kitchen` are the football actor's own list, pushed
