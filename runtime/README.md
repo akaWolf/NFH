@@ -991,9 +991,16 @@ predicate, then the all-tricks win.
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
   the next case runs on the tick after (tools/pcref/routine_order.py's
   EMPTY: the stays of 105's piano, 108's folding chair — two —, 109's
-  bed, pig and parrot, 113's ladder); one between two walks is not
-  carried (open, a tick each: 101's sofa after the room's GoTo, 107's
-  statue and its painting's case 15 after the balcony's GoTo).
+  bed, pig and parrot, 113's ladder); one after a case of no actions — a
+  room's GoTo, a GOTO alone — goes with the next case's walk since
+  2026-10-11 (PCCaseEmpty, `Pawn._pc1_empty`; tools/pcref/pc_durations.py
+  had let its tick go: 101's sofa after the room's GoTo, 107's footstool
+  after the statue's GOTO and its painting after the balcony's GoTo,
+  109's sleep after the bed's GOTO — E07's statue and painting spans
+  +0.8 and +0.6/-0.4 ticks from the video's, +1.9 and +1.7/+0.6 before).
+  Open: 109's bubble shows the sleep's icon from the walk to the bed,
+  where the PC's bed case shows `bed` and its sleep case `sleep` (its
+  span 5-6 ticks long against E09's).
 - **The PC profile's Season 1 nearobj triggers on the PC's geometry**
   (`Routine._near_hit`, `Pawn.pc1_point_now`, `pcprofile.s1_leg_point`):
   game.exe tests a station's trigger as |the actor's x - the object's

@@ -126,7 +126,8 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True, intros=None):
+def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True, intros=None,
+                empties=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
     moves, doors and no-move ticks, 0 where the case has no GOTO]; into
@@ -140,10 +141,17 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
     legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
     acts = []; lead = []; held = 0.0
+    # per station, the seconds of the job-less cases between the case before
+    # it — one of no actions: a room's GoTo, a GOTO alone — and its own (101's
+    # sofa after the room's GoTo, 107's statue and painting, 109's sleep):
+    # the next case runs a tick after each, its walk or its stay later
+    # (PCCaseEmpty)
+    lost = []
     for kind, text, t in legs:
         if kind == 'icon':
             if held and acts and acts[-1]:
                 a, v = acts[-1][-1]; acts[-1][-1] = (a, v + held)
+            lost.append(held if (held and acts and not acts[-1]) else 0.0)
             held = 0.0
             acts.append([])
         elif kind == 'action' and text.startswith('step '):
@@ -161,6 +169,7 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
     if lead and acts:
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)
+        lost.insert(0, lost.pop())
     ent = []; rgo = []; itr = []
     for kind, text, t in legs:
         if kind == 'icon':
@@ -176,6 +185,7 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
         # station: no wrap)
         st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
+        lost[0] += lost[-1]; lost = lost[:-1]
         if len(ent) > len(st):
             ent[0] = ent[0] or ent[-1]; ent = ent[:-1]
         if len(rgo) > len(st):
@@ -213,6 +223,8 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
             enters.setdefault(icon.split()[-1], []).append(ent[i] if i < len(ent) else False)
         if intros is not None:
             intros.setdefault(icon.split()[-1], []).append(itr[i] if i < len(itr) else False)
+        if empties is not None:
+            empties.setdefault(icon.split()[-1], []).append(lost[i] if i < len(lost) else 0.0)
     if st and (carry or room):
         # the lap's last case walks for its first (101's room GoTo to the
         # living room before the sofa's GOTOENTER)
@@ -245,7 +257,10 @@ def main(argv):
         gents = {}
         grooms = {}
         intros = {}
-        by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS, intros=intros)
+        emps = {}
+        by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS, intros=intros,
+                                empties=emps)
+        cempty = {}
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -289,6 +304,8 @@ def main(argv):
             centers.setdefault(item, []).extend([first and goes and ge] + [False] * (nv - 1))
             gr = bool((grooms.get(icon) or [False] * (k + 1))[k])
             crooms.setdefault(item, []).extend([first and goes and gr] + [False] * (nv - 1))
+            em = (emps.get(icon) or [0.0] * (k + 1))[k] if first else 0.0
+            cempty.setdefault(item, []).extend([int(round(em * lap_model.TICK))] + [0] * (nv - 1))
             if isinstance(share, tuple):
                 # the station split by its actions, one mobile visit each (a
                 # name joined by '+' sums its actions into one visit); each of
@@ -446,6 +463,11 @@ def main(argv):
                 e['set']['PCIconLead'] = il if len(il) > 1 else il[0]
             else:
                 e['set'].pop('PCIconLead', None)
+            ce2 = cempty.get(item) or []
+            if any(ce2) and len(ce2) == len(vals):
+                e['set']['PCCaseEmpty'] = ce2 if len(ce2) > 1 else ce2[0]
+            else:
+                e['set'].pop('PCCaseEmpty', None)
             vf = VISIT_FROM.get(n, {}).get(item)
             if vf:
                 e['set']['PCVisitFrom'] = vf

@@ -2298,7 +2298,8 @@ class Pawn:
                 if end is None:
                     self._pc1_unmark(steps)
                     return
-                self._pc1_close(leg, end, gait, last, self._pc1_kind(self._pc1_case(it), 'enter'))
+                self._pc1_close(leg, end, gait, last, self._pc1_kind(self._pc1_case(it), 'enter'),
+                                empty=self._pc1_empty(it))
             else:
                 self._pc1_unmark(steps)
                 return
@@ -2437,7 +2438,15 @@ class Pawn:
             return 'list'
         return 'enter' if visit(it.pc_case_enter) else 'goto'
 
-    def _pc1_close(self, leg, end, gait, last, kind=None):
+    def _pc1_empty(self, it):
+        """the ticks of the job-less cases before the neighbour's PC case for
+        the coming visit to `it` (PCCaseEmpty, per visit)"""
+        v = getattr(it, 'pc_case_empty', None) if (it is not None and self.role != 'Woody') else None
+        if isinstance(v, list):
+            v = v[pc_visit_ix(it, len(v))] if v else 0
+        return int(v or 0)
+
+    def _pc1_close(self, leg, end, gait, last, kind=None, empty=0):
         """a leg's PC seconds and the pace factor of its mobile steps: the
         ticks up to the update that reads its arrival (pcprofile.s1_arrive)
         and, on the walk's last, its job's (`kind`: pcprofile.s1_goto_ticks)"""
@@ -2455,6 +2464,10 @@ class Pawn:
             t = pcprofile.s1_goto_ticks(kind, t, leg['after'], own=t == 0 and not leg['after']) \
                 if last else pcprofile.s1_arrive(t, leg['after'])
             t = max(t, 0)
+            if last:
+                # the job-less cases before the visit's case, a tick each
+                # (PCCaseEmpty), on the walk's last leg
+                t += empty
         elif leg['after'] and t > 0:
             t -= 1                        # its first move in the leave's last tick
         if kind is None and not last and t > 0:
@@ -4737,6 +4750,7 @@ class Routine:
             if not got or not got[0]:
                 return False
             ticks, to = got
+        ticks += p._pc1_empty(it)          # (PCCaseEmpty: the job-less cases before it)
         self.state = self.USING
         self.timer = 0.0
         p._stand()

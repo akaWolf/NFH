@@ -34,7 +34,8 @@
     "PCCaseGoto": true,
     "PCIconLead": 0.5,
     "PCCaseEnter": true,
-    "PCCaseRoom": true
+    "PCCaseRoom": true,
+    "PCCaseEmpty": 1
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_peep's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 14.0 s"
   },
