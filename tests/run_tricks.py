@@ -1570,7 +1570,7 @@ class Driver(Recorder):
         for k, n in self._anim_calls.items():
             if n:
                 self._anim_rate[k] = n
-        self.t += DT
+        self.t += pcprofile.frame_seconds()
         if os.environ.get('TRICKS_DEBUG') and int(self.t * 60) % 30 == 0:
             w = self.v.woody
             bits = ['t=%.2f woody %s x=%.2f %s%s' % (
@@ -3081,7 +3081,7 @@ class Driver(Recorder):
         import random
         random.seed(int(os.environ.get('NFH_SEED', '0')))
         self.app.load_level(self.level_name)
-        self.app.tick(DT, events=(False, True, False, False))
+        self.app.tick(pcprofile.frame_seconds(), events=(False, True, False, False))
         self.v = self.app.viewer
         self.v.virtual_mouse = self.mouse
 
@@ -3105,11 +3105,12 @@ class Driver(Recorder):
         if tut is not None and getattr(tut, 'modal', False):
             tut.dismiss()
         v._frame_dt = DT
+        fs = pcprofile.frame_seconds()
         if not self.paused and not v.world.menu_open:
-            v.t += DT
-            self.app.tick(DT, events=(False, False, False, False))
+            v.t += fs
+            self.app.tick(fs, events=(False, False, False, False))
         for hook in self.frame_hooks:
-            hook(t, DT)
+            hook(t, fs)
         if self.frame_every is not None and t + 1e-9 >= self._next_shot:
             # Recorder.tick's frame dump (NFH_SHOT_FPS)
             v.screenshot(os.path.join(self.outdir, 'f%04d_t%05.2f.png'

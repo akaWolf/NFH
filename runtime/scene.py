@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
+                 'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_case_enter', 'pc_case_room', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
@@ -441,6 +441,15 @@ class Item:
         # GOTO (PCCaseGoto, tools/pcref/pc_durations.py: a split case's later
         # visits and another item's share of it go on where the first left)
         self.pc_case_goto = d.get('PCCaseGoto')
+        # ... and whether that GOTO is a GOTOENTER, its ENTER step the GOTO's
+        # follow-up (PCCaseEnter, the same: fcn.00479f10 — 101's and 102's
+        # sofa, 105's score, 106's shower, 113's ladder)
+        self.pc_case_enter = d.get('PCCaseEnter')
+        # ... and whether a room's GoTo of a case of its own walks before it
+        # (PCCaseRoom, the same: fcn.004764b0 — 101's and 102's sofa from the
+        # kitchen, 109's pig and parrot): the leg after its door starts the
+        # case's GOTO, a tick after the GoTo's end
+        self.pc_case_room = d.get('PCCaseRoom')
         # the PC profile's Season 1 look reaction and repair (tools/pcref/
         # pc_reactions.py): the walk-by's CreateGoToObjXJob to the tricked
         # object's hotspot x (fcn.0047a4a0), and the repair's walk to that

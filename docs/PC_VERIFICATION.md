@@ -71,7 +71,7 @@ or 5.
 | the map's perfect episode | rating ≥ 100 | rating ≥ 90 (leveldata state 4) | **fixed 2026-09-16**: `pcprofile.s1_perfect` under the profile (`app.py`'s score save) |
 | the minimum ratings | `pcprofile.S1_MIN_RATING` | leveldata.xml `minquota` 50/55/60/65/70/75, 60/65/70/75, 60/65/70/75 | agrees (data) |
 | the time limits | the mobile's TimeMinutes | leveldata.xml `time` 3600/4320/5040/7200 ticks at 12 Hz = 5:00, 6:00, 7:00, 10:00 | agrees on all 14 levels (data) |
-| the clock | 12 Hz ticks, the HUD's minutes | fcn.00438a80: elapsed++ per tick, clamped at the limit; the GUI divides by 12; the tick every 83 ms — the pacer 0x408e68-0x408e85 over .data's [0x513cc4] = 83, 1000 / 12 in whole ms (NFH2 0x40976a-0x40978f over [0x464660] = 83): twelve ticks are 996 ms, the videos' HUD seconds 0.99600 of theirs (S1 103/109/113, S2 205/213) | the tick carried 2026-10-10 (`pcprofile.TICK_MS`, `game_dt`: the profile's game clock runs 1000/996 of the frames'); the HUD's minutes agree (docs/PC_ROUTINES.md) |
+| the clock | 12 Hz ticks, the HUD's minutes | fcn.00438a80: elapsed++ per tick, clamped at the limit; the GUI divides by 12; the tick every 83 ms — the pacer 0x408e68-0x408e85 over .data's [0x513cc4] = 83, 1000 / 12 in whole ms (NFH2 0x40976a-0x40978f over [0x464660] = 83): twelve ticks are 996 ms, the videos' HUD seconds 0.99600 of theirs (S1 103/109/113, S2 205/213) | the tick carried 2026-10-10 (`pcprofile.TICK_MS`, `GameClock`: the profile's game clock runs 1000/996 of the frames', the world stepping in whole sixtieths of it, five a tick); the HUD's minutes agree (docs/PC_ROUTINES.md) |
 
 ### The catch
 
@@ -313,16 +313,26 @@ actors' job pass the update calls at 0x100445f8.
   1 (the pushes at 0x44a9e6 and 0x4760ad — the first reading of that
   evening had them at 0 and a two-tick stand before every walk), so the
   first move falls in the GOTO's first tick and a leg after a door in
-  the far door's last tick; the mover, the walk job and the GOTO are done in the tick of the last
-  move (0x47cf93-0x47d00d, 0x476112-0x476209, 0x44a81b-0x44aab0) — the
-  next step starts on the tick after, two ticks with no move — and the
-  door step and its ACTION are pushed with the run-now flag 1 in the
-  arrival's update (0x476004-0x476070, 0x474480-0x474496), as is the walk
-  job's own LEAVE (0x475ce6): each shares its first tick with the segment
-  before (tools/pcref/lap_model.py, `Pawn._pc1_close`; read so on
-  2026-09-27 — the earlier reading, a tick after the last move and three
-  with no move, counted a tick too many a walk and one more a door and a
-  leave). ENTER and LEAVE of an object, read 2026-09-27: the
+  the far door's last tick; the mover and the walk job are done in the
+  tick of the last move (0x47cf93-0x47d00d, 0x476112-0x4761aa) — a mover
+  of one move inside its push, which the walk job does not look past: it
+  reads the arrival on its next update — and the door step and its
+  ACTION are pushed with the run-now flag 1 in the arrival's update
+  (0x476004-0x476070, 0x474480-0x474496), as is the walk job's own LEAVE
+  (0x475ce6): each shares its first tick with the segment before. The
+  GOTO under the walk job reads the arrival in that tick (+0x15 its
+  started flag, 0x44a870-0x44a8ef), sets +0x14, pushes its follow-up with
+  the run-now flag 1 and returns not done (0x44a961-0x44a99a, 0x44aaac);
+  it is done on its next update (+0x14: 0x44a81b -> 0x44aad8) — the next
+  case's first job a tick after that, two ticks on the arrival, three
+  with no move (the walk job done inside the GOTO's first update) — and a
+  GOTOENTER's ENTER, its follow-up, starts in the arrival's tick, the GOTO
+  done under it (tools/pcref/lap_model.py, `pcprofile.s1_goto_ticks`;
+  read so on 2026-10-01 — the reading of 2026-09-27 had +0x14 for the
+  started flag and the GOTO done in the arrival's tick, a tick short a
+  case: the idle laps' bubble segments 0.64 tick short of E01-E14's a
+  segment, 0.18 with the GOTO's tick and the world's steps five a tick,
+  32 segments, mean |d| 1.00 -> 0.75). ENTER and LEAVE of an object, read 2026-09-27: the
   ENTER step (fcn.00473e20 -> vtable 0x4e531c, update 0x473830) sets the
   actor's flag 4 where the object carries the hideout flags 0x140, marks
   the object occupied (fcn.00444a70) and pushes the object's `enter` as an
@@ -553,8 +563,11 @@ actors' job pass the update calls at 0x100445f8.
   clocks of both videos run 0.99600 of their seconds (the last digit's
   changes, S1 103/109/113 and S2 205/213 over 150 s, residuals under
   0.06 s) — the profile runs its game clock 1000/996 of the frames'
-  (`pcprofile.game_dt` in `App._tick_level`, the recorder and the
-  viewer). The searches before missed it: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
+  (`pcprofile.GameClock` in `App._tick_level`, the recorder and the
+  viewer), the world stepping in whole sixtieths of the game's second,
+  five a tick, so a wait of whole ticks ends on its step (steps of the
+  frames' sixtieth, 4.98 a tick, had ended each up to a step late: 104's
+  picture to its oven ran 324 ticks against E04's 323 and lost the +3). The searches before missed it: the timer at `[app+0x50]` (fcn.00402cc0, fcn.00402d30)
   is an fps counter over 0.5 s windows, the only `Sleep` is the loading
   screen's, no `SetTimer`/`timeSetEvent`; the one 83 ms constant in the
   binaries (GFXEngine fcn.10003420, `GetTickCount`) is a button widget's

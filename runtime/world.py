@@ -2064,11 +2064,14 @@ class Pawn:
         tick (the walk job pushes the next mover with the run-now flag 1,
         0x4760ad), a door's pass in the last move's tick of the leg before it
         (the door step and its ACTION pushed with the run-now flag 1,
-        0x476004-0x476070, 0x474480-0x474496), and the GOTO ends in the tick
-        of its last move — the mover, the walk job and the GOTO all done in it
-        (0x47cf93-0x47d00d, 0x476112-0x476209, 0x44a81b-0x44aab0) — two ticks
-        with no move at all (the walk job done inside the GOTO's first update,
-        the GOTO on its second)"""
+        0x476004-0x476070, 0x474480-0x474496). The neighbour's legs count to
+        the update that reads their arrival — the last move's, a tick on for a
+        mover of one move — and his walk's job adds its own ticks after it
+        (pcprofile.s1_arrive, s1_goto_ticks: a GOTO done on the update after
+        the arrival and its case's next job a tick later, three ticks with no
+        move; a GOTOENTER's ENTER in the arrival's tick); Woody's legs and a
+        visit inside a case keep the earlier count — the GOTO done in the tick
+        of its last move, two ticks with no move (_pc1_close)"""
         z = self.zone
         if z is None:
             return
@@ -2091,6 +2094,17 @@ class Pawn:
         leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': floor0, 'v': speeds}
         legs = [leg]
         n = len(steps)
+        # the station's room GoTo (PCCaseRoom): its case ends as the pass into
+        # the station's room does (the GoTo done under its walk job, 0x476335
+        # -> 0x476407), the station's case's GOTO walks on from the far door a
+        # tick later — that leg its walk's first, not a leg after a pass
+        fin = steps[-1] if steps else None
+        room_zone = None
+        if fin is not None and fin.get('kind') == 'item' and self._pc1_kind('goto') is not None:
+            fit = fin['item']
+            cr = fit.pc_case_room
+            if (cr[fit.pc_use_visit % len(cr)] if cr else False) if isinstance(cr, list) else bool(cr):
+                room_zone = fit.zone
 
         def reach(st, x, y, tx, ty):
             # a step's walk, straight at its target (the WALK velocity), ends
@@ -2118,7 +2132,7 @@ class Pawn:
                     # a GOTO of its own ends there (PCWalkVia), in its last
                     # move's tick; the next one walks from it
                     via = tuple(st['pc1_via'])
-                    self._pc1_close(leg, via, gait, True)
+                    self._pc1_close(leg, via, gait, True, self._pc1_kind('goto'))
                     leg = {'from': via, 'nat': 0.0, 'after': False, 'floor': zone.pc_walk_room['floor'],
                            'v': speeds}
                     legs.append(leg)
@@ -2128,7 +2142,7 @@ class Pawn:
                     if end is None:
                         self._pc1_unmark(steps)
                         return
-                    self._pc1_close(leg, end, gait, True)
+                    self._pc1_close(leg, end, gait, True, self._pc1_kind('room'))
             elif kind == 'door':
                 d = st['door']
                 other = self.level.door_by_pid(d.link_to)
@@ -2148,7 +2162,7 @@ class Pawn:
                     return
                 st['pc1'] = leg
                 near = pw['near']
-                self._pc1_close(leg, near, gait, False)
+                self._pc1_close(leg, near, gait, False, self._pc1_kind('room'))
                 zone = self.level.zone_by_pid(other.zone) or zone
                 far = pw['far']
                 wr = getattr(zone, 'pc_walk_room', None)
@@ -2156,7 +2170,8 @@ class Pawn:
                     # the far room has no PC room (the porch): the mobile pace
                     self._pc1_unmark(steps)
                     return
-                leg = {'from': far, 'nat': 0.0, 'after': True, 'floor': wr['floor'], 'v': speeds}
+                leg = {'from': far, 'nat': 0.0, 'after': room_zone is None or other.zone != room_zone,
+                       'floor': wr['floor'], 'v': speeds}
                 legs.append(leg)
                 # the far door's placement (_warp_through: Woody's the door's
                 # own exit offset)
@@ -2177,7 +2192,7 @@ class Pawn:
                     y = ffloor
                 st['pc1_out'] = leg
                 if last:
-                    self._pc1_close(leg, far, gait, True)
+                    self._pc1_close(leg, far, gait, True, self._pc1_kind('room'))
             elif kind == 'item':
                 it = st['item']
                 floor = self.floor_y(zone)
@@ -2196,7 +2211,7 @@ class Pawn:
                 if end is None:
                     self._pc1_unmark(steps)
                     return
-                self._pc1_close(leg, end, gait, last)
+                self._pc1_close(leg, end, gait, last, self._pc1_kind(self._pc1_case(it)))
             else:
                 self._pc1_unmark(steps)
                 return
@@ -2270,24 +2285,47 @@ class Pawn:
                 nat += d[0] / v_floor + d[1] / v_vert
         return nat
 
-    def _pc1_close(self, leg, end, gait, last):
-        """a leg's PC seconds and the pace factor of its mobile steps"""
+    def _pc1_kind(self, kind):
+        """the job a Season 1 walk of the pawn ends in (pcprofile.S1_GOTO_TAIL),
+        None where its ticks keep the count of the mover alone: Woody's (his
+        click's jobs are not read) and a visit inside a PC case (no GOTO of
+        the PC's: a split case's later visits, another item's share of it)"""
+        return None if self.role == 'Woody' else kind
+
+    def _pc1_case(self, it):
+        """the job the neighbour's PC case for the coming visit to `it` walks
+        in: 'goto' (the case's GOTO, PCCaseGoto), 'enter' (a GOTOENTER,
+        PCCaseEnter), None (a visit inside a case)"""
+        def visit(v):
+            return (v[it.pc_use_visit % len(v)] if v else False) if isinstance(v, list) else bool(v)
+        if it is None or not visit(it.pc_case_goto):
+            return None
+        return 'enter' if visit(it.pc_case_enter) else 'goto'
+
+    def _pc1_close(self, leg, end, gait, last, kind=None):
+        """a leg's PC seconds and the pace factor of its mobile steps: the
+        ticks up to the update that reads its arrival (pcprofile.s1_arrive)
+        and, on the walk's last, its job's (`kind`: pcprofile.s1_goto_ticks)"""
         fx, fy = leg['from']
         t = pcprofile.s1_leg_ticks(self.role, gait, fx, fy, end[0], end[1], leg['floor'],
                                    sneaking=self.sneaking) or 0
-        if leg['after'] and t > 0:
+        if kind is not None:
+            # with no move and no door the walk job ends inside the GOTO's
+            # first update (own)
+            t = pcprofile.s1_goto_ticks(kind, t, leg['after'], own=t == 0 and not leg['after']) \
+                if last else pcprofile.s1_arrive(t, leg['after'])
+            t = max(t, 0)
+        elif leg['after'] and t > 0:
             t -= 1                        # its first move in the leave's last tick
-        if not last and t > 0:
+        if kind is None and not last and t > 0:
             # the walk job pushes the door step with the run-now flag 1 in the
             # update its mover arrives in (0x476004-0x476070), the step its
             # ACTION the same way (0x474480-0x474496): the pass starts in the
             # leg's last move's tick
             t -= 1
-        if last and t == 0 and not leg['after']:
+        if kind is None and last and t == 0 and not leg['after']:
             # no move and no door: the walk job ends inside the GOTO's first
-            # update, the GOTO on its second — the next step two ticks on;
-            # after a move the GOTO ends in its tick (0x47cf93-0x47d00d,
-            # 0x476112-0x476209, 0x44a81b-0x44aab0)
+            # update, the GOTO on its second — the next step two ticks on
             t = 2
         leg['to'] = tuple(end)
         leg['secs'] = t / pcprofile.TICKS_PER_SECOND
@@ -2353,14 +2391,15 @@ class Pawn:
             return None
         return (p[0], p[1])
 
-    def pc1_goto_ticks(self, point, x_only=False):
+    def pc1_goto_ticks(self, point, x_only=False, kind='goto'):
         """a Season 1 GOTO from where the pawn stands to `point` ([x, y, room] of
-        its PC room): (ticks, the PC point reached) — the mover's
-        (pcprofile.s1_leg_ticks), the GOTO ending in the tick of its last move,
-        two ticks with no move (Pawn._pc1_marks); x_only is CreateGoToObjXJob's
-        target (fcn.0047a4a0: the hotspot's x at the actor's own y), which walks
-        even when he stands there; the repair's (fcn.0047ae70) is skipped on the
-        point (isActorAtObject, fcn.0047aa90): 0 ticks. None outside the point's
+        its PC room): (ticks to the next job's first update, the PC point
+        reached) — the mover's (pcprofile.s1_leg_ticks) to the arrival and the
+        job's after it (pcprofile.s1_goto_ticks, `kind`); x_only is
+        CreateGoToObjXJob's (fcn.0047a4a0: the hotspot's x at the actor's own
+        y), which reads the point before it walks — two ticks where he stands;
+        the repair's GOTO (fcn.0047ae70) is skipped on the point
+        (isActorAtObject, fcn.0047aa90): 0 ticks. None outside the point's
         room"""
         z = self.zone
         r = getattr(z, 'pc_walk_room', None) if z is not None else None
@@ -2374,7 +2413,7 @@ class Pawn:
             return 0, to
         t = pcprofile.s1_leg_ticks(self.role, self._pc_gait(), here[0], here[1], to[0], to[1],
                                    r['floor'], sneaking=self.sneaking) or 0
-        return (t if t > 0 else 2), to
+        return pcprofile.s1_goto_ticks('x' if x_only else kind, t, own=t == 0), to
 
     def pc1_stand_at(self, point):
         """the pawn stands on a PC point: the next walk leaves from it"""
@@ -4487,9 +4526,11 @@ class Routine:
         where the station's PC point is off the one he stands on it walks
         there (110's plant spray after the extinguisher: case 12's GOTO to
         bal/plant, 0x4609e2, from bal/barbecue_burn — 3 px along, 20 up),
-        else it ends with no move, two ticks (the walk job inside its first
-        update, the GOTO on its second: 110's barbecue after the plant): he
-        stands the GOTO's ticks (Pawn.pc1_goto_ticks), then the use. A visit
+        else it ends with no move: the walk job inside its first update, the
+        arrival read on its second, the GOTO done on its third and the next
+        case a tick later — three ticks, a GOTOENTER's ENTER from the second
+        (pcprofile.s1_goto_ticks; 110's barbecue after the plant): he stands
+        the GOTO's ticks (Pawn.pc1_goto_ticks), then the use. A visit
         that goes on inside a case (a split case's later ones: 111's washer,
         113's drill after the ladder) and a station's own visit again (105's
         piano after its repair at the smeared score: case 4's ENTER finds him
@@ -4497,9 +4538,8 @@ class Routine:
         p = self.pawn
         if self.log and self.log[-1][0] == it.name:
             return False
-        cg = it.pc_case_goto
-        goto = (cg[it.pc_use_visit % len(cg)] if cg else False) if isinstance(cg, list) else bool(cg)
-        if not goto:
+        kind = p._pc1_case(it)
+        if kind is None:
             return False
         pt = p._pc1_item_point(it)
         here = p._pc1_here()
@@ -4507,9 +4547,9 @@ class Routine:
         if pt is None or here is None or r is None:
             return False
         if tuple(here) == tuple(pt):
-            ticks, to = 2, tuple(pt)    # no move: the GOTO's two ticks
+            ticks, to = pcprofile.s1_goto_ticks(kind, 0, own=True), tuple(pt)    # no move
         else:
-            got = p.pc1_goto_ticks([pt[0], pt[1], r['room']])
+            got = p.pc1_goto_ticks([pt[0], pt[1], r['room']], kind=kind)
             if not got or not got[0]:
                 return False
             ticks, to = got

@@ -39,7 +39,7 @@
    "object": "Piano",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 9.67,
+    "PCUseSeconds": 9.75,
     "PCFixSeconds": 2.083,
     "PCUseSecondsTricked": 3.833,
     "PCFixPoint": [
@@ -49,9 +49,10 @@
     ],
     "PCReactTail": 1,
     "PCCaseGoto": true,
-    "PCIconLead": 0.083
+    "PCIconLead": 0.083,
+    "PCCaseEnter": true
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.7 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 9.8 s"
   },
   {
    "object": "Football",

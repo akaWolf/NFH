@@ -879,7 +879,7 @@ longer). The tick is 12 Hz, not 20 (docs/PC_ROUTINES.md: the clock
 unit, the HUD's division by 12, the raw column) — 83 ms a tick, the
 pacer's `1000 / 12` in whole ms (docs/PC_VERIFICATION.md, "The frame
 pacer"; since 2026-10-10 the profile's game clock runs 1000/996 of the
-frames', `pcprofile.game_dt`) — so the hold is 5 s
+frames', `pcprofile.GameClock`) — so the hold is 5 s
 and the window 5 s + the amount over 12 — 18 s on the bath, 20 s on
 the 180 levels, 25 s on the 240 ones, 35 s after the hunter's marbles
 — and the drains above are the red-only reader's artifact: the column's
@@ -1836,18 +1836,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   none; the runs' mr records 18 / 9) — and once x is the target's, y goes
   to the target's; clamped at the target, the arrival read in the update
   of its last move (0x47cf7f-0x47cfac); the walk job finds the path's end in the same update (0x476112 ->
-  0x476209, done) and the GOTO under it, started (+0x14), ends there too
-  (0x44a81b -> 0x44aab0): the next step, pushed with the run-now flag 0,
-  starts on the tick after the last move — with no move the walk job ends
-  inside the GOTO's first update and the GOTO on its second, two ticks; the
+  0x4761aa, done) — a mover of one move is done inside its push, which the
+  walk job does not look past, and it finds the end on its next update —
+  and the GOTO under it reads the arrival there (+0x15 its started flag),
+  sets +0x14, pushes its follow-up with the run-now flag 1 and returns not
+  done (0x44a961-0x44a99a, 0x44aaac): it is done on its next update
+  (0x44a81b -> 0x44aad8) and the next case's first job runs a tick after
+  that — two ticks on the arrival, three with no move (the walk job ends
+  inside the GOTO's first update); a GOTOENTER's ENTER, its follow-up,
+  starts in the arrival's tick (`pcprofile.s1_goto_ticks`); the
   walk job pushes a door step with the run-now flag 1 in the update its
   mover arrives in (0x476004-0x476070) and the step its ACTION likewise
   (0x474480-0x474496), so the pass starts in the last move's tick, and its
   own LEAVE of an occupied object (0x475ce6, run-now 1) lends its last tick
-  to the first move (read so on 2026-09-27; the earlier reading had the
-  GOTO end a tick after the last move, three ticks with no move, and the
-  pass start on the tick after the arrival: a tick too many a walk and
-  one more a door). A walk between two raised points — two back doors' hotspots 50
+  to the first move (the door and the leave read so on 2026-09-27, the
+  GOTO's done tick on 2026-10-01: the reading of 2026-09-27 had +0x14 for
+  its started flag and the GOTO done in the arrival's tick). A walk between two raised points — two back doors' hotspots 50
   px above the floor, two stations' 30 — so goes down to the floor and up
   again, as the mobile scene's paths do on their own geometry: read on
   2026-09-27, when E13's frames put the living room's leg between its two
@@ -2847,10 +2851,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (14.35 before), the extinguisher to the spray 15.5 against 15.5 (14.8);
   the spray to the slip 17.1 against 16.6 — the slip's place the player's
   banana. A station used in place whose visit opens its PC case (its
-  ICON and GOTO) stands that GOTO's two no-move ticks where the points
-  agree (the walk job done inside its first update, the GOTO on its
-  second): 110's barbecue after the plant, 1.67 s from its icon to the
-  table's against E10's ~1.77 (the frames at 12 fps: up from the plant's
+  ICON and GOTO) stands that GOTO's no-move ticks where the points
+  agree — three: the walk job done inside its first update, the arrival
+  read on its second, the GOTO done on its third (two before 2026-10-01,
+  the GOTO's done tick unread): 110's barbecue after the plant, 22.3 ticks
+  from its icon to the table's against E10's 22.0 (21.1 with two; the
+  frames at 12 fps: up from the plant's
   shout at 199.33, off to the table at ~201.1) — pc_durations PCCaseGoto
   per visit (False on a split case's later visits and on another item's
   share of a case: 111's machines, 113's drill after the ladder, 107's

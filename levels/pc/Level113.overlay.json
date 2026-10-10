@@ -278,7 +278,8 @@
    "set": {
     "PCUseSeconds": 1.5,
     "PCCaseGoto": true,
-    "PCIconLead": 0.083
+    "PCIconLead": 0.083,
+    "PCCaseEnter": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Ladder <- ladder#0 enter 1.50 s"
   },

@@ -103,12 +103,16 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks, walks=None, leads=None):
+def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
     moves, doors and no-move ticks, 0 where the case has no GOTO]; into
     `leads` icon -> [the seconds of the leave the next case's walk plays at
-    the station's end, after the next ICON — lap_model.WalkLeave — per visit])"""
+    the station's end, after the next ICON — lap_model.WalkLeave — per visit];
+    into `enters` icon -> [whether the visit's GOTO is a GOTOENTER, its ENTER
+    the GOTO's follow-up — lap_model's 'the GOTO enters' — per visit]; into
+    `rooms` icon -> [whether a case of a room's GoTo alone walks before the
+    visit's own GOTO — lap_model's 'the room GoTo ends' — per visit])"""
     L = lap_model.Level(n)
     legs = lap_model.model(L, toks[n], steady=False)
     st = lap_model.stations(legs)
@@ -134,9 +138,21 @@ def pc_stations(n, toks, walks=None, leads=None):
     if lead and acts:
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)
+    ent = []; rgo = []
+    for kind, text, t in legs:
+        if kind == 'icon':
+            ent.append(False); rgo.append(False)
+        elif kind == 'goto' and ent and text == 'the GOTO enters':
+            ent[-1] = True
+        elif kind == 'goto' and rgo and text == 'the room GoTo ends':
+            rgo[-1] = True
     if len(st) > 1 and st[-1][0].split()[-1] == st[0][0].split()[-1]:
         st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
+        if len(ent) > len(st):
+            ent[0] = ent[0] or ent[-1]; ent = ent[:-1]
+        if len(rgo) > len(st):
+            rgo[0] = rgo[0] or rgo[-1]; rgo = rgo[:-1]
     by = {}; parts = {}
     # each station's closing walk leave (the legs' last action of the station)
     closing = []
@@ -148,13 +164,32 @@ def pc_stations(n, toks, walks=None, leads=None):
             closing[-1] = t / lap_model.TICK if getattr(text, 'walk_leave', False) else 0.0
     if len(closing) > len(st):
         closing = closing[:len(st)]
+    carry = 0; room = False
     for i, ((icon, ta, tw), aa) in enumerate(zip(st, acts)):
         by.setdefault(icon.split()[-1], []).append(ta / lap_model.TICK)
         parts.setdefault(icon.split()[-1], []).append(aa)
         if walks is not None:
-            walks.setdefault(icon.split()[-1], []).append(tw)
+            # a case of an ICON and a GOTO alone walks for the next case's
+            # visit (109's bed: ICON bed, GOTO bed/bed, then the sleep's case
+            # with its ENTER and `sleep`)
+            walks.setdefault(icon.split()[-1], []).append(tw + carry)
+        if rooms is not None:
+            rooms.setdefault(icon.split()[-1], []).append(room)
+        alone = not ta and not aa
+        carry = tw if alone else 0
+        room = alone and i < len(rgo) and rgo[i]
         if leads is not None:
             leads.setdefault(icon.split()[-1], []).append(closing[i] if i < len(closing) else 0.0)
+        if enters is not None:
+            enters.setdefault(icon.split()[-1], []).append(ent[i] if i < len(ent) else False)
+    if st and (carry or room):
+        # the lap's last case walks for its first (101's room GoTo to the
+        # living room before the sofa's GOTOENTER)
+        first = st[0][0].split()[-1]
+        if walks is not None:
+            walks[first][0] += carry
+        if rooms is not None:
+            rooms[first][0] = rooms[first][0] or room
     return by, parts
 
 
@@ -176,7 +211,9 @@ def main(argv):
             continue
         walks = {}
         leads = {}
-        by, parts = pc_stations(n, toks, walks, leads)
+        gents = {}
+        grooms = {}
+        by, parts = pc_stations(n, toks, walks, leads, gents, grooms)
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -188,9 +225,15 @@ def main(argv):
         # the first visit of the case (a split case's later ones, another
         # item's share of it, go on where the first left him) and a case
         # that walks (PCCaseGoto: where the mobile uses the station in
-        # place, the GOTO's ticks stand — two with no move,
+        # place, the GOTO's ticks stand — three with no move,
         # Routine._pc1_inplace_walk)
         cases = {}
+        # ... and whether that GOTO is a GOTOENTER (PCCaseEnter: its ENTER
+        # starts in the arrival's tick, Pawn._pc1_case), and whether a room's
+        # GoTo walks before it in a case of its own (PCCaseRoom: the leg
+        # after its door starts the GOTO's walk, Pawn._pc1_marks)
+        centers = {}
+        crooms = {}
         opened = set()
         for pr in pairs:
             item, icon, k = pr[0], pr[1], pr[2]
@@ -205,6 +248,10 @@ def main(argv):
             opened.add((icon, k))
             goes = bool((walks.get(icon) or [0] * (k + 1))[k])
             cases.setdefault(item, []).extend([first and goes] + [False] * (nv - 1))
+            ge = bool((gents.get(icon) or [False] * (k + 1))[k])
+            centers.setdefault(item, []).extend([first and goes and ge] + [False] * (nv - 1))
+            gr = bool((grooms.get(icon) or [False] * (k + 1))[k])
+            crooms.setdefault(item, []).extend([first and goes and gr] + [False] * (nv - 1))
             if isinstance(share, tuple):
                 # the station split by its actions, one mobile visit each (a
                 # name joined by '+' sums its actions into one visit); each of
@@ -242,7 +289,9 @@ def main(argv):
         patches = []
         for e in ov.get('patches', []):
             st = e.get('set') or {}
-            if 'PCUseSeconds' in st and e.get('object') not in secs:
+            # a case handler's own visit keeps its hand-read stay (102's and
+            # 105's toilets: tools/pcref/pc_reactions.py)
+            if 'PCUseSeconds' in st and e.get('object') not in secs and not st.get('PCCaseHandler'):
                 st = {k: v for k, v in st.items() if k != 'PCUseSeconds'}
                 if not st:
                     continue
@@ -344,6 +393,16 @@ def main(argv):
                 e['set']['PCCaseGoto'] = cg if len(cg) > 1 else cg[0]
             else:
                 e['set'].pop('PCCaseGoto', None)
+            ce = centers.get(item) or []
+            if any(ce) and len(ce) == len(vals):
+                e['set']['PCCaseEnter'] = ce if len(ce) > 1 else ce[0]
+            else:
+                e['set'].pop('PCCaseEnter', None)
+            cr = crooms.get(item) or []
+            if any(cr) and len(cr) == len(vals):
+                e['set']['PCCaseRoom'] = cr if len(cr) > 1 else cr[0]
+            else:
+                e['set'].pop('PCCaseRoom', None)
             il = icon_leads.get(item) or []
             if any(il) and len(il) == len(vals):
                 e['set']['PCIconLead'] = il if len(il) > 1 else il[0]

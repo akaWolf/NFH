@@ -109,6 +109,7 @@ class Viewer:
             self.cam.x = self.woody.sprite.x
             self.cam.y = self.woody.sprite.y
         self.t = 0.0
+        self._game_clock = pcprofile.GameClock()   # the world's steps (the PC's 83 ms tick)
         self.hud = Hud(self.level, self.world, self.cache, self.rnd,
                        WIDTH, HEIGHT, language=self.language) \
             if self.level.hud else None
@@ -529,7 +530,8 @@ class Viewer:
                 # step; the original runs on Time.deltaTime, which Unity
                 # itself only caps at Time.maximumDeltaTime (1/3 s by
                 # default) — a tighter cap than the engine's, no game rule
-                self.world.tick(min(pcprofile.game_dt(dt), 0.1))
+                for gdt in self._game_clock.steps(dt):
+                    self.world.tick(min(gdt, 0.1))
                 # the stored click replays once the block lifts
                 # (OnBlockingAnimationEnded / OnDoorEnterAnimationFinished —
                 # Woody.cs:336-341, 484-488)

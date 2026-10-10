@@ -401,6 +401,12 @@ def write(n, rooms, doors, points, own, vias):
     ov = json.load(open(p))
     keys = ('PCWalkRoom', 'PCWalkDoor', 'PCWalkPoint', 'PCDoorTicks', 'PCWalkVia', 'PCStart', 'PCToolPoint')
     for e in ov['patches']:
+        # an entry of the walk's own (its sources below); another's walk keys
+        # are read by hand (107's dove: its case's GoTo, tools/pcref/
+        # pc_reactions.py)
+        if not (e.get('source') or '').startswith(("the Season 1 walk (", "the neighbour's start (",
+                                                   "Woody's start (")):
+            continue
         for k in keys:
             (e.get('set') or {}).pop(k, None)
     ov['patches'] = [e for e in ov['patches'] if e.get('set') != {}]

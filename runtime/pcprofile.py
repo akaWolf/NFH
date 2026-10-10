@@ -520,15 +520,41 @@ TICKS_PER_SECOND = 12.0
 # debug keys speed_inc / speed_dec step; NFH2 0x407217). Twelve ticks are 996
 # ms: the HUD clock's second is 0.99600 of the videos' (S1 103, 109, 113 and
 # S2 205, 213, 150 s each). The profile runs the game's clock that much ahead
-# of the frames' (game_dt).
+# of the frames' (GameClock).
 TICK_MS = 83
 
 
-def game_dt(dt):
-    """a frame's real seconds as the game's: TICKS_PER_SECOND ticks of TICK_MS"""
+class GameClock:
+    """the world's steps for a frame's real seconds. Under the profile the
+    game's second is TICKS_PER_SECOND ticks of TICK_MS, and the world steps in
+    whole sixtieths of it — five a tick, as the PC's waits are whole ticks: a
+    wait of k ticks ends on its 5k-th step, where steps of a sixtieth of the
+    frames' second (4.98 a tick) ended k ticks up to a step late, a tenth of
+    a tick a wait on average, a tick over a chain of reactions (104's picture
+    to its oven, 324 ticks against E04's 323). A frame steps the world as
+    many times as the game's clock has passed (one, every 249th frame two);
+    a frame's seconds count up to 0.1 (the viewer's stall clamp)"""
+    STEP = 1.0 / 60.0
+
+    def __init__(self):
+        self.acc = 0.0
+
+    def steps(self, dt):
+        if not (is_pc() and rule('tick')):
+            return (dt,)
+        self.acc += min(dt, 0.1) * 1000.0 / (TICK_MS * TICKS_PER_SECOND)
+        n = int(self.acc / self.STEP + 1e-6)
+        self.acc -= n * self.STEP
+        return (self.STEP,) * n
+
+
+def frame_seconds():
+    """the real seconds of a scripted frame (the recorder's, the tests'): one
+    step of the world's, a sixtieth of the game's second — 83 ms over five
+    under the profile (GameClock), a sixtieth else"""
     if is_pc() and rule('tick'):
-        return dt * 1000.0 / (TICK_MS * TICKS_PER_SECOND)
-    return dt
+        return TICK_MS * TICKS_PER_SECOND / 1000.0 / 60.0
+    return 1.0 / 60.0
 # the Season 1 neighbour's first case, so many ticks into play: the AddActor
 # handler pushes his level class's job (0x43a35c: level_sofa's fcn.00470600)
 # and then, in front of it (fcn.00444d30 -> fcn.00478f90 pushes at the head),
@@ -770,6 +796,47 @@ def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
     if y1 != y0:
         t += -(-abs(y1 - y0) // v)
     return t
+
+
+def s1_arrive(moves, after=False):
+    """the ticks of a Season 1 leg of `moves` mover ticks up to the update that
+    reads its arrival — the door step's push, the walk job's end (tools/pcref/
+    lap_model.py arrive). The walk job pushes each mover with the run-now flag 1
+    (0x4760ad, 0x476148): the first move falls in the tick the leg opens in (the
+    GOTO's first update, a leave's or a pass's last tick; an `after` leg — a pass
+    before it — counts from the tick after that). The mover reads its arrival in
+    the update of its last move (0x47cf93-0x47d00d) and the walk job under it in
+    the same tick; a mover of one move is done inside its push, which the walk
+    job does not look past (0x4760cc, 0x476167, then 0x4761a6): it reads the
+    arrival on its next update. With no move, no mover: the walk job reads it in
+    the update itself (0x476004, 0x476136) — after a pass, in its last tick"""
+    a = 0 if moves == 0 else (1 if moves == 1 else moves - 1)
+    return a - 1 if after else a
+
+
+# the ticks a Season 1 walk's job adds after the update that reads its arrival, up to
+# the next job's first update. A GOTO (vtable 0x4e19e8, update 0x44a7b0) reads it in
+# the tick its walk job ends (+0x15, the actor on its point: 0x44a870-0x44a8ef), sets
+# +0x14, pushes its follow-up with the run-now flag 1 and returns not done (0x44a961-
+# 0x44a99a, 0x44aaac); it is done on its next update (+0x14: 0x44a81b -> 0x44aad8): the
+# tick after, and the next job — the next case's, after the level class's switch, or a
+# list's next element, pushed with the run-now flag 0 — a tick later: 'goto' 2. A
+# GOTOENTER's follow-up is its ENTER step (fcn.00479f10 -> fcn.0044ad10), whose ACTION
+# `enter` starts in that tick (0x4739a8-0x4739cb) and the GOTO is done under it: 'enter'
+# 0. A room's GoTo (fcn.004764b0, update 0x4762e0) is done under its walk job (+0x10:
+# 0x476335 -> 0x476407): 'room' 1. CreateGoToObjXJob's (vtable 0x4e1a48, update
+# 0x44b750) reads the point before it walks (0x44b7ac-0x44b82e -> 0x44b8c9) and is done
+# on its next update (+0x1c: 0x44b786 -> 0x44b7a4): 'x' 2, with no walk 2 in all.
+S1_GOTO_TAIL = {'goto': 2, 'enter': 0, 'room': 1, 'x': 2}
+
+
+def s1_goto_ticks(kind, moves, after=False, own=False):
+    """a Season 1 walk's ticks to the next job's first update: its last leg's
+    arrival (s1_arrive) and its job's tail (S1_GOTO_TAIL); `own`: the walk job
+    ends inside the GOTO's first update (no door, no move: the GOTO pushes it
+    with the run-now flag 1 and returns not done, 0x44a9e6-0x44aa3b) — the
+    arrival on the GOTO's second update, a tick on"""
+    return s1_arrive(moves, after) + S1_GOTO_TAIL[kind] + (1 if own and kind != 'x' else 0)
 
 
 def clip_fps(name, fps, frames=0):

@@ -289,9 +289,11 @@ class Recorder:
             self._tour_tick()
         self._mouse_tick()
         v._frame_dt = DT
+        fs = pcprofile.frame_seconds()
         if not self.paused and not v.world.menu_open:
-            v.t += DT
-            v.world.tick(pcprofile.game_dt(DT))
+            v.t += fs
+            for gdt in v._game_clock.steps(fs):
+                v.world.tick(gdt)
             # the stored click replays once the block lifts
             w = v.woody
             if w is not None and w.stored_input is not None \
@@ -309,7 +311,7 @@ class Recorder:
         v._clamp_camera()
         v.draw()
         for hook in self.frame_hooks:
-            hook(t, DT)
+            hook(t, fs)
         self.log.write(json.dumps(self._state(t)) + '\n')
         if self.frame_every is not None and t + 1e-9 >= self._next_shot:
             v.screenshot(os.path.join(self.outdir,
@@ -333,7 +335,7 @@ class Recorder:
                     break
                 self._step(pending.pop(0), t)
             self.tick(t)
-            t += DT
+            t += pcprofile.frame_seconds()
         self.log.close()
         print('recorded %.1fs, %d frames -> %s' % (self.seconds,
                                                    self._shot_i,

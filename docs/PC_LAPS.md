@@ -250,10 +250,11 @@ the target's, y first to the room's floor line, then x along it (its first
 move `start` px longer from the standing animation: 8 facing right, 10
 facing left), then y to the target's height; the arrival in the update of
 the last move, a leg after a door a tick short (its first move in the far
-door's last tick), the GOTO's end in the tick of the last move and a door's pass started in
-the last move's tick before it (read so on 2026-09-27: the earlier reading
-had the GOTO end a tick after the last move, three ticks with no move),
-two ticks with no move — the door pass one step of its two clips, started together
+door's last tick), a door's pass started in the last move's tick before it
+and the GOTO done on the update after the arrival, the next case a tick
+later — three ticks with no move, a GOTOENTER's ENTER started in the
+arrival's tick (the GOTO's done tick read on 2026-10-01; 2026-09-27's
+reading had it done in the arrival's tick) — the door pass one step of its two clips, started together
 (docs/PC_VERIFICATION.md "door transit"), and the walker's arguments read
 along its own path, with the two GoTo builders it lacked
 (docs/PC_FIDELITY.md "The walker's arguments": 108's `make_coffee`, 109's

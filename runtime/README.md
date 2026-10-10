@@ -903,27 +903,51 @@ predicate, then the all-tricks win.
   update under the profile (107's drawing: 50 frames in 2 ticks, where
   the one Refresh an update had stretched it to 0.83 s); the mobile path
   keeps its one frame an update.
-- **The PC profile's game clock** (`pcprofile.game_dt`: `App._tick_level`
+- **The PC profile's game clock** (`pcprofile.GameClock`: `App._tick_level`
   for the world, the tutorial and its camera, the recorder, the viewer):
   the PC's tick is 83 ms, not 1/12 s — game.exe's pacer (0x408e68-0x408e85,
   NFH2 0x40976a-0x40978f) steps by .data's `1000 / 12` in whole ms — so the
   world runs 1000/996 of the frames' seconds and every tick count of the
   profile (TICKS_PER_SECOND 12 a game second) keeps its seconds; the
   videos' HUD clocks run 0.99600 of their seconds, 0.5 s over a 2-minute
-  stretch the port ran behind them before.
-- **Open: a Season 1 case runs a tick longer on the PC than the lap model
-  counts.** Since the 83 ms tick the idle laps' bubble changes run
-  0.3-0.5 % ahead of the videos' (103, 106, 109, 110, 112-114: 0.3-0.6 s
-  by 100-140 s), about a tick a case: 110's balcony stays, no walk (the
-  in-place GOTO's two ticks, the list's first update, the ACTIONs' time
-  + 2), are 26.0, 43.9 and 22.0 ticks between E10's bubble changes where
-  the model and the port have 25, 43 and 21 (pour_beer; spray; take and
-  give — one tick more with two ACTIONs as with one); over 50 segments of
-  seven levels the port's run 0.8 tick short of the video's on average. The
-  actor's tick pops a done job and updates the next in the same tick
-  (0x444e05-0x444e7c) and the case switch only stores the next case
-  (fcn.0045c600) — where the tick lies is not read yet
-  (scratchpad segticks/segfit).
+  stretch the port ran behind them before. The world steps in whole
+  sixtieths of the game's second, five a tick (a frame two steps every
+  249th): a wait of k ticks ends on its 5k-th step, where steps of the
+  frames' sixtieth (4.98 a tick) had ended each up to a step late — a tenth
+  of a tick a wait, 104's picture to its oven 324 ticks against E04's 323
+  (its +3 lost).
+- **The Season 1 GOTO's done tick** (`pcprofile.s1_arrive`,
+  `s1_goto_ticks`; `Pawn._pc1_close`, `pc1_goto_ticks`,
+  `Routine._pc1_inplace_walk`; tools/pcref/lap_model.py `arrive`, `goto`):
+  game.exe's GOTO (vtable 0x4e19e8, update 0x44a7b0) sets +0x15 as its
+  first update pushes the walk job; the update under the walk job's end
+  reads the arrival (the actor on its point), sets +0x14, pushes its
+  follow-up with the run-now flag 1 and returns not done (0x44a961-
+  0x44a99a, 0x44aaac); it is done on its next update (+0x14: 0x44a81b ->
+  0x44aad8) and its case's next job runs a tick after that — two ticks on
+  the arrival, three in place (the walk job ends inside the GOTO's first
+  update). A GOTOENTER's ENTER, its follow-up (fcn.00479f10), starts in
+  the arrival's tick, the GOTO done under it (PCCaseEnter: 101's and 102's
+  sofa, 105's score, 106's bath, 113's ladder); CreateGoToObjXJob
+  (0x44b750) reads its point before it walks, two ticks in place; a
+  room's GoTo (0x4762e0) is done under its walk job, and the case after
+  it walks on from the far door a tick later (PCCaseRoom: 101's and 102's
+  sofa, 109's pig and parrot); a mover of one move ends inside its push
+  and the walk job reads the arrival on its next update (0x4760cc,
+  0x476167 -> 0x4761a6); an ENTER step of a case's own walks nowhere —
+  in the object already it is done on its first update (105's score
+  after its GOTOENTER, 0x47388a-0x4738a4). The reading of 2026-09-27 had
+  +0x14 for the started flag and the GOTO done in the arrival's tick: the
+  idle laps' bubble segments ran 0.64 tick short of the videos a segment
+  (E01-E14, 32 segments, mean |d| 1.00), 0.18 with the tick (|d| 0.75;
+  110's balcony stays 26.4, 44.3 and 22.3 ticks against E10's 26.0, 43.9
+  and 22.0, 25.1, 43.1 and 21.1 before). Open: Woody's walks and a visit
+  inside a case (a split case's later visits, another item's share: no
+  GOTO of the PC's) keep the earlier count — Woody's click builds his GOTO
+  with the action as its follow-up (fcn.0043f5b0 -> fcn.0044ad10, wrapped
+  by fcn.00472dc0), which starts it in the arrival's tick, a tick before
+  the port's; a visit inside a case walks the mobile's way between its
+  items, where the PC walks none (104's deodorant give, 2 ticks).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:
@@ -983,8 +1007,9 @@ predicate, then the all-tricks win.
   a tool is the tool's own); a station used where the mobile stands him
   whose PC point is off his stands the PC GOTO's ticks first
   (`Routine._pc1_inplace_walk`: 110's plant spray after the extinguisher),
-  and where the points agree the GOTO's two no-move ticks, on a visit that
-  opens its PC case (PCCaseGoto: 110's barbecue after the plant); a
+  and where the points agree the GOTO's three no-move ticks (a GOTOENTER's
+  one before its ENTER), on a visit that opens its PC case (PCCaseGoto:
+  110's barbecue after the plant); a
   station's repeat visit and a split case's later visits stand none (105's
   piano after its repair, 111's machines, 113's drill).
 - **The PC profile's shared step, one trick** (`Routine._pc_pair_defer`,

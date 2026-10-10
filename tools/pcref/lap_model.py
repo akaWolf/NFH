@@ -15,6 +15,9 @@ the level class's cases) is timed from the archive's data:
   door's `enter` and the far door's `leave` action times;
 - an object with `neighbor`/`neighbor_out` hotspots and `enter`/`leave`
   actions (the sofa) is entered on arrival and left on departure;
+- a GOTO reads its walk's arrival, then is done on its next update and its
+  case's next job runs a tick after that (two ticks on the arrival); a
+  GOTOENTER's ENTER starts in the arrival's tick (`goto`, `arrive`);
 - an ACTION lasts its objects.xml `time`: N ticks, or `auto` = the frames
   of its object animation (anims.xml) — or of the neighbour's own
   animation (generic/anims.xml) when the object side is `inv`.
@@ -349,47 +352,64 @@ def _lap(L, toks, start):
         b = [o for o in objs if o not in L.tricks]
         return (b or objs or [None])[-1]
 
+    def arrive(m, after):
+        """a leg of m moves: its ticks up to the update that reads its arrival
+        (the door step's push, the walk job's end). The walk job pushes each
+        mover with the run-now flag 1 (0x4760ad, 0x476148), so the first move
+        falls in the tick the leg opens in — the GOTO's first update, the
+        leave's or the pass's last tick; an `after` leg (a pass before it)
+        counts from the tick after that. The mover reads its arrival in the
+        update of its last move (0x47cf93-0x47d00d) and the walk job, updated
+        under it, in the same tick; a mover of one move is done inside that
+        push, which the walk job does not look past (0x4760ad-0x4760cc,
+        0x476138-0x47616c, then 0x4761a6): it reads the arrival on its next
+        update. With no move no mover: the walk job reads it in the update
+        itself (0x476004, 0x476136) — after a pass, in the pass's last tick
+        (a room's GoTo, its walk ending at the far door: -1)"""
+        a = 0 if m == 0 else (1 if m == 1 else m - 1)
+        return a - 1 if after else a
+
     def walk_to(room2, x2, y2, what):
+        """the walk's legs; True when the walk job ends in its first update
+        (no door, no move — the target where he stands)"""
         nonlocal room, x, y
         r = L.route(room, room2)
         if r is None:
-            legs.append(('?', 'no route %s -> %s (%s)' % (room, room2, what), 0)); room, x, y = room2, x2, y2; return
+            legs.append(('?', 'no route %s -> %s (%s)' % (room, room2, what), 0)); room, x, y = room2, x2, y2; return False
         after = False
         for d_out, d_in in r:
             xo, yo = L.door_point(d_out); xi, yi = L.door_point(d_in, out=True)
-            t = L.walk_ticks(x, y, xo, yo, L.rooms.get(room, {}).get('y', y))
-            if after and t:
-                t -= 1                # its first move in the leave's last tick (0x4760ad, run-now 1)
-            if t:
-                # the walk job pushes the door step with the run-now flag 1 in
-                # the update its mover arrives in (0x476004-0x476070), and the
-                # step its ACTION the same way (0x474480-0x474496): the pass
-                # starts in the leg's last move's tick
-                t -= 1
-            legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), t))
+            m = L.walk_ticks(x, y, xo, yo, L.rooms.get(room, {}).get('y', y))
+            # the walk job pushes the door step with the run-now flag 1 in
+            # the update that reads the mover's arrival (0x476004-0x476070),
+            # and the step its ACTION the same way (0x474480-0x474496)
+            legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), arrive(m, after)))
             # the door step's one ACTION of two entries (fcn.004741e0 -> fcn.00478030):
-            # the near `enter` and the far `leave` start together, the longer times it
+            # the near `enter` and the far `leave` start together, the longer times it;
+            # the step is done under it in its last tick (0x47491e -> 0x474a19) and
+            # the walk job pushes the next mover there
             t_out = L.job_ticks(d_out, 'enter') or 0; t_in = L.job_ticks(d_in, 'leave') or 0
             legs.append(('door', '%s enter %d | %s leave %d' % (d_out, t_out, d_in, t_in), max(t_out, t_in)))
             room, x, y = d_in.split('/')[0], xi, yi
             after = True
-        t = L.walk_ticks(x, y, x2, y2, L.rooms.get(room, {}).get('y', y))
-        if after and t:
-            t -= 1
-        legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), t)); x, y = x2, y2
+        m = L.walk_ticks(x, y, x2, y2, L.rooms.get(room, {}).get('y', y))
+        legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), arrive(m, after))); x, y = x2, y2
+        return not r and m == 0
 
-    def leave(obj=None, implicit=False, shared=False):
+    def leave(obj=None, implicit=False):
         """the object's leave; the one a walk makes (the neighbour still in the
         object when the next GOTO starts) plays there before the walk, so it
         closes the station he sits in: it goes before the next station's icon;
-        `shared`: the walk after it opens in its last tick"""
+        the walk job reads its path in the leave's last tick (the LEAVE step
+        done under it, the walk updated there: 0x475ce6, run-now 1), where its
+        first move, door or end falls"""
         nonlocal occupied
         obj = obj or occupied
         if obj:
             # the LEAVE step's ACTION `leave`: two updates without a record
             t = L.job_ticks(obj, 'leave')
             t = 2 if t is None else t
-            if shared:
+            if implicit:
                 t -= 1
             i = len(legs)
             while implicit and i > 0 and legs[i - 1][0] == 'icon':
@@ -404,7 +424,7 @@ def _lap(L, toks, start):
         t = 2 if t is None else t
         legs.append(('action', '%s enter' % obj, t)); occupied = obj
 
-    def goto(obj):
+    def goto(obj, enters=False):
         nonlocal room, x, y, current, first
         pt = L.object_point(obj)
         if pt is None: legs.append(('?', 'GOTO %s: no hotspot' % obj, 0)); return False
@@ -413,24 +433,25 @@ def _lap(L, toks, start):
             legs.append(('intro', 'start %s %d/%d -> %s' % (room, x, y, obj), 0)); room, x, y = r2, x2, y2; first = False
         else:
             left = bool(occupied and occupied != obj)
-            moved = (r2, x2, y2) != (room, x, y)
             if left:
                 # the walk job's own LEAVE (0x475ce6, pushed with the run-now
-                # flag 1 in the GOTO's first update): the walk's first move or
-                # door falls in its last tick, which the station's leave gives
-                # up (the GOTO then ends with the walk)
-                leave(implicit=True, shared=moved)
-            walk_to(r2, x2, y2, obj)
-            moved = moved or left
-            # the mover reads its arrival in the update of its last move
-            # (0x47cf93-0x47d00d, done), the walk job then finds the path's
-            # end in the same tick (0x476112 -> 0x476209, done) and the GOTO
-            # under it, started (+0x14), is done there too (0x44a81b ->
-            # 0x44aab0): the next step, pushed with the run-now flag 0, starts
-            # on the tick after the last move — no tick of the GOTO's own;
-            # with no move the walk job ends inside the GOTO's first update
-            # and the GOTO on its second: two ticks
-            legs.append(('goto', 'the GOTO ends', 0 if moved else 2))
+                # flag 1 in the GOTO's first update)
+                leave(implicit=True)
+            # the GOTO pushes the walk job with the run-now flag 1 in its first
+            # update and returns not done (+0x15, 0x44a9e6-0x44aa3b); a walk job
+            # done inside that push leaves the arrival to the GOTO's second
+            # update. The GOTO under the walk job reads the arrival in the tick
+            # the walk job ends (+0x15, the actor on the point: 0x44a870-0x44a8ef),
+            # sets +0x14 and pushes its follow-up with the run-now flag 1 — and
+            # returns not done (0x44a961-0x44a99a, 0x44aaac); it is done on its
+            # next update (+0x14: 0x44a81b -> 0x44aad8), in that follow-up's last
+            # tick or, with none, the tick after the arrival. A GOTO alone in
+            # its case ends the case there: the next case's first job runs a
+            # tick later (the level class's switch). GOTOENTER's follow-up is
+            # its ENTER step (fcn.00479f10 -> fcn.0044ad10), whose ACTION
+            # `enter` starts in the arrival's tick (0x4739a8-0x4739cb)
+            own = walk_to(r2, x2, y2, obj) and not left
+            legs.append(('goto', 'the GOTO enters' if enters else 'the GOTO ends', (0 if enters else 2) + (1 if own else 0)))
         current = obj
         return True
 
@@ -454,11 +475,24 @@ def _lap(L, toks, start):
                 if kind != 'ENTER': legs.append(('?', '%s without an object' % kind, 0))
                 elif current: enter(current)
                 continue
-            if kind == 'ENTER' and current == obj and occupied == obj: continue
+            if kind == 'ENTER':
+                # an ENTER step of the case's own (fcn.00473e20) walks nowhere:
+                # in the object already it is done on its first update (the
+                # occupied object set: 0x47388a-0x4738a4 -> 0x473a44, 105's
+                # score after the GOTOENTER), else it sets the object
+                # (fcn.00444a70) and pushes the ACTION `enter` with the run-now
+                # flag 1 (0x4739a8-0x4739cb), done under it in its last tick
+                if occupied == obj:
+                    legs.append(('action', '%s in it' % obj, 1))
+                else:
+                    enter(obj)
+                current = obj
+                continue
             # the ENTER step sets the occupied object (fcn.00444a70 in its start,
             # fcn.00473830) and pushes an ACTION `enter`, which plays nothing on
             # an object without the record (107's stool: a step of 0 ticks)
-            if goto(obj) and kind != 'GOTO' and occupied != obj:
+            enters = kind == 'GOTOENTER' and occupied != obj
+            if goto(obj, enters) and enters:
                 # the intro's enter is the previous lap's: the lap's wrap (the
                 # same tokens again) plays it — the stations would count it twice
                 if legs[-1][0] != 'intro': enter(obj)
@@ -470,7 +504,13 @@ def _lap(L, toks, start):
             if r2 in L.rooms:
                 if occupied: leave(implicit=True)
                 rt = L.route(room, r2)
-                if rt: walk_to(r2, *L.door_point(rt[-1][1], out=True), 'room ' + r2)
+                if rt:
+                    walk_to(r2, *L.door_point(rt[-1][1], out=True), 'room ' + r2)
+                    # the room's GoTo (fcn.004764b0, update 0x4762e0) pushes its
+                    # walk job with the run-now flag 1 and is done on the update
+                    # after (+0x10: 0x476335 -> 0x476407), under the walk job in
+                    # its last tick: the next case a tick later
+                    legs.append(('goto', 'the room GoTo ends', 1))
             else:
                 legs.append(('?', 'GOTO2 %s' % ' + '.join(strs), 0))
         elif kind == 'ACTION':

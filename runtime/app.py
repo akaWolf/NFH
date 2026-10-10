@@ -783,14 +783,14 @@ class App:
             v.handle_click(*self._mouse)
         w.menu_open = igm.enabled
         if igm.time_scale > 0.0 and not w.menu_open and not modal:
-            # the game's clock: the PC's 83 ms tick (pcprofile.game_dt)
-            gdt = pcprofile.game_dt(dt)
-            w.tick(min(gdt, 0.1))
-            if self.tutorial is not None and self.tutorial.active:
-                self.tutorial.tick(gdt)
-            if self.tutorial_camera is not None \
-                    and self.tutorial_camera.active:
-                self.tutorial_camera.tick(gdt)
+            # the game's clock: the PC's 83 ms tick (pcprofile.GameClock)
+            for gdt in v._game_clock.steps(dt):
+                w.tick(min(gdt, 0.1))
+                if self.tutorial is not None and self.tutorial.active:
+                    self.tutorial.tick(gdt)
+                if self.tutorial_camera is not None \
+                        and self.tutorial_camera.active:
+                    self.tutorial_camera.tick(gdt)
             woody = v.woody
             if woody is not None and woody.stored_input is not None \
                     and not woody.input_locked and not woody.anim.blocking \
