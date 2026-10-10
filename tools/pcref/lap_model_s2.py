@@ -1073,6 +1073,41 @@ LAP_PRESENT = {207: (('beachright_mat', 'beachright_mat_guarded'),),
 # the step object's bytes at a lap's start (205's script arms its mat step's
 # `talk` in its constructor, 0x10025a9f, and the table step re-arms it)
 LAP_BYTES = {205: {'obj0xd': 1}}
+# a step whose poll waits through another actor's own steps, which his job
+# before it starts: {level: {step: (actor, his hotspot the actor is put at and
+# comes back to, the object and hotspot it walks to, its job there)}} — 210's
+# elephant: his `put1` shows Fifi (objnextanim ms3), her step 0x10018239 —
+# once she is no longer `inv` — walks her to the elephant's `fifi` hotspot
+# and plays `dogattack` (0x1001841f), her next 0x10017f4a walks her back to
+# his `fifi_1` hotspot (the "1" at 0x100ac45c through fcn.1003cc45) and sets
+# `help` (fcn.10043d66); his step 0x10019ddb polls her there and `help`
+# (fcn.1000e172, fcn.1000ec67) before his `take1` (co_cycle_ticks)
+CO_CYCLE = {210: {0x10019ddb: ('fifi', 'fifi_1', 'bar/elefant', 'fifi', 'dogattack')}}
+
+
+def co_cycle_ticks(n, step, d=None, g=None):
+    """the ticks CO_CYCLE's actor takes from his job's end to his poll's pass:
+    her step's tick past the `inv` test, her GoTo to the object (walk_span),
+    her job there, her GoTo back to his hotspot and the tick his poll sees
+    `help` on; None where a part is unknown"""
+    spec = CO_CYCLE.get(n, {}).get(step)
+    if spec is None:
+        return None
+    actor, his, obj, hot, job = spec
+    d = d or Data(n); g = g or d.geom()
+    me = g.point(obj, 'neighbor', exact=True)
+    off = re.search(r'<actor name="neighbor"[^>]*>(?:(?!</actor>).)*?<hotspot name="%s" offset="(-?\d+)/(-?\d+)"' % his,
+                    g.ob, re.S)
+    if me is None or off is None:
+        return None
+    room = g.room_of(obj)
+    put = (room, me[0] + int(off.group(1)), me[1] + int(off.group(2)))
+    t1, at = walk_span(g, put, obj, actor, d, hotspot=hot)
+    tj = d.action_ticks(d.real.get(obj.replace('/', '_'), obj), job, actor)
+    t2, _p = walk_span(g, at, put, actor, d)
+    if None in (t1, tj, t2):
+        return None
+    return 1 + t1 + tj + t2 + 1
 
 
 def lap_steps(n):
@@ -1094,6 +1129,9 @@ def lap_steps(n):
                 if isinstance(x, str) and not x.startswith('$'):
                     objs.add(x)
         parts = station_ticks(d, ev, ctx)
+        if cur in CO_CYCLE.get(n, {}):
+            # the wait for the other actor's round (co_cycle_ticks)
+            parts.insert(0, (CO_CYCLE[n][cur][0], 'cycle', co_cycle_ticks(n, cur, d, ctx['geom'])))
         hid = ctx.pop('route_leave', None)
         if hid and out:
             # the route's leave of the hideout the last step left him in
@@ -1221,10 +1259,12 @@ class Geometry:
         self.ob = canon.read('%s/%s/objects.xml' % (X, folder))
         go = canon.read('%s/generic/objects.xml' % X)
         self.speed = {}
-        for am in re.finditer(r'<actor name="(\w+)"[^>]*>(.*?)</actor>', go, re.S):
-            recs = [dict(re.findall(r'(\w+)="([^"]*)"', t)) for t in re.findall(r'<speed\b[^>]*/>', am.group(2))]
-            if recs:
-                self.speed[am.group(1)] = {r['name']: (int(r['speed']), int(r['start'])) for r in recs}
+        # (a level's own actors' records after the generic ones: 210's Fifi)
+        for src in (go, self.ob):
+            for am in re.finditer(r'<actor name="(\w+)"[^>]*(?<!/)>(.*?)</actor>', src, re.S):
+                recs = [dict(re.findall(r'(\w+)="([^"]*)"', t)) for t in re.findall(r'<speed\b[^>]*/>', am.group(2))]
+                if recs and am.group(1) not in self.speed:
+                    self.speed[am.group(1)] = {r['name']: (int(r['speed']), int(r['start'])) for r in recs}
         self.rooms = {}
         # an object's room is the level.xml <room> it is placed in — not its
         # name's prefix (203: 'wallleft/melons' stands in groundleft)
@@ -1726,7 +1766,7 @@ PAIRS = {
     # for the Mother's call (pc_durations_s2.py CLIPS, MotherWakeSleepBehavior)
     210: {'DogBasket': [(None, 'pool_fifi_sleep', 'tickle'), (None, 'pool_fifi_sleep', 'take')],
           'TurbanShop': [(None, 'fifi', 'put3'), (None, 'turbanshop', 'try_turban'), (None, 'fifi', 'take3')],
-          'Elephant': [(None, 'fifi', 'put1'), (None, 'fifi', 'take1')],
+          'Elephant': [(None, 'fifi', 'put1'), (None, 'fifi', 'cycle'), (None, 'fifi', 'take1')],
           'DogBasketPut': [(None, 'pool_fifi_sleep', 'put')]},
     # his lap after the table (the skis ridden, walked back and put — the
     # mobile's two WaterSkiis visits —, the chef's eel, the rocket, the sand

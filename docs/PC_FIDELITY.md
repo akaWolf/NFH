@@ -2901,6 +2901,25 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   her deck chair (-13), 211's Olga at the rail (0) and by the kid (-13)
   and its Mother by the kid (-13) and at her deck chair (-2), 212's
   Mother at the red bull (6) and the statue hideout (-1, inside it: `inv`).
+  And 210's elephant (carried 2026-09-30): E10's idle first lap against
+  the port's, bubble by bubble — the call 25 / 27.5, the basket 33 / 33.8,
+  the shop 41 / 42.0, the elephant 68 / 69.0, then his chair 102 against
+  94.2 and the next call 132 against 129.7: E10 at 1 fps has him at the
+  elephant from ~81 to ~92 — Fifi put down, off to the elephant, its
+  trunk up, back to him — where the port stood 2.5 s. By the code his step
+  0x10019ddb (after the `put1` of 0x1001a052) polls her at his `fifi_1`
+  hotspot and the `help` object's flag (fcn.1000e172, fcn.1000ec67) before
+  its `take1`; hers 0x10018239 waits until she is no longer `inv` (the
+  `put1`'s objnextanim ms3), walks her to the elephant's `fifi` hotspot
+  (60 px, 10 ticks) and plays `dogattack` (80 frames: 82 ticks), and
+  0x10017f4a walks her back to his `fifi_1` (the "1" at 0x100ac45c) and
+  sets `help` (fcn.10043d66): 104 ticks between his two jobs, 11.17 s for
+  the visit (lap_model_s2 CO_CYCLE / co_cycle_ticks, a level's own actors'
+  speed records in Geometry). The idle lap: his chair at 102.8, the next
+  call at 133.7 (E10 102, 132), call to call 106.2 s against the video's
+  107 (102.2 before). The 210 plan's tool belt waited for a window the
+  later lap closes: v27 has it wait for him at her chair (~138) and go to
+  the beach before his way to the shop — 100 at 428.4 s.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

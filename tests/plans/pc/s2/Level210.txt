@@ -1,4 +1,8 @@
-# Level210 under the PC profile (v25, 2026-09-25: an action's behaviour is posted as its
+# Level210 under the PC profile. v27 (2026-09-30): the elephant's stay waits for Fifi's
+# round — her walk to the elephant, its `dogattack` and her walk back (11.2 s, 2.5
+# before) — so he is back in his chair at ~109 and called at ~134: the tool belt waits
+# for him at her chair (~138) and goes to the beach before his way to the shop (~153);
+# 100 at 428.4 s. (v25, 2026-09-25: an action's behaviour is posted as its
 # job ends — her call's `call` 1.8 s after the call starts, her `order` as the order
 # ends). v26 (2026-10-03): Olga by her script — the mat's 10-s bar first, then the
 # shower, whose bra hangs on the rail for the 120-tick wait alone (19-29 s, 50-60, 80-90
@@ -30,6 +34,8 @@ take! OlgaBra IT2_Bra                  # Zone01
 take CricketBat IT2_Bat                # Zone01
 take SuntanOil IT2_Sunoil              # Zone01
 prime WaterMelons IT2_Bra              # Zone03 once the gate lets him (~100) -> IT2_Bra_sling
+whenusing CallRTMother                 # (~138) he is at her chair in the pool: the beach is off his lap-2 way
+park Zone01                            # through the shop's room before he comes to it (~153)
 unlock ToolBelt IT2_Brailer            # Zone01: the tongs
 prime Valve IT2_Tongs                  # Zone01: the pool drains (the fall_empty coin)
 take ValveWaterPuddle IT2_Oktopus      # Zone01
