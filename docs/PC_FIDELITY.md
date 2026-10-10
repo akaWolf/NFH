@@ -2954,6 +2954,23 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   agree), 210's call icon 1.1-1.6 s ahead of the port's (the chair's
   leave after it) — read again on the level's clock and the bubble's
   other states in "The Season 2 bubble by the script's icons".
+  On the PC's 83 ms tick (since 2026-10-10: the videos' seconds against
+  the port's frames, no scale — scratchpad survey tools over idle runs):
+  Season 2's first laps 203 -0.10..+0.03 s over 86 s, 205 -0.19..+0.15,
+  207 -0.14..+0.08, 208 -0.24..+0.23, 211 -0.13..+0.06, 212 -0.15..-0.03,
+  213 -0.32..-0.03, 214 -0.16..-0.15, the station to station spans within
+  0.1-0.2 s with no drift; 204 -0.39 at the hot dog (41.6 s); 209 +0.15..
+  +0.33 by the ice (45 s); 210 -0.20 at the call, -0.54 at Fifi (her
+  call to his Fifi 0.32 s short), -0.69 by 117 s; 206's lesson -0.35 at
+  the call (8.8 s), each errand after it two ticks short (the order, the
+  pillows, the give: 41, 70, 70 ticks in E06 against 39, 68, 68), -0.82
+  by the hide (23.8 s); 202 -0.21..-0.37 before the player's swim.
+  Season 1's: 101, 102 and 114 within 0.1-0.4 s over 120 s; 103, 106,
+  109, 110, 112 and 113 ahead by 0.3-0.6 s at 100-140 s, a tick a case
+  (runtime/README.md, "a Season 1 case runs a tick longer"); 105's first
+  span +0.9 s (the piano from the start to the football's icon: 11.63 s
+  against E05's 10.76), its later spans within 0.1 s; 104, 107, 108 and
+  111 the player's from their second station on, the first within 0.2 s.
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's
