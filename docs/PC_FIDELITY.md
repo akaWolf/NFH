@@ -2885,7 +2885,22 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   box — 201 4, 204 10, 205 12, 207 1, 211 21, 212 37, 213 40, 214 56, the
   rest 0; the chains of 212, 213 and 214 against the gauges stay within
   0.5 s where comparable (213's picnic to the pinata aside, above), so a
-  run the check would lengthen has not shown in them.
+  run the check would lengthen has not shown in them. What a detour costs
+  by the code: a floor walk heading at a standing actor d px off its floor
+  line (|d| < 15) steps off the line to her y + 15 — when she is above
+  the walker or on the room path's top edge ([+0x20]) — else to her y - 15
+  (0x10009706-0x1000971b; to the target's side where the target is within
+  50 px of her x, 0x100096ed-0x10009701), along to her x ± 50 and back to
+  the line: |d ± 15| px each way at 3 px a tick, 10 ticks for an actor on
+  the line, 2 for one 13 px above it; a walking actor costs the walker a
+  tick a step — the route's and the pass's straight movements keep their
+  target (+0x2f set by fcn.1000901b and fcn.100090bd through fcn.10008ef4
+  -> fcn.10008e19), a direct one ends where it stands (fcn.10008f6a: the
+  pass's run to `<actor>_in` and back to the floor). The co-actors' PC stations within 15 px of
+  their floor line (PCApproach): 207's Mother at the pool ladder (-4) and
+  her deck chair (-13), 211's Olga at the rail (0) and by the kid (-13)
+  and its Mother by the kid (-13) and at her deck chair (-2), 212's
+  Mother at the red bull (6) and the statue hideout (-1, inside it: `inv`).
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's
