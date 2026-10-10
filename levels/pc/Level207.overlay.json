@@ -576,7 +576,9 @@
         "Zone04",
         "Zone01"
        ]
-      }
+      },
+      "tx": -217,
+      "dpx": -4
      },
      "Woody": {
       "obj": "pool/divingboard",

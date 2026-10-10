@@ -2920,6 +2920,29 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   107 (102.2 before). The 210 plan's tool belt waited for a window the
   later lap closes: v27 has it wait for him at her chair (~138) and go to
   the beach before his way to the shop — 100 at 428.4 s.
+  And 207's board to the bar, frame by frame (carried 2026-09-30): E07's
+  icons against the port's idle run (tools/pcref/bubble_changes.py --s2)
+  had the bar's span 18.1 s where the port walked 15.8 — the pool board's
+  step 0x100169c5 dives past its poll on the Mother in her chair and
+  leaves him in the pool (neighbor_hideout), whose `leave` (n_leave, 17
+  ticks) the bar step's route plays after its icon and whose
+  neighbor_out, 432/286, the walk leaves from — 104 ticks to the bar
+  keeper, not the diving board's 93 (lap_model_s2.HIDEOUT_AFTER ->
+  PCApproach `tx` -217, `dpx` -4). And the level's first walk, from
+  level.xml's 362/583 to the stairs' hotspot 78 px on, ended at once:
+  the mobile start sits 0.04 u from the stairs' point, under the walk's
+  arrival test (0.03), so the stretch's 10 ticks were lost — a stretch the
+  scene has next to no length for now stands its PC ticks out
+  (`Pawn._pc_floor_pace`, pc_secs). The idle lap against E07 since: the
+  elephant 36.3 / 36.5, the shell 50.6 / 50.8, the towel 92.5 / 92.3, the
+  board 108.0 / 107.8 (the bar's icon 1.42 s before the port's: it comes
+  before the pool's leave, as Season 1's before a walk's own leave).
+  Season 2's idle laps against the icons otherwise: 204, 212, 213 and 214
+  within 0.2-0.3 s of the first icon at every station, 205, 211 and 203
+  drifting by up to 0.5-0.8 s over 90-100 s, 208's shoe machine and 209's
+  Taj and hot shoe splitting a station's time differently (the totals
+  agree), 210's call icon 1.1-1.6 s ahead of the port's (the chair's
+  leave after it).
   And the linked pairs' coins: the level's done count is its trick
   table's credited records (fcn.1000140b -> fcn.100522e6), so each record
   shows its coin on its own tick — E09's coin bar takes the hot shoe's

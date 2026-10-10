@@ -1921,6 +1921,16 @@ def code_moves(n):
     return out
 
 
+# a station whose step ends with him inside a hideout, past a poll the walk
+# does not follow: the next step's GoTo leaves it — the route's `leave` and
+# the placement at its `<actor>_out` (_leave_place) — 207's board: 0x100169c5
+# waits for the Mother in her chair, then the dive puts him in the pool
+# (pool/pool: neighbor_hideout, `enter` of time 0), whose `leave` (n_leave,
+# 17 ticks) the bar step's route plays before the walk from its
+# neighbor_out, 432/286 (the board's hotspot 649/236)
+HIDEOUT_AFTER = {207: {'PoolBoard': 'pool_pool'}}
+
+
 def code_places(n):
     """{mobile item: [(x, y) or None per visit]}: where the next walk leaves
     from after a visit whose step leaves a hideout (_leave_place) — the
@@ -1959,6 +1969,10 @@ def code_places(n):
             per.append(None)
         if any(x is not None for x in per):
             out[item] = per
+    for item, hid in HIDEOUT_AFTER.get(n, {}).items():
+        place = _leave_place(g, d, hid)
+        if place is not None:
+            out[item] = [tuple(place)]
     return out
 
 

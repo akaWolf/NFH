@@ -1778,6 +1778,14 @@ class Pawn:
                 x, y = tx, ty
             ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'dx': fl['px']}, self.sneaking)
             pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
+            if ticks and length < 2 * self._min_dist() and 'pc_secs' not in st:
+                # a stretch the mobile scene has next to no length for, which
+                # the PC walks its px of: stood out for its ticks — the
+                # arrival test would end it at once (207's start: the level.xml
+                # place 78 px left of the stairs' hotspot, 0.04 u in the scene)
+                st['pc_secs'] = ticks / pcprofile.TICKS_PER_SECOND
+                self._pc_step_t = 0.0
+                pace = None
             self._pc_floor = cur = (fl, pace)
         if cur[1] is None:
             # no dx on the PC (two spots of the mobile scene at one PC x): the
