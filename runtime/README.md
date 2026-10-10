@@ -973,11 +973,20 @@ predicate, then the all-tricks win.
   by the walk's mode step fcn.00472dc0) — so his action starts in the
   tick of his last move (a tick sooner than the port had it; one tick
   where he stands, two before), and a floor click a walk job alone
-  (fcn.004757a0 at 0x43fbdf): `Pawn._pc1_kind`. Open: a visit inside a
-  case (a split case's later visits, another item's share: no GOTO of the
-  PC's) and the neighbour's reaction walks keep the earlier count — the
-  mover's ticks, two in place: 35 such legs over the 14 plans, two ticks
-  each at 104's basin (4), 109's alarm clock (3) and 114's hat (4). A
+  (fcn.004757a0 at 0x43fbdf): `Pawn._pc1_kind`. A visit inside a case
+  (PCCaseGoto false: a split case's later visits, another item's share of
+  it, a case with no GOTO — 104's aftershave after the deodorant on the
+  shelf and the gives back, 109's alarm clock from the bed, 113's drill
+  after the ladder, 114's medals after the hat) walks none since
+  2026-10-11: the case's list goes on, its next element the tick after
+  the last ends (in the stays), so the pawn is put on the mobile item's
+  use spot at once (`Pawn._pc1_case` 'list', `_pc1_place_at`; a climbed
+  item's at the edge of its use band, a hair inside; one in another zone
+  walks as a snap, `_pc1_close`) — it had walked the mover's ticks
+  between the mobile places, two where they mapped to one PC point (104's
+  shelf 2.4 and 2.6 ticks, its chain 5 shorter since). The neighbour's
+  reaction walks keep the earlier count — the mover's ticks, two in
+  place. A
   case that pushes no job costs a tick: the level class's job returns not
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
   the next case runs on the tick after (tools/pcref/routine_order.py's

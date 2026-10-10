@@ -152,7 +152,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 3.33,
-    "PCIconLead": 0.583
+    "PCIconLead": 0.583,
+    "PCCaseGoto": false
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_bath's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Towel <- towel#0 3.3 s"
   },

@@ -252,7 +252,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 5.25,
-    "PCIconLead": 0.417
+    "PCIconLead": 0.417,
+    "PCCaseGoto": false
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_art's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): DieselGenerator <- potterswheel#0 potter+leave 5.25 s"
   },

@@ -289,7 +289,8 @@
    "object": "SinkDeodrant",
    "component": "TrickItem",
    "set": {
-    "PCUseSeconds": 2.83
+    "PCUseSeconds": 2.83,
+    "PCCaseGoto": false
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SinkDeodrant <- basin#1 grease_hair 2.83 s"
   },

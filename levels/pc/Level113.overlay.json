@@ -287,7 +287,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 4.08,
-    "PCIconLead": 0.083
+    "PCIconLead": 0.083,
+    "PCCaseGoto": false
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.08 s"
   },

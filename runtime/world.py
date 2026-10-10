@@ -1647,10 +1647,11 @@ class Pawn:
                 if leg is not None:
                     if leg.get('scale') is None:
                         # no move of the PC's in this leg: a snap (_pc_floor_pace's)
+                        # — the state's own move in a frame (a climb's, not
+                        # the WALK step's target)
                         self.pos_snap = True
-                        tx, ty = self._step_target()
                         n = (vx * vx + vy * vy) ** 0.5
-                        d = max(((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5, 1e-6)
+                        d = max(self._pc1_snap_dist(), 1e-6)
                         return d * 60.0 / n if n > 0.0 else s
                     # the leg's PC-timed pace (tests/invariants.py)
                     k = self._pc1_pace(leg)
@@ -2334,6 +2335,48 @@ class Pawn:
             leg['v'] = v
         return nat / max(end - el, 1.0 / 60.0)
 
+    def _pc1_place_at(self, it):
+        """a Season 1 visit inside a PC case (_pc1_case 'list': PCCaseGoto
+        false): no GOTO and no move on the PC — the case's list goes on, its
+        next element the tick after the last — so the pawn is put on the
+        mobile item's use spot (a climbed one's height), the PC point he
+        stands on the item's where it has one. False where the item is in
+        another zone (its walk goes, as a snap: _pc1_close)"""
+        if self.zone is None or it.zone != self.zone.pid:
+            return False
+        self.sprite.x = it.move_x(self.role)
+        if it.should_walk_up or it.should_walk_down:
+            # where a climb from his height would stop: the edge of the use
+            # height's band, a hair inside (104's shelf, the deodorant then
+            # the aftershave)
+            my = it.y + it.dy
+            thr = self.item_threshold + it.delta_use_height - 1e-4
+            self.sprite.y = min(max(self.sprite.y, my - thr), my + thr)
+        else:
+            self.sprite.y = self.floor_y()
+        self.pos_snap = True
+        pt = self._pc1_item_point(it)
+        if pt is not None:
+            self.pc1_stand_at(pt)
+        return True
+
+    def _pc1_snap_dist(self):
+        """the move a snap of a leg with no PC move makes this frame: the WALK
+        step's target, or a climb's or descent's rest to its arrival test (a
+        hair inside it, as _pc1_left reads it)"""
+        x, y = self.sprite.x, self.sprite.y
+        eps = 1e-4
+        if self.state == self.DOOR_CLIMB:
+            d = self._step['door']
+            return max(0.0, abs(d.y - y) - self._use_thr(d) + eps)
+        if self.state == self.ITEM_CLIMB:
+            it = self._step['item']
+            return max(0.0, abs(it.y - y) - self._use_thr(it) + eps)
+        if self.state == self.DESCEND:
+            return max(0.0, (y - self.floor_y()) - self.zone_threshold + eps)
+        tx, ty = self._step_target()
+        return ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5
+
     def _pc1_left(self, leg, v):
         """the natural seconds of the leg's path still to walk at the floor
         and climbing records `v`: the current step's rest from where the pawn
@@ -2383,11 +2426,15 @@ class Pawn:
     def _pc1_case(self, it):
         """the job the neighbour's PC case for the coming visit to `it` walks
         in: 'goto' (the case's GOTO, PCCaseGoto), 'enter' (a GOTOENTER,
-        PCCaseEnter), None (a visit inside a case)"""
+        PCCaseEnter), 'list' (a visit inside a case: PCCaseGoto false — a
+        split case's later visits, another item's share of it, a case with
+        no GOTO), None where the item has no PC case (a reaction's walk)"""
         def visit(v):
             return (v[pc_visit_ix(it, len(v))] if v else False) if isinstance(v, list) else bool(v)
-        if it is None or not visit(it.pc_case_goto):
+        if it is None or it.pc_case_goto is None:
             return None
+        if not visit(it.pc_case_goto):
+            return 'list'
         return 'enter' if visit(it.pc_case_enter) else 'goto'
 
     def _pc1_close(self, leg, end, gait, last, kind=None):
@@ -2397,7 +2444,12 @@ class Pawn:
         fx, fy = leg['from']
         t = pcprofile.s1_leg_ticks(self.role, gait, fx, fy, end[0], end[1], leg['floor'],
                                    sneaking=self.sneaking) or 0
-        if kind is not None:
+        if kind == 'list':
+            # a visit inside a PC case: no GOTO and no mover — the case's list
+            # goes on, its next element starting the tick after the last ends
+            # (the stays'): the mobile steps are a snap
+            t = 0
+        elif kind is not None:
             # with no move and no door the walk job ends inside the GOTO's
             # first update (own)
             t = pcprofile.s1_goto_ticks(kind, t, leg['after'], own=t == 0 and not leg['after']) \
@@ -4614,6 +4666,11 @@ class Routine:
             self._pending = 'advance'
             self.state = self.IDLE
             return
+        if pcprofile.is_pc() and not self.pawn.nfh2 and self.pawn.role == 'Rottweiler' \
+                and not self.pawn.at_use_range(it) and self.pawn._pc1_case(it) == 'list':
+            # a visit inside the PC case (PCCaseGoto false): no GOTO and no
+            # move — the list goes on where he stands (Pawn._pc1_place_at)
+            self.pawn._pc1_place_at(it)
         if self.pawn.at_use_range(it):
             if pcprofile.is_pc() and it.pc_approach.get(self.pawn.role):
                 # used where he stands: the PC visit's step still leaves him
@@ -4666,7 +4723,7 @@ class Routine:
         if self.log and self.log[-1][0] == it.name:
             return False
         kind = p._pc1_case(it)
-        if kind is None:
+        if kind is None or kind == 'list':
             return False
         pt = p._pc1_item_point(it)
         here = p._pc1_here()

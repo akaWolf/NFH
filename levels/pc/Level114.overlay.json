@@ -228,7 +228,8 @@
     "PCFireAt": 0.25,
     "PCStopSkip": true,
     "PCFireLead": true,
-    "PCEndAfter": "Hat"
+    "PCEndAfter": "Hat",
+    "PCCaseGoto": false
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MedalBox <- hat#0 wearmedals 4.67 s"
   },

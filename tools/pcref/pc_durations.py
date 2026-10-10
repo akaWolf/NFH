@@ -126,7 +126,7 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
-def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True):
+def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True, intros=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
     moves, doors and no-move ticks, 0 where the case has no GOTO]; into
@@ -161,10 +161,12 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
     if lead and acts:
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)
-    ent = []; rgo = []
+    ent = []; rgo = []; itr = []
     for kind, text, t in legs:
         if kind == 'icon':
-            ent.append(False); rgo.append(False)
+            ent.append(False); rgo.append(False); itr.append(False)
+        elif kind == 'intro' and itr:
+            itr[-1] = True               # the level's first walk: a GOTO the lap does not time
         elif kind == 'goto' and ent and text == 'the GOTO enters':
             ent[-1] = True
         elif kind == 'goto' and rgo and text == 'the room GoTo ends':
@@ -209,6 +211,8 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
             leads.setdefault(icon.split()[-1], []).append(closing[i] if i < len(closing) else 0.0)
         if enters is not None:
             enters.setdefault(icon.split()[-1], []).append(ent[i] if i < len(ent) else False)
+        if intros is not None:
+            intros.setdefault(icon.split()[-1], []).append(itr[i] if i < len(itr) else False)
     if st and (carry or room):
         # the lap's last case walks for its first (101's room GoTo to the
         # living room before the sofa's GOTOENTER)
@@ -240,7 +244,8 @@ def main(argv):
         leads = {}
         gents = {}
         grooms = {}
-        by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS)
+        intros = {}
+        by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS, intros=intros)
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -278,7 +283,7 @@ def main(argv):
             icon_leads.setdefault(item, []).extend([0.0] * (nv - 1) + [ld])
             first = (icon, k) not in opened
             opened.add((icon, k))
-            goes = bool((walks.get(icon) or [0] * (k + 1))[k])
+            goes = bool((walks.get(icon) or [0] * (k + 1))[k]) or bool((intros.get(icon) or [False] * (k + 1))[k])
             cases.setdefault(item, []).extend([first and goes] + [False] * (nv - 1))
             ge = bool((gents.get(icon) or [False] * (k + 1))[k])
             centers.setdefault(item, []).extend([first and goes and ge] + [False] * (nv - 1))
@@ -421,7 +426,8 @@ def main(argv):
                 e = {'object': item, 'component': kind, 'set': {'PCUseSeconds': v}, 'source': src}
                 ov['patches'].append(e)
             cg = cases.get(item) or []
-            if any(cg) and len(cg) == len(vals):
+            if len(cg) == len(vals):
+                # (all false too: the visits inside a case walk none, Pawn._pc1_case)
                 e['set']['PCCaseGoto'] = cg if len(cg) > 1 else cg[0]
             else:
                 e['set'].pop('PCCaseGoto', None)
