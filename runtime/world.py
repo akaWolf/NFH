@@ -3888,6 +3888,16 @@ class Routine:
         it = self.item
         if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
             return None
+        if self.role != 'Rottweiler':
+            # another role's (PCIconRole, PCIconClipsRole)
+            clips = it.pc_icon_clips_role.get(self.role)
+            if self.state == self.USING and clips:
+                sp = self.pawn.anim.sprite
+                cur = sp.anims[sp.current].name \
+                    if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
+                if cur in clips:
+                    return clips[cur]
+            return it.pc_icon_role.get(self.role)
         if self.state == self.USING:
             if self.pc_bubble_next is not None:
                 return self.pc_bubble_next

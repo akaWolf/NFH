@@ -38,8 +38,14 @@ S2 = {201: 'ship1', 202: 'cn_b1', 203: 'cn_c2', 204: 'cn_c1', 205: 'cn_b2', 206:
       208: 'in_c1', 209: 'in_c2', 210: 'in_b2', 211: 'ship3', 212: 'me_c1', 213: 'me_c2', 214: 'ship4'}
 # level -> mobile item -> (role, [PC "object.action" ...], walk between them in s)
 ALIAS = {
-    212: {'MumWaitZone3': ('Mother', ['midleft/red_bull.use'], 0.0),
-          'MumWaitZone4': ('Mother', ['midright/statue_hideout.use'], 0.0)},
+    # 212's waits by their rooms (their PCApproach, the mobile scene's
+    # zones: Zone04 the midleft room of the red bull, Zone03 the midright
+    # of the statue) — and the bubble's icons, the mobile's bull at
+    # MumWaitZone4, E12's bull's head over her first 15.3 s, the red
+    # bull's `use` of 144 ticks after her walk (paired the other way round
+    # until 2026-09-30)
+    212: {'MumWaitZone3': ('Mother', ['midright/statue_hideout.use'], 0.0),
+          'MumWaitZone4': ('Mother', ['midleft/red_bull.use'], 0.0)},
     213: {'MotherWaitZone2': ('Mother', ['bottomright/water.use'], 0.0),
           # the port's Zone05 holds the statue and the flowers; her script's
           # lap is the water and the flowers alone (0x100372f0 <->
@@ -415,7 +421,100 @@ def pc_actions(d):
     return out
 
 
+# level -> mobile item -> (role, icon spec): another role's bubble at the
+# item where her script's icon element (fcn.100422a5) is not the mobile
+# item's — ('step', address) the icon that step sets, ('icon', name) one read
+# off a branch the walker does not take ('' none)
+ICON_ROLE = {
+    # 209's shop step 0x1001f729 sets the fakir's shop (E09: Ramschid's over
+    # her first 13 s), the mobile's MotherStart the shoe cleaner
+    209: {'MotherStart': ('Mother', ('step', 0x1001f729))},
+    # 211's script sets her none (0x1002f83f, the chair; 0x1002f570, the
+    # kid): E11 shows her no bubble
+    211: {'DeckChairMother': ('Mother', ('icon', '')), 'OlgaChild': ('Mother', ('icon', ''))},
+    # 213's water step 0x100372f0 and 214's reling step 0x10039f34 set
+    # `water`, the mobile's waits goswim
+    213: {'MotherWaitZone2': ('Mother', ('step', 0x100372f0))},
+    214: {'MotherWait': ('Mother', ('step', 0x10039f34))},
+    # 206's after the lesson: her chair step 0x1002b9fe clears it (E06: none
+    # from her sleep on)
+    206: {'DeckChair': ('Mother', ('step', 0x1002b9fe))},
+}
+# level -> mobile item -> (role, {clip: icon spec}): the clips of her stays
+# under other icons — ('bar',) none (fcn.1000e7f2's stay hides the bubble
+# until a step sets an icon again), ('step', address) the icon of the step
+# whose route plays the clip's leave, ('icon', name) a branch's
+ICON_CLIPS_ROLE = {
+    # 207: the pool's bar, the chair step 0x1001447d's route out of the pool
+    # (E07: the deck chair's icon at 47.87, over the ladder); the chair's
+    # bar (the check step 0x100141e0 sets the chair's icon again for the
+    # get-up)
+    207: {'PoolLadder': ('Mother', {'MotherPoolLadderSwim': ('bar',),
+                                    'MotherPoolLadderLeave': ('step', 0x1001447d)}),
+          'DeckChair': ('Mother', {'MotherSleepLoop': ('bar',)})},
+    # 208's and 209's dressing room: the bar, the next step's route out of
+    # it (Fifi's 0x1001d030 — E08: fifi at 36.47 —, the shop's 0x1001f729)
+    208: {'DressingRoom': ('Mother', {'MotherRoomIdle': ('bar',), 'Hide_Out': ('step', 0x1001d030)})},
+    209: {'DressingRoom': ('Mother', {'MotherRoomIdle': ('bar',), 'Hide_Out': ('step', 0x1001f729)})},
+    # 210's deck chair: the sleep's bar, the awake one (0x100187d8 clears
+    # the icon for it), and the check's call branch (0x10018a93: the
+    # neighbour's icon, then the chair's `leave`, E10: 22.34)
+    210: {'DeckChairMother': ('Mother', {'MotherSleepPillow': ('bar',), 'MotherSleepSingle': ('bar',),
+                                         'MotherLookLoop': ('bar',),
+                                         'MotherGetUpPillow': ('icon', 'neighbor')})},
+    # 214's deck chair: the bar, the reling step 0x10039f34's route out of
+    # the chair
+    214: {'DeckChairMother': ('Mother', {'MotherSleepSingle': ('bar',),
+                                         'MotherGetUpPillow': ('step', 0x10039f34)})},
+}
+
+
+def _role_icon(n, spec):
+    import lap_model_s2
+    if spec[0] == 'bar':
+        return ''
+    if spec[0] == 'icon':
+        return spec[1]
+    return lap_model_s2.step_icon(n, spec[1]) or ''
+
+
+def icon_role_keys(n):
+    """{item: {PCIconRole: {role: icon}} | {PCIconClipsRole: {role: {clip:
+    icon}}}} of ICON_ROLE and ICON_CLIPS_ROLE"""
+    sys.path.insert(0, HERE)
+    out = {}
+    for item, (role, spec) in ICON_ROLE.get(n, {}).items():
+        out.setdefault(item, {})['PCIconRole'] = {role: _role_icon(n, spec)}
+    for item, (role, clips) in ICON_CLIPS_ROLE.get(n, {}).items():
+        out.setdefault(item, {})['PCIconClipsRole'] = {role: {c: _role_icon(n, sp) for c, sp in clips.items()}}
+    return out
+
+
+def write_icon_role_keys(n):
+    p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
+    ov = json.load(open(p))
+    for k in ('PCIconRole', 'PCIconClipsRole'):
+        ov['patches'] = _strip_key(ov.get('patches', []), k)
+    keys = icon_role_keys(n)
+    for item, kv in keys.items():
+        for k, v in kv.items():
+            _set_key(ov['patches'], item, k, v)
+    note = (' The Mother\'s bubble (tools/pcref/pc_durations_others.py ICON_ROLE, ICON_CLIPS_ROLE):'
+            ' PCIconRole and PCIconClipsRole from her script\'s icon elements (GameLogic.dll'
+            ' fcn.100422a5) where they are not the mobile items\' — \'\' no bubble: a null icon,'
+            ' and a bar (fcn.1000e7f2) until the next icon.')
+    if keys and note not in ov.get('source', ''):
+        ov['source'] = ov.get('source', '') + note
+    json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')
+
+
 def main(argv):
+    if '--icons' in argv:
+        for n in [int(a) for a in argv if a.isdigit()] or sorted(set(ICON_ROLE) | set(ICON_CLIPS_ROLE)):
+            print(n, json.dumps(icon_role_keys(n), ensure_ascii=False))
+            if '--write' in argv:
+                write_icon_role_keys(n)
+        return
     write = '--write' in argv
     levels = [int(a) for a in argv if a.isdigit()] or sorted(set(ALIAS) | set(BARS) | set(CLIPS_ROLE) | set(WAITS_ROLE)
                                                              | set(ITEM_CLIPS) | set(ROLE_START))

@@ -3077,6 +3077,26 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the Taj's icon over the shoe visit. Open: 202's swim — the rake's icon
   to the sea's bar 14.5 s against the port's 13.4 (the wait at the shore
   for Olga's sub), the laps after it 1.6-1.9 s ahead.
+  The Mother's bubble the same way (her HUD portrait's cloud against
+  hud.think_m, 2026-09-30): her scripts' icons where they are not the
+  mobile items' (tools/pcref/pc_durations_others.py ICON_ROLE,
+  ICON_CLIPS_ROLE -> PCIconRole, PCIconClipsRole): 209's shop step sets
+  the fakir's shop (E09: Ramschid's over her first 13 s; the mobile's
+  MotherStart the shoe cleaner), 208's and 209's dressing room is left
+  under the next step's icon (Fifi's, E08 36.47 / the port's 36.72; the
+  shop's, E09 49.98 / 49.88), 210's check step gets her up under the
+  neighbour's icon (its call branch, 0x10018a93 — E10 22.34 / 22.57) and
+  keeps none through her awake wait (0x100187d8 clears it), 207's chair
+  step leads her out of the pool under the chair's (E07 47.87 / 48.00),
+  214's reling step out of her chair under `water` (213's water step's
+  too; the mobile's goswim), 211's script sets her none at all and 206's
+  none after the lesson (0x1002b9fe). 212's two waits were paired the
+  wrong way round (pc_durations_others ALIAS: MumWaitZone4 is the midleft
+  room's red bull by its PCApproach, the mobile's bull icon and its
+  longer mobile wait) — the red bull's 12.0 s and the statue's 8.67
+  swapped since: her bull icon to the whip 15.18 s against E12's 15.30
+  (11.88 before), the whip to the bull 17.0 against 17.0, lap for lap
+  within 0.2 s.
 - *A trick record past its action's end (2026-10-04, carried).*
   Loader.dll stores a `<trick>` record's `time` clamped to its action's:
   the trick parser reads the attribute by name (its global 0x1003c14c

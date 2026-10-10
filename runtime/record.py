@@ -233,6 +233,12 @@ class Recorder:
                 rt = next((r for r in w.routines if r.role == 'Rottweiler'), None)
                 shown, name = v.hud.think_icon(rt)
                 hud['think'] = '' if (not shown or rott is None) else name
+                # the Mother's, the mobile's sleep bars' disable kept for her
+                mom = w.pawns.get('Mother')
+                if mom is not None:
+                    mt = next((r for r in w.routines if r.role == 'Mother'), None)
+                    shown, name = v.hud.think_icon(mt)
+                    hud['think_m'] = '' if (not shown or mom.hud_disable_think) else name
         return {
             't': round(t, 3),
             'woody': None if wd is None else {

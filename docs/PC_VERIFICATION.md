@@ -1430,3 +1430,18 @@ actors' job pass the update calls at 0x100445f8.
   start, then 8.13 / 8.03 ... 100.27 / 100.38. All 28 plans at 100 as
   before (runs/icons1_pc: the same legs and scores), mobile 270/270, both
   tutorials ALL OK.
+- `runtime/world.py`, `runtime/scene.py`, `runtime/record.py`,
+  `tools/pcref/pc_durations_others.py`, `levels/pc/Level206-214.overlay.json`
+  (2026-09-30): the Mother's bubble (PCIconRole, PCIconClipsRole) and 212's
+  waits paired by room. Her cloud in the videos (the white of it outside
+  the icon, 30 fps) against hud.think_m (fine idle laps): 209 the fakir's
+  shop from the start, the dressing room 12.98 / 12.85, hidden 19.82 /
+  19.88, the shop 49.98 / 49.88 (the dressing room's icon to 50.72 and the
+  shoe cleaner's after it before); 208 hidden 6.87 / 6.72, Fifi's 36.47 /
+  36.72, the dressing room 43.77 / 43.77; 210 hidden 2.60 / 2.50, the
+  neighbour's 22.34 / 22.57, hidden from 34.54 / 34.60 through her awake
+  wait (the deck chair's icon at 54.67 and 89.72 before); 207 the deck
+  chair's 47.87 / 48.00 over the ladder; 212 the whip 15.30 / 15.18, the
+  bull 32.27 / 32.20, 52.47 / 52.52, 69.43 / 69.53, 89.67 / 89.85; 211
+  none throughout (bring_pillow and scold_kid before); 213 and 214's
+  water. Plan 212 at 100 (PC 17539); all 28 at 100 (runs/mom1_pc).

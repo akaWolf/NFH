@@ -835,7 +835,10 @@ predicate, then the all-tricks win.
   bubble goes by these alone under the profile; the mobile sleep bars'
   think-bubble disable (ProgressBar.SetSleeping) keeps the Season 1
   bubble and the Mother's. The profile's lesson's '' (206's
-  TutorialPC206) hides the bubble the same way.
+  TutorialPC206) hides the bubble the same way. Another role's —
+  the Mother's — at an item: PCIconRole (role -> icon) and
+  PCIconClipsRole (role -> {clip: icon}); the neighbour's keys are his
+  alone.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
