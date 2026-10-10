@@ -959,6 +959,21 @@ predicate, then the all-tricks win.
   bed, pig and parrot, 113's ladder); one between two walks is not
   carried (open, a tick each: 101's sofa after the room's GoTo, 107's
   statue and its painting's dove case).
+- **The PC profile's Season 1 nearobj triggers on the PC's geometry**
+  (`Routine._near_hit`, `Pawn.pc1_point_now`, `pcprofile.s1_leg_point`):
+  game.exe tests a station's trigger as |the actor's x - the object's
+  `neighbor` hotspot x| < 15 px in its room (fcn.00471bc0) on every tick
+  before the actors' pass, his x the mover's; the port had tested the
+  mobile item's place, 6-61 px off the PC object's mapped into the room
+  (the picture 22, the toilet 38, the traps 35 and 61, the iron -55: up to
+  7.6 ticks of walk). The station walk-bys (PCFixPoint) now test his PC x
+  — on a leg the mover's after the ticks the leg has run, its first move
+  in the leg's opening tick (an `after` leg's in the pass's tick before)
+  — and he stands on that point as the handler takes over: 104's picture
+  noticed at x 424 (the hall walk's 41st move from the bathroom's door),
+  not 443, its GoToObjX one move; the
+  floor tricks keep the mobile test (the trick lies where the click put
+  it, in the zone's mapping both ways).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:

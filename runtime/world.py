@@ -2344,6 +2344,25 @@ class Pawn:
             return st.get('pc1_out')
         return st.get('pc1')
 
+    def pc1_point_now(self):
+        """the PC point the Season 1 pawn is on at this frame: on a leg the
+        mover's after the ticks the leg has run (pcprofile.s1_leg_point — its
+        first move in the leg's opening tick, an `after` leg's in the pass's
+        last tick before it; game.exe's nearobj test reads the actor's x
+        before the tick's actors' pass, fcn.00472390), else the point it
+        stands on (_pc1_here); and its PC room"""
+        z = self.zone
+        r = getattr(z, 'pc_walk_room', None) if z is not None else None
+        if r is None:
+            return None, None
+        leg = self._pc1_leg() if self.state in self.MOVING else None
+        if leg is not None and 'to' in leg:
+            n = int(leg.get('el', 0.0) * pcprofile.TICKS_PER_SECOND + 1e-6) + (1 if leg['after'] else 0)
+            fx, fy = leg['from']
+            return pcprofile.s1_leg_point(self.role, self._pc_gait(), fx, fy, leg['to'][0], leg['to'][1],
+                                          leg['floor'], n, sneaking=self.sneaking), r['room']
+        return self._pc1_here(), r['room']
+
     def _pc1_here(self):
         """the PC point the pawn stands at: the station it came to, as long as
         it stands where it got there, else its place mapped into the PC room"""
@@ -7329,10 +7348,28 @@ class Routine:
         if w is None or self.pawn.zone is None:
             return
         for it in list(w.near_items.get(self.pawn.zone.pid, ())):
-            if it.tricked and \
-                    abs(self.pawn.sprite.x - it.target_x) \
-                    < self._notice_distance(it):
+            if it.tricked and self._near_hit(it):
                 self._on_surprise_near(it)
+
+    def _near_hit(self, it):
+        """the walk-by notice's test: the pawn within the item's reach
+        (_notice_distance) — under the profile's Season 1 a station's nearobj
+        trigger on the PC's geometry: |his x - the object's `neighbor`
+        hotspot x| < 15 px in its room (fcn.00471bc0; PCFixPoint), his x the
+        mover's on the leg he walks (Pawn.pc1_point_now) — the mobile item's
+        place mapped into the PC room is 6-61 px off the PC object's (103's
+        toilet 38, 113's trap 61); he stands on that point as the handler
+        takes over (its GoToObjX walks from there)"""
+        p = self.pawn
+        fp = getattr(it, 'pc_fix_point', None)
+        if self._pc_nearobj(it) and not p.nfh2 and not it.is_floor and fp:
+            here, room = p.pc1_point_now()
+            if here is not None and (len(fp) < 3 or fp[2] == room):
+                if abs(here[0] - fp[0]) < pcprofile.S1_NEAROBJ_PX:
+                    p.pc1_stand_at(here)
+                    return True
+                return False
+        return abs(p.sprite.x - it.target_x) < self._notice_distance(it)
 
     def _notice_distance(self, it):
         """the walk-by notice's reach: the pawn's NoticeWhenNearTrickedDistance
@@ -7369,8 +7406,7 @@ class Routine:
         inside = set()
         hit = None
         for it in list(w.near_items.get(self.pawn.zone.pid, ())):
-            if self._pc_nearobj(it) and it.tricked and \
-                    abs(self.pawn.sprite.x - it.target_x) < self._notice_distance(it):
+            if self._pc_nearobj(it) and it.tricked and self._near_hit(it):
                 inside.add(id(it))
                 if hit is None and id(it) not in self._pc_near_in:
                     hit = it

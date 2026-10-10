@@ -798,6 +798,50 @@ def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
     return t
 
 
+def s1_leg_point(role, gait, x0, y0, x1, y1, floor, n, sneaking=False):
+    """the PC point a Season 1 mover stands on after n of its ticks from (x0,
+    y0) toward (x1, y1) — s1_leg_ticks' moves: off the target's x, y first to
+    the room's floor line at the vertical record, then x along it at the
+    floor record (its first move `start` px longer from the standing
+    animation), clamped at the target's x, then y to the target's height"""
+    key = 'Woody_sneak' if (role == 'Woody' and sneaking) else role
+    rec = WALK_PX_PER_TICK.get(key)
+    if rec is None or n <= 0:
+        return (x0, y0)
+    h, v = rec[0], rec[1]
+    if (role, gait) in GAIT_PX_PER_TICK:
+        h, v = GAIT_PX_PER_TICK[(role, gait)]
+
+    def towards(a, b, k, rate):
+        d = abs(b - a)
+        return b if k * rate >= d else a + (k * rate if b > a else -k * rate)
+    x, y = x0, y0
+    standing = True
+    if x1 != x0:
+        if y != floor:
+            k = -(-abs(floor - y) // v)
+            y = towards(y, floor, min(n, k), v)
+            n -= k
+            standing = False
+            if n <= 0:
+                return (x, y)
+        sp = S1_START_PX.get(key)
+        start = sp[0 if x1 > x0 else 1] \
+            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) else 0
+        a = abs(x1 - x0)
+        k = 1 + (-(-(a - h - start) // h) if a > h + start else 0)
+        if n < k:
+            return (towards(x0, x1, 1, h + start) if n == 1 else
+                    towards(x0, x1, 1, h + start + (n - 1) * h), y)
+        x = x1
+        n -= k
+        if n <= 0:
+            return (x, y)
+    if y1 != y:
+        y = towards(y, y1, n, v)
+    return (x, y)
+
+
 def s1_arrive(moves, after=False):
     """the ticks of a Season 1 leg of `moves` mover ticks up to the update that
     reads its arrival — the door step's push, the walk job's end (tools/pcref/
