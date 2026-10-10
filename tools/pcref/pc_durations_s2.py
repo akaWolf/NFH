@@ -829,8 +829,8 @@ def icon_keys(n):
     for item, hi in lap_model_s2.code_hurt_icons(n).items():
         own = mob.get(item)
         hv = {}
-        for k in ('wait', 'shout'):
-            ic = REMASTER_ICON.get(hi[k], hi[k])
+        for k in ('wait', 'shout', 'fix'):
+            ic = REMASTER_ICON.get(hi.get(k), hi.get(k))
             hv[k] = ic if (ic is not None and ic != own and _texture(ic)) else None
         if any(hv.values()):
             out.setdefault(item, {})['PCHurtIcon'] = hv

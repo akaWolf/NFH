@@ -1463,3 +1463,17 @@ actors' job pass the update calls at 0x100445f8.
   shower's SHOUT after its wait under the bouquet's icon (577.65-579.98),
   being_hit from the pistol's wait (735.48). Plans 204 and 214 at 100 (the
   same scores).
+  Then (the same day) the other flows: plan 207's shell 406.32-415.48,
+  its linked castle 439.15-461.15 (the fall to the billboard's SHOUT),
+  its board over the closed awning 491.48-499.82 (being_hit); plan 213's
+  picnic 348.82-360.65 and bull controls 394.48-400.15; plan 206's rabbit
+  shot 263.65 (being_hit) and the lesson's Mother fight 76.32-85.98; plan
+  211's women's wc: the toilet from the rush, olgafight over the SHOUT
+  196.48-198.82, the toilet over the sign's repair to 203.98. Plans 206,
+  207, 211, 213 at 100 (the same scores).
+- `runtime/world.py`, `runtime/record.py` (2026-09-30): Season 1's `shout`
+  icon (bubble_wut) over each trick's shout until the next case — E01 at
+  30 fps: the wut icon 68.97-74.27, 86.60-94.53, 100.70-114.07,
+  120.83-128.73 s (episode time; the video's own tricks); plan 101 (hud.think,
+  now logged on Season 1 too): 77.15-79.48, 88.32-98.32, 104.48-112.32,
+  from 120.82. Plan 101 at 100 (the same score).

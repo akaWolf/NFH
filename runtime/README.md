@@ -840,7 +840,9 @@ predicate, then the all-tricks win.
   PCIconClipsRole (role -> {clip: icon}); the neighbour's keys are his
   alone. Through a co-actor's fight after a trick, PCHurtIcon
   ({'wait', 'shout'}: the wait in fear's and the angry's, a fix clip
-  the station's; `Routine.pc_hurt`).
+  the station's; `Routine.pc_hurt`). Season 1's shout: the fire's
+  `shout` icon (bubble_wut) from the shout to the next action or urgent
+  (`Routine.pc_shout_icon`).
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed

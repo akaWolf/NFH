@@ -2100,21 +2100,51 @@ def code_icons(n):
     return out
 
 
+# the fights after a trick the flows above do not read as TRICKED_CONT's:
+# {level: {item: (the step he waits in, his SHOUT's, his repair's)}} — 213's
+# bull controls (0x10037d3b: o_hurt_n, its latch on olga_fight, no SHOUT),
+# 207's board over the closed awning (0x100148d5: m_hurt_n until the
+# Mother's fight, 0x100171ee: m_hurt_n and SHOUT 1), 207's castle over the
+# towel (0x1001513f: o_hurt_n until Olga's n_lift), 206's rabbit shot
+# (0x1002de6a: being_hit — ship2's own icon — and SHOUT 1 after the
+# Mother's hit, 0x1002dbc4 the ramp's repair under it)
+HURT_STEPS = {213: {'MechanicalBullControls': (0x10037d3b, 0x10037d3b, None)},
+              207: {'PoolBoard': (0x100148d5, 0x100171ee, None),
+                    'SandCastle': (0x1001513f, 0x1001513f, None)},
+              206: {'LaunchPad': (None, 0x1002de6a, 0x1002dbc4)}}
+
+
 def code_hurt_icons(n):
-    """{item: {'wait': icon, 'shout': icon}}: the bubble through a 'fight'
-    flow (TRICKED_CONT) — the step his tricked station hands over to sets
+    """{item: {'wait': icon, 'shout': icon, 'fix': icon}}: the bubble through
+    a 'fight' flow (TRICKED_CONT) — the step his tricked station hands over to sets
     the icon he waits for the co-actor's fight under (204's 0x10031b2c,
     207's 0x10014937, 213's 0x10038221, 214's 0x1003a413 / 0x1003a49c:
     o_hurt_n; 210's 0x100192b0: m_hurt_n; 214's shower hands over to the
     bouquet's step), and the fight's handler the one of his SHOUT (its own,
     or the wait's where it sets none: 207's 0x1001596a; 204's 0x10032b6f
     the rickshaw's again)"""
+    out = {}
+    for item, (w, sh, fx) in HURT_STEPS.get(n, {}).items():
+        wait = step_icon(n, w) if w else None
+        shout = step_icon(n, sh) if sh else None
+        fix = (step_icon(n, fx) or shout) if fx else None
+        out[item] = {'wait': wait, 'shout': shout, 'fix': fix}
     lap, pairs = _paired_parts(n)
     if not lap:
-        return {}
+        return out
     trick = tricked_presence(n)
-    out = {}
     for item, spec in TRICKED_CONT.get(n, {}).items():
+        if spec[0] == 'steps' and spec[2]:
+            # a continuation whose steps hold the fight's handler (211's
+            # sweets: the women's wc, Olga's fight after the puke —
+            # 0x10030d0f's o_hurt_n and SHOUT): he waits under the first
+            # step's icon, SHOUTs under the handler's
+            ics = [step_icon(n, a) for a in spec[2]]
+            k = next((k for k, ic in enumerate(ics) if ic in ('o_hurt_n', 'm_hurt_n')), None)
+            if k is not None:
+                out[item] = {'wait': ics[0], 'shout': ics[k],
+                             'fix': _repair_icon(n, spec[2][k + 1] if k + 1 < len(spec[2]) else None)}
+            continue
         if spec[0] != 'fight' or item not in pairs:
             continue
         visits = pairs[item][1]
@@ -2129,8 +2159,22 @@ def code_hurt_icons(n):
         wait = step_icon(n, nxt) if nxt else None
         handler = spec[2][0] if spec[2] else None
         shout = step_icon(n, handler) if handler else None
-        out[item] = {'wait': wait, 'shout': shout if shout is not None else wait}
+        hnxt = run_step(Level(n), handler, {})[1] if handler else None
+        out[item] = {'wait': wait, 'shout': shout if shout is not None else wait,
+                     'fix': _repair_icon(n, hnxt)}
     return out
+
+
+def _repair_icon(n, step):
+    """the icon of a step that plays a repair (a DoAction `repair`: 204's
+    0x1003250a, 211's sign 0x10030b9d, 214's pistol 0x1003b0b5), None for
+    another step or none"""
+    if not step:
+        return None
+    ev, _nx = run_step(Level(n), step, {})
+    if not any(e[0] == 'DO' and len(e[1]) > 1 and e[1][1] == 'repair' for e in ev):
+        return None
+    return step_icon(n, step)
 
 
 def code_places(n):

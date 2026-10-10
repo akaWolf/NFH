@@ -44,7 +44,12 @@
      "Mother": 3.33
     },
     "PCJingle": true,
-    "PCIconClip": "PoolGetOut"
+    "PCIconClip": "PoolGetOut",
+    "PCHurtIcon": {
+     "wait": "being_hit",
+     "shout": "being_hit",
+     "fix": null
+    }
    }
   },
   {
@@ -96,7 +101,8 @@
     },
     "PCHurtIcon": {
      "wait": "olgafight",
-     "shout": "olgafight"
+     "shout": "olgafight",
+     "fix": null
     }
    }
   },
@@ -148,7 +154,12 @@
     },
     "PCResumeHeadSeconds": 2.42,
     "PCExtraCoinLinked": 30,
-    "PCUseSeconds": 8.08
+    "PCUseSeconds": 8.08,
+    "PCHurtIcon": {
+     "wait": "olgafight",
+     "shout": "olgafight",
+     "fix": null
+    }
    }
   },
   {

@@ -3661,6 +3661,7 @@ class Routine:
         self.pc_bubble_next = None
         self._pc_icon_sched = None       # the visit's icon changes to come (PCIconAt): [(t, icon)]
         self.pc_hurt = None              # a fight's bubble after a trick: (item, 'wait' | 'shout')
+        self.pc_shout_icon = None        # Season 1: the fire list's `shout` icon, up to the next case's
         self._pc_icon_t = 0.0
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
         self.pc_credit_item = None
@@ -3886,17 +3887,22 @@ class Routine:
         next or the tail's icon once up (PCIconLead, PCIconTail, PCIconClip),
         a clip's (PCIconClips), the visit's own (PCIcon) — '' no bubble —;
         None where the item's own shows as on the mobile"""
+        if self.pc_shout_icon is not None and pcprofile.is_pc():
+            # the Season 1 fire's list: its `shout` icon before the shout
+            # (generic objects.xml: gui/bubbles/bubble_wut), up until the
+            # next case sets its own (E01's tricks: 5-13 s each)
+            return self.pc_shout_icon
         if self.pc_hurt is not None and pcprofile.is_pc():
             # a co-actor's fight after a trick: the step he waits in, then
-            # his handler's SHOUT (PCHurtIcon); a repair after it is the
-            # station's (204's rickshaw, 214's pistol)
+            # his handler's SHOUT and the repair step's (PCHurtIcon; 211's
+            # sign under the toilet's)
             hit, phase = self.pc_hurt
             sp = self.pawn.anim.sprite
             cur = sp.anims[sp.current].name \
                 if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
             fix = set(hit.fix_sequence or ()) | ({hit.fix_animation} if hit.fix_animation else set())
-            ic = hit.pc_hurt_icon.get(phase)
-            if ic is not None and not (phase == 'shout' and cur in fix):
+            ic = hit.pc_hurt_icon.get('fix' if (phase == 'shout' and cur in fix) else phase)
+            if ic is not None:
                 return ic
         it = self.item
         if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
@@ -3931,6 +3937,7 @@ class Routine:
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
         self._pc_icon_sched = None
+        self.pc_shout_icon = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -4169,6 +4176,7 @@ class Routine:
 
     def _start_action(self, start_next=False):
         self.started = True              # StartAction: CurrentAction = ...
+        self.pc_shout_icon = None        # the next case sets its own icon
         self._active = None              # the entry at the index from here on
         it = self.item
         a = self.action
@@ -6126,6 +6134,7 @@ class Routine:
         Pawn.cs:444-448) — SurpriseActionFar and ToiletAction serialize it,
         the AlarmAction and the Return leg do not, Grab/UseFixingItem do on
         L110/L113 only."""
+        self.pc_shout_icon = None        # its handler's case sets its own icon
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
@@ -9473,6 +9482,10 @@ class World:
                     play_fixes()
 
             def shout():
+                if pc_shout > 0.0 and routine is not None:
+                    # the list's `shout` icon element, right before the
+                    # shout (fcn.0047bd00's list; flag 2 builds neither)
+                    routine.pc_shout_icon = 'bubble_wut'
                 if seq:
                     mobile = pawn.anim.sequence_seconds(seq)
                     if mobile > 0.0 and pc_shout > 0.0:

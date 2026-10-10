@@ -226,7 +226,7 @@ class Recorder:
                    'bubble': v.hud.desc_string if v.hud.show_description
                    else None,
                    'cursor': v.hud.cursor_tex}
-            if pcprofile.is_pc() and w.woody is not None and w.woody.nfh2:
+            if pcprofile.is_pc() and w.woody is not None:
                 # the neighbour's think bubble under the profile: its icon,
                 # '' none shown (a sleep bar's or a null icon's)
                 rott = w.pawns.get('Rottweiler')

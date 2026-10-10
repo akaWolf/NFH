@@ -3096,12 +3096,33 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   own, or the wait's where it sets none; 204's 0x10032b6f the
   rickshaw's again, its repair under it): E04's fight icon 5.7 s
   between two rickshaw spans, the port's 5.84 (plan 204, 303.98-
-  309.82 s; the station's icon throughout before). The remaster ships
-  both pictures, unused by the mobile, as being_hit and olgafight
-  (E06's m_hurt_n at 73 s is the Mother hitting him); PCHurtIcon
-  {'wait', 'shout'} from lap_model_s2.code_hurt_icons, the port's wait
-  in fear and its angry (Routine.pc_hurt), and the 206 lesson's two
-  m_hurt_n icons show being_hit (an empty bubble before).
+  309.82 s; the station's icon throughout before). The same in the
+  flows read elsewhere (lap_model_s2.HURT_STEPS): 213's bull controls
+  (0x10037d3b, no SHOUT), 207's board over the closed awning
+  (0x100148d5, then 0x100171ee's SHOUT 1), its castle over the towel
+  (0x1001513f: o_hurt_n from the castle's fall to the billboard's SHOUT
+  2), 206's rabbit shot (0x1002de6a: being_hit, the ramp's repair under
+  it), 211's sweets in the women's wc (0x10030d0f's SHOUT after Olga's
+  fight, the toilet's icon over the wait and the sign's repair,
+  0x10030b9d). The icons: generic/objects.xml's m_hurt_n and o_hurt_n
+  (icons/m_hurt_n.tga, o_hurt_n.tga), ship2's being_hit and ship3's
+  olgafight; the remaster ships the last two alone, unused by the
+  mobile, and the videos show their pictures where the code sets the
+  first two (E04's fight at 100-104 s, olgafight's Olga at him; E06's
+  Mother at 73 s, being_hit's): PCHurtIcon {'wait', 'shout', 'fix'}
+  from lap_model_s2.code_hurt_icons (pc_durations_s2.REMASTER_ICON), the
+  port's wait in fear, its angry and a fix clip (Routine.pc_hurt), and
+  the 206 lesson's two m_hurt_n icons show being_hit (an empty bubble
+  before).
+  Season 1's shout the same way (2026-09-30): the fire's list pushes the
+  `shout` icon before the shout (fcn.0047bd00; generic/objects.xml's
+  icon `shout`, gui/bubbles/bubble_wut — the remaster's bubble_wut,
+  unused by the mobile), which stays until the next case sets its own:
+  E01's four tricks show it 5.3, 7.9, 13.4 and 7.9 s where the port
+  kept the station's icon; the port shows it from its shout (a step
+  with one) to the routine's next action or urgent
+  (Routine.pc_shout_icon) — plan 101: 77.15, 88.32, 104.48, 120.82.
+  Its `noise` icon is the mobile's bubble_what already.
   The Mother's bubble the same way (her HUD portrait's cloud against
   hud.think_m, 2026-09-30): her scripts' icons where they are not the
   mobile items' (tools/pcref/pc_durations_others.py ICON_ROLE,

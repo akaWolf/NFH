@@ -126,7 +126,8 @@
     "PCUseSeconds": 12.83,
     "PCHurtIcon": {
      "wait": "olgafight",
-     "shout": "olgafight"
+     "shout": "olgafight",
+     "fix": null
     }
    }
   },
@@ -181,7 +182,12 @@
     "PCUseSeconds": [
      1.0,
      0.08
-    ]
+    ],
+    "PCHurtIcon": {
+     "wait": "olgafight",
+     "shout": "olgafight",
+     "fix": null
+    }
    }
   },
   {

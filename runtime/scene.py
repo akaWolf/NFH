@@ -683,8 +683,8 @@ class Item:
         self.pc_icon_role = d.get('PCIconRole') or {}
         self.pc_icon_clips_role = d.get('PCIconClipsRole') or {}
         # the bubble through a co-actor's fight after this item's trick
-        # (PCHurtIcon: {'wait': icon, 'shout': icon} — the step he waits
-        # in and his handler's, o_hurt_n / m_hurt_n the remaster's
+        # (PCHurtIcon: {'wait', 'shout', 'fix'} — the step he waits in,
+        # his handler's and the repair's, o_hurt_n / m_hurt_n the remaster's
         # olgafight / being_hit; lap_model_s2.code_hurt_icons)
         self.pc_hurt_icon = d.get('PCHurtIcon') or {}
         # the other actors' stays under the profile (PCUseSecondsRole: role ->

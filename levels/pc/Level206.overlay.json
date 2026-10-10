@@ -56,7 +56,12 @@
      null,
      null,
      "fifi"
-    ]
+    ],
+    "PCHurtIcon": {
+     "wait": null,
+     "shout": "being_hit",
+     "fix": "being_hit"
+    }
    }
   },
   {

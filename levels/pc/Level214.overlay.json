@@ -38,7 +38,8 @@
     "PCUseSeconds": 3.83,
     "PCHurtIcon": {
      "wait": "bouquet",
-     "shout": "olgafight"
+     "shout": "olgafight",
+     "fix": null
     }
    }
   },
@@ -75,7 +76,8 @@
     "PCUseSeconds": 8.5,
     "PCHurtIcon": {
      "wait": "being_hit",
-     "shout": "being_hit"
+     "shout": "being_hit",
+     "fix": null
     }
    }
   },
@@ -106,7 +108,8 @@
     "PCUseSeconds": 4.58,
     "PCHurtIcon": {
      "wait": "olgafight",
-     "shout": "olgafight"
+     "shout": "olgafight",
+     "fix": null
     }
    }
   },

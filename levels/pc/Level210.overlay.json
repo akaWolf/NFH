@@ -45,7 +45,8 @@
     ],
     "PCHurtIcon": {
      "wait": "being_hit",
-     "shout": "being_hit"
+     "shout": "being_hit",
+     "fix": null
     }
    }
   },

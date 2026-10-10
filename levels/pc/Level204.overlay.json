@@ -74,7 +74,8 @@
     "PCUseSeconds": 6.08,
     "PCHurtIcon": {
      "wait": "olgafight",
-     "shout": null
+     "shout": null,
+     "fix": null
     }
    }
   },
