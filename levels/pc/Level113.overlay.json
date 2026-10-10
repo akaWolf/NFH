@@ -1221,6 +1221,15 @@
     }
    },
    "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
+  },
+  {
+   "object": "Radiator",
+   "component": "TrickItem",
+   "set": {
+    "PCUseSecondsTricked": 3.5,
+    "PCShoutIndex": 1
+   },
+   "source": "Level_DIY's heater case 8 with the heater hot (game.exe 0x4523b6): the list's first update and kit/heater_hot's vent (its own vent, auto 39, 41 ticks — the plain heater's is 55), then OBJ2 kit/heater_hot at index 2 — the radiator the valve heated is the trick that pays (the ValveHot's tricked values stand for the dependency's case)"
   }
  ]
 }
