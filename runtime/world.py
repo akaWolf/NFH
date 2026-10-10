@@ -683,6 +683,9 @@ class Pawn:
         # door's climb or descent
         self._pc_pass = None
         self._pc_climb_pace = None
+        # (start y, climb u to the `<actor>` hotspot) of a back door's climb
+        # whose pair is taken up it (_pc_claim_marks' `pc_claim_up`)
+        self._pc_climb_claim = None
         # (stretch, pace u/s or None for a snap) of the floor stretch being
         # walked (_pc_floor_marks), and the PC-timed pace of the frame's movement
         self._pc_floor = None
@@ -1714,6 +1717,10 @@ class Pawn:
                 door = hold[1]
             elif st.get('kind') == 'door' and st['door'].pc_pass.get(self.role):
                 door = st['door']
+                if door.should_walk_up and door.pc_pass[self.role].get('nb'):
+                    # a back door whose `<actor>` hotspot sits up the
+                    # climb: the pair is taken there (_pc_climb_claim)
+                    st['pc_claim_up'] = True
             if door is not None:
                 st['pc_claim'] = door
 
@@ -2321,8 +2328,17 @@ class Pawn:
             # the PC profile: the climb lasts the Season 2 pass's `in` run
             # (the walk up to the near door's `<actor>_in`)
             thr = self.item_threshold + door.delta_use_height
-            self._pc_climb_pace = self._pc_back_door_pace(
-                door, 'in', abs(door.y - self.sprite.y) - thr)
+            dist = abs(door.y - self.sprite.y) - thr
+            self._pc_climb_pace = self._pc_back_door_pace(door, 'in', dist)
+            if self._step is not None and self._step.get('pc_claim_up'):
+                # the climb's part to the `<actor>` hotspot (`nb`): the
+                # route's movement, the pass pushed once it is done
+                p = door.pc_pass.get(self.role) or {}
+                gait = self._pc_gait()
+                whole = pcprofile.s2_pass_ticks(self.role, gait, pc_pass_piece(p, 'in'), self.sneaking)
+                part = pcprofile.s2_pass_ticks(self.role, gait, {'in': p.get('nb', 0)}, self.sneaking)
+                self._pc_climb_claim = (self.sprite.y, max(dist, 0.0) * part / whole
+                                        if whole and part else 0.0)
             return
         # a finished-entrance pass through an ExitDoor asks first
         # (Pawn.cs:1378-1383; ExitConfirmationShown latches for the retry):
@@ -2886,7 +2902,7 @@ class Pawn:
                     return
                 door = s.get('pc_claim')
                 run = s.get('pc_hold_run')
-                if door is not None and not s.get('pc_claimed'):
+                if door is not None and not s.get('pc_claimed') and not s.get('pc_claim_up'):
                     # the PC's door-pass step starts at the near door's
                     # `<actor>` hotspot — the route pushes it once its
                     # movement there is done (0x1000aac2, fcn.10003d50 at
@@ -2993,6 +3009,19 @@ class Pawn:
                 return
             if self._wait_for_passing(d, other):
                 return                    # MoveToDoor's head, Pawn.cs:1359
+            s = self._step
+            if s.get('pc_claim_up') and not s.get('pc_claimed'):
+                # the PC profile: a back door whose `<actor>` hotspot sits up
+                # the climb — the route's movement there first (fcn.1000901b
+                # at 0x1000ab8d), then the pass's claim, or a stand there
+                # while another holds the pair (_pc_claim_marks)
+                y0, dy = self._pc_climb_claim or (self.sprite.y, 0.0)
+                if abs(self.sprite.y - y0) >= dy - 1e-9:
+                    if not self._pc_claim_pair(d):
+                        self.velocity = (0.0, 0.0)
+                        self._stand()
+                        return
+                    s['pc_claimed'] = True
             # the climb arm (Pawn.cs:1398-1416): the climb strip is
             # re-asserted every frame (a wait's stand ends), and
             # UseDoorAtOnce leaves at once, from any height

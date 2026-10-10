@@ -208,8 +208,11 @@ on both doors, pushed once the route's movement to the door's `<actor>` hotspot
 is done; `Pawn._pc_claim_marks`): the next pawn stands at the door until it is
 free (since 2026-10-04; at its stretch's start before) — its `in` run's part
 down or up to that hotspot (`nb`) stood out first, the rest once the pair is
-its own (since 2026-09-30; the whole run after the wait before) —, and the
-mobile's IsOtherPawnPassing waits give way to it. The routine stations and Woody's items
+its own (since 2026-09-30; the whole run after the wait before; on the two
+back doors whose hotspot sits up the climb, 211's for him at `nb` -80 and
+213's for Olga at -55, the pair is taken where the climb reaches it,
+`Pawn._pc_climb_claim`) —, and the mobile's IsOtherPawnPassing waits give way
+to it. The routine stations and Woody's items
 add the PC's runs up or down to their hotspots (`Item.pc_approach`), and every
 walk between rooms takes the PC path finder's route (`world.pc_route` over
 `Zone.pc_room`, from the station's hotspot or the pawn's x on the floor line;
