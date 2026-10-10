@@ -3904,6 +3904,13 @@ class Routine:
             ic = hit.pc_hurt_icon.get('fix' if (phase == 'shout' and cur in fix) else phase)
             if ic is not None:
                 return ic
+        wd = getattr(self.pawn.world, 'woody', None)
+        if self.role == 'Mother' and pcprofile.is_pc() and wd is not None and wd.nfh2 \
+                and (self._urgent_action or {}).get('kind') == 'hit_pawn':
+            # her fight step's icon as she runs to him and hits (m_hurt_n —
+            # 207's 0x1001452c, 210's 0x10018d76, 214's 0x1003a21c; the
+            # remaster's being_hit)
+            return 'being_hit'
         it = self.item
         if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
             return None

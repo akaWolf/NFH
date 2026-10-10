@@ -1477,3 +1477,8 @@ actors' job pass the update calls at 0x100445f8.
   120.83-128.73 s (episode time; the video's own tricks); plan 101 (hud.think,
   now logged on Season 1 too): 77.15-79.48, 88.32-98.32, 104.48-112.32,
   from 120.82. Plan 101 at 100 (the same score).
+- `runtime/world.py`, `tools/pcref/pc_durations_s2.py`,
+  `levels/pc/Level205.overlay.json` (2026-09-30): the Mother's being_hit
+  over her hit run (plans 210 and 214: 332.98-336.32, 739.32-743.98) and
+  205's table step's two ticks before the play (fine idle 205: the
+  waterski icon 16.43 against E05's 16.57). Plans 205, 210, 214 at 100.

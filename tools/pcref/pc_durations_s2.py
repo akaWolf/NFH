@@ -194,7 +194,7 @@ WAITS = {202: {'Swimming': {'clip': 'WaitSea', 'role': 'Olga', 'item': 'Submarin
          # sends her back to her mat (her step 0x1002621c) — his use's end,
          # the use's PawnToAbortMutexOnFinish
          205: {'TabbleTennis': {'clip': 'Tennis', 'role': 'Olga', 'item': 'TabbleTennis', 'at': 'start',
-                                'then': [('beachright_pingpong_guarded', 'play')]}},
+                                'then': [('step',), ('beachright_pingpong_guarded', 'play')]}},
          # 210's chair: awake until her call — her `callneighbor` carries
          # behavior="call" (generic objects.xml), posted as its job ends,
          # and on the tick after his handler (0x1001b4f6) sends him out of the
@@ -439,7 +439,12 @@ def clip_secs(n):
 
     def part(p):
         # (object, action): the action's ticks; (object, action, actor): an
-        # action whose job posts a behaviour, to its offer's tick
+        # action whose job posts a behaviour, to its offer's tick; ('step',)
+        # the polling step's own ticks as it passes (lap_model_s2.
+        # WALK_STEP_TICKS: its run that sees the awaited object, the
+        # sequence's first update)
+        if p == ('step',):
+            return lap_model_s2.WALK_STEP_TICKS
         if len(p) == 3:
             return (d.job_ticks(*p) or 0) + 1
         return d.action_ticks(*p) or 0

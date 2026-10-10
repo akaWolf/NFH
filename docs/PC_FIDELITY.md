@@ -3123,6 +3123,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   with one) to the routine's next action or urgent
   (Routine.pc_shout_icon) — plan 101: 77.15, 88.32, 104.48, 120.82.
   Its `noise` icon is the mobile's bubble_what already.
+  The Mother's own fight steps set her m_hurt_n as she runs to him and
+  hits (207's 0x1001452c, 210's 0x10018d76, 214's 0x1003a21c): her
+  bubble being_hit over her hit run (Routine.pc_think_icon, the
+  hit_pawn urgent) — plan 210's elephant 332.98-336.32, plan 214's
+  pistol 739.32-743.98, her station's icon before. And 205's table:
+  his step polls for the guarded table Olga's step shows, then plays —
+  its run that sees it and the sequence's first update before the
+  `play` (PCWaitFor's `then` 4.5 s, 4.33 before): the waterski icon
+  16.43 against E05's 16.57 (16.27); his waterski span stays 0.35 s
+  over E05's (the walk back after the skiing: the model's 50 ticks
+  along, 3 down and 1 up, where E05 reads ~4.2 s).
   The Mother's bubble the same way (her HUD portrait's cloud against
   hud.think_m, 2026-09-30): her scripts' icons where they are not the
   mobile items' (tools/pcref/pc_durations_others.py ICON_ROLE,
