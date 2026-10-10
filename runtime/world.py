@@ -557,10 +557,27 @@ class AnimPlayer:
         if self.time_scale != 1.0:
             dt = dt * self.time_scale     # the profile only; the mobile path keeps its floats
         self.acc = _f32(self.acc - _f32(dt))
-        if self.acc > (pcprofile.TIMER_EPS if pcprofile.is_pc() else 0.0):
+        eps = pcprofile.TIMER_EPS if pcprofile.is_pc() else 0.0
+        if self.acc > eps:
             # (the PC profile: a frame paced to whole PC ticks ends on the
             # frame they are reached, not a float residue later)
             return
+        a0 = self.anim
+        while True:
+            self._refresh_frame()
+            # a clip paced past a frame an update (the profile's time_scale:
+            # a PC stand shorter than the mobile clip's frames at 60 a second
+            # — 107's drawing, 50 frames in 2 ticks) takes the frames its
+            # time covers in the same update, where Refresh's one frame an
+            # update had stretched it (0.83 s for 0.17)
+            if not (pcprofile.is_pc() and self.time_scale != 1.0) or self.acc > eps \
+                    or self.anim is not a0 or self.sprite.hidden or self.sprite.current is None \
+                    or self.skip_clip:
+                return
+
+    def _refresh_frame(self):
+        """one Refresh: the frame's sounds, AdvanceFrame, the advance hooks,
+        the end check and the next frame's time (AnimationControllerBase.cs)"""
         a = self.anim
         if self.sound_sink:
             idx = self.current_index()

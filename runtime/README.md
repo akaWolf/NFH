@@ -897,6 +897,12 @@ predicate, then the all-tricks win.
   that goes on with its path leaves it to the path's legs); and the
   carpet's case sends him to the vacuum first (Level_Laundry's case 21),
   not to the carpet.
+- **The PC profile's paced clips** (`AnimPlayer.tick`, `_refresh_frame`):
+  a clip paced past a frame an update — a PC stand shorter than the mobile
+  clip's frames at 60 a second — takes the frames its time covers in one
+  update under the profile (107's drawing: 50 frames in 2 ticks, where
+  the one Refresh an update had stretched it to 0.83 s); the mobile path
+  keeps its one frame an update.
 - **The PC profile's game clock** (`pcprofile.game_dt`: `App._tick_level`
   for the world, the tutorial and its camera, the recorder, the viewer):
   the PC's tick is 83 ms, not 1/12 s — game.exe's pacer (0x408e68-0x408e85,
@@ -927,7 +933,14 @@ predicate, then the all-tricks win.
   bal/dove_free at the way point) — the port had fired it as he walked by
   on his way to the dove's point, before the dove case (107's plan: the
   picture, then the freed dove 7.05 s later, where the code fires the dove
-  at its point first — dove 137.0, picture 147.6, camera 166.8 now). The
+  at its point first). The dove itself is its case's too (0x45860d-
+  0x45878f): the GoTo to bal/dove_free's hotspot (PCWalkPoint 530/420 —
+  the mobile's walk had gone to the dove's own place, 747 in the PC room,
+  2.2 s more), no far look (the mobile's FindLeftFar), the fire after the
+  free dove's list start, StopMsg and in-place GOTO; and the smeared
+  picture fires on arrival at the easel (PCUseSecondsTricked 0.167, OBJ2 at
+  0x458931) with its clean (PCFixSeconds 1.5), where the port had painted
+  3.56 s first — the plan's dove 134.1, picture 139.2, camera 157.8. The
   toilets of 102 and 105 (level_sofa's and level_piano's triggers have no
   toi/toiletstuffed) run the look handler after the visit instead
   (PCCaseHandler: `Routine._pc_case_visit_end`, `_pc_case_look`): the
