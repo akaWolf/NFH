@@ -1448,6 +1448,27 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   puts the shoes on the mat and enters the curtain from it, so the Taj
   is the shoe mat's; 204's jade step walks to the jade, not its dummy
   (67 px).
+  2026-10-10: the pieces' time. Each piece — the hop's straight part, a
+  floor stretch, a timed step (the run down from a station) — had walked
+  one pace over its whole mobile length, so it ended where its last
+  step's arrival test passed (`mag <= _min_dist`: 0.03 u at a point, an
+  item's use distance or a walk-up item's use height) and spent a frame
+  with no move on each step's test: a frame or so a piece either way
+  where the scene's path is long, most of the ticks of a stretch it has
+  little length for. The pieces walk the path still left to their end's
+  test over their PC time still to run (counted on their walking frames),
+  a frame a step early, and hold the rest at their end (`Pawn._pc_aim`,
+  `_pc_rest`; Season 1's legs the same way, `_pc1_pace`): 210's run to her
+  chair is walk_span's 59 ticks piece by piece (2 + 13, the door's `in`
+  run 7 + 2, the stairs 22, the `out` run 3, 9 + 1) where it had been 56.8
+  — its last stretch, 147 px over 0.034 u, cut by the call's 0.01 u use
+  distance to 6.4 of its 9 ticks —, and 213's last stretch to the picnic
+  (55 px over 0.065 u at the item's 0.04 u) its 7 ticks where it had
+  walked 3. E13's piñata, bull ride and tub -0.17, -0.12, -0.19 s since
+  (-0.40, -0.34, -0.39), E10's spans after the call -0.25..-0.40
+  (-0.48..-0.65); the other levels within 0.05 s of before (a timed
+  step's frame: 208's first two icons 0.05 earlier, 209's 0.03-0.08
+  nearer).
   The idle laps against the model's walks (walk_ticks, the translations
   in) per leg: 203 +0.1..+0.3 s, 205 +0.1..+0.3, 208 +0.1..+0.2, 211
   +0.1..+0.2, 212 +0.1..+0.3 — and three exceptions with their reasons:
@@ -2972,7 +2993,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   by 117 s; 206's lesson -0.35 at
   the call (8.8 s), each errand after it two ticks short (the order, the
   pillows, the give: 41, 70, 70 ticks in E06 against 39, 68, 68), -0.82
-  by the hide (23.8 s); 202 -0.21..-0.37 before the player's swim.
+  by the hide (23.8 s); 202 -0.21..-0.37 before the player's swim. With
+  the walk's pieces timed to their ends (2026-10-10, "Season 2 walks"):
+  210 -0.24 at the call, -0.36 at Fifi, -0.25..-0.40 to the deck chair
+  (102.5 s), -0.64 by 117 s; 213 -0.12..-0.19 at every icon to the tub
+  (100 s); 206's errands three ticks short each (39, 67, 67 — the walks
+  walk_span's 50 where they had run a tick over), -0.99 by the hide; the
+  rest within 0.05 s of the above.
   Season 1's: 101, 102 and 114 within 0.1-0.4 s over 120 s; 103, 106,
   109, 110, 112 and 113 ahead by 0.3-0.6 s at 100-140 s, a tick a case —
   read on 2026-10-01 as the GOTO's done tick (runtime/README.md, "The
@@ -3981,7 +4008,9 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   poll (fcn.1000e172) reads his position in the tick of his last move and
   pushes `order` without a first run (fcn.10049216 at 0x100187ab;
   PCWaitForRole `then` 0.083, E10's call to Fifi 0.10 s nearer, 0.30 s
-  short still: his run 56.8 ticks against the model's 59, its icon a tick
+  short still: his run 56.8 ticks against the model's 59 — its last
+  stretch cut by the arrival test, the model's 59 since 2026-10-10 ("Season
+  2 walks"), the call to Fifi 0.12 s short —, its icon a tick
   late); a station of the same PC object
   reached with no walk (`Pawn._pc_departure_step`: her call spot and her
   chair; the routine actors only); his stays the code's from her order on

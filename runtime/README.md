@@ -204,7 +204,21 @@ whatever the mobile scene's length between the same two points
 (`Pawn._pc_floor_marks`: 205's mat to the table is 359 px, 3.75 s, where the
 mobile scene has 2.1 u); one the scene has next to no length for (under twice
 the walk's arrival distance) stands its ticks out (`Pawn._pc_floor_pace`,
-since 2026-09-30: 207's start, 78 px where the scene has 0.04 u). A pair is held from the moment a pawn's pass starts
+since 2026-09-30: 207's start, 78 px where the scene has 0.04 u). Each such
+piece — a hop's straight part, a floor stretch, a timed step (the run down
+from a station) — walks the mobile path still left to its end's arrival test
+(`Pawn._pc_rest`: each step straight at its target from where the last one's
+test let the pawn go) over its PC seconds still to run, counted on its
+walking frames, a frame per step early, and holds the rest at its end with
+its strip kept (`Pawn._pc_aim`, since 2026-10-10; Season 1's legs the same
+way, `Pawn._pc1_pace`): one pace over the whole mobile length had ended each
+piece the arrival distance short and spent a frame on each step's arrival
+test — a frame or so a piece either way, but a stretch the scene has little
+length for lost most of its ticks: 210's run to her chair 56.8 ticks against
+the code's 59, its last stretch 147 px over 0.034 u of the scene, which the
+call's 0.01 u use distance cut to 6.4 of its 9 ticks; the run is the code's 59
+since, piece by piece (2 + 13, the door's `in` run 7 + 2, the stairs 22, the
+`out` run 3, 9 + 1). A pair is held from the moment a pawn's pass starts
 at its near door until the far room is reached (the PC door-pass step's flag 8
 on both doors, pushed once the route's movement to the door's `<actor>` hotspot
 is done; `Pawn._pc_claim_marks`): the next pawn stands at the door until it is

@@ -1654,7 +1654,11 @@ class Pawn:
         run (pcprofile.s2_pass_ticks over Door.pc_pass); a back door's climb
         and descent last its `in` and `out` runs and its strips the clips, a
         station's climb its run up or down to the hotspot (_pc_climb_pace,
-        set as they start), a timed step its `pc_secs`."""
+        set as they start), a timed step its `pc_secs`. A hop's straight
+        part, a floor stretch and a timed step walk the mobile path still
+        left to their end's arrival test over their PC seconds still to run
+        (_pc_aim): they last their ticks whatever the step machine's frames
+        with no move, as Season 1's legs do (_pc1_pace)."""
         if self.state in (self.DOOR_CLIMB, self.DESCEND, self.ITEM_CLIMB):
             return self._pc_climb_pace
         st = self._step
@@ -1662,31 +1666,100 @@ class Pawn:
             return None
         if 'pc_secs' in st:
             ln = st.get('pc_len', 0.0)
-            return ln / st['pc_secs'] if ln > 1e-6 and st['pc_secs'] > 0.0 else None
+            if ln <= 1e-6 or st['pc_secs'] <= 0.0:
+                return None
+            if st.get('pc_path'):
+                # a path timed by its length's shares (pc_time_path): the
+                # watch that stops it reads its place
+                return ln / st['pc_secs']
+            return self._pc_aim(self._pc_rest([st]), st['pc_secs'] - self._pc_step_t, 1)
         near = st.get('pc_hop')
         if near is None:
             fl = st.get('pc_floor')
             return self._pc_floor_pace(st, fl) if fl is not None else None
-        cur = self._pc_pass
-        if cur is None or cur[0] is not near:
-            # the hop's straight part starts: the complex path left of it,
-            # through its transfer, against the PC movement's ticks
+        # the hop's straight part: the complex path left of it, through its
+        # transfer, against the PC movement's ticks
+        secs = self._pc_piece_secs(st)
+        if not secs:
+            self._pc_pass = None
+            return None
+        steps = self._pc_piece_steps(st['pc_piece'])
+        pace = self._pc_aim(self._pc_rest(steps), secs - st['pc_piece'].get('el', 0.0), len(steps))
+        self._pc_pass = (near, pace)
+        return pace
+
+    def _pc_piece_steps(self, piece):
+        """the steps of a PC-timed piece (a floor stretch, a hop through its
+        transfer: `pc_piece`) from the current one on"""
+        out = []
+        for stp in [self._step] + list(self.steps):
+            if stp is None or stp.get('pc_piece') is not piece:
+                break
+            out.append(stp)
+            if 'transfer' in stp:
+                break
+        return out
+
+    def _pc_rest(self, steps):
+        """the mobile path still to walk from the pawn's place through `steps`
+        (the current one first): each step straight at its target from where
+        the last one's arrival test let the pawn go — the WALK state's `mag <=
+        _min_dist`, a hair inside it, as _pc1_left reads a Season 1 leg's —
+        and one already inside its test none"""
+        x, y = self.sprite.x, self.sprite.y
+        rest = 0.0
+        for stp in steps:
+            tx, ty = self._step_target(stp)
+            d = ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5
+            md = self._min_dist(stp)
+            if d > md:
+                rest += d - md
+                x, y = tx - (tx - x) * md / d, ty - (ty - y) * md / d
+        return rest + 1e-4
+
+    @staticmethod
+    def _pc_aim(rest, left, frames):
+        """the pace (u/s) that walks `rest` in the seconds `left` less
+        `frames` frames — each step's arrival test takes a frame with no
+        move (TakeNextStep zeroes the velocity) — so a PC-timed piece comes
+        to its end inside its time, and stands out the rest of it at its end
+        (_walk_on_path)"""
+        step = pcprofile.GameClock.STEP
+        return rest / max(left - frames * step, step)
+
+    def _pc_piece_secs(self, st):
+        """the PC seconds of the piece `st` walks in (`pc_piece`), taken as it
+        starts: a hop's straight movement at the gait (Door.pc_pass), a floor
+        stretch's px (_pc_floor_marks); None where the mobile scene has next
+        to no length for a stretch the PC walks — stood out on its step
+        (`pc_secs`) —, 0 where the PC has no move"""
+        piece = st['pc_piece']
+        if 'secs' in piece:
+            return piece['secs']
+        near = st.get('pc_hop')
+        if near is not None:
             p = near.pc_pass.get(self.role) or {}
+            ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), pc_pass_piece(p, 'straight'),
+                                            self.sneaking)
+        else:
+            ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'dx': piece['px']}, self.sneaking)
             x, y = self.sprite.x, self.sprite.y
             length = 0.0
-            for stp in [st] + list(self.steps):
-                if stp.get('pc_hop') is not near:
-                    break
+            for stp in self._pc_piece_steps(piece):
                 tx, ty = self._step_target(stp)
                 length += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5
                 x, y = tx, ty
-                if 'transfer' in stp:
-                    break
-            straight = pc_pass_piece(p, 'straight')
-            ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), straight, self.sneaking)
-            pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
-            self._pc_pass = cur = (near, pace)
-        return cur[1]
+            if ticks and length < 2 * self._min_dist(st) and 'pc_secs' not in st:
+                # a stretch the mobile scene has next to no length for, which
+                # the PC walks its px of: stood out for its ticks — the
+                # arrival test would end it at once (207's start: the level.xml
+                # place 78 px left of the stairs' hotspot, 0.04 u in the scene)
+                st['pc_secs'] = ticks / pcprofile.TICKS_PER_SECOND
+                self._pc_step_t = 0.0
+                piece['secs'] = None
+                return None
+        piece['secs'] = (ticks or 0) / pcprofile.TICKS_PER_SECOND
+        return piece['secs']
 
     def pc_time_path(self, secs, short=0.0):
         """the path the pawn is about to walk timed to `secs` in all — up to
@@ -1706,6 +1779,7 @@ class Pawn:
         secs = secs * total / (total - short)
         for st, ln in zip(steps, lens):
             st['pc_secs'] = secs * ln / total
+            st['pc_path'] = True
             # (the stands the PC walk would add — the run down from her
             # station, a hop's `in` and `out` runs — are in `secs` already)
             for k in ('pc_prehold', 'pc_hold_run', 'pc_after_run'):
@@ -1784,36 +1858,21 @@ class Pawn:
 
     def _pc_floor_pace(self, st, fl):
         """the pace (u/s) of a floor stretch (_pc_floor_marks): its mobile
-        length over the PC ticks of its px at the gait, taken as it starts"""
-        cur = self._pc_floor
-        if cur is None or cur[0] is not fl:
-            x, y = self.sprite.x, self.sprite.y
-            length = 0.0
-            for stp in [st] + list(self.steps):
-                if stp.get('pc_floor') is not fl:
-                    break
-                tx, ty = self._step_target(stp)
-                length += ((tx - x) ** 2 + (ty - y) ** 2) ** 0.5
-                x, y = tx, ty
-            ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'dx': fl['px']}, self.sneaking)
-            pace = length * pcprofile.TICKS_PER_SECOND / ticks if ticks else None
-            if ticks and length < 2 * self._min_dist() and 'pc_secs' not in st:
-                # a stretch the mobile scene has next to no length for, which
-                # the PC walks its px of: stood out for its ticks — the
-                # arrival test would end it at once (207's start: the level.xml
-                # place 78 px left of the stairs' hotspot, 0.04 u in the scene)
-                st['pc_secs'] = ticks / pcprofile.TICKS_PER_SECOND
-                self._pc_step_t = 0.0
-                pace = None
-            self._pc_floor = cur = (fl, pace)
-        if cur[1] is None:
-            # no dx on the PC (two spots of the mobile scene at one PC x): the
-            # movement has no horizontal tick — each step puts the pawn at its
-            # target in a frame (the port's 60 Hz), a snap
+        path still to walk over the PC seconds still to run of its px at the
+        gait (_pc_piece_secs, _pc_aim)"""
+        secs = self._pc_piece_secs(st)
+        if not secs:
+            # no dx on the PC (two spots of the mobile scene at one PC x), or
+            # stood out: the movement has no horizontal tick — each step puts
+            # the pawn at its target in a frame (the port's 60 Hz), a snap
+            self._pc_floor = (fl, None)
             self.pos_snap = True
             tx, ty = self._step_target(st)
             return max(((tx - self.sprite.x) ** 2 + (ty - self.sprite.y) ** 2) ** 0.5, 1e-6) * 60.0
-        return cur[1]
+        steps = self._pc_piece_steps(fl)
+        pace = self._pc_aim(self._pc_rest(steps), secs - fl.get('el', 0.0), len(steps))
+        self._pc_floor = (fl, pace)
+        return pace
 
     def _pc_hop_steps(self, door, steps):
         """a transition's hop under the profile's Season 2 pass (Door.pc_pass):
@@ -1825,6 +1884,7 @@ class Pawn:
         the far room at `<actor>_out`, before the run down). No step is added:
         the step counts the mid-stairs reroutes read stay the mobile's."""
         first = True
+        piece = {}                        # its PC seconds' run (_pc_pass_pace)
         for k, st in enumerate(steps):
             hop = st.get('kind') == 'cpoint' or 'transfer' in st
             if hop and first and k > 0 and steps[k - 1].get('kind') == 'point' \
@@ -1833,6 +1893,7 @@ class Pawn:
             if hop:
                 first = False
                 st['pc_hop'] = door
+                st['pc_piece'] = piece
             if 'transfer' in st:
                 st['pc_after_run'] = ('out', door)
         return steps
@@ -2047,6 +2108,7 @@ class Pawn:
                 mark = {'px': abs(end - x_pc)}
                 for s2 in run:
                     s2['pc_floor'] = mark
+                    s2['pc_piece'] = mark     # its PC seconds' run (_pc_floor_pace)
             run = []
             x_pc = after
 
@@ -2991,6 +3053,13 @@ class Pawn:
                 self._pc_step_t += dt
             if 'pc_prehold' in self._step or self._step.get('pc_holding'):
                 self._pc_hold_t += dt
+            # a PC-timed piece's seconds (_pc_pass_pace) run while its steps
+            # walk, not while one of them stands a run of its own out (an
+            # `out` run before it, an `in` run after it) or is timed itself
+            pc = self._step.get('pc_piece')
+            if pc is not None and 'pc_secs' not in self._step \
+                    and 'pc_prehold' not in self._step and not self._step.get('pc_holding'):
+                pc['el'] = pc.get('el', 0.0) + dt
         # the PC profile's Season 1 leg the frame runs in (Pawn._pc1_pace)
         leg = self._pc1_leg() if self.state in self.MOVING else None
         self._walk_on_path()
@@ -3085,10 +3154,23 @@ class Pawn:
                     self.walk_hook()
                     if self.state != self.WALK:
                         return
+                pc = s.get('pc_piece')
+                if pc is not None and 'pc_secs' not in s:
+                    self._pc_piece_secs(s)   # (a piece reached at once: its seconds)
                 if 'pc_secs' in s and self._pc_step_t < s['pc_secs'] - 1e-9:
                     # a timed step of the PC profile holds until its time is out
+                    # (a walked one's last frame, _pc_aim's, keeps its strip)
                     self.velocity = (0.0, 0.0)
-                    self._stand()
+                    if s.get('pc_path') or s.get('pc_len', 0.0) <= 1e-6:
+                        self._stand()
+                    return
+                if pc is not None and 'pc_secs' not in s and pc.get('secs') \
+                        and pc.get('el', 0.0) < pc['secs'] - 1e-9 \
+                        and ('transfer' in s or not self.steps
+                             or self.steps[0].get('pc_piece') is not pc):
+                    # a PC-timed piece's end, reached inside its time
+                    # (_pc_aim): held to its last tick, its strip kept
+                    self.velocity = (0.0, 0.0)
                     return
                 door = s.get('pc_claim')
                 run = s.get('pc_hold_run')
