@@ -905,6 +905,19 @@ predicate, then the all-tricks win.
   profile (TICKS_PER_SECOND 12 a game second) keeps its seconds; the
   videos' HUD clocks run 0.99600 of their seconds, 0.5 s over a 2-minute
   stretch the port ran behind them before.
+- **Open: a Season 1 case runs a tick longer on the PC than the lap model
+  counts.** Since the 83 ms tick the idle laps' bubble changes run
+  0.3-0.5 % ahead of the videos' (103, 106, 109, 110, 112-114: 0.3-0.6 s
+  by 100-140 s), about a tick a case: 110's balcony stays, no walk (the
+  in-place GOTO's two ticks, the list's first update, the ACTIONs' time
+  + 2), are 26.0, 43.9 and 22.0 ticks between E10's bubble changes where
+  the model and the port have 25, 43 and 21 (pour_beer; spray; take and
+  give — one tick more with two ACTIONs as with one); over 50 segments of
+  seven levels the port's run 0.8 tick short of the video's on average. The
+  actor's tick pops a done job and updates the next in the same tick
+  (0x444e05-0x444e7c) and the case switch only stores the next case
+  (fcn.0045c600) — where the tick lies is not read yet
+  (scratchpad segticks/segfit).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:
@@ -914,10 +927,19 @@ predicate, then the all-tricks win.
   bal/dove_free at the way point) — the port had fired it as he walked by
   on his way to the dove's point, before the dove case (107's plan: the
   picture, then the freed dove 7.05 s later, where the code fires the dove
-  at its point first — dove 137.0, picture 147.6, camera 166.8 now). Open:
-  102's and 105's toilets and 109's pig are walk-bys of the
-  mobile with no trigger either (their cases fire them: 102 0x4704e7,
-  109 case 18), carried as the reaction handlers' stands.
+  at its point first — dove 137.0, picture 147.6, camera 166.8 now). The
+  toilets of 102 and 105 (level_sofa's and level_piano's triggers have no
+  toi/toiletstuffed) run the look handler after the visit instead
+  (PCCaseHandler: `Routine._pc_case_visit_end`, `_pc_case_look`): the
+  visit plays its own case — 102's sitting, shit_with_paper and grabpaper
+  or, with the holder empty, the paper's case with its FIRE5 (no shout,
+  its own `nopaper`); 105's puke — and then the bowl's IsVariant runs
+  fcn.0047d9e0: the StopMsg, the GoToObjX, the doubletake, the fire, the
+  shout, the clean. 102's laxative to the paper 15.85 s (E02: 15.9, the
+  walk-by's surprise had fired the bowl 10.0 s after it, then the sitting,
+  the paper 18.6 s later). Open: 109's pig is a walk-by of the mobile with
+  no trigger either (case 18 fires it), carried as a reaction handler's
+  stand.
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove

@@ -245,7 +245,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
                  'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role', 'pc_hurt_icon',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -795,6 +795,11 @@ class Item:
         # the message step that closes it (PCReactTail)
         self.pc_react_lead = int(d.get('PCReactLead') or 0)
         self.pc_react_tail = int(d.get('PCReactTail') or 0)
+        # a walk-by of the mobile whose PC object has no nearobj trigger: the
+        # level class's case runs the look handler (fcn.0047d9e0) after the
+        # visit instead — 102's and 105's toilets, level_sofa 0x470427-0x470532,
+        # level_piano 0x46ebdc-0x46ec54 (PCCaseHandler; Routine._pc_case_visit_end)
+        self.pc_case_handler = bool(d.get('PCCaseHandler'))
         self.pc_fix_secs = _f('PCFixSeconds')
         self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
         # the PC's part of a ReuseAfterFix station after the fire (PCRedoSeconds:

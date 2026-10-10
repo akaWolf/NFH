@@ -818,6 +818,16 @@
     }
    },
    "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "NoticeWhenWalkNearby": false,
+    "PCCaseHandler": true,
+    "PCUseSeconds": 2.833
+   },
+   "source": "level_piano's toilet case (game.exe 0x46ea7b-0x46ec75): the GoTo to toi/toilet, the list's first update, neighbor.puke (31 frames: auto 30, 32 ticks), the StopMsg — 34 ticks; then IsVariant(toi/toiletstuffed) at 0x46ec14 runs the look handler fcn.0047d9e0 (0x46ec54) — level_piano's trigger.xml has no nearobj trigger on the bowl"
   }
  ]
 }

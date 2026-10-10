@@ -5044,6 +5044,19 @@ class Routine:
         # the Drawing subclass cycles its RottweilerUse set itself
         # (Drawing.cs:44-68) — handled by _drawing_use before this call
         it.current_sequence = 'RottweilerUse'      # the default stamp
+        if pcprofile.is_pc() and it.pc_case_handler:
+            # the PC case's visit (102's toilet: shit_without_paper and the
+            # paper's fire when the holder is empty, shit_with_paper and
+            # grabpaper when not — level_sofa 0x470088-0x4703bd; 105's puke);
+            # a stuffed bowl's own trick waits for the look handler after
+            # the visit (_pc_case_visit_end)
+            dep = items.get(it.depends_on) if it.depends_on is not None else None
+            if dep is not None and dep.tricked:
+                it.current_sequence = 'RottweilerUseTricked'
+                return list(it.use_tricked_anim.get('Rottweiler') or []), \
+                    (lambda: w.play_tricked_item_anim(it, self.pawn))
+            return list(it.use_anim.get('Rottweiler') or []), \
+                (lambda: w.play_use_item_anim(it))
         if it.pc_masked:
             # a visit the PC plays untricked (206: the pad's load and Fifi's
             # take while its rabbit waits, the harpoon's take with the pad
@@ -5547,6 +5560,12 @@ class Routine:
         onto the item that pays it); the host's values are its own trick's"""
         if it is None or not it.is_tricked(self.level.items):
             return it
+        if pcprofile.is_pc() and it.pc_case_handler:
+            # a PC case visit plays its dependency's trick (102's toilet
+            # paper, FIRE5 after shit_without_paper, 0x4703a1); the object's
+            # own is the look handler's after it (_pc_case_visit_end)
+            dep = self.level.items.get(it.depends_on) if it.depends_on is not None else None
+            return dep if dep is not None and dep.tricked else it
         return self._tricked_item(it) or it
 
     def _pc_compound(self, it):
@@ -6560,6 +6579,10 @@ class Routine:
         a tricked item still plays the angry set first
         (RoutineActionUse.cs:546-553)"""
         it = self.urgent_item
+        if pcprofile.is_pc() and it is not None and it.pc_case_handler \
+                and self.pawn.world is not None:
+            self._pc_case_visit_end(it)
+            return
         target = None
         if it is not None and it.kind in TRICK_KINDS \
                 and it.is_tricked(self.level.items) \
@@ -6574,6 +6597,69 @@ class Routine:
                                        on_done=self._urgent_finished)
         else:
             self._urgent_finished()
+
+    def _pc_case_visit_end(self, it):
+        """the end of a PC case's visit (Item.pc_case_handler): the visit's
+        dependency trick pays first — 102's paper, fired in the visit at
+        PCFireAt, its step's shout-less tail — then the level class's next
+        case asks IsVariant for the stuffed bowl (level_sofa 0x4704e7, after
+        its LEAVE; level_piano 0x46ec14) and runs the look handler on it
+        (fcn.0047d9e0: StopMsg, the GoToObjX, the doubletake, OBJ2, the
+        clean), where the mobile noticed the bowl on his way in"""
+        w = self.pawn.world
+        dep = self.level.items.get(it.depends_on) if it.depends_on is not None else None
+
+        def stuffed():
+            if it.tricked and not it.pc_fired:
+                self._pc_case_look(it, self._urgent_finished)
+            else:
+                self._urgent_finished()
+        if dep is not None and dep.tricked:
+            w.play_angry(self.pawn, dep, on_done=stuffed)
+        else:
+            stuffed()
+
+    def _pc_case_look(self, it, done):
+        """the look handler a PC case runs on its tricked object
+        (fcn.0047d9e0): its list pushed as the case runs, its first element
+        after the list's own update and StopMsg (PCReactLead), the GoToObjX
+        to the object's hotspot x (PCAlignX, PCFixPoint), the doubletake
+        (PCSurpriseSeconds), then the fire, the shout and the clean
+        (play_angry; PCFixSeconds, PCReactTail) — as _on_surprise_near plays
+        a trigger's"""
+        w = self.pawn.world
+        seq = it.surprise_right if self.pawn.facing == 'Right' else it.surprise_left
+        seq = [a for a in seq if self.pawn.anim.has(a)]
+
+        def angry():
+            self.pawn.anim.time_scale = 1.0
+            w.play_angry(self.pawn, it, on_done=done)
+
+        def look():
+            if seq:
+                pc = getattr(it, 'pc_surprise_secs', None)
+                if pc:
+                    mobile = self.pawn.anim.sequence_seconds(seq)
+                    if mobile > 0.0:
+                        self.pawn.anim.time_scale = mobile / pc
+                self.pawn.anim.play_sequence(seq, on_end=angry)
+            else:
+                angry()
+
+        def begin():
+            g = self.pawn.pc1_goto_ticks(getattr(it, 'pc_fix_point', None), x_only=True) \
+                if getattr(it, 'pc_align_x', False) else None
+            if g is not None:
+                self.pawn.pc1_stand_at(g[1])
+                self.pawn._stand()
+                w.call_later(g[0] / pcprofile.TICKS_PER_SECOND, look)
+            else:
+                look()
+        self.pawn._stand()
+        if it.pc_react_lead:
+            w.call_later(it.pc_react_lead / pcprofile.TICKS_PER_SECOND, begin)
+        else:
+            begin()
 
     def _same_zone_check(self):
         """RoutineActionMove.SameZone (RoutineActionMove.cs:105-128), asked

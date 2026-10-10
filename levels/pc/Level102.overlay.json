@@ -664,6 +664,28 @@
     }
    },
    "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
+  },
+  {
+   "object": "Toilet",
+   "component": "TrickItem",
+   "set": {
+    "NoticeWhenWalkNearby": false,
+    "PCCaseHandler": true,
+    "PCUseSeconds": 8.333
+   },
+   "source": "level_sofa's toilet cases (game.exe 0x470015-0x470570): the GOTO and ENTER (fcn.00479f10, enter 0: 2 ticks), the list's first update, shit_with_paper (neighbor_shit 86 frames: auto 85, 87 ticks), grabpaper (6 frames: 7), the StopMsg, LEAVE (2) — 100 ticks; with the holder empty the paper's case instead (ToiletPaper); then IsVariant(toi/toiletstuffed) at 0x4704e7 runs the look handler fcn.0047d9e0 (0x470532) — level_sofa's trigger.xml has no nearobj trigger on the bowl"
+  },
+  {
+   "object": "ToiletPaper",
+   "component": "SearchItem",
+   "set": {
+    "PCUseSecondsTricked": 9.25,
+    "PCFireAt": 7.583,
+    "PCFireLead": true,
+    "PCShoutSkip": true,
+    "PCFixSeconds": 0
+   },
+   "source": "level_sofa's toilet case with the holder empty (0x470282-0x4703bd): ENTER 2, the list's first update, the StopMsg, shit_without_paper (87 ticks) — the fire at 91 ticks — then the FIRE5 toiletpaper (flags 2: no shout; its list's first two ticks and its own nopaper, 15 frames: 16) and LEAVE (2): 111 ticks"
   }
  ]
 }
