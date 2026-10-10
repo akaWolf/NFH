@@ -928,7 +928,11 @@ predicate, then the all-tricks win.
   clip's frames at 60 a second — takes the frames its time covers in one
   update under the profile (107's drawing: 50 frames in 2 ticks, where
   the one Refresh an update had stretched it to 0.83 s); the mobile path
-  keeps its one frame an update.
+  keeps its one frame an update. A paced sequence's next clip takes the
+  last frame's overrun into its first (`AnimPlayer._set_start`, since
+  2026-10-11): the PC stay is one count of ticks, and dropping the
+  overrun at each clip had rounded every clip up to the app's frame —
+  109's sleep, BedIn and thirty BedSleeps, 27.45 s for its 27.0.
 - **The PC profile's game clock** (`pcprofile.GameClock`: `App._tick_level`
   for the world, the tutorial and its camera, the recorder, the viewer):
   the PC's tick is 83 ms, not 1/12 s — game.exe's pacer (0x408e68-0x408e85,

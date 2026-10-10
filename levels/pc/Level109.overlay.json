@@ -1130,6 +1130,19 @@
     }
    },
    "source": "Level_Pig::run (game.exe class 468c8c): case 17's IsVariant(anc/pigout of anc/pig) walks him to anc/pigout (0x46a4fc; its neighbor hotspot 521/420, anc/pig's 567/420), case 18 the list's first update and its StopMsg, then OBJ2 anc/pigout (0x46a5cc) — no doubletake, level_pig's trigger.xml has no nearobj trigger on the pig"
+  },
+  {
+   "object": "Bed",
+   "component": "TrickItem",
+   "set": {
+    "PCIcon": "bubble_bed",
+    "PCIconClips": {
+     "BedIn": "bubble_sleep",
+     "BedSleep": "bubble_sleep",
+     "BedPinsJump": "bubble_sleep"
+    }
+   },
+   "source": "level_pig's bed cases (tools/pcref/routine_order.py: 5(bed, bed/bed) > 6 > 7(sleep)): case 5's ICON bed over the GOTO to bed/bed, case 7's ICON sleep as the stay starts — the mobile's HUD shows the Bed's active icon (bubble_sleep) over its walk as well"
   }
  ]
 }

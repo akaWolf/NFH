@@ -301,7 +301,15 @@ class AnimPlayer:
             self.frame = 0
         else:
             self.frame = a.pattern[0] if a.pattern else a.start
-        self.acc = 0.0
+        if pcprofile.is_pc() and self._refreshing and self.time_scale != 1.0 and self.acc < 0.0:
+            # a paced sequence's next clip (the profile's time_scale): the
+            # last frame's overrun carries into its first frame — the PC
+            # stay is one count of ticks, where dropping it at each clip
+            # had rounded every clip up to the app's frame (109's sleep,
+            # BedIn and thirty BedSleeps: 27.45 s for 27.0)
+            pass
+        else:
+            self.acc = 0.0
         if pcprofile.is_pc() and not self._refreshing:
             # a clip the profile paces to a PC action's ticks (time_scale, or a
             # door strip at clip_fps), started outside a Refresh: its first
