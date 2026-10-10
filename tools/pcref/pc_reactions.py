@@ -176,6 +176,13 @@ TABLE = {
           'DieselGenerator': use('kit/potterswheel_fast', fix='kit/potterswheel_fast', fixwalk=True,
                                  before=[('kit/potterswheel_fast', 'potter_fast'),
                                          ('kit/potterswheel_fast', 'leave')]),
+          # the dove's case (0x45860d-0x45878f): the free dove's list — its
+          # first update, the StopMsg, the GOTO at bal/dove_free in place —
+          # before the OBJ2, read by hand into the overlay's own patch (the
+          # Dove's PCFireAt 0.333 / PCUseSecondsTricked 0.5 / PCFireLead, its
+          # PCWalkPoint and no far look) and the smeared picture's fire on
+          # arrival (0x458931) on the Drawing's (its component is not a
+          # TrickItem: this writer's patches never reach it)
           'MumStatueFootStool': use('lir/footstool_unlocked'), 'Camera': use('bed/camera_flashy'), 'Dove': use('bal/dove_free')},
     # the brush's redo after the repair is the case's brush_teeth and take3 —
     # the first take3 is the tricked stand's
@@ -215,6 +222,10 @@ TABLE = {
     112: {'Weights': use('bas/barbell_sawed'), 'GroundSkates': wb('kit/skate'), 'FishTank': use('wor/fishfood_steroid'),
           'Yoga': use('wor/book_replaced'), 'YogaBook': use('wor/book_replaced'), 'Trampoline': use('bed/trampoline_elastic'),
           'Rope': use('anc/skippingrope_knotted'), 'Bicycle': use('lir/hometrainer_tonged'), 'ChestExpander': use('bas/expander_elastic')},
+    # kit/heater_hot pays at the radiator the valve heats (the Radiator is
+    # tricked itself): its tricked stand, the hot heater's own vent, sits in
+    # the overlay's hand-read Radiator patch (PCUseSecondsTricked 3.5,
+    # PCShoutIndex) — a rerun must key it on 'Radiator' to keep it
     113: {'ValveHot': use('kit/heater_hot'), 'ChairAssembly': use('lir/stoolkit_pain'), 'ChairAssemblyBook': use('lir/stoolkit_pain'),
           'Sink': use('toi/basin_flooded'), 'ValveMain': use('toi/basin_flooded'), 'FuseBox': use('anc/fuse'),
           'Ladder': use('wor/ladder_cut'), 'AngleGrinder': use('bal/anglegrinder_manipulated')},
