@@ -118,8 +118,8 @@ CLIPS = {202: {'Swimming': {'WaitSea': ('anim', 'neighbor', 'waitsea'),
               # (fcn.1000e172) and plays `order`, whose behavior="order"
               # (generic objects.xml), posted as its job ends (state 2,
               # fcn.1004000a at 0x10002708), sends him on to Fifi on the tick
-              # after (his handler 0x1001b4f6 -> 0x1001aecc) — the order's job
-              # and the offer's tick over the mobile's three stands
+              # after (his handler 0x1001b4f6 -> 0x1001aecc) — the order's push,
+              # job and offer over the mobile's three stands
               'CallRTMother': {'Stand_Left': ('job', 'mother', 'order', 'mother', 3)}},
         # 205's table (his table step 0x100254d5: `play` on the guarded table
         # once Olga is there)
@@ -409,10 +409,12 @@ def clip_secs(n):
                         else (d.action_ticks(*p) or 0) for p in src[1])
             elif src[0] == 'job':
                 # another actor's action whose job posts the behaviour the
-                # stand waits for, and the offer's tick, over so many clips
+                # stand waits for — pushed without a first run as her step
+                # finds him there (fcn.10049216 at 0x100187ab), its first
+                # update a tick on — and the offer's tick, over so many clips
                 t = d.job_ticks(src[1], src[2], src[3])
                 if t is not None:
-                    t = (t + 1) / float(src[4])
+                    t = (1 + t + 1) / float(src[4])
             else:
                 t = d.action_ticks(src[0], src[1])
                 if t is not None and len(src) > 2 and src[2] == 'step':

@@ -224,9 +224,12 @@ ITEM_CLIPS = {205: {'OlgaMatBeach': ('Olga', {'N2TrickItemExtra1': ('beachright_
 # level -> mobile item -> (role, wait): another actor's clip held until a role
 # has used an item or begun to (PCWaitForRole, the runtime's PCWaitFor for that
 # role): 210's Mother waits at her chair after the call until he stands there
-# (her order step's poll) — his use of the call begun
+# (her order step's poll, fcn.1000e172: his position on the hotspot, read in
+# the tick of his last move) — his use of the call begun — and pushes her
+# `order` without a first run (fcn.10049216 at 0x100187ab): its first update
+# a tick on
 WAITS_ROLE = {210: {'CallRTMother': ('Mother', {'clip': 'MotherStandDownInfinite', 'role': 'Rottweiler',
-                                                'item': 'CallRTMother', 'at': 'start', 'then': 0.0})},
+                                                'item': 'CallRTMother', 'at': 'start', 'then': 0.083})},
               # 211's Olga on his uses (her script's handler 0x10031888, the
               # behaviours his actions post as their jobs end — ship3's
               # objects.xml): in the toilet until the dish's `bonbons` (the

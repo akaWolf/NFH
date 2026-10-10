@@ -2967,7 +2967,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   213 -0.32..-0.03, 214 -0.16..-0.15, the station to station spans within
   0.1-0.2 s with no drift; 204 -0.39 at the hot dog (41.6 s); 209 +0.15..
   +0.33 by the ice (45 s); 210 -0.20 at the call, -0.54 at Fifi (her
-  call to his Fifi 0.32 s short), -0.69 by 117 s; 206's lesson -0.35 at
+  call to his Fifi 0.32 s short; on the world's steps five a tick and her
+  order's push tick, 2026-10-01: -0.19, -0.49, -0.79 by 117 s), -0.69
+  by 117 s; 206's lesson -0.35 at
   the call (8.8 s), each errand after it two ticks short (the order, the
   pillows, the give: 41, 70, 70 ticks in E06 against 39, 68, 68), -0.82
   by the hide (23.8 s); 202 -0.21..-0.37 before the player's swim.
@@ -3967,9 +3969,14 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   call's job and the offer's tick (PCWaitFor `at` start and `then`; at
   once until 2026-09-25, the start reading) — and his flag 4 off from it
   (PCHideout, tools/pcref/pc_catch_s2.py with the flag element); his three
-  stands at her chair her order's job and the offer's tick, 0.53 s each
-  (PCClipSeconds Stand_Left; none until 2026-09-25) and her wait held
-  until he has come (PCWaitForRole); a station of the same PC object
+  stands at her chair her order's push, job and the offer's tick, 0.56 s
+  each (PCClipSeconds Stand_Left; none until 2026-09-25, 0.53 until
+  2026-10-01) and her wait held until he has come and a tick more — her
+  poll (fcn.1000e172) reads his position in the tick of his last move and
+  pushes `order` without a first run (fcn.10049216 at 0x100187ab;
+  PCWaitForRole `then` 0.083, E10's call to Fifi 0.10 s nearer, 0.30 s
+  short still: his run 56.8 ticks against the model's 59, its icon a tick
+  late); a station of the same PC object
   reached with no walk (`Pawn._pc_departure_step`: her call spot and her
   chair; the routine actors only); his stays the code's from her order on
   (tools/pcref/lap_model_s2.py LAP_START: Fifi's tickle and take 2.5, the

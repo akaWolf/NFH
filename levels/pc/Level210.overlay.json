@@ -832,11 +832,11 @@
       "role": "Rottweiler",
       "item": "CallRTMother",
       "at": "start",
-      "then": 0.0
+      "then": 0.083
      }
     },
     "PCClipSeconds": {
-     "Stand_Left": 0.53
+     "Stand_Left": 0.56
     }
    }
   },
