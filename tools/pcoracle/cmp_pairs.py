@@ -10,7 +10,7 @@ port's routine clip starts (STATION_CLIPS: the PC action -> the port's anim, by 
 listed are printed unpaired); the trick records paid (PC CREDIT, port TRICKS); the catches (the PC's
 `woody fight`, the port's Woody caught). Each pair prints both times and the port minus the PC in seconds;
 the summary the mean and the spread per kind."""
-import json, os, sys
+import json, os, re, sys
 
 STATION_CLIPS = {
     # PC DoAction (room/object family, action) -> the port's routine anim that starts then (Level202)
@@ -152,6 +152,28 @@ def show_phases(pc, port):
         elif x: print('  %7.2f %-4s %5.2f %-28s |' % (x[0], x[1], x[2], '+'.join(x[3])[:28])); i += 1
         else: print('  %41s | %7.2f %5.2f %-40s' % ('', y[0], y[2], '+'.join(y[3])[:40])); j += 1
 
+def arrivals(segs, is_walk, is_stand):
+    """the times a station's action starts: the first animation that is neither a walk nor a stand after a
+    walk (the stands between — the PC's arrival and dispatch ticks, the port's door claims — are no station)"""
+    out = []; walking = False
+    for t, anim, x, y in segs:
+        if is_walk(anim): walking = True
+        elif is_stand(anim): continue
+        elif walking: out.append(t); walking = False
+    return out
+
+def show_arrivals(pc, port):
+    """station to station: the stations' action starts paired in order, the legs between them on both sides
+    — free of the stay / walk boundary"""
+    a = arrivals(pc, lambda n: n in WALKS, lambda n: n in ('ms0', 'ms1', 'ms2', 'ms3'))
+    b = arrivals(port, lambda n: n.startswith('Walk_'), lambda n: n.startswith('Stand_'))
+    print('== stations (PC / port: the action start, the leg since the last one; port minus PC per leg, the running sum)')
+    acc = 0.0
+    for i in range(min(len(a), len(b))):
+        la = a[i] - a[i - 1] if i else a[i]; lb = b[i] - b[i - 1] if i else b[i]
+        d = lb - la; acc += d
+        print('  %7.2f %6.2f | %7.2f %6.2f | %+5.2f (sum %+5.2f)' % (a[i], la, b[i], lb, d, acc))
+
 def show_segments(pc, port):
     print('== the neighbour\'s animations (PC anim at x,y / port anim at x,y in PC px) to %.0f s' % max([t for t, *_ in pc] + [0]))
     i = j = 0
@@ -202,9 +224,13 @@ def main(argv):
     show('caught', [((a, 'fight'), (b, 'caught')) for a, b in zip(pc_ca, po_ca)] + [((a, 'fight'), None) for a in pc_ca[len(po_ca):]] + [(None, (b, 'caught')) for b in po_ca[len(pc_ca):]])
     until = float(next((a[len('--segments='):] for a in argv if a.startswith('--segments=')), '0'))
     if until:
-        n = int(next(x for x in os.path.basename(os.path.normpath(argv[2])).split('_') if x.startswith('Level'))[5:])
-        pcs, pos = pc_segments(argv[1], until=until), port_segments(argv[2], until=until, to_px=px_mapper(n))
-        show_segments(pcs, pos); show_phases(pcs, pos)
+        m = re.search(r'(?<!\d)([12]\d\d)(?!\d)', os.path.basename(os.path.normpath(argv[2]))) or re.search(r'(?<!\d)([12]\d\d)(?!\d)', argv[2])
+        n = int(m.group(1))
+        role = next((a[len('--role='):] for a in argv if a.startswith('--role=')), 'Rottweiler')
+        pc_role = {'Rottweiler': 'neighbor', 'Olga': 'olga', 'Mother': 'mother', 'Woody': 'woody'}.get(role, role.lower())
+        pcs, pos = pc_segments(argv[1], role=pc_role, until=until), port_segments(argv[2], role=role, until=until, to_px=px_mapper(n))
+        print('== %s' % role)
+        show_segments(pcs, pos); show_phases(pcs, pos); show_arrivals(pcs, pos)
 
 if __name__ == '__main__':
     main(sys.argv)

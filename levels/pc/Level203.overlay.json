@@ -50,7 +50,10 @@
      -22
     ],
     "PCFixIcon": "",
-    "PCUseSeconds": 15.5
+    "PCUseSeconds": 15.5,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -76,7 +79,10 @@
       "tail": 0.0
      }
     },
-    "PCUseSeconds": 5.0
+    "PCUseSeconds": 5.0,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -96,7 +102,10 @@
     "PCJingleAt": [
      3.17
     ],
-    "PCUseSeconds": 3.83
+    "PCUseSeconds": 3.83,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -115,7 +124,10 @@
     "PCJingleAt": [
      3.67
     ],
-    "PCUseSeconds": 8.75
+    "PCUseSeconds": 8.75,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -1087,7 +1099,8 @@
     "PCStart": {
      "zone": "Zone03",
      "x": 1200,
-     "px": 40
+     "px": 40,
+     "depart": 4
     }
    }
   },

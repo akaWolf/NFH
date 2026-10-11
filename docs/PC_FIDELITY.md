@@ -4589,7 +4589,12 @@ a lap early, by block (PC / port, seconds) — the walk to the mat 5.08 /
 the walk back 13.17 / 12.95; lap 2 the same shape (the sea 19.00 / 18.42).
 The fifth lap's mat comes 3.9 s early, before Woody's crayfish is on it —
 the PC's visit found it placed and caught him, the port's usewith failed
-and was retried: the lap drift decides a plan.
+and was retried: the lap drift decides a plan. The drift was the step
+dispatch at every station exit (tools/pcoracle/exit_ticks.py: the mat 4
+ticks, the rail 2, the sea 1, Olga's 3, the level start 4): PCDepartTicks
+and PCStart `depart` (tools/pcoracle/pc_depart_ticks.py) stand them out,
+and 202's legs then pair within a tick but the sea's (-0.7 s a lap: the
+action-to-animation and bar-end ticks, the wait on Olga's dive).
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

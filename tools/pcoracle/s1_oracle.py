@@ -1,26 +1,21 @@
-"""gdb (winedbg proxy) script: the PC original as an oracle — one level run with a tick-stamped input
-script and a per-tick trace.
+"""gdb (winedbg proxy) script: NFH1's game.exe as an oracle — one level run with a tick-stamped input script
+or the port's plan, and a per-tick trace; the Season 1 twin of oracle.py (the game logic is in game.exe).
 
-Run through wdbg.py:
-    WDBG_LEVEL=cn_b1 WDBG_SCRIPT=inputs.json WDBG_SECS=300 WDBG_CLICKS="300 300 4  283 314 4  745 550 1" \\
-        python3 wdbg.py nfh2 $PWD/oracle.py 400
+    WDBG_LEVEL=level_peep WDBG_SECS=200 WDBG_CLICKS="400 300 4  414 313 4  65 116 3  750 555 1" \\
+        python3 wdbg.py nfh1 $PWD/s1_oracle.py 400       # (s1smoke.sh wraps it: S1SCRIPT=s1_oracle.py)
 
-The script (WDBG_SCRIPT) is a JSON list of {"tick": N, "kind": "use"|"combine"|"goto", "args": [...]}:
-use [object], combine [object, item], goto [room, x]. LEAD (4) ticks before N a dummy floor click is sent (xdotool at
-WDBG_DUMMY, default 400 300 — a floor spot on screen); its GoToPosMsg is replaced in GameLogic's message
-loop (GL+0x10044464) by a message built in scratch memory (inject2.py's layouts). The tick the game really
-took it at is in its own GameLogicLog (UTF-16, ~/nfh-bench/wine/nfh/drive_c/users/<user>/Documents/JoWooD/NFH2).
-
-WDBG_PLAN=<port plan file> runs the port's plan (tests/plans/pc/...) instead, its legs mapped by pcmap.py
-and its conditions read off the trace: a take / use / usewith / prime / unlock waits for Woody to stand
-idle, injects, and is done when his action on the object has run and he stands again (or he declined);
-park waits for his arrival in the zone's room; whenusing X for the neighbour's next action on X's object;
-await X for the next trick record paid; wait / until for the clock; sneak sets the walks' sneaking.
-
-The trace (~/nfh-bench/wine/logs/oracle_<level>.jsonl): per tick the actors' x/y/anim (GameLogic's actor
-object: +0x2c, +0x30, +0x40 — captured from the path finder fcn.1000a711), and the script elements — GoTo
-fcn.1000e3e0, DoAction fcn.10002cd5, icon fcn.100422a5, behaviour post fcn.1004000a, SHOUT fcn.1000f977, a trick record paid fcn.100522e6 —
-with the calling step's return address. The level tick is fcn.10044234 (12 a second)."""
+The level: the session start fcn.00406970 holds the level's name String on its stack (word 13 — the menu's
+button name, tutorial_1 for the first), patched to WDBG_LEVEL (in place, or into VirtualAlloc'd scratch —
+the IAT slot 0x4dc0f8 — with the String's begin / end repointed). The tick: the GameLogic update's call of
+the level update, 0x43b2f5 -> fcn.00439cd0 (12 a second). The actors: the mover's update fcn.0047cb50 takes
+the actor as its second stack argument — +4 name, +0x28 x, +0x2c y, +0x3c animation. The inputs: the
+update's message loop pops each input message into [esp+0x18] at 0x43b165 (after `call [eax+0xc]`), where a
+dummy floor click's GoToPosMsg (vtable 0x4e79fc: +4 room, +0xc x, +0x10 y, refcount +0x18) is replaced by
+the built one — UseObjectMsg 0x4e77e4 (+4 name, +8 text, refcount +0x10), CombineMsg 0x4e7a14 (as
+GameLogic.dll's: +4 object, +8 object2, +0xc text, offsets, refcount +0x1c). The script calls: DoAction
+fcn.00477f60 ([esp+8] object, [esp+0xc] action), SetIcon fcn.00437f70 ([esp+4] icon). The trace:
+$WDBG_LOGS/oracle_<level>.jsonl, as oracle.py's (tick records with the actors' x/y/anim, action, icon,
+injected, leg); the game's own GameLogicLog records the tick of every message (loggamelogic on)."""
 import gdb, os, re, sys, time, struct, json, subprocess, threading, signal
 port = os.environ.get('WDBG_PORT', '33333'); want = os.environ.get('WDBG_LEVEL'); secs = float(os.environ.get('WDBG_SECS', '60'))
 HOME = os.path.expanduser('~'); LOGS = os.environ.get('WDBG_LOGS', HOME + '/nfh-bench/wine/logs')
@@ -33,17 +28,12 @@ gdb.execute('target remote 127.0.0.1:%s' % port)
 inf = gdb.selected_inferior()
 def rd(a, n): return bytes(inf.read_memory(a, n))
 def wr(a, b):
-    # (winedbg's proxy garbles a memory write past 32 bytes — the chunk after the first repeated bytes
-    # 16..31 —: 16 bytes a packet, read back)
     for i in range(0, len(b), 16):
         inf.write_memory(a + i, b[i:i + 16])
     if bytes(inf.read_memory(a, len(b))) != bytes(b):
         raise RuntimeError('memory write mismatch at %#x' % a)
 def u32(a): return struct.unpack('<I', rd(a, 4))[0]
-lg = open(LOGS + '/winedbg.log').read()
-GL = int(re.search(r'GameLogic.dll @([0-9A-Fa-f]+)', lg).group(1), 16); DELTA = GL - 0x10000000
-def gl(a): return a + DELTA
-def ungl(a): return a - DELTA if GL <= a < GL + 0x100000 else a
+def reg(n): return int(gdb.parse_and_eval('$' + n))
 def as_string(p):
     try:
         if p < 0x10000 or p > 0x7fffffff: return None
@@ -61,28 +51,28 @@ def decode_args(esp, n=4):
         out.append(s if s is not None else v)
     return out
 
-# --- scratch memory and synthetic messages (inject2.py) ---
+# --- scratch memory and synthetic messages ---
+VT_GOTO, VT_USE, VT_COMBINE = 0x4e79fc, 0x4e77e4, 0x4e7a14
 scratch = {'base': None, 'pos': 0, 'sproto': None}
 def alloc_scratch():
-    va = u32(0x452108)       # kernel32!VirtualAlloc through game.exe's import slot
-    p = int(gdb.parse_and_eval('((unsigned int (*)(unsigned int, unsigned int, unsigned int, unsigned int))%#x)(0, 262144, 0x3000, 0x40)' % va))
-    scratch['base'] = p
+    va = u32(0x4dc0f8)       # kernel32!VirtualAlloc through game.exe's import slot (0x423524)
+    scratch['base'] = int(gdb.parse_and_eval('((unsigned int (*)(unsigned int, unsigned int, unsigned int, unsigned int))%#x)(0, 262144, 0x3000, 0x40)' % va))
 def salloc(n):
     n = (n + 15) & ~15
     p = scratch['base'] + scratch['pos']; scratch['pos'] += n; wr(p, b'\0' * n); return p
 def make_string(text):
-    """a core String {vtable, begin, end, +0xc, refcount +0x10}: the game's release deletes at zero"""
+    """a core String {vtable, begin, end, +0xc, refcount +0x10} cloned from a live one"""
     data = text.encode('utf-16le') + b'\0\0'
     buf = salloc(len(data)); wr(buf, data)
     obj = salloc(32); wr(obj, rd(scratch['sproto'], 32))
     wr(obj + 4, struct.pack('<II', buf, buf + len(data) - 2)); wr(obj + 0x10, struct.pack('<I', 0x1000))
     return obj
 def msg_use(name):
-    m = salloc(0x40); wr(m, struct.pack('<IIIII', 0x453b2c, make_string(name), make_string('oracle'), 0, 0x1000)); return m
+    m = salloc(0x40); wr(m, struct.pack('<IIIII', VT_USE, make_string(name), make_string('oracle'), 0, 0x1000)); return m
 def msg_combine(obj, item, offset=(0, 0), flag18=0):
-    m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', 0x453b20, make_string(obj), make_string(item), make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
+    m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', VT_COMBINE, make_string(obj), make_string(item), make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
 def msg_goto(room, x, sneak=False):
-    m = salloc(0x40); wr(m, struct.pack('<IIIIIBBHI', 0x453b38, make_string(room), 0, int(x), 0, 1 if sneak else 0, 0, 0, 0x1000)); return m
+    m = salloc(0x40); wr(m, struct.pack('<IIIIIII', VT_GOTO, make_string(room), 0, int(x), 0, 1 if sneak else 0, 0x1000)); return m
 def build(step):
     k, a = step['kind'], step['args']
     if k == 'use': return msg_use(a[0])
@@ -92,10 +82,12 @@ def build(step):
 
 script = json.load(open(os.environ['WDBG_SCRIPT'])) if os.environ.get('WDBG_SCRIPT') else []
 script.sort(key=lambda s: s['tick'])
-pending = []          # messages built, waiting for a dummy click to replace
-state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0, 'actions': {}, 'credits': [], 'declines': [], 'caught': [], 'sneak': False}
+pending = []
+state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0, 'actions': {}, 'credits': [], 'declines': [], 'caught': [], 'sneak': False, 'patched': False}
 actors = {}
-
+import importlib.util
+_spec = importlib.util.spec_from_file_location('pcmap_s1', os.path.join(T, 'pcmap_s1.py')); pcmap_s1 = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(pcmap_s1)
+sys.modules['pcmap'] = pcmap_s1          # the plan runner's `import pcmap` is the Season 1 map here
 class PlanRunner:
     """the port's plan on the oracle: one leg at a time, its condition read off the trace each tick"""
     # (Woody stands in ms0-3; after a trick's action he keeps its `smile` until the next command — the
@@ -210,34 +202,52 @@ def actor_states():
     out = {}
     for name, a in actors.items():
         try:
-            out[name] = {'x': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'y': struct.unpack('<i', rd(a + 0x30, 4))[0], 'anim': as_string(u32(a + 0x40))}
+            out[name] = {'x': struct.unpack('<i', rd(a + 0x28, 4))[0], 'y': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'anim': as_string(u32(a + 0x3c))}
         except Exception: pass
     return out
-LEAD = int(os.environ.get('WDBG_LEAD', '4'))      # ticks between the dummy's dispatch and the scripted tick
+LEAD = int(os.environ.get('WDBG_LEAD', '4'))
 def click_dummy():
-    # (the game polls the mouse at its 12 Hz: xdotool's instant click fell between two polls every other
-    # time — the button is held 0.2 s; the move settles 0.3 s before; the message lands 3-4 ticks on)
     subprocess.Popen([T + '/xdotool-result/bin/xdotool', 'mousemove', DUMMY[0], DUMMY[1], 'sleep', '0.3',
                       'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
                      env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
 def watchdog():
     while True:
         time.sleep(1)
-        if state['t0'] is not None and time.time() - state['last'] > 8:
-            print('WATCHDOG: no tick for 8 s (last tick %d)' % state['tick'], flush=True)
+        if state['t0'] is not None and time.time() - state['last'] > float(os.environ.get('WDBG_WATCHDOG', '20')):
+            print('WATCHDOG: no tick for %s s (last tick %d)' % (os.environ.get('WDBG_WATCHDOG', '20'), state['tick']), flush=True)
             os.kill(os.getpid(), signal.SIGINT); return
 threading.Thread(target=watchdog, daemon=True).start()
 
+class LevelName(gdb.Breakpoint):
+    """the session start fcn.00406970: the level's name String on its stack, patched to WDBG_LEVEL"""
+    def __init__(self): super().__init__('*0x406970', internal=True)
+    def stop(self):
+        try:
+            esp = reg('esp')
+            for i in range(40):
+                p = u32(esp + 4 * i); s = as_string(p)
+                if s and s.startswith(('level_', 'tutorial_')):
+                    print('level %s (stack word %d)' % (s, i), flush=True)
+                    if want and not state['patched'] and want != s:
+                        b, e = u32(p + 4), u32(p + 8)
+                        if len(want) == len(s):
+                            wr(b, want.encode('utf-16le'))
+                        else:
+                            if scratch['base'] is None: alloc_scratch()
+                            data = want.encode('utf-16le') + b'\0\0'; buf = salloc(len(data)); wr(buf, data)
+                            wr(p + 4, struct.pack('<II', buf, buf + len(data) - 2))
+                        state['patched'] = True; print('patched to %s' % want, flush=True)
+                    break
+        except Exception as ex:
+            print('level name err', repr(ex), flush=True)
+        return False
 class Tick(gdb.Breakpoint):
-    def __init__(self): super().__init__('*%#x' % gl(0x10044234), internal=True)
+    def __init__(self): super().__init__('*0x43b2f5', internal=True)
     def stop(self):
         state['tick'] += 1; now = time.time(); state['last'] = now
         if state['t0'] is None:
             state['t0'] = now; open(LOGS + '/level_started', 'w').write('%.3f' % now)
-        if state['tick'] == 1:
-            # (the level's setup flood is before the first tick; the loop hook is cheap from here)
-            alloc_scratch(); state['loop'].enabled = True
-        # a dummy click LEAD ticks ahead of each scripted message; the plan's legs as they come due
+        if state['tick'] == 1 and scratch['base'] is None: alloc_scratch()
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()
             emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
@@ -248,15 +258,17 @@ class Tick(gdb.Breakpoint):
         emit({'tick': state['tick'], 'wall': round(now - state['t0'], 3), 'ev': 'tick', 'actors': actor_states()})
         return now - state['t0'] > secs
 class Loop(gdb.Breakpoint):
-    def __init__(self): super().__init__('*%#x' % gl(0x10044464), internal=True)
+    """the message loop after the pop (0x43b165): the message at [esp+0x18]; a player's message with a
+    step pending is replaced by the built one"""
+    def __init__(self): super().__init__('*0x43b165', internal=True)
     def stop(self):
         try:
-            ebp = int(gdb.parse_and_eval('$ebp')); msg = u32(ebp - 0x14); vt = u32(msg)
-            if vt in (0x453b38, 0x453b2c, 0x453b20):      # a player's message: GoToPos / UseObject / Combine
+            esp = reg('esp'); msg = u32(esp + 0x18); vt = u32(msg)
+            if vt in (VT_GOTO, VT_USE, VT_COMBINE):
                 if scratch['sproto'] is None: scratch['sproto'] = u32(msg + 4)
                 if pending:
                     step = pending.pop(0); new = build(step)
-                    wr(ebp - 0x14, struct.pack('<I', new))
+                    wr(esp + 0x18, struct.pack('<I', new))
                     emit({'tick': state['tick'], 'ev': 'injected', 'step': step})
                     print('INJECTED tick %d: %s' % (state['tick'], step), flush=True)
                 else:
@@ -264,95 +276,34 @@ class Loop(gdb.Breakpoint):
         except Exception as e:
             print('loop err', repr(e), flush=True)
         return False
-class PathHook(gdb.Breakpoint):
-    def __init__(self): super().__init__('*%#x' % gl(0x1000a711), internal=True)
+class Mover(gdb.Breakpoint):
+    """the mover's update fcn.0047cb50: its second argument is the actor (+4 name)"""
+    def __init__(self): super().__init__('*0x47cb50', internal=True)
     def stop(self):
         try:
-            a = u32(int(gdb.parse_and_eval('$esp')) + 8); name = as_string(u32(a + 4))
+            a = u32(reg('esp') + 8); name = as_string(u32(a + 4))
             if name and name not in actors: actors[name] = a
         except Exception: pass
         return False
-MINIGAME_TICKS = int(os.environ.get('WDBG_MINIGAME_TICKS', '36'))
-class Perfect(gdb.Breakpoint):
-    """the PC minigame played perfectly: the minigame object's update (fcn.100508a1) scores the thumb's
-    distance from the wobbling field's middle each tick — 4 within 200 of its 1000-unit radius, 3 / 2 / 1
-    farther out, a penalty beyond (0x1005099d-0x10050a17, [this+0x18]); the score accumulates (fcn.10001b2c,
-    [this+0x28]) into the progress [this+0x1c] the action reads. WDBG_MINIGAME=perfect writes the 4 at the
-    join 0x10050a1a: the game is won as fast as the rules allow, its length a property of the data"""
-    def __init__(self): super().__init__('*%#x' % gl(0x10050a1a), internal=True); self.n = 0
-    def stop(self):
-        try:
-            esi = int(gdb.parse_and_eval('$esi')); self.n += 1
-            wr(esi + 0x18, struct.pack('<I', 4))
-            if self.n == 1 or self.n % 24 == 0:
-                emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % esi, 'perfect': self.n, 'progress': u32(esi + 0x1c), 'acc': u32(esi + 0x28)})
-        except Exception as e:
-            emit({'tick': state['tick'], 'ev': 'error', 'name': 'perfect', 'err': repr(e)})
-        return False
-class Minigame(gdb.Breakpoint):
-    """a PC minigame won: the game action's update asks the minigame object's progress (fcn.100507f0:
-    [this+0x1c], 100 = done, 0x10004c63) every tick — the oracle writes 100 MINIGAME_TICKS calls in"""
-    def __init__(self): super().__init__('*%#x' % gl(0x100507f0), internal=True); self.calls = {}
-    def stop(self):
-        try:
-            ecx = int(gdb.parse_and_eval('$ecx'))
-            n = self.calls.get(ecx, 0) + 1; self.calls[ecx] = n
-            if n >= MINIGAME_TICKS:
-                # (the GUI pushes its own progress into the object every tick: written before each read)
-                wr(ecx + 0x1c, struct.pack('<I', 100))
-                if n == MINIGAME_TICKS:
-                    emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % ecx, 'won_after': n})
-                    print('MINIGAME won at tick %d' % state['tick'], flush=True)
-            elif n == 1:
-                emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % ecx, 'progress': u32(ecx + 0x1c)})
-        except Exception as e:
-            emit({'tick': state['tick'], 'ev': 'error', 'name': 'minigame', 'err': repr(e)})
-        return False
-class Setter(gdb.Breakpoint):
-    """the GUI's push of its minigame progress (fcn.100507dd: [this+0x1c] = arg): the first calls' return
-    addresses and values, to find the GUI's own progress variable"""
-    def __init__(self): super().__init__('*%#x' % gl(0x100507dd), internal=True); self.n = 0
-    def stop(self):
-        try:
-            self.n += 1
-            if self.n <= 8 or self.n % 50 == 0:
-                esp = int(gdb.parse_and_eval('$esp'))
-                emit({'tick': state['tick'], 'ev': 'setprogress', 'ret': '%#x' % ungl(u32(esp)), 'value': u32(esp + 4), 'n': self.n,
-                      'ebp': '%#x' % int(gdb.parse_and_eval('$ebp')), 'esi': '%#x' % int(gdb.parse_and_eval('$esi')), 'edi': '%#x' % int(gdb.parse_and_eval('$edi'))})
-        except Exception as e:
-            emit({'tick': state['tick'], 'ev': 'error', 'name': 'setprogress', 'err': repr(e)})
-        return False
 class Hook(gdb.Breakpoint):
     def __init__(self, addr, name, nargs=4):
-        super().__init__('*%#x' % gl(addr), internal=True); self.name, self.nargs = name, nargs
+        super().__init__('*%#x' % addr, internal=True); self.name, self.nargs = name, nargs
     def stop(self):
         try:
-            esp = int(gdb.parse_and_eval('$esp'))
+            esp = reg('esp')
             args = decode_args(esp, self.nargs)
-            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % ungl(u32(esp)), 'args': args})
+            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % u32(esp), 'args': args})
             if self.name == 'action' and isinstance(args[1], str):
                 state['actions'].setdefault(args[1], []).append((state['tick'], args[2]))
                 if args[1] == 'woody' and args[2] == 'decline': state['declines'].append(state['tick'])
                 if args[1] == 'woody' and args[2] in ('fight', 'respawn'):
                     state['caught'].append((state['tick'], args[2])); print('CAUGHT tick %d: %s' % (state['tick'], args[2]), flush=True)
-            elif self.name == 'credit':
-                state['credits'].append(state['tick'])
         except Exception as e:
             emit({'tick': state['tick'], 'ev': 'error', 'name': self.name, 'err': repr(e)})
         return False
 
-gdb.Breakpoint('*0x408014'); gdb.execute('continue')
-ebp = int(gdb.parse_and_eval('$ebp')); sobj = u32(u32(u32(ebp + 0xc)) + 4); b, e = u32(sobj + 4), u32(sobj + 8)
-name = rd(b, e - b).decode('utf-16le'); print('level', name, flush=True)
-if want and len(want) == len(name):
-    wr(b, want.encode('utf-16le')); print('patched to', want, flush=True)
-gdb.execute('delete')
-lp = Loop(); lp.enabled = False; state['loop'] = lp
-Tick(); PathHook()
-Hook(0x1000e3e0, 'goto'); Hook(0x10002cd5, 'action'); Hook(0x100422a5, 'icon'); Hook(0x1004000a, 'post'); Hook(0x1000f977, 'shout', 5)
-Hook(0x100522e6, 'credit', 3)       # a trick record paid (fcn.1000140b -> fcn.100522e6 on the record's tick)
-if os.environ.get('WDBG_MINIGAME', 'perfect') == 'perfect': Perfect()
-else: Minigame()
+LevelName(); Tick(); Loop(); Mover()
+Hook(0x477f60, 'action'); Hook(0x437f70, 'icon', 2)
 try:
     gdb.execute('continue')
 except Exception as ex:

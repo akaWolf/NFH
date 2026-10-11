@@ -76,3 +76,6 @@ for l in s.split('\n'):
             out.append('park %s   # x %.3f' % (zone, wx))
 print('# replayed from %s (tools/pcoracle/oracle2plan.py)' % os.path.basename(logp))
 print('\n'.join(out))
+until = next((a[len('--until='):] for a in sys.argv if a.startswith('--until=')), None)
+if until:
+    print('until %s' % until)          # the run goes on to the clock: an idle lap's record after the park

@@ -66,6 +66,9 @@
      "SeeSub": "",
      "SeeShark": "",
      "LeaveSea": "bridge"
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 1
     }
    },
    "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"
@@ -109,6 +112,9 @@
      "BeachGetBeer": "beer",
      "BeachCrabGetBeer": "beer",
      "BeachGetUp": "beer"
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 4
     }
    },
    "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
@@ -142,7 +148,10 @@
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 1.83,
     "PCLinkedPaysAt": 6.42,
-    "PCUseSeconds": 11.0
+    "PCUseSeconds": 11.0,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -691,6 +700,9 @@
       "TowelLaydown": 3.0,
       "BeachGetUp": 0.75
      }
+    },
+    "PCDepartTicks": {
+     "Olga": 3
     }
    }
   },
@@ -718,6 +730,9 @@
       "OlgaPutSub": 1.75,
       "OlgaPutSubTricked": 1.75
      }
+    },
+    "PCDepartTicks": {
+     "Olga": 3
     }
    }
   },
@@ -1138,7 +1153,8 @@
     "PCStart": {
      "zone": "Zone01",
      "x": 300,
-     "px": 0
+     "px": 0,
+     "depart": 3
     }
    }
   },
@@ -1149,7 +1165,8 @@
     "PCStart": {
      "zone": "Zone02",
      "x": 1300,
-     "px": -30
+     "px": -30,
+     "depart": 4
     }
    }
   },

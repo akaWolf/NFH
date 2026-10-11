@@ -133,11 +133,15 @@ class _PCStartPoint:
     """the PC start a pawn's first walk departs from (World._pc_place_start):
     the station-like source _pc_departure_step reads — its zone, no
     approach of its own"""
-    __slots__ = ('zone', 'pc_approach')
+    __slots__ = ('zone', 'pc_approach', 'pc_depart_ticks')
 
-    def __init__(self, zone):
+    def __init__(self, zone, depart_ticks=None):
         self.zone = zone
         self.pc_approach = {}
+        # PCStart `depart`: the ticks from the level's first tick to the actor's
+        # first move — the script's first GoTo on tick 2, the mover's first
+        # move two ticks on (tools/pcoracle/pc_depart_ticks.py)
+        self.pc_depart_ticks = dict(depart_ticks or {})
 
 
 def pc_ap_tricked(ap, it):
@@ -2122,15 +2126,27 @@ class Pawn:
                 del steps[:]              # arrived: the path finishes at once
             return pcx
         ticks = pcprofile.s2_pass_ticks(self.role, self._pc_gait(), {'in': px}, self.sneaking)
-        if not ticks:
+        # the step dispatch between the station's last action and the walk:
+        # the level script's next step runs the tick the action ends or the
+        # one after, the GoTo's mover moves first two ticks after the call
+        # (fcn.10009177 / fcn.10009215) — per role and station from the
+        # oracle's idle traces (Item.pc_depart_ticks, PCDepartTicks: 202's mat
+        # 4, rail 2, sea 1 for the neighbour, Olga's mat and sub 3), stood
+        # before the run down to the floor
+        dispatch = (getattr(src, 'pc_depart_ticks', None) or {}).get(self.role, 0) \
+            if (src is not None and self.role != 'Woody') else 0
+        if not ticks and not dispatch:
             return pcx
-        secs = ticks / pcprofile.TICKS_PER_SECOND
+        secs = (ticks or 0) / pcprofile.TICKS_PER_SECOND
+        dsecs = dispatch / pcprofile.TICKS_PER_SECOND
         first = steps[0]
-        if first.get('kind') == 'point' and first.get('y') is not None \
+        if ticks and first.get('kind') == 'point' and first.get('y') is not None \
                 and abs(first['x'] - self.sprite.x) < 1e-9:
             first['pc_secs'] = secs       # the floor step down from the station
+            if dsecs:
+                first['pc_prehold'] = first.get('pc_prehold', 0.0) + dsecs
         else:
-            first['pc_prehold'] = first.get('pc_prehold', 0.0) + secs
+            first['pc_prehold'] = first.get('pc_prehold', 0.0) + secs + dsecs
         return pcx
 
     def _pc_floor_marks(self, steps, x_pc):
@@ -13352,7 +13368,7 @@ class World:
         p.sprite.x = z.left + (float(st['x']) - pr['x1']) * (z.right - z.left) / w
         p.pos_snap = True
         p._pc_depart = (float(st['x']), float(st.get('px') or 0.0), p.sprite.x, p.sprite.y,
-                        _PCStartPoint(z.pid))
+                        _PCStartPoint(z.pid, {p.role: int(st.get('depart') or 0)}))
 
     def spawn_woody(self, sprite, zone, spec=None):
         """port plumbing: build the Woody pawn over his AnimController sprite

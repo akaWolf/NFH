@@ -108,16 +108,34 @@ real thing without reading videos.
   mobile station's, not the PC hotspot the walk timing leaves from).
 - `cmp_idle.py` — the same for an idle lap (`runtime/record.py`,
   NFH_PROFILE=pc).
-- `s1_smoke.py` (`s1smoke.sh <level folder> <secs> [clicks]`) — NFH1's
-  game.exe under the same harness: the game logic is in game.exe (no
-  GameLogic.dll; the same Loader.dll messages and GameLogicLog): the level
-  factory fcn.00439fe0 picks the level class by name (tutorial_1,
-  level_peep...), the GameLogic constructor fcn.0043ab40 calls it; the
-  script calls are __fastcall-ish — DoAction fcn.00477f60 (ecx object, edx
-  action), GoTo fcn.00479da0 (edx object), SetIcon fcn.00437f70 (ecx); the
-  per-tick `<time>` log is written at 0x450c40. The menu walk: the title
-  (400,300), START GAME (414,313), tutorial_1 (65,116), play (750,555) —
-  NFH1 runs 800x600 fullscreen by default.
+- `s1_smoke.py` / `s1_probe.py` (`S1SCRIPT=s1_probe.py s1smoke.sh <level
+  folder> <secs> [clicks]`) — NFH1's game.exe under the same harness: the
+  game logic is in game.exe (no GameLogic.dll; the same Loader.dll
+  messages and GameLogicLog, off by default — `gameopts.py nfh1
+  system.loggamelogic=true`). The level's name String is on the stack of
+  the session start fcn.00406970 (word 13 — the menu's level button name:
+  tutorial_1 for the first), patched there (in place when the lengths
+  agree, else into VirtualAlloc'd scratch — the IAT slot 0x4dc0f8 — with
+  the String's begin / end repointed); the per-object factory fcn.00439fe0
+  then compares it with the level class names (fcn.00413840 at 0x43a2da:
+  `level_peep` ...). The level tick is the GameLogic update's call of the
+  level update, 0x43b2f5 -> fcn.00439cd0 (12.1 a second measured); the
+  update's message loop pops each input message and has it accepted by
+  the logger (0x43b18d) and the handler (0x43b1a3 / 0x43b1bd: `call
+  [edx+8]`, ecx = the message) — GoToPosMsg vtable 0x4e79fc (+4 room, +0xc
+  x, +0x10 y, +0x18 refcount). The script calls take their Strings on the
+  stack as GameLogic.dll's: DoAction fcn.00477f60 ([esp+8] object, [esp+0xc]
+  action), SetIcon fcn.00437f70 ([esp+4] icon, ecx the actor object); the
+  mover's update is fcn.0047cb50 (ecx = the mover: +0xc / +0x10 the
+  target). The menu walk: the title (400,300), START GAME (414,313),
+  tutorial_1 (65,116), play (750,555) — NFH1 runs 800x600 fullscreen by
+  default. A catch stops the level ticks (the cutscene): a probe's floor
+  clicks keep Woody out of the neighbour's room.
+- A second instance: WDBG_DISPLAY=:96 WDBG_PORT=33334
+  WDBG_PREFIX=~/nfh-bench/wine/nfh1pfx WDBG_LOGS=~/nfh-bench/wine/logs1
+  (`wineboot -u` makes the prefix; the game's first start writes its
+  gameoptions.xml) runs beside the first — `idlebatch.sh <secs> <levels>`
+  runs the idle laps of Season 2 levels one after another on the first.
 - `trace_*.py`, `inject*.py`, `test_call.py`, `smoke_gdb.py` — the
   experiments the above grew from (kept for their hook recipes).
 

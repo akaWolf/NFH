@@ -94,7 +94,7 @@ from prefs import MemoryPrefs                       # noqa: E402
 from menu import GameIntroAnimation                 # noqa: E402
 
 LEG_TIMEOUT = 75.0      # a walk + search anywhere fits well inside this
-STATE_EVERY = 10          # state.jsonl rows per 60 Hz ticks (6 Hz)
+STATE_EVERY = int(os.environ.get("NFH_STATE_EVERY", "10"))   # state.jsonl rows per 60 Hz ticks (6 Hz; the oracle replays at 5 = 12 Hz)
 AWAIT_TIMEOUT = 150.0   # a routine lap is ~35 s; alarms and toilets stall it
 AWAIT_TIMEOUT_S2_PC = 210.0   # Season 2 under the PC profile: his laps by code are 80-130 s
                               # (the door passes and station runs of GameLogic.dll), a trick

@@ -1,6 +1,6 @@
 #!/bin/sh
 # clicks.sh nfh2 "<gx gy wait> | key <name> <wait> ..." — the menuwalk click loop against a running game window
-G=$1; CLICKS=$2; T=$(dirname "$(readlink -f "$0")"); L=$HOME/nfh-bench/wine/logs
+G=$1; CLICKS=$2; T=$(dirname "$(readlink -f "$0")"); L=${WDBG_LOGS:-$HOME/nfh-bench/wine/logs}
 X=$T/xdotool-result/bin/xdotool
 sleep ${START:-18}
 WID=$($X search --name "[Nn]eighbou*rs [Ff]rom [Hh]ell" | head -1)
@@ -19,7 +19,7 @@ while [ $# -ge 3 ]; do
   elif [ -z "$WINDOWED" ]; then PX=$((OX+$1)); PY=$((OY+$2)); echo "$(date +%s.%N) click game($1,$2) -> X($PX,$PY)"; $X mousemove $PX $PY sleep 0.3 mousedown 1 sleep 0.2 mouseup 1
   else PX=$(( ( $1 + 30 ) * 4 / 3 + OX )); PY=$((OY+$2)); echo "$(date +%s.%N) click game($1,$2) -> X($PX,$PY)"; $X mousemove $PX $PY sleep 0.3 mousedown 1 sleep 0.2 mouseup 1; fi
   sleep $3
-  $T/xwd-result/bin/xwd -root -silent -display :97 -out $L/${G}_clicks_$i.xwd
+  $T/xwd-result/bin/xwd -root -silent -display ${WDBG_DISPLAY:-:97} -out $L/${G}_clicks_$i.xwd
   shift 3
 done
 echo done

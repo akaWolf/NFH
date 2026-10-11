@@ -192,7 +192,7 @@ class Item:
                  'started',
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
-                 'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
+                 'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach', 'pc_depart_ticks',
                  'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_case_enter', 'pc_case_room', 'pc_case_empty', 'pc_next_anim', 'pc_pose_after', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
@@ -420,6 +420,12 @@ class Item:
         # and its height against the room's floor (levels/pc overlays,
         # tools/pcref/pc_walks_s2.py)
         self.pc_approach = d.get('PCApproach') or {}
+        # the PC profile's Season 2 departure: per role the ticks the actor
+        # stands after the station's last animation before its next walk's
+        # first move — the level script's step dispatch and the GoTo's mover
+        # (PCDepartTicks, tools/pcoracle/pc_depart_ticks.py from the oracle's
+        # idle traces)
+        self.pc_depart_ticks = d.get('PCDepartTicks') or {}
         # the PC profile's Season 1 station: per role the hotspot of the PC
         # object the walk goes to, px of the PC room — one point, or one a
         # visit (PCWalkPoint, tools/pcref/pc_walks_s1.py)

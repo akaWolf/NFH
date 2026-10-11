@@ -308,6 +308,18 @@ there is the release machinery — `PawnToAbortMutexOnFinish`,
 hardcoding in `ActionManager`, which is what lets Olga and Mother out of their
 waiting poses.
 
+- **PCDepartTicks / PCStart `depart` (Season 2, 2026-10-02).** The ticks an
+  actor stands after a station's last animation before its next walk's
+  first move, and from the level's first tick to its first move: the
+  level script's next step runs the tick the action ends or the one after
+  (a hand-over), the GoTo's mover (fcn.10009177 / fcn.10009215) makes its
+  first move two ticks after the call. Measured on the original by the
+  oracle (tools/pcoracle/pc_depart_ticks.py from the idle traces): 202's
+  neighbour the mat 4, the rail 2, the sea 1, Olga's mat and sub 3, the
+  start 4 / 3; stood out as a prehold before the run down to the floor
+  (Pawn._pc_departure_step, _PCStartPoint). Before it the port's neighbour
+  ran a second a lap early on 202 (0.27 s a walk).
+
 ## Verified in this pass (each read from the source)
 
 - **Frame stepping is `Refresh` verbatim**: a time accumulator, at most one

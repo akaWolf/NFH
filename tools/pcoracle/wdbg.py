@@ -4,9 +4,10 @@ HOME = os.path.expanduser('~')
 W = '/nix/store/4p6dqsj06jv2fqraf80xkqcjr5hz7nhv-wine-wow-10.0/bin/'
 GDB = os.environ.get('NFH_GDB') or os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gdb-result/bin/gdb')
 GAME = sys.argv[1]; SCRIPT = sys.argv[2]; TIMEOUT = float(sys.argv[3]) if len(sys.argv) > 3 else 120
-DISP = ':97'; PORT = 33333
-env = dict(os.environ, WINEPREFIX=HOME + '/nfh-bench/wine/nfh', WINEDLLOVERRIDES='mscoree,mshtml=', WINEDEBUG=os.environ.get('WDBG_WINEDEBUG', '-all'), DISPLAY=DISP)
-logs = HOME + '/nfh-bench/wine/logs/'
+DISP = os.environ.get('WDBG_DISPLAY', ':97'); PORT = int(os.environ.get('WDBG_PORT', '33333'))
+env = dict(os.environ, WINEPREFIX=os.environ.get('WDBG_PREFIX', HOME + '/nfh-bench/wine/nfh'), WINEDLLOVERRIDES='mscoree,mshtml=', WINEDEBUG=os.environ.get('WDBG_WINEDEBUG', '-all'), DISPLAY=DISP)
+logs = os.environ.get('WDBG_LOGS', HOME + '/nfh-bench/wine/logs') + '/'
+os.makedirs(logs, exist_ok=True)
 try: os.remove(logs + 'level_started')
 except OSError: pass
 procs = []
