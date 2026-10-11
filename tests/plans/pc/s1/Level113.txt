@@ -31,7 +31,7 @@ whenzone Zone01                       # (80) his lap-1 radiator is done
 use! ValveHot                         # Z09: the radiator hot for his lap-2 kitchen, 15 — cold
 whenzone Zone04                       # (91) he is at the sink: up through the hall before his run down it (~102)
 take! BedDrawer IT_Painbook           # Z06
-usewith! GroundMarbles@Zone06 IT_Marbles x=3.56   # Z06, PC 813 (its trigger 838, 18 px from the balcony door's 856 — the port tests no door pass), laid by the balcony door (the mobile's spot 2.41): his study trips never cross it, his lap-2 way to the grinder does — hot, and the grinder follows inside the marbles' 27 s
+usewith! GroundMarbles@Zone06 IT_Marbles x=2.59   # Z06, PC 690 (its trigger 715) by the bed's foot, where E13's frames have them (2026-10-11; PC 813 by the balcony door before): his study trips never cross it, his lap-2 way to the grinder does — hot, the chair to the marbles 17.10 s (E13 17.17), the grinder 26.59 after (26.53)
 use! AngleGrinder                     # Z07, bare, 10: his lap-2 grinder, in the marbles' window — hot
 usewith! ChairAssemblyBook IT_Painbook # Z02, 10: his lap-2 chair (~190) — cold
 hide! Bed                             # Z06: his lap-1 study trip passes it twice (~143, ~165), his lap-2 grinder trip twice

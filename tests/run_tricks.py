@@ -37,6 +37,9 @@ N-th in the level's order, from 1):
     hide <HideItem>          climb into the bed/wardrobe and stay hidden
                              (the next leg's click brings Woody out)
     wait <seconds>           idle that long (still dodging)
+    until <seconds>          idle until the level clock reaches that second
+                             (a reference run's click at its own time;
+                             `until!` without dodging)
     whenusing <Item>         park safe until the neighbour's routine is
                              using the item (a lap landmark)
     whenzone <ZoneName>      park safe until the neighbour stands in the
@@ -3233,6 +3236,14 @@ class Driver(Recorder):
                 continue
             if op == 'wait':
                 self.run_seconds(float(args[0]))
+                i += 1
+                continue
+            if op == 'until':
+                # the level clock (World.time) reaching that second: a
+                # reference run's click replayed at its own time
+                left = float(args[0]) - self.world.time
+                if left > 0.0:
+                    self.run_seconds(left, dodge=not self._rush)
                 i += 1
                 continue
             if op == 'sneak':

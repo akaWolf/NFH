@@ -1103,8 +1103,11 @@ predicate, then the all-tricks win.
   room's pointer as the pass starts, fcn.004741e0, his flag 0x20 kept —
   the reaction's list then goes on top of the pass's ACTION), where the
   port tests a walk and a stand only; the plans lay no floor trick within
-  15 px of a door's point (103's soap at 534 by the door's 551, 113's
-  marbles' trigger at 838 by the balcony door's 856, moved there for it).
+  15 px of a door's point (103's soap at 534 by the door's 551; 113's
+  marbles by the bed's foot since 2026-10-11, PC 690 where E13's frames
+  have them — the chair to the marbles 17.10 s against 17.17, the grinder
+  26.59 after against 26.53 —, their trigger at 838 by the balcony door's
+  856 before).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:

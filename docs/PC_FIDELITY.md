@@ -2707,7 +2707,17 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   reaction; the port's had come after the loo, 63 s later) and walked to on
   the PC's path, the soap by the stuffed toilet slipping him into the
   bowl's look (fcn.0047e000; 104's toilet so too, 0.1 s sooner: -0.23
-  against E04). The other plans pay their own orders. Since 2026-10-11 too 106's
+  against E04). 113's E13 spans since 2026-10-11, the marbles laid where
+  E13's frames have them (PC 690 by the bed's foot, the balcony door's 813
+  before): the chair to the marbles 17.10 s (17.17), the marbles to the
+  grinder 26.59 (26.53), the ladder to the fuse 13.74 (14.03), the sink to
+  the trap 10.19 (10.61: the run from the bathroom to the basement 0.6 s
+  short, its doors' passes not read on the frames). 108's lap against
+  E08's bubble (the chili woken as Woody first crosses the living room,
+  23.5 s): the stations within ~0.6 s to his second deck chair (166 s),
+  where E08's chain starts; its pairs the deck chair to the lotion and the
+  coffee to the toothbrush (above). The other plans pay their own orders.
+  Since 2026-10-11 too 106's
   toilet pays 8.6 s after the candy as in E06 (the rush walks to the
   toilet's hotspot, 12.6 s before) and the album within 0.1 s of the
   towel's offset (the tub's leave after the tricked towel); 109's nitro
