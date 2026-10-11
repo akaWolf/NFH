@@ -7,6 +7,8 @@ import json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, 'tools', 'pcref'))
 import canon
+sys.path.insert(0, HERE)
+import pcgeo
 
 # the mobile item -> the PC object's base name where the names differ (the objects.xml of each level)
 ALIASES = {'Television': 'tv', 'Drawer': 'ark', 'FirstAid': 'firstaid', 'TV': 'tv', 'ToiletPaper': 'paperbracket',
@@ -31,9 +33,10 @@ ALIASES = {'Television': 'tv', 'Drawer': 'ark', 'FirstAid': 'firstaid', 'TV': 't
            'ShotgunShells': 'munition', 'Shotgun': 'gun', 'GoldCup': 'cups', 'Pipe': 'tabacbox', 'Aquarium': 'aquarium'}
 
 
-class PCMap:
+class PCMap(pcgeo.MapOps):
     def __init__(self, n):
         self.n = n
+        self.geo = pcgeo.Geo(n)           # the port's level: the zones' limits and PC rooms, the floor items
         ov = json.load(open(os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)))
         folder = canon.pc_level(n)['folder']
         X = os.path.expanduser('~/nfh-bench/pcref/pc/nfh1/x/%s' % folder)

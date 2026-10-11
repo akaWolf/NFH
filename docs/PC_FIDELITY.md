@@ -4639,23 +4639,60 @@ everywhere (a tick a station).
 
 **The plans on the original (2026-10-03 01:30, the first runs):** 202's
 whole plan runs (the oracle's PlanRunner, tools/pcoracle/planrun.sh);
-203's `unlock OlgaBag` is the tights minigame — the combination of the
-handbag's family with a `game` and a single object ingredient, started by
-a use of that object (not of the container the overlay's PCApproach
-names; pcmap.combine_target with no item); 204's first `take RiceBowl`
-walks Woody down the groundleft stairs through the neighbour's rickshaw
-and he is caught at 10 s where the port's Woody takes another way —
-the PC's path finder (the room graph, the door costs) against the port's
-mobile routing of Woody: open; 205's `unlock DuckCage` is the egg
-minigame, whose GUI stops the level ticks while it runs (the oracle's
-watchdog now counts the minigame's calls); 206's `hide Pipe` keeps Woody
-hidden — the runner takes him as standing until he walks. 101 on NFH1:
+203's `unlock OlgaBag` and 205's `unlock DuckCage` are the tights and
+egg minigames — the combination of the object's family with a `game=`
+and a single object ingredient (groundright/olgahandbag, shop/duckcage).
+How the GUI starts one was read in game.exe's click handler
+(fcn.00408161): a click on an object the GUI finds with flag 0x80 and no
+item in hand sends a CombineMsg whose second object is NULL (0x40828a),
+not a UseObjectMsg — the UseObjectMsg of the game object only walks
+Woody to it (203: he stood at the bag 2 minutes), the UseObjectMsg of
+the `_container` the overlay's PCApproach names crashes GameLogic
+(SIGSEGV, 0x008e88c5 relocated = GameLogic 0x100088c5; the run that
+looked like "a modal minigame stopping the ticks" was this crash). With
+the NULL combine (oracle.py msg_combine, pcmap.combine_target with no
+item) 205's egg game runs under the perfect hook from tick 30, is won at
+tick 100 and the container's open + take follow on their own (the
+autotake), 7.6 s from the click. 204's first `take RiceBowl` walks Woody
+down the groundleft stairs through the neighbour's rickshaw and he is
+caught at 10 s where the port's Woody takes another way — the PC's path
+finder (the room graph, the door costs) against the port's mobile
+routing of Woody: open; 206's `hide Pipe` keeps Woody hidden — the
+runner takes him as standing until he walks. 101 on NFH1:
 the plan's `use! Television` after the glued binoculars — the PC's
 Woody walks to the set, stands 14 s with no `use_mid` and walks to the
 sofa into the returning neighbour (the use is time=11 with the `smile`
 after; the neighbour's shout ran 86-94 s meanwhile): open, the trace shows
 no DoAction for Woody's item uses on NFH1 (another entry than
 fcn.00477f60).
+
+**The plans gated (2026-10-03 03:00):** the first batches ran the plans
+blind and most ended in early catches (212 at 7 s, 214 at 11 s, every
+Season 1 level once) — the plans carry the port's timing and its gate
+(tests/run_tricks.py gate_open: a leg starts when its target zone and
+the zones on the way stay clear of catchers for the job, read off the
+routine's ETAs). The oracle has no model of the PC's routine, so its
+runner gates on the live state: a take / use / usewith / park / walk
+waits until no catcher stands in the target's room, none is on a walk
+(mg*/mr* — his target is unknown) and none is in a door pass (no state);
+a leg the plan marks `!` runs ungated as the port runs it. New legs on
+the runner: `walk x y` (the point's zone on its PC room, runtime/
+world.py pc_room_x through tools/pcoracle/pcgeo.py — the port's own
+loader and overlay give the zones' walking limits), `usewith Ground@Zone
+IT_X [x=]` (a Season 1 floor trick: the CombineMsg of the zone's room
+object with the item at the drop's x — level_mail's toi/groundsoap <-
+toi + soap; x=-4.6 lands on 534, the plan's own PC note), `whenin Role
+Zone`, `activated X` (three seconds; the PC has no inactive objects),
+and the item's PC inventory name from combine.xml (IT_Wcpaper is
+level_mail's `toiletpaper`, which the first 103 run combined as
+`wcpaper` and was declined). What the gate cannot do is leave a room
+before the catcher comes: 101's binoculars trick ends at 101 s, the
+plan's `park! Zone01` would walk Woody out of the kitchen at once, the
+PC neighbour leaves the sofa at 100 s and is in the kitchen (the
+microwave's clean) 6.9 s later — the gated runner held Woody for the
+walking neighbour and he was caught standing; ungated he walks into him
+in the living room. The port's replay of that run (replay.sh) is the
+measure of where its neighbour is at 108 s.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

@@ -5,6 +5,6 @@ SECS=$1; shift
 for N in "$@"; do
   L=$(cd ../.. && python3 -c "import sys; sys.path.insert(0,'tools/pcref'); import canon; print(canon.pc_level($N)['folder'])")
   echo "== $N $L $(date +%T)"
-  env -u WDBG_PLAN ./planrun.sh $N $L $SECS planrun 2>&1 | grep "LEG\|^plan\|WATCHDOG\|CAUGHT\|MINIGAME" | cut -c1-110
+  env -u WDBG_PLAN ./planrun.sh $N $L $SECS ${TAG:-planrun} 2>&1 | grep "LEG\|^plan\|WATCHDOG\|CAUGHT\|MINIGAME" | cut -c1-110
 done
 echo "planbatch done $(date +%T)"

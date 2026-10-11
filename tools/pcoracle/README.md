@@ -89,7 +89,29 @@ real thing without reading videos.
   and floor); whenusing X for the neighbour's next action on X's station;
   await for a record paid since the item's trick; wait / until for the
   clock; a leg times out at 120 s; a take right after the item's unlock is
-  done if the unlock's take happened (the PC's combination takes the item).
+  done if the unlock's take happened (the PC's combination takes the item);
+  `walk x y` goes to the point's zone on its PC room (pcgeo.py: the port's
+  loader and overlay give the zones' walking limits, runtime/world.py
+  pc_room_x the x); `usewith Ground@Zone IT_X [x=]` is a floor trick (the
+  CombineMsg of the zone's room object with the item at the drop's x);
+  `whenin Role Zone` waits for the pawn in the zone's room; `activated X`
+  is three seconds (the PC has no inactive objects); a tool-less `unlock`
+  is the GUI's own click on a `game` object — a CombineMsg with a NULL
+  second object (game.exe fcn.00408161 @ 0x40828a), which starts the
+  minigame (a UseObjectMsg of the object only walks him there, one of its
+  `_container` crashes GameLogic); an item's PC inventory name comes
+  from combine.xml's ingredient on the object's family (IT_Wcpaper is
+  level_mail's `toiletpaper`). The gate: a take / use / usewith / park /
+  walk waits until no catcher stands in the target's room, none walks
+  (mg*/mr*) and none is in a door pass (no state) — the port's gate reads
+  its routine's ETAs instead (tests/run_tricks.py gate_open); a leg the
+  plan marks `!` runs ungated, as the port runs it. WDBG_USETEXT sets the
+  UseObjectMsg's text field (a probe; the GUI's own is the action's label
+  or NULL for flag-2 objects — the game ignores it on takes and uses).
+  Batches: `planbatch.sh <secs> <levels>` (S2) and `s1plan.sh <secs>
+  <levels>` (S1) take TAG=<tag> for the runs' file names (default
+  planrun) — never edit a running .sh (sh reads it incrementally: the
+  TAG edit broke both running batches with a syntax error).
   The legs' outcomes go to `oracle_<level>_legs.json`, the catches
   (`woody fight` / `respawn`) are printed; the game's own log (a new
   GameLogicLogNN.xml per session) then gives the port the same inputs by
@@ -233,3 +255,17 @@ then right, then down to the shore; the port right then down); WaitSea
 sea -> rail 16.16 / 16.10 (the port stands 3.3 s at the stairs' foot and
 climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
 -0.28 in the sea, -0.1 the rest.
+
+## What the plan batches found (2026-10-03 03:00)
+
+Blind, the plans end in early catches on the original (212 at 7 s, 214 at
+11 s, each Season 1 level once — a Season 1 catch ends the level): the
+plans carry the port's timing and the port's predictive gate. The runner's
+live-state gate (above) keeps Woody out of a catcher's room but cannot
+leave a room before the catcher arrives — 101's `park! Zone01` right after
+the binoculars (101 s): the PC neighbour leaves the sofa at 100 s and is in
+the kitchen 6.9 s later for the microwave's clean, the gated Woody waited
+for him to stop walking and was caught standing. The port's replay of the
+run (replay.sh, `s1gatedreplay.sh` on the bench) is where its neighbour is
+at that second. 203's handbag and 205's duck cage: see the unlock note
+above (the first run's "modal minigame" was the container use's SIGSEGV).

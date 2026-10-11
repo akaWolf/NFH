@@ -6,11 +6,14 @@ import json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, 'tools', 'pcref'))
 import canon
+sys.path.insert(0, HERE)
+import pcgeo
 
 
-class PCMap:
+class PCMap(pcgeo.MapOps):
     def __init__(self, n):
         self.n = n
+        self.geo = pcgeo.Geo(n)           # the port's level: the zones' limits and PC rooms, the floor items
         ov = json.load(open(os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)))
         self.objs = {}; self.rooms = {}; self.stations = {}
         for e in ov['patches']:

@@ -67,16 +67,16 @@ def make_string(text):
     obj = salloc(32); wr(obj, rd(scratch['sproto'], 32))
     wr(obj + 4, struct.pack('<II', buf, buf + len(data) - 2)); wr(obj + 0x10, struct.pack('<I', 0x1000))
     return obj
-def msg_use(name):
-    m = salloc(0x40); wr(m, struct.pack('<IIIII', VT_USE, make_string(name), make_string('oracle'), 0, 0x1000)); return m
+def msg_use(name, sneak=False):
+    m = salloc(0x40); wr(m, struct.pack('<IIIII', VT_USE, make_string(name), make_string('oracle'), 1 if sneak else 0, 0x1000)); return m   # (+0xc sneaking, as NFH2's)
 def msg_combine(obj, item, offset=(0, 0), flag18=0):
     m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', VT_COMBINE, make_string(obj), make_string(item), make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
 def msg_goto(room, x, sneak=False):
     m = salloc(0x40); wr(m, struct.pack('<IIIIIII', VT_GOTO, make_string(room), 0, int(x), 0, 1 if sneak else 0, 0x1000)); return m
 def build(step):
     k, a = step['kind'], step['args']
-    if k == 'use': return msg_use(a[0])
-    if k == 'combine': return msg_combine(a[0], a[1], tuple(step.get('offset', (0, 0))), step.get('flag18', 0))
+    if k == 'use': return msg_use(a[0], step.get('sneak', False))
+    if k == 'combine': return msg_combine(a[0], a[1], tuple(step.get('offset', (0, 0))), step.get('flag18', 1 if step.get('sneak') else 0))
     if k == 'goto': return msg_goto(a[0], a[1], step.get('sneak', False))
     raise ValueError(k)
 
@@ -109,6 +109,38 @@ class PlanRunner:
         if getattr(self, 'hidden', False) and w is not None and w['anim'] not in ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3'):
             return True
         return w is None or w['anim'] in self.STANDS
+    CATCHERS = ('neighbor', 'mother', 'chili', 'dog')       # (Season 1's dogs bark Woody into his fear: 107's chili)
+    ROLES = {'Rottweiler': 'neighbor', 'Mother': 'mother', 'Olga': 'olga', 'Woody': 'woody'}
+    def room_of(self, a):
+        """an actor's PC room: by name where the trace carries it (Season 1), else the PCRoom whose x range and
+        floor hold his position (Season 2's overlays)"""
+        if a is None: return None
+        if a.get('room') is not None: return a['room']
+        for z, pr in self.m.rooms.items():
+            if pr['x1'] - 60 <= a['x'] <= pr['x2'] + 60 and abs(a['y'] - pr['floor']) <= 150: return pr['room']
+        return None
+    GAITS = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')
+    def gate_closed(self, room):
+        """the port's runner walks into a room only when its gate is open — no catcher in it, none due there
+        while Woody works (tests/run_tricks.py gate_open reads the routine's ETAs); here, without a model of
+        the PC's routine: no catcher stands in the room and none is on a walk (a walking catcher's target is
+        unknown — he may be coming; he stops within seconds)"""
+        if not room: return False
+        st = actor_states(); w = st.get('woody')
+        # the rooms on Woody's way too (the port's door graph; the PC's path finder may differ)
+        rooms = set(self.m.geo.route(self.room_of(w) if w else None, room)) | {room}
+        for c in self.CATCHERS:
+            if c not in self.present: continue
+            a = st.get(c)
+            if a is None: return True                   # (no state: he is in a door pass — a walk)
+            if self.room_of(a) in rooms or a['anim'] in self.GAITS: return True   # (NFH1: no GoTo hook — a walk's target is unknown)
+        return False
+    @property
+    def present(self):
+        """the catchers the level has (a state seen once)"""
+        if not hasattr(self, '_present'): self._present = set()
+        self._present |= set(c for c in self.CATCHERS if c in actor_states())
+        return self._present
     def acts_on(self, obj, since=0):
         """the actions logged on the object's family (the guarded / container variants) since a tick"""
         fam = self.m.family(obj)
@@ -118,17 +150,38 @@ class PlanRunner:
         """returns the steps to inject this tick"""
         if self.i >= len(self.legs): return []
         leg = self.legs[self.i]; op, args = leg[0], leg[1:]
-        op = op.rstrip('!')
+        ungated = op.endswith('!'); op = op.rstrip('!')     # `!`: the port runs the leg without its gate
         w = self.woody()
         if self.phase == 'idle':
-            self.leg_start = tick
+            if getattr(self, '_idle_leg', None) != self.i: self.leg_start = tick; self._idle_leg = self.i
             if op in ('take', 'use', 'usewith', 'prime', 'unlock', 'hide'):
                 self.phase = 'wait_idle'          # (`hide`: the PC's use of the wardrobe or bed — he stays in)
             elif op == 'park':
                 room, x = self.m.zone_center(args[0])
                 if room is None: return self.done('no room for %s' % args[0])
+                if not ungated and self.gate_closed(room):
+                    if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
+                    return []                      # the gate: the room free of the catchers first
                 self.phase = 'parking'; self.target = args[0]
                 return [{'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': state['sneak'], 'leg': ' '.join(leg)}]
+            elif op == 'walk':
+                # `walk x y`: the world point's zone on its PC room (pcgeo: the port's own geometry)
+                room, px = self.m.walk_point(float(args[0]), float(args[1]))
+                if room is None: return self.done('no room for the walk')
+                if not ungated and self.gate_closed(room):
+                    if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
+                    return []
+                self.phase = 'walking'; self.target = (room, px); self.last_input = tick
+                return [{'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': state['sneak'], 'leg': ' '.join(leg)}]
+            elif op == 'whenin':
+                # `whenin Role Zone`: the pawn in the zone's PC room (tests/run_tricks.py leg_whenin)
+                self.phase = 'whenin'; self.target = (self.ROLES.get(args[0], args[0].lower()), self.m.rooms.get(args[1]))
+                if self.target[1] is None: return self.done('no room for %s' % args[1])
+            elif op == 'activated':
+                # (the port parks until the item's GameObject is active — a game event's SetActive; the PC's
+                # object is in its scene throughout or comes with the same event: three seconds here, the
+                # take's own timeout covers the rest)
+                self.phase = 'wait'; self.target = tick + 36
             elif op == 'whenusing':
                 self.phase = 'whenusing'; self.target = self.m.station(args[0])
                 if self.target is None: return self.done('no station for %s' % args[0])
@@ -156,10 +209,22 @@ class PlanRunner:
                     return self.done('taken with the unlock')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout waiting for Woody')
             if not self.idle(w) or tick - self.last_input < 6: return []
-            if op in ('usewith', 'prime', 'unlock') and len(args) > 1:
-                obj, game = self.m.combine_target(args[0], self.m.pc_item(args[1]))
+            # the gate: the target's room free of the catchers before the input goes
+            tgt = self.m.use_target(args[0]) if op not in ('usewith', 'prime', 'unlock') else (self.m.combine_target(args[0], self.m.item_name(args[0], args[1]) if len(args) > 1 else None)[0])
+            if tgt and not ungated and self.gate_closed(tgt.split('/')[0]): return []
+            if op == 'usewith' and args[0].startswith('Ground@'):
+                # a floor trick: the combination of the zone's room object with the item at the drop's x
+                mx = next((float(o[2:]) for o in args[2:] if o.startswith('x=')), None)
+                room, px, pcname, result = self.m.floor_target(args[0].split('@', 1)[1], mx, args[1])
+                if room is None: return self.done('no floor for %s' % args[0])
+                if not ungated and self.gate_closed(room): return []
+                step = {'tick': tick, 'kind': 'combine', 'args': [room, pcname], 'offset': (int(round(px)), 0)}
+                obj = result or room
+            elif op in ('usewith', 'prime', 'unlock') and len(args) > 1:
+                pcname = self.m.item_name(args[0], args[1])
+                obj, game = self.m.combine_target(args[0], pcname)
                 if obj is None: return self.done('no PC object for %s' % args[0])
-                step = {'tick': tick, 'kind': 'combine', 'args': [obj, self.m.pc_item(args[1])]}
+                step = {'tick': tick, 'kind': 'combine', 'args': [obj, pcname]}
             elif op == 'unlock':
                 # a dexterity unlock without a tool: the use of the minigame combination's own object
                 obj, game = self.m.combine_target(args[0], None)
@@ -169,18 +234,37 @@ class PlanRunner:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 step = {'tick': tick, 'kind': 'use', 'args': [obj]}
-            step['leg'] = ' '.join(leg); self.target = obj; self.phase = 'acting'; self.last_input = tick
+            step['leg'] = ' '.join(leg); step['sneak'] = state['sneak']; self.target = obj; self.phase = 'acting'; self.last_input = tick
             self.acted = len(self.acts_on(obj)); self.declined = len(state['declines'])
             return [step]
         if self.phase == 'acting':
             if len(state['declines']) > self.declined: return self.done('declined')
             acts = self.acts_on(self.target)
+            if op == 'usewith' and args[0].startswith('Ground@'):
+                acts = acts + [(t, a) for t, a in state['actions'].get('woody', []) if t > self.leg_start and a not in ('start', 'fear1', 'fear2', 'fear3', 'fight', 'respawn', 'decline')]
+                acts.sort()
             if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
                 self.hidden = True; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
                 if w is not None and w['anim'] in self.STANDS: self.hidden = False
                 return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'walking':
+            room, px = self.target
+            if w is not None and self.idle(w) and tick - self.last_input >= 6 and abs(w['x'] - px) <= 40 \
+                    and (w.get('room') is None or w['room'] == room):
+                return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'whenin':
+            role, pr = self.target; a = actor_states().get(role)
+            if a is not None and tick - self.leg_start > 6:
+                if a.get('room') is not None:
+                    if a['room'] == pr['room']: return self.done('ok')
+                elif pr['x1'] - 60 <= a['x'] <= pr['x2'] + 60 and abs(a['y'] - pr['floor']) <= 150:
+                    return self.done('ok')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
         if self.phase == 'parking':
