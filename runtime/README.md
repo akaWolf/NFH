@@ -1006,7 +1006,15 @@ predicate, then the all-tricks win.
   hotspot, the dog's 0/0, the parrot's 25/15 — 114's dog at 830/410
   where the mobile spot mapped to 776/420): E14's dog alarm from its
   icon to the records' 11.22 s against 10.8 (10.29 before), the records'
-  walk back and take 14.61 against 14.6 (13.77). A
+  walk back and take 14.61 against 14.6 (13.77). The toilet rush walks to
+  the toilet's `neighbor` hotspot since 2026-10-11 (PCWalkPoint on the
+  remaster's ToiletAction item, tools/pcref/pc_walks_s1.py RUSH_TARGETS:
+  the rush cases' GOTO — 102's GOTOENTER at 0x470068, 105's and 106's
+  GoTo toi/toilet, 103's GoTo toi/firstaid — where its mobile spot had
+  mapped next to the door, 544 against 505): the stuffed toilet's nearobj
+  trigger meets him on the way, E06's look 8.6 s after the candy (the
+  port's 8.63; he had puked at the door first and looked on his way to
+  the bath, 12.6 s). A
   case that pushes no job costs a tick: the level class's job returns not
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
   the next case runs on the tick after (tools/pcref/routine_order.py's

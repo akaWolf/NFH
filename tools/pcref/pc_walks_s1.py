@@ -191,6 +191,14 @@ REACTION_TARGETS = {111: {'Vacuum': 'lir/vacuum', 'DirtyCarpet': 'lir/dirtycarpe
 # — 110's extinguisher: case 9's take, then its GOTO to bal/barbecue_burn
 # (0x4602f6), 20 px lower than the barbecue's own hotspot; 111's vacuum:
 # case 22's GOTO to lir/dirtycarpet (0x456704) -> PCToolPoint
+# the rush's GOTO (the remaster's ToiletAction item): the level class's
+# rush case walks him to the object's `neighbor` hotspot — 102's GOTOENTER
+# to the toilet (case 11, 0x470068: fcn.00479f10), 103's GoTo toi/firstaid
+# (0x45f410), 105's and 106's GoTo toi/toilet (0x46eaaf, 0x46d11a) — where
+# the stuffed toilet's nearobj trigger meets him on the way (E06: the look
+# at the toilet 8.6 s after the candy, before the puke)
+RUSH_TARGETS = {102: {'Toilet': 'toi/toilet'}, 103: {'FirstAid': 'toi/firstaid'},
+                105: {'Toilet': 'toi/toilet'}, 106: {'Toilet': 'toi/toilet'}}
 TOOL_TARGETS = {110: {'FireExtinguisher': 'bal/barbecue_burn'},
                 111: {'Vacuum': 'lir/dirtycarpet'}}
 
@@ -360,7 +368,7 @@ def level_data(n):
         # (107's camera: the posing spot, then the camera) — the
         # visits cycle as PCUseSeconds' do (Routine._pc_visit_seconds)
         points[item] = {'Rottweiler': pts[0] if all(p == pts[0] for p in pts) else pts}
-    for item, obj in REACTION_TARGETS.get(n, {}).items():
+    for item, obj in list(REACTION_TARGETS.get(n, {}).items()) + list(RUSH_TARGETS.get(n, {}).items()):
         p = L.object_point(obj)
         if p is not None and item not in points:
             points[item] = {'Rottweiler': list(p[1:]) + [p[0]]}

@@ -803,6 +803,11 @@
    "component": "TrickItem",
    "set": {
     "PCWalkPoint": {
+     "Rottweiler": [
+      505,
+      397,
+      "toi"
+     ],
      "Woody": [
       530,
       397,
