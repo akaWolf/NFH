@@ -4069,6 +4069,7 @@ class Routine:
         self.pc_zero_visit = False       # this visit's PCUseSeconds is 0: the PC plays nothing
         self._pc_redo = None             # the ReuseAfterFix redo's item (PCRedoSeconds)
         self._pc_redo_pose = None        # ... and the animation it leaves (PCPoseAfter)
+        self._pc_alarm_listed = False    # the PC alarm's list begun (the pet's icon up)
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
@@ -4336,6 +4337,16 @@ class Routine:
             # 207's 0x1001452c, 210's 0x10018d76, 214's 0x1003a21c; the
             # remaster's being_hit)
             return 'being_hit'
+        u = self.urgent_item
+        if u is not None and pcprofile.is_pc() and not pcprofile.SEASON2 and self.role == 'Rottweiler' \
+                and u.kind == 'Alerter' and self.state == self.MOVING and not self._pc_alarm_listed:
+            # the level class's `noise` case sets the noise icon (generic
+            # objects.xml `noise`, gui/bubbles/bubble_what) before his run to
+            # the pet's room; the alarm's list sets the pet's shout icon as it
+            # starts there with his search (fcn.0047a690: fcn.00437f70 with
+            # dog_shout, else chili_shout, 0x47a7d4-0x47a816) — the
+            # Alerter's own mad icon from his arrival
+            return 'bubble_what'
         it = self.item
         if not pcprofile.is_pc() or self.urgent_item is not None or it is None:
             return None
@@ -6637,6 +6648,7 @@ class Routine:
             # job's, 0x475ce6): its next animation, the stay's last (PCNextAnim)
             self._pc1_stay_pose(self.item)
         self.pc_shout_icon = None        # its handler's case sets its own icon
+        self._pc_alarm_listed = False
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
         self.pc_fire_at = 0.0; self.pc_fire_item = None
@@ -6895,6 +6907,8 @@ class Routine:
         elif it.kind == 'Alerter' or it.rott_surprise:
             seq = [a for a in it.rott_surprise if self.pawn.anim.has(a)]
             self.state = self.USING
+            # (the alarm's list begins: its pet's icon from here, pc_think_icon)
+            self._pc_alarm_listed = it.kind == 'Alerter'
             secs = getattr(it, 'pc_surprise_secs', None) \
                 if it.kind == 'Alerter' and pcprofile.is_pc() else None
             if seq and secs:

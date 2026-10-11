@@ -3272,7 +3272,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   kept the station's icon; the port shows it from its shout (a step
   with one) to the routine's next action or urgent
   (Routine.pc_shout_icon) — plan 101: 77.15, 88.32, 104.48, 120.82.
-  Its `noise` icon is the mobile's bubble_what already.
+  Its `noise` icon is the mobile's bubble_what already; since 2026-10-11
+  it shows from the level class's `noise` case over his run to the pet's
+  room, and the alarm's list sets the pet's shout icon as it starts
+  there with his search (fcn.0047a690: fcn.00437f70 with dog_shout, else
+  chili_shout, 0x47a7d4-0x47a816), where the port had shown the Alerter's
+  mad icon from the run's start (Routine.pc_think_icon): E14's dog `?!`
+  at 255.27 s and its shout icon at 257.87, the plan's 256.12 and 258.78
+  (the whistle the plan's; the run 2.66 s against 2.6).
   The Mother's own fight steps set her m_hurt_n as she runs to him and
   hits (207's 0x1001452c, 210's 0x10018d76, 214's 0x1003a21c): her
   bubble being_hit over her hit run (Routine.pc_think_icon, the
