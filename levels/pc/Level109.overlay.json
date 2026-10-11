@@ -1217,6 +1217,18 @@
     "PCRedoGoto": true
    },
    "source": "level_pig's case 18 (game.exe 0x46a542-0x46a739): the pig's OBJ2, catch_pig and the switch back to anc/pig, then case 17 again (0x46a737) — Icon pig and, the pig in its pen, GoTo anc/pig (0x46a52a) — before case 19's feeding: the redo after the catch walks from anc/pigout's hotspot (521/420) to anc/pig's (567/420)"
+  },
+  {
+   "object": "Chili",
+   "component": "Alerter",
+   "set": {
+    "PCVisitPosts": {
+     "enter": "wakeup",
+     "use": "pause",
+     "end": "resume"
+    }
+   },
+   "source": "the pet's visit (tools/pcref/pc_pets_s1.py VISIT_POSTS): the behaviours the level class posts to it as the neighbour comes into its room, starts the stay and ends it"
   }
  ]
 }

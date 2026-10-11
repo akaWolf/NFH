@@ -3598,6 +3598,10 @@ class AlerterFSM:
         self.pc_busy = False             # a bark or a whine holds the PC class's step
         self.pc_idle = False             # the PC class's idle: the timer counts, it may sleep
         self.pc_whistle = False          # the whistle's flag (+0x1d): the next free step barks
+        self.pc_paused = False           # `pause` .. `resume` (+0xc): the class does nothing
+        self.pc_job_seq = 0              # the action in hand on the pet's queue (_play)
+        self.pc_job_left = 0.0
+        self.pc_job_done = None
         if self.player is not None:
             self._play(item.sleep_sequence, chain=True)
 
@@ -3621,7 +3625,24 @@ class AlerterFSM:
             # remaster's DogPoorRight an InfiniteLoop clip that had held the
             # class's step for good)
             self.player.ignore_infinite = bool(ticks)
-            self.player.play_sequence(names, on_end=done)
+            if ticks and done is not None:
+                # the PC action is a job of its ticks on the pet's queue: it
+                # ends with its timer whatever plays over the sprite meanwhile
+                # (109's feeding and fire clips over the parrot's whine), the
+                # clip's own end then coming to nothing (tick)
+                self.pc_job_seq += 1
+                seq = self.pc_job_seq
+                self.pc_job_left = ticks / float(pcprofile.S1_TICK_HZ)
+                self.pc_job_done = done
+
+                def end(seq=seq):
+                    if seq == self.pc_job_seq:
+                        self.pc_job_seq += 1
+                        self.pc_job_left = 0.0
+                        done()
+                self.player.play_sequence(names, on_end=end)
+            else:
+                self.player.play_sequence(names, on_end=done)
         elif done is not None:
             done()
 
@@ -3661,6 +3682,16 @@ class AlerterFSM:
     def tick(self, dt):
         w = self._woody()
         if w is None:
+            return
+        if self._pc() and self.pc_job_left > 0.0:
+            self.pc_job_left -= dt
+            if self.pc_job_left <= 1e-6:
+                self.pc_job_left = 0.0
+                self.pc_job_seq += 1
+                self.pc_job_done()
+        if self._pc() and self.pc_paused:
+            # the class's update returns at once while paused (fcn.0045bfa0's
+            # +0xc test): no decision, no timer
             return
         if self._pc() and self.awake and not self.alert and not self.pc_busy \
                 and self.pc_timer > 0.0:
@@ -3780,7 +3811,7 @@ class AlerterFSM:
         `wakeup` action and the awake timer (0x45c129-0x45c153) — then state
         4, whose step barks at Woody in the room or on the whistle's flag and
         else whines or idles (_pc_step_done); awake, nothing"""
-        if self.awake:
+        if self.awake or self.pc_paused:
             return
         self.pc_timer = pcprofile.S1_PET_AWAKE_TICKS / float(pcprofile.S1_TICK_HZ)
         self.awake = True
@@ -3837,7 +3868,7 @@ class AlerterFSM:
         it, else the idle while the timer lasts, else asleep (fcn.0045bfa0)"""
         self.pc_busy = False
         self.pc_idle = False
-        if not self.awake:
+        if not self.awake or self.pc_paused:
             return
         w = self._woody()
         if w is not None and w.zone is not None and w.zone.pid == self.item.zone \
@@ -3866,8 +3897,29 @@ class AlerterFSM:
         else:
             self._pc_fall_asleep()
 
+    def pc_post(self, name):
+        """a behaviour the level class posts to the pet (fcn.004728d0): the
+        class's filter (slot 5, 0x45be80) sets +0xc on `pause` and clears it
+        on `resume`, its handler (slot 4, 0x45bdd0) takes `wakeup` from asleep
+        to state 3 — neither while paused (0x45bdea); resumed, its update
+        decides on the next tick"""
+        if name == 'pause':
+            # (the station's stay plays the pet's own clips over its sprite:
+            # a whine in hand ends with it — its end decides nothing paused)
+            self.pc_paused = True
+            self.pc_busy = False
+            self.pc_idle = False
+        elif name == 'resume':
+            if self.pc_paused:
+                self.pc_paused = False
+                self._pc_step_done()
+        elif name == 'wakeup':
+            self.pc_noise_wake()
+
     def on_rottweiler_enter(self):
         if self._pc():
+            if self.pc_paused:
+                return
             # the PC class whines at the neighbour only awake and with no
             # Woody to bark at (state 4's third branch), as its step is free;
             # asleep it goes on sleeping — the neighbour's gaits make no noise
@@ -5342,6 +5394,10 @@ class Routine:
         self._pc_use_tricked = bool(tricked)
         if self.on_use:
             self.on_use(it, tricked)
+        if pcprofile.is_pc() and self.pawn.world is not None:
+            # the stay's case posts the pet its behaviour (109's case 27,
+            # `pause`, 0x46b0bd) before the feeding
+            self.pawn.world.pc_visit_post(it, 'use')
         pc = self._pc_use_seconds(it)
         if pc > 0.0:
             # the stay's actions: his animation is theirs (no neighbour
@@ -6317,6 +6373,13 @@ class Routine:
             w.pc_end_after('use', self.item)  # a class's StopMsg after his use (PCEndAfter)
         if self.pawn.pc_bed and self.item is not None and self.item.name == 'AlarmClock':
             self.pawn.pc_bed = False      # the alarm clock's BedOut: the leave
+        if pcprofile.is_pc() and self.item is not None and self.state == self.USING \
+                and w is not None:
+            # the case after the stay posts the pet its behaviour (109's case
+            # 28, `resume`, 0x46b468) — the next case, a tick after the
+            # stay's list ends
+            w.call_later(1.0 / pcprofile.TICKS_PER_SECOND,
+                         lambda it=self.item: w.pc_visit_post(it, 'end'))
         if pcprofile.is_pc() and self.item is not None \
                 and self.state == self.USING:
             # a held clip elsewhere waits for this role's use of this item
@@ -11516,9 +11579,24 @@ class World:
         """a `wakeup` behaviour posted to a pet (the pet class's slot 4,
         0x45bdfe-0x45be2e: asleep, state 3 — the `wakeup` action and the
         timer; awake, nothing)"""
+        self.pc_pet_post(name, 'wakeup')
+
+    def pc_pet_post(self, name, behaviour):
+        """a behaviour posted to the named pet (AlerterFSM.pc_post)"""
         fsm = next((f for f in self.alerters.values() if f.item.name == name), None)
+        if fsm is not None and behaviour:
+            fsm.pc_post(behaviour)
+
+    def pc_visit_post(self, it, phase):
+        """the neighbour's stay at a pet's own station (the parrot's Alerter
+        and the TrickItem he feeds it by share 109's GameObject): the
+        behaviour its PCVisitPosts names for the phase"""
+        fsm = next((f for f in self.alerters.values()
+                    if f.item.go == it.go and f.item.pc_visit_posts), None)
         if fsm is not None:
-            fsm.pc_noise_wake()
+            b = fsm.item.pc_visit_posts.get(phase)
+            if b:
+                fsm.pc_post(b)
 
     def _pc_whistle(self, src, entry):
         """the PC's dog whistle: Woody's `dogwhistle` (level_hunter's
@@ -11755,6 +11833,12 @@ class World:
             if fsm.item.zone == old_zone_pid:
                 fsm.on_rottweiler_leave()
             elif fsm._pc() and pawn.zone is not None and fsm.item.zone == pawn.zone.pid:
+                rt = next((r for r in self.routines if r.pawn is pawn), None)
+                if fsm.item.pc_visit_posts and rt is not None and rt.item is not None \
+                        and rt.item.go == fsm.item.go and rt.urgent_item is None:
+                    # his visit to the pet: the class's case after the room's
+                    # GoTo posts its behaviour (109's case 26, `wakeup`)
+                    fsm.pc_post(fsm.item.pc_visit_posts.get('enter'))
                 # the PC's pet whines whenever the neighbour is in its room
                 # (not only at the alarm's end)
                 fsm.on_rottweiler_enter()

@@ -32,6 +32,15 @@ LEVEL_DIR = {101: 'level_peep', 102: 'level_sofa', 103: 'level_mail', 104: 'leve
 PETS = {'dog': 'Dog', 'chili': 'Chili'}
 SOURCE = ("the PC's pet (tools/pcref/pc_pets_s1.py): level.xml's actor in its room, the remaster's "
           "Alerter placed there — active, the PC x on the room's zone, its zone")
+# a pet the routine visits: the behaviours the level class posts to it
+# (fcn.004728d0 from `neighbor`) — 109's parrot: case 26, after case 25's
+# GoTo to the living room, posts `wakeup` (0x46b00d) and walks to it, case
+# 27 posts `pause` (0x46b0bd) before the feeding, case 28 `resume`
+# (0x46b468); E09's parrot sits up as he comes to feed it (101 s) and is
+# still awake as he leaves (110 s), where the remaster's sleeps on
+VISIT_POSTS = {109: {'Chili': {'enter': 'wakeup', 'use': 'pause', 'end': 'resume'}}}
+POSTS_SOURCE = ("the pet's visit (tools/pcref/pc_pets_s1.py VISIT_POSTS): the behaviours the level class "
+                "posts to it as the neighbour comes into its room, starts the stay and ends it")
 
 
 def pc_pets(n):
@@ -60,7 +69,17 @@ def placements(n):
     """[(name, active, mobile zone, PC room, patches)] — patches None where the
     mobile's pet stands active in the PC's room"""
     import scene
-    lv = scene.Level(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n))
+    # the remaster's scene as it ships (no overlay: the profile's own patches
+    # are what this compares against)
+    prof = os.environ.get('NFH_PROFILE')
+    os.environ['NFH_PROFILE'] = 'mobile'
+    try:
+        lv = scene.Level(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n))
+    finally:
+        if prof is None:
+            del os.environ['NFH_PROFILE']
+        else:
+            os.environ['NFH_PROFILE'] = prof
     objs = lv.objs
     rooms = zone_rooms(n)
     zcomp = {}
@@ -106,10 +125,13 @@ def placements(n):
 def write(n, pls):
     p = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(p))
-    keep = [e for e in ov['patches'] if e.get('source') != SOURCE]
+    keep = [e for e in ov['patches'] if e.get('source') not in (SOURCE, POSTS_SOURCE)]
     for name, _a, _z, _r, patches in pls:
         if patches:
             keep.extend(patches)
+    for name, posts in sorted(VISIT_POSTS.get(n, {}).items()):
+        keep.append({'object': name, 'component': 'Alerter', 'set': {'PCVisitPosts': posts},
+                     'source': POSTS_SOURCE})
     ov['patches'] = keep
     json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
     open(p, 'a').write('\n')
@@ -123,7 +145,9 @@ def main(argv):
             print('%d %-6s mobile %s %s, PC %s%s' % (n, name, zname, 'active' if active else 'inactive', room,
                                                    '' if patches is None else ' -> ' + json.dumps(patches[1]['set']['position'])
                                                    + ' ' + patches[2]['set']['Zone']['name']))
-        if do_write and any(pl[4] for pl in pls):
+        for name, posts in sorted(VISIT_POSTS.get(n, {}).items()):
+            print('%d %-6s visit posts %s' % (n, name, posts))
+        if do_write and (any(pl[4] for pl in pls) or VISIT_POSTS.get(n)):
             write(n, pls)
             print('   written')
 

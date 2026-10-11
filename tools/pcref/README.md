@@ -87,7 +87,10 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   another room is placed in the PC's (its GameObject active, its Transform
   at the PC x on the room's zone, the inverse of Pawn._pc1_map, its
   Alerter's Zone): 112's dog, asleep in the kitchen (the remaster's an
-  unreferenced inactive Dog in the living room).
+  unreferenced inactive Dog in the living room). VISIT_POSTS the behaviours
+  a level class posts to a pet the routine visits (PCVisitPosts: 109's
+  parrot, `wakeup` as he comes into the living room, `pause` before the
+  feeding, `resume` after it — cases 26-28).
 - `pc_reactions.py [--write] [106 …]`: the keys per mobile item out of the
   stands — PCShoutIndex/PCShoutSkip (the step's index and flag 2, the
   register-valued ones from `fire_sites.py --fibers`), PCUseSecondsTricked,

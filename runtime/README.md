@@ -1424,7 +1424,20 @@ the skate's list wakes it: its element before the slide (0x4631aa,
 fcn.0047c6c0 over fcn.00462d90) posts `wakeup` from the neighbour to the dog
 (fcn.004728d0), which reaches it with the slide's first move (PCWakePet,
 `World.pc_wake_pet`: the pet class's slot 4, asleep -> state 3; E12's dog
-sits up as he flies out of the window, 262 s).
+sits up as he flies out of the window, 262 s). 109's parrot is fed by the
+neighbour (the remaster's Chili TrickItem and Alerter share its GameObject):
+Level_Pig's case 26, after case 25's GoTo to the living room, posts `wakeup`
+to it and walks to it (0x46b00d), case 27 posts `pause` before the feeding
+(0x46b0bd), case 28 `resume` (0x46b468) — PCVisitPosts on the Alerter,
+`World.pc_visit_post` from his zone change into its room, the stay's start
+and, a tick after its end, the next case (`AlerterFSM.pc_post`: the class's
+filter, slot 5, sets and clears +0xc, under which its update and slot 4 do
+nothing). E09's parrot sits up as he comes to feed it and is awake as he
+leaves (101-110 s), where the remaster's slept through; the profile's wakes,
+whines while he is in the room, and sleeps 6 s after he leaves. A PC pet
+action (the wake-up, a bark, a whine) is a job of its ticks on the pet's
+queue and ends with its timer (`AlerterFSM._play`, pc_job_left), whatever
+clip the station's stay plays over the sprite meanwhile.
 
 ## The HUD
 

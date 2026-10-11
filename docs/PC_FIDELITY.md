@@ -2670,6 +2670,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the skate where E12's frames have him stop, 423 — the kitchen door to
   the skates and the slide had read 0.4 and 0.5 s quicker on the frames
   than the port's, the mobile test's place 18 px short of the PC door's);
+  109's parrot wakes as the neighbour comes to feed it since 2026-10-11
+  (Level_Pig's cases 26-28 post it `wakeup`, `pause` and `resume`; E09's
+  parrot awake 101-110 s, the remaster's asleep throughout): it whines while
+  he is in the living room and sleeps 6 s after he leaves (the plan's 117.9
+  and 257.9 s), a bark at Woody there meanwhile.
   112's dog sleeps in the kitchen since 2026-10-11 as level_fitness has it
   (E12's frames: there from the start, sitting up as the skate takes him out
   of the window — the skate list's `wakeup` to it), where the remaster's
