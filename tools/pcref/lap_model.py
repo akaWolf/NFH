@@ -240,8 +240,10 @@ class Level:
         of its name (105's football, made by the script)"""
         e = self.objects.get(obj)
         base = (obj.split('/')[0], 0, 0)
-        if not e and obj in self.actors and obj != 'neighbor':
-            e = self.actors[obj]
+        if not e and obj != 'neighbor' and (obj in self.actors or obj in self.placed):
+            # (a pet placed by level.xml whose block is generic/objects.xml's:
+            # 111-114's dog, 107 and 108's parrot)
+            e = self.actors.get(obj) or self.gen_actors.get(obj)
             base = self.placed.get(obj) or base
         if not e: return None
         other = 'woody' if actor == 'neighbor' else 'neighbor'

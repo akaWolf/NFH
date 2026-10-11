@@ -1421,6 +1421,20 @@
     }
    },
    "source": "Woody's start (tools/pcref/pc_walks_s1.py woody_start: level.xml's position, game.exe's start job fcn.004718b0 — the walk to `anc`, then `start`, a job of its time + 2)"
+  },
+  {
+   "object": "Dog",
+   "component": "Alerter",
+   "set": {
+    "PCWalkPoint": {
+     "Rottweiler": [
+      690,
+      395,
+      "lir"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots): the alarm's GoTo to the pet (fcn.0047a690: fcn.0044ac80 at 0x47a82f), its level.xml place and `neighbor` hotspot"
   }
  ]
 }

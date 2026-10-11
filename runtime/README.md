@@ -989,8 +989,18 @@ predicate, then the all-tricks win.
   walks as a snap, `_pc1_close`) — it had walked the mover's ticks
   between the mobile places, two where they mapped to one PC point (104's
   shelf 2.4 and 2.6 ticks, its chain 5 shorter since). The neighbour's
-  reaction walks keep the earlier count — the mover's ticks, two in
-  place. A
+  reaction walks to an object with no PC case of its own end in a GOTO's
+  ticks since 2026-10-11 (`Pawn.goto_item`'s `pc1_goto`, `_pc1_kind`: the
+  level class's or the reaction list's GOTO — the pet after the alarm's
+  search, fcn.0044ac80 at 0x47a82f; a fixing tool and its give back; the
+  antenna's run), the alarm's walk to the pet runs to its end (the
+  mobile's SameZone yell within 0.05 u dropped under the profile: the
+  shout is the list's next element), and it walks to the pet's PC point
+  (PCWalkPoint on the Alerter: its level.xml place and `neighbor`
+  hotspot, the dog's 0/0, the parrot's 25/15 — 114's dog at 830/410
+  where the mobile spot mapped to 776/420): E14's dog alarm from its
+  icon to the records' 11.28 s against 10.8 (10.29 before), the records'
+  walk back and take 14.61 against 14.6 (13.77). A
   case that pushes no job costs a tick: the level class's job returns not
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
   the next case runs on the tick after (tools/pcref/routine_order.py's

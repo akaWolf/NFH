@@ -195,6 +195,23 @@ TOOL_TARGETS = {110: {'FireExtinguisher': 'bal/barbecue_burn'},
                 111: {'Vacuum': 'lir/dirtycarpet'}}
 
 
+def pet_targets(n):
+    """{mobile Alerter: the PC pet}: the alarm's list walks him to the pet
+    (fcn.0047a690: fcn.0044ac80 at 0x47a82f) — its position in level.xml
+    plus its `neighbor` hotspot (generic/objects.xml: the dog's 0/0, the
+    parrot's 25/15)"""
+    d = json.load(open(os.path.join(ROOT, 'levels', 's1', 'Level%d.json' % n)))
+    out = {}
+    for o in d['objects'].values():
+        if o.get('type') != 'Alerter':
+            continue
+        nm = ((o.get('data') or {}).get('m_GameObject') or {}).get('name')
+        pet = {'Dog': 'dog', 'Chili': 'chili'}.get(nm)
+        if pet:
+            out[nm] = pet
+    return out
+
+
 def station_vias(n):
     """mobile item -> the PC objects its station's walk passes through: the
     GOTOs of the level class in the station's room from the last door to the
@@ -351,6 +368,10 @@ def level_data(n):
         p = L.object_point(obj)
         if p is not None:
             points.setdefault(item, {})['tool'] = list(p[1:]) + [p[0]]
+    for item, obj in pet_targets(n).items():
+        p = L.object_point(obj)
+        if p is not None and item not in points:
+            points[item] = {'Rottweiler': list(p[1:]) + [p[0]]}
     for item, obj in woody_targets(n).items():
         p = L.object_point(obj, actor='woody')
         if p is not None:

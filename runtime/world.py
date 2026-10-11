@@ -786,6 +786,8 @@ class Pawn:
         # PC's mover goes on under the reaction's list (pushed on top,
         # fcn.00444d30), its first move long done (Pawn._pc1_marks)
         self._pc1_resume = False
+        # the walk under way is a Season 1 reaction's GOTO step (goto_item)
+        self._pc1_reaction_goto = False
         self.adjacent_zones = spec.get('adjacent_zones') or False
         self.passing_complex = False     # Pawn.PassingComplexMove
         self.done_passing = False        # Pawn.DonePassingToOtherZone
@@ -1271,14 +1273,16 @@ class Pawn:
         self._capture_click(dest)
         return self._route(dest, {'kind': 'point', 'x': x}, on_arrive)
 
-    def goto_item(self, it, on_arrive=None):
+    def goto_item(self, it, on_arrive=None, pc1_goto=False):
         """BuildPathToItem (Pawn.cs:811-825): route to the zone, then a
         plain floor step at the item's TargetLocation.x before the item
         step — but only for an elevated item the pawn is not already
         standing under (IsAtItemLocation, cs:827-830: within 0.1 of the
         item's own x). The floor step takes TargetLocation.x itself, where
         the item step takes GetMoveLocation, which offsets Olga and the
-        Mother (Item.cs:2245-2262)."""
+        Mother (Item.cs:2245-2262). `pc1_goto`: the walk is a Season 1
+        reaction's GOTO step (Pawn._pc1_kind)."""
+        self._pc1_reaction_goto = bool(pc1_goto)
         dest = self.level.zone_by_pid(it.zone)
         if dest is None:
             return False
@@ -2488,8 +2492,16 @@ class Pawn:
         action, the door step or the hideout's ENTER as its follow-up, a walk
         job alone on the floor); None where the walk's ticks keep the mover's
         count alone — a visit inside a PC case (no GOTO of the PC's: a split
-        case's later visits, another item's share of it)"""
-        return woody if self.role == 'Woody' else kind
+        case's later visits, another item's share of it). A reaction's walk
+        to an object with no PC case of its own (goto_item's `pc1_goto`: the
+        level class's or the reaction list's GOTO — the pet after the
+        alarm's search, fcn.0044ac80 at 0x47a82f; a fixing tool and its
+        give back; the antenna's run) ends in a GOTO's"""
+        if self.role == 'Woody':
+            return woody
+        if kind is None and self._pc1_reaction_goto:
+            return 'goto'
+        return kind
 
     def _pc1_case(self, it):
         """the job the neighbour's PC case for the coming visit to `it` walks
@@ -6726,7 +6738,8 @@ class Routine:
                 self.routine_behavior.on_move_to_routine_action(item, None)
         if self.pawn.at_use_range(item):
             self._urgent_arrived()
-        elif not self.pawn.goto_item(item, on_arrive=self._urgent_arrived):
+        elif not self.pawn.goto_item(item, on_arrive=self._urgent_arrived,
+                                     pc1_goto=self.role == 'Rottweiler'):
             self._urgent_finished()
 
     def _pc_runs(self, item, kind, name):
@@ -7107,7 +7120,8 @@ class Routine:
         # Owner.MoveToGoal(Item, Zone, TargetLocation, stopAtExitDoor: false)
         # (cs:466) is the plain walk: InUrgentMove drops (Pawn.cs:428-433)
         self.pawn.in_urgent = False
-        if not self.pawn.goto_item(it, on_arrive=self._same_zone_yell):
+        if not self.pawn.goto_item(it, on_arrive=self._same_zone_yell,
+                                   pc1_goto=self.role == 'Rottweiler'):
             self._same_zone_yell()
 
     def _same_zone_yell(self):
@@ -8260,7 +8274,10 @@ class Routine:
         # the SameZone run's proximity yell (ActionManager.cs:459-481):
         # closing within 0.05 of the target stops the walk and plays the
         # surprise-left set once
-        if self._same_zone and self.state == self.MOVING \
+        # (the PC's alarm list walks its GoTo to the pet to its end, the
+        # shout its next element: the walk's arrival yells, _same_zone_walk)
+        pc_list = pcprofile.is_pc() and not pcprofile.SEASON2 and self.role == 'Rottweiler'
+        if self._same_zone and self.state == self.MOVING and not pc_list \
                 and self.urgent_item is not None and not self._same_zone_yelled:
             if abs(self.pawn.sprite.x
                    - self.urgent_item.move_x(self.role)) < 0.05:

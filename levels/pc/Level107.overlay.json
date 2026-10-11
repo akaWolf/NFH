@@ -1091,6 +1091,20 @@
     "PCFixSeconds": 1.5
    },
    "source": "level_art's painting case (game.exe 0x45880d-0x458a2f): the GoTo to bal/picture_empty, then with the picture smeared the list's first update and its StopMsg, OBJ2 bal/picture_smeared (0x458931) — the fire on arrival, not after a painting — its clean (time 15: 17 ticks) and the message step that switches the empty picture back (1)"
+  },
+  {
+   "object": "Chili",
+   "component": "Alerter",
+   "set": {
+    "PCWalkPoint": {
+     "Rottweiler": [
+      425,
+      420,
+      "lir"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots): the alarm's GoTo to the pet (fcn.0047a690: fcn.0044ac80 at 0x47a82f), its level.xml place and `neighbor` hotspot"
   }
  ]
 }
