@@ -39,7 +39,7 @@
     "PCLinkedPaysAt": 4.33,
     "PCUseSeconds": 4.08,
     "PCDepartTicks": {
-     "Rottweiler": 3
+     "Rottweiler": 1
     }
    }
   },
@@ -81,7 +81,7 @@
      "fix": null
     },
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 0
     }
    }
   },
@@ -103,7 +103,7 @@
     ],
     "PCUseSeconds": 4.5,
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 3
     }
    }
   },
@@ -1173,7 +1173,7 @@
      "zone": "Zone01",
      "x": 550,
      "px": 0,
-     "depart": 4
+     "depart": 1
     }
    }
   },

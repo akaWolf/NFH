@@ -36,7 +36,10 @@
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 2.33,
     "PCLinkedPaysAt": 5.25,
-    "PCUseSeconds": 6.83
+    "PCUseSeconds": 6.83,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -67,7 +70,10 @@
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 1.83,
     "PCLinkedPaysAt": 4.08,
-    "PCUseSeconds": 5.17
+    "PCUseSeconds": 5.17,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -87,7 +93,10 @@
     "PCJingleAt": [
      3.75
     ],
-    "PCUseSeconds": 7.5
+    "PCUseSeconds": 7.5,
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -106,7 +115,10 @@
     "PCJingleAt": [
      3.83
     ],
-    "PCUseSeconds": 5.25
+    "PCUseSeconds": 5.25,
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -140,7 +152,10 @@
     "PCFixSecondsLinked": 0,
     "PCShoutTailLinked": 0.33,
     "PCLinkedPaysAt": 3.92,
-    "PCUseSeconds": 9.0
+    "PCUseSeconds": 9.0,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -189,7 +204,10 @@
      -64
     ],
     "PCUseSeconds": 13.0,
-    "PCIcon": ""
+    "PCIcon": "",
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -949,7 +967,10 @@
       }
      }
     },
-    "PCUseSeconds": 3.83
+    "PCUseSeconds": 3.83,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -1296,6 +1317,9 @@
     },
     "PCUseSecondsRole": {
      "Mother": 12.0
+    },
+    "PCDepartTicks": {
+     "Mother": 2
     }
    }
   },
@@ -1319,6 +1343,9 @@
     },
     "PCUseSecondsRole": {
      "Mother": 8.67
+    },
+    "PCDepartTicks": {
+     "Mother": 2
     }
    }
   },
@@ -1927,7 +1954,8 @@
     "PCStart": {
      "zone": "Zone04",
      "x": 177,
-     "px": -34
+     "px": -34,
+     "depart": 4
     }
    }
   },
@@ -1938,7 +1966,8 @@
     "PCStart": {
      "zone": "Zone05",
      "x": 1015,
-     "px": -24
+     "px": -24,
+     "depart": 1
     }
    }
   },

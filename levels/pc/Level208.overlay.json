@@ -55,7 +55,10 @@
       8.5,
       "shoecleaner"
      ]
-    ]
+    ],
+    "PCDepartTicks": {
+     "Rottweiler": 3
+    }
    }
   },
   {
@@ -74,7 +77,10 @@
     "PCJingleAt": [
      1.58
     ],
-    "PCUseSeconds": 4.58
+    "PCUseSeconds": 4.58,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -93,7 +99,10 @@
     "PCJingleAt": [
      4.58
     ],
-    "PCUseSeconds": 5.92
+    "PCUseSeconds": 5.92,
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -113,7 +122,10 @@
     "PCJingleAt": [
      4.58
     ],
-    "PCUseSeconds": 5.25
+    "PCUseSeconds": 5.25,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -179,6 +191,9 @@
       "MotherRoomIdle": "",
       "Hide_Out": "fifi"
      }
+    },
+    "PCDepartTicks": {
+     "Mother": 1
     }
    }
   },
@@ -1354,7 +1369,8 @@
     "PCStart": {
      "zone": "Zone03",
      "x": 1149,
-     "px": 0
+     "px": 0,
+     "depart": 4
     }
    }
   },
@@ -1365,7 +1381,8 @@
     "PCStart": {
      "zone": "Zone02",
      "x": 1257,
-     "px": -16
+     "px": -16,
+     "depart": 4
     }
    }
   },

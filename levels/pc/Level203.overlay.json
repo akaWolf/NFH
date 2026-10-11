@@ -26,7 +26,10 @@
      11.17
     ],
     "PCPairNext": "ToiletFlush",
-    "PCUseSeconds": 11.42
+    "PCUseSeconds": 11.42,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -81,7 +84,7 @@
     },
     "PCUseSeconds": 5.0,
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 0
     }
    }
   },
@@ -104,7 +107,7 @@
     ],
     "PCUseSeconds": 3.83,
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 1
     }
    }
   },

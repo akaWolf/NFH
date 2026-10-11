@@ -79,6 +79,9 @@
     "PCJingle": true,
     "PCIconRole": {
      "Mother": ""
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 0
     }
    }
   },
@@ -703,6 +706,9 @@
       "px": -8,
       "routes": {}
      }
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 0
     }
    }
   },
@@ -1150,7 +1156,10 @@
     "PCUseSeconds": [
      1.5,
      1.58
-    ]
+    ],
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -1632,7 +1641,8 @@
     "PCStart": {
      "zone": "Zone04",
      "x": 220,
-     "px": -10
+     "px": -10,
+     "depart": 3
     }
    }
   },
@@ -1643,7 +1653,8 @@
     "PCStart": {
      "zone": "Zone04",
      "x": 550,
-     "px": -50
+     "px": -50,
+     "depart": 4
     }
    }
   }

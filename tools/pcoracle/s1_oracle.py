@@ -119,8 +119,8 @@ class PlanRunner:
         w = self.woody()
         if self.phase == 'idle':
             self.leg_start = tick
-            if op in ('take', 'use', 'usewith', 'prime', 'unlock'):
-                self.phase = 'wait_idle'
+            if op in ('take', 'use', 'usewith', 'prime', 'unlock', 'hide'):
+                self.phase = 'wait_idle'          # (`hide`: the PC's use of the wardrobe or bed — he stays in)
             elif op == 'park':
                 room, x = self.m.zone_center(args[0])
                 if room is None: return self.done('no room for %s' % args[0])
@@ -129,6 +129,11 @@ class PlanRunner:
             elif op == 'whenusing':
                 self.phase = 'whenusing'; self.target = self.m.station(args[0])
                 if self.target is None: return self.done('no station for %s' % args[0])
+            elif op == 'whenzone':
+                # the neighbour in the zone's PC room: his room by name (Season 1's actors carry it), else his
+                # position within the room's x range and floor
+                self.phase = 'whenzone'; self.target = self.m.rooms.get(args[0])
+                if self.target is None: return self.done('no room for %s' % args[0])
             elif op == 'await':
                 self.phase = 'await'; self.target = self.tricked.get(args[0], tick)
             elif op == 'wait':
@@ -178,6 +183,15 @@ class PlanRunner:
         if self.phase == 'whenusing':
             acts = self.acts_on(self.target, self.leg_start)
             if acts and acts[-1][1] != 'leave': return self.done('ok')
+            return []
+        if self.phase == 'whenzone':
+            nb = actor_states().get('neighbor'); pr = self.target
+            if nb is not None and tick - self.leg_start > 6:
+                if nb.get('room') is not None:
+                    if nb['room'] == pr['room']: return self.done('ok')
+                elif pr['x1'] - 60 <= nb['x'] <= pr['x2'] + 60 and abs(nb['y'] - pr['floor']) <= 150:
+                    return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
         if self.phase == 'await':
             if any(t >= self.target for t in state['credits']): return self.done('ok')
@@ -328,7 +342,7 @@ class Mover(gdb.Breakpoint):
                             if s4 and 1 < len(s4) <= 4 and '/' not in s4: found['+%#x' % (4 * i)] = s4
                         except Exception: pass
                 print('ACTOR %s at %#x: room-like pointees %s' % (name, a, found), flush=True)
-                emit({'tick': state['tick'], 'ev': 'actor', 'name': name, 'rooms': found})
+                emit({'tick': state['tick'], 'ev': 'actor', 'name': name, 'ptr': a, 'rooms': found})
         except Exception: pass
         return False
 class Hook(gdb.Breakpoint):
@@ -342,7 +356,8 @@ class Hook(gdb.Breakpoint):
             if self.name == 'action' and isinstance(args[1], str):
                 state['actions'].setdefault(args[1], []).append((state['tick'], args[2]))
                 if args[1] == 'woody' and args[2] == 'decline': state['declines'].append(state['tick'])
-                if args[1] == 'woody' and args[2] in ('fight', 'respawn'):
+                if args[1] == 'woody' and (args[2] in ('fight', 'respawn') or args[2].startswith('fear')):
+                    # (a Season 1 catch: Woody's fear, then the level's FAILED screen — the ticks stop)
                     state['caught'].append((state['tick'], args[2])); print('CAUGHT tick %d: %s' % (state['tick'], args[2]), flush=True)
         except Exception as e:
             emit({'tick': state['tick'], 'ev': 'error', 'name': self.name, 'err': repr(e)})

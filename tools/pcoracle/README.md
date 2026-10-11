@@ -117,7 +117,23 @@ real thing without reading videos.
   step the tick the action ends or the one after, the mover's first move
   two ticks after the GoTo), per station into the overlay's PCDepartTicks
   (per role) and PCStart `depart` (the level's start); a catch's fight is
-  no exit. `pc_clips_from_trace.py <n> <trace> [--write]` — a station's
+  no exit. The stands are the PC's absolute ones and over-correct a level
+  whose station seconds (the video-paired PCUseSeconds / PCClipSeconds)
+  carry them already — 205's legs paired within a tick before any were
+  written and ran 0.6 s per 100 s late after: `calib_depart.py <n> <trace>
+  <port run without them> [--write | --strip]` settles them as the net
+  ticks each leg lacks (the port's replay with NFH_NO_DEPART=1 against the
+  trace, station action start to action start, the deficit written on the
+  station the leg leaves; the port long -> 0; no paired leg -> 0), or
+  strips every departure key of a level whose bubble drifts under 0.1 s
+  per 100 s without them — `calib.sh <n> <tag>` runs the whole settlement
+  (the replay without, the decision, the replay with, the pairing). The
+  walks' targets are the actor's own `goto` records: the trace's `actor`
+  records name the objects (the path finder's registration), and an older
+  trace is attributed by the rooms the walks end in against the targets'
+  (207's Olga polls her mat's GoTo every tick and out-voted the neighbour
+  by coincidence before).
+  `pc_clips_from_trace.py <n> <trace> [--write]` — a station's
   PCClipSeconds re-measured where its clips are the actor's own animations
   (202's sea), each from its animation's first tick to the next's, the
   last to the walk less the exit's ticks; a waited-on clip keeps its value.
@@ -133,7 +149,10 @@ real thing without reading videos.
   predicate fcn.1003f573 (`xor eax, eax; ret 0x10` at the first tick —
   tools/pcref/pc_catch_s2.py) for an idle lap with Woody uncatchable. When
   the ticks stall six seconds the watchdog takes a screenshot
-  (stall_<level>.xwd: a dialog after a Season 1 catch?). The port's
+  (stall_<level>.xwd: Season 1's FAILED screen — a catch ends a Season 1
+  level, Woody's `fear` is the catch; its idle laps park him in the hall's
+  wardrobe (`use Wardrobe`, ~/nfh-bench/plans/park/Level1NN.txt) where the
+  lap crosses the port's park zone). The port's
   state.jsonl cadence is NFH_STATE_EVERY (10 = 6 Hz; the replays 5 = 12 Hz).
 - `cmp_idle.py` — the same for an idle lap (`runtime/record.py`,
   NFH_PROFILE=pc).

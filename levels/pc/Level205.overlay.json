@@ -37,7 +37,7 @@
     "PCShoutTail": 0.08,
     "PCJingle": true,
     "PCDepartTicks": {
-     "Rottweiler": 2,
+     "Rottweiler": 0,
      "Olga": 3
     }
    }
@@ -66,7 +66,7 @@
      0.92
     ],
     "PCDepartTicks": {
-     "Rottweiler": 3
+     "Rottweiler": 1
     }
    }
   },
@@ -89,7 +89,7 @@
     ],
     "PCUseSeconds": 4.92,
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 1
     }
    }
   },
@@ -112,7 +112,7 @@
     ],
     "PCUseSeconds": 2.83,
     "PCDepartTicks": {
-     "Rottweiler": 3
+     "Rottweiler": 0
     }
    }
   },
@@ -134,7 +134,7 @@
     ],
     "PCUseSeconds": 7.42,
     "PCDepartTicks": {
-     "Rottweiler": 3
+     "Rottweiler": 2
     }
    }
   },
@@ -742,7 +742,8 @@
     "PCBehaviourAt": 0.33,
     "PCUseSeconds": 6.5,
     "PCDepartTicks": {
-     "Rottweiler": 1
+     "Rottweiler": 0,
+     "Olga": 3
     }
    }
   },
@@ -1217,7 +1218,7 @@
      "zone": "Zone02",
      "x": 1100,
      "px": 0,
-     "depart": 4
+     "depart": 0
     }
    }
   },

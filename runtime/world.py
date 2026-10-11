@@ -2134,7 +2134,9 @@ class Pawn:
         # 4, rail 2, sea 1 for the neighbour, Olga's mat and sub 3), stood
         # before the run down to the floor
         dispatch = (getattr(src, 'pc_depart_ticks', None) or {}).get(self.role, 0) \
-            if (src is not None and self.role != 'Woody') else 0
+            if (src is not None and self.role != 'Woody' and not os.environ.get('NFH_NO_DEPART')) else 0
+        # (NFH_NO_DEPART=1: a calibration run of the oracle's replay without them — the ticks a level's
+        # legs lack against the original are then the ones to write, tools/pcoracle/calib_depart.py)
         if not ticks and not dispatch:
             return pcx
         secs = (ticks or 0) / pcprofile.TICKS_PER_SECOND

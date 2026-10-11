@@ -154,6 +154,9 @@
      "ChairWakeup": "",
      "ChairAwake": "",
      "ChairLeave": "mother"
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 0
     }
    }
   },
@@ -724,7 +727,10 @@
       }
      }
     },
-    "PCUseSeconds": 1.25
+    "PCUseSeconds": 1.25,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -876,6 +882,9 @@
       "OlgaShowerTakeBra": 0.75,
       "OlgaShowerLeave": 1.42
      }
+    },
+    "PCDepartTicks": {
+     "Olga": 3
     }
    }
   },
@@ -1001,6 +1010,9 @@
      "N2TrickItemExtra1": 0.92,
      "N2TrickItemUseNormal": 10.0,
      "N2TrickItemExtra2": 0.92
+    },
+    "PCDepartTicks": {
+     "Olga": 3
     }
    }
   },
@@ -1516,7 +1528,8 @@
     "PCStart": {
      "zone": "Zone01",
      "x": 578,
-     "px": 1
+     "px": 1,
+     "depart": 4
     }
    }
   },
@@ -1527,7 +1540,8 @@
     "PCStart": {
      "zone": "Zone01",
      "x": 300,
-     "px": 0
+     "px": 0,
+     "depart": 0
     }
    }
   },
@@ -1538,7 +1552,8 @@
     "PCStart": {
      "zone": "Zone04",
      "x": 300,
-     "px": 0
+     "px": 0,
+     "depart": 4
     }
    }
   },

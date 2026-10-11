@@ -4600,7 +4600,42 @@ a clip from its animation's first tick to the next clip's): SeeSub 8.25
 (the bar's 97 ticks and the leave step's one), LeaveSea 1.67 (the exit's
 tick in PCDepartTicks), the wait's tail 0.25 (the neighbour enters three
 ticks after Olga's put ends: the poll, the GoTo, the enter) — the sea leg
--0.35 a lap now, the whole lap -0.2 s.
+-0.35 a lap now, the whole lap -0.2 s. The stands are not to be written
+as the PC's absolute ones everywhere: 205's station seconds (video-paired)
+carry them, its legs paired within a tick before and ran 0.6 s per 100 s
+late after — the keys are settled per level as the net ticks each leg
+lacks against the original (tools/pcoracle/calib_depart.py, calib.sh:
+the port's replay without them first; a level drifting under 0.1 s per
+100 s without them keeps none). Season 1 on the same oracle (NFH1,
+tools/pcoracle/s1_oracle.py; the idle laps with Woody parked, or hidden
+in the hall's wardrobe where the lap crosses the port's park zone — a
+Season 1 catch ends the level): the port's neighbour runs 0.03-0.58 s per
+100 s early on every level (101 -0.23, 102 -0.53, 103 -0.58, 104 -0.27,
+105 -0.31, 106 -0.21, 107 -0.36, 109 -0.17, 110 -0.03, 111 -0.22, 112
+-0.27, 113 -0.26, 114 -0.27), a tick at every second station — the
+Season 1 exit stands (1 after an `inv` station, 2 after a take or give,
+tools/pcoracle/exit_ticks.py) are the next thing to carry. 108's port
+replay fails where the PC's lap runs: the port's Woody hidden in the
+wardrobe is caught (four restarts), the PC's is not — the port's `use` of a
+HideItem toggles him in and out; the replay writes the port's `hide` leg
+for it (oracle2plan.py), and 108 then pairs (-0.31 s per 100 s).
+
+**Season 2 after the settlement (2026-10-03 01:20, the parked / uncatchable
+laps against the port's replays, the bubble's drift per 100 s):** 202
+-0.27, 203 -0.14, 204 -1.33, 205 -0.04, 206 -1.00, 207 -1.36, 208 +0.15,
+209 +0.33, 210 -1.05, 211 +0.13, 212 -0.57, 213 -0.94, 214 -0.99; all 14
+plans EXCELLENT (the sweep of 01:09). What is left is no dispatch but a
+station or a walk, each a leg off by ten ticks or more against the
+original (tools/pcoracle/stays_report.py --ticks=5): 202's sea leg -5
+(the climb to the rail); 204's walk from the hot dog to the jade -11 (the
+original walks a Manhattan path from the stairs' foot to the jade's
+hotspot, mg3 / mg2 / mg3 / mg0 over 5.2 s, the port stands 1.9 s and
+walks straight 2.4 s); 207's elephant +10 and shell +12 (the port's stays
+long); 209's cow ride +11 and ice cream -6; 210's Fifi put -19; 213's
+pinata -11, bath -7, picnic -79; 214's pistol +10; 206's pillow service
+(takes and gives of a second or two, each 2-3 ticks short in the port,
+-0.5 s over its first 24 s). Season 1: 0.03-0.58 s per 100 s early
+everywhere (a tick a station).
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

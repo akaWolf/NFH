@@ -127,8 +127,8 @@ class PlanRunner:
         w = self.woody()
         if self.phase == 'idle':
             self.leg_start = tick
-            if op in ('take', 'use', 'usewith', 'prime', 'unlock'):
-                self.phase = 'wait_idle'
+            if op in ('take', 'use', 'usewith', 'prime', 'unlock', 'hide'):
+                self.phase = 'wait_idle'          # (`hide`: the PC's use of the wardrobe or bed — he stays in)
             elif op == 'park':
                 room, x = self.m.zone_center(args[0])
                 if room is None: return self.done('no room for %s' % args[0])
@@ -137,6 +137,11 @@ class PlanRunner:
             elif op == 'whenusing':
                 self.phase = 'whenusing'; self.target = self.m.station(args[0])
                 if self.target is None: return self.done('no station for %s' % args[0])
+            elif op == 'whenzone':
+                # the neighbour in the zone's PC room: his room by name (Season 1's actors carry it), else his
+                # position within the room's x range and floor
+                self.phase = 'whenzone'; self.target = self.m.rooms.get(args[0])
+                if self.target is None: return self.done('no room for %s' % args[0])
             elif op == 'await':
                 self.phase = 'await'; self.target = self.tricked.get(args[0], tick)
             elif op == 'wait':
@@ -185,6 +190,15 @@ class PlanRunner:
         if self.phase == 'whenusing':
             acts = self.acts_on(self.target, self.leg_start)
             if acts and acts[-1][1] != 'leave': return self.done('ok')
+            return []
+        if self.phase == 'whenzone':
+            nb = actor_states().get('neighbor'); pr = self.target
+            if nb is not None and tick - self.leg_start > 6:
+                if nb.get('room') is not None:
+                    if nb['room'] == pr['room']: return self.done('ok')
+                elif pr['x1'] - 60 <= nb['x'] <= pr['x2'] + 60 and abs(nb['y'] - pr['floor']) <= 150:
+                    return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
         if self.phase == 'await':
             if any(t >= self.target for t in state['credits']): return self.done('ok')
@@ -295,7 +309,8 @@ class PathHook(gdb.Breakpoint):
     def stop(self):
         try:
             a = u32(int(gdb.parse_and_eval('$esp')) + 8); name = as_string(u32(a + 4))
-            if name and name not in actors: actors[name] = a
+            if name and name not in actors:
+                actors[name] = a; emit({'tick': state['tick'], 'ev': 'actor', 'name': name, 'ptr': a})
         except Exception: pass
         return False
 MINIGAME_TICKS = int(os.environ.get('WDBG_MINIGAME_TICKS', '36'))

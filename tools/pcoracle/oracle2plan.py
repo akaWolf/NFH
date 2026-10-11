@@ -31,10 +31,11 @@ if n < 200:
 def item_of(obj):
     return items.get(obj) or families.get(family(obj))
 raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))
-inv = set(); gives = {}; primes = {}; unlockers = {}
+inv = set(); gives = {}; primes = {}; unlockers = {}; hides = set()
 for o in raw['objects'].values():
     d = o.get('data') or {}
     name = (d.get('m_GameObject') or {}).get('name')
+    if name and o.get('type') == 'HideItem': hides.add(name)      # the port's `hide` leg: he climbs in and stays
     for k in ('RequiredInventory', 'SecondRequiredInventory', 'PrimedInventoryType', 'DexterityUnlocker'):
         v = d.get(k)
         if isinstance(v, str) and v.startswith('IT'): inv.add(v)
@@ -69,6 +70,7 @@ for l in s.split('\n'):
             it = item_of(a['name'])
             if not it: out.append('# no item for %s' % a['name'])
             elif gives.get(it): out.append('take %s %s' % (it, gives[it]))
+            elif it in hides: out.append('hide %s' % it)
             else: out.append('use %s' % it)
         elif l.startswith('<CombineMsg'):
             it = item_of(a['object']); held = it_of(a['object2'])

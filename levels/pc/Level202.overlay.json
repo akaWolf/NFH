@@ -29,6 +29,9 @@
      "clip": "SearchNFH2",
      "repair": 1.67,
      "tail": 0.17
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 0
     }
    },
    "note": "the rake's component is the Rake subclass (scene.py), not a plain TrickItem — the patch matched nothing until 2026-09-17"
@@ -68,7 +71,7 @@
      "LeaveSea": "bridge"
     },
     "PCDepartTicks": {
-     "Rottweiler": 1
+     "Rottweiler": 4
     }
    },
    "note": "cn_b1/tricks.xml shark=35000: the coin is read from the Swimming item's AngerAmount when the shark pays, not from the Submarine that arms it (2026-09-17)"
@@ -114,7 +117,7 @@
      "BeachGetUp": "beer"
     },
     "PCDepartTicks": {
-     "Rottweiler": 4
+     "Rottweiler": 3
     }
    },
    "source": "cn_b1/tricks.xml crayfish=20000 (the mobile's 30)"
@@ -150,7 +153,7 @@
     "PCLinkedPaysAt": 6.42,
     "PCUseSeconds": 11.0,
     "PCDepartTicks": {
-     "Rottweiler": 2
+     "Rottweiler": 1
     }
    }
   },

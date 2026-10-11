@@ -10,7 +10,7 @@ echo "== $N $L $(date +%T)"
 WDBG_PLAN=$HOME/nfh-bench/plans/park/Level$N.txt ./s1planrun.sh $N $L $SECS park 2>&1 | grep "LEG\|^plan\|WATCHDOG\|CAUGHT\|^done" | cut -c1-100
 UNTIL=$SECS ./replay.sh $N $L park 2>&1 | tail -2
 R=$HOME/nfh-bench/runs/replay${N}_park
-NFH_PROFILE=pc nix-shell --run "python3 ../pcoracle/cmp_pairs.py $LOGS/oracle_${L}_park.jsonl $R/s1_Level$N --segments=$SECS" > $R/pairs.txt 2>&1
+(cd ../.. && NFH_PROFILE=pc nix-shell --run "python3 tools/pcoracle/cmp_pairs.py $LOGS/oracle_${L}_park.jsonl $R/s1_Level$N --segments=$SECS") > $R/pairs.txt 2>&1
 sed -n '/== stations (PC \/ port: the action/,$p' $R/pairs.txt | head -12
 done
 echo "s1parkbatch done $(date +%T)"

@@ -26,7 +26,10 @@
      6.08
     ],
     "PCUseSeconds": 3.75,
-    "PCIcon": "limberwall"
+    "PCIcon": "limberwall",
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -55,7 +58,10 @@
      5.25
     ],
     "PCExtraPaysAt": 5.25,
-    "PCUseSeconds": 8.5
+    "PCUseSeconds": 8.5,
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -83,7 +89,10 @@
      2.67
     ],
     "PCExtraPaysAt": 2.67,
-    "PCUseSeconds": 1.75
+    "PCUseSeconds": 1.75,
+    "PCDepartTicks": {
+     "Rottweiler": 2
+    }
    }
   },
   {
@@ -128,6 +137,10 @@
      "wait": "olgafight",
      "shout": "olgafight",
      "fix": null
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 2,
+     "Olga": 2
     }
    }
   },
@@ -156,7 +169,10 @@
     "PCJingleAt": [
      1.08
     ],
-    "PCUseSeconds": 7.08
+    "PCUseSeconds": 7.08,
+    "PCDepartTicks": {
+     "Rottweiler": 1
+    }
    }
   },
   {
@@ -206,7 +222,10 @@
     "PCJingleAt": [
      6.08
     ],
-    "PCUseSeconds": 9.67
+    "PCUseSeconds": 9.67,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -1009,6 +1028,9 @@
     },
     "PCIconRole": {
      "Mother": "water"
+    },
+    "PCDepartTicks": {
+     "Mother": 1
     }
    }
   },
@@ -1387,6 +1409,9 @@
     },
     "PCUseSecondsRole": {
      "Mother": 17.0
+    },
+    "PCDepartTicks": {
+     "Mother": 1
     }
    }
   },
@@ -1462,7 +1487,10 @@
       "BullRide": 7.0
      }
     },
-    "PCBehaviourAtEnd": 0.08
+    "PCBehaviourAtEnd": 0.08,
+    "PCDepartTicks": {
+     "Olga": 3
+    }
    }
   },
   {
@@ -1569,6 +1597,9 @@
       "at": "start",
       "then": 0.0
      }
+    },
+    "PCDepartTicks": {
+     "Olga": 1
     }
    }
   },
@@ -2233,7 +2264,8 @@
     "PCStart": {
      "zone": "Zone04",
      "x": 141,
-     "px": -22
+     "px": -22,
+     "depart": 0
     }
    }
   },
@@ -2244,7 +2276,8 @@
     "PCStart": {
      "zone": "Zone05",
      "x": 1286,
-     "px": 6
+     "px": 6,
+     "depart": 4
     }
    }
   },

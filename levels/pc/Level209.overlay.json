@@ -24,7 +24,10 @@
     "PCJingleAt": [
      0.83
     ],
-    "PCUseSeconds": 1.33
+    "PCUseSeconds": 1.33,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -64,7 +67,10 @@
     "PCIcon": [
      "tadj_mahal",
      null
-    ]
+    ],
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -104,7 +110,10 @@
     "PCShoutLinked": 2,
     "PCFixSecondsLinked": 1.92,
     "PCLinkedPaysAt": 4.25,
-    "PCUseSeconds": 4.5
+    "PCUseSeconds": 4.5,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -123,7 +132,10 @@
     "PCJingleAt": [
      2.83
     ],
-    "PCUseSeconds": 10.17
+    "PCUseSeconds": 10.17,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -142,7 +154,10 @@
     "PCJingleAt": [
      5.17
     ],
-    "PCUseSeconds": 15.75
+    "PCUseSeconds": 15.75,
+    "PCDepartTicks": {
+     "Rottweiler": 0
+    }
    }
   },
   {
@@ -179,6 +194,9 @@
       "MotherRoomIdle": "",
       "Hide_Out": "fakirshop"
      }
+    },
+    "PCDepartTicks": {
+     "Mother": 1
     }
    }
   },
@@ -197,6 +215,9 @@
     "PCIcon": "",
     "PCIconClips": {
      "TadjMahalLeave": "slippers"
+    },
+    "PCDepartTicks": {
+     "Rottweiler": 0
     }
    }
   },
@@ -1462,6 +1483,9 @@
     },
     "PCIconRole": {
      "Mother": "fakirshop"
+    },
+    "PCDepartTicks": {
+     "Mother": 2
     }
    }
   },
@@ -1487,7 +1511,8 @@
     "PCStart": {
      "zone": "Zone02",
      "x": 1100,
-     "px": 0
+     "px": 0,
+     "depart": 4
     }
    }
   },
@@ -1498,7 +1523,8 @@
     "PCStart": {
      "zone": "Zone05",
      "x": 800,
-     "px": 0
+     "px": 0,
+     "depart": 0
     }
    }
   },

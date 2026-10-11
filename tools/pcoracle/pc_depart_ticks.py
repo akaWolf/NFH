@@ -26,23 +26,35 @@ def family(name):
     return room, base.split('_')[0]
 
 
-def actor_gotos(rows, role_ticks, gotos):
-    """the actor's walks' targets as (tick, target) — the `goto` records of the actor pointer that starts
-    the walks (voted), else (Season 1: no GoTo hook) the first DoAction on a room/object within four ticks
-    after an arrival (the stand after a walk), credited to the walk before it"""
+def actor_gotos(rows, role_ticks, gotos, role='neighbor', rooms=None):
+    """the actor's walks' targets as (tick, target): the `goto` records of the actor's object — the trace's
+    `actor` record names it (the path finder's registration), else the pointer whose targets' rooms agree
+    most with the rooms the actor's walks end in (`rooms`: {zone: PCRoom} of the level — the room of a
+    target is its name's prefix, the room of a position the PCRoom whose x range and floor hold it), else
+    (Season 1: no GoTo hook) the first DoAction on a room/object within four ticks after an arrival"""
     WALKS_ = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')
-    moves = set()
-    for i in range(1, len(role_ticks)):
-        if role_ticks[i][1] in WALKS_ and (role_ticks[i][2], role_ticks[i][3]) != (role_ticks[i - 1][2], role_ticks[i - 1][3]) and role_ticks[i - 1][1] not in WALKS_:
-            moves.add(role_ticks[i][0])
     firsts = []; last = None
     for t, ptr, target in gotos:
         if (ptr, target) != last: firsts.append((t, ptr, target)); last = (ptr, target)
-    votes = {}
-    for t, ptr, target in firsts:
-        if any(t <= m <= t + 3 for m in moves): votes[ptr] = votes.get(ptr, 0) + 1
-    if votes:
-        mine = max(votes, key=votes.get)
+    named = [r for r in rows if r.get('ev') == 'actor' and r.get('name') == role and r.get('ptr')]
+    mine = named[0]['ptr'] if named else None
+    if mine is None and firsts:
+        # the walks' ends: the last walk tick before a stand or another animation
+        ends = []
+        for i in range(1, len(role_ticks)):
+            if role_ticks[i - 1][1] in WALKS_ and role_ticks[i][1] not in WALKS_:
+                ends.append(role_ticks[i - 1])
+        def room_of(x, y):
+            for z, pr in (rooms or {}).items():
+                if pr['x1'] - 150 <= x <= pr['x2'] + 150 and abs(y - pr['floor']) <= 200: return pr['room']
+            return None
+        score = {}
+        for t, ptr, target in firsts:
+            e = next((e for e in ends if e[0] >= t), None)
+            if e is None: continue
+            if room_of(e[2], e[3]) == target.split('/')[0]: score[ptr] = score.get(ptr, 0) + 1
+        if score: mine = max(score, key=score.get)
+    if mine is not None:
         return [(t, target) for t, ptr, target in firsts if ptr == mine]
     # the fallback: arrivals and the actions right after them
     actions = [(r['tick'], r['args'][1]) for r in rows if r['ev'] == 'action' and isinstance(r['args'][1], str) and '/' in r['args'][1]]
@@ -57,6 +69,7 @@ def actor_gotos(rows, role_ticks, gotos):
             if a: out.append((start if start is not None else t, a))
     return out
 
+ROOMS = {}        # the level's {zone: PCRoom}, set by main for the attribution of the walks' targets
 def exits(rows, role):
     """(station object left, after-anim, stand ticks) per walk start of the actor"""
     ticks = []; gotos = []
@@ -66,7 +79,7 @@ def exits(rows, role):
             if a: ticks.append((r['tick'], a['anim'], a['x'], a['y']))
         elif r['ev'] == 'goto' and isinstance(r['args'][2], str):
             gotos.append((r['tick'], r['args'][1], r['args'][2]))
-    firsts = [(t, None, target) for t, target in actor_gotos(rows, ticks, gotos)]
+    firsts = [(t, None, target) for t, target in actor_gotos(rows, ticks, gotos, role, ROOMS.get('rooms'))]
     out = []; i = 0; station = None
     while i < len(ticks):
         t, anim, x, y = ticks[i]
@@ -100,6 +113,7 @@ def main(argv):
     m = pcmap.PCMap(n)
     ov_path = os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)
     ov = json.load(open(ov_path))
+    ROOMS['rooms'] = {e['object']: e['set']['PCRoom'] for e in ov['patches'] if (e.get('set') or {}).get('PCRoom')}
     # the stations by role: the item whose PCApproach for the role names the object's family
     stations = {}
     for e in ov['patches']:
@@ -129,8 +143,10 @@ def main(argv):
                             st['depart'] = val; changed += 1
                 continue
             item = stations.get(role, {}).get(family(station))
-            print('%-10s %-34s %-26s stands %s -> %d' % (role, station, item or '(no item)', dict(stands), val))
-            if item and write:
+            # (a stand past six ticks is the station's own wait, not the dispatch — 213's bull controls 75,
+            # 214's glass 35: the port's stay models those)
+            print('%-10s %-34s %-26s stands %s -> %d%s' % (role, station, item or '(no item)', dict(stands), val, '' if val <= 6 else ' (a wait: not written)'))
+            if item and write and val <= 6:
                 for e in ov['patches']:
                     if e.get('object') == item and isinstance(e.get('set'), dict) and 'PCDepartTicks' in e['set']:
                         cur = e['set']['PCDepartTicks']; break
