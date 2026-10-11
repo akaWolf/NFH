@@ -163,7 +163,12 @@ TABLE = {
                               prime=[('kit/cake', 'put_tnt'), ('kit/cake', 'light_tnt')]),
           'LetterBox': use('anc/mailbox_trap')},
     104: {'MumPicture': wb('anc/mum_smeared'), 'Toilet': wb('toi/toiletstuffed'), 'Microwave': use('kit/microwavedirty'),
-          'WhippedCream': use('kit/foamcream'),
+          # the cream's case is two mobile visits (pc_durations.py PAIRS): the
+          # put at the cream — the remaster's UseAtOtherPlace plays it at the
+          # normal visit's pace, its trick at the pie's — and the eat, the
+          # tricked stand there: the StopMsg after the case's IFTRICKED and
+          # eat_foam, then the OBJ2 (put_cream is the cream visit's)
+          'WhippedCream': use('kit/foamcream', before=[('neighbor', 'eat_foam')]),
           # the basin stand serves both tricks: each item takes its own action
           'SinkAftershave': use('toi/aftershave_glue', before=[('toi/basin', 'shave_glue')], after=[]),
           'AfterShave': use('toi/aftershave_glue', before=[('toi/basin', 'shave_glue')], after=[]),

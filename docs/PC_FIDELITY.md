@@ -1216,7 +1216,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   level ended on the pair before the radiator. The chips carry
   cookiebox_hot's keys beside the chili (pc_reactions.py), and with the
   playing trick's stand 104 rates 100 too (the whipped cream's 5.9 s at
-  the pie). A fixing tool plays its own case: 111's glued vacuum
+  the pie; since 2026-10-11 the eat's alone, 3.58 s — the case's put is
+  the cream visit's, which the remaster's UseAtOtherPlace plays at the
+  normal pace before the pie's visit takes the trick: the stand at the pie
+  had counted the put twice, the cream's fire 2.8 s after E04's, the
+  chain after it 2.9; now +0.07 s and +0.2-0.6 with the soap laid by the
+  bathroom door as E04 lays it, tests/plans/pc/s1/Level104.txt v9). A
+  fixing tool plays its own case: 111's glued vacuum
   (Level_Laundry's case 22) is the take (PCGrabSeconds 0.33), the stand at
   the carpet with the fire before the explode clip (vacuum_hole 2.92, then
   FIRE5's vacuum_explode 2.58: PCUseSecondsTricked 5.5, PCFireAt 2.92),

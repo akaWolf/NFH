@@ -32,6 +32,12 @@
 # cream while he is in the bathroom (Woody out through the living room,
 # Zone02), the bathroom four while he is in the kitchen, the oven and the
 # picture while he is in the bathroom after it.
+# v9 (2026-10-11): the cream's tricked stand at the pie is the case's eat
+# alone (the put is the cream visit's own, tools/pcref/pc_reactions.py) and
+# the soap lies by the bathroom door as E04 lays it, so he slips on his
+# walk-in and passes the toilet after: against E04's thermometer the cream
+# +0.07 s (+2.81 before), the soap -0.20, the toilet +0.45, the rest
+# +0.46-0.56.
 take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer, while he is in the kitchen
 take ToiletPaper IT_Wcpaper
 take SoapDish IT_Soap             # the one soap
@@ -45,7 +51,7 @@ whenzone Zone03                   # his second kitchen stay: the bathroom four
 usewith! Deodrant IT_Hairrestorer # on the shelf (Primed); pays at SinkDeodrant, score 15
 usewith! AfterShave IT_Superglue  # on the shelf (Primed); pays at SinkAftershave, score 20
 usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by (0.1), score 8
-usewith! Ground@Zone04 IT_Soap    # CauseSlip on his bathroom walk-in, 8
+usewith! Ground@Zone04 IT_Soap x=-4.2   # by the bathroom door (the door at -4.07), as E04 lays it: his slip on the walk-in, 8
 hide! Wardrobe                    # before he leaves the kitchen
 whenzone Zone04                   # his second bathroom stay: the oven and the picture
 usewith! Microwave IT_Egg         # the dirty oven: fires on his next oven visit, 8
