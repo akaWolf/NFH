@@ -112,7 +112,10 @@ class PlanRunner:
     def woody(self):
         return actors.get('woody') and actor_states().get('woody')
     def idle(self, w):
-        # (Woody is in `actors` from his first walk on; before it he stands where the level put him)
+        # (Woody is in `actors` from his first walk on; before it he stands where the level put him; hidden
+        # in a wardrobe, a bed or a pipe after a `hide` leg he is as good as standing — a click brings him out)
+        if getattr(self, 'hidden', False) and w is not None and w['anim'] not in ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3'):
+            return True
         return w is None or w['anim'] in self.STANDS
     def acts_on(self, obj, since=0):
         """the actions logged on the object's family (the guarded / container variants) since a tick"""
@@ -165,6 +168,11 @@ class PlanRunner:
                 obj, game = self.m.combine_target(args[0], self.m.pc_item(args[1]))
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 step = {'tick': tick, 'kind': 'combine', 'args': [obj, self.m.pc_item(args[1])]}
+            elif op == 'unlock':
+                # a dexterity unlock without a tool: the use of the minigame combination's own object
+                obj, game = self.m.combine_target(args[0], None)
+                if obj is None: return self.done('no PC object for %s' % args[0])
+                step = {'tick': tick, 'kind': 'use', 'args': [obj]}
             else:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
@@ -175,8 +183,11 @@ class PlanRunner:
         if self.phase == 'acting':
             if len(state['declines']) > self.declined: return self.done('declined')
             acts = self.acts_on(self.target)
+            if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
+                self.hidden = True; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
+                if w is not None and w['anim'] in self.STANDS: self.hidden = False
                 return self.done('ok')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
@@ -325,6 +336,7 @@ class Perfect(gdb.Breakpoint):
         try:
             esi = int(gdb.parse_and_eval('$esi')); self.n += 1
             wr(esi + 0x18, struct.pack('<I', 4))
+            state['last'] = time.time()          # (a minigame keeps the watchdog quiet)
             if self.n == 1 or self.n % 24 == 0:
                 emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % esi, 'perfect': self.n, 'progress': u32(esi + 0x1c), 'acc': u32(esi + 0x28)})
         except Exception as e:
@@ -338,6 +350,7 @@ class Minigame(gdb.Breakpoint):
         try:
             ecx = int(gdb.parse_and_eval('$ecx'))
             n = self.calls.get(ecx, 0) + 1; self.calls[ecx] = n
+            state['last'] = time.time()          # (a minigame keeps the watchdog quiet)
             if n >= MINIGAME_TICKS:
                 # (the GUI pushes its own progress into the object every tick: written before each read)
                 wr(ecx + 0x1c, struct.pack('<I', 100))

@@ -4637,6 +4637,26 @@ pinata -11, bath -7, picnic -79; 214's pistol +10; 206's pillow service
 -0.5 s over its first 24 s). Season 1: 0.03-0.58 s per 100 s early
 everywhere (a tick a station).
 
+**The plans on the original (2026-10-03 01:30, the first runs):** 202's
+whole plan runs (the oracle's PlanRunner, tools/pcoracle/planrun.sh);
+203's `unlock OlgaBag` is the tights minigame — the combination of the
+handbag's family with a `game` and a single object ingredient, started by
+a use of that object (not of the container the overlay's PCApproach
+names; pcmap.combine_target with no item); 204's first `take RiceBowl`
+walks Woody down the groundleft stairs through the neighbour's rickshaw
+and he is caught at 10 s where the port's Woody takes another way —
+the PC's path finder (the room graph, the door costs) against the port's
+mobile routing of Woody: open; 205's `unlock DuckCage` is the egg
+minigame, whose GUI stops the level ticks while it runs (the oracle's
+watchdog now counts the minigame's calls); 206's `hide Pipe` keeps Woody
+hidden — the runner takes him as standing until he walks. 101 on NFH1:
+the plan's `use! Television` after the glued binoculars — the PC's
+Woody walks to the set, stands 14 s with no `use_mid` and walks to the
+sofa into the returning neighbour (the use is time=11 with the `smile`
+after; the neighbour's shout ran 86-94 s meanwhile): open, the trace shows
+no DoAction for Woody's item uses on NFH1 (another entry than
+fcn.00477f60).
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 

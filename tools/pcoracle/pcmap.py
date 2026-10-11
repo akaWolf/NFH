@@ -63,14 +63,18 @@ class PCMap:
 
     def combine_target(self, mobile_item, item):
         """the PC object `item` (a PC inventory name) is combined with: the combination whose ingredients
-        are the item and an object of the mobile item's PC family — and the minigame it opens, if any"""
+        are the item and an object of the mobile item's PC family — and the minigame it opens, if any.
+        `item` None: a dexterity unlock without a tool (203's handbag, 205's duck cage) — the combination of
+        the family with a `game` and a single object ingredient; its object is the one to use"""
         obj = self.objs.get(mobile_item)
         if obj is None: return None, None
         base = obj.split('/')[-1].split('_')[0]
         for name, ings, game in self.combos:
-            if item in ings:
-                objs = [i for i in ings if '/' in i and i.split('/')[-1].split('_')[0] == base]
-                if objs: return objs[0], (game.group(1) if game else None)
+            objs = [i for i in ings if '/' in i and i.split('/')[-1].split('_')[0] == base]
+            if item is None:
+                if game and objs and all('/' in i for i in ings): return objs[0], game.group(1)
+            elif item in ings and objs:
+                return objs[0], (game.group(1) if game else None)
         return obj, None
 
     def use_target(self, mobile_item):
