@@ -256,6 +256,20 @@ sea -> rail 16.16 / 16.10 (the port stands 3.3 s at the stairs' foot and
 climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
 -0.28 in the sea, -0.1 the rest.
 
+- `WDBG_NOCATCH=1` on NFH1 (s1_oracle.py): Woody uncatchable — the state
+  function's rooms test (fcn.00436bb0: the two room objects equal, the
+  neighbour's pause byte +0x78 clear, no flag 4 on either, fcn.0043c2b0)
+  stores its `seen` byte at 0x436d2c; five NOPs there, and a breakpoint on
+  them logs `wouldcatch` events (once a second) — a plan runs its whole
+  length and every would-be catch is in the trace. `catch_report.py <n>
+  <trace> <port run dir>` lines a run's catches up with the port's replay
+  (the rooms of Woody and the catchers over the seconds before, whether the
+  port's Woody shares a room with a catcher then); the replay must run to
+  the trace's end (replay.sh UNTIL=<secs>) or the port's state is frozen at
+  its last leg; the port's replay of an uncatchable run takes NFH_NO_CATCH=1
+  (runtime/world.py _catch: the catch logged as `WOULD CATCH t= by` once a
+  second and not played — a harness switch like NFH_NO_DEPART).
+
 ## What the plan batches found (2026-10-03 03:00)
 
 Blind, the plans end in early catches on the original (212 at 7 s, 214 at

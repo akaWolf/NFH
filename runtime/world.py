@@ -13669,6 +13669,17 @@ class World:
         # false. caught_by is the port's own record of who did it (the
         # runner / the recorder read it; no game rule hangs off it)
         catcher = catcher or self.pawns.get('Rottweiler')
+        if os.environ.get('NFH_NO_CATCH'):
+            # a harness switch (tools/pcoracle: the originals run with their catch stubbed — NFH2's
+            # predicate fcn.1003f573, NFH1's rooms test at 0x436d2c — so a plan runs its whole length and
+            # every would-be catch is logged; the port's replay of such a run must go on the same way):
+            # the catch is recorded once a second and not played — no game rule reads would_catch
+            lst = getattr(self.game, 'would_catch', None)
+            if lst is None: lst = self.game.would_catch = []
+            if not lst or self.time - lst[-1][0] >= 1.0:
+                lst.append((round(self.time, 2), catcher.role if catcher is not None else 'Rottweiler'))
+                print('WOULD CATCH t=%.2f by %s' % lst[-1], flush=True)
+            return
         if os.environ.get('NFH_CATCH_TRACE'):
             import traceback
             w = self.woody

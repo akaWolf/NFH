@@ -6,7 +6,7 @@ LOGS=${WDBG_LOGS:-$HOME/nfh-bench/wine/logs}; R=$HOME/nfh-bench/runs/replay${N}_
 S=s2; [ "$N" -lt 200 ] && S=s1
 mkdir -p $R/$S
 NFH_PROFILE=pc nix-shell --run "python3 tools/pcoracle/oracle2plan.py $N $LOGS/gamelog_${L}_$TAG.xml ${UNTIL:+--until=$UNTIL}" > $R/$S/Level$N.txt
-NFH_STATE_EVERY=5 nix-shell --run "python3 tests/run_tricks.py $R/$S/Level$N.txt --out=$R" > $R/run.log 2>&1
+NFH_STATE_EVERY=5 NFH_NO_DODGE=1 nix-shell --run "python3 tests/run_tricks.py $R/$S/Level$N.txt --out=$R" > $R/run.log 2>&1
 tail -3 $R/run.log
 python3 tools/pcoracle/cmp_run.py $LOGS/oracle_${L}_$TAG.jsonl $R/${S}_Level$N > $R/cmp.txt
 echo "cmp: $R/cmp.txt ($(wc -l < $R/cmp.txt) lines)"

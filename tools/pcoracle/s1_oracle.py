@@ -154,6 +154,10 @@ class PlanRunner:
         w = self.woody()
         if self.phase == 'idle':
             if getattr(self, '_idle_leg', None) != self.i: self.leg_start = tick; self._idle_leg = self.i
+            if op == 'hide' and getattr(self, 'hidden', False) and getattr(self, 'hidden_in', None) == args[0]:
+                # (the port's hide while hidden is a no-op; the PC's second use of the wardrobe brings him
+                # out for a walk and in again — 106's Woody was caught on it)
+                return self.done('already hidden')
             if op in ('take', 'use', 'usewith', 'prime', 'unlock', 'hide'):
                 self.phase = 'wait_idle'          # (`hide`: the PC's use of the wardrobe or bed — he stays in)
             elif op == 'park':
@@ -244,7 +248,7 @@ class PlanRunner:
                 acts = acts + [(t, a) for t, a in state['actions'].get('woody', []) if t > self.leg_start and a not in ('start', 'fear1', 'fear2', 'fear3', 'fight', 'respawn', 'decline')]
                 acts.sort()
             if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
-                self.hidden = True; return self.done('ok')
+                self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
                 if w is not None and w['anim'] in self.STANDS: self.hidden = False
@@ -375,7 +379,14 @@ class Tick(gdb.Breakpoint):
         state['tick'] += 1; now = time.time(); state['last'] = now
         if state['t0'] is None:
             state['t0'] = now; open(LOGS + '/level_started', 'w').write('%.3f' % now)
-        if state['tick'] == 1 and scratch['base'] is None: alloc_scratch()
+        if state['tick'] == 1 and scratch['base'] is None:
+            alloc_scratch()
+            if os.environ.get('WDBG_NOCATCH'):
+                # Woody uncatchable: the state function's rooms test (fcn.00436bb0 — Woody's and the
+                # neighbour's room objects equal, the neighbour's pause byte +0x78 clear, neither carrying
+                # flag 4, fcn.0043c2b0) sets its `seen` byte at 0x436d2c; five NOPs there, and the
+                # WouldCatch breakpoint on them logs each tick the test passes
+                wr(0x436d2c, b'\x90' * 5); WouldCatch(); print('NOCATCH: the rooms test stubbed', flush=True)
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()
             emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
@@ -389,6 +400,15 @@ class Tick(gdb.Breakpoint):
             emit({'tick': state['tick'], 'ev': 'dummy', 'retry': state['dummy_i']})
         emit({'tick': state['tick'], 'wall': round(now - state['t0'], 3), 'ev': 'tick', 'actors': actor_states()})
         return now - state['t0'] > secs
+class WouldCatch(gdb.Breakpoint):
+    """the rooms test passed (Woody in the neighbour's room, unhidden): a catch on an unpatched game"""
+    def __init__(self): super().__init__('*0x436d2c', internal=True); self.last = -100
+    def stop(self):
+        if state['tick'] - self.last >= 12:
+            emit({'tick': state['tick'], 'ev': 'wouldcatch', 'actors': actor_states()}); print('WOULDCATCH tick %d' % state['tick'], flush=True)
+            state.setdefault('wouldcatch', []).append(state['tick'])
+        self.last = state['tick']
+        return False
 class Loop(gdb.Breakpoint):
     """the message loop after the pop (0x43b165): the message at [esp+0x18]; a player's message with a
     step pending is replaced by the built one"""
@@ -468,5 +488,5 @@ log.flush()
 print('done: %d ticks, %d records, %d script steps left' % (state['tick'], state['n'], len(script) + len(pending)), flush=True)
 if plan is not None:
     json.dump(plan.results, open(LOGS + '/oracle_%s_legs.json' % (want or 'cur'), 'w'), indent=1)
-    print('plan: %d/%d legs, %s; caught %s' % (plan.i, len(plan.legs), [r['why'] for r in plan.results], state['caught']), flush=True)
+    print('plan: %d/%d legs, %s; caught %s; would be caught at %s' % (plan.i, len(plan.legs), [r['why'] for r in plan.results], state['caught'], state.get('wouldcatch', [])), flush=True)
 gdb.execute('kill')

@@ -1656,8 +1656,11 @@ class Driver(Recorder):
         if w is None or w.zone is None or w.is_warping or w.hiding \
                 or w.input_locked:
             return
-        if getattr(self, '_rush', False):
-            return                  # a `!` leg: the human's call, no dodging
+        if getattr(self, '_rush', False) or os.environ.get('NFH_NO_DODGE'):
+            # a `!` leg: the human's call, no dodging; NFH_NO_DODGE: a replay
+            # of the original's inputs (tools/pcoracle/replay.sh) sends those
+            # and nothing else — the dodge's own clicks would part the runs
+            return
         if w.state in (w.DOOR_CLIMB, w.DOOR_ANIM):
             # already at the door, climbing into the pass: a click now
             # ('climb' is swallowed by handle_click, but a Run_Up-less

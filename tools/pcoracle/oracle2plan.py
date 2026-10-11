@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """The oracle run's inputs, as the game itself logged them, as a port plan replaying them at their ticks:
 the GameLogicLog's player messages (UseObjectMsg name= / CombineMsg object= object2= / GoToPosMsg room=
-position=) become `until <tick/12>` + the port's op on the mobile item (the overlay's PCApproach Woody
+position=) become `until <tick/12>` + the port's op on the mobile item, marked `!` (ungated, no dodging: the
+PC's inputs at the PC's seconds and nothing else) (the overlay's PCApproach Woody
 `obj` inverted; an inventory item x -> IT2_X by the level's TrickItem inventory names), so the port's run
 takes the same inputs at the same level seconds and the two traces compare on one clock (cmp_run.py).
 
@@ -69,22 +70,22 @@ for l in s.split('\n'):
         if l.startswith('<UseObjectMsg'):
             it = item_of(a['name'])
             if not it: out.append('# no item for %s' % a['name'])
-            elif gives.get(it): out.append('take %s %s' % (it, gives[it]))
-            elif it in hides: out.append('hide %s' % it)
-            else: out.append('use %s' % it)
+            elif gives.get(it): out.append('take! %s %s' % (it, gives[it]))
+            elif it in hides: out.append('hide! %s' % it)
+            else: out.append('use! %s' % it)
         elif l.startswith('<CombineMsg'):
             it = item_of(a['object']); held = it_of(a['object2'])
             if not it: out.append('# no item for %s' % a['object'])
-            elif primes.get(it) == held: out.append('prime %s %s' % (it, held))
+            elif primes.get(it) == held: out.append('prime! %s %s' % (it, held))
             elif unlockers.get(it) == held:
                 # (the PC's combination takes the item as its game is won; the port's SearchItem wants
                 # the take click after its unlock — right after, no clock)
-                out.append('unlock %s %s' % (it, held))
-                if gives.get(it): out.append('take %s %s' % (it, gives[it]))
-            else: out.append('usewith %s %s' % (it, held))
+                out.append('unlock! %s %s' % (it, held))
+                if gives.get(it): out.append('take! %s %s' % (it, gives[it]))
+            else: out.append('usewith! %s %s' % (it, held))
         else:
             wx, zone = world_x(a['room'], int(a['position'].split('/')[0]))
-            out.append('park %s   # x %.3f' % (zone, wx))
+            out.append('park! %s   # x %.3f' % (zone, wx))
 print('# replayed from %s (tools/pcoracle/oracle2plan.py)' % os.path.basename(logp))
 print('\n'.join(out))
 until = next((a[len('--until='):] for a in sys.argv if a.startswith('--until=')), None)

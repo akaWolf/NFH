@@ -171,6 +171,10 @@ class PlanRunner:
         w = self.woody()
         if self.phase == 'idle':
             if getattr(self, '_idle_leg', None) != self.i: self.leg_start = tick; self._idle_leg = self.i
+            if op == 'hide' and getattr(self, 'hidden', False) and getattr(self, 'hidden_in', None) == args[0]:
+                # (the port's hide while hidden is a no-op; the PC's second use of the wardrobe brings him
+                # out for a walk and in again — 106's Woody was caught on it)
+                return self.done('already hidden')
             if op in ('take', 'use', 'usewith', 'prime', 'unlock', 'hide'):
                 self.phase = 'wait_idle'          # (`hide`: the PC's use of the wardrobe or bed — he stays in)
             elif op == 'park':
@@ -262,7 +266,7 @@ class PlanRunner:
                 acts = acts + [(t, a) for t, a in state['actions'].get('woody', []) if t > self.leg_start and a not in ('start', 'fear1', 'fear2', 'fear3', 'fight', 'respawn', 'decline')]
                 acts.sort()
             if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
-                self.hidden = True; return self.done('ok')
+                self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
                 if w is not None and w['anim'] in self.STANDS: self.hidden = False
