@@ -494,9 +494,12 @@ class Fiber(object):
                         # reaches the fire site
                         val = 'true' if any(x not in self.tested for x in tricked) else 'false'
                     elif variant is not None and len(names) == 1 and variant not in tricked and variant not in present \
-                            and any(x.startswith(variant + '_') for x in tricked):
+                            and any(x.startswith(variant + '_') and x not in self.tested for x in tricked):
                         # IsVariant(normal, variant) with the variant's name in a
                         # register (kit/stool of kit/stool_pins): the twin is tricked
+                        # — not a variant the class tests by its own name
+                        # (114's bas/gun_loaded_plugged, after bas/gun_loaded's
+                        # test at 0x467098 — its own at 0x46728c)
                         val = 'true'
                     else:
                         val = 'true' if variant in tricked or variant in present else 'false'

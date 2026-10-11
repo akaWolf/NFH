@@ -1,26 +1,6 @@
 {
- "source": "PC Night of the Hunter: the dog whistle is an inventory item from the hall's chest of drawers, used from the kitchen while the neighbour is at the record player (Steam guide 2584421942; Badinfos' run, lap 2). The mobile has no whistle — its Dog is a Zone06 Alerter. PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_hunter/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (ElectricTrap 272, GroundMarbles 360); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
+ "source": "PC Night of the Hunter: the dog whistle comes from the study's chest with the gunpowder (the PC's wor/ark, the mobile's DeskDrawer: IT_Dogwhistle, its DirectUse Whistle and WakeAlerter) and is blown from the hall while the neighbour is at the record player (Badinfos' run, lap 2): under the profile Woody's `dogwhistle` action (PCWoodySeconds, PCWhistlePet: World._pc_whistle). PC anger (game.exe, docs/PC_ROUTINES.md \"The anger and the bonus\"): PCAngryTime on the Rottweiler is level_hunter/level.xml's angrytime=240 (1/12 s ticks: the level state ticks 12 times a second, as the HUD clock shows) — the rage current a trick without its own value is set to and the mercury's full scale; PCAngryTime on an item is its tricks.xml angrytime (ElectricTrap 272, GroundMarbles 360); the profile holds the current 60 ticks, counts it down one per tick and pays +3 for a trick fired while it is above zero (pcprofile.s1_rage_*). The Season 1 trick step's data per item (tools/pcref/pc_reactions.py over tools/pcref/trick_branches.py: game.exe's level class simulated with the trick in place, docs/PC_ROUTINES.md \"The fire's tail\"): PCShoutIndex/PCShoutSkip the step's shout, PCUseSecondsTricked the tricked stand's actions with the step's own clip, PCFireAt the second of it at which the step fires, PCFixSeconds the repair or clean after the fire, PCSurpriseSeconds/PCFireBefore/PCSlipSeconds the walk-bys', slips' and trap's clip and fire.",
  "patches": [
-  {
-   "object": "Drawer",
-   "component": "SearchItem",
-   "zone": "Zone01",
-   "append": {
-    "InventoryItems": [
-     {
-      "Type": "IT_Whistle",
-      "UseCount": 0,
-      "NameString": "Dog whistle",
-      "DescriptionString": "Only the dog hears it. The neighbour hears the dog.",
-      "PrimedNameString": "",
-      "PrimedDescriptionString": "",
-      "WrongZoneTooltip": "",
-      "LongDescription": false,
-      "NFH2Inventory": false
-     }
-    ]
-   }
-  },
   {
    "object": "Rottweiler",
    "component": "Rottweiler",
@@ -215,8 +195,11 @@
     "PCCaseGoto": true,
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0"
-    }
+     "PCUseSecondsTricked": "ms0",
+     "PCUseSecondsCompound": "ms0"
+    },
+    "PCUseSecondsCompound": 7.083,
+    "PCFireAtCompound": 6.417
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.3 s"
   },
@@ -349,10 +332,11 @@
    "component": "TrickItem",
    "set": {
     "PCWoodySeconds": {
-     "IT_Munition": 2.083
+     "IT_Munition": 2.083,
+     "IT_Cork": 2.083
     }
    },
-   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Munition <- bas/gun munition 25 ticks"
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Munition <- bas/gun munition 25 ticks; IT_Cork <- bas/gun cork 25 ticks"
   },
   {
    "object": "MouseHole",
@@ -419,10 +403,12 @@
    "component": "SearchItem",
    "set": {
     "PCWoodySeconds": {
-     "use": 1.667
-    }
+     "use": 1.667,
+     "IT_Dogwhistle": 1.833
+    },
+    "PCWhistlePet": "Dog"
    },
-   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 20 ticks"
+   "source": "Woody's trick action (level_hunter's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- wor/ark take 20 ticks; IT_Dogwhistle <- dog dogwhistle 22 ticks (noise 1 at the dog, `whistle` to it)"
   },
   {
    "object": "Wardrobe",

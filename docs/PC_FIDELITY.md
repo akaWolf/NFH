@@ -22,6 +22,14 @@ carries a confidence.
 
 ### 2.1 Level114 — the dog whistle (confidence: high on mechanism, medium on timing)
 
+*Corrected 2026-10-11.* The mobile has the whistle: the study's DeskDrawer
+gives IT_Dogwhistle with the gunpowder (its DirectUse `Whistle`, WakeAlerter
+— Item.OnIconPressed, Item.cs:2176-2199), as the PC's wor/ark holds
+`dogwhistle` and `gunpowder` (level_hunter's objects.xml); the hall's chest
+(anc/ark) holds the marbles and the shoe polish. The overlay's whistle in the
+hall's chest below is gone, and under the profile the icon press is Woody's
+`dogwhistle` action (`World._pc_whistle`, runtime/README.md).
+
 PC (guide): "wait for the neighbour to get vinyl, use dog whistle, use rusty
 nail with record player, use gunpowder with tobacco tin, go back to the
 kitchen". The whistle is an inventory item used from the kitchen; the dog
@@ -420,8 +428,9 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   controller's animation, `actions` to rebuild an ActionManager's list by
   item names (addressed by `owner`). Shipped: Level113 (the electric trap
   lifted to the depth it has in L111/L114, so the click ray reaches it),
-  Level114 (the dog whistle in the hall's chest of drawers; since
-  2026-09-17 the pipe's tin without the remaster's priming and the
+  Level114 (until 2026-10-11 a dog whistle added to the hall's chest of
+  drawers — the whistle is the mobile's own, the study's DeskDrawer, §2.1;
+  since 2026-09-17 the pipe's tin without the remaster's priming and the
   phonograph unlocked for good by the neighbour's first `open`, as
   level_hunter's objects.xml has them — the catch-on-sight rule leaves no
   window for a trick that needs him in the room), and every
@@ -448,9 +457,10 @@ its results in `docs/PC_LAPS.md`: 108's PC lap is 95-97 s, the mobile's
   level entrance — since 2026-09-25 in the room of the catch fiber's case 4,
   §2.5 —, the neighbour resumes his routine), no dexterity
   mini-games (`_dexterity_gate` runs WinDexterity's side effects on the
-  first click), `World.blow_whistle()` — the targetless inventory use
-  that wakes every alerter (the W key in the viewer, the `whistle` plan
-  leg; the icon is the PC's own, cropped from the video).
+  first click), `World.blow_whistle()` — the whistle's icon pressed (the
+  W key in the viewer, the `whistle` plan leg), under the profile Woody's
+  `dogwhistle` action (§2.1; the icon is the PC's own, cropped from the
+  video).
 - Verified against the binaries (2026-09-16, `docs/PC_VERIFICATION.md`,
   rule by rule with the addresses): the Season 1 level-end state machine
   (fcn.00436bb0 — success at a rating of 100 or every trick, time's up
@@ -2657,14 +2667,50 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   bicycle-to-skates span 0.7 s long, the kitchen door to the skates and
   the slide read off E12's frames 0.4 and 0.5 s quicker than the port's,
   unexplained by the code (the trigger's place moved toward the window
-  only lengthens it); 114 -0.6 s from the gramophone, -1.5 from the
-  shotgun — the records' second visit to the phonograph 13.8 s against
-  E14's 14.6 after the dog's alarm (whose run, search and shout take
-  the port 12.8 s against 13.4). The other plans pay their own orders.
+  only lengthens it); 114 +0.2 s at the polish, +0.6 from the gramophone
+  on (the trap to the shotgun +0.05) since 2026-10-11 — the whistle Woody's
+  22-tick action, its noise waking the dog and its behaviour making it
+  bark as it ends (E14's `?!` 1.84 s after the whistle's start, the
+  port's 1.81), the shotgun with the cork the case's other arm (below);
+  it had paid the gramophone 1.0 s late and the shotgun 0.94 s early.
+  The other plans pay their own orders.
   Every tricked stand of the fourteen plans fires at its PCFireAt or
   after its PCUseSecondsTricked within 0.05 s (the routine log against
   the pays), every slip and trap two ticks after its trigger and every
   look 1.6-1.8 s after it (the lead, the x alignment, the doubletake).
+- *114's whistle and shotgun (2026-10-11).* The dog whistle is the
+  study's (the PC's wor/ark, the mobile's DeskDrawer: IT_Dogwhistle with the
+  gunpowder — the overlay's whistle in the hall's chest was an invention),
+  and blowing it is Woody's `dogwhistle`, the `dog` actor's record: the
+  whistle clip, time auto 20, an ACTION step of 22 ticks. Its noise 1 is
+  located at the action's object, the dog (the step's first update,
+  fcn.004729c0 at 0x477724 over the object's name), so the pet's `wakeup`
+  trigger in its own room fires the next tick: the `wakeup` action (9
+  ticks) and its awake idle, no bark with Woody away; its behaviour
+  `whistle` is posted to the dog as the step ends (fcn.004728d0 at
+  0x4778e7, the update's branch for a started step) and delivered the tick
+  after, and the pet class's flag +0x1d makes its free step bark
+  (0x45c2ae): noise 2, the neighbour's alarm — E14's whistle tone (its
+  frame 5) at 253.85 s, the `?!` at 255.27, 1.84 s after the clip's
+  start; the port 1.81 (`World._pc_whistle`, `AlerterFSM.pc_noise_wake`,
+  `pc_whistle_heard`, the plan's whistle 0.7 s into his gramophone as
+  Badinfos blew it), where the instant wake had answered after the
+  wake-up alone. The shotgun the plan loads with the munition and the
+  cork (the mobile's compound trick, CompoundTrickScore 13) is the gun
+  case's other arm: case 20 tests bas/gun_loaded (0x467098), then
+  bas/gun_loaded_plugged (0x46728c) — take, shoot_loaded_plugged
+  (rifle_explode, 68 frames against shoot_rifle's 56), the OBJ2, and the
+  give both arms share (0x4675ec): the fire at 6.417 s of a 7.083-s stand
+  (PCFireAtCompound, PCUseSecondsCompound; the munition alone 5.417 of
+  6.083), the trap to the shotgun 25.35 s against E14's 25.3 (24.4
+  before). trick_branches' twin rule (a variant's name in a register,
+  kit/stool of kit/stool_pins) had sent the plugged gun down the loaded
+  arm: a variant the class tests by its own name is no twin. Woody's cork
+  is bas/gun's `cork`, 25 ticks (PCWoodySeconds IT_Cork). The dog's whine
+  (DogPoorRight, an InfiniteLoop clip) had held the pet's step for good
+  after the alarm: a PC action ends with its timer whatever its clip's
+  loop flag (`AlerterFSM._play`), so the dog whines every 25 ticks while
+  he is in the bedroom and sleeps 6 s after he leaves.
 - *Season 2's chains against Badinfos' gauge (2026-10-04, read and
   carried).* The anger gauge's jumps (the bar at the frame's left,
   tools/pcref/gauge.py at 4 fps) against the port's credits where the
@@ -3284,8 +3330,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   there with his search (fcn.0047a690: fcn.00437f70 with dog_shout, else
   chili_shout, 0x47a7d4-0x47a816), where the port had shown the Alerter's
   mad icon from the run's start (Routine.pc_think_icon): E14's dog `?!`
-  at 255.27 s and its shout icon at 257.87, the plan's 256.12 and 258.78
-  (the whistle the plan's; the run 2.66 s against 2.6).
+  at 255.27 s and its shout icon at 257.87, the plan's 255.14 and 257.96
+  since the whistle is Woody's action (2026-10-11; 256.12 and 258.78
+  before; the run 2.82 s against 2.6).
   The Mother's own fight steps set her m_hurt_n as she runs to him and
   hits (207's 0x1001452c, 210's 0x10018d76, 214's 0x1003a21c): her
   bubble being_hit over her hit run (Routine.pc_think_icon, the

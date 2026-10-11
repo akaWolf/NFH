@@ -117,7 +117,7 @@ REG = {'lir/stickybook': (1, 0), 'lir/bathcandy': (0, 3), 'toi/tub_hair': (0, 3)
 
 
 def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None, fixwalk=False, pre=None,
-        redo=None):
+        redo=None, compound=None):
     """a station use: the tool's stand, or the listed (object, action) parts
     (`own`: the five-argument step's clip where the site passes its actor in a
     register; `prime`: the part the mobile's prime leg plays when tricked;
@@ -125,9 +125,11 @@ def use(pc, site=None, before=None, after=None, fix=None, own=None, prime=None, 
     station's actions of the cases before the tricked one, which the tricked
     visit plays too; `redo`: a ReuseAfterFix station's tail after the case's
     own actions after the repair — PCRedoSeconds, what the mobile's redo of
-    the normal use stands for)"""
+    the normal use stands for; `compound`: the PC object of the mobile's
+    compound trick, the case's other tricked variant with its own fire site —
+    PCUseSecondsCompound, PCFireAtCompound)"""
     return dict(pc=pc, kind='use', site=site, before=before, after=after, fix=fix, own=own, prime=prime,
-                fixwalk=fixwalk, pre=pre, redo=redo)
+                fixwalk=fixwalk, pre=pre, redo=redo, compound=compound)
 
 
 def wb(pc, site=None, fix=None):
@@ -257,7 +259,13 @@ TABLE = {
           'MedalBox': use('bed/medalbox_rat', before=[], own=[('neighbor', 'ratdance')], after=[]),
           'Hat': use('bed/stickyhat', before=[('neighbor', 'riphat')]),
           'Gramaphone': use('lir/phono_nail'), 'Polish': use('kit/blackpolish'), 'Horn': use('bal/balloonhorn'),
-          'Pipe': use('lir/tabacbox_explosive'), 'Shotgun': use('bas/gun_loaded')},
+          # the gun's case 20 tests bas/gun_loaded (0x467098), then
+          # bas/gun_loaded_plugged (0x46728c): the munition alone shoots
+          # (shoot_loaded), with the cork too — the mobile's compound trick,
+          # CompoundTrickScore 13 — the gun bursts (shoot_loaded_plugged,
+          # 12 frames longer); both arms give the gun back (0x4675ec)
+          'Pipe': use('lir/tabacbox_explosive'),
+          'Shotgun': use('bas/gun_loaded', compound='bas/gun_loaded_plugged')},
 }
 # the fixing runs whose tool is the valve itself: Level_DIY's case 5 sets the run
 # gait when the basin flooded (game.exe 0x452a1c) and case 6 switches the main
@@ -317,7 +325,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
-        'PCPoseAfter')
+        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -695,6 +703,23 @@ def specs(n):
                     # the stand's next step after its list; FIRE_LEAD)
                     keys['PCUseSecondsTricked'] = round(total + FIRE_LEAD, 3)
                     keys['PCFireLead'] = True
+                if spec.get('compound'):
+                    # the compound variant's own site, cut the same way (its
+                    # shout and flags those of the other arm's step)
+                    crow = site_of(n, spec['compound'])
+                    if index_flags(crow) != (idx, fl):
+                        raise ValueError('%d %s: the compound step shouts otherwise' % (n, name))
+                    csm = crow['summary']
+                    cb = sum(v for _, v in csm['before']) + csm.get('pre_fire', 0.0)
+                    ca = sum(v for _, v in csm['after'])
+                    co = (csm['own'][1] or 0.0) if csm['own'] else 0.0
+                    ctotal = cb + co + ca
+                    keys['PCUseSecondsCompound'] = round(ctotal + (FIRE_LEAD if co + ca > 0 else 0.0), 3)
+                    if co + ca > 0 or ctotal == 0:
+                        keys['PCFireAtCompound'] = round(cb, 3)
+                    pose['PCUseSecondsCompound'] = _pose(
+                        L, _parts(l for l, _ in csm['before']) + _parts(l for l, _ in csm['after'])
+                        + (_parts([csm['own'][0]]) if csm['own'] else []))
         if base in RUNTO.get(n, ()):
             keys['PCRunTo'] = True
             # the run ends on the object's hotspot: the repair does not walk

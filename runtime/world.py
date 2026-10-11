@@ -3563,6 +3563,7 @@ class AlerterFSM:
         self.pc_timer = 0.0
         self.pc_busy = False             # a bark or a whine holds the PC class's step
         self.pc_idle = False             # the PC class's idle: the timer counts, it may sleep
+        self.pc_whistle = False          # the whistle's flag (+0x1d): the next free step barks
         if self.player is not None:
             self._play(item.sleep_sequence, chain=True)
 
@@ -3581,6 +3582,11 @@ class AlerterFSM:
                 if mobile > 0.0:
                     scale = mobile / (ticks / float(pcprofile.S1_TICK_HZ))
             self.player.time_scale = scale
+            # a PC action ends with its timer whatever the clip's loop flag
+            # (the whine's: the PC's poor1 is a loop its 25 ticks cut, the
+            # remaster's DogPoorRight an InfiniteLoop clip that had held the
+            # class's step for good)
+            self.player.ignore_infinite = bool(ticks)
             self.player.play_sequence(names, on_end=done)
         elif done is not None:
             done()
@@ -3733,6 +3739,37 @@ class AlerterFSM:
             seq = self._alert_pair()
         self._play(seq, chain=True)
 
+    def pc_noise_wake(self):
+        """generic/trigger.xml's `wakeup` on a noise of 1 in its room (the
+        dog whistle's own, at its action's start — Woody's action on the pet,
+        the noise located at it: World._pc_whistle): asleep, state 3 — the
+        `wakeup` action and the awake timer (0x45c129-0x45c153) — then state
+        4, whose step barks at Woody in the room or on the whistle's flag and
+        else whines or idles (_pc_step_done); awake, nothing"""
+        if self.awake:
+            return
+        self.pc_timer = pcprofile.S1_PET_AWAKE_TICKS / float(pcprofile.S1_TICK_HZ)
+        self.awake = True
+        self.alert = False
+        self.pc_idle = False
+        self.pc_busy = True
+        self._play([self.item.alert_start] if self.item.alert_start else [],
+                   ticks=pcprofile.S1_PET_WAKEUP_TICKS.get(self.item.name),
+                   on_end=self._pc_step_done)
+
+    def pc_whistle_heard(self):
+        """the whistle's behaviour, posted as Woody's action ends and
+        delivered the tick after: the pet class's flag +0x1d (0x45bf6a) — an
+        awake pet's next free step barks (0x45c2ae: bark1/bark3, noise 2, the
+        neighbour's `alarm`), the idle's at once; one asleep wakes first
+        (0x45be33: state 3, the `wakeup`)"""
+        self.pc_whistle = True
+        self.triggered_by_woody = False
+        if not self.awake:
+            self.pc_noise_wake()
+        elif not self.pc_busy:
+            self._pc_step_done()
+
     def _pc_bark(self, first):
         """one bark (bark1/bark3, pcprofile.S1_PET_BARK): the remaster's
         alert clips at its ticks; every bark after the first is noise 2 again,
@@ -3771,12 +3808,20 @@ class AlerterFSM:
         w = self._woody()
         if w is not None and w.zone is not None and w.zone.pid == self.item.zone \
                 and not w.hiding and not w.is_warping:
+            self.pc_whistle = False       # (the bark at Woody clears it, 0x45c2a5)
             if self.alert:
                 self._pc_bark(first=False)
             else:
                 self.animation_type = 0
                 self.triggered_by_woody = True
                 self.on_notice_woody()
+            return
+        if self.pc_whistle:
+            # the whistle's bark (0x45c2ae-0x45c350): noise 2, the
+            # neighbour's `alarm` at its start
+            self.pc_whistle = False
+            self.alert = True
+            self._pc_bark(first=False)
             return
         self.alert = False
         if self._pc_rott_in():
@@ -5287,16 +5332,17 @@ class Routine:
                 if oseq:
                     olga.anim.play_sequence(oseq)
         ft = self._pc_trick_item(it)
+        fire_at = self._pc_fire_at(ft, it)
         if pcprofile.is_pc() and self.role == 'Rottweiler' and it is not None \
-                and getattr(ft, 'pc_fire_at', None) is not None \
+                and fire_at is not None \
                 and it.is_tricked(self.level.items) and not ft.pc_fired:
             # the PC step fires this far into the tricked stand when its own
             # clip or more actions follow the fire (PCFireAt: the tub's hair
             # after the shower clip, the dirty microwave on arrival at 0 and
             # the cooking after it — docs/PC_ROUTINES.md "The fire's tail");
             # the playing trick fires, the one the angry pays (_pc_trick_item)
-            if float(ft.pc_fire_at) > 0.0:
-                self.pc_fire_at = float(ft.pc_fire_at)
+            if fire_at > 0.0:
+                self.pc_fire_at = fire_at
                 self.pc_fire_item = ft
             elif w is not None:
                 w.s1_fire(self.pawn, ft)
@@ -5934,6 +5980,16 @@ class Routine:
         Tricked, the use selection's cs:824-830 arm) under the profile"""
         return pcprofile.is_pc() and it is not None and it.compound \
             and it.compound_tricked and it.tricked
+
+    def _pc_fire_at(self, ft, it):
+        """the second of the tricked stand at which the PC step fires
+        (PCFireAt), the compound arm's own (PCFireAtCompound) at a
+        compound-tricked visit (_pc_compound: 114's gun with the cork,
+        shoot_loaded_plugged before its OBJ2); None: no fire inside the stand"""
+        v = getattr(ft, 'pc_fire_at_compound', None) if self._pc_compound(it) else None
+        if v is None:
+            v = getattr(ft, 'pc_fire_at', None)
+        return None if v is None else float(v)
 
     def _pc_clip_end(self):
         """the per-clip timing, the hold and the credit watch end with the use"""
@@ -6865,11 +6921,12 @@ class Routine:
                     self.pc_credit3_timer = float(src.pc_toilet_pays_at)
                     self.pc_credit3_item = src
             ft = self._pc_trick_item(it)
+            fire_at = self._pc_fire_at(ft, it)
             if pcprofile.is_pc() and self.role == 'Rottweiler' \
-                    and getattr(ft, 'pc_fire_at', None) is not None \
+                    and fire_at is not None \
                     and it.is_tricked(self.level.items) and not ft.pc_fired:
-                if float(ft.pc_fire_at) > 0.0:
-                    self.pc_fire_at = float(ft.pc_fire_at)
+                if fire_at > 0.0:
+                    self.pc_fire_at = fire_at
                     self.pc_fire_item = ft
                 elif w is not None:
                     w.s1_fire(self.pawn, ft)
@@ -9822,8 +9879,10 @@ class World:
             br0 = pc_branch(self.level.items if self.level is not None else None, item)
             if br0 is not None and br0.get('PCPoseAfter'):
                 pose = br0['PCPoseAfter']       # the case's other arm (PCWhenTricked)
-            if 'PCUseSecondsTricked' in pose:
-                pawn.pc1_pose(pose['PCUseSecondsTricked'])
+            key = 'PCUseSecondsCompound' if item.compound and item.compound_tricked \
+                and item.tricked and 'PCUseSecondsCompound' in pose else 'PCUseSecondsTricked'
+            if key in pose:
+                pawn.pc1_pose(pose[key])        # (the compound arm's own stand)
             if item.angry_hard and pc_shout > 0.0:
                 seq = [item.angry_hard]
             fire_pre, fire_post = self._s1_fire_stands(item, fired_early, pc_shout)
@@ -11204,12 +11263,47 @@ class World:
                                     lambda s=src: self._raise_alarm(s))
                 return False
             if src.wake_alerter_flag:
+                if pcprofile.is_pc() and src.pc_whistle_pet:
+                    # the PC's whistle is the one item of the chest's that
+                    # whistles (its PCWoodySeconds), as Woody's action
+                    if entry.get('type') not in src.pc_woody_secs:
+                        return True
+                    self._pc_whistle(src, entry)
+                    return False
                 if src.direct_use and w.anim.has(src.direct_use):
                     w.anim.play_single(src.direct_use)
                 for fsm in self.alerters.values():
                     fsm.wake_up()                  # GameInfo.Alerter.WakeUp
                 return False
         return True
+
+    def _pc_whistle(self, src, entry):
+        """the PC's dog whistle: Woody's `dogwhistle` (level_hunter's
+        objects.xml, the `dog` actor's record — the whistle clip, time auto
+        20: an ACTION step of 22 ticks, PCWoodySeconds), the remaster's
+        DirectUse clip at its pace. The step's first update makes its noise 1
+        located at its object, the pet (fcn.004729c0 at 0x477724 over the
+        object's name): the pet's `wakeup` trigger in its room
+        (generic/trigger.xml), the next tick's trigger pass delivering it
+        (AlerterFSM.pc_noise_wake); the step's end posts its behaviour
+        `whistle` to the pet (fcn.004728d0 at 0x4778e7, the update's branch
+        for a started step: the tick its timer is done, time + 1 after the
+        start), delivered the tick after that — the step's whole ticks from
+        its start (AlerterFSM.pc_whistle_heard). E14: the whistle's sound
+        (frame 5) at 253.85 s, the neighbour's noise icon at 255.27"""
+        w = self.woody
+        w.steps = []
+        w.state = w.IDLE                       # Woody.Stop
+        secs = src.pc_woody_secs.get(entry.get('type'))
+        if src.direct_use and w.anim.has(src.direct_use):
+            w.anim.clip_pace = {src.direct_use: secs}
+            w.anim.time_scale = 1.0
+            w.anim.play_single(src.direct_use)
+        fsm = next((f for f in self.alerters.values() if f.item.name == src.pc_whistle_pet), None)
+        if fsm is not None and secs:
+            tick = 1.0 / pcprofile.TICKS_PER_SECOND
+            self.call_later(tick, fsm.pc_noise_wake)
+            self.call_later(secs, fsm.pc_whistle_heard)
 
     def _raise_alarm(self, src):
         """Item.RaiseAlarm (Item.cs:2201-2205) + Rottweiler.OnAlarmRaised
@@ -13547,22 +13641,22 @@ class World:
         return self._pc_respawn_left > 0.0
 
     def blow_whistle(self):
-        """PC profile only (docs/PC_FIDELITY.md 2.1): the dog whistle, an
-        inventory use with no target — every sleeping alerter wakes as if it
-        had heard Woody, and the neighbour's HearAlerter chain follows
-        (Alerter.WakeUp -> CoRoutineRottweilerHearAlerter)"""
-        if not pcprofile.is_pc() or self.woody is None:
+        """the dog whistle's icon pressed (114's IT_Dogwhistle from the
+        study's DeskDrawer: Item.OnIconPressed's WakeAlerter, Item.cs:
+        2190-2195 — the DirectUse clip and every Alerter woken; under the
+        profile Woody's `dogwhistle`, _pc_whistle); False without a whistle"""
+        if self.woody is None:
             return False
-        if not self.inventory.has('IT_Whistle'):
-            return False
-        n = 0
-        for fsm in self.alerters.values():
-            if not fsm.alert:
-                fsm.animation_type = 1
-                fsm.triggered_by_woody = False
-                fsm.wake_up()
-                n += 1
-        return n > 0
+        for entry in self.inventory.items:
+            src = self.level.items.get(entry.get('item')) if entry.get('item') else None
+            if src is None or not src.wake_alerter_flag:
+                continue
+            if pcprofile.is_pc() and src.pc_whistle_pet \
+                    and entry.get('type') not in src.pc_woody_secs:
+                continue
+            self.icon_pressed(entry)
+            return True
+        return False
 
     def _finish_game(self):
         """GameInfo.FinishGame (GameInfo.cs:358-371), shared by every ending:

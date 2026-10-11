@@ -887,7 +887,13 @@ predicate, then the all-tricks win.
   combination's action and pay the mobile's extra coin
   (Item.ExtraCoinCompound, Item.cs:2398-2409 — at the use's start there)
   on its record's tick, its rage the ladder's cs:620-624 / cs:630-634 arm
-  alone (the `compound` part of `_s2_credit`).
+  alone (the `compound` part of `_s2_credit`). Season 1's one compound
+  item, 114's shotgun with the cork, is the gun case's other arm
+  (bas/gun_loaded_plugged: take, shoot_loaded_plugged, the OBJ2, the give)
+  — its stand and its fire inside it (PCUseSecondsCompound,
+  PCFireAtCompound: 7.083 and 6.417 s against the munition's 6.083 and
+  5.417; `Routine._pc_fire_at`, play_angry's pose by the arm's key;
+  tools/pcref/pc_reactions.py `compound`).
 - **The PC profile's repair walk** (PCFixDepart, play_angry's `after_run`):
   a repair at another object (211's sign after the wc, 203's generator
   after the stage, 208's plain tap after the electrified one's shock) or
@@ -999,7 +1005,7 @@ predicate, then the all-tricks win.
   (PCWalkPoint on the Alerter: its level.xml place and `neighbor`
   hotspot, the dog's 0/0, the parrot's 25/15 — 114's dog at 830/410
   where the mobile spot mapped to 776/420): E14's dog alarm from its
-  icon to the records' 11.28 s against 10.8 (10.29 before), the records'
+  icon to the records' 11.22 s against 10.8 (10.29 before), the records'
   walk back and take 14.61 against 14.6 (13.77). A
   case that pushes no job costs a tick: the level class's job returns not
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
@@ -1228,6 +1234,26 @@ the neighbour is out of the pet's zone too**. That guard is why the unit test's
 pet "refused" to sleep: Level113's neighbour *starts* in the dog's zone. With
 him elsewhere the full cycle closes — bark at t=0.0, alert dropped at t=3.1,
 asleep again at t=11.2.
+
+**The dog whistle** (114's IT_Dogwhistle from the study's DeskDrawer:
+`Item.OnIconPressed`'s WakeAlerter arm plays Woody's `Whistle` and wakes the
+level's alerter, Item.cs:2190-2195; `World.blow_whistle`, the `whistle` plan
+leg and the viewer's W press its icon). Under the PC profile the press is
+Woody's `dogwhistle` (`World._pc_whistle`: level_hunter's objects.xml, the
+`dog` actor's record — the whistle clip, time auto 20, an ACTION step of 22
+ticks, PCWoodySeconds; the pet named by PCWhistlePet, tools/pcref/pc_woody.py):
+its noise 1 at the step's start is located at the action's object, the dog
+(fcn.004729c0 at 0x477724), so the pet's `wakeup` trigger in its room fires
+the next tick (`AlerterFSM.pc_noise_wake`: the `wakeup` action, then the
+awake idle — no bark with Woody away); its behaviour `whistle` is posted as
+the step ends (fcn.004728d0 at 0x4778e7) and delivered the tick after
+(`pc_whistle_heard`): the pet class's flag +0x1d, which an awake pet's next
+free step barks on (0x45c2ae — noise 2, the neighbour's alarm), one asleep
+first waking. Only the whistle of the chest's two items whistles under the
+profile (the gunpowder's icon is a plain one there, where the mobile's
+shared Item makes both whistle). A PC pet action ends with its timer
+whatever its clip's loop flag (`AlerterFSM._play`: the dog's whine,
+DogPoorRight, is an InfiniteLoop clip that had held its step for good).
 
 **`NoticeWhenEnterZone`** rides the same plumbing without a pet:
 `TrickItem.Start` registers the item in `Zone.NoticeOnEnterItems`, and the

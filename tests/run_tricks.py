@@ -44,8 +44,10 @@ N-th in the level's order, from 1):
     whenanim <Role> <Anim>   park safe until that pawn plays the animation
                              (a stationary catcher's phase on its own clock)
     whenin <Role> <ZoneName> park safe until that pawn stands in the zone
-    whistle                  PC profile: blow the dog whistle (needs
-                             IT_Whistle held) — every Alerter wakes
+    whistle                  blow the dog whistle (114's IT_Dogwhistle
+                             held): its icon pressed — the DirectUse clip,
+                             every Alerter woken; under the PC profile
+                             Woody's 22-tick `dogwhistle` (World._pc_whistle)
     sneak on|off|auto        the Tab toggle by hand; auto (the default)
                              sneaks in/into Alerter zones, runs elsewhere
     manual <text...>         a step the data cannot script — recorded as
@@ -2668,7 +2670,9 @@ class Driver(Recorder):
         return False, '%s never completed' % what
 
     def leg_whistle(self, *args):
-        """PC profile: blow the dog whistle (World.blow_whistle)"""
+        """blow the dog whistle (World.blow_whistle: the whistle's icon
+        pressed, Item.OnIconPressed's WakeAlerter; under the PC profile
+        Woody's `dogwhistle` action)"""
         ok = self.v.world.blow_whistle()
         return (True, '') if ok else (False, 'no whistle in the inventory')
 

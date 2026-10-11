@@ -56,9 +56,16 @@ def mobile_items(n):
         dd = o.get('data') or {}
         nm = (dd.get('m_GameObject') or {}).get('name')
         if o.get('type') in ('TrickItem', 'Drawing', 'Rake', 'Toilet', 'Television') and nm:
-            out[nm] = (o['type'], [x for x in (dd.get('RequiredInventory'), dd.get('SecondRequiredInventory'))
+            # (the compound trick's second item too: 114's gun takes the
+            # cork on its own `cork` action — bas/gun's, time 23)
+            out[nm] = (o['type'], [x for x in (dd.get('RequiredInventory'), dd.get('SecondRequiredInventory'),
+                                               dd.get('CompoundRequiredInventory') if dd.get('Compound') else None)
                                    if x and x != 'IT_NONE'], dd.get('Animation'))
     return out
+
+
+# the whistles' pets by level and item (woody_seconds): PCWhistlePet
+WHISTLE = {}
 
 
 def woody_seconds(n):
@@ -127,6 +134,37 @@ def woody_seconds(n):
         t = ticks.pop()
         out[nm] = ('SearchItem', {'use': round(t / lap_model.TICK, 3)},
                    ['use <- %s take %d ticks' % ('/'.join(sorted(cands)), t)])
+    # the dog whistle: the remaster's SearchItem with DirectUse and
+    # WakeAlerter (114's DeskDrawer — the PC's wor/ark, the whistle with the
+    # gunpowder) gives the item Woody blows wherever he stands; the PC
+    # combination of that item alone names the actor it addresses (`dog` <-
+    # dogwhistle) and Woody's action of that actor named after the item is
+    # the step he plays (`dogwhistle`: the whistle clip, time auto 20) — its
+    # noise located at the actor, its behaviour posted to the behavioractor
+    # as the step ends (World._pc_whistle): PCWoodySeconds by the item's
+    # type, PCWhistlePet the remaster's Alerter of that actor
+    alerters = {((o.get('data') or {}).get('m_GameObject') or {}).get('name')
+                for o in d.values() if o.get('type') == 'Alerter'}
+    for o in d.values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        if o.get('type') != 'SearchItem' or not nm or not (dd.get('DirectUse') and dd.get('WakeAlerter')):
+            continue
+        for i in dd.get('InventoryItems') or []:
+            t = i.get('Type') if isinstance(i, dict) else None
+            inv = canon.norm(t) if t else None
+            for actor, ing in sorted(combos.items()):
+                rec = (L.actors.get(actor) or {}).get('act', {}).get(('woody', inv)) if ing == [inv] else None
+                v = L.job_ticks(actor, inv, actor='woody') if rec else None
+                pet = next((a for a in alerters if a and rec and a.lower() == rec.get('behavioractor')), None)
+                if v is None or pet is None:
+                    continue
+                kind, vals, notes = out.get(nm, ('SearchItem', {}, []))
+                vals[t] = round(v / lap_model.TICK, 3)
+                notes.append('%s <- %s %s %d ticks (noise %s at the %s, `%s` to it)'
+                             % (t, actor, inv, v, rec.get('noise'), actor, rec.get('behavior')))
+                out[nm] = (kind, vals, notes)
+                WHISTLE.setdefault(n, {})[nm] = pet
     # the hideouts: Woody's `enter` and `leave` of the PC object carrying the
     # hideout flag and the HideItem's name (the wardrobe 19 and 19 ticks, the
     # bed 4 and 4) — the remaster's hide clip and its leave clip paced to them
@@ -279,11 +317,14 @@ def main(argv):
             e = next((e for e in ov['patches'] if e.get('object') == item and e.get('component') == kind
                       and 'PCWoodySeconds' in (e.get('set') or {})), None)
             if e is None:
-                ov['patches'].append({'object': item, 'component': kind, 'set': {'PCWoodySeconds': vals},
-                                      'source': src})
+                e = {'object': item, 'component': kind, 'set': {'PCWoodySeconds': vals}, 'source': src}
+                ov['patches'].append(e)
             else:
                 e['set']['PCWoodySeconds'] = vals
                 e['source'] = src
+            pet = WHISTLE.get(n, {}).get(item)
+            if pet:
+                e['set']['PCWhistlePet'] = pet
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1)
         open(p, 'a').write('\n')
     return 0
