@@ -2691,8 +2691,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   before, -2.6 s), the stuffed bowl fires without the look on its hotspot
   (isActorAtObject) and the rush's end goes back to the beer (case 13 ->
   2; the mobile advances to the sofa: the sawn sofa had paid 37 s early
-  and the laxative's sit had looped). The other plans pay their own
-  orders. Since 2026-10-11 too 106's
+  and the laxative's sit had looped). 107's spans against E07's
+  thermometer (its chain a lap's 7.7 s later than Badinfos'): the dove to
+  the picture 5.16 s (E07 ~4.95, the picture's jump merged — its `shout`
+  icon), the picture to the camera 20.66 (20.79) since the dove-cut arm
+  plays (paint_nonsense, `world.pc_branch` by name; 18.58 before), then
+  18.58, 19.40, 15.49 and 21.34 against 18.08, 19.85, 15.62 and 21.22
+  (the banana's slip half a second later along his walk, the plan's lay).
+  The other plans pay their own orders. Since 2026-10-11 too 106's
   toilet pays 8.6 s after the candy as in E06 (the rush walks to the
   toilet's hotspot, 12.6 s before) and the album within 0.1 s of the
   towel's offset (the tub's leave after the tricked towel); 109's nitro

@@ -891,7 +891,11 @@ predicate, then the all-tricks win.
   107's painting once Woody has cut the dove loose (combine.xml's
   `bal/dove_free` removes the tied dove `aux`) — nonsense painted on the
   easel, 3.58 s, and on the smeared picture after its fire, 3.5 s, where
-  the tied dove's arm cleans it (1.5 s).
+  the tied dove's arm cleans it (1.5 s). The other item goes by its name
+  (the level keys its items by pid: until 2026-10-11 the lookup never
+  matched, and the tied dove's arm played in both — the picture's clean
+  1.5 s for its paint_nonsense 3.5, E07's drawing to the camera 20.8 s
+  against the port's 18.6; 20.66 since).
 - **The PC profile's compound visit** (PCUseSecondsCompound,
   PCCreditAtCompound, PCJingleAtCompound, PCExtraPaysAt; `_pc_compound`):
   213's compound-tricked plant and tortilla stand their second

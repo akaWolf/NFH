@@ -153,7 +153,9 @@ def pc_branch(items, it):
     tricked (Item.pc_when_tricked: 107's painting with the dove cut loose),
     None where no such item has"""
     for name, keys in (getattr(it, 'pc_when_tricked', None) or {}).items():
-        o = items.get(name) if items is not None else None
+        # (the overlay names the item; the level keys them by pid)
+        o = next((x for x in items.values() if x.name == name), None) \
+            if items is not None else None
         if o is not None and (o.tricked or o.got_tricked or o.already_tricked):
             return keys
     return None
