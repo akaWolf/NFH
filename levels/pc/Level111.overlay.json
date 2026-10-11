@@ -139,7 +139,7 @@
      6.25
     ],
     "PCSurpriseSeconds": 1.333,
-    "PCFixSeconds": 4.583,
+    "PCFixSeconds": 1.083,
     "PCAlignX": true,
     "PCFixPoint": [
      535,
@@ -157,9 +157,11 @@
      "ms0"
     ],
     "PCPoseAfter": {
-     "PCSurpriseSeconds": "doubletake3",
-     "PCFixSeconds": "ms0"
-    }
+     "PCOwnBeforeShout": "ms2",
+     "PCFixSeconds": "ms0",
+     "PCSurpriseSeconds": "doubletake3"
+    },
+    "PCOwnBeforeShout": 3.5
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_laundry's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Iron <- ironing#0 0.6 s; Iron <- ironing#1 6.2 s"
   },

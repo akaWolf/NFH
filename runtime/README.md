@@ -1234,6 +1234,19 @@ predicate, then the all-tricks win.
   0.2-0.4 s like every other icon of the two levels (tools/pcref/
   pc_reactions.py; a ReuseAfterFix station's are its redo already, a
   flag-2 step's shouts nothing).
+- **The PC profile's walk-by with a clip of its own and the tool's walk
+  back** (111; PCOwnBeforeShout, `World._s1_fire_stands`;
+  `Routine.start_urgent`): the burnt board's handler fires a five-argument
+  step whose own clip (look_clothes, 3.5 s) is its list's first element,
+  before the `shout` icon and the shout — the port had played it with the
+  repair after the shout (E11's shout icon to the next 9.40 s, the port's
+  12.95; now 9.46) — and the glued vacuum's walk back to its place and
+  `give` are the tricked case's own GoTo and action, under the shout's
+  icon, where the port's return urgent had shown the vacuum's (E11 13.37 s
+  to the board's icon, the port's 11.95 with the vacuum's icon over the
+  walk back; now 13.28). Every shout icon of the fourteen plans' videos
+  against the port's (tools/pcref/shout_runs.py: the wut icon by
+  template, its run to the next icon): within 0.2 s.
 - **The PC profile's tricked bed** (109; `Routine.pc_think_icon`): the
   bed's clip icons (PCIconClips: BedIn, BedSleep, BedPinsJump -> sleep)
   stand for Level_Pig's case 7, the sleep's ICON; the tricked visit is

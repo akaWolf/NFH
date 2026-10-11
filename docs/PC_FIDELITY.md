@@ -3399,6 +3399,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   kept the station's icon; the port shows it from its shout (a step
   with one) to the routine's next action or urgent
   (Routine.pc_shout_icon) — plan 101: 77.15, 88.32, 104.48, 120.82.
+  The shout icon's runs — from the `wut` icon (found by template in the
+  videos) to the next icon, the tricked reaction's tail — against the
+  port's since 2026-10-11, every trick of the fourteen plans that the
+  video shows too: within 0.2 s (111's burnt board 9.46 / 9.40 once its
+  own clip comes before the shout, its vacuum 13.28 / 13.37 once the walk
+  back keeps the shout's icon; 113's chair kit 7.97 / 7.73 and grinder
+  9.79 / 9.83 with the steps after the fire after the shout, 5.15 and 9.13
+  before).
   Since 2026-10-11 the case's steps after a shouting fire play after the
   shout (the fire's list goes onto his queue above the case's sequence,
   PCAfterShout): the shout icon 0.4-0.5 s sooner at 114's hat, guns, horn

@@ -6917,7 +6917,12 @@ class Routine:
             # a walk from the hideout he sits in opens with its LEAVE (the walk
             # job's, 0x475ce6): its next animation, the stay's last (PCNextAnim)
             self._pc1_stay_pose(self.item)
-        self.pc_shout_icon = None        # its handler's case sets its own icon
+        if kind != 'return':
+            # its handler's case sets its own icon; a fixing tool's walk back
+            # is the tricked case's own GoTo and give, under the shout's icon
+            # (111's vacuum, Level_Laundry's GOTO lir/vacuum after vacuum2:
+            # E11's shout icon to the ironing board's, 13.37 s)
+            self.pc_shout_icon = None
         self._pc_alarm_listed = False
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
@@ -10056,7 +10061,8 @@ class World:
         pre = (0 if stood else pcprofile.S1_FIRE_LEAD_TICKS) \
             + (pcprofile.S1_FIRE_ICON_TICKS if shout > 0.0 else 0)
         post = pcprofile.S1_FIRE_STOP_TICKS if listed and not item.pc_stop_skip else 0
-        return pre / pcprofile.TICKS_PER_SECOND, post / pcprofile.TICKS_PER_SECOND
+        own = (item.pc_own_before_shout or 0.0) if (listed and not fired_early) else 0.0
+        return pre / pcprofile.TICKS_PER_SECOND + own, post / pcprofile.TICKS_PER_SECOND
 
     def _angry_without_animations(self, pawn, item, on_done, routine, nfh2):
         """Rottweiler.PlayAngryAnimation's AngryWithoutAnimations branch

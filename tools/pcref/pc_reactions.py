@@ -378,7 +378,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
         'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
         'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout', 'PCWakePet', 'PCAfterShout',
-        'PCAfterShoutFirst', 'PCAfterShoutCompound')
+        'PCAfterShoutFirst', 'PCAfterShoutCompound', 'PCOwnBeforeShout')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -726,9 +726,20 @@ def specs(n):
                     # y), the doubletake as an ACTION step (time + 2), the fire,
                     # the shout, the repair with its walk (fix_point)
                     keys['PCSurpriseSeconds'] = round(lv.action('neighbor', 'doubletake3') or DOUBLETAKE, 3)
-                    keys['PCFixSeconds'] = round(fix + own + after, 3)
+                    if own > 0 and not (fl & 2):
+                        # a five-argument step's own clip is its list's first
+                        # element, before the `shout` icon and the shout (the
+                        # list on top of the handler's: 111's burnt board,
+                        # look_clothes — E11's shout icon 3.5 s before the
+                        # repair-first order had it)
+                        keys['PCOwnBeforeShout'] = round(own, 3)
+                        keys['PCFixSeconds'] = round(fix + after, 3)
+                        pose['PCOwnBeforeShout'] = _pose(L, p_own)
+                        pose['PCFixSeconds'] = _pose(L, p_after + p_fix)
+                    else:
+                        keys['PCFixSeconds'] = round(fix + own + after, 3)
+                        pose['PCFixSeconds'] = _pose(L, p_own + p_after + p_fix)
                     pose['PCSurpriseSeconds'] = _pose(L, [('neighbor', 'doubletake3')])
-                    pose['PCFixSeconds'] = _pose(L, p_own + p_after + p_fix)
                     keys['PCAlignX'] = True
                     keys['PCReactLead'] = REACT_LEAD
                     keys['PCReactTail'] = REACT_TAIL

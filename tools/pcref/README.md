@@ -82,6 +82,11 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   `--cases`/`--chain` print a level's cases and chain, `--dump` a code range
   with its strings. The walk-trigger handlers (the doubletakes, the slips,
   the trap) are no cases: their straight branch is read instead.
+- `shout_runs.py <run> <level>` (2026-10-11): the Season 1 shout icon's runs
+  (its appearance to the next icon: the tricked reaction's tail) in
+  Badinfos' run, found by template, against a port run's — within 0.2 s
+  over the fourteen plans since the steps after a shouting fire, a
+  walk-by's own clip and the tool's walk back were read.
 - `pc_pets_s1.py [--write]` (2026-10-11): level.xml's `dog` / `chili` actors
   against the remaster's Alerters — a pet the mobile has inactive or in
   another room is placed in the PC's (its GameObject active, its Transform
@@ -119,7 +124,9 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   steps after a shouting OBJ2 or five-argument step, which play after the
   shout (the fire's list on top of the case's sequence; PCAfterShoutFirst
   where they come before the case's repair, `after_first` over the steps'
-  order; the compound arm's PCAfterShoutCompound); REDO_SHOUT the ReuseAfterFix
+  order; the compound arm's PCAfterShoutCompound); a walk-by's
+  five-argument step's own clip before the shout (PCOwnBeforeShout: 111's
+  burnt board, look_clothes); REDO_SHOUT the ReuseAfterFix
   stations whose redo runs no ICON case (PCRedoShout: the fire's shout
   icon stays over it — 104's microwave, 105's piano, 108's deck chair and
   toothbrush, 110's steak chair, 113's ladder); the skate's PCWakePet (its
