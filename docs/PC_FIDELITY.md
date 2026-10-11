@@ -2645,6 +2645,26 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   (PCUseSecondsLinked, PCShoutLinked, PCFixSecondsLinked,
   PCCreditAtLinked, PCLinkedPaysAt, PCJingleAtLinked); 212's plan ends
   1.9 s later, at 100.
+- *Season 1's chains against Badinfos' thermometer (2026-10-11).* The
+  plans' pays (the game clock, x 0.996 for the frames') against the
+  mercury's jumps of the episode (tools/pcref/thermo_jumps.py; the jump
+  read at 10 fps lags the fire by up to ~0.3 s: E04's toilet shout at
+  ~145.0 s by the frames, its jump at 144.6) where a plan pays the run's
+  chain in its order: 104 within 0.6 s after the cream's stand and the
+  soap's place (above, "The playing trick"); 103's spans within 0.15 s
+  but the soap to the toilet, 11.1 s against 12.5 (the soap's place,
+  the plan's); 112 +0.2 s to the bicycle, +0.9 from the skates on — the
+  bicycle-to-skates span 0.7 s long, the kitchen door to the skates and
+  the slide read off E12's frames 0.4 and 0.5 s quicker than the port's,
+  unexplained by the code (the trigger's place moved toward the window
+  only lengthens it); 114 -0.6 s from the gramophone, -1.5 from the
+  shotgun — the records' second visit to the phonograph 13.8 s against
+  E14's 14.6 after the dog's alarm (whose run, search and shout take
+  the port 12.8 s against 13.4). The other plans pay their own orders.
+  Every tricked stand of the fourteen plans fires at its PCFireAt or
+  after its PCUseSecondsTricked within 0.05 s (the routine log against
+  the pays), every slip and trap two ticks after its trigger and every
+  look 1.6-1.8 s after it (the lead, the x alignment, the doubletake).
 - *Season 2's chains against Badinfos' gauge (2026-10-04, read and
   carried).* The anger gauge's jumps (the bar at the frame's left,
   tools/pcref/gauge.py at 4 fps) against the port's credits where the
