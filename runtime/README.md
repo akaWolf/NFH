@@ -1233,7 +1233,25 @@ predicate, then the all-tricks win.
   tucks its head at ~45.0 s, the model's sleeps at 45.8 (its 72-tick timer
   from the last whine's end at 40.47, the neighbour through the kitchen
   door at 40.1; E08's door at ~40.4) — a timer of ~4.5 s for the model's
-  5.33 there.
+  5.33 there. The timer itself holds where the history is the code's: 112's
+  dog, woken by the skate's list, whines while the neighbour is in the
+  kitchen (to the list's move to fro/outside after the fallout, 0x462ca0)
+  and sleeps 72 ticks after the whine in hand ends — 13.5 s after the skate's
+  trigger in E12 (258.5 -> 271.9) and in the port (260.0 -> 273.5); 108's
+  parrot counted fewer ticks before the neighbour came than E08's (E08's
+  Woody still in the living room at 24.0 s, the plan's up the stairs at
+  23.2: his crossing, the barks and the idle before the neighbour's arrival
+  are the plan's, not E08's). Open, with numbers: E08's parrot whines
+  toward the kitchen door until ~42.4 s (the neighbour's pass there under
+  way at 41.5) and starts its `fallasleep` at ~44.6 — 26 ticks of idle,
+  so 46 counted before he came, where his pass into the living room
+  (~26.0, out of the door at 27.8) leaves 6 ticks after the bark's end
+  (~25.5) by any reading here. The code read so far — state 4 decides on
+  every tick its job is free, the idle sets the animation and no job, the
+  room pointers flip at a door pass's start — would start the whine at
+  his pass's start rather than at its end (on_rottweiler_enter): tried,
+  the plan's parrot then sleeps at 46.3 instead of 45.8, further from
+  E08's 44.6; not carried until the 40 ticks are found.
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove
