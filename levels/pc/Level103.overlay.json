@@ -15,7 +15,7 @@
     "PCUseSeconds": 1.5,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.833,
+    "PCUseSecondsTricked": 2.833,
     "PCCaseGoto": true,
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
@@ -35,7 +35,7 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 2.833,
-    "PCPrimeSecondsTricked": 0.833,
+    "PCPrimeSecondsTricked": 1.0,
     "PCCaseGoto": [
      true,
      false

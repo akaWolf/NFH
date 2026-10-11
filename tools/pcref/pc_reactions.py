@@ -158,7 +158,11 @@ TABLE = {
           # the cake is one PC station (Level_Mail's case 4) the mobile plays
           # as a prime leg and a use: tricked, put_tnt and light_tnt, then
           # celebrate_boom and the fire
-          'Candle': use('kit/candlebox_boom'),
+          # (the candle's trick plays at the cake's use visit, its DependsOn:
+          # the stand there is celebrate_boom, the prime leg's put_tnt and
+          # light_tnt the cake's PCPrimeSecondsTricked — the candle's own
+          # visit, UseAtOtherPlace, stays untricked)
+          'Candle': use('kit/candlebox_boom', before=[('kit/cake', 'celebrate_boom')]),
           'BirthdayCake': use('kit/candlebox_boom', before=[('kit/cake', 'celebrate_boom')],
                               prime=[('kit/cake', 'put_tnt'), ('kit/cake', 'light_tnt')]),
           'LetterBox': use('anc/mailbox_trap')},
@@ -668,7 +672,9 @@ def specs(n):
                     # the repair helper's closing message step (REACT_TAIL)
                     keys['PCReactTail'] = REACT_TAIL
                 if spec.get('prime'):
-                    keys['PCPrimeSecondsTricked'] = round(_sum(lv, spec['prime']), 3)
+                    # (with the case's instants before them, its list's start
+                    # and StopMsg: the prime leg opens the case)
+                    keys['PCPrimeSecondsTricked'] = round(_sum(lv, spec['prime'], sm), 3)
                 if fix and sm.get('repair') and spec.get('fix') is None:
                     # the repair helper's walk to the tricked object when he
                     # does not stand on it (fix_point)

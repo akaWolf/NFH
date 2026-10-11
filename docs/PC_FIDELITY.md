@@ -1221,7 +1221,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   normal pace before the pie's visit takes the trick: the stand at the pie
   had counted the put twice, the cream's fire 2.8 s after E04's, the
   chain after it 2.9; now +0.07 s and +0.2-0.6 with the soap laid by the
-  bathroom door as E04 lays it, tests/plans/pc/s1/Level104.txt v9). A
+  bathroom door as E04 lays it, tests/plans/pc/s1/Level104.txt v9; 103's
+  candle the same way: its trick plays at the cake's use visit after the
+  cake's prime leg, the stand there celebrate_boom alone, 2.83 s for the
+  case's 3.83, and the prime leg the case's instants with put_tnt and
+  light_tnt, 1.0 s for 0.83 — the microwave to the candle 16.25 s against
+  E03's 16.4, 17.08 before). A
   fixing tool plays its own case: 111's glued vacuum
   (Level_Laundry's case 22) is the take (PCGrabSeconds 0.33), the stand at
   the carpet with the fire before the explode clip (vacuum_hole 2.92, then
