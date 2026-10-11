@@ -3391,6 +3391,19 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   port's wait in fear, its angry and a fix clip (Routine.pc_hurt), and
   the 206 lesson's two m_hurt_n icons show being_hit (an empty bubble
   before).
+  The repairs a tricked flow hands over to (2026-10-11): the repair's
+  step sets its own icon over its walk and repair — 203's generator step
+  0x100343a5 a null one, and E03 shows no bubble 127.0-132.0 s where the
+  port had kept the microphone's (PCFixIcon ''; the tail to the next
+  icon 8.80 s against 8.87) —, and 207's board, a scene step's flow, hands
+  over to the spring's repair (0x1001665a after the awning's crash and
+  the pool's leave, 0x1001683b after the Mother's fight): the walk back
+  to the spring board and its `repair` under the board's icon before the
+  bar's step, which the profile had not played — E07 holds the board's
+  icon 12.83 s past the credit (123.5 s) while he walks back to it, and
+  the spring lies on the floor as he goes (the Ef779 show); the port's
+  bar icon came 6.97 s after it, now 12.95 (PCFixSeconds 6.08, linked
+  7.17; lap_model_s2._scene_handover).
   Season 1's shout the same way (2026-09-30): the fire's list pushes the
   `shout` icon before the shout (fcn.0047bd00; generic/objects.xml's
   icon `shout`, gui/bubbles/bubble_wut — the remaster's bubble_wut,

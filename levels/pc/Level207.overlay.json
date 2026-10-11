@@ -13,6 +13,7 @@
    "component": "TrickItem",
    "set": {
     "PCLaugh": 0,
+    "PCJingle": true,
     "PCClipSeconds": {
      "PoolDive": 4.92,
      "PoolGetOut": 1.42,
@@ -31,19 +32,21 @@
      "shout"
     ],
     "PCShout": 1,
-    "PCFixSeconds": 0,
-    "PCShoutTail": 0.08,
+    "PCFixSeconds": 6.08,
+    "PCFixDepart": [
+     649,
+     -54
+    ],
+    "PCFixIcon": "divingboard",
     "PCSceneLinked": [
      1.75,
      "shout"
     ],
     "PCShoutLinked": 1,
-    "PCFixSecondsLinked": 0,
-    "PCShoutTailLinked": 0.08,
+    "PCFixSecondsLinked": 7.17,
     "PCHitSeconds": {
      "Mother": 3.33
     },
-    "PCJingle": true,
     "PCIconClip": "PoolGetOut",
     "PCHurtIcon": {
      "wait": "being_hit",
@@ -88,17 +91,17 @@
     "PCHitSeconds": {
      "Olga": 3.58
     },
-    "PCCreditAt": 4.08,
-    "PCJingleAt": [
-     4.08
-    ],
-    "PCUseSeconds": 6.08,
     "PCHitAfter": {
      "Olga": 0.75
     },
     "PCHitRun": {
      "Olga": 2.33
     },
+    "PCCreditAt": 4.08,
+    "PCJingleAt": [
+     4.08
+    ],
+    "PCUseSeconds": 6.08,
     "PCHurtIcon": {
      "wait": "olgafight",
      "shout": "olgafight",

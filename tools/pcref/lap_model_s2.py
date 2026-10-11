@@ -2775,7 +2775,7 @@ COMPOUND_PRESENT = {213: {'PlantCarnivore': ({'topright_carnivore_bigmanip'},
                                         'bottomright_tortilla_tequila'})}}
 
 
-def _scene_step_events(n, item, linked=None):
+def _scene_step_events(n, item, linked=None, with_next=False):
     """the events of an item's SCENE_STEPS steps, run with its trick in the
     scene (tricked_presence, else the table's) — and the linked trick's,
     `linked` (shown, hidden), for the linked variant, or LINKED_PRESENT's
@@ -2796,15 +2796,19 @@ def _scene_step_events(n, item, linked=None):
     lv = Level(n)
     lv.present = (set(lv.present) - set(hidden)) | set(shown)
     ev = []
+    nx = None
     for st in steps:
-        evs, _nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1,
-                            streq=streq)
+        evs, nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1,
+                           streq=streq)
         ev += ([('STEP',)] if ev else []) + evs
     at = SCENE_AT.get(n, {}).get(item)
     if at is not None:
         # where he stands as the flow starts (a GoTo element's walk leaves
         # from there)
         ev = [('AT', at)] + ev
+    if with_next:
+        # (and the scene it leaves, the step its last one hands over to)
+        return ev, lv, nx
     return ev
 
 
@@ -2822,12 +2826,37 @@ def scene_steps(n):
     return out
 
 
+def _scene_plain_next(n, item):
+    """the step an item's SCENE_STEPS flow hands over to with no trick in the
+    scene (207's board: the dive's continuation, the bar's 0x100164ee)"""
+    spec = SCENE_STEPS[n][item]
+    unknown = spec[3] if len(spec) > 3 else 1
+    streq = spec[4] if len(spec) > 4 else 0
+    lv = Level(n)
+    nx = None
+    for st in spec[0]:
+        _e, nx = run_step(lv, st, dict(LAP_BYTES.get(n) or {}), unknown=unknown, latch=1, streq=streq)
+    return nx
+
+
+def _scene_handover(n, d, item, ev, lv, nx, level, repair):
+    """_handover_repair of a SCENE_STEPS flow whose SHOUT has no repair of its
+    own and whose last step hands over to another than the untricked flow's
+    (207's board: the spring's repair step), else None"""
+    if level is None or level < 0 or repair is not None or nx is None or nx == _scene_plain_next(n, item):
+        return None
+    return _handover_repair(n, d, ev, lv, nx, LAP_BYTES.get(n) or {})
+
+
 def scene_step_reactions(n):
-    """{mobile item: (SHOUT level, repair s or None, tail s)} of the
-    SCENE_STEPS flows that are not TRICKED_SCENE's: the reaction the flow
+    """{mobile item: (SHOUT level, repair s or None, tail s, depart, icon)} of
+    the SCENE_STEPS flows that are not TRICKED_SCENE's: the reaction the flow
     plays after its tricked part (fcn.1000f977's level, -1 none; the repair
     after it, _step_parts_split; the rest before the next step, _shout_tail)
-    — the SHOUT the stand-in's record laugh (PCLaugh) had stood in for"""
+    — the SHOUT the stand-in's record laugh (PCLaugh) had stood in for; the
+    repair in the step the flow hands over to where its own has none
+    (_scene_handover: 207's board, the spring's), with where its walk leaves
+    him and the icon over it (else None, None)"""
     d = Data(n)
     out = {}
     # (a linked partner no station visits alone: 212's second ruby, played in
@@ -2836,23 +2865,29 @@ def scene_step_reactions(n):
     for item in SCENE_STEPS.get(n, {}):
         if item in TRICKED_SCENE.get(n, ()) or item in partners:
             continue
-        ev = _scene_step_events(n, item)
+        ev, lv, nx = _scene_step_events(n, item, with_next=True)
         _stand, level, repair, _credit = _step_parts_split(d, ev)
         if level is None:
             continue
-        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev)))
+        h = _scene_handover(n, d, item, ev, lv, nx, level, repair)
+        if h is not None:
+            out[item] = (level,) + h
+            continue
+        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev)), None, None)
     return out
 
 
 def scene_step_linked_reactions(n):
-    """{mobile item: (SHOUT level, repair s or None, tail s, scene, hit)} of
-    the SCENE_STEPS flows scene_step_reactions reads, run with the mobile
-    linked trick's scene too where that changes their DoActions (210's
-    hedgehog chair over the damaged pole: the chair's `electrify` between
-    its `enter` and `leave`, SHOUT 1, 0x1001964b's PRESENT pole_damaged);
-    where the flow hands its reaction on (SCENE_LINKED_CONT: 207's board
-    over the closed awning) the co-actor's `fight` — hit {actor: seconds} —
-    and the SHOUT of the step his handler picks for it"""
+    """{mobile item: (SHOUT level, repair s or None, tail s, scene, hit,
+    depart, icon)} of the SCENE_STEPS flows scene_step_reactions reads, run
+    with the mobile linked trick's scene too where that changes their
+    DoActions (210's hedgehog chair over the damaged pole: the chair's
+    `electrify` between its `enter` and `leave`, SHOUT 1, 0x1001964b's
+    PRESENT pole_damaged); where the flow hands its reaction on
+    (SCENE_LINKED_CONT: 207's board over the closed awning) the co-actor's
+    `fight` — hit {actor: seconds} — and the SHOUT of the step his handler
+    picks for it; the repair in the step it hands over to after that
+    (_scene_handover: 207's spring, 0x1001683b)"""
     d = Data(n)
     out = {}
     trick = tricked_presence(n)
@@ -2862,7 +2897,7 @@ def scene_step_linked_reactions(n):
         if lnk not in trick:
             continue
         ev1 = _scene_step_events(n, item)
-        ev2 = _scene_step_events(n, item, trick[lnk])
+        ev2, lv2, nx = _scene_step_events(n, item, trick[lnk], with_next=True)
         if dos(ev2) == dos(ev1):
             continue
         hit = None
@@ -2871,16 +2906,17 @@ def scene_step_linked_reactions(n):
             kind, actor, steps = cont
             lvc = Level(n)
             for stp in steps:
-                ev2 = ev2 + [('STEP',)] + run_step(lvc, stp, dict(LAP_BYTES.get(n) or {}),
-                                                   unknown=1, streq=1)[0]
+                evs, nx = run_step(lvc, stp, dict(LAP_BYTES.get(n) or {}), unknown=1, streq=1)
+                ev2 = ev2 + [('STEP',)] + evs
             if kind == 'fight':
                 ft = d.action_ticks('neighbor', 'fight', actor=actor)
                 hit = {actor: _secs(ft)}
         _stand, level, repair, _credit = _step_parts_split(d, ev2)
         if level is None:
             continue
-        out[item] = (level, _secs(repair), _secs(_shout_tail(d, ev2)), _scene_secs(_scene_span(d, ev2)),
-                     hit)
+        h = _scene_handover(n, d, item, ev2, lv2, nx, level, repair)
+        rep, tail, dep, icon = h if h is not None else (_secs(repair), _secs(_shout_tail(d, ev2)), None, None)
+        out[item] = (level, rep, tail, _scene_secs(_scene_span(d, ev2)), hit, dep, icon)
     return out
 
 
@@ -2980,6 +3016,30 @@ def _repair_walk(n, d, ev):
     if not t:
         return 0, None
     return t, (q[0], q[1] - g.floor(g.room_of(b)))
+
+
+def _handover_repair(n, d, ev, lv, nx, by):
+    """(repair s, tail s, depart, icon) | None: the repair in the step a
+    tricked flow `ev` hands over to off the lap, `nx` (run on `lv`, the
+    scene the flow left) — its walk to the repaired object and the `repair`
+    on the flow's clock from the SHOUT (the SHOUT's step's own elements
+    after it, the next step's start, the repair and the instants after it),
+    the tail after it (_shout_tail), where the walk leaves him
+    (_repair_walk) and the icon the step sets on its first run, over its
+    walk and repair (fcn.100422a5; '' a null one, the bubble hidden) — 203's
+    generator after the stage's crash, 0x100343a5 (E03 127.0-132.0 s: no
+    bubble); 207's spring board after the dive, 0x1001665a, and after the
+    Mother's fight, 0x1001683b (E07 130.5-136.3 s: the board's icon over the
+    walk back to it and the spring's `repair`); None where that step has no
+    repair"""
+    evr, _nr = run_step(lv, nx, dict(by))
+    _s, _l, crep, _c = _step_parts_split(d, ev + [('STEP',)] + evr)
+    if crep is None or not any(e2[0] == 'DO' and len(e2[1]) > 1 and e2[1][1] == 'repair' for e2 in evr):
+        return None
+    wk, dep = _repair_walk(n, d, ev + evr)
+    ics = [x[1] for x in evr if x[0] == 'IC']
+    icon = (ics[0][0] if ics[0] else '') if ics else None
+    return round((crep + wk) / 12.0, 2), _secs(_shout_tail(d, ev + [('STEP',)] + evr)), dep, icon
 
 
 def _goel_depart(n, d, ev):
@@ -3635,22 +3695,16 @@ def code_stays_tricked(n):
                             and nx2 is not None and nx2 != nx1:
                         # the repair in the step the tricked flow hands over
                         # to off the lap (203's generator after the stage's
-                        # crash, 0x100343a5: its walk, `repair` and switch back)
-                        evr, _nr = run_step(lvj, nx2, dict(byi))
-                        # (on the flow's clock from the SHOUT: the SHOUT's
-                        # step's own elements after it, the next step's
-                        # start, the repair and the instants after it —
-                        # station_ticks of the repair's step alone until
-                        # 2026-10-04, a tick or two short)
-                        _s, _l, crep, _c = _step_parts_split(d, ev2 + [('STEP',)] + evr)
-                        if crep is not None and any(
-                                e2[0] == 'DO' and len(e2[1]) > 1 and e2[1][1] == 'repair' for e2 in evr):
-                            # (and the walk to it: 203's stage to the generator)
-                            wk, dep = _repair_walk(n, d, ev2 + evr)
-                            e['repair'] = round((crep + wk) / 12.0, 2)
-                            e['tail'] = _secs(_shout_tail(d, ev2 + [('STEP',)] + evr))
+                        # crash, 0x100343a5: its walk, `repair` and switch
+                        # back; station_ticks of the repair's step alone
+                        # until 2026-10-04, a tick or two short)
+                        h = _handover_repair(n, d, ev2, lvj, nx2, byi)
+                        if h is not None:
+                            e['repair'], e['tail'], dep, icon = h
                             if dep is not None:
                                 e['fix_depart'] = dep
+                            if icon is not None:
+                                e['fix_icon'] = icon
                     out[item] = e
                     where[item] = (i, ev2)
                     break

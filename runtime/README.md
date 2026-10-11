@@ -854,7 +854,13 @@ predicate, then the all-tricks win.
   PCIconClipsRole (role -> {clip: icon}); the neighbour's keys are his
   alone. Through a co-actor's fight after a trick, PCHurtIcon
   ({'wait', 'shout'}: the wait in fear's and the angry's, a fix clip
-  the station's; `Routine.pc_hurt`). Season 1's shout: the fire's
+  the station's; `Routine.pc_hurt`). A repair in the step a tricked flow
+  hands over to shows that step's icon over the walk and the repair
+  (PCFixIcon, `Routine.pc_fix_icon`, set as play_angry's fix clips
+  start): '' for 203's generator step 0x100343a5 — E03 shows no bubble
+  127.0-132.0 s, the port the microphone's until 2026-10-11 (the tail to
+  the next icon 8.80 s against E03's 8.87) —, the board's for 207's
+  spring (0x1001665a, 0x1001683b). Season 1's shout: the fire's
   `shout` icon (bubble_wut) from its message step's tick to the next
   action or urgent (`Routine.pc_shout_icon`) — the step's one update
   applies it (0x47c550 -> 0x479610, fcn.00437f70) and is done, the
@@ -929,10 +935,19 @@ predicate, then the all-tricks win.
 - **The PC profile's repair walk** (PCFixDepart, play_angry's `after_run`):
   a repair at another object (211's sign after the wc, 203's generator
   after the stage, 208's plain tap after the electrified one's shock) or
-  back from where a hideout's leave put him (212's bench) plays where he
-  stands for the walk and the repair
-  (PCFixSeconds) and his next walk leaves that object's hotspot
-  (`Pawn._pc_depart`).
+  back from where a hideout's leave put him (212's bench; 207's spring
+  board from the pool's neighbor_out after the dive, and from the
+  Mother's deck chair after her fight) plays where he stands for the
+  walk and the repair (PCFixSeconds) and his next walk leaves that
+  object's hotspot (`Pawn._pc_depart`). 207's board is a scene step's
+  flow (lap_model_s2.SCENE_STEPS), whose hand-over to the spring's
+  repair step — 0x1001665a after the awning's crash and the pool,
+  0x1001683b after the fight's SHOUT, each a GoTo to the spring board,
+  its `repair` and the switch back before the bar's step 0x100164ee — the
+  profile had not had until 2026-10-11 (PCFixSeconds 0: the bar's walk
+  straight after the SHOUT); with it (6.08 s, linked 7.17) the bar's
+  icon comes at 136.44 s against E07's 136.30 (130.46 before), the
+  board's 12.95 s after the credit against the video's 12.83.
 - **The PC profile's 211 rush** (the after-toilet angry in
   `Routine._urgent_finished`, PCToiletPaysAt): the angry after the wc is
   the rush's own item (the sweets) under the profile — GameLogic's toilet

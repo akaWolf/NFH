@@ -4231,6 +4231,7 @@ class Routine:
         self._pc_icon_sched = None       # the visit's icon changes to come (PCIconAt): [(t, icon)]
         self.pc_hurt = None              # a fight's bubble after a trick: (item, 'wait' | 'shout')
         self.pc_walkby_icon = None       # Season 1: the icon up as a walk-by's handler took over
+        self.pc_fix_icon = None          # Season 2: the repair's step's icon over the repair (PCFixIcon)
         self.pc_shout_icon = None        # Season 1: the fire list's `shout` icon, up to the next case's
         self._pc_icon_t = 0.0
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
@@ -4474,6 +4475,10 @@ class Routine:
         next or the tail's icon once up (PCIconLead, PCIconTail, PCIconClip),
         a clip's (PCIconClips), the visit's own (PCIcon) — '' no bubble —;
         None where the item's own shows as on the mobile"""
+        if self.pc_fix_icon is not None and pcprofile.is_pc():
+            # Season 2: the step a tricked flow's repair is in sets its own
+            # icon over the repair ('' none: 203's generator, PCFixIcon)
+            return self.pc_fix_icon
         if self.pc_shout_icon is not None and pcprofile.is_pc():
             # the Season 1 fire's list: its `shout` icon before the shout
             # (generic objects.xml: gui/bubbles/bubble_wut), up until the
@@ -4568,6 +4573,7 @@ class Routine:
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
         self._pc_icon_sched = None
+        self.pc_fix_icon = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -4808,6 +4814,7 @@ class Routine:
 
     def _start_action(self, start_next=False):
         self.started = True              # StartAction: CurrentAction = ...
+        self.pc_fix_icon = None          # the next step sets its own
         if not self._pc_keeps_shout(self.item):
             self.pc_shout_icon = None    # the next case sets its own icon
         self._active = None              # the entry at the index from here on
@@ -6917,6 +6924,7 @@ class Routine:
             # a walk from the hideout he sits in opens with its LEAVE (the walk
             # job's, 0x475ce6): its next animation, the stay's last (PCNextAnim)
             self._pc1_stay_pose(self.item)
+        self.pc_fix_icon = None
         if kind != 'return':
             # its handler's case sets its own icon; a fixing tool's walk back
             # is the tricked case's own GoTo and give, under the shout's icon
@@ -10673,6 +10681,9 @@ class World:
                 pawn.anim.time_scale = 1.0
                 # the SHOUT's end: the list's end callback next (fcn.1000d559)
                 self._pc_scene_shout_end(item)
+                if routine is not None and item.pc_fix_icon is not None and fixes:
+                    # the repair's step sets its icon (PCFixIcon)
+                    routine.pc_fix_icon = item.pc_fix_icon
                 if fixes:
                     if fix_secs:
                         mobile = pawn.anim.sequence_seconds(fixes)

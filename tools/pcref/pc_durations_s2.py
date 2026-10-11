@@ -530,7 +530,7 @@ def write_tricked_keys(ov, n, clips):
               'PCCreditAt', 'PCCreditAtLinked', 'PCShoutLinked', 'PCFixSecondsLinked',
               'PCLinkedPaysAt', 'PCHitSeconds', 'PCHitSecondsLinked', 'PCResumeHeadSeconds',
               'PCExtraCoinLinked', 'PCExtraPaysAtLinked', 'PCTrickArm', 'PCTrickFire',
-              'PCToiletPaysAt', 'PCFixDepart', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter', 'PCHitRun',
+              'PCToiletPaysAt', 'PCFixDepart', 'PCFixIcon', 'PCShoutTail', 'PCShoutTailLinked', 'PCHitAfter', 'PCHitRun',
               'PCScene', 'PCSceneLinked', 'PCJingleAt', 'PCJingleAtLinked', 'PCHitJinglesLinked',
               'PCUseSecondsCompound', 'PCCreditAtCompound', 'PCJingleAtCompound', 'PCExtraPaysAt'):
         ov['patches'] = _strip_key(ov['patches'], k)
@@ -631,6 +631,10 @@ def write_tricked_keys(ov, n, clips):
             # the repair's walk leaves him at the repaired
             # object: his next walk from its hotspot (x, px)
             _set_key(ov['patches'], item, 'PCFixDepart', list(tr['fix_depart']))
+        if tr.get('fix_icon') is not None:
+            # the icon of the step the repair is in, over it ('' the
+            # bubble hidden: 203's generator)
+            _set_key(ov['patches'], item, 'PCFixIcon', tr['fix_icon'])
         if tr.get('toilet_pays_at') is not None:
             # the rush's own record, its tick into the wc's
             # action (211's wcright, 27 of the puke's 40)
@@ -646,13 +650,22 @@ def write_tricked_keys(ov, n, clips):
     for item, sc in sorted(lap_model_s2.scene_steps(n).items()):
         # the scene of a tricked flow off the model's lap (SCENE_STEPS)
         _set_key(ov['patches'], item, 'PCScene', sc)
-    for item, (level, repair, tail) in sorted(lap_model_s2.scene_step_reactions(n).items()):
+    departs, icons = {}, {}
+    for item, (level, repair, tail, dep, icon) in sorted(lap_model_s2.scene_step_reactions(n).items()):
         # and its SHOUT and repair (the flow's reaction, in the stand-in's
-        # record laugh's stead)
+        # record laugh's stead) — a repair in the step the flow hands over
+        # to with its walk, where it leaves him and the icon over it (207's
+        # board: the spring's)
         _set_key(ov['patches'], item, 'PCShout', level)
         _set_key(ov['patches'], item, 'PCFixSeconds', repair or 0)
         if tail:
             _set_key(ov['patches'], item, 'PCShoutTail', tail)
+        if dep is not None:
+            departs[item] = dep
+            _set_key(ov['patches'], item, 'PCFixDepart', list(dep))
+        if icon is not None:
+            icons[item] = icon
+            _set_key(ov['patches'], item, 'PCFixIcon', icon)
     ov['patches'] = _strip_key(ov['patches'], 'PCPair')
     ov['patches'] = _strip_key(ov['patches'], 'PCPairNext')
     for item, pair in sorted(lap_model_s2.paired_reactions(n).items()):
@@ -670,7 +683,13 @@ def write_tricked_keys(ov, n, clips):
         # the flow a mobile tricked state plays that is no PC trick (202's
         # laid rake without the weed: `use` and repair, no SHOUT)
         _set_key(ov['patches'], item, 'PCPlain', plain)
-    for item, (level, repair, tail, sc, hit) in sorted(lap_model_s2.scene_step_linked_reactions(n).items()):
+    for item, (level, repair, tail, sc, hit, dep, icon) in sorted(lap_model_s2.scene_step_linked_reactions(n).items()):
+        if dep is not None and departs.get(item) != dep:
+            # (PCFixDepart is the item's: the linked variant's repair
+            # leaves him where the plain one's does — 207's spring board)
+            raise ValueError('%d %s: the linked repair departs elsewhere' % (n, item))
+        if icon is not None and icons.get(item) != icon:
+            raise ValueError('%d %s: the linked repair has another icon' % (n, item))
         # the linked variant's (210's hedgehog chair over the damaged pole:
         # the chair's `electrify`, SHOUT 1; 207's board over the closed
         # awning: the Mother's `fight`, then SHOUT 1)
