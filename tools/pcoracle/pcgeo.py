@@ -109,6 +109,16 @@ class MapOps:
             result = next((name for name, ings, game in self.combos if room in ings and item in ings), None)
         return room, px, item, result
 
+    def single_combo(self, obj):
+        """the object is the sole ingredient of a combination (no tool, no game): the GUI's click on it is a
+        CombineMsg with a NULL second object, as for a tool-less unlock — 101's lir/tv (lir/twistedantenna)"""
+        if obj is None: return False
+        fam = obj.split('/')[-1].split('_')[0]; room = obj.split('/')[0]
+        for name, ings, game in self.combos:
+            if len(ings) == 1 and '/' in ings[0] and ings[0].split('/')[0] == room and ings[0].split('/')[-1].split('_')[0] == fam:
+                return True
+        return False
+
     def item_name(self, mobile_item, it_type):
         """the PC inventory name of a mobile type for a combination on the item: combine.xml's ingredient of
         the object's family that is no object — the type's own lower-cased name where it is one, the single

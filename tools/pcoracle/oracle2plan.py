@@ -74,8 +74,15 @@ for l in s.split('\n'):
             elif it in hides: out.append('hide! %s' % it)
             else: out.append('use! %s' % it)
         elif l.startswith('<CombineMsg'):
-            it = item_of(a['object']); held = it_of(a['object2'])
+            it = item_of(a['object']); held = it_of(a['object2']) if a.get('object2') else None
             if not it: out.append('# no item for %s' % a['object'])
+            elif held is None:
+                # no second object: the GUI's click on a single-object combination — a tool-less dexterity
+                # unlock (203's handbag, 205's duck cage) or a bare trick (101's TV, lir/twistedantenna <- lir/tv)
+                if it in unlockers:
+                    out.append('unlock! %s' % it)
+                    if gives.get(it): out.append('take! %s %s' % (it, gives[it]))
+                else: out.append('use! %s' % it)
             elif primes.get(it) == held: out.append('prime! %s %s' % (it, held))
             elif unlockers.get(it) == held:
                 # (the PC's combination takes the item as its game is won; the port's SearchItem wants

@@ -45,9 +45,11 @@ class PCMap(pcgeo.MapOps):
             return b.decode('utf-16') if b[:2] in (b'\xff\xfe', b'\xfe\xff') else b.decode('latin-1')
         objects_xml = rd('objects.xml')
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
-        self.uses = set()
+        self.uses = set(); self.hideouts = {}
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
+            h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
+            if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
         self.combos = []
         try:
             for m in re.finditer(r'<combination name="([^"]+)"([^>]*)>(.*?)</combination>', rd('combine.xml'), re.S):

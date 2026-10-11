@@ -115,12 +115,17 @@ class PlanRunner:
         self.last_input = -100; self.tricked = {}
     def woody(self):
         return actors.get('woody') and actor_states().get('woody')
-    def idle(self, w):
+    def idle(self, w, strict=False):
         # (Woody is in `actors` from his first walk on; before it he stands where the level put him; hidden
         # in a wardrobe, a bed or a pipe after a `hide` leg he is as good as standing — a click brings him out)
         if getattr(self, 'hidden', False) and w is not None and w['anim'] not in ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3'):
             return True
-        return w is None or w['anim'] in self.STANDS
+        if w is None or w['anim'] in self.STANDS: return True
+        # an action without an actornextanim leaves him on its last frame (208's `take3` held 48 s after the
+        # shovel): any pose that is no gait and no catch, unchanged for two seconds, is a stand — except for
+        # a leg whose action runs long on purpose (an unlock's minigame: `strict`, the stands alone)
+        if strict or w['anim'] in self.GAITS or w['anim'].startswith(('fear', 'fight', 'respawn', 'fly_away')): return False
+        return state['tick'] - getattr(self, '_anim_since', state['tick']) >= 24
     CATCHERS = ('neighbor', 'mother')
     ROLES = {'Rottweiler': 'neighbor', 'Mother': 'mother', 'Olga': 'olga', 'Woody': 'woody'}
     def room_of(self, a):
@@ -145,6 +150,7 @@ class PlanRunner:
             if c not in self.present: continue
             a = st.get(c)
             if a is None: return True                   # (no state: he is in a door pass — a walk)
+            if self.blind(c, a): continue
             if self.room_of(a) in rooms: return True
             if a['anim'] in self.GAITS:
                 # his walk's target: the goto hook's last destination object for his actor pointer
@@ -152,6 +158,16 @@ class PlanRunner:
                 dest = d[1].split('/')[0] if d and isinstance(d[1], str) and '/' in d[1] else None
                 if dest is None or dest in rooms: return True
         return False
+    def blind(self, c, a):
+        """the catcher inside a hideout station — the PC's flag 4 (tools/pcref/pc_catch_s2.py: the enter step of an
+        object carrying hideout / neighbor_hideout sets it, its leave step clears it; the catch predicate skips
+        either object carrying it): his last walk's target on NFH2 (the goto hook), on NFH1 any neighbor_hideout
+        object whose last action is an enter or a sleep, while he stands"""
+        if a['anim'] in self.GAITS: return False
+        ins = state.get('inside', {}); d = state.get('dest', {}).get(actors.get(c))
+        objs = [d[1]] if d and isinstance(d[1], str) else [o for o, k in self.m.hideouts.items() if k == 'neighbor_hideout']
+        fams = set(self.m.family(o) for o in objs if o in self.m.hideouts or self.m.family(o) in set(self.m.family(h) for h in self.m.hideouts))
+        return any(v[0] and self.m.family(o) in fams for o, v in ins.items())       # (the guarded / plain variants are one)
     @property
     def present(self):
         """the catchers the level has (a state seen once)"""
@@ -169,6 +185,8 @@ class PlanRunner:
         leg = self.legs[self.i]; op, args = leg[0], leg[1:]
         ungated = op.endswith('!'); op = op.rstrip('!')     # `!`: the port runs the leg without its gate
         w = self.woody()
+        if w is not None and w['anim'] != getattr(self, '_last_anim', None):
+            self._last_anim = w['anim']; self._anim_since = tick
         if self.phase == 'idle':
             if getattr(self, '_idle_leg', None) != self.i: self.leg_start = tick; self._idle_leg = self.i
             if op == 'hide' and getattr(self, 'hidden', False) and getattr(self, 'hidden_in', None) == args[0]:
@@ -194,6 +212,11 @@ class PlanRunner:
                     return []
                 self.phase = 'walking'; self.target = (room, px); self.last_input = tick
                 return [{'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': state['sneak'], 'leg': ' '.join(leg)}]
+            elif op == 'whenanim':
+                # `whenanim Role Anim` (tests/run_tricks.py leg_whenanim): the pawn's phase — a sleep or a hide
+                # is his hideout's flag 4 here, a walk his gait, another name the next animation of his own
+                self.phase = 'whenanim'; self.target = (self.ROLES.get(args[0], args[0].lower()), args[1])
+                self._anim0 = (actor_states().get(self.target[0]) or {}).get('anim')
             elif op == 'whenin':
                 # `whenin Role Zone`: the pawn in the zone's PC room (tests/run_tricks.py leg_whenin)
                 self.phase = 'whenin'; self.target = (self.ROLES.get(args[0], args[0].lower()), self.m.rooms.get(args[1]))
@@ -255,7 +278,11 @@ class PlanRunner:
             else:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
-                step = {'tick': tick, 'kind': 'use', 'args': [obj]}
+                if op == 'use' and self.m.single_combo(obj):
+                    # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
+                    step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
+                else:
+                    step = {'tick': tick, 'kind': 'use', 'args': [obj]}
             step['leg'] = ' '.join(leg); step['sneak'] = state['sneak']; self.target = obj; self.phase = 'acting'; self.last_input = tick
             self.acted = len(self.acts_on(obj)); self.declined = len(state['declines'])
             return [step]
@@ -267,7 +294,7 @@ class PlanRunner:
                 acts.sort()
             if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
                 self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
-            if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
+            if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w, strict=(op == 'unlock')):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
                 if w is not None and w['anim'] in self.STANDS: self.hidden = False
                 return self.done('ok')
@@ -278,6 +305,17 @@ class PlanRunner:
             if w is not None and self.idle(w) and tick - self.last_input >= 6 and abs(w['x'] - px) <= 40 \
                     and (w.get('room') is None or w['room'] == room):
                 return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'whenanim':
+            role, anim = self.target; a = actor_states().get(role)
+            if a is not None and tick - self.leg_start > 3:
+                if 'Sleep' in anim or 'Hide' in anim:
+                    if self.blind(role, a): return self.done('ok')
+                elif 'Walk' in anim:
+                    if a['anim'] in self.GAITS: return self.done('ok')
+                elif a['anim'] != self._anim0 and a['anim'] not in self.GAITS and a['anim'] not in self.STANDS:
+                    return self.done('ok (approximate: his next animation)')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
         if self.phase == 'whenin':
@@ -484,6 +522,8 @@ class Hook(gdb.Breakpoint):
             emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % ungl(u32(esp)), 'args': args})
             if self.name == 'goto':
                 state.setdefault('dest', {})[args[1]] = (state['tick'], args[2])      # the actor's walk target
+            if self.name == 'action' and isinstance(args[1], str) and args[2] in ('enter', 'leave', 'sleep'):
+                state.setdefault('inside', {})[args[1]] = (args[2] != 'leave', state['tick'])     # a hideout's flag 4
             if self.name == 'action' and isinstance(args[1], str):
                 state['actions'].setdefault(args[1], []).append((state['tick'], args[2]))
                 if args[1] == 'woody' and args[2] == 'decline': state['declines'].append(state['tick'])

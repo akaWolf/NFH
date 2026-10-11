@@ -27,6 +27,16 @@ def main(argv):
         return None
     ticks = {r['tick']: r['actors'] for r in rows if r['ev'] == 'tick'}
     catches = [(r['tick'], r['args'][2]) for r in rows if r['ev'] == 'action' and r['args'][1] == 'woody' and r['args'][2] in CATCH]
+    catches += [(r['tick'], 'wouldcatch') for r in rows if r['ev'] == 'wouldcatch']     # (an uncatchable run's)
+    catches.sort()
+    # the port's own would-be catches (NFH_NO_CATCH=1: run.log's `WOULD CATCH t=.. by ..` lines)
+    port_would = []
+    try:
+        for l in open(os.path.join(os.path.dirname(run.rstrip('/')), 'run.log')):
+            if l.startswith('WOULD CATCH t='):
+                port_would.append((float(l.split('t=')[1].split()[0]), l.split('by ')[1].strip()))
+    except OSError:
+        pass
     port = [json.loads(l) for l in open(os.path.join(run, 'state.jsonl'))]
     def port_at(t):
         return min(port, key=lambda st: abs(st['t'] - t))
@@ -45,7 +55,14 @@ def main(argv):
             print('  %6.2f  PC %-60s port %s' % (t / 12.0, pc, po))
         st = port_at(tick / 12.0); w = st.get('woody') or {}; wr = zone_room.get(w.get('zone'))
         shared = [r['role'] for r in st['routines'] if r['role'] in CATCHERS.values() and zone_room.get(r.get('zone')) == wr]
-        print('  the port at the catch: Woody in %s, a catcher there: %s' % (wr, shared or 'no'))
+        near = [t for t, who in port_would if abs(t - tick / 12.0) <= 2.0]
+        print('  the port at the catch: Woody in %s, a catcher there: %s; the port would catch within 2 s: %s' % (wr, shared or 'no', near or 'no'))
+    if port_would:
+        pc_t = [t / 12.0 for t, w in catches]
+        alone = [t for t, who in port_would if not any(abs(t - x) <= 2.0 for x in pc_t)]
+        # (one entry per second while the rooms are shared: the first of each cluster)
+        firsts = [t for i, t in enumerate(alone) if i == 0 or t - alone[i - 1] > 1.5]
+        print('== the port would catch, the PC would not (within 2 s): %s' % ([round(t, 1) for t in firsts] or 'none'))
 
 
 if __name__ == '__main__':
