@@ -377,7 +377,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
         'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
-        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout')
+        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout', 'PCWakePet')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -673,6 +673,12 @@ def specs(n):
                     # of 12 ticks (fcn.0047e520, an element's time + 1) and a
                     # StopMsg before the fire (PCFallSeconds, from the arrival)
                     keys['PCReactLead'] = 6
+                    # the element before the slide (0x4631aa: fcn.0047c6c0
+                    # over fcn.00462d90) posts `wakeup` from the neighbour to
+                    # the kitchen's dog (fcn.004728d0), delivered with the
+                    # slide's first move (E12: the dog sits up as he flies
+                    # out of the window; tools/pcref/pc_pets_s1.py lays it)
+                    keys['PCWakePet'] = ['Dog', keys['PCReactLead']]
                     keys['PCFallSeconds'] = round(_sum(lv, [('kit/window', 'fallout')]) + (12 + 1 + 1) / FPS, 3)
                     # the slide is the list's GoTo to kit/window's hotspot at
                     # the skate gait (skate1, 18 px a tick; fcn.0044ad10)

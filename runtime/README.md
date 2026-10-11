@@ -1415,7 +1415,16 @@ Verified on Level102's TV: 20 points and `FuckedUp`, since `CanFix` is false.
 Level112's dog is an *inactive* GameObject and nothing in the level's data
 references it — no `ActivateItemAfterFix`, no behavior, no script. It is dead
 content in this build; the port gates the FSM on the sprite's existence,
-which only active objects get.
+which only active objects get. The PC has it: level_fitness's level.xml lays
+the dog asleep in the kitchen (`kit`, 330/410 — E12's frames show it there),
+so under the profile the overlay activates the remaster's Dog and moves it
+into the kitchen's zone, the PC x on the zone's span (tools/pcref/
+pc_pets_s1.py; the seven other pets stand in the PC's rooms already), and
+the skate's list wakes it: its element before the slide (0x4631aa,
+fcn.0047c6c0 over fcn.00462d90) posts `wakeup` from the neighbour to the dog
+(fcn.004728d0), which reaches it with the slide's first move (PCWakePet,
+`World.pc_wake_pet`: the pet class's slot 4, asleep -> state 3; E12's dog
+sits up as he flies out of the window, 262 s).
 
 ## The HUD
 

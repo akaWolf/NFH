@@ -31,7 +31,11 @@
      "PCSurpriseSeconds": "inv",
      "PCBreathSeconds": "ms3",
      "PCShoutAfter": "ms2"
-    }
+    },
+    "PCWakePet": [
+     "Dog",
+     6
+    ]
    }
   },
   {
@@ -1516,6 +1520,45 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots): the alarm's GoTo to the pet (fcn.0047a690: fcn.0044ac80 at 0x47a82f), its level.xml place and `neighbor` hotspot"
+  },
+  {
+   "component": "GameObject",
+   "match": {
+    "name": "Dog"
+   },
+   "set": {
+    "active": true
+   },
+   "source": "the PC's pet (tools/pcref/pc_pets_s1.py): level.xml's actor in its room, the remaster's Alerter placed there — active, the PC x on the room's zone, its zone"
+  },
+  {
+   "object": "Dog",
+   "component": "Transform",
+   "set": {
+    "position": [
+     2.965,
+     0.99,
+     -0.23000000417232513
+    ],
+    "world_position": [
+     2.965,
+     0.99,
+     -0.23000000417232513
+    ]
+   },
+   "source": "the PC's pet (tools/pcref/pc_pets_s1.py): level.xml's actor in its room, the remaster's Alerter placed there — active, the PC x on the room's zone, its zone"
+  },
+  {
+   "object": "Dog",
+   "component": "Alerter",
+   "set": {
+    "Zone": {
+     "path": 411,
+     "name": "Zone03",
+     "type": "Zone"
+    }
+   },
+   "source": "the PC's pet (tools/pcref/pc_pets_s1.py): level.xml's actor in its room, the remaster's Alerter placed there — active, the PC x on the room's zone, its zone"
   }
  ]
 }

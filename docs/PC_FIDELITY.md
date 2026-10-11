@@ -2670,6 +2670,11 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the skate where E12's frames have him stop, 423 — the kitchen door to
   the skates and the slide had read 0.4 and 0.5 s quicker on the frames
   than the port's, the mobile test's place 18 px short of the PC door's);
+  112's dog sleeps in the kitchen since 2026-10-11 as level_fitness has it
+  (E12's frames: there from the start, sitting up as the skate takes him out
+  of the window — the skate list's `wakeup` to it), where the remaster's
+  Dog is dead content; the plan rates 100 with it (Woody tiptoes in the
+  kitchen) and its chain holds.
   114 +0.2 s at the polish and +0.2-0.28 to the end since 2026-10-11 (the
   alarm's GoTo to the dog from the bedroom door's far point, where the
   room walk ends; +0.6 before) — the whistle Woody's

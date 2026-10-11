@@ -8085,6 +8085,14 @@ class Routine:
         lead = it.pc_react_lead if pcprofile.is_pc() and not pcprofile.SEASON2 else 0
         if station:
             lead += int(round(float(it.pc_fire_at) * pcprofile.TICKS_PER_SECOND))
+        wp = it.pc_wake_pet if pcprofile.is_pc() and not pcprofile.SEASON2 else None
+        if wp and self.pawn.world is not None:
+            # the handler's list wakes a pet on its way: 112's skate list's
+            # fifth element (fcn.0047c6c0 over fcn.00462d90, 0x4631aa) posts
+            # `wakeup` from the neighbour to the dog (fcn.004728d0), which
+            # reaches it with the slide's first move (PCWakePet)
+            wd = self.pawn.world
+            wd.call_later(wp[1] / pcprofile.TICKS_PER_SECOND, lambda n=wp[0]: wd.pc_wake_pet(n))
         if lead:
             # the handler's list (fcn.0047d520, fcn.0047b6a0 and their kin):
             # pushed with the run-now flag 0 as the trigger pass delivers the
@@ -11503,6 +11511,14 @@ class World:
                     fsm.wake_up()                  # GameInfo.Alerter.WakeUp
                 return False
         return True
+
+    def pc_wake_pet(self, name):
+        """a `wakeup` behaviour posted to a pet (the pet class's slot 4,
+        0x45bdfe-0x45be2e: asleep, state 3 — the `wakeup` action and the
+        timer; awake, nothing)"""
+        fsm = next((f for f in self.alerters.values() if f.item.name == name), None)
+        if fsm is not None:
+            fsm.pc_noise_wake()
 
     def _pc_whistle(self, src, entry):
         """the PC's dog whistle: Woody's `dogwhistle` (level_hunter's

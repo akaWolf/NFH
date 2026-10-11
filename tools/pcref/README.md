@@ -82,6 +82,12 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   `--cases`/`--chain` print a level's cases and chain, `--dump` a code range
   with its strings. The walk-trigger handlers (the doubletakes, the slips,
   the trap) are no cases: their straight branch is read instead.
+- `pc_pets_s1.py [--write]` (2026-10-11): level.xml's `dog` / `chili` actors
+  against the remaster's Alerters — a pet the mobile has inactive or in
+  another room is placed in the PC's (its GameObject active, its Transform
+  at the PC x on the room's zone, the inverse of Pawn._pc1_map, its
+  Alerter's Zone): 112's dog, asleep in the kitchen (the remaster's an
+  unreferenced inactive Dog in the living room).
 - `pc_reactions.py [--write] [106 …]`: the keys per mobile item out of the
   stands — PCShoutIndex/PCShoutSkip (the step's index and flag 2, the
   register-valued ones from `fire_sites.py --fibers`), PCUseSecondsTricked,
@@ -109,7 +115,8 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   coffee's case 3, past the can's return); REDO_SHOUT the ReuseAfterFix
   stations whose redo runs no ICON case (PCRedoShout: the fire's shout
   icon stays over it — 104's microwave, 105's piano, 108's deck chair and
-  toothbrush, 110's steak chair, 113's ladder);
+  toothbrush, 110's steak chair, 113's ladder); the skate's PCWakePet (its
+  list's element before the slide posts `wakeup` to the kitchen's dog);
   ANTENNA_RUN the antenna's (2026-10-11): `discover3` (PCSurpriseSeconds),
   the run three ticks after the next case's icon (PCReactLead) and the
   handler's three ticks on arrival in PCUseSecondsTricked;
