@@ -193,7 +193,7 @@ class Item:
                  'use_distance', 'delta_olga_x', 'delta_mother_x',
                  'should_walk_up', 'should_walk_down', 'item_use_height',
                  'delta_use_height', 'enter_zone', 'leave_zone', 'pc_approach',
-                 'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_case_enter', 'pc_case_room', 'pc_case_empty', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
+                 'pc_hideout', 'pc_walk', 'pc_walk_tricked', 'pc_walk_via', 'pc_tool_point', 'pc_case_goto', 'pc_case_enter', 'pc_case_room', 'pc_case_empty', 'pc_next_anim', 'pc_pose_after', 'pc_align_x', 'pc_fix_point', 'pc_breath_secs', 'pc_shout_after',
                  'pc_prime_secs_tricked',
                  'woody_delta_use_height', 'use_woody_extra', 'passable',
                  'animation', 'take_animation', 'empty_animation',
@@ -255,7 +255,7 @@ class Item:
                  'pc_credit_in_clip', 'pc_linked_credit_in_clip', 'pc_plain', 'pc_pair', 'pc_pair_next', 'pc_pair_play', 'pc_credited', 'pc_credit_overflow',
                  'pc_linked_due', 'pc_linked_paid', 'pc_linked_overflow', 'pc_linked_amount',
                  'pc_done_due', 'pc_extra_due', 'pc_masked', 'pc_coin_booked',
-                 'pc_fired', 'pc_shout_secs', 'sprite',
+                 'pc_fired', 'pc_shout_secs', 'pc_shout_clip', 'sprite',
                  'tricked', 'got_tricked', 'already_tricked', 'depends_on',
                  'use_at_other_place', 'neutral',
                  # behaviors and the alarm plumbing
@@ -456,6 +456,14 @@ class Item:
         # balcony's, 109's sleep after the bed's GOTO): each runs the next
         # case a tick on (fcn.0045c600, `xor al, al`)
         self.pc_case_empty = d.get('PCCaseEmpty')
+        # ... and, per visit, the neighbour's animation as his stay there
+        # ends — the last action's actornextanim, the walk after it starts
+        # from it (PCNextAnim, the same: a mover's first move takes its
+        # `start` px from ms1 / ms3 alone, pcprofile.s1_start_ok); and his
+        # animation after each part of a trick's flow (PCPoseAfter {the
+        # part's seconds key: anim}, tools/pcref/pc_reactions.py)
+        self.pc_next_anim = d.get('PCNextAnim')
+        self.pc_pose_after = d.get('PCPoseAfter') or {}
         # the PC profile's Season 1 look reaction and repair (tools/pcref/
         # pc_reactions.py): the walk-by's CreateGoToObjXJob to the tricked
         # object's hotspot x (fcn.0047a4a0), and the repair's walk to that
@@ -915,6 +923,7 @@ class Item:
         self.pc_minigame_lift = d.get('PCMinigameLift')
         self.pc_fired = False            # the PC fire happened before the angry (World.s1_fire)
         self.pc_shout_secs = None        # the shout the early fire chose
+        self.pc_shout_clip = None        # ... by name (its next animation)
         self.depends_on = (d.get('DependsOn') or {}).get('path')
         self.use_at_other_place = bool(d.get('UseAtOtherPlace'))
         self.neutral = bool(d.get('Neutral'))

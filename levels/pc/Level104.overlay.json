@@ -22,7 +22,11 @@
      "anc"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -39,7 +43,11 @@
      "toi"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -53,6 +61,10 @@
     "PCCaseGoto": [
      true,
      false
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms3"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.5 s; ApplePie <- whippedcream#0 eat 2.50 s"
@@ -70,7 +82,11 @@
      "kit"
     ],
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Microwave <- microwave#0 16.8 s"
   },
@@ -100,7 +116,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.0
+    "PCUseSecondsTricked": 5.0,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "stickyaftershave"
+    }
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Superglue <- toi/aftershave superglue 13 ticks"
   },
@@ -113,7 +132,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.083
+    "PCUseSecondsTricked": 4.083,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "deohair"
+    }
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Hairrestorer <- toi/grease hairrestorer 13 ticks"
   },
@@ -146,7 +168,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.0
+    "PCUseSecondsTricked": 5.0,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "stickyaftershave"
+    }
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/aftershave superglue 13 ticks"
   },
@@ -159,7 +184,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.083
+    "PCUseSecondsTricked": 4.083,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "deohair"
+    }
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Magnesium <- toi/grease hairrestorer 13 ticks"
   },
@@ -182,7 +210,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.333
+    "PCUseSecondsTricked": 6.333,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "spit"
+    }
    },
    "source": "Woody's trick action (level_pie's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Shavingfoam <- kit/whippedcream shavingfoam 13 ticks"
   },
@@ -257,6 +288,10 @@
     "PCCaseGoto": [
      true,
      false
+    ],
+    "PCNextAnim": [
+     null,
+     "ms0"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Deodrant <- basin#0 take 0.58 s; Deodrant <- basin#2 give 0.58 s"
@@ -272,6 +307,10 @@
     "PCCaseGoto": [
      false,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     null
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AfterShave <- basin#0 take 0.50 s; AfterShave <- basin#2 give 0.50 s"
@@ -290,7 +329,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 2.83,
-    "PCCaseGoto": false
+    "PCCaseGoto": false,
+    "PCNextAnim": "deo"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SinkDeodrant <- basin#1 grease_hair 2.83 s"
   },
@@ -360,7 +400,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -370,7 +411,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -390,7 +432,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -400,7 +443,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -420,7 +464,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -430,7 +475,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -450,7 +496,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -460,7 +507,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -480,7 +528,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -490,7 +539,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -510,7 +560,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -520,7 +571,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -540,7 +592,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -565,7 +618,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms1"
      }
     },
     "PCDoorTicks": {
@@ -590,7 +644,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -600,7 +655,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -620,7 +676,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -630,7 +687,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

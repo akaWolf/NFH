@@ -30,7 +30,10 @@
     "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -48,7 +51,12 @@
     ],
     "PCFireLead": true,
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.6 s"
   },
@@ -67,7 +75,12 @@
     ],
     "PCFireLead": true,
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 7.0 s"
   },
@@ -89,7 +102,15 @@
     "PCCaseGoto": [
      true,
      true
-    ]
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3",
+     "PCGrabSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ValveMain <- valve#0 0.6 s; ValveMain <- valve#1 0.6 s"
   },
@@ -98,7 +119,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 4.67,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms1"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Radiator <- heater#0 4.7 s"
   },
@@ -110,7 +132,11 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 5.333,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sink <- basin#0 3.6 s"
   },
@@ -128,7 +154,14 @@
     "PCCaseGoto": [
      true,
      true
-    ]
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FuseBox <- fuse#0 0.6 s; FuseBox <- fuse#1 0.6 s"
   },
@@ -148,7 +181,11 @@
      "lir"
     ],
     "PCFireLead": true,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 25 ticks"
   },
@@ -196,7 +233,11 @@
      420,
      "wor"
     ],
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "inv",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 25 ticks"
   },
@@ -288,7 +329,8 @@
    "set": {
     "PCUseSeconds": 4.08,
     "PCIconLead": 0.083,
-    "PCCaseGoto": false
+    "PCCaseGoto": false,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.08 s"
   },
@@ -311,7 +353,11 @@
     "PCRunTo": true,
     "PCGrabSeconds": 0.417,
     "PCToolUseSeconds": 0.0,
-    "PCReturnSeconds": 0.0
+    "PCReturnSeconds": 0.0,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1",
+     "PCGrabSeconds": "ms0"
+    }
    }
   },
   {
@@ -329,7 +375,10 @@
     ],
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -450,7 +499,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -460,7 +510,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -480,7 +531,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -490,7 +542,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -510,7 +563,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -520,7 +574,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -540,7 +595,8 @@
       "far": [
        572,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -550,7 +606,8 @@
       "far": [
        592,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -570,7 +627,8 @@
       "far": [
        556,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -580,7 +638,8 @@
       "far": [
        576,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -600,7 +659,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -610,7 +670,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -630,7 +691,8 @@
       "far": [
        401,
        371
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -640,7 +702,8 @@
       "far": [
        421,
        371
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -660,7 +723,8 @@
       "far": [
        690,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -670,7 +734,8 @@
       "far": [
        710,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -690,7 +755,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -700,7 +766,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -720,7 +787,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -730,7 +798,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -750,7 +819,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -775,7 +845,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -785,7 +856,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -805,7 +877,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -815,7 +888,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -835,7 +909,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms2"
      }
     },
     "PCDoorTicks": {
@@ -860,7 +935,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -870,7 +946,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -890,7 +967,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -900,7 +978,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -920,7 +999,8 @@
       "far": [
        402,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -930,7 +1010,8 @@
       "far": [
        412,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -950,7 +1031,8 @@
       "far": [
        340,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -960,7 +1042,8 @@
       "far": [
        350,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

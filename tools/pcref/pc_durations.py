@@ -127,7 +127,7 @@ EMPTIES = {109: ['PigKeys']}
 
 
 def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True, intros=None,
-                empties=None):
+                empties=None, nexts=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
     (and into `walks` icon -> [the walk's ticks of each visit: its GOTO's
     moves, doors and no-move ticks, 0 where the case has no GOTO]; into
@@ -166,10 +166,21 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
         tgt = acts[-1] if acts and acts[-1] else lead
         if tgt:
             a, v = tgt[-1]; tgt[-1] = (a, v + held)
+    # per station, his animation as the walk after its stay starts (the next
+    # station's first walk leg's, lap_model.WalkText: the first move's
+    # `start` px needs ms1 / ms3 — PCNextAnim); None with no walk after it
+    after = []
+    for kind, text, t in legs:
+        if kind == 'icon':
+            after.append(None)
+        elif kind == 'walk' and len(after) >= 2 and after[-2] is None and after[-1] is None \
+                and getattr(text, 'anim', None):
+            after[-2] = text.anim
     if lead and acts:
         # a steady lap opens inside its first station (lap_model.stations)
         acts.insert(0, acts.pop() + lead)
         lost.insert(0, lost.pop())
+        after.insert(0, after.pop())
     ent = []; rgo = []; itr = []
     for kind, text, t in legs:
         if kind == 'icon':
@@ -186,6 +197,7 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
         st[0][1] += st[-1][1]; st[0][2] += st[-1][2]; st = st[:-1]
         acts[0] += acts[-1]; acts = acts[:-1]
         lost[0] += lost[-1]; lost = lost[:-1]
+        after = after[:-1]
         if len(ent) > len(st):
             ent[0] = ent[0] or ent[-1]; ent = ent[:-1]
         if len(rgo) > len(st):
@@ -225,6 +237,8 @@ def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=T
             intros.setdefault(icon.split()[-1], []).append(itr[i] if i < len(itr) else False)
         if empties is not None:
             empties.setdefault(icon.split()[-1], []).append(lost[i] if i < len(lost) else 0.0)
+        if nexts is not None:
+            nexts.setdefault(icon.split()[-1], []).append(after[i] if i < len(after) else None)
     if st and (carry or room):
         # the lap's last case walks for its first (101's room GoTo to the
         # living room before the sofa's GOTOENTER)
@@ -258,9 +272,11 @@ def main(argv):
         grooms = {}
         intros = {}
         emps = {}
+        nxs = {}
         by, parts = pc_stations(n, toks, walks, leads, gents, grooms, wrap=n not in VISIT_LAPS, intros=intros,
-                                empties=emps)
+                                empties=emps, nexts=nxs)
         cempty = {}
+        cnext = {}
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -306,6 +322,9 @@ def main(argv):
             crooms.setdefault(item, []).extend([first and goes and gr] + [False] * (nv - 1))
             em = (emps.get(icon) or [0.0] * (k + 1))[k] if first else 0.0
             cempty.setdefault(item, []).extend([int(round(em * lap_model.TICK))] + [0] * (nv - 1))
+            # (the station's last visit: its stay's end is the station's)
+            nxa = (nxs.get(icon) or [None] * (k + 1))[k] if last_of[(icon, k)] == i else None
+            cnext.setdefault(item, []).extend([None] * (nv - 1) + [nxa])
             if isinstance(share, tuple):
                 # the station split by its actions, one mobile visit each (a
                 # name joined by '+' sums its actions into one visit); each of
@@ -463,6 +482,11 @@ def main(argv):
                 e['set']['PCIconLead'] = il if len(il) > 1 else il[0]
             else:
                 e['set'].pop('PCIconLead', None)
+            cn = cnext.get(item) or []
+            if any(cn) and len(cn) == len(vals):
+                e['set']['PCNextAnim'] = cn if len(cn) > 1 else cn[0]
+            else:
+                e['set'].pop('PCNextAnim', None)
             ce2 = cempty.get(item) or []
             if any(ce2) and len(ce2) == len(vals):
                 e['set']['PCCaseEmpty'] = ce2 if len(ce2) > 1 else ce2[0]
@@ -478,8 +502,16 @@ def main(argv):
                 other, (uo, ua), (fo, fa) = wt
                 L = lap_model.Level(n)
                 tu, tf = L.job_ticks(uo, ua), L.job_ticks(fo, fa)
-                e['set']['PCWhenTricked'] = {other: {'PCUseSeconds': round((1 + tu) / lap_model.TICK, 2),
-                                                     'PCFixSeconds': round(tf / lap_model.TICK, 2)}}
+                br = {'PCUseSeconds': round((1 + tu) / lap_model.TICK, 2),
+                      'PCFixSeconds': round(tf / lap_model.TICK, 2)}
+                # his animation after either (the record's next: PCNextAnim
+                # as the stay ends, PCPoseAfter after the fire's part)
+                nu, nf = L.next_anim(uo, ua, None), L.next_anim(fo, fa, None)
+                if nu:
+                    br['PCNextAnim'] = nu
+                if nf:
+                    br['PCPoseAfter'] = {'PCFixSeconds': nf}
+                e['set']['PCWhenTricked'] = {other: br}
                 e['source'] += ("; with %s tricked the case's other arm: the list's first update and %s's "
                                 "%s (%d ticks), %s's %s after the fire (%d)" % (other, uo, ua, tu, fo, fa, tf))
             else:

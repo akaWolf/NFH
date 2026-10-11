@@ -23,9 +23,11 @@ scene's paths do on their own geometry.
 
 The overlay entries, in px of the PC scene (the room's own coordinates):
   Zone       PCWalkRoom   {'room', 'x1', 'x2' (the room's path), 'floor'}
-  Door       PCWalkDoor   {role: {'near': [x, y], 'far': [x, y]}}: the near door's
+  Door       PCWalkDoor   {role: {'near': [x, y], 'far': [x, y], 'next': anim}}: the near door's
                           standing point and the far door's (`<actor>_out`), the
-                          neighbour's and Woody's
+                          neighbour's and Woody's, and his animation as the pass
+                          ends (the far door's `leave`'s next: the first move's
+                          `start` px needs ms1 / ms3)
              PCDoorTicks  {role: {'enter': ticks, 'leave': ticks}}: the door's own
                           `enter` / `leave` ACTION steps (time + 2, lap_model.
                           job_ticks) where they differ from its type's
@@ -314,6 +316,12 @@ def level_data(n):
             far = L.door_point('%s/%s' % (b, a), out=True, actor=actor)
             if near is not None and far is not None:
                 entry[role] = {'near': list(near), 'far': list(far)}
+                # his animation as the pass ends: the far door's `leave`'s
+                # (the next mover's first-move test, lap_model.walk_ticks)
+                nx = L.next_anim('%s/%s' % (b, a), 'leave', L.next_anim('%s/%s' % (a, b), 'enter', None, actor),
+                                 actor)
+                if nx:
+                    entry[role]['next'] = nx
             # the door's own figures against its type's (the strips' pace)
             typ = pcprofile.DOOR_TICKS.get((role, side))
             for i, act in enumerate(('enter', 'leave')):

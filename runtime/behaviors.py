@@ -618,6 +618,10 @@ class RollerSkaterBehavior(Behavior):
                 self._fall_left = (pcprofile.S1_FIRE_LEAD_TICKS + 1) / pcprofile.TICKS_PER_SECOND
                 return
         self.state = self.COMEBACK                    # cs:168-179
+        if self._pc('pc_fall_secs'):
+            # the `fallout` has left his animation (PCPoseAfter): the walk
+            # back in's mover starts from it
+            rott.pc1_pose((self.roller_skater.pc_pose_after or {}).get('PCSurpriseSeconds'))
         rott.sprite.hidden = False
         rott.movement_paused = False                  # ContinueMovement
         rott.sprite.x, rott.sprite.y = self.entrance_location
@@ -680,6 +684,8 @@ class RollerSkaterBehavior(Behavior):
 
                 def shouted():
                     rott.anim.time_scale = 1.0
+                    # (the shout2's next animation, PCPoseAfter)
+                    rott.pc1_pose((self.roller_skater.pc_pose_after or {}).get('PCShoutAfter'))
                     # the list's StopMsg after the shout2 (0x46355a): a tick
                     rott._stand()
                     self.world.call_later(1 / pcprofile.TICKS_PER_SECOND, self._shout)

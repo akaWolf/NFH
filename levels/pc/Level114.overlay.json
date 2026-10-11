@@ -44,7 +44,10 @@
     ],
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -58,7 +61,10 @@
     "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -68,7 +74,10 @@
     "RequirePriming": false,
     "RottweilerUseTogglesPrime": false,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.917
+    "PCUseSecondsTricked": 5.917,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "PC objects.xml (level_hunter): lir/tabacbox's `gunpowder` is Woody's plain action (time 23), no condition — the tin takes the gunpowder any time; the remaster's RequirePriming and the prime toggle on the neighbour's every pipe (Item.cs:1085/1331: an unprimed Pipe stops taking clicks) have no PC counterpart (2026-09-17)"
   },
@@ -86,7 +95,11 @@
      "lir"
     ],
     "PCFireLead": true,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
   },
@@ -117,7 +130,15 @@
     "PCCaseGoto": [
      true,
      true
-    ]
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Polish <- polish#0 1.6 s; Polish <- polish#1 1.6 s"
   },
@@ -126,7 +147,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 2.17,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): GoldCup <- cups#0 2.2 s"
   },
@@ -141,6 +163,10 @@
     "PCCaseGoto": [
      true,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms1"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pipe <- smoke#0 0.6 s; Pipe <- smoke#1 5.9 s"
@@ -158,6 +184,11 @@
      true,
      true,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0",
+     "ms0"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Gramaphone <- phonograph#0 0.6 s; Gramaphone <- phonograph#1 0.8 s; Gramaphone <- phonograph#2 0.6 s"
@@ -167,7 +198,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 2.08,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CDs <- records#0 2.1 s"
   },
@@ -180,7 +212,11 @@
     "PCUseSecondsTricked": 6.083,
     "PCFireAt": 5.417,
     "PCFireLead": true,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.3 s"
   },
@@ -200,7 +236,14 @@
     "PCCaseGoto": [
      true,
      false
-    ]
+    ],
+    "PCNextAnim": [
+     null,
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 take+takehat 4.83 s; Hat <- hat#0 putbackhat+give 1.75 s"
   },
@@ -213,7 +256,11 @@
     "PCUseSecondsTricked": 5.417,
     "PCFireAt": 4.75,
     "PCFireLead": true,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 6.2 s"
   },
@@ -229,7 +276,10 @@
     "PCStopSkip": true,
     "PCFireLead": true,
     "PCEndAfter": "Hat",
-    "PCCaseGoto": false
+    "PCCaseGoto": false,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "handrat"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): MedalBox <- hat#0 wearmedals 4.67 s"
   },
@@ -532,7 +582,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -542,7 +593,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -562,7 +614,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -572,7 +625,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -592,7 +646,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -602,7 +657,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -622,7 +678,8 @@
       "far": [
        572,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -632,7 +689,8 @@
       "far": [
        592,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -652,7 +710,8 @@
       "far": [
        556,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -662,7 +721,8 @@
       "far": [
        576,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -682,7 +742,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -692,7 +753,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -712,7 +774,8 @@
       "far": [
        401,
        371
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -722,7 +785,8 @@
       "far": [
        421,
        371
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -742,7 +806,8 @@
       "far": [
        690,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -752,7 +817,8 @@
       "far": [
        710,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -772,7 +838,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -782,7 +849,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -802,7 +870,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -812,7 +881,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -832,7 +902,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -857,7 +928,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -867,7 +939,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -887,7 +960,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -897,7 +971,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -917,7 +992,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms2"
      }
     },
     "PCDoorTicks": {
@@ -942,7 +1018,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -952,7 +1029,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -972,7 +1050,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -982,7 +1061,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -1002,7 +1082,8 @@
       "far": [
        402,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -1012,7 +1093,8 @@
       "far": [
        412,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -1032,7 +1114,8 @@
       "far": [
        340,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -1042,7 +1125,8 @@
       "far": [
        350,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

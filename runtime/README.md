@@ -1073,6 +1073,44 @@ predicate, then the all-tricks win.
   time at the new records over the old, as the fixed pace did — 110's
   sneaked descent from the bedroom's back door 2.8 s, the PC's 50 px down
   at 2 a tick and 35 along at 5.
+- **The PC profile's Season 1 mover start, by the neighbour's animation**
+  (`Pawn.pc1_anim`, `pcprofile.s1_start_ok`): a mover's first move along
+  the floor takes the record's `start` px only from the standing
+  animation of its facing by name — the actor's +0x3c against `ms1`
+  moving right (0x47ccce, the string at 0x519624) and `ms3` moving left
+  (0x47cd88, 0x51963c), fcn.00445070 reading it, fcn.00413780 comparing;
+  the bonus had been taken from any standing. His animation: `ms` as the
+  level makes him (fcn.0043ab40 sets it at 0x43ae7d through fcn.004450a0),
+  so his first walk takes none; `mg` while a mover walks him; as one
+  arrives the standing animation of its last move's facing (0x47cfb7-
+  0x47cfdc: fcn.0047c7f0's facing into ms0-ms3, the table 0x51b610) — y
+  last where the target's height is off the floor line, else x
+  (`pcprofile.s1_arrival_anim`); a door pass leaves the far door's
+  `leave`'s next (PCWalkDoor `next`, tools/pcref/pc_walks_s1.py); a stay
+  leaves its last action's actornextanim, else its actoranim (PCNextAnim
+  per visit, tools/pcref/pc_durations.py from tools/pcref/lap_model.py,
+  which walks the laps with the same rule — `action` while the stay
+  plays: no neighbour record animates ms1 or ms3 but a zero-time
+  `leave`); a trick's flow its parts' (PCPoseAfter by the part's seconds
+  key — the tricked stand, the repair, the fixing tool's take, use,
+  shout, repair and give, the skate's fall and shout2 — tools/pcref/
+  pc_reactions.py; the shout's by its record, `pcprofile.S1_SHOUT_NEXT`:
+  shout2_extra ms3, shout2 ms2, the shout0s ms0); a GOTO of the reaction
+  (the look's x alignment, the repair's walk) its arrival; a walk from a
+  hideout he sits in (a GOTOENTER's stay cut by a run: 101's and 102's
+  antenna shout from the sofa) opens with its LEAVE (the walk job's,
+  0x475ce6), the stay's PCNextAnim (`Routine._pc1_in_hideout`). A walk
+  the walk-by and slip handlers stop goes on after their list with no
+  `start` (their list pushed on top of his jobs, the mover under it
+  resumed: `Pawn._pc1_resume`). The idle laps: +0.0-0.5 s by the lap
+  model (113 177.4 against 176.9); the bubble segments of the idle runs
+  against E01-E14 0.21 tick long on average, |d| 0.44 tick over 38 (0.24
+  short, 0.68 before; docs/PC_FIDELITY.md). Not known (the bonus taken as
+  before): after a walk the profile keeps at the mobile's pace (the
+  front door's) and after the mobile's own clips where the PC data has
+  none; a run that cuts a stay's action (the pets' alarm) starts from
+  the action's own animation — whether game.exe lets the action end
+  first is not read.
 - **The PC profile's Season 1 tools and in-place stations**: a carried
   fixing tool's walk to its use goes to the tool's PCToolPoint
   (`Pawn._pc1_item_point`: 110's extinguisher to bal/barbecue_burn, where

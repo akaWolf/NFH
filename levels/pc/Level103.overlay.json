@@ -16,7 +16,11 @@
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.833,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Candle <- candle#0 1.5 s"
   },
@@ -35,7 +39,14 @@
     "PCCaseGoto": [
      true,
      false
-    ]
+    ],
+    "PCNextAnim": [
+     null,
+     "ms1"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): BirthdayCake <- cake#0 6.2 s /2"
   },
@@ -50,7 +61,11 @@
     "PCFireAt": 1.917,
     "PCFireLead": true,
     "PCCaseGoto": true,
-    "PCIconLead": 0.25
+    "PCIconLead": 0.25,
+    "PCNextAnim": "ms1",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_mail's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LetterBox <- mail#0 6.0 s"
   },
@@ -70,7 +85,11 @@
      "kit"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
   },
@@ -90,7 +109,11 @@
      "anc"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
@@ -110,7 +133,11 @@
      "toi"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_mail's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
@@ -268,7 +295,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -278,7 +306,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -298,7 +327,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -308,7 +338,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -328,7 +359,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -338,7 +370,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -358,7 +391,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -368,7 +402,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -388,7 +423,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -398,7 +434,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -418,7 +455,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -428,7 +466,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -448,7 +487,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -473,7 +513,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms1"
      }
     },
     "PCDoorTicks": {
@@ -498,7 +539,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -508,7 +550,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -528,7 +571,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -538,7 +582,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

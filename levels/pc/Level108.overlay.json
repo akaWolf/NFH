@@ -19,7 +19,10 @@
     "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -32,7 +35,11 @@
     "PCUseSecondsTricked": 8.5,
     "PCFireAt": 6.75,
     "PCFireLead": true,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CoffeeMaker <- coffee#0 6.6 s"
   },
@@ -49,7 +56,12 @@
      "bal"
     ],
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms2",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms2",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shezlong <- foldingchair#0 2.5 s"
   },
@@ -64,6 +76,10 @@
     "PCCaseGoto": [
      true,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     null
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): WateringCan <- ewer#1 0.9 s; WateringCan <- ewer#2 0.9 s"
@@ -75,7 +91,11 @@
     "PCUseSeconds": 2.33,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 2.5,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Plant <- flower#0 2.3 s"
   },
@@ -88,7 +108,10 @@
     },
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 8.0
+    "PCUseSecondsTricked": 8.0,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms2"
+    }
    },
    "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Honey <- bal/suncream honey 25 ticks"
   },
@@ -124,7 +147,11 @@
     "PCUseSecondsTricked": 7.167,
     "PCFireAt": 2.333,
     "PCFireLead": true,
-    "PCRedoSeconds": 3.917
+    "PCRedoSeconds": 3.917,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3",
+     "PCRedoSeconds": "ms3"
+    }
    },
    "source": "Woody's trick action (level_suntan's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Brush <- toi/toothbrushset brush 25 ticks"
   },
@@ -215,7 +242,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 4.33,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_suntan's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ToothBrush <- toothbrush#0 4.3 s"
   },
@@ -319,7 +347,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -329,7 +358,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -349,7 +379,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -359,7 +390,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -379,7 +411,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -389,7 +422,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -409,7 +443,8 @@
       "far": [
        572,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -419,7 +454,8 @@
       "far": [
        592,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -439,7 +475,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -449,7 +486,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -469,7 +507,8 @@
       "far": [
        401,
        371
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -479,7 +518,8 @@
       "far": [
        421,
        371
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -499,7 +539,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -509,7 +550,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -529,7 +571,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -539,7 +582,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -559,7 +603,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -584,7 +629,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -594,7 +640,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -614,7 +661,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms2"
      }
     },
     "PCDoorTicks": {
@@ -639,7 +687,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -649,7 +698,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -669,7 +719,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -679,7 +730,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -699,7 +751,8 @@
       "far": [
        402,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -709,7 +762,8 @@
       "far": [
        412,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

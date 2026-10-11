@@ -55,6 +55,18 @@ class WalkLeave(str):
     walk_leave = True
 
 
+class WalkText(str):
+    """a walk leg's text with the actor's animation as its mover starts
+    (`anim`: the first move's `start` test, walk_ticks)"""
+    anim = None
+
+
+def walk_text(text, anim):
+    t = WalkText(text)
+    t.anim = anim
+    return t
+
+
 CASE_ROUNDS = {101: ('lir/sofa', ('sit', 'sit_remo', 'sit', 'sit_remo', 'sit')),
                102: ('lir/sofa', ('sit_beer', 'sit_remo', 'sit', 'sit', 'sit_beer'))}
 
@@ -267,7 +279,7 @@ class Level:
                     return path[::-1]
         return None
 
-    def walk_ticks(self, x0, y0, x1, y1, floor):
+    def walk_ticks(self, x0, y0, x1, y1, floor, anim=None):
         """a mover's ticks (vtable 0x4e59e8, update 0x47cb50), one axis a tick:
         while x is off the target's, y goes to the room's floor line first (the
         room's point, fcn.0044bac0 on the actor's room: its path's y; the up and
@@ -284,11 +296,42 @@ class Level:
                 y0 = floor
                 standing = False
             a = abs(x1 - x0)
+            if anim is not None:
+                # the test is the actor's animation by name: ms1 for a first
+                # move right, ms3 for one left (0x47ccce: [0x519624] `ms1`,
+                # 0x47cd88: [0x51963c] `ms3`, against the actor's +0x3c,
+                # fcn.00445070 / fcn.00413780)
+                standing = standing and anim == ('ms1' if x1 > x0 else 'ms3')
             start = (self.start_px if x1 > x0 else self.start_px_left) if standing else 0
             t += 1 + (-(-(a - self.speed - start) // self.speed) if a > self.speed + start else 0)
         if y1 != y0:
             t += -(-abs(y1 - y0) // self.vspeed)
         return t
+
+    def next_anim(self, obj, name, anim, actor='neighbor'):
+        """the actor's animation once an action is done: its record's
+        actornextanim, else its own animation (the step sets both by name,
+        +0x3c); `anim` where nobody has the record"""
+        r = self._record(obj, name, actor) if obj else None
+        if r is None:
+            return anim
+        a = r[0]
+        return a.get('actornextanim') or a.get('actoranim') or anim
+
+
+def arrival_anim(x0, y0, x1, y1, floor, anim):
+    """the actor's animation as a mover arrives: the standing animation of
+    its last move's facing (0x47cfb7-0x47cfdc: fcn.0047c7f0's facing into
+    ms0-ms3, 0x51b610) — y last when the target's height is off the floor
+    line it walked along, else x — the animation it had with no move"""
+    if x1 != x0:
+        y = floor if y0 != floor else y0
+        if y1 != y:
+            return 'ms0' if y1 < y else 'ms2'
+        return 'ms1' if x1 > x0 else 'ms3'
+    if y1 != y0:
+        return 'ms0' if y1 < y0 else 'ms2'
+    return anim
 
 
 def tokens_of(levels, cache, laps=None):
@@ -347,6 +390,10 @@ def _lap(L, toks, start):
     occupied = None if start is None else start[3]      # the container object the neighbour sits in
     current = None if start is None else start[4]       # the object of the last GOTO / ENTER (the target of a bare ACTION)
     first = start is None
+    # the actor's animation by name (+0x3c): `ms` as the level adds him
+    # (fcn.0043ab40 at 0x43ae7d), then each action's and mover's
+    anim = 'ms' if start is None or len(start) < 6 else start[5]
+    ANIM = os.environ.get('LAP_ANIM', '1') == '1'
 
     def base_of(objs):
         b = [o for o in objs if o not in L.tricks]
@@ -372,28 +419,35 @@ def _lap(L, toks, start):
     def walk_to(room2, x2, y2, what):
         """the walk's legs; True when the walk job ends in its first update
         (no door, no move — the target where he stands)"""
-        nonlocal room, x, y
+        nonlocal room, x, y, anim
         r = L.route(room, room2)
         if r is None:
             legs.append(('?', 'no route %s -> %s (%s)' % (room, room2, what), 0)); room, x, y = room2, x2, y2; return False
         after = False
         for d_out, d_in in r:
             xo, yo = L.door_point(d_out); xi, yi = L.door_point(d_in, out=True)
-            m = L.walk_ticks(x, y, xo, yo, L.rooms.get(room, {}).get('y', y))
+            fl = L.rooms.get(room, {}).get('y', y)
+            m = L.walk_ticks(x, y, xo, yo, fl, anim if ANIM else None)
+            a0, anim = anim, arrival_anim(x, y, xo, yo, fl, anim)
             # the walk job pushes the door step with the run-now flag 1 in
             # the update that reads the mover's arrival (0x476004-0x476070),
             # and the step its ACTION the same way (0x474480-0x474496)
-            legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), arrive(m, after)))
+            legs.append(('walk', walk_text('%s %d/%d -> %s %d/%d' % (room, x, y, d_out, xo, yo), a0), arrive(m, after)))
             # the door step's one ACTION of two entries (fcn.004741e0 -> fcn.00478030):
             # the near `enter` and the far `leave` start together, the longer times it;
             # the step is done under it in its last tick (0x47491e -> 0x474a19) and
             # the walk job pushes the next mover there
             t_out = L.job_ticks(d_out, 'enter') or 0; t_in = L.job_ticks(d_in, 'leave') or 0
             legs.append(('door', '%s enter %d | %s leave %d' % (d_out, t_out, d_in, t_in), max(t_out, t_in)))
+            # (the far door's `leave` sets his animation last)
+            anim = L.next_anim(d_in, 'leave', L.next_anim(d_out, 'enter', anim))
             room, x, y = d_in.split('/')[0], xi, yi
             after = True
-        m = L.walk_ticks(x, y, x2, y2, L.rooms.get(room, {}).get('y', y))
-        legs.append(('walk', '%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), arrive(m, after))); x, y = x2, y2
+        fl = L.rooms.get(room, {}).get('y', y)
+        m = L.walk_ticks(x, y, x2, y2, fl, anim if ANIM else None)
+        a0, anim = anim, arrival_anim(x, y, x2, y2, fl, anim)
+        legs.append(('walk', walk_text('%s %d/%d -> %s %d/%d' % (room, x, y, what, x2, y2), a0), arrive(m, after)))
+        x, y = x2, y2
         return not r and m == 0
 
     def leave(obj=None, implicit=False):
@@ -403,9 +457,10 @@ def _lap(L, toks, start):
         the walk job reads its path in the leave's last tick (the LEAVE step
         done under it, the walk updated there: 0x475ce6, run-now 1), where its
         first move, door or end falls"""
-        nonlocal occupied
+        nonlocal occupied, anim
         obj = obj or occupied
         if obj:
+            anim = L.next_anim(obj, 'leave', anim)
             # the LEAVE step's ACTION `leave`: two updates without a record
             t = L.job_ticks(obj, 'leave')
             t = 2 if t is None else t
@@ -418,7 +473,8 @@ def _lap(L, toks, start):
             legs.insert(i, ('action', WalkLeave(text) if implicit else text, t)); occupied = None
 
     def enter(obj):
-        nonlocal occupied
+        nonlocal occupied, anim
+        anim = L.next_anim(obj, 'enter', anim)
         # the ENTER step's ACTION `enter`: two updates without a record (107's stool)
         t = L.job_ticks(obj, 'enter')
         t = 2 if t is None else t
@@ -600,8 +656,10 @@ def _lap(L, toks, start):
                 legs.append(('?', 'ACTION %s on %s: no time' % (name, ' + '.join(objs) or current), 0))
             else:
                 legs.append(('action', '%s %s' % (used, name), t))
+            if t is not None and used:
+                anim = L.next_anim(used, name, anim)
     # the lap closes on the first station's enter; its leave opens the next lap
-    return legs, (room, x, y, occupied, current)
+    return legs, (room, x, y, occupied, current, anim)
 
 
 def stations(legs):

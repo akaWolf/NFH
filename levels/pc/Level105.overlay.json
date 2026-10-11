@@ -22,7 +22,10 @@
    "set": {
     "PCAngryTime": 276,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.0
+    "PCUseSecondsTricked": 3.0,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "phone"
+    }
    }
   },
   {
@@ -32,7 +35,10 @@
     "PCAngryTime": 288,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 3.583
+    "PCUseSecondsTricked": 3.583,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1"
+    }
    }
   },
   {
@@ -50,7 +56,12 @@
     "PCReactTail": 1,
     "PCCaseGoto": true,
     "PCIconLead": 0.083,
-    "PCCaseEnter": true
+    "PCCaseEnter": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 8.8 s"
   },
@@ -59,7 +70,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 1.58,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms1"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Football <- football#0 1.6 s"
   },
@@ -68,7 +80,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 3.17,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms2"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.2 s"
   },
@@ -82,7 +95,11 @@
     "PCUseSecondsTricked": 2.667,
     "PCStopSkip": true,
     "PCEndAfter": "rush",
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PlantStink <- flower#0 3.9 s"
   },
@@ -102,7 +119,11 @@
      "kit"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 26 ticks"
   },
@@ -122,7 +143,11 @@
      "anc"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Marker <- anc/mum marker 25 ticks"
   },
@@ -142,7 +167,11 @@
      "toi"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_piano's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
@@ -320,7 +349,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -330,7 +360,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -350,7 +381,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -360,7 +392,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -380,7 +413,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -390,7 +424,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -410,7 +445,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -420,7 +456,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -440,7 +477,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -450,7 +488,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -470,7 +509,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -480,7 +520,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -500,7 +541,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -525,7 +567,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -550,7 +593,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -560,7 +604,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -580,7 +625,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -590,7 +636,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

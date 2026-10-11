@@ -26,7 +26,12 @@
      420,
      "kit"
     ],
-    "PCEndAfter": "reaction"
+    "PCEndAfter": "reaction",
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "inv",
+     "PCBreathSeconds": "ms3",
+     "PCShoutAfter": "ms2"
+    }
    }
   },
   {
@@ -45,7 +50,10 @@
     ],
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -59,7 +67,10 @@
     "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -74,7 +85,11 @@
      420,
      "lir"
     ],
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -89,7 +104,11 @@
      420,
      "bas"
     ],
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms2",
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -112,7 +131,14 @@
     "PCCaseGoto": [
      true,
      true
-    ]
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms2"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): YogaBook <- book#0 1.6 s; YogaBook <- book#1 1.6 s"
   },
@@ -123,7 +149,11 @@
     "PCUseSeconds": 2.75,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 5.667,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): FishTank <- aquarium#0 2.8 s"
   },
@@ -134,7 +164,11 @@
     "PCUseSeconds": 9.17,
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 6.0,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms2",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms2"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Yoga <- yoga_mat#0 9.2 s"
   },
@@ -151,7 +185,12 @@
      "bed"
     ],
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms1",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Trampoline <- trampoline#0 6.2 s"
   },
@@ -160,7 +199,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 4.17,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Bicycle <- home_trainer#0 4.2 s"
   },
@@ -178,7 +218,12 @@
      "bas"
     ],
     "PCReactTail": 1,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms1",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChestExpander <- expander#0 6.5 s"
   },
@@ -187,7 +232,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 10.83,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Weights <- barbell#0 10.8 s"
   },
@@ -201,7 +247,11 @@
     "PCUseSecondsTricked": 5.583,
     "PCFireAt": 4.583,
     "PCFireLead": true,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Rope <- skipping_rope#0 5.8 s"
   },
@@ -418,6 +468,10 @@
     "PCCaseGoto": [
      true,
      false
+    ],
+    "PCNextAnim": [
+     null,
+     "ms1"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_fitness's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Mixer <- mixer#0 mix 2.17 s, drink 2.33 s"
@@ -549,7 +603,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -559,7 +614,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -579,7 +635,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -589,7 +646,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -609,7 +667,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -619,7 +678,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -639,7 +699,8 @@
       "far": [
        572,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -649,7 +710,8 @@
       "far": [
        592,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -669,7 +731,8 @@
       "far": [
        556,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -679,7 +742,8 @@
       "far": [
        576,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -699,7 +763,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -709,7 +774,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -729,7 +795,8 @@
       "far": [
        401,
        371
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -739,7 +806,8 @@
       "far": [
        421,
        371
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -759,7 +827,8 @@
       "far": [
        690,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -769,7 +838,8 @@
       "far": [
        710,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -789,7 +859,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -799,7 +870,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -819,7 +891,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -829,7 +902,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -849,7 +923,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -859,7 +934,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -879,7 +955,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -889,7 +966,8 @@
       "far": [
        672,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -909,7 +987,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -919,7 +998,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -939,7 +1019,8 @@
       "far": [
        56,
        218
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -949,7 +1030,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -969,7 +1051,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -979,7 +1062,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -999,7 +1083,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -1009,7 +1094,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -1029,7 +1115,8 @@
       "far": [
        402,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -1039,7 +1126,8 @@
       "far": [
        412,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -1059,7 +1147,8 @@
       "far": [
        340,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -1069,7 +1158,8 @@
       "far": [
        350,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

@@ -150,6 +150,11 @@ S1_RAGE_HOLD_TICKS = 60
 # (tools/pcref/lap_model.py job_ticks).
 S1_SHOUT_TICKS = {'shout2_extra': 93, 'shout0_light': 26, 'shout0_medium': 46,
                   'shout0': 27, 'shout2': 27}
+# the neighbour's animation once the shout's ACTION is done: its record's
+# actornextanim (generic/objects.xml; the step sets it by name, +0x3c) — the
+# next mover's first move reads it (s1_start_ok)
+S1_SHOUT_NEXT = {'shout2_extra': 'ms3', 'shout0_light': 'ms0', 'shout0_medium': 'ms0',
+                 'shout0': 'ms0', 'shout2': 'ms2'}
 # The fire is itself a step of the stand's list (vtable 0x4e5944, update
 # 0x47bd00): its first update fires — the score, the rage, the face, the
 # jingle — builds a list of its own (fcn.00476770) and pushes it with the
@@ -771,9 +776,34 @@ S1_START_PX = {           # the first move's extra px, facing right / left (gene
 }
 
 
-def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
+def s1_start_ok(anim, x0, x1):
+    """the mover's first horizontal move takes its `start` px from the standing
+    animation by name — ms1 to the right, ms3 to the left (game.exe 0x47ccce
+    `ms1`, 0x47cd88 `ms3`, against the actor's +0x3c: fcn.00445070,
+    fcn.00413780); `anim` None: any standing (the pawns the profile keeps no
+    animation for)"""
+    return anim is None or anim == ('ms1' if x1 > x0 else 'ms3')
+
+
+def s1_arrival_anim(x0, y0, x1, y1, floor, anim):
+    """the actor's animation as a Season 1 mover arrives: the standing one of
+    its last move's facing (0x47cfb7-0x47cfdc: fcn.0047c7f0's facing into
+    ms0-ms3, 0x51b610) — y last where the target's height is off the floor
+    line it walked along, else x —, `anim` with no move"""
+    if x1 != x0:
+        y = floor if y0 != floor else y0
+        if y1 != y:
+            return 'ms0' if y1 < y else 'ms2'
+        return 'ms1' if x1 > x0 else 'ms3'
+    if y1 != y0:
+        return 'ms0' if y1 < y0 else 'ms2'
+    return anim
+
+
+def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False, anim=None):
     """the ticks of one Season 1 mover from (x0, y0) to (x1, y1), px of the PC scene,
-    in a room whose floor line is at `floor`, at the pawn's gait"""
+    in a room whose floor line is at `floor`, at the pawn's gait; `anim` the actor's
+    animation as it starts (s1_start_ok)"""
     key = 'Woody_sneak' if (role == 'Woody' and sneaking) else role
     rec = WALK_PX_PER_TICK.get(key)
     if rec is None:
@@ -790,7 +820,8 @@ def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
             standing = False
         sp = S1_START_PX.get(key)
         start = sp[0 if x1 > x0 else 1] \
-            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) else 0
+            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) \
+            and s1_start_ok(anim, x0, x1) else 0
         a = abs(x1 - x0)
         t += 1 + (-(-(a - h - start) // h) if a > h + start else 0)
     if y1 != y0:
@@ -798,12 +829,13 @@ def s1_leg_ticks(role, gait, x0, y0, x1, y1, floor, sneaking=False):
     return t
 
 
-def s1_leg_point(role, gait, x0, y0, x1, y1, floor, n, sneaking=False):
+def s1_leg_point(role, gait, x0, y0, x1, y1, floor, n, sneaking=False, anim=None):
     """the PC point a Season 1 mover stands on after n of its ticks from (x0,
     y0) toward (x1, y1) — s1_leg_ticks' moves: off the target's x, y first to
     the room's floor line at the vertical record, then x along it at the
     floor record (its first move `start` px longer from the standing
-    animation), clamped at the target's x, then y to the target's height"""
+    animation, s1_start_ok), clamped at the target's x, then y to the
+    target's height"""
     key = 'Woody_sneak' if (role == 'Woody' and sneaking) else role
     rec = WALK_PX_PER_TICK.get(key)
     if rec is None or n <= 0:
@@ -827,7 +859,8 @@ def s1_leg_point(role, gait, x0, y0, x1, y1, floor, n, sneaking=False):
                 return (x, y)
         sp = S1_START_PX.get(key)
         start = sp[0 if x1 > x0 else 1] \
-            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) else 0
+            if standing and sp is not None and (role != 'Rottweiler' or gait in ('walk', 'run')) \
+            and s1_start_ok(anim, x0, x1) else 0
         a = abs(x1 - x0)
         k = 1 + (-(-(a - h - start) // h) if a > h + start else 0)
         if n < k:

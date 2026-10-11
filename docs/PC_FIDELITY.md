@@ -1851,10 +1851,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   while x is off the target's, y first goes to the room's floor line (the
   room's point, fcn.0044bac0 on the actor's room: its path's y; the up and
   down records, 0x47cbc6-0x47cc9d), then x along it — its first move the
-  record's `start` px longer when it leaves the standing animation (the
-  mover's +0x14 and the `ms` test, 0x47ccc6-0x47cd27: the neighbour's mg1
-  8 + 8 facing right, mg3 8 + 10 facing left, mg0 / mg2 3 up and down with
-  none; the runs' mr records 18 / 9) — and once x is the target's, y goes
+  record's `start` px longer when it leaves the standing animation of its
+  facing (the mover's +0x14 and the name test, 0x47ccc6-0x47cd27: the
+  actor's +0x3c, fcn.00445070, against `ms1` moving right and `ms3`
+  moving left, fcn.00413780 — read on 2026-10-11, any standing before;
+  the neighbour's mg1 8 + 8 facing right, mg3 8 + 10 facing left, mg0 /
+  mg2 3 up and down with none; the runs' mr records 18 / 9) — and once x is the target's, y goes
   to the target's; clamped at the target, the arrival read in the update
   of its last move (0x47cf7f-0x47cfac); the walk job finds the path's end in the same update (0x476112 ->
   0x4761aa, done) — a mover of one move is done inside its push, which the
@@ -3015,7 +3017,14 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   read on 2026-10-01 as the GOTO's done tick (runtime/README.md, "The
   Season 1 GOTO's done tick"): with it and the world's steps five a tick
   the bubble segments of the idle laps run 0.18 tick short of the
-  videos' a segment (32 segments, mean |d| 0.75; 0.64 and 1.00 before);
+  videos' a segment (32 segments, mean |d| 0.75; 0.64 and 1.00 before;
+  since 2026-10-11, the mover's `start` by the animation's name — runtime/
+  README.md "The PC profile's Season 1 mover start" —, 38 segments of
+  runs/fineQ1 0.21 tick long a segment on average, |d| 0.44 tick, against
+  0.24 short and 0.68: the fit's walk and door terms, -1.15 and +1.33
+  ticks a walk and a door, are -0.08 and -0.02 — 113's valve +1.8 -> -0.2
+  ticks and basin +1.6 -> -0.5, 109's teeth +1.3 -> +0.4, 110's meat bowl
+  +1.0 -> 0.0);
   107's potter's wheel and statue had run 5.9 and 4.6 ticks short — the
   case's ENTER enters the wheel (fcn.0047a0b0's variant name at 0x457c7a,
   ENTER 0x457d22 / 0x457ec3: `sit_down` 6 ticks and its leave `get_up`

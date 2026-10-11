@@ -9,7 +9,10 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 7.833,
     "PCFireAt": 5.083,
-    "PCFireLead": true
+    "PCFireLead": true,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    }
   },
   {
@@ -26,7 +29,10 @@
     "TrickScore": 10,
     "ReuseAfterFix": true,
     "PCFixSeconds": 1.167,
-    "PCReactLead": 2
+    "PCReactLead": 2,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Level_Pig::run (game.exe class 468c8c): case 17 finds the pig out (anc/pigout), case 18 fires the pigout, plays catch_pig and switches the pig back, and returns to case 17, which goes on to 19-20 (shake_bottle, feed; the nitro bottle's fire at 0x46a907) — the catch and the feeding are one visit. ReuseAfterFix restarts the station after the pigout's repair (Rottweiler.cs:707-714): the feeding plays in the same visit, the PigMilk's trick through DependsOn when the bottle holds the nitro."
   },
@@ -41,7 +47,10 @@
     "PCSlipSeconds": 2.833,
     "PCFireLead": true,
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    }
   },
   {
@@ -51,7 +60,10 @@
     "PCAngryTime": 240,
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.25
+    "PCUseSecondsTricked": 5.25,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    }
   },
   {
@@ -70,7 +82,14 @@
     "PCCaseGoto": [
      true,
      true
-    ]
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
+    ],
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Teeth <- teeth#0 0.6 s; Teeth <- teeth#1 0.6 s"
   },
@@ -83,7 +102,10 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 2.0,
     "PCCaseGoto": true,
-    "PCCaseEmpty": 1
+    "PCCaseEmpty": 1,
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Bed <- sleep#0 27.0 s"
   },
@@ -97,7 +119,11 @@
     "PCUseSecondsTricked": 4.917,
     "PCFireAt": 3.0,
     "PCFireLead": true,
-    "PCCaseGoto": false
+    "PCCaseGoto": false,
+    "PCNextAnim": "ms1",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms1"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AlarmClock <- alarm_clock#0 3.6 s"
   },
@@ -112,6 +138,10 @@
     "PCCaseGoto": [
      true,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PigKeys <- pig_key#0 1.7 s; PigKeys <- pig_key#1 1.7 s"
@@ -127,6 +157,10 @@
     "PCCaseGoto": [
      true,
      true
+    ],
+    "PCNextAnim": [
+     "ms0",
+     "ms0"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): PigMilk <- milk_bottle#0 1.6 s; PigMilk <- milk_bottle#1 1.6 s"
@@ -137,7 +171,8 @@
    "set": {
     "PCUseSeconds": 5.92,
     "PCCaseGoto": true,
-    "PCCaseRoom": true
+    "PCCaseRoom": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Pig <- pig#1 5.9 s"
   },
@@ -146,7 +181,8 @@
    "component": "TrickItem",
    "set": {
     "PCUseSeconds": 2.33,
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0"
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): CornChips <- cookies#0 2.3 s"
   },
@@ -160,7 +196,11 @@
     "PCFireAt": 5.083,
     "PCFireLead": true,
     "PCCaseGoto": true,
-    "PCCaseRoom": true
+    "PCCaseRoom": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pig's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Chili <- parrot#1 4.2 s"
   },
@@ -442,7 +482,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -452,7 +493,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -472,7 +514,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -482,7 +525,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -502,7 +546,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -512,7 +557,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -532,7 +578,8 @@
       "far": [
        572,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -542,7 +589,8 @@
       "far": [
        592,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -562,7 +610,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -572,7 +621,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -592,7 +642,8 @@
       "far": [
        401,
        371
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -602,7 +653,8 @@
       "far": [
        421,
        371
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -622,7 +674,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -632,7 +685,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -652,7 +706,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -662,7 +717,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -682,7 +738,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -707,7 +764,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -717,7 +775,8 @@
       "far": [
        856,
        423
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -737,7 +796,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -762,7 +822,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -772,7 +833,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -792,7 +854,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -802,7 +865,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -822,7 +886,8 @@
       "far": [
        404,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -832,7 +897,8 @@
       "far": [
        414,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

@@ -27,7 +27,12 @@
     "PCCaseGoto": true,
     "PCIconLead": 0.5,
     "PCCaseEnter": true,
-    "PCCaseRoom": true
+    "PCCaseRoom": true,
+    "PCNextAnim": "ms3",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Sofa <- sofa#0 14.4 s"
   },
@@ -43,7 +48,11 @@
     "PCFireAt": 1.417,
     "PCFireLead": true,
     "PCEndAfter": "rush",
-    "PCCaseGoto": true
+    "PCCaseGoto": true,
+    "PCNextAnim": "ms0",
+    "PCPoseAfter": {
+     "PCUseSecondsTricked": "ms3"
+    }
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_sofa's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Beer <- beer#0 1.5 s"
   },
@@ -63,7 +72,11 @@
      "kit"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Egg <- kit/microwave egg 25 ticks"
   },
@@ -77,7 +90,10 @@
     "PCFixSeconds": 2.083,
     "PCUseSecondsTricked": 0.167,
     "PCRunTo": true,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 25 ticks"
   },
@@ -97,7 +113,11 @@
      "toi"
     ],
     "PCReactLead": 2,
-    "PCReactTail": 1
+    "PCReactTail": 1,
+    "PCPoseAfter": {
+     "PCSurpriseSeconds": "doubletake3",
+     "PCFixSeconds": "ms0"
+    }
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Wcpaper <- toi/toilet toiletpaper 25 ticks"
   },
@@ -228,7 +248,8 @@
       "far": [
        458,
        367
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -238,7 +259,8 @@
       "far": [
        478,
        367
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -258,7 +280,8 @@
       "far": [
        150,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -268,7 +291,8 @@
       "far": [
        170,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -288,7 +312,8 @@
       "far": [
        761,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -298,7 +323,8 @@
       "far": [
        781,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -318,7 +344,8 @@
       "far": [
        463,
        370
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -328,7 +355,8 @@
       "far": [
        483,
        370
-      ]
+      ],
+      "next": "ms2"
      }
     }
    },
@@ -348,7 +376,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -358,7 +387,8 @@
       "far": [
        551,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -378,7 +408,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      },
      "Woody": {
       "near": [
@@ -388,7 +419,8 @@
       "far": [
        763,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     }
    },
@@ -408,7 +440,8 @@
       "far": [
        840,
        420
-      ]
+      ],
+      "next": "ms3"
      }
     },
     "PCDoorTicks": {
@@ -433,7 +466,8 @@
       "far": [
        66,
        218
-      ]
+      ],
+      "next": "ms1"
      }
     },
     "PCDoorTicks": {
@@ -458,7 +492,8 @@
       "far": [
        279,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -468,7 +503,8 @@
       "far": [
        289,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },
@@ -488,7 +524,8 @@
       "far": [
        88,
        420
-      ]
+      ],
+      "next": "ms1"
      },
      "Woody": {
       "near": [
@@ -498,7 +535,8 @@
       "far": [
        98,
        420
-      ]
+      ],
+      "next": "ms1"
      }
     }
    },

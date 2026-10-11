@@ -773,6 +773,19 @@ class Pawn:
                                          # snap (tests/invariants.py reads it)
         # the NFH2 walk-through pathing state (Pawn.cs:150-183)
         self.nfh2 = spec.get('nfh2') or False
+        # the PC profile's Season 1 neighbour's animation by name, game.exe's
+        # actor +0x3c (Pawn.pc1_pose): `ms` as the actor is made (fcn.0043ab40,
+        # 0x43ae7d), `mg` while a mover walks him, the standing one of its
+        # last move's facing as it arrives, a door pass's or an action's next
+        # — a mover's first move takes its `start` px from ms1 / ms3 alone
+        # (pcprofile.s1_start_ok); None where the profile does not know it.
+        # Woody's is not kept (None: his movers take it as before)
+        self._pc1_posed = pcprofile.is_pc() and not self.nfh2 and role == 'Rottweiler'
+        self.pc1_anim = 'ms' if self._pc1_posed else None
+        # a walk the profile resumes after a reaction that stopped it: the
+        # PC's mover goes on under the reaction's list (pushed on top,
+        # fcn.00444d30), its first move long done (Pawn._pc1_marks)
+        self._pc1_resume = False
         self.adjacent_zones = spec.get('adjacent_zones') or False
         self.passing_complex = False     # Pawn.PassingComplexMove
         self.done_passing = False        # Pawn.DonePassingToOtherZone
@@ -1526,6 +1539,13 @@ class Pawn:
                                          # (cs:1795) for an item's arrival
         prev, self._step = self._step, None
         if not self.steps:
+            if self._pc1_posed and prev is not None:
+                # the walk's last mover leaves him standing in its last
+                # move's facing (a walk ending at a door: the pass's), a
+                # visit inside a case as he was (_pc1_leg_end)
+                leg = prev.get('pc1_out') if prev.get('kind') == 'door' else prev.get('pc1')
+                if leg is not None and 'to' in leg:
+                    self.pc1_pose(self._pc1_leg_end(leg))
             self.state = self.IDLE
             # OnPathFinished: the stand switch (Woody.cs:366; the base
             # TakeNextStep's, Pawn.cs:1070) with its Woody clears
@@ -2166,7 +2186,17 @@ class Pawn:
         move; a GOTOENTER's ENTER in the arrival's tick); Woody's the same,
         his click's follow-up in the arrival's tick (_pc1_kind). A visit
         inside a case keeps the earlier count — the GOTO done in the tick of
-        its last move, two ticks with no move (_pc1_close)"""
+        its last move, two ticks with no move (_pc1_close). Each leg's mover
+        starts from the neighbour's animation (`anim`, Pawn.pc1_anim): the
+        walk's first from his own — a walk resumed after a reaction from none
+        that takes the `start` px, its mover's first move long done —, a leg
+        after a via from the via's arrival, after a door from the pass's
+        (PCWalkDoor `next`)"""
+        pre = self.pc1_anim
+        resume, self._pc1_resume = self._pc1_resume, False
+        # a walk whose legs the profile cannot lay walks at the mobile's pace:
+        # where it leaves him standing is not known
+        self.pc1_pose(None)
         z = self.zone
         if z is None:
             return
@@ -2186,7 +2216,8 @@ class Pawn:
         x, y = self.sprite.x, self.sprite.y
         zone = z
         speeds = (v_floor, v_vert)
-        leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': floor0, 'v': speeds}
+        leg = {'from': start, 'nat': 0.0, 'after': False, 'floor': floor0, 'v': speeds,
+               'anim': 'mg' if resume else pre}
         legs = [leg]
         n = len(steps)
         # the station's room GoTo (PCCaseRoom): its case ends as the pass into
@@ -2229,7 +2260,7 @@ class Pawn:
                     via = tuple(st['pc1_via'])
                     self._pc1_close(leg, via, gait, True, self._pc1_kind('goto'))
                     leg = {'from': via, 'nat': 0.0, 'after': False, 'floor': zone.pc_walk_room['floor'],
-                           'v': speeds}
+                           'v': speeds, 'anim': self._pc1_leg_end(leg)}
                     legs.append(leg)
                     continue
                 if last:
@@ -2265,8 +2296,11 @@ class Pawn:
                     # the far room has no PC room (the porch): the mobile pace
                     self._pc1_unmark(steps)
                     return
+                # the pass's ACTIONs leave his animation: the far door's
+                # `leave`'s next (PCWalkDoor `next`), else the near leg's
+                nx = pw.get('next') if self._pc1_posed else None
                 leg = {'from': far, 'nat': 0.0, 'after': room_zone is None or other.zone != room_zone,
-                       'floor': wr['floor'], 'v': speeds}
+                       'floor': wr['floor'], 'v': speeds, 'anim': nx or self._pc1_leg_end(leg)}
                 legs.append(leg)
                 # the far door's placement (_warp_through: Woody's the door's
                 # own exit offset)
@@ -2311,6 +2345,31 @@ class Pawn:
             else:
                 self._pc1_unmark(steps)
                 return
+        # his movers walk him (their walking animation, mg0-mg3); a walk with
+        # none — a visit inside a case, no move — leaves it as it was
+        moves = any('to' in lg and not lg.get('list') and tuple(lg['from']) != tuple(lg['to'])
+                    for lg in legs)
+        self.pc1_pose('mg' if moves else pre)
+
+    def pc1_pose(self, anim):
+        """the Season 1 neighbour's animation is now `anim` (pc1_anim; None:
+        not known) — Woody's is not kept"""
+        if self._pc1_posed:
+            self.pc1_anim = anim
+
+    def _pc1_leg_end(self, leg):
+        """the animation a leg leaves him in: its mover's arrival's
+        (pcprofile.s1_arrival_anim), the one it started from where it has no
+        mover (a visit inside a case); None for a pawn whose animation is
+        not kept"""
+        if not self._pc1_posed:
+            return None
+        a = leg.get('anim')
+        if leg.get('list') or 'to' not in leg:
+            return a
+        fx, fy = leg['from']
+        tx, ty = leg['to']
+        return pcprofile.s1_arrival_anim(fx, fy, tx, ty, leg['floor'], a)
 
     @staticmethod
     def _pc1_unmark(steps):
@@ -2460,7 +2519,8 @@ class Pawn:
         and, on the walk's last, its job's (`kind`: pcprofile.s1_goto_ticks)"""
         fx, fy = leg['from']
         t = pcprofile.s1_leg_ticks(self.role, gait, fx, fy, end[0], end[1], leg['floor'],
-                                   sneaking=self.sneaking) or 0
+                                   sneaking=self.sneaking, anim=leg.get('anim')) or 0
+        leg['list'] = kind == 'list'
         if kind == 'list':
             # a visit inside a PC case: no GOTO and no mover — the case's list
             # goes on, its next element starting the tick after the last ends
@@ -2518,7 +2578,8 @@ class Pawn:
             n = int(leg.get('el', 0.0) * pcprofile.TICKS_PER_SECOND + 1e-6) + (1 if leg['after'] else 0)
             fx, fy = leg['from']
             return pcprofile.s1_leg_point(self.role, self._pc_gait(), fx, fy, leg['to'][0], leg['to'][1],
-                                          leg['floor'], n, sneaking=self.sneaking), r['room']
+                                          leg['floor'], n, sneaking=self.sneaking,
+                                          anim=leg.get('anim')), r['room']
         return self._pc1_here(), r['room']
 
     def _pc1_here(self):
@@ -2574,7 +2635,9 @@ class Pawn:
     def pc1_goto_ticks(self, point, x_only=False, kind='goto'):
         """a Season 1 GOTO from where the pawn stands to `point` ([x, y, room] of
         its PC room): (ticks to the next job's first update, the PC point
-        reached) — the mover's (pcprofile.s1_leg_ticks) to the arrival and the
+        reached, the animation its mover leaves him in — pcprofile.
+        s1_arrival_anim, for pc1_pose) — the mover's (pcprofile.s1_leg_ticks,
+        from his animation now) to the arrival and the
         job's after it (pcprofile.s1_goto_ticks, `kind`); x_only is
         CreateGoToObjXJob's (fcn.0047a4a0: the hotspot's x at the actor's own
         y), which reads the point before it walks — two ticks where he stands;
@@ -2590,10 +2653,11 @@ class Pawn:
             return None
         to = (point[0], here[1]) if x_only else (point[0], point[1])
         if not x_only and tuple(here) == to:
-            return 0, to
+            return 0, to, self.pc1_anim
         t = pcprofile.s1_leg_ticks(self.role, self._pc_gait(), here[0], here[1], to[0], to[1],
-                                   r['floor'], sneaking=self.sneaking) or 0
-        return pcprofile.s1_goto_ticks('x' if x_only else kind, t, own=t == 0), to
+                                   r['floor'], sneaking=self.sneaking, anim=self.pc1_anim) or 0
+        end = pcprofile.s1_arrival_anim(here[0], here[1], to[0], to[1], r['floor'], self.pc1_anim)
+        return pcprofile.s1_goto_ticks('x' if x_only else kind, t, own=t == 0), to, end
 
     def pc1_stand_at(self, point):
         """the pawn stands on a PC point: the next walk leaves from it"""
@@ -4004,6 +4068,7 @@ class Routine:
         self.pc_hold = 0.0               # the PC profile's stand at a walk-by station (_pc_use_seconds)
         self.pc_zero_visit = False       # this visit's PCUseSeconds is 0: the PC plays nothing
         self._pc_redo = None             # the ReuseAfterFix redo's item (PCRedoSeconds)
+        self._pc_redo_pose = None        # ... and the animation it leaves (PCPoseAfter)
         self.pc_mutex_left = None        # the PC profile's timed mutex (a PC stay on a MutexAction)
         self.pc_hold_cb = None           # what a pc_hold ends in, when not the use's own end
         self.pc_return = None            # the tricked station whose shout waits for the return (PCTrickReturn)
@@ -4752,12 +4817,12 @@ class Routine:
         if pt is None or here is None or r is None:
             return False
         if tuple(here) == tuple(pt):
-            ticks, to = pcprofile.s1_goto_ticks(kind, 0, own=True), tuple(pt)    # no move
+            ticks, to, pose = pcprofile.s1_goto_ticks(kind, 0, own=True), tuple(pt), p.pc1_anim    # no move
         else:
             got = p.pc1_goto_ticks([pt[0], pt[1], r['room']], kind=kind)
             if not got or not got[0]:
                 return False
-            ticks, to = got
+            ticks, to, pose = got
         ticks += p._pc1_empty(it)          # (PCCaseEmpty: the job-less cases before it)
         self.state = self.USING
         self.timer = 0.0
@@ -4765,6 +4830,7 @@ class Routine:
 
         def go():
             p.pc1_stand_at(to)
+            p.pc1_pose(pose)
             self._use()
         self.pc_hold = ticks / pcprofile.TICKS_PER_SECOND
         self.pc_hold_cb = go
@@ -5153,6 +5219,11 @@ class Routine:
         if self.on_use:
             self.on_use(it, tricked)
         pc = self._pc_use_seconds(it)
+        if pc > 0.0:
+            # the stay's actions: his animation is theirs (no neighbour
+            # record of objects.xml plays ms1 or ms3 but a zero-time
+            # `leave`), their last's next as it ends (PCNextAnim, _finish)
+            self.pawn.pc1_pose('action')
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
         self._pc_icon_sched = None
@@ -5982,6 +6053,7 @@ class Routine:
         """the PC station's seconds for this visit of the neighbour's routine under the
         profile (the item's PCUseSeconds, one value or one per visit, cycling); 0 = none"""
         self.pc_zero_visit = False
+        self._pc_redo_pose = None
         redo, self._pc_redo = self._pc_redo, None
         if it is None or not pcprofile.is_pc() or not pcprofile.rule('durations'):
             return 0.0
@@ -5990,6 +6062,7 @@ class Routine:
             # stands for the PC case's own actions after the repair
             # (PCRedoSeconds); the visit's slot passes as the redo's would
             self._pc_visit_seconds(it)
+            self._pc_redo_pose = (it.pc_pose_after or {}).get('PCRedoSeconds')
             return float(it.pc_redo_secs)
         if self.role != 'Rottweiler':
             # another actor's stand at the PC data's `time` (PCUseSecondsRole)
@@ -6042,6 +6115,29 @@ class Routine:
         # of: the ACTION step's start, fcn.004772f0, finds none and pushes no job)
         self.pc_zero_visit = bool(it.pc_use_secs) and v == 0.0
         return v
+
+    def _pc1_in_hideout(self, it):
+        """the stay at `it` is a GOTOENTER's, his station an object he
+        occupies (PCCaseEnter of the visit under way)"""
+        v = it.pc_case_enter
+        if isinstance(v, list):
+            return bool(v[pc_visit_ix(it, len(v), max(it.pc_use_visit, 1) - 1)]) if v else False
+        return bool(v)
+
+    def _pc1_stay_pose(self, it):
+        """his animation as a Season 1 station's stay ends: the last action's
+        next (PCNextAnim, per visit; the case's other arm's, PCWhenTricked;
+        the redo's after a repair, PCPoseAfter)"""
+        if self._pc_redo_pose:
+            self.pawn.pc1_pose(self._pc_redo_pose)
+            self._pc_redo_pose = None
+            return
+        br = pc_branch(self.level.items, it)
+        nx = br.get('PCNextAnim') if br is not None and br.get('PCNextAnim') else it.pc_next_anim
+        if isinstance(nx, list):
+            nx = nx[pc_visit_ix(it, len(nx), max(it.pc_use_visit, 1) - 1)] if nx else None
+        if nx:
+            self.pawn.pc1_pose(nx)
 
     def _pc_visit_seconds(self, it):
         """the item's PCUseSeconds for this visit: one value, or one per
@@ -6142,6 +6238,8 @@ class Routine:
             return
         if it is not None and it.pc_masked:
             it.pc_masked = False           # the untricked visit is over
+        if it is not None and self.role == 'Rottweiler':
+            self._pc1_stay_pose(it)
         self._action_stopped()
         self._pending = 'advance'
         self._check_parked_runs()
@@ -6533,6 +6631,11 @@ class Routine:
         Pawn.cs:444-448) — SurpriseActionFar and ToiletAction serialize it,
         the AlarmAction and the Return leg do not, Grab/UseFixingItem do on
         L110/L113 only."""
+        if self.role == 'Rottweiler' and self.state == self.USING and self.item is not None \
+                and self._pc1_in_hideout(self.item):
+            # a walk from the hideout he sits in opens with its LEAVE (the walk
+            # job's, 0x475ce6): its next animation, the stay's last (PCNextAnim)
+            self._pc1_stay_pose(self.item)
         self.pc_shout_icon = None        # its handler's case sets its own icon
         self.pawn.anim.time_scale = 1.0     # an urgent interrupts a paced station
         self.pc_hold = 0.0
@@ -6924,6 +7027,7 @@ class Routine:
                 if getattr(it, 'pc_align_x', False) else None
             if g is not None:
                 self.pawn.pc1_stand_at(g[1])
+                self.pawn.pc1_pose(g[2])
                 self.pawn._stand()
                 w.call_later(g[0] / pcprofile.TICKS_PER_SECOND, look)
             else:
@@ -7295,6 +7399,13 @@ class Routine:
             if mobile > 0.0:
                 self.pawn.anim.time_scale = mobile / float(secs)
 
+    def _pc1_part_pose(self, it, key, secs):
+        """his animation after a part of a Season 1 trick's flow that played
+        (`secs` > 0): its last record's next (PCPoseAfter[key]; not known
+        without it) — a part the case plays none of leaves it"""
+        if it is not None and secs and float(secs) > 0.0:
+            self.pawn.pc1_pose((getattr(it, 'pc_pose_after', None) or {}).get(key))
+
     def run_to_fixing_item(self, tool, tricked):
         """Rottweiler.RunToFixingItem (Rottweiler.cs:1077-1082): shift the
         tricked item's stand spot by DeltaFixLocation, wire the chain, and
@@ -7320,6 +7431,8 @@ class Routine:
         def grabbed():
             self.pawn.anim.time_scale = 1.0
             tool = self._fix_tool
+            g = getattr(tool, 'pc_grab_secs', None)
+            self._pc1_part_pose(tool, 'PCGrabSeconds', 1.0 if g is None else g)
             if tool is not None and tool.sprite is not None:
                 tool.sprite.hidden = True    # SetActiveObjectHidden(true)
             self.pawn.fixing_item = tool     # Rottweiler.FixingItem = Item
@@ -7401,12 +7514,14 @@ class Routine:
 
         def repaired():
             self.pawn.anim.time_scale = 1.0
+            self._pc1_part_pose(tool, 'PCToolRepair', tool.pc_tool_repair)
             self._fixing_done()
 
         def shouted():
             # the check StopMsg (0x46076c) — a level whose last step skipped its
             # own ends here (PCEndAfter 'tool') — then the repair and the switch
             self.pawn.anim.time_scale = 1.0
+            self._pc1_part_pose(tool, 'PCToolShout', tool.pc_tool_shout)
             w.pc_end_after('tool', tgt)
             fix = [x for x in [tgt.fix_animation] if x and self.pawn.anim.has(x)]
             self._pc_tool_pace(fix, tool.pc_tool_repair)
@@ -7418,6 +7533,10 @@ class Routine:
 
         def used():
             self.pawn.anim.time_scale = 1.0
+            if secs is not None:
+                self._pc1_part_pose(tool, 'PCFixUseSeconds' if redo else 'PCToolUseSeconds', secs)
+            elif seq:
+                self.pawn.pc1_pose(None)      # the mobile's clips: not known
             if tail:
                 # the case's shout after the sound tool's use (PCToolShout:
                 # the state message and shout0_medium) at the angry's pace
@@ -7469,6 +7588,8 @@ class Routine:
         def returned():
             self.pawn.anim.time_scale = 1.0
             tool = self._fix_tool
+            r = getattr(tool, 'pc_return_secs', None)
+            self._pc1_part_pose(tool, 'PCReturnSeconds', 1.0 if r is None else r)
             if tool is not None and tool.sprite is not None:
                 tool.sprite.hidden = False
             self._fix_tool = self._fix_target = None
@@ -7640,6 +7761,9 @@ class Routine:
         # a RoutineActionSurpriseNear is current: IsAlarmPostponed's first
         # arm (Rottweiler.cs:1049-1052)
         self._urgent_action = {'kind': 'surprise_near'}
+        # game.exe's handler pushes its list on top of his jobs: a walk it
+        # stops goes on after it, its mover's first move done (Pawn._pc1_marks)
+        self.pawn._pc1_resume = self.pawn._pc1_posed and self.pawn.state in self.pawn.MOVING
         self.pawn.steps = []
         self.pawn.state = self.pawn.IDLE
         self.pawn.movement_paused = True      # Owner.PauseMovement
@@ -7695,6 +7819,7 @@ class Routine:
                 # x before the doubletake (fcn.0047a4a0 in fcn.0047d520 and its
                 # kin) — its ticks stood, the pawn then on that point
                 self.pawn.pc1_stand_at(g[1])
+                self.pawn.pc1_pose(g[2])
                 self.pawn._stand()
                 self.pawn.world.call_later(g[0] / pcprofile.TICKS_PER_SECOND, surprise)
             else:
@@ -9487,6 +9612,8 @@ class World:
                 pcprofile.s1_rage_percent(pawn.rage_current, pawn.rage_max))
         item.pc_shout_secs = pcprofile.s1_shout_seconds(
             points, bonus, item.pc_shout_index, item.pc_shout_skip)
+        item.pc_shout_clip = pcprofile.s1_shout_clip(
+            points, bonus, item.pc_shout_index, item.pc_shout_skip)
         item.pc_fire_points = points
         self._pc_last_fire = item
         # a step without its StopMsg (flag 1) leaves the check flag to the
@@ -9649,8 +9776,16 @@ class World:
             if not fired_early:
                 self.s1_fire(pawn, item)
             pc_shout = item.pc_shout_secs or 0.0
+            shout_clip, item.pc_shout_clip = item.pc_shout_clip, None
             item.pc_fired = False
             item.pc_shout_secs = None
+            # the tricked stand's actions have left his animation (PCPoseAfter)
+            pose = item.pc_pose_after
+            br0 = pc_branch(self.level.items if self.level is not None else None, item)
+            if br0 is not None and br0.get('PCPoseAfter'):
+                pose = br0['PCPoseAfter']       # the case's other arm (PCWhenTricked)
+            if 'PCUseSecondsTricked' in pose:
+                pawn.pc1_pose(pose['PCUseSecondsTricked'])
             if item.angry_hard and pc_shout > 0.0:
                 seq = [item.angry_hard]
             fire_pre, fire_post = self._s1_fire_stands(item, fired_early, pc_shout)
@@ -9913,18 +10048,20 @@ class World:
                 fix_secs = float(br['PCFixSeconds'])
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
-            walk = [pawn.pc1_goto_ticks(getattr(item, 'pc_fix_point', None))
-                    if fixes and pawn.role == 'Rottweiler' else None]
+            walk = [bool(fixes) and pawn.role == 'Rottweiler']
 
             def play_fixes():
                 pawn.anim.time_scale = 1.0
-                g, walk[0] = walk[0], None
+                # (its mover starts from the animation the shout left)
+                g = pawn.pc1_goto_ticks(getattr(item, 'pc_fix_point', None)) if walk[0] else None
+                walk[0] = False
                 if g is not None:
                     # the repair's walk to the tricked object's hotspot when
                     # he does not stand on it (fcn.0047ae70: isActorAtObject,
                     # fcn.0047aa90, then fcn.0044ac80 to it) — its ticks
                     # stood; the next walk leaves from that point
                     pawn.pc1_stand_at(g[1])
+                    pawn.pc1_pose(g[2])
                     if g[0] > 0:
                         pawn._stand()
                         self.call_later(g[0] / pcprofile.TICKS_PER_SECOND, play_fixes)
@@ -9934,6 +10071,9 @@ class World:
                         mobile = pawn.anim.sequence_seconds(fixes)
                         if mobile > 0.0:
                             pawn.anim.time_scale = mobile / fix_secs
+                    # the repair or clean leaves its record's next animation
+                    # (PCPoseAfter; not known without the PC's)
+                    pawn.pc1_pose(pose.get('PCFixSeconds'))
                     pawn.anim.play_sequence(fixes, on_end=tail)
                 else:
                     if not seq and pawn.anim.seq_end_hook is not None:
@@ -9974,6 +10114,9 @@ class World:
                     # the list's `shout` icon element, right before the
                     # shout (fcn.0047bd00's list; flag 2 builds neither)
                     routine.pc_shout_icon = 'bubble_wut'
+                if pc_shout > 0.0:
+                    # the shout's ACTION leaves its record's next
+                    pawn.pc1_pose(pcprofile.S1_SHOUT_NEXT.get(shout_clip))
                 if seq:
                     mobile = pawn.anim.sequence_seconds(seq)
                     if mobile > 0.0 and pc_shout > 0.0:
