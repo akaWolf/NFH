@@ -18,12 +18,44 @@ sys.path.insert(0, os.path.join(ROOT, 'tools', 'pcref')); sys.path.insert(0, HER
 import pcmap
 
 STANDS = ('ms0', 'ms1', 'ms2', 'ms3')
-WALKS = ('mg0', 'mg1', 'mg2', 'mg3')
+WALKS = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')   # the walk and run gaits
 ROLES = {'neighbor': 'Rottweiler', 'olga': 'Olga', 'mother': 'Mother', 'kid': 'Kid', 'fifi': 'Fifi'}
 
 def family(name):
     room, _, base = name.rpartition('/')
     return room, base.split('_')[0]
+
+
+def actor_gotos(rows, role_ticks, gotos):
+    """the actor's walks' targets as (tick, target) — the `goto` records of the actor pointer that starts
+    the walks (voted), else (Season 1: no GoTo hook) the first DoAction on a room/object within four ticks
+    after an arrival (the stand after a walk), credited to the walk before it"""
+    WALKS_ = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')
+    moves = set()
+    for i in range(1, len(role_ticks)):
+        if role_ticks[i][1] in WALKS_ and (role_ticks[i][2], role_ticks[i][3]) != (role_ticks[i - 1][2], role_ticks[i - 1][3]) and role_ticks[i - 1][1] not in WALKS_:
+            moves.add(role_ticks[i][0])
+    firsts = []; last = None
+    for t, ptr, target in gotos:
+        if (ptr, target) != last: firsts.append((t, ptr, target)); last = (ptr, target)
+    votes = {}
+    for t, ptr, target in firsts:
+        if any(t <= m <= t + 3 for m in moves): votes[ptr] = votes.get(ptr, 0) + 1
+    if votes:
+        mine = max(votes, key=votes.get)
+        return [(t, target) for t, ptr, target in firsts if ptr == mine]
+    # the fallback: arrivals and the actions right after them
+    actions = [(r['tick'], r['args'][1]) for r in rows if r['ev'] == 'action' and isinstance(r['args'][1], str) and '/' in r['args'][1]]
+    out = []; walking = False; start = None
+    for t, anim, x, y in role_ticks:
+        if anim in WALKS_:
+            if not walking: start = t
+            walking = True
+        elif walking:
+            walking = False
+            a = next((obj for at, obj in actions if t <= at <= t + 4), None)
+            if a: out.append((start if start is not None else t, a))
+    return out
 
 def exits(rows, role):
     """(station object left, after-anim, stand ticks) per walk start of the actor"""
@@ -34,16 +66,7 @@ def exits(rows, role):
             if a: ticks.append((r['tick'], a['anim'], a['x'], a['y']))
         elif r['ev'] == 'goto' and isinstance(r['args'][2], str):
             gotos.append((r['tick'], r['args'][1], r['args'][2]))
-    firsts = []; last = None
-    for t, ptr, target in gotos:
-        if (ptr, target) != last: firsts.append((t, ptr, target)); last = (ptr, target)
-    moves = set()
-    for i in range(1, len(ticks)):
-        if ticks[i][1] in WALKS and (ticks[i][2], ticks[i][3]) != (ticks[i - 1][2], ticks[i - 1][3]) and ticks[i - 1][1] not in WALKS:
-            moves.add(ticks[i][0])
-    votes = collections.Counter(ptr for t, ptr, target in firsts if any(t <= m <= t + 3 for m in moves))
-    mine = votes.most_common(1)[0][0] if votes else None
-    firsts = [f for f in firsts if f[1] == mine]
+    firsts = [(t, None, target) for t, target in actor_gotos(rows, ticks, gotos)]
     out = []; i = 0; station = None
     while i < len(ticks):
         t, anim, x, y = ticks[i]
@@ -96,9 +119,10 @@ def main(argv):
             stands = collections.Counter(s for a, s in lst)
             val = stands.most_common(1)[0][0]
             if station == '(start)':
-                # PCStart's `depart`: the ticks from the level's first tick to the actor's first move
-                print('%-10s %-34s %-26s stands %s -> %d' % (role, station, 'PCStart', dict(stands), val))
-                if write:
+                # PCStart's `depart`: the ticks from the level's first tick to the actor's first move — an
+                # actor whose lap begins with a stay (206's neighbour, 108 ticks) has none to write
+                print('%-10s %-34s %-26s stands %s -> %d%s' % (role, station, 'PCStart', dict(stands), val, '' if val <= 12 else ' (a stay first: not written)'))
+                if write and val <= 12:
                     for e in ov['patches']:
                         st = (e.get('set') or {}).get('PCStart')
                         if st and e.get('component') == role:

@@ -214,7 +214,15 @@ def actor_states():
         except Exception: pass
     return out
 LEAD = int(os.environ.get('WDBG_LEAD', '4'))      # ticks between the dummy's dispatch and the scripted tick
+DUMMIES = [DUMMY] + [d.split() for d in os.environ.get('WDBG_DUMMIES', '400 400;300 450;500 450;400 500;200 400;600 400').split(';')]
 def click_dummy():
+    # (a dummy click that hits no floor sends no message: the Tick hook re-clicks the next point of
+    # DUMMIES while a step stays pending)
+    state['dummy_at'] = state['tick']; pt = DUMMIES[state.get('dummy_i', 0) % len(DUMMIES)]
+    subprocess.Popen([T + '/xdotool-result/bin/xdotool', 'mousemove', pt[0], pt[1], 'sleep', '0.3',
+                      'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
+                     env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
+def _click_dummy_old():
     # (the game polls the mouse at its 12 Hz: xdotool's instant click fell between two polls every other
     # time — the button is held 0.2 s; the move settles 0.3 s before; the message lands 3-4 ticks on)
     subprocess.Popen([T + '/xdotool-result/bin/xdotool', 'mousemove', DUMMY[0], DUMMY[1], 'sleep', '0.3',
@@ -245,6 +253,10 @@ class Tick(gdb.Breakpoint):
             for step in plan.step(state['tick']):
                 pending.append(step); click_dummy()
                 emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
+        if pending and state['tick'] - state.get('dummy_at', 0) > 10:
+            # no message took the dummy: another floor point
+            state['dummy_i'] = state.get('dummy_i', 0) + 1; click_dummy()
+            emit({'tick': state['tick'], 'ev': 'dummy', 'retry': state['dummy_i']})
         emit({'tick': state['tick'], 'wall': round(now - state['t0'], 3), 'ev': 'tick', 'actors': actor_states()})
         return now - state['t0'] > secs
 class Loop(gdb.Breakpoint):

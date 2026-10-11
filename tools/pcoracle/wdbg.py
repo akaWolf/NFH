@@ -63,6 +63,8 @@ finally:
             envb = open('/proc/%s/environ' % pid, 'rb').read()
         except Exception:
             continue
-        if ('WINEPREFIX=' + env['WINEPREFIX']).encode() in envb and int(pid) != os.getpid():
+        # (the whole variable, NUL-terminated: ~/nfh-bench/wine/nfh is a prefix of ~/nfh-bench/wine/nfh1pfx —
+        # the second instance was killed by the first's cleanup once)
+        if ('WINEPREFIX=' + env['WINEPREFIX']).encode() + b'\0' in envb and int(pid) != os.getpid():
             try: os.kill(int(pid), signal.SIGKILL)
             except Exception: pass

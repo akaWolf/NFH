@@ -98,14 +98,37 @@ real thing without reading videos.
 - `cmp_run.py <trace> <run dir>` — the two sides on one clock: the PC's
   station actions, icon changes, posts, SHOUTs and inputs against the
   port's routine transitions, think icon, trick count and clicks.
-- `cmp_pairs.py <trace> <run dir> [--segments=<secs>]` — the same, paired:
-  the inputs (equal by construction), the bubble (the PC's icon changes
-  against the port's think changes, matched by value in order), the
-  stations (STATION_CLIPS: the PC action on a room/object family -> the
-  port's clip), the records paid, the catches — each pair with the port
-  minus the PC in seconds and a mean per kind; `--segments` lists the
-  neighbour's animation changes on both sides (the port's sprite x is the
-  mobile station's, not the PC hotspot the walk timing leaves from).
+- `cmp_pairs.py <trace> <run dir> [--segments=<secs>] [--role=Olga]` —
+  the same, paired: the inputs (equal by construction), the bubble (the
+  PC's icon changes against the port's think changes, matched by value in
+  order), the stations (STATION_CLIPS: the PC action on a room/object
+  family -> the port's clip), the records paid, the catches — each pair
+  with the port minus the PC in seconds and a mean per kind; `--segments`
+  adds the actor's animation changes on both sides (the port's sprite x is
+  the mobile station's, not the PC hotspot the walk timing leaves from),
+  the walks and stays as blocks, the station-to-station legs (the action
+  starts: free of the stay / walk boundary — the PC's action starts two
+  ticks after the arrival, the port's clip at once), and the visits (the
+  neighbour's GoTo targets against the port's routine items, by the
+  overlay's PCApproach — the lap's order, not its timing).
+- `exit_ticks.py <trace> [role]` and `pc_depart_ticks.py <n> <trace>
+  [--write]` — the ticks an actor stands between a station's last
+  animation and its next walk's first move (the step dispatch: the next
+  step the tick the action ends or the one after, the mover's first move
+  two ticks after the GoTo), per station into the overlay's PCDepartTicks
+  (per role) and PCStart `depart` (the level's start); a catch's fight is
+  no exit. `pc_clips_from_trace.py <n> <trace> [--write]` — a station's
+  PCClipSeconds re-measured where its clips are the actor's own animations
+  (202's sea), each from its animation's first tick to the next's, the
+  last to the walk less the exit's ticks; a waited-on clip keeps its value.
+- `idlebatch.sh <secs> <levels>` runs the levels' idle laps one after
+  another (Woody at his start — the catches in 203-205 and 208 spoil the
+  lap); `parkbatch.sh <secs> <levels>` the laps with Woody parked
+  (~/nfh-bench/plans/park/LevelN.txt: the port's auto park zone, then a
+  wait) as plan runs, each replayed by the port to the clock (UNTIL) and
+  paired (runs/replayN_park/pairs.txt); `s1parkbatch.sh` the same on NFH1
+  through `s1planrun.sh` (the menu walk, the NFH1 log). The port's
+  state.jsonl cadence is NFH_STATE_EVERY (10 = 6 Hz; the replays 5 = 12 Hz).
 - `cmp_idle.py` — the same for an idle lap (`runtime/record.py`,
   NFH_PROFILE=pc).
 - `s1_smoke.py` / `s1_probe.py` (`S1SCRIPT=s1_probe.py s1smoke.sh <level
@@ -159,7 +182,12 @@ wineserver is gone `wineserver -k9` reaches none of them: wdbg.py's cleanup
 kills every process whose environment names the prefix (475 of them had
 piled up from the earlier runs, one game.exe spinning for three hours).
 Woody is in the trace's `actors` from his first walk on (the path finder
-hook): before it the plan runner takes him as standing.
+hook): before it the plan runner takes him as standing. The cleanup's
+prefix match is the whole NUL-terminated variable: ~/nfh-bench/wine/nfh is
+a prefix of the second instance's ~/nfh-bench/wine/nfh1pfx, and the first
+instance's cleanup killed the second's run once. A dummy click that hits
+no floor sends no message: the Tick hook re-clicks the next point of
+WDBG_DUMMIES while a step stays pending.
 
 ## What the first plan run found (202, 2026-10-02)
 

@@ -11,7 +11,7 @@ GoTo call's tick on the actor (the `goto` hook's first record for the walk's tar
 import json, os, sys
 
 STANDS = ('ms0', 'ms1', 'ms2', 'ms3')
-WALKS = ('mg0', 'mg1', 'mg2', 'mg3')
+WALKS = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')   # the walk and run gaits
 
 def main(argv):
     role = argv[2] if len(argv) > 2 else 'neighbor'

@@ -31,8 +31,9 @@ def load_pc(p):
         t = r['tick'] / 12.0
         if r['ev'] == 'injected':
             s = r['step']; inputs.append((t, '%s %s' % (s['kind'], ' '.join(map(str, s['args'])))))
-        elif r['ev'] == 'icon' and r['args'][0] == 'neighbor':
-            ic = r['args'][1]
+        elif r['ev'] == 'icon' and (r['args'][0] == 'neighbor' or (isinstance(r['args'][0], str) and not isinstance(r['args'][1], str))):
+            # Season 2: SetIcon(actor, icon); Season 1: SetIcon(icon) — the neighbour's bubble either way
+            ic = r['args'][1] if r['args'][0] == 'neighbor' else r['args'][0]
             if ic != icon:
                 icon = ic; icons.append((t, ic if isinstance(ic, str) else ''))
         elif r['ev'] == 'action':
@@ -112,7 +113,7 @@ def px_mapper(n):
         return int(round(pr['x1'] + (x - z.left) * (pr['x2'] - pr['x1']) / float(z.right - z.left))), pr['floor']
     return f
 
-WALKS = ('mg0', 'mg1', 'mg2', 'mg3', 'ms0', 'ms1', 'ms2', 'ms3')
+WALKS = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3', 'ms0', 'ms1', 'ms2', 'ms3')
 def phases(segs, is_walk):
     """the animation changes folded into phases: a run of walk / stand animations is one `walk`, every other
     animation its own phase — (start, name, duration)"""
@@ -165,14 +166,100 @@ def arrivals(segs, is_walk, is_stand):
 def show_arrivals(pc, port):
     """station to station: the stations' action starts paired in order, the legs between them on both sides
     — free of the stay / walk boundary"""
-    a = arrivals(pc, lambda n: n in WALKS, lambda n: n in ('ms0', 'ms1', 'ms2', 'ms3'))
-    b = arrivals(port, lambda n: n.startswith('Walk_'), lambda n: n.startswith('Stand_'))
+    a = arrivals(pc, lambda n: n in WALKS and not n.startswith('ms'), lambda n: n in ('ms0', 'ms1', 'ms2', 'ms3'))
+    b = arrivals(port, lambda n: n.startswith(('Walk_', 'Run_')), lambda n: n.startswith('Stand_'))
     print('== stations (PC / port: the action start, the leg since the last one; port minus PC per leg, the running sum)')
     acc = 0.0
     for i in range(min(len(a), len(b))):
         la = a[i] - a[i - 1] if i else a[i]; lb = b[i] - b[i - 1] if i else b[i]
         d = lb - la; acc += d
         print('  %7.2f %6.2f | %7.2f %6.2f | %+5.2f (sum %+5.2f)' % (a[i], la, b[i], lb, d, acc))
+
+
+def actor_gotos(rows, role_ticks, gotos):
+    """the actor's walks' targets as (tick, target) — the `goto` records of the actor pointer that starts
+    the walks (voted), else (Season 1: no GoTo hook) the first DoAction on a room/object within four ticks
+    after an arrival (the stand after a walk), credited to the walk before it"""
+    WALKS_ = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')
+    moves = set()
+    for i in range(1, len(role_ticks)):
+        if role_ticks[i][1] in WALKS_ and (role_ticks[i][2], role_ticks[i][3]) != (role_ticks[i - 1][2], role_ticks[i - 1][3]) and role_ticks[i - 1][1] not in WALKS_:
+            moves.add(role_ticks[i][0])
+    firsts = []; last = None
+    for t, ptr, target in gotos:
+        if (ptr, target) != last: firsts.append((t, ptr, target)); last = (ptr, target)
+    votes = {}
+    for t, ptr, target in firsts:
+        if any(t <= m <= t + 3 for m in moves): votes[ptr] = votes.get(ptr, 0) + 1
+    if votes:
+        mine = max(votes, key=votes.get)
+        return [(t, target) for t, ptr, target in firsts if ptr == mine]
+    # the fallback: arrivals and the actions right after them
+    actions = [(r['tick'], r['args'][1]) for r in rows if r['ev'] == 'action' and isinstance(r['args'][1], str) and '/' in r['args'][1]]
+    out = []; walking = False; start = None
+    for t, anim, x, y in role_ticks:
+        if anim in WALKS_:
+            if not walking: start = t
+            walking = True
+        elif walking:
+            walking = False
+            a = next((obj for at, obj in actions if t <= at <= t + 4), None)
+            if a: out.append((start if start is not None else t, a))
+    return out
+
+def lap_orders(pc_path, port_dir, role='neighbor', port_role='Rottweiler', until=400.0):
+    """the station sequence on both sides: the PC's GoTo targets of the actor (the `goto` hook's records,
+    the actor pointer voted by the walks it starts) against the port's routine item changes"""
+    rows = [json.loads(l) for l in open(os.path.expanduser(pc_path))]
+    ticks = []; gotos = []
+    for r in rows:
+        if r['ev'] == 'tick':
+            a = r['actors'].get(role)
+            if a: ticks.append((r['tick'], a['anim'], a['x'], a['y']))
+        elif r['ev'] == 'goto' and isinstance(r['args'][2], str):
+            gotos.append((r['tick'], r['args'][1], r['args'][2]))
+    pc_seq = [(t / 12.0, target) for t, target in actor_gotos(rows, ticks, gotos) if t / 12.0 <= until]
+    port_seq = []; last = None
+    for l in open(os.path.join(os.path.expanduser(port_dir), 'state.jsonl')):
+        st = json.loads(l)
+        if st['t'] > until: break
+        r = next(x for x in st['routines'] if x['role'] == port_role)
+        if r['item'] != last: port_seq.append((st['t'], r['item'])); last = r['item']
+    # the visits: consecutive GoTos to one object's family are one visit; the port's items the same way;
+    # paired in order while the names agree (the item whose PCApproach for the role names the family),
+    # the deltas per visit
+    n = int(re.search(r'(?<!\d)([12]\d\d)(?!\d)', os.path.basename(os.path.normpath(port_dir)) + ' ' + port_dir).group(1))
+    ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    ov = json.load(open(os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)))
+    fam_item = {}
+    for e in ov['patches']:
+        ap = ((e.get('set') or {}).get('PCApproach') or {}).get(port_role)
+        if isinstance(ap, dict) and ap.get('obj'):
+            room, _, base = ap['obj'].rpartition('/'); fam_item.setdefault((room, base.split('_')[0]), e['object'])
+    if n < 200:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import pcmap_s1
+        for it, obj in pcmap_s1.PCMap(n).objs.items():
+            room, _, base = obj.rpartition('/'); fam_item.setdefault((room, base.split('_')[0]), it)
+    def famof(name):
+        room, _, base = name.rpartition('/'); return room, base.split('_')[0]
+    visits = []
+    for t, target in pc_seq:
+        if not visits or famof(visits[-1][1]) != famof(target): visits.append((t, target))
+    print('== the visits (PC: the neighbour\'s GoTo to a station / port: the routine\'s item; port minus PC)')
+    i = j = 0; acc = []
+    while i < len(visits) or j < len(port_seq):
+        a = visits[i] if i < len(visits) else None; b = port_seq[j] if j < len(port_seq) else None
+        it = fam_item.get(famof(a[1])) if a else None
+        if a and b and it == b[1]:
+            d = b[0] - a[0]; acc.append(d)
+            print('  %7.2f %-32s | %7.2f %-22s | %+6.2f' % (a[0], a[1], b[0], b[1], d)); i += 1; j += 1
+        elif a and (b is None or (it is not None and it in [x[1] for x in port_seq[j:j + 3]]) is False):
+            print('  %7.2f %-32s | %7s %-22s |' % (a[0], a[1] + ('' if it else ' (no item)'), '', '')); i += 1
+        else:
+            print('  %7s %-32s | %7.2f %-22s |' % ('', '', b[0], b[1])); j += 1
+    if acc:
+        print('  -> %d visits paired, port - PC mean %+.2f s, min %+.2f, max %+.2f' % (len(acc), sum(acc) / len(acc), min(acc), max(acc)))
 
 def show_segments(pc, port):
     print('== the neighbour\'s animations (PC anim at x,y / port anim at x,y in PC px) to %.0f s' % max([t for t, *_ in pc] + [0]))
@@ -215,7 +302,7 @@ def main(argv):
     pc_in, pc_ic, pc_st, pc_cr, pc_ca = load_pc(argv[1])
     po_in, po_th, po_cl, po_tr, po_ca = load_port(argv[2])
     show('inputs', [((a[0], a[1]), (b[0], b[1])) for a, b in zip(pc_in, po_in)] + [((a[0], a[1]), None) for a in pc_in[len(po_in):]] + [(None, (b[0], b[1])) for b in po_in[len(pc_in):]])
-    show('bubble (PC icon / port think)', pair_by_value(pc_ic, po_th))
+    show('bubble (PC icon / port think)', pair_by_value(pc_ic, po_th, key=lambda v: (v or '').replace('bubble_', '').lower()))
     mapped = [(t, STATION_CLIPS[(f, a)]) for t, f, a in pc_st if (f, a) in STATION_CLIPS]
     show('stations (PC action / port clip)', pair_by_value(mapped, [(t, c) for t, c in po_cl if c in STATION_CLIPS.values()]))
     rest = sorted(set((f, a) for t, f, a in pc_st if (f, a) not in STATION_CLIPS))
@@ -231,6 +318,7 @@ def main(argv):
         pcs, pos = pc_segments(argv[1], role=pc_role, until=until), port_segments(argv[2], role=role, until=until, to_px=px_mapper(n))
         print('== %s' % role)
         show_segments(pcs, pos); show_phases(pcs, pos); show_arrivals(pcs, pos)
+        lap_orders(argv[1], argv[2], pc_role, role, until)
 
 if __name__ == '__main__':
     main(sys.argv)

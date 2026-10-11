@@ -170,7 +170,8 @@ class PlanRunner:
         if self.phase == 'parking':
             pr = self.m.rooms.get(self.target)
             if w is not None and self.idle(w) and tick - self.last_input >= 6 and pr and \
-                    pr['x1'] - 120 <= w['x'] <= pr['x2'] + 120 and abs(w['y'] - pr['floor']) <= 150:
+                    pr['x1'] - 120 <= w['x'] <= pr['x2'] + 120 and abs(w['y'] - pr['floor']) <= 150 \
+                    and (w.get('room') in (None, pr['room'])):
                 return self.done('ok')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
@@ -202,11 +203,20 @@ def actor_states():
     out = {}
     for name, a in actors.items():
         try:
-            out[name] = {'x': struct.unpack('<i', rd(a + 0x28, 4))[0], 'y': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'anim': as_string(u32(a + 0x3c))}
+            out[name] = {'x': struct.unpack('<i', rd(a + 0x28, 4))[0], 'y': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'anim': as_string(u32(a + 0x3c)),
+                         'room': as_string(u32(u32(a + 0x1c) + 4))}          # the room object at +0x1c, its name at +4
         except Exception: pass
     return out
 LEAD = int(os.environ.get('WDBG_LEAD', '4'))
+DUMMIES = [DUMMY] + [d.split() for d in os.environ.get('WDBG_DUMMIES', '400 400;300 450;500 450;400 500;200 400;600 400').split(';')]
 def click_dummy():
+    # (a dummy click that hits no floor sends no message: the Tick hook re-clicks the next point of
+    # DUMMIES while a step stays pending)
+    state['dummy_at'] = state['tick']; pt = DUMMIES[state.get('dummy_i', 0) % len(DUMMIES)]
+    subprocess.Popen([T + '/xdotool-result/bin/xdotool', 'mousemove', pt[0], pt[1], 'sleep', '0.3',
+                      'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
+                     env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
+def _click_dummy_old():
     subprocess.Popen([T + '/xdotool-result/bin/xdotool', 'mousemove', DUMMY[0], DUMMY[1], 'sleep', '0.3',
                       'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
                      env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
@@ -255,20 +265,35 @@ class Tick(gdb.Breakpoint):
             for step in plan.step(state['tick']):
                 pending.append(step); click_dummy()
                 emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
+        if pending and state['tick'] - state.get('dummy_at', 0) > 10:
+            # no message took the dummy: another floor point
+            state['dummy_i'] = state.get('dummy_i', 0) + 1; click_dummy()
+            emit({'tick': state['tick'], 'ev': 'dummy', 'retry': state['dummy_i']})
         emit({'tick': state['tick'], 'wall': round(now - state['t0'], 3), 'ev': 'tick', 'actors': actor_states()})
         return now - state['t0'] > secs
 class Loop(gdb.Breakpoint):
     """the message loop after the pop (0x43b165): the message at [esp+0x18]; a player's message with a
     step pending is replaced by the built one"""
-    def __init__(self): super().__init__('*0x43b165', internal=True)
+    def __init__(self): super().__init__('*0x43b165', internal=True); self.slot = None; self.hits = 0
     def stop(self):
         try:
-            esp = reg('esp'); msg = u32(esp + 0x18); vt = u32(msg)
+            esp = reg('esp'); self.hits += 1
+            if self.hits <= 3 and state['t0'] is not None: print('loop hit %d tick %d [esp+0x14] %#x [esp+0x18] %#x' % (self.hits, state['tick'], u32(esp + 0x14), u32(esp + 0x18)), flush=True)
+            # the pop's out-parameter: [esp+0x14] before the push of its address, [esp+0x18] if the callee
+            # left the push — whichever holds a message of the player's classes
+            for off in ((self.slot,) if self.slot is not None else (0x18, 0x14)):
+                msg = u32(esp + off)
+                vt = u32(msg) if 0x10000 < msg < 0x7fffffff else 0
+                if vt in (VT_GOTO, VT_USE, VT_COMBINE):
+                    if self.slot is None: self.slot = off; print('message slot [esp+%#x]' % off, flush=True)
+                    break
+            else:
+                return False
             if vt in (VT_GOTO, VT_USE, VT_COMBINE):
                 if scratch['sproto'] is None: scratch['sproto'] = u32(msg + 4)
                 if pending:
                     step = pending.pop(0); new = build(step)
-                    wr(esp + 0x18, struct.pack('<I', new))
+                    wr(esp + off, struct.pack('<I', new))
                     emit({'tick': state['tick'], 'ev': 'injected', 'step': step})
                     print('INJECTED tick %d: %s' % (state['tick'], step), flush=True)
                 else:
@@ -282,7 +307,19 @@ class Mover(gdb.Breakpoint):
     def stop(self):
         try:
             a = u32(reg('esp') + 8); name = as_string(u32(a + 4))
-            if name and name not in actors: actors[name] = a
+            if name and name not in actors:
+                actors[name] = a
+                # the room: a pointer among the actor's words whose +4 is a short String (anc, lir, kit...)
+                found = {}
+                for i in range(2, 40):
+                    w = u32(a + 4 * i)
+                    if 0x10000 < w < 0x7fffffff:
+                        try:
+                            s4 = as_string(u32(w + 4))
+                            if s4 and 1 < len(s4) <= 4 and '/' not in s4: found['+%#x' % (4 * i)] = s4
+                        except Exception: pass
+                print('ACTOR %s at %#x: room-like pointees %s' % (name, a, found), flush=True)
+                emit({'tick': state['tick'], 'ev': 'actor', 'name': name, 'rooms': found})
         except Exception: pass
         return False
 class Hook(gdb.Breakpoint):

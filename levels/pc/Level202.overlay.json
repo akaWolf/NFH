@@ -41,9 +41,9 @@
     "PCClipSeconds": {
      "WaitSea": 6.17,
      "EnterSea": 3.17,
-     "SeeSub": 8.08,
+     "SeeSub": 8.25,
      "SeeShark": 9.92,
-     "LeaveSea": 1.75
+     "LeaveSea": 1.67
     },
     "PCCreditInClip": {
      "EnterSea": 3.0
@@ -52,7 +52,7 @@
      "clip": "WaitSea",
      "role": "Olga",
      "item": "Submarine",
-     "then": 0.0
+     "then": 0.25
     },
     "PCScene": [
      0.17,

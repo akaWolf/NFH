@@ -22,6 +22,12 @@ for e in ov['patches']:
         # (the message names the variant the input went to — beachleft/crayfish for the container's
         # item, pond/rake for the rake_ground's: one family)
         families.setdefault(family(ap['Woody']['obj']), e['object'])
+if n < 200:
+    # Season 1: the items' PC objects by name (pcmap_s1.py — no PCApproach in those overlays)
+    sys.path.insert(0, HERE)
+    import pcmap_s1
+    for it, obj in pcmap_s1.PCMap(n).objs.items():
+        items.setdefault(obj, it); families.setdefault(family(obj), it)
 def item_of(obj):
     return items.get(obj) or families.get(family(obj))
 raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))
@@ -43,9 +49,12 @@ def it_of(pc):
     return cands[0] if cands else 'IT2_' + pc.capitalize()
 import scene
 lv = scene.Level(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n))
-rooms = {z.pc_room['room']: z for z in lv.zones if getattr(z, 'pc_room', None)}
+def _room_of(z):
+    # Season 2's PCRoom, Season 1's PCWalkRoom: both {room, x1, x2, floor}
+    return getattr(z, 'pc_room', None) or getattr(z, 'pc_walk_room', None)
+rooms = {_room_of(z)['room']: z for z in lv.zones if _room_of(z)}
 def world_x(room, x):
-    z = rooms[room]; pr = z.pc_room
+    z = rooms[room]; pr = _room_of(z)
     return z.left + (x - pr['x1']) * (z.right - z.left) / float(pr['x2'] - pr['x1']), z.name
 s = open(logp, 'rb').read().decode('utf-16')
 t = None; t0 = None; out = []

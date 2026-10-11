@@ -4594,7 +4594,13 @@ dispatch at every station exit (tools/pcoracle/exit_ticks.py: the mat 4
 ticks, the rail 2, the sea 1, Olga's 3, the level start 4): PCDepartTicks
 and PCStart `depart` (tools/pcoracle/pc_depart_ticks.py) stand them out,
 and 202's legs then pair within a tick but the sea's (-0.7 s a lap: the
-action-to-animation and bar-end ticks, the wait on Olga's dive).
+action-to-animation and bar-end ticks, the wait on Olga's dive). The sea's
+clips re-measured on the trace (tools/pcoracle/pc_clips_from_trace.py:
+a clip from its animation's first tick to the next clip's): SeeSub 8.25
+(the bar's 97 ticks and the leave step's one), LeaveSea 1.67 (the exit's
+tick in PCDepartTicks), the wait's tail 0.25 (the neighbour enters three
+ticks after Olga's put ends: the poll, the GoTo, the enter) — the sea leg
+-0.35 a lap now, the whole lap -0.2 s.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
