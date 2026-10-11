@@ -89,7 +89,8 @@
     "PCReactTail": 1,
     "PCPoseAfter": {
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCNearDx": 25
    }
   },
   {

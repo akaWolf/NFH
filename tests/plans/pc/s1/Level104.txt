@@ -38,6 +38,12 @@
 # walk-in and passes the toilet after: against E04's thermometer the cream
 # +0.07 s (+2.81 before), the soap -0.20, the toilet +0.45, the rest
 # +0.46-0.56.
+# v10 (2026-10-11): the floor tricks' trigger is the PC's (the laid object's
+# `neighbor` hotspot against his PC x, World._pc_floor_point): the soap lies
+# at PC 515, 36 px into the bathroom from the door's 551 — his third move
+# after the door, as E04's frames have him slip — where x=-4.2 put it past
+# the door: against E04's thermometer the cream +0.07, the soap -0.11, the
+# rest -0.02 to -0.13.
 take FirstAid IT_Shavingfoam      # Zone04: Shavingfoam + Hairrestorer, while he is in the kitchen
 take ToiletPaper IT_Wcpaper
 take SoapDish IT_Soap             # the one soap
@@ -51,7 +57,7 @@ whenzone Zone03                   # his second kitchen stay: the bathroom four
 usewith! Deodrant IT_Hairrestorer # on the shelf (Primed); pays at SinkDeodrant, score 15
 usewith! AfterShave IT_Superglue  # on the shelf (Primed); pays at SinkAftershave, score 20
 usewith! Toilet IT_Wcpaper        # Neutral: raw-Tricked walk-by (0.1), score 8
-usewith! Ground@Zone04 IT_Soap x=-4.2   # by the bathroom door (the door at -4.07), as E04 lays it: his slip on the walk-in, 8
+usewith! Ground@Zone04 IT_Soap x=-4.78  # 36 px into toi from the door's 551, as E04 lays it: his slip on the walk-in, 8
 hide! Wardrobe                    # before he leaves the kitchen
 whenzone Zone04                   # his second bathroom stay: the oven and the picture
 usewith! Microwave IT_Egg         # the dirty oven: fires on his next oven visit, 8

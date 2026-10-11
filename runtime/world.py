@@ -7754,11 +7754,16 @@ class Routine:
         hotspot x| < 15 px in its room (fcn.00471bc0; PCFixPoint), his x the
         mover's on the leg he walks (Pawn.pc1_point_now) — the mobile item's
         place mapped into the PC room is 6-61 px off the PC object's (103's
-        toilet 38, 113's trap 61); he stands on that point as the handler
-        takes over (its GoToObjX walks from there)"""
+        toilet 38, 113's trap 61) — and a floor trick's where Woody laid it
+        (_pc_floor_point; since 2026-10-11, the mobile sprite's x against
+        the click's before, where the mobile walk's place — a door's, the
+        zone's — is up to 20 px off the PC mover's); he stands on that point
+        as the handler takes over (its GoToObjX walks from there)"""
         p = self.pawn
-        fp = getattr(it, 'pc_fix_point', None)
-        if self._pc_nearobj(it) and not p.nfh2 and not it.is_floor and fp:
+        fp = None
+        if self._pc_nearobj(it) and not p.nfh2:
+            fp = self._pc_floor_point(it) if it.is_floor else getattr(it, 'pc_fix_point', None)
+        if fp:
             here, room = p.pc1_point_now()
             if here is not None and (len(fp) < 3 or fp[2] == room):
                 if abs(here[0] - fp[0]) < pcprofile.S1_NEAROBJ_PX:
@@ -7766,6 +7771,20 @@ class Routine:
                     return True
                 return False
         return abs(p.sprite.x - it.target_x) < self._notice_distance(it)
+
+    def _pc_floor_point(self, it):
+        """a Season 1 floor trick's nearobj point [x, y, room]: game.exe
+        creates the object where Woody lays it, its `woody` hotspot on his
+        place — the click's, mapped into the zone's room (Pawn._pc1_map, as
+        his walk to it is) — and the trigger tests its `neighbor` hotspot
+        (PCNearDx: the marbles' 25 px on; the soap's, the banana's and the
+        skate's 0); None where the zone has no PC room"""
+        z = self.level.zone_by_pid(it.zone) if self.level is not None else None
+        r = getattr(z, 'pc_walk_room', None) if z is not None else None
+        if r is None:
+            return None
+        at = self.pawn._pc1_map(z, it.target_x, self.pawn.floor_y(z))
+        return [at[0] + it.pc_near_dx, at[1], r['room']]
 
     def _notice_distance(self, it):
         """the walk-by notice's reach: the pawn's NoticeWhenNearTrickedDistance

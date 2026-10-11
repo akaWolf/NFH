@@ -22,8 +22,8 @@ usewith FishTank IT_Steroids          # Z08, 8 at his [1]
 usewith YogaBook IT_Knotbook          # Z08: pays as the YogaBook at his Yoga [2]
 usewith Trampoline IT_Spring          # Z06, 8 at his [4]
 usewith Bicycle IT_Tongs              # Z02, 8 at his [5]
-usewith GroundSkates IT_Skate         # Z03 x=4.12, on his Z02 -> Mixer walk (14 at the Shout)
-usewith GroundMarbles@Zone01 IT_Marbles   # x=3.30, on his Z03 -> Z09 walk, 7: the hot slip sends him for the fixing tool, and the profile brings him back to the expander (the PC neighbour's way)
+usewith GroundSkates IT_Skate x=3.87  # Z03, PC 423 (E12's frames: he stops at ~420, the slide 15 ticks): on his Z02 -> Mixer walk
+usewith GroundMarbles@Zone01 IT_Marbles x=2.92   # PC 606, its trigger 25 px on: on his Z03 -> Z09 walk, 7: the hot slip sends him for the fixing tool, and the profile brings him back to the expander (the PC neighbour's way)
 usewith ChestExpander IT_Rubberrope   # Z09, 8 at his [8], once he has left the basement
 usewith ElectricTrap IT_Cable         # Z09 x=2.06, crossed on the [8] -> [9] walk, 7 — likewise back to the weights after the shock
 usewith Weights IT_Metalsaw           # Z09, 8 at his [9]

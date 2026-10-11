@@ -110,6 +110,10 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   use ends it — 102/105/106's rushes, 106's towel, 112's skate, 114's hat)
   and FIXRUN 113's valve stations after the flood and the hot heater (the
   switch alone); 111's machines leave their give to the prime leg.
+  PCNearDx (2026-10-11): a floor trick's nearobj point off where Woody laid
+  it — the PC object's `neighbor` hotspot x less its `woody` one (the
+  marbles' 25; the soap, the banana and the skate 0, no key), written for
+  the four marbles levels alone (`near_dx`).
   `compound` (2026-10-11): the mobile's compound trick as the case's other
   tricked arm with its own fire site (114's shotgun with the cork:
   bas/gun_loaded_plugged — PCUseSecondsCompound, PCFireAtCompound; written

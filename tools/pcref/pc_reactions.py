@@ -325,7 +325,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
-        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound')
+        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -365,6 +365,19 @@ def slip_cleans(n, item, floor, lv):
         if v is not None and zone not in [z for z, _, _ in out]:
             out.append((zone, v, '%s/%s' % (room, floor)))
     return out
+
+
+def near_dx(L, name):
+    """a floor trick's nearobj point off where Woody laid it: game.exe
+    creates the object at his place, its `woody` hotspot on him, and the
+    neighbour's trigger tests its `neighbor` hotspot (fcn.00471bc0) — the
+    x between the two (the marbles' 25/20 against 0/20; the soap's, the
+    banana's and the skate's 0/6 against 0/0), the same in every room"""
+    vals = {o['hot']['neighbor'][0] - o['hot']['woody'][0] for nm, o in L.objects.items()
+            if nm.split('/')[-1] == name and 'neighbor' in o.get('hot', {}) and 'woody' in o.get('hot', {})}
+    if len(vals) > 1:
+        raise ValueError('%s: the rooms differ %s' % (name, sorted(vals)))
+    return vals.pop() if vals else 0
 
 
 def fix_point(n, obj):
@@ -496,6 +509,10 @@ def specs(n):
             keys = {'PCShoutIndex': 1, 'PCFixSeconds': 0.0, 'PCFireBefore': True,
                     'PCSlipSeconds': round((lv.action('neighbor', 'slip1') or SLIP) + FIRE_LEAD, 3), 'PCFireLead': True,
                     'PCReactLead': REACT_LEAD, 'PCReactTail': REACT_TAIL}
+            dx = near_dx(L, 'marbles' if base == 'GroundMarbles'
+                         else ('groundbanana' if n in BANANA_LEVELS else 'groundsoap'))
+            if dx:
+                keys['PCNearDx'] = dx
             floor = SLIP_CLEAN.get(base) or ('groundbanana' if n in BANANA_LEVELS else None)
             if floor:
                 # the clean of the floor object in each of the item's rooms:

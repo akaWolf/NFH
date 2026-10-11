@@ -49,7 +49,7 @@ usewith! Pipe IT_Gunpowder            # Zone02: the tin, at his second pipe visi
 usewith! Gramaphone IT_Nail           # Zone02: the record player, at his play — 10
 hide! Wardrobe                        # Zone01 before he comes back down
 whenzone Zone09                       # his lap-2 basement: the trap and the shotgun keep him ~40 s
-usewith! GroundMarbles@Zone01 IT_Marbles   # Zone01, 7: he crosses the hall on his way up
+usewith! GroundMarbles@Zone01 IT_Marbles x=-0.92   # Zone01 (PC 232, its trigger 25 px on), 7: he crosses the hall on his way up
 usewith! Hat IT_Superglue             # Zone06, 8
 usewith! MedalBox IT_Rat              # Zone06, 8
 usewith! Horn IT_Balloon              # Zone07, 8

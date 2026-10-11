@@ -2661,13 +2661,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   read at 10 fps lags the fire by up to ~0.3 s: E04's toilet shout at
   ~145.0 s by the frames, its jump at 144.6) where a plan pays the run's
   chain in its order: 104 within 0.6 s after the cream's stand and the
-  soap's place (above, "The playing trick"); 103's spans within 0.15 s
-  but the soap to the toilet, 11.1 s against 12.5 (the soap's place,
-  the plan's); 112 +0.2 s to the bicycle, +0.9 from the skates on — the
-  bicycle-to-skates span 0.7 s long, the kitchen door to the skates and
-  the slide read off E12's frames 0.4 and 0.5 s quicker than the port's,
-  unexplained by the code (the trigger's place moved toward the window
-  only lengthens it); 114 +0.2 s at the polish, +0.6 from the gramophone
+  soap's place (above, "The playing trick"; since 2026-10-11, the floor
+  tricks' trigger the PC's and the soap 36 px into the bathroom as E04's
+  frames have it, the cream +0.07 and the six others -0.02 to -0.13);
+  103's spans within 0.15 s but the soap to the toilet, 11.1 s against
+  12.5 (the soap's place, the plan's); 112 +0.2 s to the bicycle, +0.4
+  from the skates on since 2026-10-11 (+0.9 before: the PC trigger and
+  the skate where E12's frames have him stop, 423 — the kitchen door to
+  the skates and the slide had read 0.4 and 0.5 s quicker on the frames
+  than the port's, the mobile test's place 18 px short of the PC door's);
+  114 +0.2 s at the polish, +0.6 from the gramophone
   on (the trap to the shotgun +0.05) since 2026-10-11 — the whistle Woody's
   22-tick action, its noise waking the dog and its behaviour making it
   bark as it ends (E14's `?!` 1.84 s after the whistle's start, the

@@ -1040,9 +1040,26 @@ predicate, then the all-tricks win.
   in the leg's opening tick (an `after` leg's in the pass's tick before)
   — and he stands on that point as the handler takes over: 104's picture
   noticed at x 424 (the hall walk's 41st move from the bathroom's door),
-  not 443, its GoToObjX one move; the
-  floor tricks keep the mobile test (the trick lies where the click put
-  it, in the zone's mapping both ways).
+  not 443, its GoToObjX one move. The floor tricks the same since
+  2026-10-11 (`Routine._pc_floor_point`): game.exe creates the object
+  where Woody lays it, its `woody` hotspot on his place — the click's,
+  mapped into the room as his walk to it is — and tests its `neighbor`
+  hotspot, the marbles' 25 px to the right of the woody one, the soap's,
+  the banana's and the skate's on it (PCNearDx, tools/pcref/pc_reactions.py);
+  the mobile sprite's x against the click's had put the trigger up to 20
+  px off the PC mover's (the mobile walk leaves a door at its own place —
+  112's kitchen door 18 px short of the PC's 279) and the marbles 25 px
+  early or late. The Badinfos plans lay them where his frames have him
+  slip: 104's and 106's soap 36 px into the bathroom (his third move from
+  the door, where x=-4.2 had put it past the door's 551, noticed only by
+  the mobile test), 112's skate at 423 and marbles at 606, 114's marbles
+  at 232. Not carried: game.exe tests the trigger during a door's pass too
+  (the door step places the actor at the far door's hotspot with the
+  room's pointer as the pass starts, fcn.004741e0, his flag 0x20 kept —
+  the reaction's list then goes on top of the pass's ACTION), where the
+  port tests a walk and a stand only; the plans lay no floor trick within
+  15 px of a door's point (103's soap at 534 by the door's 551, 113's
+  marbles' trigger at 838 by the balcony door's 856, moved there for it).
 - **The PC profile's Season 1 walk-bys**: a mobile NoticeWhenWalkNearby item
   whose PC object carries no `nearobj` trigger (the level's trigger.xml)
   fires in its level class's case instead, the overlay clearing the flag:

@@ -14,7 +14,7 @@ take Drawer IT_Boom               # Zone01 (3-8): Boom + Marker + Mousetrap, he 
 take ToiletPaper IT_Wcpaper       # Zone04
 usewith Toilet IT_Wcpaper         # Neutral: raw-Tricked walk-by (0.1), 10, on the rush
 take SoapDish IT_Soap             # Zone04: the one soap
-usewith Ground@Zone04 IT_Soap     # Zone04 x -4.45: the bathroom floor, on his rush to the first-aid kit
+usewith Ground@Zone04 IT_Soap x=-4.6   # Zone04, PC 534 (17 px in from the door's 551, outside its nearobj reach — the port tests no door pass): on his rush to the first-aid kit
 park Zone02                       # the living room, never his: through the hall once he is back in the kitchen
 walk 0.4 1.26                     # at the kitchen door (Zone02's DoorRight01 x 0.69)
 whenzone Zone01                   # his mail: the kitchen is empty ~10.9 s
