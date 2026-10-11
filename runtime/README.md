@@ -1002,9 +1002,10 @@ predicate, then the all-tricks win.
   after the statue's GOTO and its painting after the balcony's GoTo,
   109's sleep after the bed's GOTO — E07's statue and painting spans
   +0.8 and +0.6/-0.4 ticks from the video's, +1.9 and +1.7/+0.6 before).
-  Open: 109's bubble shows the sleep's icon from the walk to the bed,
-  where the PC's bed case shows `bed` and its sleep case `sleep` (its
-  span 5-6 ticks long against E09's).
+  109's bubble shows `bed` over the walk to the bed and `sleep` from the
+  stay (PCIcon bubble_bed, PCIconClips; the mobile's HUD shows the Bed's
+  active icon over both), its span to the alarm clock 328.2 ticks against
+  E09's 327.7 since 2026-10-11.
 - **The PC profile's Season 1 nearobj triggers on the PC's geometry**
   (`Routine._near_hit`, `Pawn.pc1_point_now`, `pcprofile.s1_leg_point`):
   game.exe tests a station's trigger as |the actor's x - the object's
