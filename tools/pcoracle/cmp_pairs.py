@@ -271,6 +271,14 @@ def show_segments(pc, port):
         else:
             print('  %7.2f port %-18s %5s,%-4s' % (b[0], b[1], b[2], b[3])); j += 1
 
+BUBBLE_ALIASES = {'milkbottle': 'babybottle', 'cookies': 'cookiebox', 'parrot': 'chili', 'mail': 'mailbox',
+                  'klavier': 'piano', 'blume': 'flower', 'fussball': 'football'}
+def bubble_key(v):
+    """the PC's icon name and the port's think name (bubble_<mobile name>) on one key: the prefix and the
+    underscores dropped (alarm_clock / alarmclock), the few the mobile names otherwise aliased"""
+    k = (v or '').replace('bubble_', '').replace('_', '').lower()
+    return BUBBLE_ALIASES.get(k, k)
+
 def pair_by_value(pc, port, key=lambda v: v):
     """both sides in order; a value missing on one side is skipped (listed as a slip)"""
     out = []; j = 0
@@ -302,7 +310,7 @@ def main(argv):
     pc_in, pc_ic, pc_st, pc_cr, pc_ca = load_pc(argv[1])
     po_in, po_th, po_cl, po_tr, po_ca = load_port(argv[2])
     show('inputs', [((a[0], a[1]), (b[0], b[1])) for a, b in zip(pc_in, po_in)] + [((a[0], a[1]), None) for a in pc_in[len(po_in):]] + [(None, (b[0], b[1])) for b in po_in[len(pc_in):]])
-    show('bubble (PC icon / port think)', pair_by_value(pc_ic, po_th, key=lambda v: (v or '').replace('bubble_', '').lower()))
+    show('bubble (PC icon / port think)', pair_by_value(pc_ic, po_th, key=bubble_key))
     mapped = [(t, STATION_CLIPS[(f, a)]) for t, f, a in pc_st if (f, a) in STATION_CLIPS]
     show('stations (PC action / port clip)', pair_by_value(mapped, [(t, c) for t, c in po_cl if c in STATION_CLIPS.values()]))
     rest = sorted(set((f, a) for t, f, a in pc_st if (f, a) not in STATION_CLIPS))

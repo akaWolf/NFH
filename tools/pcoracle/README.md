@@ -127,7 +127,13 @@ real thing without reading videos.
   (~/nfh-bench/plans/park/LevelN.txt: the port's auto park zone, then a
   wait) as plan runs, each replayed by the port to the clock (UNTIL) and
   paired (runs/replayN_park/pairs.txt); `s1parkbatch.sh` the same on NFH1
-  through `s1planrun.sh` (the menu walk, the NFH1 log). The port's
+  through `s1planrun.sh` (the menu walk, the NFH1 log). The port's safe
+  zone is not the PC's on 204, 207-209 (the PC lap or the respawn puts him
+  in the neighbour's room): WDBG_NOCATCH=1 stubs the mode-1 trigger
+  predicate fcn.1003f573 (`xor eax, eax; ret 0x10` at the first tick —
+  tools/pcref/pc_catch_s2.py) for an idle lap with Woody uncatchable. When
+  the ticks stall six seconds the watchdog takes a screenshot
+  (stall_<level>.xwd: a dialog after a Season 1 catch?). The port's
   state.jsonl cadence is NFH_STATE_EVERY (10 = 6 Hz; the replays 5 = 12 Hz).
 - `cmp_idle.py` — the same for an idle lap (`runtime/record.py`,
   NFH_PROFILE=pc).
@@ -182,7 +188,10 @@ wineserver is gone `wineserver -k9` reaches none of them: wdbg.py's cleanup
 kills every process whose environment names the prefix (475 of them had
 piled up from the earlier runs, one game.exe spinning for three hours).
 Woody is in the trace's `actors` from his first walk on (the path finder
-hook): before it the plan runner takes him as standing. The cleanup's
+hook): before it the plan runner takes him as standing. 201 (the
+tutorial) runs fcn.10044234 once and then waits for the tutorial's own
+inputs (the level clock runs, the actors stand): the idle and parked
+batches skip it — its plan's `tutorial` legs are the port's scripted ones. The cleanup's
 prefix match is the whole NUL-terminated variable: ~/nfh-bench/wine/nfh is
 a prefix of the second instance's ~/nfh-bench/wine/nfh1pfx, and the first
 instance's cleanup killed the second's run once. A dummy click that hits

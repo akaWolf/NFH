@@ -8,7 +8,27 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.pat
 sys.path.insert(0, os.path.join(ROOT, 'tools', 'pcref'))
 import canon
 
-ALIASES = {'Television': 'tv', 'Drawer': 'ark', 'FirstAid': 'firstaid', 'TV': 'tv'}
+# the mobile item -> the PC object's base name where the names differ (the objects.xml of each level)
+ALIASES = {'Television': 'tv', 'Drawer': 'ark', 'FirstAid': 'firstaid', 'TV': 'tv', 'ToiletPaper': 'paperbracket',
+           'SoapDish': 'soapbracket', 'MumPicture': 'mum', 'PinsBoard': 'pinboard', 'RubbishBinBanana': 'trashcan',
+           'RubbishBinBanana2': 'trashcan', 'RubbishBinBottle': 'trashcan', 'RubbishBinCable': 'trashcan',
+           'BedDrawer': 'bedbox', 'DeskDrawer': 'ark', 'ElectricTrap': 'electrotrap', 'FishTank': 'aquarium',
+           'LetterBox': 'mailbox', 'BirthdayCake': 'cake', 'Candle': 'candlebox', 'Piano': 'score', 'Mobile': 'handyholder',
+           'PlantStink': 'flower', 'Pudding': 'foampudding', 'BathTub': 'tub', 'PhotoAlbum': 'book', 'DieselChair': 'stool',
+           'MumStatueFootStool': 'footstool', 'Drawing': 'picture', 'DieselGenerator': 'potterswheel',
+           'MumStatueDummy': 'statue', 'Dove': 'dove_free', 'Shezlong': 'foldingchair', 'Plant': 'flower',
+           'SunLotion': 'suncream', 'WateringCan': 'ewer', 'SoilBag': 'soil', 'BeeHive': 'bees', 'CoffeeMaker': 'coffeebox',
+           'ToothBrush': 'toothbrushset', 'PigMilk': 'babybottle', 'CornChips': 'cookiebox', 'SpicyChips': 'chips',
+           'ChemicalSet': 'chemicalkit', 'PigKeys': 'keyboard', 'BBQ': 'barbecue', 'CarnivorPlantSpray': 'spray',
+           'CarnivorPlant': 'plant', 'FireExtinguisher': 'extinguisher', 'PigPen': 'pigcage', 'SteakMeat': 'meatbowl',
+           'SteakChair': 'chair', 'SteakWineGlass': 'glass', 'SteakTable': 'table', 'SteakWine': 'wine', 'Airer': 'clothes',
+           'TableShovel': 'shovel', 'Iron': 'ironingboard', 'Drier': 'tumbledrier', 'WineCellar': 'wine', 'Perch': 'birdpole',
+           'PlantSoil': 'flower', 'Rope': 'skippingrope', 'SportsBag': 'bag', 'TableSaw': 'saw', 'Bicycle': 'hometrainer',
+           'YogaExercise': 'mat', 'Yoga': 'mat', 'YogaBook': 'book', 'ChestExpander': 'expander', 'Weights': 'barbell',
+           'FuseBox': 'fuse', 'ChairAssembly': 'stoolkit', 'ChairAssemblyBook': 'pieces', 'LadderDrill': 'ladder',
+           'Sink': 'basin', 'Radiator': 'heater', 'ValveHot': 'heatvalve_off', 'ValveMain': 'valve_off',
+           'ElectricTrapTatter': 'tatter', 'Horn': 'woodhorn', 'CDs': 'records', 'Gramaphone': 'lockedphono',
+           'ShotgunShells': 'munition', 'Shotgun': 'gun', 'GoldCup': 'cups', 'Pipe': 'tabacbox', 'Aquarium': 'aquarium'}
 
 
 class PCMap:
@@ -62,8 +82,10 @@ class PCMap:
                 # a walk point: [x, y, room], or one per visit [[x, y, room], ...]
                 if isinstance(v, list) and v and isinstance(v[0], list): v = v[0]
                 return v[2] if isinstance(v, list) and len(v) >= 3 else None
-            room = room_of(wp.get('Woody'))
+            room = room_of(wp.get('Woody')) or room_of(wp.get('Rottweiler'))
             pick = next((c for c in cands if room is None or c.split('/')[0] == room), cands[0] if cands else None)
+            if pick is None and room:
+                pick = '%s/%s' % (room, base)         # a hotspot-only object (105's kit/football is no objects.xml entry)
             if pick: self.objs[it] = pick
             if pick and room_of(wp.get('Rottweiler')): self.stations[it] = pick
         self.unmapped = [it for it in items if it not in self.objs]

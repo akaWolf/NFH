@@ -32,9 +32,22 @@ def main(argv):
                 if l.startswith('=='): break
                 m = re.match(r'\s+([\d.]+) stay\s+([\d.]+) (.*?)\s*\|\s+([\d.]+)\s+([\d.]+) (.*?)\s*\|', l)
                 if m: stays.append((float(m.group(1)), m.group(3).strip(), m.group(6).strip()))
-        if not rows: continue
+        # the bubble pairs: the drift of the port against the PC per 100 s (the robust measure where the
+        # action starts do not pair one to one)
+        b = next((k for k, l in enumerate(lines) if l.startswith('== bubble')), None)
+        bub = []
+        if b is not None:
+            for l in lines[b + 1:]:
+                if l.startswith('=='): break
+                m = re.match(r'\s+([\d.]+) PC (\S*)\s+([\d.]+) port (\S*)\s+([+-][\d.]+)', l)
+                if m: bub.append((float(m.group(1)), float(m.group(5))))
+        drift = ''
+        if len(bub) >= 2 and bub[-1][0] > bub[0][0]:
+            drift = ', the bubble %+.2f s over %.0f s (%+.2f s per 100 s, %d pairs)' % (bub[-1][1] - bub[0][1], bub[-1][0] - bub[0][0], (bub[-1][1] - bub[0][1]) * 100.0 / (bub[-1][0] - bub[0][0]), len(bub))
+        if not rows:
+            print('== %s: no station legs%s' % (level, drift)); continue
         bad = [r for r in rows if abs(r[4]) * 12 >= thr - 0.5]
-        print('== %s: %d legs, %d off by %d+ ticks, the sum %+.2f s over %.0f s' % (level, len(rows), len(bad), thr, rows[-1][5], rows[-1][0]))
+        print('== %s: %d legs, %d off by %d+ ticks, the sum %+.2f s over %.0f s%s' % (level, len(rows), len(bad), thr, rows[-1][5], rows[-1][0], drift))
         for t, la, tb, lb, d, acc in bad:
             st = next((s for s in stays if abs(s[0] - t) < 0.6), None)
             clips = ('%s / %s' % (st[1][:22], st[2][:30])) if st else ''

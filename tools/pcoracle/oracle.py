@@ -229,8 +229,17 @@ def _click_dummy_old():
                       'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
                      env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
 def watchdog():
+    shot = False
     while True:
         time.sleep(1)
+        if state['t0'] is not None and time.time() - state['last'] > 6 and not shot:
+            # the ticks stalled: a screenshot of what the game shows (a dialog after a catch?)
+            shot = True
+            try:
+                subprocess.Popen([T + '/xwd-result/bin/xwd', '-root', '-silent', '-display', os.environ.get('WDBG_DISPLAY', ':97'),
+                                  '-out', LOGS + '/stall_%s.xwd' % (want or 'cur')])
+            except Exception as e:
+                print('stall shot err', repr(e), flush=True)
         if state['t0'] is not None and time.time() - state['last'] > 8:
             print('WATCHDOG: no tick for 8 s (last tick %d)' % state['tick'], flush=True)
             os.kill(os.getpid(), signal.SIGINT); return
@@ -245,6 +254,11 @@ class Tick(gdb.Breakpoint):
         if state['tick'] == 1:
             # (the level's setup flood is before the first tick; the loop hook is cheap from here)
             alloc_scratch(); state['loop'].enabled = True
+            if os.environ.get('WDBG_NOCATCH'):
+                # an idle lap with Woody uncatchable: the trigger predicate of mode 1 (fcn.1003f573 — both
+                # objects in one room, the target placed, neither carrying flag 4: tools/pcref/pc_catch_s2.py)
+                # returns false — `xor eax, eax; ret 0x10` over its first bytes
+                wr(gl(0x1003f573), b'\x31\xc0\xc2\x10\x00'); print('NOCATCH: the catch predicate stubbed', flush=True)
         # a dummy click LEAD ticks ahead of each scripted message; the plan's legs as they come due
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()

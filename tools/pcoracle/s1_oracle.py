@@ -221,8 +221,17 @@ def _click_dummy_old():
                       'mousedown', '1', 'sleep', '0.2', 'mouseup', '1'],
                      env=dict(os.environ, DISPLAY=os.environ.get('WDBG_DISPLAY', ':97')))
 def watchdog():
+    shot = False
     while True:
         time.sleep(1)
+        if state['t0'] is not None and time.time() - state['last'] > 6 and not shot:
+            # the ticks stalled: a screenshot of what the game shows (a dialog after a catch?)
+            shot = True
+            try:
+                subprocess.Popen([T + '/xwd-result/bin/xwd', '-root', '-silent', '-display', os.environ.get('WDBG_DISPLAY', ':97'),
+                                  '-out', LOGS + '/stall_%s.xwd' % (want or 'cur')])
+            except Exception as e:
+                print('stall shot err', repr(e), flush=True)
         if state['t0'] is not None and time.time() - state['last'] > float(os.environ.get('WDBG_WATCHDOG', '20')):
             print('WATCHDOG: no tick for %s s (last tick %d)' % (os.environ.get('WDBG_WATCHDOG', '20'), state['tick']), flush=True)
             os.kill(os.getpid(), signal.SIGINT); return
