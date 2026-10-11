@@ -2698,7 +2698,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   plays (paint_nonsense, `world.pc_branch` by name; 18.58 before), then
   18.58, 19.40, 15.49 and 21.34 against 18.08, 19.85, 15.62 and 21.22
   (the banana's slip half a second later along his walk, the plan's lay).
-  The other plans pay their own orders. Since 2026-10-11 too 106's
+  105 pays E05's order since 2026-10-11 — the piano, the microwave, the
+  bowling ball, the picture, the phone, the plant, the soap, the loo at
+  -0.21, -0.52, -0.55, -0.52, -0.63, (-0.49 by the bubble), (-0.37 by the
+  slip's shout icon), -0.81 s: the bowling ball's cases 10 and 11 before
+  the window's shout (the window 3.2 s short before), the phone answered
+  on the way to the plant (its behaviour pending through the picture's
+  reaction; the port's had come after the loo, 63 s later) and walked to on
+  the PC's path, the soap by the stuffed toilet slipping him into the
+  bowl's look (fcn.0047e000; 104's toilet so too, 0.1 s sooner: -0.23
+  against E04). The other plans pay their own orders. Since 2026-10-11 too 106's
   toilet pays 8.6 s after the candy as in E06 (the rush walks to the
   toilet's hotspot, 12.6 s before) and the album within 0.1 s of the
   towel's offset (the tub's leave after the tricked towel); 109's nitro

@@ -148,17 +148,28 @@ def pc_ap_tricked(ap, it):
     return 'xt' in ap and it is not None and it.tricked and not it.pc_masked
 
 
-def pc_branch(items, it):
-    """the overlay keys of the item's PC case arm while another item has been
-    tricked (Item.pc_when_tricked: 107's painting with the dove cut loose),
-    None where no such item has"""
+def pc_branch_of(items, it):
+    """(the other item's name, the overlay keys) of the item's PC case arm
+    while that item has been tricked (Item.pc_when_tricked: 107's painting
+    with the dove cut loose), (None, None) where no such item has; an arm
+    the class plays once after the other's trick (PCOnce: 105's window
+    after the bowling ball's kick, the cases 10 and 11) is spent by the
+    visit that played it (Item.pc_branch_done)"""
     for name, keys in (getattr(it, 'pc_when_tricked', None) or {}).items():
+        if keys.get('PCOnce') and name in it.pc_branch_done:
+            continue
         # (the overlay names the item; the level keys them by pid)
         o = next((x for x in items.values() if x.name == name), None) \
             if items is not None else None
         if o is not None and (o.tricked or o.got_tricked or o.already_tricked):
-            return keys
-    return None
+            return name, keys
+    return None, None
+
+
+def pc_branch(items, it):
+    """the overlay keys of the item's PC case arm (pc_branch_of), None
+    where none plays"""
+    return pc_branch_of(items, it)[1]
 
 
 def pc_visit_ix(it, n, visit=None):
@@ -6345,6 +6356,10 @@ class Routine:
             it.pc_masked = False           # the untricked visit is over
         if it is not None and self.role == 'Rottweiler':
             self._pc1_stay_pose(it)
+            if pcprofile.is_pc():
+                name, br = pc_branch_of(self.level.items, it)
+                if br is not None and br.get('PCOnce'):
+                    it.pc_branch_done.add(name)     # (its arm played)
         self._action_stopped()
         self._pending = 'advance'
         self._check_parked_runs()
@@ -6442,24 +6457,34 @@ class Routine:
                     and target.pc_station_ends_on_trick:
                 self._end_pc_station(target)
         self._check_parked_runs()
-        lead = target.pc_leave_tricked if (pcprofile.is_pc() and not pcprofile.SEASON2
-                                           and self.role == 'Rottweiler' and target is not None
-                                           and target is it) else 0.0
-        if lead > 0.0 and self._pending == 'advance' and self._urgent_action is None:
+        s1 = pcprofile.is_pc() and not pcprofile.SEASON2 and self.role == 'Rottweiler' \
+            and target is not None and target is it
+        lead = target.pc_leave_tricked if s1 else 0.0
+        nxt = (target.pc_next_case_secs or 0.0) if s1 else 0.0
+        if lead + nxt > 0.0 and self._pending == 'advance' and self._urgent_action is None:
             # the tricked case ends inside the object it entered: the next
             # case's walk job plays the LEAVE first, after the case's ICON
             # (game.exe 0x475ce6; PCLeaveTricked — the untricked visit's
             # stay carries it as PCIconLead): the next station's icon up, he
-            # stands the leave, then walks (E06: the towel's tub, 0.58 s)
+            # stands the leave, then walks (E06: the towel's tub, 0.58 s).
+            # Or the class runs further cases where he stands before the
+            # next station's walk, the first with its ICON (PCNextCaseSeconds:
+            # 105's bowling ball — case 10's football icon and GoTo to the
+            # ball in place, case 11's take_low and its messages before the
+            # GoTo to the window, 0x46e355-0x46e528; E05's football icon
+            # 0.25 s after the kick's shout, the take before the walk)
             self._pending = None
             self.state = self.USING
             self.timer = 0.0
             self.pawn._stand()
+            if nxt:
+                self.pawn.pc1_pose((target.pc_pose_after or {}).get('PCNextCaseSeconds'))
+            self.pc_shout_icon = None      # the next case's ICON replaces the shout's
             self.pc_bubble_next = self._pc_next_icon()
 
             def go():
                 self._pending = 'advance'
-            self.pc_hold = lead
+            self.pc_hold = lead + nxt
             self.pc_hold_cb = go
 
     def _end_pc_station(self, it):
@@ -7480,6 +7505,20 @@ class Routine:
         if self.role != 'Rottweiler' or ua is None:
             return
         kind = ua.get('kind')
+        w = self.pawn.world
+        if kind == 'surprise_near' and pcprofile.is_pc() and w is not None \
+                and w.woody is not None and not w.woody.nfh2:
+            # the PC's walk-by is a trigger's handler list on top of the level
+            # class; a behaviour posted meanwhile (the ringing phone's) stays
+            # pending until every job above the class is abortable and is
+            # then taken (fcn.00448180 -> fcn.00447d90): the class's next
+            # GOTO after the list carries the flag (the cases' GoTos pass 1)
+            # — 105's phone rung during the picture's reaction is answered
+            # on the way to the plant (E05: rung 125.8, paid 139.4), where
+            # the mobile's walk-by end checks nothing and the tricked plant
+            # postponed it past the loo
+            self._check_pending_alarm(False)
+            return
         if kind == 'surprise_far':
             self._check_pending_alarm(self._template_postponed(ua, finished))
         elif kind in ('use', 'return'):
@@ -8035,7 +8074,24 @@ class Routine:
             return
         if it is not None and it.tricked and self.pawn.world is not None:
             self.pawn.world.play_angry(self.pawn, it,
-                                       on_done=self._surprise_near_stopped)
+                                       on_done=lambda i=it: self._pc_then_look(i))
+        else:
+            self._surprise_near_stopped()
+
+    def _pc_then_look(self, it):
+        """the trigger's list going on after the slip with another object's
+        look (PCThenLook: the soap's trigger with the bowl stuffed runs
+        fcn.0047e000 — the slip's list, then the bowl's look handler
+        fcn.0047d9e0 — 0x47e214-0x47e283; E05: the slip by the stuffed toilet,
+        the doubletake at the bowl and its fire 13.0 s after the slip, no
+        puke between), the walk-by's end after it"""
+        name = getattr(it, 'pc_then_look', None) if pcprofile.is_pc() else None
+        other = next((x for x in self.level.items.values() if x.name == name), None) \
+            if name else None
+        if other is not None and other.tricked and not other.pc_fired:
+            # (the combined list pushes the look's list in the tick the slip's
+            # ends, as a case pushes its own: the same lead)
+            self._pc_case_look(other, self._surprise_near_stopped)
         else:
             self._surprise_near_stopped()
 

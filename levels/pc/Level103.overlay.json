@@ -785,6 +785,14 @@
     }
    },
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py RUSH_TARGETS: the rush case's GOTO to toi/firstaid's `neighbor` hotspot)"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCThenLook": "Toilet"
+   }
   }
  ]
 }

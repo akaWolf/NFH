@@ -37,8 +37,10 @@
     "PCFixSeconds": 0,
     "PCUseSecondsTricked": 3.583,
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms1"
-    }
+     "PCUseSecondsTricked": "ms1",
+     "PCNextCaseSeconds": "ms0"
+    },
+    "PCNextCaseSeconds": 1.25
    }
   },
   {
@@ -81,9 +83,16 @@
    "set": {
     "PCUseSeconds": 3.17,
     "PCCaseGoto": true,
-    "PCNextAnim": "ms2"
+    "PCNextAnim": "ms2",
+    "PCWhenTricked": {
+     "Football": {
+      "PCUseSeconds": 5.33,
+      "PCNextAnim": "ms2",
+      "PCOnce": true
+     }
+    }
    },
-   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.2 s"
+   "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Window <- football#1 3.2 s; with Football tricked the case's other arm: the gait's message back and kit/window's throw_bowling (25 ticks) and kit/window's shout (38 ticks), once (the visit right after its trick)"
   },
   {
    "object": "PlantStink",
@@ -846,6 +855,20 @@
    "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
   },
   {
+   "object": "Phone",
+   "component": "TrickItem",
+   "set": {
+    "PCWalkPoint": {
+     "Rottweiler": [
+      500,
+      380,
+      "anc"
+     ]
+    }
+   },
+   "source": "the Season 1 walk (tools/pcref/pc_walks_s1.py: game.exe's GOTO, walk job and movers; level.xml's rooms and doors, objects.xml's hotspots)"
+  },
+  {
    "object": "Rottweiler",
    "component": "Rottweiler",
    "set": {
@@ -882,6 +905,14 @@
     "PCCaseGoto": true
    },
    "source": "level_piano's toilet case (game.exe 0x46ea7b-0x46ec75): the GoTo to toi/toilet (PCCaseGoto), the list's first update, neighbor.puke (31 frames: auto 30, 32 ticks), the StopMsg — 34 ticks; then IsVariant(toi/toiletstuffed) at 0x46ec14 runs the look handler fcn.0047d9e0 (0x46ec54) — level_piano's trigger.xml has no nearobj trigger on the bowl"
+  },
+  {
+   "object": "Ground",
+   "component": "TrickItem",
+   "zone": "Zone04",
+   "set": {
+    "PCThenLook": "Toilet"
+   }
   }
  ]
 }

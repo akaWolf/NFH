@@ -185,7 +185,12 @@ REACTION_TARGETS = {111: {'Vacuum': 'lir/vacuum', 'DirtyCarpet': 'lir/dirtycarpe
                     # 110's burning barbecue: the fuel beer's case 8 list goes
                     # on after the fire with the GOTO to bed/extinguisher
                     # (0x460083, fcn.0044ac80)
-                    110: {'FireExtinguisher': 'bed/extinguisher'}}
+                    110: {'FireExtinguisher': 'bed/extinguisher'},
+                    # 105's ringing phone: case 17's GOTO to anc/phoneringing
+                    # (0x46ed0b, fcn.00479da0) — down to the floor line,
+                    # along it, up to the hotspot (E05: 33 ticks from the
+                    # picture's 435/390 to 500/380)
+                    105: {'Phone': 'anc/phoneringing'}}
 # the object a fixing tool's case walks it to before its use there (the
 # mobile's RoutineActionUseFixingItem walk): {level: {tool item: PC object}}
 # — 110's extinguisher: case 9's take, then its GOTO to bal/barbecue_burn

@@ -100,8 +100,14 @@ VISIT_FROM = {107: {'Drawing': 1}}
 # `bal/dove_free` removes `aux`): case 18 paints nonsense on the easel's
 # picture (0x458d46-0x458dce), and on the smeared one after its fire with no
 # clean (StopMsg, OBJ2 0x458ac4, paint_nonsense 0x458b22)
-WHEN_TRICKED = {107: {'Drawing': ('Dove', ('bal/picture', 'paint_nonsense'),
-                                  ('bal/picture_smeared', 'paint_nonsense'))}}
+# 105's window after the bowling ball's kick (once: the next laps kick the
+# football again): case 11's list after its GoTo to kit/window — the gait's
+# message back, throw_bowling (0x46e591-0x46e63c) — then case 7's DoAction,
+# the window's shout (0x46e6ef-0x46e730), the normal visit's whole stay
+WHEN_TRICKED = {107: {'Drawing': ('Dove', "the list's first update", [('bal/picture', 'paint_nonsense')],
+                                  ('bal/picture_smeared', 'paint_nonsense'), False)},
+                105: {'Window': ('Football', "the gait's message back",
+                                 [('kit/window', 'throw_bowling'), ('kit/window', 'shout')], None, True)}}
 
 
 # a hideout the neighbour may leave off his lap: the object's `leave` (the
@@ -535,21 +541,33 @@ def main(argv):
                 e['set'].pop('PCVisitFrom', None)
             wt = WHEN_TRICKED.get(n, {}).get(item)
             if wt:
-                other, (uo, ua), (fo, fa) = wt
+                other, instant, uses, fix, once = wt
                 L = lap_model.Level(n)
-                tu, tf = L.job_ticks(uo, ua), L.job_ticks(fo, fa)
-                br = {'PCUseSeconds': round((1 + tu) / lap_model.TICK, 2),
-                      'PCFixSeconds': round(tf / lap_model.TICK, 2)}
+                tus = [L.job_ticks(uo, ua) for uo, ua in uses]
+                br = {'PCUseSeconds': round((1 + sum(tus)) / lap_model.TICK, 2)}
+                text = ' and '.join("%s's %s (%d ticks)" % (uo, ua, t) for (uo, ua), t in zip(uses, tus))
+                nf = None
+                if fix is not None:
+                    fo, fa = fix
+                    tf = L.job_ticks(fo, fa)
+                    br['PCFixSeconds'] = round(tf / lap_model.TICK, 2)
+                    nf = L.next_anim(fo, fa, None)
+                    text += ", %s's %s after the fire (%d)" % (fo, fa, tf)
                 # his animation after either (the record's next: PCNextAnim
                 # as the stay ends, PCPoseAfter after the fire's part)
-                nu, nf = L.next_anim(uo, ua, None), L.next_anim(fo, fa, None)
+                nu = None
+                for uo, ua in uses:
+                    nu = L.next_anim(uo, ua, nu)
                 if nu:
                     br['PCNextAnim'] = nu
                 if nf:
                     br['PCPoseAfter'] = {'PCFixSeconds': nf}
+                if once:
+                    br['PCOnce'] = True
+                    text += ', once (the visit right after its trick)'
                 e['set']['PCWhenTricked'] = {other: br}
-                e['source'] += ("; with %s tricked the case's other arm: the list's first update and %s's "
-                                "%s (%d ticks), %s's %s after the fire (%d)" % (other, uo, ua, tu, fo, fa, tf))
+                e['source'] += ("; with %s tricked the case's other arm: %s and %s"
+                                % (other, instant, text))
             else:
                 e['set'].pop('PCWhenTricked', None)
         json.dump(ov, open(p, 'w'), ensure_ascii=False, indent=1); open(p, 'a').write('\n')

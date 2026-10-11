@@ -1167,6 +1167,37 @@ predicate, then the all-tricks win.
   kitchen stay): the microwave +0.10, the binoculars +0.14, the TV +0.19,
   the sofa -0.03 s from the thermometer's jumps (the TV -0.58 and the
   sofa -0.80 with the mobile's startle and an instant run).
+- **The PC profile's Season 1 cases after a trick** (105's bowling ball;
+  PCNextCaseSeconds, PCWhenTricked's PCOnce, `Routine._angry_done`,
+  `world.pc_branch_of`): Level_Piano's tricked kick (case 9) is followed by
+  case 10 — the football icon and a GoTo to the ball on its hotspot — and
+  case 11's list: take_low, the ball's message and the gait's (4, the
+  carry), the GoTo to the window, the gait back, throw_bowling (0x46e355-
+  0x46e63c); then case 7's window shout as on any lap. The part before the
+  walk stands where the kick left him after the shout, the next station's
+  icon up (1.25 s), the throw and the shout are the window's visit right
+  after the trick (5.33 s for 3.17, spent by that visit: the next laps kick
+  the football again). E05: the football icon 0.26 s and the flower icon
+  0.06 s from Badinfos' (the window had stood 3.2 s short).
+- **The PC profile's pending phone** (`Routine._release_at_urgent_stop`):
+  level_piano's `phone` trigger (anc/phoneringing, position house, always)
+  posts a behaviour every tick; it waits while a job above the class is not
+  abortable (a walk-by's handler list) and is taken at the class's next
+  GoTo (fcn.00448180 -> fcn.00447d90; the cases' GoTos pass 1) — under the
+  profile a walk-by's end takes the parked alarm, where the mobile's walk-by
+  checks nothing and the tricked plant after it postponed the call past the
+  loo (E05: rung during the picture's reaction, answered on the way to the
+  plant; the port's had come 63 s later). Case 17's GoTo to anc/phoneringing
+  is a PC walk (PCWalkPoint 500/380: down to the floor line, along it, up —
+  33 ticks from the picture's 435/390, as E05's bubble has it; 20 before).
+- **The PC profile's soap by a stuffed bowl** (PCThenLook,
+  `Routine._pc_then_look`): the generic trigger handler (fcn.0047e120)
+  answers `soap_on_floor` over toi/groundsoap with the bowl stuffed by
+  fcn.0047e000's list — the slip's, then the bowl's look handler
+  (fcn.0047d9e0, its GoToObjX and doubletake off the hotspot) — so the
+  stuffed toilet fires after the slip's shout, before the rush's puke
+  (E05: the doubletake 0.7 s after the slip's shout, the fire 13.0 s after
+  the slip; the port's 12.5).
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove

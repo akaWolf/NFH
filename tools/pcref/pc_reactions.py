@@ -296,6 +296,14 @@ FIXRUN = {113: {'ValveMain': ('bas/valve_on', 'switch_off'), 'ValveHot': ('bas/h
 # first update, the StopMsg, the OBJ2) — three ticks before the handler's
 # two (PCUseSecondsTricked); the look is `discover3` (PCSurpriseSeconds)
 ANTENNA_RUN = {101: 'Television', 102: 'Television'}
+# the cases the class runs after a tricked one before the next station's
+# walk, where he stands (PCNextCaseSeconds, after the shout): 105's bowling
+# ball — case 10's GoTo to kit/bowlingball on its hotspot (in place: done on
+# its third update), case 11's list: its first update, take_low, the ball's
+# message and the gait's (gait 4; 0x46e355-0x46e528) — (instant ticks,
+# actions); the GoTo to the window, the gait back, throw_bowling and case
+# 7's shout are the Window's next visit (pc_durations.py WHEN_TRICKED)
+NEXT_CASES = {105: {'Football': (3 + 1 + 2, [('neighbor', 'take_low')])}}
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
 # Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
@@ -342,7 +350,8 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
-        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked')
+        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
+        'PCNextCaseSeconds', 'PCThenLook')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -543,6 +552,16 @@ def specs(n):
                          else ('groundbanana' if n in BANANA_LEVELS else 'groundsoap'))
             if dx:
                 keys['PCNearDx'] = dx
+            toilet = TABLE.get(n, {}).get('Toilet')
+            if base == 'Ground' and n not in BANANA_LEVELS and toilet and toilet['pc'] == 'toi/toiletstuffed':
+                # the soap's trigger with the bowl stuffed (fcn.0047e120's
+                # `soap_on_floor` over toi/groundsoap, the IsVariant of
+                # toi/toiletstuffed at 0x47e259): fcn.0047e000's list — the
+                # slip's (fcn.0047ddc0), then the bowl's look handler
+                # (fcn.0047d9e0) — the bathroom's soap only
+                for zone, _, obj in slip_cleans(n, base, 'groundsoap', lv):
+                    if obj == 'toi/groundsoap':
+                        out.setdefault('%s@%s' % (name, zone), {})['PCThenLook'] = 'Toilet'
             floor = SLIP_CLEAN.get(base) or ('groundbanana' if n in BANANA_LEVELS else None)
             if floor:
                 # the clean of the floor object in each of the item's rooms:
@@ -780,6 +799,10 @@ def specs(n):
             keys['PCRunTo'] = True
             # the run ends on the object's hotspot: the repair does not walk
             keys.pop('PCFixPoint', None)
+        nc = NEXT_CASES.get(n, {}).get(base)
+        if nc is not None:
+            keys['PCNextCaseSeconds'] = round(nc[0] / FPS + _sum(lv, nc[1]), 3)
+            pose['PCNextCaseSeconds'] = _pose(L, nc[1])
         if ANTENNA_RUN.get(n) == base:
             keys['PCSurpriseSeconds'] = round(lv.action('neighbor', 'discover3'), 3)
             keys['PCReactLead'] = 3
