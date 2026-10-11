@@ -4392,6 +4392,23 @@ class Routine:
         self._pc_icon_t += dt
         while self._pc_icon_sched and self._pc_icon_sched[0][0] <= self._pc_icon_t + 1e-9:
             self.pc_bubble_next = self._pc_icon_sched.pop(0)[1]
+            self.pc_shout_icon = None    # a later case's ICON replaces the shout's
+
+    def _pc_keeps_shout(self, it):
+        """the fire's `shout` icon stays over this visit: the redo of a
+        ReuseAfterFix station whose cases set no ICON (PCRedoShout: 108's
+        deck chair, case 10's branch to the empty case 11 and case 12's
+        sunbathing), or a visit that is a later share of its PC case, after
+        the case's ICON (PCNoIcon, per visit: 113's ladder drill in the
+        ladder's case)"""
+        if it is None or not pcprofile.is_pc():
+            return False
+        if it.pc_redo_shout and self._pc_redo is it:
+            return True
+        v = it.pc_no_icon
+        if isinstance(v, list):
+            v = v[pc_visit_ix(it, len(v))] if v else False
+        return bool(v)
 
     @staticmethod
     def _pc_visit_icon(it, visit):
@@ -4471,7 +4488,6 @@ class Routine:
         self.pc_icon_at = 0.0
         self.pc_bubble_next = None
         self._pc_icon_sched = None
-        self.pc_shout_icon = None
         self.index = self._next_index(self.index)
         skip = getattr(self, '_pc_skip_item', None)
         if skip is not None:
@@ -4482,6 +4498,8 @@ class Routine:
             it = self.level.items.get(a['item']) if a else None
             if it is not None and it.name == skip:
                 self.index = self._next_index(self.index)
+        if not self._pc_keeps_shout(self.item):
+            self.pc_shout_icon = None
 
     def pc_wake_from_bed(self):
         """the pig level class's `wakeup` (level_pig's trigger.xml: noise 1 in
@@ -4710,7 +4728,8 @@ class Routine:
 
     def _start_action(self, start_next=False):
         self.started = True              # StartAction: CurrentAction = ...
-        self.pc_shout_icon = None        # the next case sets its own icon
+        if not self._pc_keeps_shout(self.item):
+            self.pc_shout_icon = None    # the next case sets its own icon
         self._active = None              # the entry at the index from here on
         it = self.item
         a = self.action
@@ -8639,6 +8658,7 @@ class Routine:
             if self.pc_icon_at <= 0.0:
                 self.pc_icon_at = 0.0
                 self.pc_bubble_next = self._pc_next_icon()
+                self.pc_shout_icon = None    # the next case's ICON replaces the shout's
         if self.state == self.USING and self._pc_icon_sched:
             self._pc_icon_tick(dt)
         it = self.item
@@ -8648,6 +8668,7 @@ class Routine:
             cur = sp.anims[sp.current].name if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
             if cur == it.pc_icon_clip:
                 self.pc_bubble_next = self._pc_next_icon()
+                self.pc_shout_icon = None
         if self.state == self.USING and self.pc_fire_at > 0.0:
             # the PC's five-argument step fires so many seconds into the
             # tricked use, before the trick's own clip (PCFireAt,

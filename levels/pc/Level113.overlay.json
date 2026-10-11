@@ -238,7 +238,8 @@
     "PCPoseAfter": {
      "PCUseSecondsTricked": "inv",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCRedoShout": true
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Tongs <- wor/ladder tongs 25 ticks"
   },
@@ -331,7 +332,8 @@
     "PCUseSeconds": 4.08,
     "PCIconLead": 0.083,
     "PCCaseGoto": false,
-    "PCNextAnim": "ms0"
+    "PCNextAnim": "ms0",
+    "PCNoIcon": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): LadderDrill <- ladder#0 drill+touch+climb_down+leave 4.08 s"
   },

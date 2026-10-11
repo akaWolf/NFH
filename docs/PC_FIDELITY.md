@@ -3389,6 +3389,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   kept the station's icon; the port shows it from its shout (a step
   with one) to the routine's next action or urgent
   (Routine.pc_shout_icon) — plan 101: 77.15, 88.32, 104.48, 120.82.
+  Since 2026-10-11 it stays over a ReuseAfterFix redo whose cases set no
+  ICON and over a split case's later share (PCRedoShout, PCNoIcon):
+  E05's 14 s over the piano's replay (the port's 14.3, the piano's icon
+  over the last 8.6 before), E08's 21.2 s over the deck chair's re-sit
+  and the lotion (21.1; the chair's icon 8.1 s before), E10's 12.5 s over
+  the steak chair's (13.4).
   Its `noise` icon is the mobile's bubble_what already; since 2026-10-11
   it shows from the level class's `noise` case over his run to the pet's
   room, and the alarm's list sets the pet's shout icon as it starts

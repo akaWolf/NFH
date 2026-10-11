@@ -312,6 +312,24 @@ NEXT_CASES = {105: {'Football': (3 + 1 + 2, [('neighbor', 'take_low')])}}
 # next); the mobile's RemoveActionByItem parks the can for a round and goes
 # on to the deck chair (E08: the coffee's icon over his walk from the plant)
 NEXT_TRICKED = {108: {'Plant': 'CoffeeMaker'}}
+# the ReuseAfterFix stations whose redo runs no ICON case — the repair's
+# list goes on with the station's own actions, or the cases after it have
+# none — so the fire's `shout` icon stays over the redo (PCRedoShout) until
+# a case sets its own: 104's microwave (case 4's tricked branch falls into
+# the three kit/microwave actions, 0x461d26-0x461e4f, then case 5's ICON),
+# 105's piano (case 2's branch to case 3, no job, and case 4's play,
+# 0x46d9ed-0x46db12; E05: the shout 57-71 s, the football's icon at 72),
+# 108's deck chair (case 10's branch to 11, an empty case, and 12's
+# sunbathing; E08: the shout 166.3-187.5 s over the re-sit and the lotion)
+# and toothbrush (case 2's branch brushes again after the SWITCH to
+# toi/toothbrushset, 0x45cf0a-0x45cffa), 110's steak chair (case 17's
+# branch sits again, 0x461205-0x4612b2, then case 19's ICON; E10: the
+# shout 230-242 s, the wine's icon at 243), 113's ladder (case 14's branch
+# to case 15, no ICON, 0x45334e-0x45335e); 102's sofa (case 14 to case 6's
+# ICON, 0x46f96a) and 109's bed (case 6 to case 7's ICON) and pig (case 17
+# again, its ICON) show the station's icon over the redo
+REDO_SHOUT = {104: ('Microwave',), 105: ('Piano',), 108: ('Shezlong', 'ToothBrush'),
+              110: ('SteakChair',), 113: ('Ladder',)}
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
 # Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
@@ -359,7 +377,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
         'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
-        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked')
+        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -810,6 +828,8 @@ def specs(n):
         nt = NEXT_TRICKED.get(n, {}).get(base)
         if nt is not None:
             keys['PCNextTricked'] = nt
+        if base in REDO_SHOUT.get(n, ()):
+            keys['PCRedoShout'] = True
         nc = NEXT_CASES.get(n, {}).get(base)
         if nc is not None:
             keys['PCNextCaseSeconds'] = round(nc[0] / FPS + _sum(lv, nc[1]), 3)

@@ -867,7 +867,18 @@ predicate, then the all-tricks win.
   frames there, too, a tick sooner after the jump than the code's (the
   first at the fire's third tick, the stand at its tenth: 0.65 s on the
   frames for 0.75); a jump drawn a tick after the fire would explain both
-  (the OBJ2s' 0.12-0.13 s then against one tick, 0.08).
+  (the OBJ2s' 0.12-0.13 s then against one tick, 0.08). The icon stays
+  until a case calls fcn.00437f70 (`Routine._pc_keeps_shout`): over the
+  redo of a ReuseAfterFix station whose cases set no ICON (PCRedoShout,
+  tools/pcref/pc_reactions.py REDO_SHOUT: 104's microwave, 105's piano,
+  108's deck chair and toothbrush, 110's steak chair, 113's ladder — E05
+  shows it 57-71 s over the piano's replay, E08 166.3-187.5 s over the
+  re-sit and the lotion, E10 13 s over the steak chair's; 102's sofa
+  (case 6) and 109's bed (case 7) and pig (case 17) set the station's
+  again) and over a visit that is a later share of its PC case
+  (PCNoIcon per visit, tools/pcref/pc_durations.py: 113's ladder drill,
+  114's medal box, 111's wash and dry legs); the next case's icon a
+  stay's PCIconLead brings up replaces it.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed

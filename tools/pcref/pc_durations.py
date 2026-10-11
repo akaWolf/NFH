@@ -329,6 +329,10 @@ def main(argv):
         # after its door starts the GOTO's walk, Pawn._pc1_marks)
         centers = {}
         crooms = {}
+        # per visit, whether it is a later share of its PC case — another
+        # item's part of a split station, after the case's ICON: a shout's
+        # icon before it stays over it (PCNoIcon, Routine._pc_keeps_shout)
+        noicons = {}
         opened = set()
         # a station split over items: its closing leave, after the next ICON,
         # ends its last item's visit (107's wheel: the generator's, not the
@@ -348,6 +352,7 @@ def main(argv):
             opened.add((icon, k))
             goes = bool((walks.get(icon) or [0] * (k + 1))[k]) or bool((intros.get(icon) or [False] * (k + 1))[k])
             cases.setdefault(item, []).extend([first and goes] + [False] * (nv - 1))
+            noicons.setdefault(item, []).extend([not first] + [True] * (nv - 1))
             ge = bool((gents.get(icon) or [False] * (k + 1))[k])
             centers.setdefault(item, []).extend([first and goes and ge] + [False] * (nv - 1))
             gr = bool((grooms.get(icon) or [False] * (k + 1))[k])
@@ -510,6 +515,11 @@ def main(argv):
                 e['set']['PCCaseRoom'] = cr if len(cr) > 1 else cr[0]
             else:
                 e['set'].pop('PCCaseRoom', None)
+            ni = noicons.get(item) or []
+            if any(ni) and len(ni) == len(vals):
+                e['set']['PCNoIcon'] = ni if len(ni) > 1 else ni[0]
+            else:
+                e['set'].pop('PCNoIcon', None)
             il = icon_leads.get(item) or []
             if any(il) and len(il) == len(vals):
                 e['set']['PCIconLead'] = il if len(il) > 1 else il[0]

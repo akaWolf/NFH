@@ -69,6 +69,10 @@
     "PCIcon": [
      "bubble_applepie",
      "bubble_whippedcream"
+    ],
+    "PCNoIcon": [
+     false,
+     true
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.5 s; ApplePie <- whippedcream#0 eat 2.50 s"
@@ -90,7 +94,8 @@
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCRedoShout": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Microwave <- microwave#0 16.8 s"
   },
@@ -296,6 +301,10 @@
     "PCNextAnim": [
      null,
      "ms0"
+    ],
+    "PCNoIcon": [
+     false,
+     true
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Deodrant <- basin#0 take 0.58 s; Deodrant <- basin#2 give 0.58 s"
@@ -315,6 +324,10 @@
     "PCNextAnim": [
      "ms0",
      null
+    ],
+    "PCNoIcon": [
+     true,
+     false
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AfterShave <- basin#0 take 0.50 s; AfterShave <- basin#2 give 0.50 s"
@@ -334,7 +347,8 @@
    "set": {
     "PCUseSeconds": 2.83,
     "PCCaseGoto": false,
-    "PCNextAnim": "deo"
+    "PCNextAnim": "deo",
+    "PCNoIcon": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SinkDeodrant <- basin#1 grease_hair 2.83 s"
   },

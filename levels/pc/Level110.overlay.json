@@ -107,7 +107,8 @@
      "PCUseSecondsTricked": "get_up",
      "PCFixSeconds": "ms0",
      "PCRedoSeconds": "ms0"
-    }
+    },
+    "PCRedoShout": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_barbecue's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): SteakChair <- table#0 6.8 s"
   },
