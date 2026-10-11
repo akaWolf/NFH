@@ -51,8 +51,11 @@ N-th in the level's order, from 1):
                              held): its icon pressed — the DirectUse clip,
                              every Alerter woken; under the PC profile
                              Woody's 22-tick `dogwhistle` (World._pc_whistle)
-    sneak on|off|auto        the Tab toggle by hand; auto (the default)
+    sneak on|off|auto|pet    the Tab toggle by hand; auto (the default)
                              sneaks in/into Alerter zones, runs elsewhere
+                             — or runs in one when a catcher is due there
+                             soon; pet tiptoes there whatever comes (a
+                             reference run's crossing past the sleeper)
     manual <text...>         a step the data cannot script — recorded as
                              such in the results (a pass-3 finding)
     entrance skip            (first line) start with the walk-in finished:
@@ -1547,7 +1550,7 @@ class Driver(Recorder):
         # and a woken pet only sends him searching — being seen ends the
         # level. Run when one is due in THIS pet room within a few seconds.
         if want and here and not shared and not w.hiding \
-                and not w.is_warping:
+                and not w.is_warping and not getattr(self, 'sneak_pet', False):
             # ... but only when the tiptoe would not get him out in time:
             # the crawl to the flee route's first door plus the pass start
             _tz, first_door, _slack = self._flee_target(w.zone.pid)
@@ -3248,7 +3251,8 @@ class Driver(Recorder):
                 continue
             if op == 'sneak':
                 w = self.v.woody
-                self.sneak_manual = args[0] != 'auto'
+                self.sneak_manual = args[0] not in ('auto', 'pet')
+                self.sneak_pet = args[0] == 'pet'
                 if self.sneak_manual:
                     w.sneak_toggle = args[0] == 'on'
                     w.sneaking = w.sneak_toggle

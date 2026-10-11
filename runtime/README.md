@@ -1201,6 +1201,22 @@ predicate, then the all-tricks win.
   stuffed toilet fires after the slip's shout, before the rush's puke
   (E05: the doubletake 0.7 s after the slip's shout, the fire 13.0 s after
   the slip; the port's 12.5).
+- **The PC profile's case after the dead flower** (108; PCNextTricked,
+  `Routine._pc_next_tricked`): Level_Suntan's case 16 answers the poisoned
+  can by its tricked branch (the SWITCH to anc/deadflower, the shout) and
+  yields fcn.0045c600(ebx, 16, 15) with ebx = 3 (0x45cb2a): the coffee's
+  case 3, past case 17 — the can back, the other branch's next. The
+  mobile's RemoveActionByItem parks the can as action 1 for one more round
+  (ActionManager.cs:781-789) and goes on to the deck chair; under the
+  profile the parked can leaves at once and the routine goes on with the
+  coffee, over the hall's floor. E08: the coffee's icon over his walk from
+  the plant, the banana 7.07 s after the plant (the port's 7.14 with the
+  banana where E08 slips him) and the coffee 26.96 s after it (26.94);
+  the deck chair had come first, the coffee 46 s later. Open: E08's parrot
+  tucks its head at ~45.0 s, the model's sleeps at 45.8 (its 72-tick timer
+  from the last whine's end at 40.47, the neighbour through the kitchen
+  door at 40.1; E08's door at ~40.4) — a timer of ~4.5 s for the model's
+  5.33 there.
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove

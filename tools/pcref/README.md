@@ -104,6 +104,9 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   the next station's walk (PCNextCaseSeconds: 105's bowling ball, cases 10
   and 11 up to the GoTo to the window); the bathroom soap's PCThenLook
   (the bowl's look after the slip while it is stuffed, fcn.0047e000);
+  NEXT_TRICKED the case a tricked branch hands the class where the
+  mobile's routine goes elsewhere (PCNextTricked: 108's dead flower to the
+  coffee's case 3, past the can's return);
   ANTENNA_RUN the antenna's (2026-10-11): `discover3` (PCSurpriseSeconds),
   the run three ticks after the next case's icon (PCReactLead) and the
   handler's three ticks on arrival in PCUseSecondsTricked;

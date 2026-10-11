@@ -2712,11 +2712,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   before): the chair to the marbles 17.10 s (17.17), the marbles to the
   grinder 26.59 (26.53), the ladder to the fuse 13.74 (14.03), the sink to
   the trap 10.19 (10.61: the run from the bathroom to the basement 0.6 s
-  short, its doors' passes not read on the frames). 108's lap against
-  E08's bubble (the chili woken as Woody first crosses the living room,
-  23.5 s): the stations within ~0.6 s to his second deck chair (166 s),
-  where E08's chain starts; its pairs the deck chair to the lotion and the
-  coffee to the toothbrush (above). The other plans pay their own orders.
+  short, its doors' passes not read on the frames). 108 pays E08's order
+  since 2026-10-11 — the deck chair, the lotion, the plant, the banana in
+  the hall, the coffee, the toothbrush at -0.40, -0.69, -0.72, -0.65,
+  -0.67 and -0.87 s from E08's HUD counter (166.1, 179.6, 212.1, 219.1,
+  246.1, 259.4) — once the dead flower sends him to the coffee (Level_
+  Suntan's case 16 to case 3, PCNextTricked; the mobile's routine had gone
+  on to the deck chair and slipped him on the banana on the toothbrush
+  rush, 52 s late); its bubble from the parrot's alarm on 0.25-0.44 s
+  early (the `?!` 0.69 s, Woody's crossing the plan's). The other plans
+  pay their own orders.
   Since 2026-10-11 too 106's
   toilet pays 8.6 s after the candy as in E06 (the rush walks to the
   toilet's hotspot, 12.6 s before) and the album within 0.1 s of the

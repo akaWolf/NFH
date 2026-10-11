@@ -304,6 +304,14 @@ ANTENNA_RUN = {101: 'Television', 102: 'Television'}
 # actions); the GoTo to the window, the gait back, throw_bowling and case
 # 7's shout are the Window's next visit (pc_durations.py WHEN_TRICKED)
 NEXT_CASES = {105: {'Football': (3 + 1 + 2, [('neighbor', 'take_low')])}}
+# the case a tricked branch hands the class where the mobile's routine goes
+# elsewhere (PCNextTricked, the item whose action comes next): 108's dead
+# flower — case 16's tricked branch (IFVARIANT, the SWITCH to anc/deadflower,
+# the shout) yields fcn.0045c600(ebx, 16, 15) with ebx = 3 (0x45cb2a): the
+# coffee's case 3, past the can's return (case 17, the other branch's
+# next); the mobile's RemoveActionByItem parks the can for a round and goes
+# on to the deck chair (E08: the coffee's icon over his walk from the plant)
+NEXT_TRICKED = {108: {'Plant': 'CoffeeMaker'}}
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
 # Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
@@ -351,7 +359,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
         'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
-        'PCNextCaseSeconds', 'PCThenLook')
+        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -799,6 +807,9 @@ def specs(n):
             keys['PCRunTo'] = True
             # the run ends on the object's hotspot: the repair does not walk
             keys.pop('PCFixPoint', None)
+        nt = NEXT_TRICKED.get(n, {}).get(base)
+        if nt is not None:
+            keys['PCNextTricked'] = nt
         nc = NEXT_CASES.get(n, {}).get(base)
         if nc is not None:
             keys['PCNextCaseSeconds'] = round(nc[0] / FPS + _sum(lv, nc[1]), 3)

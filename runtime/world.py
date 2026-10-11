@@ -5847,6 +5847,25 @@ class Routine:
         for k, a in enumerate(self.actions_to_add):
             self.actions.insert(at + k, a)
 
+    def _pc_next_tricked(self, name):
+        """the PC level class's case after a tricked one (PCNextTricked): the
+        routine goes on with the named item's action — 108's dead flower
+        jumps to the coffee's case 3 (case 16's tricked branch:
+        fcn.0045c600(ebx, 16, 15) at 0x45e2c4-0x45e33b, ebx = 3 at
+        0x45cb2a), past the can's return in case 17, where the mobile goes
+        on to the deck chair; the can RemoveActionByItem parked as action 1
+        for one more round (ActionManager.cs:781-789) leaves with it"""
+        items = self.level.items
+        if self.remove_watering_can and len(self.actions) > 2:
+            del self.actions[1]
+            self.remove_watering_can = False
+            self.remove_now = False
+        for i, a in enumerate(self.actions):
+            it = items.get(a['item']) if a['item'] else None
+            if it is not None and it.name == name:
+                self.index = (i - 1) % len(self.actions)     # the advance lands on it
+                return
+
     def remove_actions_by_item(self, item_pid):
         """ActionManager.RemoveActionByItem (ActionManager.cs:748-790):
         rebuild the list and re-anchor the index the way the original does
@@ -6308,6 +6327,9 @@ class Routine:
                 self.remove_actions_by_item(dep.pid)
             if it.remove_after_first_use:
                 self.remove_actions_by_item(it.pid)
+            if it.pc_next_tricked and pcprofile.is_pc() \
+                    and it.is_tricked(self.level.items):
+                self._pc_next_tricked(it.pc_next_tricked)
         w = self.pawn.world
         if self.role == 'Rottweiler' and it is not None and w is not None:
             # the Harpoon hand-off (cs:541-545): the pad's stop plays the
