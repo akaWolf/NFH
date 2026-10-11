@@ -1005,8 +1005,12 @@ predicate, then the all-tricks win.
   (PCWalkPoint on the Alerter: its level.xml place and `neighbor`
   hotspot, the dog's 0/0, the parrot's 25/15 — 114's dog at 830/410
   where the mobile spot mapped to 776/420): E14's dog alarm from its
-  icon to the records' 11.22 s against 10.8 (10.29 before), the records'
-  walk back and take 14.61 against 14.6 (13.77). The toilet rush walks to
+  icon to the records' 10.96 s against 10.8 (10.29 before; 11.22 while
+  the GoTo to the dog left the mobile search spot mapped, 298/396, where
+  the room walk had ended at the bedroom door's far point, 401/371 — the
+  door's far point is kept for a path cut there before a move since
+  2026-10-11, `Pawn._pc1_door_at`), the records' walk back and take 14.61
+  against 14.6 (13.77). The toilet rush walks to
   the toilet's `neighbor` hotspot since 2026-10-11 (PCWalkPoint on the
   remaster's ToiletAction item, tools/pcref/pc_walks_s1.py RUSH_TARGETS:
   the rush cases' GOTO — 102's GOTOENTER at 0x470068, 105's and 106's

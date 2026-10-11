@@ -2670,8 +2670,9 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   the skate where E12's frames have him stop, 423 — the kitchen door to
   the skates and the slide had read 0.4 and 0.5 s quicker on the frames
   than the port's, the mobile test's place 18 px short of the PC door's);
-  114 +0.2 s at the polish, +0.6 from the gramophone
-  on (the trap to the shotgun +0.05) since 2026-10-11 — the whistle Woody's
+  114 +0.2 s at the polish and +0.2-0.28 to the end since 2026-10-11 (the
+  alarm's GoTo to the dog from the bedroom door's far point, where the
+  room walk ends; +0.6 before) — the whistle Woody's
   22-tick action, its noise waking the dog and its behaviour making it
   bark as it ends (E14's `?!` 1.84 s after the whistle's start, the
   port's 1.81), the shotgun with the cork the case's other arm (below);

@@ -751,6 +751,10 @@ class Pawn:
         # the PC profile's Season 1 walk (Pawn._pc1_marks): the PC point the
         # pawn stands at with where it stood when it got there (zone pid, x, y)
         self._pc1_at = None
+        # ... and the last door pass's far point, kept when its path goes on:
+        # a path cut there (an urgent's run arriving in the room) leaves him
+        # on it
+        self._pc1_door_at = None
         # the PC profile's Season 2 catch (World._pc_s2_sees): the catcher's
         # flag 4 (Item.pc_hideout) with the use it belongs to, whether it
         # outlives that use, the clip last read; Woody's hideout leave clip
@@ -2597,10 +2601,13 @@ class Pawn:
     def _pc1_here(self):
         """the PC point the pawn stands at: the station it came to, as long as
         it stands where it got there, else its place mapped into the PC room"""
-        at = self._pc1_at
-        if at is not None and self.zone is not None and at[1] == self.zone.pid \
-                and abs(self.sprite.x - at[2]) < 0.15 and abs(self.sprite.y - at[3]) < 0.4:
-            return at[0]
+        for at in (self._pc1_at, self._pc1_door_at):
+            if at is not None and self.zone is not None and at[1] == self.zone.pid \
+                    and abs(self.sprite.x - at[2]) < 0.15 and abs(self.sprite.y - at[3]) < 0.4:
+                # (the door's far point where the path that went on from it
+                # was cut before a move: 114's alarm run, the search in the
+                # bedroom's door and the GoTo to the dog from there)
+                return at[0]
         return self._pc1_map(self.zone, self.sprite.x, self.sprite.y)
 
     def _pc1_map(self, zone, x, y):
@@ -3009,6 +3016,7 @@ class Pawn:
             if pw and pw.get('far'):
                 far_at = (tuple(pw['far']), self.zone.pid, self.sprite.x, self.sprite.y)
                 self._pc1_at = far_at
+                self._pc1_door_at = far_at
         if not hooked and self.world is not None \
                 and old_zone != (self.zone.pid if self.zone else None):
             if self.world.on_pawn_zone_changed(self, old_zone):
