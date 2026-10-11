@@ -570,6 +570,11 @@ def frame_seconds():
 # 0 — 37 steps — so the class's case 0 (the first icon, 0x46f96a) runs on the
 # 37th tick after the first: 3.08 s, the video's 3.07-3.10 s (E01-E06)
 S1_START_TICKS = 37
+# the Season 2 scripts' first move, so many ticks after the clock's origin:
+# the level update's first call a tick in (its status tick counts the time
+# the HUD clock divides by 12), the script's first step there pushing its
+# GoTo without a first run (0x1001e0ce), the GoTo's first update moving
+S2_START_TICKS = 2
 # Woody's own start job (the same fcn.004718b0, pushed at the head of his queue at
 # 0x43a207; its Woody branch fcn.00471960): its first tick idles, its second pushes
 # the walk to the room `anc` (fcn.004716f0 -> fcn.004764b0, the string 0x4e0c80 — the

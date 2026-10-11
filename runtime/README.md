@@ -2399,8 +2399,16 @@ the level selection menu, LevelLoader, not modelled).
   catch no longer waits for it: game.exe's state function tests the rooms,
   the pause byte and the hideout flag only (fcn.00436bb0, 0x436cc7-
   0x436d31), from the first tick of play. (Season 2 has no such wait: its
-  scripts' icons are up on the first frame, and the profile starts them
-  there.) His first walk leaves from level.xml's place (PCStart on the
+  scripts run from the level's first update — the level update 0x100442b3
+  runs the actors' jobs on every call, and its status tick counts the
+  time +0x24 the HUD clock divides by 12, so the first update is a tick
+  after the clock's origin —, a script's first step pushing its GoTo
+  without a first run (0x1001e0ce), whose first update moves: the first
+  move two ticks in, `pcprofile.S2_START_TICKS`, since 2026-10-11; the
+  profile had started them on the first frame, and E02-E14's first
+  stations came 0.15 s after the port's on the HUD clock's own origin —
+  0:01 at 1.001-s steps from it, within 0.04 s of the survey's — now
+  within 0.08.) His first walk leaves from level.xml's place (PCStart on the
   Rottweiler, tools/pcref/pc_walks_s1.py neighbour_start; `Pawn.pc1_stand_at`
   at the spawn), the mobile start stood on it: 101's GOTO from 500/420 to
   the sofa's 335/410 is 24 ticks (since 2026-09-30; the mobile start mapped

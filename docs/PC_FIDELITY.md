@@ -3018,7 +3018,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   other states in "The Season 2 bubble by the script's icons".
   On the PC's 83 ms tick (since 2026-10-10: the videos' seconds against
   the port's frames, no scale — scratchpad survey tools over idle runs):
-  Season 2's first laps 203 -0.10..+0.03 s over 86 s, 205 -0.19..+0.15,
+  Season 2's first laps (since 2026-10-11 with the scripts' first move
+  two ticks after the clock's origin, pcprofile.S2_START_TICKS — runtime/
+  README.md "The Season 1 start" —: the first events within 0.08 s of
+  the videos, 203 0.00..+0.10 over 86 s, 205 -0.05..+0.17, 207 -0.03..
+  +0.16, 208 -0.13..+0.22, 211 0.00..+0.18 to the second rod, 212 -0.14..
+  +0.01, 213 -0.06..+0.02, 214 -0.01..+0.01; until then 0.15 s sooner
+  throughout:) 203 -0.10..+0.03 s over 86 s, 205 -0.19..+0.15,
   207 -0.14..+0.08, 208 -0.24..+0.23, 211 -0.13..+0.06, 212 -0.15..-0.03,
   213 -0.32..-0.03, 214 -0.16..-0.15, the station to station spans within
   0.1-0.2 s with no drift; 204 -0.39 at the hot dog (41.6 s); 209 +0.15..

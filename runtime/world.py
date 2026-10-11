@@ -8209,13 +8209,20 @@ class Routine:
         # long before the unfreeze, and StartFirstAction under Frozen is a
         # no-op (ActionManager.cs:106) — the Unfreeze's StartNextAction is
         # what starts him, at once
-        if self.delay_start > 0.0 and pcprofile.is_pc() and pcprofile.SEASON2:
-            # the PC's level scripts run from the first tick of play — the
-            # clock's 0:00, as the intro card ends: the icons their first
-            # steps show are up on the first frame (pc_nfh2_all_720, 209's
-            # neighbour and Mother at 2088.6 s) — no 1.5 s before the first
-            # action
-            self.delay_start = 0.0
+        if self.delay_start > 0.0 and pcprofile.is_pc() and pcprofile.SEASON2 \
+                and not self._pc_start_job:
+            # the PC's level scripts run from the level's first update — no
+            # 1.5 s before the first action: the level update (0x100442b3)
+            # runs the actors' jobs on every call and its status tick counts
+            # the time (+0x24) up by one, which the HUD clock divides by 12
+            # (0:01 on the twelfth update: the first is a tick after the
+            # clock's origin); a script's first step pushes its GoTo without
+            # a first run (0x1001e0ce), whose first update moves (its first
+            # movement step included) — the first move two ticks in
+            # (pcprofile.S2_START_TICKS: the first stations of E02-E14
+            # 0.15 s sooner on the port's walks from the first frame)
+            self._pc_start_job = True
+            self.delay_start = pcprofile.S2_START_TICKS / pcprofile.TICKS_PER_SECOND
         if self.delay_start > 0.0 and pcprofile.is_pc() and self.role == 'Rottweiler' \
                 and not self._pc_start_job:
             # the PC's Season 1 neighbour: the start job in front of his
