@@ -325,7 +325,7 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCReturnSeconds', 'PCRunTo', 'PCTrickReturn', 'PCAlignX', 'PCFixPoint', 'PCBreathSeconds',
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
-        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx')
+        'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -365,6 +365,19 @@ def slip_cleans(n, item, floor, lv):
         if v is not None and zone not in [z for z, _, _ in out]:
             out.append((zone, v, '%s/%s' % (room, floor)))
     return out
+
+
+def icon_lead(n, item):
+    """the station's PCIconLead (tools/pcref/pc_durations.py: the leave the
+    next case's walk job plays at its end, lap_model.WalkLeave) — its last
+    visit's where it has one per visit; 0 none"""
+    ov = json.load(open(os.path.join(ROOT, 'levels/pc/Level%d.overlay.json' % n)))
+    for e in ov.get('patches', []):
+        st = e.get('set') or {}
+        if e.get('object') == item and e.get('component') == 'TrickItem' and 'PCIconLead' in st:
+            v = st['PCIconLead']
+            return float(v[-1] if isinstance(v, list) else v)
+    return 0.0
 
 
 def near_dx(L, name):
@@ -720,6 +733,15 @@ def specs(n):
                     # the stand's next step after its list; FIRE_LEAD)
                     keys['PCUseSecondsTricked'] = round(total + FIRE_LEAD, 3)
                     keys['PCFireLead'] = True
+                lead = icon_lead(n, base)
+                labels = [a for _, a in (spec.get('pre') or []) + p_before + p_after + p_own + p_fix]
+                if lead and base not in reuse and 'leave' not in labels:
+                    # the tricked case ends inside the object it entered (the
+                    # station's visit leaves it as the next case's walk job
+                    # starts — its PCIconLead): the leave follows the
+                    # reaction, after the next case's ICON (103's mailbox,
+                    # 106's towel in the tub)
+                    keys['PCLeaveTricked'] = lead
                 if spec.get('compound'):
                     # the compound variant's own site, cut the same way (its
                     # shout and flags those of the other arm's step)

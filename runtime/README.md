@@ -1014,7 +1014,20 @@ predicate, then the all-tricks win.
   mapped next to the door, 544 against 505): the stuffed toilet's nearobj
   trigger meets him on the way, E06's look 8.6 s after the candy (the
   port's 8.63; he had puked at the door first and looked on his way to
-  the bath, 12.6 s). A
+  the bath, 12.6 s). A ReuseAfterFix redo whose case walks its GOTO again
+  walks it (PCRedoGoto, `Routine._pc1_inplace_walk`): 109's pig — case
+  18's catch goes back to case 17, Icon pig and GoTo anc/pig (0x46a52a),
+  from the pig let out (521) to its pen (567) before case 19's feeding —
+  where the redo had fed it on the spot (E09's pig to the nitro milk 11.2
+  s, the port's 11.13, 10.53 before). A tricked case that ends inside the
+  object it entered has the next case's walk job LEAVE it after the
+  case's ICON (game.exe 0x475ce6), which the untricked visit's stay
+  carries as PCIconLead: since 2026-10-11 the tricked visit stands it
+  after its reaction with the next station's icon up (PCLeaveTricked,
+  `Routine._angry_done`; tools/pcref/pc_reactions.py: a station with a
+  PCIconLead whose tricked branch plays no LEAVE and has no redo — 103's
+  mailbox 0.25 s, 106's towel in the tub 0.58 s): E06's towel to the
+  album's shout within 0.1 s (-0.48 before). A
   case that pushes no job costs a tick: the level class's job returns not
   done once it has stored the next case (fcn.0045c600, `xor al, al`) and
   the next case runs on the tick after (tools/pcref/routine_order.py's

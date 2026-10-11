@@ -110,6 +110,11 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   use ends it — 102/105/106's rushes, 106's towel, 112's skate, 114's hat)
   and FIXRUN 113's valve stations after the flood and the hot heater (the
   switch alone); 111's machines leave their give to the prime leg.
+  PCLeaveTricked (2026-10-11): a station with a PCIconLead (the leave the
+  next case's walk job plays) whose tricked branch plays no LEAVE and has no
+  redo — the leave after the tricked visit's reaction (103's mailbox, 106's
+  towel). PCRedoGoto (109's pig, by hand in the overlay): the redo walks
+  the case's GOTO again (case 18's catch back to case 17).
   PCNearDx (2026-10-11): a floor trick's nearobj point off where Woody laid
   it — the PC object's `neighbor` hotspot x less its `woody` one (the
   marbles' 25; the soap, the banana and the skate 0, no key), written for

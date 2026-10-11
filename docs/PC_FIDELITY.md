@@ -2676,7 +2676,13 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   bark as it ends (E14's `?!` 1.84 s after the whistle's start, the
   port's 1.81), the shotgun with the cork the case's other arm (below);
   it had paid the gramophone 1.0 s late and the shotgun 0.94 s early.
-  The other plans pay their own orders.
+  The other plans pay their own orders. Since 2026-10-11 too 106's
+  toilet pays 8.6 s after the candy as in E06 (the rush walks to the
+  toilet's hotspot, 12.6 s before) and the album within 0.1 s of the
+  towel's offset (the tub's leave after the tricked towel); 109's nitro
+  milk 11.13 s after the pig against E09's 11.2 (the redo walks the pig
+  case's GoTo anc/pig again; 10.53 before) — E06's nine and E09's six
+  within +0.05 to +0.36 of the video, flat.
   Every tricked stand of the fourteen plans fires at its PCFireAt or
   after its PCUseSecondsTricked within 0.05 s (the routine log against
   the pays), every slip and trap two ticks after its trigger and every

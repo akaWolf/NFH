@@ -4872,9 +4872,12 @@ class Routine:
         that goes on inside a case (a split case's later ones: 111's washer,
         113's drill after the ladder) and a station's own visit again (105's
         piano after its repair at the smeared score: case 4's ENTER finds him
-        seated) stand none. True when held"""
+        seated) stand none — but a redo whose case walks its GOTO again
+        (PCRedoGoto: 109's pig, case 18's catch back to case 17's GoTo
+        anc/pig, from the pig let out to its pen). True when held"""
         p = self.pawn
-        if self.log and self.log[-1][0] == it.name:
+        if self.log and self.log[-1][0] == it.name \
+                and not (it.pc_redo_goto and self._pc_redo is it):
             return False
         kind = p._pc1_case(it)
         if kind is None or kind == 'list':
@@ -6416,6 +6419,25 @@ class Routine:
                     and target.pc_station_ends_on_trick:
                 self._end_pc_station(target)
         self._check_parked_runs()
+        lead = target.pc_leave_tricked if (pcprofile.is_pc() and not pcprofile.SEASON2
+                                           and self.role == 'Rottweiler' and target is not None
+                                           and target is it) else 0.0
+        if lead > 0.0 and self._pending == 'advance' and self._urgent_action is None:
+            # the tricked case ends inside the object it entered: the next
+            # case's walk job plays the LEAVE first, after the case's ICON
+            # (game.exe 0x475ce6; PCLeaveTricked — the untricked visit's
+            # stay carries it as PCIconLead): the next station's icon up, he
+            # stands the leave, then walks (E06: the towel's tub, 0.58 s)
+            self._pending = None
+            self.state = self.USING
+            self.timer = 0.0
+            self.pawn._stand()
+            self.pc_bubble_next = self._pc_next_icon()
+
+            def go():
+                self._pending = 'advance'
+            self.pc_hold = lead
+            self.pc_hold_cb = go
 
     def _end_pc_station(self, it):
         """the PC's three-phase machine (111's washer and drier, the

@@ -1209,6 +1209,14 @@
     }
    },
    "source": "level_pig's bed cases (tools/pcref/routine_order.py: 5(bed, bed/bed) > 6 > 7(sleep)): case 5's ICON bed over the GOTO to bed/bed, case 7's ICON sleep as the stay starts — the mobile's HUD shows the Bed's active icon (bubble_sleep) over its walk as well"
+  },
+  {
+   "object": "Pig",
+   "component": "TrickItem",
+   "set": {
+    "PCRedoGoto": true
+   },
+   "source": "level_pig's case 18 (game.exe 0x46a542-0x46a739): the pig's OBJ2, catch_pig and the switch back to anc/pig, then case 17 again (0x46a737) — Icon pig and, the pig in its pen, GoTo anc/pig (0x46a52a) — before case 19's feeding: the redo after the catch walks from anc/pigout's hotspot (521/420) to anc/pig's (567/420)"
   }
  ]
 }

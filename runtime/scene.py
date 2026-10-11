@@ -245,7 +245,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_visit_from', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_when_tricked', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_whistle_pet', 'pc_near_dx', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_at_compound', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_when_tricked', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_whistle_pet', 'pc_near_dx', 'pc_redo_goto', 'pc_leave_tricked', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_at_compound', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
                  'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role', 'pc_hurt_icon',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -873,6 +873,13 @@ class Item:
         # (PCNearDx: the PC object's `neighbor` hotspot x less its `woody`
         # one — the marbles' 25; tools/pcref/pc_reactions.py)
         self.pc_near_dx = float(d.get('PCNearDx') or 0.0)
+        # the ReuseAfterFix redo walks its case's GOTO again (PCRedoGoto: 109's
+        # pig — case 18's tail goes back to case 17, GoTo anc/pig)
+        self.pc_redo_goto = bool(d.get('PCRedoGoto'))
+        # the leave after a tricked visit whose case ends inside the object
+        # (PCLeaveTricked: the next case's walk job's LEAVE, after its ICON —
+        # 103's mailbox, 106's towel in the tub; tools/pcref/pc_reactions.py)
+        self.pc_leave_tricked = float(d.get('PCLeaveTricked') or 0.0)
         # Season 2: the tricked stand with the linked trick too, where the
         # script plays another step for it (201's puddle by the open rail:
         # crash_long, 0x100297c5, where the soap alone plays crash_short)

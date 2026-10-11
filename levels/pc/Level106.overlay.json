@@ -77,7 +77,8 @@
     "PCEndAfter": "Towel",
     "PCPoseAfter": {
      "PCUseSecondsTricked": "inv"
-    }
+    },
+    "PCLeaveTricked": 0.583
    }
   },
   {
