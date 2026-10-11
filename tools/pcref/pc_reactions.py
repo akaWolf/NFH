@@ -155,7 +155,12 @@ TABLE = {
     101: {'Microwave': wb('kit/microwavedirty'), 'Television': use('lir/twistedantenna'),
           'Binoculars': use('kit/binoculars_glue'), 'Sofa': use('lir/sofa_fartbag')},
     102: {'Microwave': wb('kit/microwavedirty'), 'Toilet': wb('toi/toiletstuffed'), 'Television': use('lir/twistedantenna'),
-          'Sofa': use('lir/sofa_broken'), 'Beer': use('kit/laxativebeer')},
+          # the laxative beer's sit: case 5's GOTOENTER, case 1's first round
+          # (fcn.0046f4c0 by the round counter +0x14: 0 sit_beer, 1 sit_remo,
+          # 4 sit_beer, else sit — pushed with fcn.00479c70), then, the
+          # taken beer's flag +0x1c set and the counter still 0 (0x46fa2d-
+          # 0x46fa41), case 7: the surprise and the FIRE4
+          'Sofa': use('lir/sofa_broken'), 'Beer': use('kit/laxativebeer', pre=[('lir/sofa', 'sit_beer')])},
     103: {'MumPicture': wb('anc/mum_smeared'), 'Toilet': wb('toi/toiletstuffed'), 'Microwave': wb('kit/microwavedirty'),
           # the cake is one PC station (Level_Mail's case 4) the mobile plays
           # as a prime leg and a use: tricked, put_tnt and light_tnt, then

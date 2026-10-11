@@ -2681,6 +2681,16 @@ class Pawn:
         end = pcprofile.s1_arrival_anim(here[0], here[1], to[0], to[1], r['floor'], self.pc1_anim)
         return pcprofile.s1_goto_ticks('x' if x_only else kind, t, own=t == 0), to, end
 
+    def pc1_at_point(self, point):
+        """isActorAtObject (fcn.0047aa90): the pawn in the point's PC room on
+        the very point ([x, y, room])"""
+        z = self.zone
+        r = getattr(z, 'pc_walk_room', None) if z is not None else None
+        if not point or r is None or (len(point) > 2 and point[2] != r['room']):
+            return False
+        here = self._pc1_here()
+        return here is not None and tuple(here) == (point[0], point[1])
+
     def pc1_stand_at(self, point):
         """the pawn stands on a PC point: the next walk leaves from it"""
         if self.zone is not None and point is not None:
@@ -7133,10 +7143,19 @@ class Routine:
         to the object's hotspot x (PCAlignX, PCFixPoint), the doubletake
         (PCSurpriseSeconds), then the fire, the shout and the clean
         (play_angry; PCFixSeconds, PCReactTail) — as _on_surprise_near plays
-        a trigger's"""
+        a trigger's. The GoToObjX and the doubletake only when he does not
+        stand on the object's hotspot: isActorAtObject (fcn.0047aa90: its
+        room and the very point) jumps past both to the OBJ2 (0x47daac-
+        0x47dab6 -> 0x47dba5) — the toilet cases' visits end on the bowl's
+        hotspot (102's LEAVE to its neighbor_out, 105's GoTo), so their
+        stuffed bowl fires on the list's StopMsg (E02: the toilet's `shout`
+        icon 2.2 s after the paper's fire, no look between)"""
         w = self.pawn.world
         seq = it.surprise_right if self.pawn.facing == 'Right' else it.surprise_left
         seq = [a for a in seq if self.pawn.anim.has(a)]
+        at = self.pawn.pc1_at_point(getattr(it, 'pc_fix_point', None))
+        if at:
+            seq = []
 
         def angry():
             self.pawn.anim.time_scale = 1.0
@@ -7155,7 +7174,7 @@ class Routine:
 
         def begin():
             g = self.pawn.pc1_goto_ticks(getattr(it, 'pc_fix_point', None), x_only=True) \
-                if getattr(it, 'pc_align_x', False) else None
+                if getattr(it, 'pc_align_x', False) and not at else None
             if g is not None:
                 self.pawn.pc1_stand_at(g[1])
                 self.pawn.pc1_pose(g[2])
@@ -7337,7 +7356,12 @@ class Routine:
             # — nor does its OriginalAction replay
             self._urgent_stack = []
             self._original_action = None
-            self._pending = 'advance'
+            # the PC's toilet case goes back to the beer: Level_Sofa's case 13
+            # pushes the bowl's handler and sets case 2 (ICON beer, the GoTo
+            # to it; 0x470532-0x47056b) — the action the rush interrupted,
+            # where the mobile's ContinueToNextAfterFinished advances past
+            # it to the sofa
+            self._pending = 'start' if (pcprofile.is_pc() and not nfh2) else 'advance'
             self.state = self.IDLE
             self._release_at_urgent_stop(ua, finished)
             return

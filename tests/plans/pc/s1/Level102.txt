@@ -1,45 +1,39 @@
-# Level102 under the PC profile (2026-09-17, the PC paces, the doors' two clips
-# in turn, the catch the room alone). His lap (27 s, the idle run under the
-# profile, runs/idlepc4): the sofa 0-13 (sit 3.6) > the kitchen 13-24 (beer 18)
-# > the sofa 24-40 (sit 30.5) > the kitchen 40-51 > ... The kitchen is a dead
-# end off the living room, the bathroom one off the hall. The egg and the
-# laxative go in on his second sit (24-40): the microwave pays on his next beer
-# walk (45), the laxative at the sit after it (57 -> the loo run); the sofa is
-# sawn while he is on the loo, and the television switched once he sits on the
-# sawn sofa and goes for the next beer.
-# v7 (2026-09-30): the sofa's five rounds (the case again while its counter is at most 4:
-# sit_beer, sit_remo, sit, sit, sit_beer) — he sits ~14.4 s, the lap is ~36 s: the sofa
-# 6-21 > the kitchen 26-32 (beer 31) > the sofa 42-56 > the kitchen 61-68 > ... The egg
-# waits for his second sit (after his first beer), the laxative for the sit after the
-# microwave's anger: 100 at 189.1 s.
-# v6 (2026-09-27): the walk on the floor line (Woody's too) — the egg first, while he sits,
-# the laxative with the toilet paper.
-# v5 (2026-09-26): Woody's tricks at the PC's times (the microwave's egg 1.92 s, the
-# remaster's 1.2 before) — the toilet paper and the toilet moved from his first beer walk
-# to the one after the microwave pays (he is in the kitchen, the hall and the bathroom
-# free), so the egg run of his second sit starts 0.8 s sooner.
-# v4 (2026-09-17): the television armed on the loo trip with the saw (it paid 46 s after the sofa in v3, cold); v3: the egg and the laxative on separate sits — the kitchen window
-# (16 s) holds one trip from the hall, not the walk from the bathroom.
-take! Fridge IT_Egg               # Zone03 by the hall's stairs while he sits (0-13)
-take Drawer IT_Saw                # Zone01 (the hall) while he is in the kitchen (14-24)
-park! Zone01                      # the hall, off his lap, next to the kitchen's stairs
-whenusing Beer                    # (31) his first beer
-whenusing Sofa                    # (42) his second sit, five rounds: the kitchen is free until 61
-usewith! Microwave IT_Egg         # Zone03: NoticeWhenWalkNearby, 10 — his beer walk passes it
-park! Zone01                      # out through the living room before he comes for the beer (40)
-await Microwave 10                # the beer walk: surprise near, angry, fix
-take FirstAid IT_Laxative         # Zone04 while he is in the kitchen
-take ToiletPaper IT_Wcpaper       # Zone04: TrickAfterWoodyUse + GetTrickedAtOnce, the holder is tricked
-usewith Toilet IT_Wcpaper         # the blocked-up toilet (Toilet.DependsOn -> ToiletPaper), score 10
+# Level102 under the PC profile (2026-10-11): Badinfos' E02 order — the
+# laxative beer, the missing paper, the stuffed toilet, the microwave, the
+# TV, the sawn sofa (the thermometer's jumps at 81.65, 97.60, —, 134.40,
+# 148.05 and 160.67 s of the episode; the stuffed toilet's under the
+# paper's rage: its `shout` icon at 99.65). His lap (the sofa's five
+# rounds — sit_beer, sit_remo, sit, sit, sit_beer — then the beer): the
+# sofa 5-20 > the kitchen 29 > the sofa 41-55 > the kitchen 65 > the sofa
+# 77. Woody's as E02's HUD shows them: the saw, the paper, the laxative and
+# the paper in the bowl first; the laxative in the beer as he leaves the
+# kitchen for his second sit (he takes it on his next beer and drinks it on
+# the third sit's first round, sit_beer, then the surprise and the fire),
+# the egg as he sits again; the saw as he runs for the loo — the TV here
+# on his way to the kitchen after the loo (E02 twisted it before hiding;
+# the port's Woody comes out of the sawing ~1 s later and would meet him
+# in the hall), the wardrobe while he crosses the hall.
+take Drawer IT_Saw                # (1-5) the hall's chest
+take ToiletPaper IT_Wcpaper       # (9-12) the bathroom: TrickAfterWoodyUse, the holder empty
+take FirstAid IT_Laxative         # (13-15)
+usewith Toilet IT_Wcpaper         # (16-18) the paper in the bowl
 park! Zone01
-whenusing Sofa                    # his next sit: the kitchen again
-usewith! Beer IT_Laxative         # Zone03: UseAtOtherPlace, drunk at the sofa (Sofa.DependsOn -> Beer), 18
-park! Zone01                      # out before his beer walk
-await Beer 18                     # SitBeer, SitSurprise, SpitLeft: the beer pays at the sofa (~100)
-whenzone Zone04                   # he is on the loo (the PC neighbour sees Woody on his rush): the sofa
-usewith! Sofa IT_Saw              # score 25 — sawn during the toilet trip, out again before he comes back
-use! Television                   # bare-hand, NoticeWhenEnterZone, 15: the same trip — it pays as he walks back in, seconds before the sawn sofa (the chain's fifth tick)
-park! Zone03                      # the kitchen while he comes back through the hall to the sofa
-await Toilet 10                   # the ToiletAction visit (ShitNormal, ShitNoPaper) — paid meanwhile
-await Sofa 25                     # the next sit: SitDown, SitFall, SofaBlur
-await Television 15
+whenusing Beer                    # (26-31) his first beer
+whenzone Zone02                   # (~32) back in the living room
+usewith! Beer IT_Laxative         # Zone03 (32-38)
+take! Fridge IT_Egg               # Zone03 (39-42)
+park! Zone01
+whenusing Beer                    # (56-67) his second beer: the laxative's
+whenzone Zone02                   # (~68) back to the sofa
+usewith! Microwave IT_Egg         # Zone03 (67-74): noticed on his next beer walk
+wait! 3                           # in the kitchen: the fart (80.7), the rush to the loo
+usewith Sofa IT_Saw               # (85-103) from the kitchen as he leaves the living room
+hide! Wardrobe                    # he comes out of the bathroom and goes for his beer
+whenzone Zone03                   # in the kitchen for his beer
+use! Television                   # Zone02: noticed as he comes back (case 5's IsVariant)
+hide! Wardrobe
+await ToiletPaper
+await Toilet
+await Microwave
+await Television
+await Sofa

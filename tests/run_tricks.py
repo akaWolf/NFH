@@ -3070,8 +3070,16 @@ class Driver(Recorder):
             # right after the plate, the Mother walking in)
             self.wait_until(lambda: self._woody_free(w), 5.0)
         self.click_item(it)
-        ok = self.wait_until(lambda: w.hiding, LEG_TIMEOUT,
-                             poke=lambda: self.click_item(it))
+
+        def poke():
+            a = w.anim.anim
+            if pcprofile.is_pc() and a is not None and a.name == it.animation:
+                # climbing in: the PC's `enter` lasts its ticks (PCWoodySeconds,
+                # 1.75 s for 102's wardrobe) and Hiding lands as it ends — a
+                # click inside it would un-hide him at once
+                return
+            self.click_item(it)
+        ok = self.wait_until(lambda: w.hiding, LEG_TIMEOUT, poke=poke)
         return ok, None if ok else 'never hidden'
 
     # -- the run ------------------------------------------------------------

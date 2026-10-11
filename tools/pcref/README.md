@@ -98,6 +98,8 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   (PCGrabSeconds, PCFixUseSeconds, PCToolUseSeconds, PCReturnSeconds);
   RUNTO marks the objects the class runs to (PCRunTo: the gait set to 2
   before the GoTo — 101/102's antenna, 110's extinguisher, 113's valves);
+  102's laxative beer `pre`s the sofa's sit_beer (Level_Sofa's case 1, the
+  round helper fcn.0046f4c0, before case 7's surprise and FIRE4);
   ANTENNA_RUN the antenna's (2026-10-11): `discover3` (PCSurpriseSeconds),
   the run three ticks after the next case's icon (PCReactLead) and the
   handler's three ticks on arrival in PCUseSecondsTricked;

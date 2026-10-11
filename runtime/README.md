@@ -1127,7 +1127,18 @@ predicate, then the all-tricks win.
   fcn.0047d9e0: the StopMsg, the GoToObjX, the doubletake, the fire, the
   shout, the clean. 102's laxative to the paper 15.85 s (E02: 15.9, the
   walk-by's surprise had fired the bowl 10.0 s after it, then the sitting,
-  the paper 18.6 s later). 109's pig, a walk-by of the mobile with no
+  the paper 18.6 s later). The GoToObjX and the doubletake only when he
+  does not stand on the bowl's hotspot (isActorAtObject, fcn.0047aa90: the
+  room and the very point; 0x47daac -> 0x47dba5, `Pawn.pc1_at_point`) —
+  the toilet cases end on it (102's LEAVE to neighbor_out, the same
+  505/397; 105's GoTo), so the stuffed bowl fires on the list's StopMsg,
+  1.92 s after the paper (E02: its `shout` icon 2.2 s after the paper's
+  jump, the neighbour standing up from the paper straight into the
+  shout; the port had looked 1.33 s first, 3.41 s). Level_Sofa's case 13
+  then sets case 2, the beer (0x470563-0x47056b): under the profile the
+  rush's end replays the interrupted action (`Routine._urgent_finished`),
+  where the mobile's ContinueToNextAfterFinished advances past it to the
+  sofa — E02's bubble: the beer after the loo. 109's pig, a walk-by of the mobile with no
   trigger either, is its station's tricked visit: case 17's IsVariant
   walks him to anc/pigout (PCWalkPointTricked, 521/420 against the pig's
   567/420; `Pawn._pc1_item_point`), case 18 fires it after its list's
@@ -2225,7 +2236,8 @@ What the passes fixed, by area — each against its lines:
   L110/L113 and walks on L111, the Return leg walks everywhere, Olga runs to
   her hit and the Mother walks to hers except on Level210. Level102's
   ToiletAction carries `ContinueToNextAfterFinished`: its end is a plain
-  advance (ActionManager.cs:530-538). A `Duration` that runs out (L110's Beer,
+  advance (ActionManager.cs:530-538) — under the PC profile the action it
+  interrupted again (Level_Sofa's case 13 -> case 2, the beer). A `Duration` that runs out (L110's Beer,
   1.0 s) is a bare `Finished` — but its `TakeGround` drains in 4/7 s first, so
   the branch never fires in the shipped data.
 - The Dog/Chili run is watched by `RoutineActionMove.SameZone()` on every
