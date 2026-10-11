@@ -1234,6 +1234,13 @@ predicate, then the all-tricks win.
   0.2-0.4 s like every other icon of the two levels (tools/pcref/
   pc_reactions.py; a ReuseAfterFix station's are its redo already, a
   flag-2 step's shouts nothing).
+- **The PC profile's tricked bed** (109; `Routine.pc_think_icon`): the
+  bed's clip icons (PCIconClips: BedIn, BedSleep, BedPinsJump -> sleep)
+  stand for Level_Pig's case 7, the sleep's ICON; the tricked visit is
+  case 6's branch before it (the pins' jump, the OBJ2, the switch back,
+  0x469124-0x46933e), so a Season 1 tricked stand keeps the visit's own
+  icon — E09's bed icon up to the shout's (277.1-279.4 s), where the port
+  had shown the sleep's from the stand's start.
 - **The PC profile's case after the dead flower** (108; PCNextTricked,
   `Routine._pc_next_tricked`): Level_Suntan's case 16 answers the poisoned
   can by its tricked branch (the SWITCH to anc/deadflower, the shout) and

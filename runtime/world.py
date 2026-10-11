@@ -4534,7 +4534,11 @@ class Routine:
         if self.state == self.USING:
             if self.pc_bubble_next is not None:
                 return self.pc_bubble_next
-            if it.pc_icon_clips:
+            if it.pc_icon_clips and not (not self.pawn.nfh2 and getattr(self, '_pc_use_tricked', False)):
+                # (a Season 1 tricked stand is the case's tricked branch, before
+                # the case whose ICON the clips stand for: 109's bed, case 6's
+                # pins before case 7's sleep, 0x469124-0x46933e — E09's bed
+                # icon up to the shout's)
                 sp = self.pawn.anim.sprite
                 cur = sp.anims[sp.current].name \
                     if 0 <= getattr(sp, 'current', -1) < len(sp.anims) else None
