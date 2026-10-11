@@ -4230,6 +4230,7 @@ class Routine:
         self.pc_bubble_next = None
         self._pc_icon_sched = None       # the visit's icon changes to come (PCIconAt): [(t, icon)]
         self.pc_hurt = None              # a fight's bubble after a trick: (item, 'wait' | 'shout')
+        self.pc_walkby_icon = None       # Season 1: the icon up as a walk-by's handler took over
         self.pc_shout_icon = None        # Season 1: the fire list's `shout` icon, up to the next case's
         self._pc_icon_t = 0.0
         self.pc_credit_timer = 0.0       # Season 2: the record's credit due so many seconds into it (PCCreditAt)
@@ -4499,6 +4500,16 @@ class Routine:
             return 'being_hit'
         u = self.urgent_item
         if u is not None and pcprofile.is_pc() and not pcprofile.SEASON2 and self.role == 'Rottweiler' \
+                and (self._urgent_action or {}).get('kind') == 'surprise_near' \
+                and self.pc_walkby_icon is not None:
+            # a walk-by's handler list sets no icon (the slips' fcn.0047d0e0,
+            # fcn.0047ddc0, fcn.0047b6a0, the looks' fcn.0047d9e0, fcn.0047d520,
+            # fcn.0047d780, the generic fcn.0047e120: no fcn.00437f70): the
+            # station's stays up until the fire's `shout` icon — E08's coffee
+            # over the banana slip (218.4-221.9 s), E05's toilet rush's over
+            # the soap — where the mobile's surprise shows the floor item's
+            return self.pc_walkby_icon
+        if u is not None and pcprofile.is_pc() and not pcprofile.SEASON2 and self.role == 'Rottweiler' \
                 and u.kind == 'Alerter' and self.state == self.MOVING and not self._pc_alarm_listed:
             # the level class's `noise` case sets the noise icon (generic
             # objects.xml `noise`, gui/bubbles/bubble_what) before his run to
@@ -4532,6 +4543,19 @@ class Routine:
             # the visit is counted as its stay starts (_pc_visit_seconds)
             return self._pc_visit_icon(it, max(it.pc_use_visit - 1, 0))
         return self._pc_visit_icon(it, it.pc_use_visit)
+
+    def _pc_shown_icon(self):
+        """the icon the think bubble shows now (the HUD's think_icon over this
+        routine: the PC script's, else the urgent's or the action's item's)"""
+        th = self.pc_think_icon()
+        if th is not None:
+            return th
+        it = self.urgent_item or self.item
+        if it is None:
+            return None
+        if it.kind == 'Alerter':
+            return it.bubble_icon_mad or it.bubble_icon
+        return it.bubble_icon_active or it.bubble_icon
 
     def _advance(self):
         self._override = None
@@ -8050,6 +8074,8 @@ class Routine:
         RoutineActionSurpriseNear.OnActionStarted (cs:12-37): pause, postpone
         the alarm, and the facing-matched surprise sequence shifted by
         SurpriseDeltaLocation."""
+        self.pc_walkby_icon = self._pc_shown_icon() \
+            if pcprofile.is_pc() and not pcprofile.SEASON2 else None
         if self._urgent_action is not None:
             # the run it lands on becomes its OriginalAction (cs:679-718) —
             # unless that is a SurpriseNear itself (cs:681-691)

@@ -878,7 +878,13 @@ predicate, then the all-tricks win.
   again) and over a visit that is a later share of its PC case
   (PCNoIcon per visit, tools/pcref/pc_durations.py: 113's ladder drill,
   114's medal box, 111's wash and dry legs); the next case's icon a
-  stay's PCIconLead brings up replaces it.
+  stay's PCIconLead brings up replaces it. A walk-by's handler list sets
+  no icon either (the slips' fcn.0047d0e0, fcn.0047ddc0, fcn.0047b6a0, the
+  looks' fcn.0047d9e0, fcn.0047d520, fcn.0047d780, the generic
+  fcn.0047e120 — none calls fcn.00437f70): the icon up as it takes over
+  stays until the fire's `shout` (`Routine.pc_walkby_icon`), where the
+  mobile's surprise showed the floor item's bubble_what — E08's coffee over
+  the banana slip (218.4-221.9 s), E05's toilet over the soap.
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
