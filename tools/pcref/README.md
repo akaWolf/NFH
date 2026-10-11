@@ -98,6 +98,9 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   (PCGrabSeconds, PCFixUseSeconds, PCToolUseSeconds, PCReturnSeconds);
   RUNTO marks the objects the class runs to (PCRunTo: the gait set to 2
   before the GoTo — 101/102's antenna, 110's extinguisher, 113's valves);
+  ANTENNA_RUN the antenna's (2026-10-11): `discover3` (PCSurpriseSeconds),
+  the run three ticks after the next case's icon (PCReactLead) and the
+  handler's three ticks on arrival in PCUseSecondsTricked;
   PCPoseAfter (2026-10-11) the neighbour's animation after each of those
   parts by its key — the last record's actornextanim, else its actoranim
   (`lap_model.Level.next_anim`), the stand's in the order the fire's list

@@ -400,7 +400,10 @@ class AnimPlayer:
             if i is None:
                 continue
             a = self.sprite.anims[i]
-            n = len(a.pattern) if a.pattern else (a.end - a.start + 1)
+            # an empty pattern ends on its first Refresh (AnimationInstance.
+            # ReachedEndFrame, cs:197-204: Anim.empty_pattern) — one frame
+            # (L101's SitSurprise, between the sofa's SitDown and SitFart)
+            n = 1 if a.empty_pattern else len(a.pattern) if a.pattern else (a.end - a.start + 1)
             t += max(1, n) / float(a.fps or 10.0)
         return t
 
@@ -6987,8 +6990,22 @@ class Routine:
         # to the angry flow, a Neutral TrickItem gets a full Use, anything
         # else plays its surprise animation
         if it.is_tricked(self.level.items):
-            self.pawn.world.play_angry(self.pawn, it,
-                                       on_done=self._urgent_finished)
+            stand = it.pc_use_secs_tricked if (pcprofile.is_pc() and not self.pawn.nfh2
+                                               and self.role == 'Rottweiler'
+                                               and getattr(it, 'pc_run_to', False)) else None
+            if stand:
+                # the antenna run's arrival: the GOTO done, the gait's message
+                # back, the class's next case calling the handler, its list's
+                # first update and StopMsg before the OBJ2 (PCUseSecondsTricked,
+                # tools/pcref/pc_reactions.py ANTENNA_RUN)
+                self.state = self.USING
+                self.pawn._stand()
+                self.pawn.world.call_later(
+                    stand, lambda i=it: self.pawn.world.play_angry(self.pawn, i,
+                                                                    on_done=self._urgent_finished))
+            else:
+                self.pawn.world.play_angry(self.pawn, it,
+                                           on_done=self._urgent_finished)
         elif it.kind in TRICK_KINDS and it.neutral and self.role == 'Rottweiler':
             if self._fixing_dispatch(it):
                 return                     # the fetch replaces the use
@@ -8270,14 +8287,39 @@ class Routine:
                     return True
                 startle = it.surprise_far_left if self.pawn.facing == 'Right' \
                     else it.surprise_far_right
+                run = lambda i=it: self.start_urgent(i)
+                if pcprofile.is_pc() and not self.pawn.nfh2 and self.role == 'Rottweiler' \
+                        and getattr(it, 'pc_run_to', False):
+                    # the PC's antenna run (101's and 102's level classes,
+                    # tools/pcref/pc_reactions.py ANTENNA_RUN): the case's
+                    # `discover3` (PCSurpriseSeconds), then the next case's
+                    # `shout` icon and its list — the run's first move
+                    # PCReactLead ticks after the icon
+                    secs = getattr(it, 'pc_surprise_secs', None)
+                    if startle and secs and self.pawn.anim.has(startle):
+                        mobile = self.pawn.anim.sequence_seconds([startle])
+                        if mobile > 0.0:
+                            self.pawn.anim.time_scale = mobile / secs
+                    lead = int(it.pc_react_lead or 0)
+
+                    def go(i):
+                        self.start_urgent(i)
+                        self.pc_shout_icon = 'bubble_wut'    # (the case's, over the run)
+
+                    def run(i=it, lead=lead):
+                        self.pawn.anim.time_scale = 1.0
+                        self.pc_shout_icon = 'bubble_wut'
+                        if lead:
+                            self.pawn.world.call_later(lead / pcprofile.TICKS_PER_SECOND,
+                                                       lambda: go(i))
+                        else:
+                            go(i)
                 if startle and self.pawn.anim.has(startle):
                     # RunToTrickedItem is a PlaySingleAnimation, not a
                     # sequence (Rottweiler.cs:329-342)
-                    self.pawn.anim.play_sequence(
-                        [startle], on_end=lambda i=it: self.start_urgent(i),
-                        as_sequence=False)
+                    self.pawn.anim.play_sequence([startle], on_end=run, as_sequence=False)
                 else:
-                    self.start_urgent(it)
+                    run()
                 return True
         # cs:194-201: the parked alerter run behind CanCheckSurpriseActionFar,
         # then the parked phone alarm behind its own gate
@@ -10255,11 +10297,15 @@ class World:
                 else:
                     play_fixes()
 
-            def shout():
+            def icon():
                 if pc_shout > 0.0 and routine is not None:
-                    # the list's `shout` icon element, right before the
-                    # shout (fcn.0047bd00's list; flag 2 builds neither)
+                    # the list's `shout` icon element (fcn.0047bd00's list;
+                    # flag 2 builds neither): the message step's one update
+                    # applies the icon (0x47c550 -> 0x479610, fcn.00437f70)
+                    # and is done, the shout's ACTION starting a tick later
                     routine.pc_shout_icon = 'bubble_wut'
+
+            def shout():
                 if pc_shout > 0.0:
                     # the shout's ACTION leaves its record's next
                     pawn.pc1_pose(pcprofile.S1_SHOUT_NEXT.get(shout_clip))
@@ -10273,10 +10319,17 @@ class World:
 
             if fire_pre > 0.0:
                 # the fire's own tick, its list's first update and the
-                # `shout` icon before the shout (_s1_fire_stands)
+                # `shout` icon's tick before the shout (_s1_fire_stands)
                 pawn._stand()
+                lead = fire_pre - (pcprofile.S1_FIRE_ICON_TICKS / pcprofile.TICKS_PER_SECOND
+                                   if pc_shout > 0.0 else 0.0)
+                if lead > pcprofile.TIMER_EPS:
+                    self.call_later(lead, icon)
+                else:
+                    icon()
                 self.call_later(fire_pre, shout)
             else:
+                icon()
                 shout()
             return
         level = None

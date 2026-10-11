@@ -88,12 +88,15 @@
      "use": 2.083
     },
     "PCFixSeconds": 2.083,
-    "PCUseSecondsTricked": 0.167,
+    "PCUseSecondsTricked": 0.417,
     "PCRunTo": true,
     "PCReactTail": 1,
     "PCPoseAfter": {
-     "PCFixSeconds": "ms0"
-    }
+     "PCFixSeconds": "ms0",
+     "PCSurpriseSeconds": "discover3"
+    },
+    "PCSurpriseSeconds": 0.667,
+    "PCReactLead": 3
    },
    "source": "Woody's trick action (level_sofa's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): use <- lir/tv 25 ticks"
   },

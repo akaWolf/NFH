@@ -2677,7 +2677,12 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   bark as it ends (E14's `?!` 1.84 s after the whistle's start, the
   port's 1.81), the shotgun with the cork the case's other arm (below);
   it had paid the gramophone 1.0 s late and the shotgun 0.94 s early.
-  The other plans pay their own orders. Since 2026-10-11 too 106's
+  101 pays E01's order since 2026-10-11 — the microwave, the binoculars,
+  the TV, the sofa at +0.10, +0.14, +0.19 and -0.03 s — once the antenna
+  run is the level class's (`discover3`, the case's `shout` icon, the run
+  three ticks after it, the handler's ticks on arrival: runtime/README.md,
+  "The PC profile's Season 1 antenna run"; the TV -0.58 and the sofa -0.80
+  before). The other plans pay their own orders. Since 2026-10-11 too 106's
   toilet pays 8.6 s after the candy as in E06 (the rush walks to the
   toilet's hotspot, 12.6 s before) and the album within 0.1 s of the
   towel's offset (the tub's leave after the tricked towel); 109's nitro

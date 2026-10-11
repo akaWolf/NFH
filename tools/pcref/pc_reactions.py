@@ -279,6 +279,18 @@ FIXRUN = {113: {'ValveMain': ('bas/valve_on', 'switch_off'), 'ValveHot': ('bas/h
 # extinguisher's fetch after the fuel beer and the way back to the burning
 # barbecue (110 case 8 0x45fffe, reset in case 9 0x460339 — the mobile's
 # fixing chain), the valves of FIXRUN
+# the antenna's run (101's case at 0x470ffd/0x471083, 102's at 0x46fe1a):
+# the case that finds the twisted antenna plays `discover3` (fcn.00479ba0)
+# and the next one sets the `shout` icon and pushes its list — the gait's
+# message, the GOTO to the antenna, the gait's message back — whose first
+# update is a tick before the message and the GOTO's first move two ticks
+# on (the move inside the GOTO's first update): the run starts three ticks
+# after the icon (PCReactLead); after the arrival the GOTO is done on its
+# next update, the message back takes a tick, the list's end hands the
+# class its next case, which calls the handler (fcn.0047dc70: its list's
+# first update, the StopMsg, the OBJ2) — three ticks before the handler's
+# two (PCUseSecondsTricked); the look is `discover3` (PCSurpriseSeconds)
+ANTENNA_RUN = {101: 'Television', 102: 'Television'}
 RUNTO = {101: ('Television',), 102: ('Television',), 110: ('FireExtinguisher',),
          113: ('ValveMain', 'ValveHot')}
 # Season 2 (GameLogic.dll): a level script sets the actor's gait (+0x3c) to 2
@@ -763,6 +775,11 @@ def specs(n):
             keys['PCRunTo'] = True
             # the run ends on the object's hotspot: the repair does not walk
             keys.pop('PCFixPoint', None)
+        if ANTENNA_RUN.get(n) == base:
+            keys['PCSurpriseSeconds'] = round(lv.action('neighbor', 'discover3'), 3)
+            keys['PCReactLead'] = 3
+            keys['PCUseSecondsTricked'] = round(keys.get('PCUseSecondsTricked', 0.0) + 3 / FPS, 3)
+            pose['PCSurpriseSeconds'] = _pose(L, [('neighbor', 'discover3')])
         run = FIXRUN.get(n, {}).get(base)
         if run is not None:
             keys['PCGrabSeconds'] = round(_sum(lv, [run]), 3)

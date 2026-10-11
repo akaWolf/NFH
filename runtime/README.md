@@ -855,8 +855,19 @@ predicate, then the all-tricks win.
   alone. Through a co-actor's fight after a trick, PCHurtIcon
   ({'wait', 'shout'}: the wait in fear's and the angry's, a fix clip
   the station's; `Routine.pc_hurt`). Season 1's shout: the fire's
-  `shout` icon (bubble_wut) from the shout to the next action or urgent
-  (`Routine.pc_shout_icon`).
+  `shout` icon (bubble_wut) from its message step's tick to the next
+  action or urgent (`Routine.pc_shout_icon`) — the step's one update
+  applies it (0x47c550 -> 0x479610, fcn.00437f70) and is done, the
+  shout's ACTION starting a tick later (since 2026-10-11; the port had
+  shown it with the shout): two ticks after an OBJ2's fire (E01's
+  microwave and binoculars 0.13 and 0.12 s from the thermometer's jump
+  to the icon, the port's 0.17 — 0.25 before), ten after the fart bag's
+  FIRE4 (its ready step, the sofa's LEAVE of 8 ticks, first: the port's
+  0.86). Open: E01's sofa shows it 0.70 s after the jump — the leave's
+  frames there, too, a tick sooner after the jump than the code's (the
+  first at the fire's third tick, the stand at its tenth: 0.65 s on the
+  frames for 0.75); a jump drawn a tick after the fire would explain both
+  (the OBJ2s' 0.12-0.13 s then against one tick, 0.08).
 - **The PC profile's timed hit run** (PCHitRun, `Pawn.pc_time_path`): a
   co-actor's run to him from the hideout she leaves lasts the PC's
   seconds (204's Olga from the rickshaw's olga_out: the path's steps timed
@@ -938,7 +949,12 @@ predicate, then the all-tricks win.
   last frame's overrun into its first (`AnimPlayer._set_start`, since
   2026-10-11): the PC stay is one count of ticks, and dropping the
   overrun at each clip had rounded every clip up to the app's frame —
-  109's sleep, BedIn and thirty BedSleeps, 27.45 s for its 27.0.
+  109's sleep, BedIn and thirty BedSleeps, 27.45 s for its 27.0. A clip
+  of UsePattern with an empty Pattern counts one frame in the pace
+  (`AnimPlayer.sequence_seconds`, since 2026-10-11): it ends on its first
+  Refresh (Anim.empty_pattern) — L101's SitSurprise had counted its
+  seven sheet frames, and the tricked sofa's stand, paced to its 5.167 s,
+  had run 4.58: the shout icon 0.37 s after the fart bag's fire.
 - **The PC profile's game clock** (`pcprofile.GameClock`: `App._tick_level`
   for the world, the tutorial and its camera, the recorder, the viewer):
   the PC's tick is 83 ms, not 1/12 s — game.exe's pacer (0x408e68-0x408e85,
@@ -1119,6 +1135,23 @@ predicate, then the all-tricks win.
   had stood the walk-by's 1.5 s FindRight before it. The chain after it
   runs 0.85 s sooner, 0.8-1.6 s ahead of E09's thermometer where it had
   matched within 0.35 s — the case tick above.
+- **The PC profile's Season 1 antenna run** (101's and 102's TV:
+  PCSurpriseSeconds, PCReactLead and PCUseSecondsTricked with PCRunTo;
+  RunToTrickedItem's PC branch and `Routine._urgent_arrived`; tools/pcref/
+  pc_reactions.py ANTENNA_RUN): the case that finds the twisted antenna
+  (101's 0x470ffd, 102's 0x46fe1a) plays `discover3` — the mobile's
+  startle paced to its 8 ticks —, the next case sets the `shout` icon and
+  pushes its list: the gait's message, the GOTO to the antenna, the gait's
+  message back, the run's first move three ticks after the icon (the
+  list's first update a tick before the message, the move inside the
+  GOTO's first update two on); on arrival the GOTO's done tick, the
+  message back, the class's next case calling the handler (fcn.0047dc70:
+  its list's first update and StopMsg) — three ticks before the OBJ2's
+  two, PCUseSecondsTricked 0.417 for the 0.167 before. E01's chain in its
+  order since 2026-10-11 (the plan: the egg and the glue after his first
+  kitchen stay): the microwave +0.10, the binoculars +0.14, the TV +0.19,
+  the sofa -0.03 s from the thermometer's jumps (the TV -0.58 and the
+  sofa -0.80 with the mobile's startle and an instant run).
 - **The PC profile's Season 1 leg pace** (`Pawn._pc1_marks`): a leg's
   one pace spreads its PC seconds over the mobile path as the pawn walks
   it — each step, straight at its target, ends within its MinDistToNextMove
