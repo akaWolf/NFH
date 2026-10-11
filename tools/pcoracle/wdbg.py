@@ -22,8 +22,8 @@ try:
     start(['Xvfb', DISP, '-screen', '0', os.environ.get('WDBG_SCREEN', '800x600x24'), '+extension', 'GLX'], 'xvfb'); time.sleep(1.5)
     subprocess.run([W + 'wineserver', '-p'], env=env, timeout=30)
     cwd = HOME + '/nfh-bench/wine/%sgame/bin' % GAME
-    import shlex
-    cmd = shlex.split(os.environ.get('WDBG_CMD') or (W + 'winedbg --gdb --no-start --port %d game.exe' % PORT))
+    # (split on blanks, not shlex: a Windows path's backslashes are no escapes)
+    cmd = (os.environ.get('WDBG_CMD') or (W + 'winedbg --gdb --no-start --port %d game.exe' % PORT)).split()
     wd = start(cmd, 'winedbg', cwd=cwd)
     t0 = time.time()
     ready = False
@@ -54,4 +54,14 @@ finally:
         except Exception: pass
     try: subprocess.run([W + 'wineserver', '-k9'], env=env, timeout=15)
     except Exception: subprocess.run(['pkill', '-9', 'wineserver'])
-    subprocess.run(['pkill', '-9', '-f', 'wine-preloader|wine64-preloader'])
+    # (Wine rewrites its processes' argv to the Windows paths — winedevice.exe, game.exe —, and with the
+    # server gone -k9 reaches none of them: every process of this prefix is found by its environment)
+    for pid in os.listdir('/proc'):
+        if not pid.isdigit(): continue
+        try:
+            envb = open('/proc/%s/environ' % pid, 'rb').read()
+        except Exception:
+            continue
+        if ('WINEPREFIX=' + env['WINEPREFIX']).encode() in envb and int(pid) != os.getpid():
+            try: os.kill(int(pid), signal.SIGKILL)
+            except Exception: pass

@@ -11,18 +11,33 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.pat
 sys.path.insert(0, os.path.join(ROOT, 'runtime'))
 n = int(sys.argv[1]); logp = sys.argv[2]
 ov = json.load(open(os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)))
-items = {}
+items = {}; families = {}
+def family(name):
+    room, _, base = name.rpartition('/')
+    return room, base.split('_')[0]
 for e in ov['patches']:
     ap = (e.get('set') or {}).get('PCApproach')
     if ap and 'Woody' in ap and 'obj' in ap['Woody']:
         items.setdefault(ap['Woody']['obj'], e['object'])
+        # (the message names the variant the input went to — beachleft/crayfish for the container's
+        # item, pond/rake for the rake_ground's: one family)
+        families.setdefault(family(ap['Woody']['obj']), e['object'])
+def item_of(obj):
+    return items.get(obj) or families.get(family(obj))
 raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))
-inv = set()
+inv = set(); gives = {}; primes = {}; unlockers = {}
 for o in raw['objects'].values():
     d = o.get('data') or {}
-    for k in ('RequiredInventory', 'SecondRequiredInventory', 'PrimedInventoryType', 'InventoryType', 'DexterityUnlocker'):
+    name = (d.get('m_GameObject') or {}).get('name')
+    for k in ('RequiredInventory', 'SecondRequiredInventory', 'PrimedInventoryType', 'DexterityUnlocker'):
         v = d.get(k)
         if isinstance(v, str) and v.startswith('IT'): inv.add(v)
+    for e in d.get('InventoryItems') or []:
+        inv.add(e['Type']); gives.setdefault(name, e['Type'])
+    if d.get('PrimingItem') and gives.get(name):
+        primes[d['PrimingItem']['name']] = gives[name]        # the priming station <- the held type it primes
+    if isinstance(d.get('DexterityUnlocker'), str) and d['DexterityUnlocker'].startswith('IT2'):
+        unlockers[name] = d['DexterityUnlocker']
 def it_of(pc):
     cands = [v for v in inv if v.split('_', 1)[-1].lower() == pc.lower()]
     return cands[0] if cands else 'IT2_' + pc.capitalize()
@@ -42,11 +57,20 @@ for l in s.split('\n'):
         a = dict(re.findall(r'(\w+)="([^"]*)"', l)); tick = t - (t0 or 0)
         out.append('until %.4f' % (tick / 12.0))
         if l.startswith('<UseObjectMsg'):
-            it = items.get(a['name'])
-            out.append('take %s' % it if it else '# no item for %s' % a['name'])
+            it = item_of(a['name'])
+            if not it: out.append('# no item for %s' % a['name'])
+            elif gives.get(it): out.append('take %s %s' % (it, gives[it]))
+            else: out.append('use %s' % it)
         elif l.startswith('<CombineMsg'):
-            it = items.get(a['object'])
-            out.append('usewith %s %s' % (it, it_of(a['object2'])) if it else '# no item for %s' % a['object'])
+            it = item_of(a['object']); held = it_of(a['object2'])
+            if not it: out.append('# no item for %s' % a['object'])
+            elif primes.get(it) == held: out.append('prime %s %s' % (it, held))
+            elif unlockers.get(it) == held:
+                # (the PC's combination takes the item as its game is won; the port's SearchItem wants
+                # the take click after its unlock — right after, no clock)
+                out.append('unlock %s %s' % (it, held))
+                if gives.get(it): out.append('take %s %s' % (it, gives[it]))
+            else: out.append('usewith %s %s' % (it, held))
         else:
             wx, zone = world_x(a['room'], int(a['position'].split('/')[0]))
             out.append('park %s   # x %.3f' % (zone, wx))

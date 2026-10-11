@@ -20,6 +20,48 @@ for e in ov['patches']:
 def pc_room_x(zone, x):
     pr = zone.pc_room; w = (zone.right - zone.left) or 1.0
     return pr['x1'] + (x - zone.left) * (pr['x2'] - pr['x1']) / w
+# the PC data: combine.xml's combinations (an inventory item on an object) and objects.xml's own `use`
+# actions of Woody's, for the targets of a combine and of a bare-hand use (tools/pcref/canon.py's folder)
+sys.path.insert(0, os.path.join(ROOT, 'tools', 'pcref'))
+import canon, re
+folder = canon.pc_level(n)['folder']
+X = os.path.expanduser('~/nfh-bench/pcref/pc/%s/x/%s' % ('nfh1' if n < 200 else 'nfh2', folder))
+def rd(name):
+    b = open(os.path.join(X, name), 'rb').read()
+    return b.decode('utf-16') if b[:2] in (b'\xff\xfe', b'\xfe\xff') else b.decode('latin-1')
+combos = []
+for m in re.finditer(r'<combination name="([^"]+)"([^>]*)>(.*?)</combination>', rd('combine.xml'), re.S):
+    if 'wrong="true"' in m.group(2): continue
+    combos.append((m.group(1), re.findall(r'<ingredient name="([^"]+)"', m.group(3))))
+uses = set()
+for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', rd('objects.xml'), re.S):
+    if re.search(r'<action name="use" actor="woody"', m.group(2)): uses.add(m.group(1))
+raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))
+kinds = {}
+for o in raw['objects'].values():
+    d = o.get('data') or {}
+    if d.get('m_GameObject') and ('Item' in str(o.get('type')) or o.get('type') in ('Rake',)):
+        kinds[d['m_GameObject']['name']] = o['type']
+def family(obj):
+    base = obj.split('/')[-1].split('_')[0]
+    return [name for name, _ in combos if name.split('/')[-1].split('_')[0] == base] + [obj]
+def combine_target(obj, item):
+    """the object the PC combines `item` with: the combination whose ingredients are the item and an
+    object of the item's PC family (pond/rake_ground_weed: weed on pond/rake_ground)"""
+    base = obj.split('/')[-1].split('_')[0]
+    for name, ings in combos:
+        if item in ings:
+            objs = [i for i in ings if '/' in i and i.split('/')[-1].split('_')[0] == base]
+            if objs: return objs[0]
+    return obj
+def use_target(mobile_item, obj):
+    """a bare-hand use of a TrickItem: the PC object of its family with Woody's own `use` (pond/rake, not
+    the laid rake the neighbour walks to); a SearchItem's click is its take on the overlay's object"""
+    if kinds.get(mobile_item) != 'SearchItem':
+        base = obj.split('/')[-1].split('_')[0]
+        cands = sorted(u for u in uses if u.split('/')[-1].split('_')[0] == base and u.split('/')[0] == obj.split('/')[0])
+        if cands: return cands[0]
+    return obj
 out = []
 for c in json.load(open(os.path.join(run, 'clicks.json'))):
     tick = int(round(c['frame'] / 5.0))
@@ -29,11 +71,13 @@ for c in json.load(open(os.path.join(run, 'clicks.json'))):
             sys.stderr.write('no PC object for %s\n' % c['item']); continue
         # (the port's take after an unlock keeps the unlocker in hand: a plain use on the PC)
         prev = out[-1] if out else None
-        if c.get('type') and not (prev and prev['kind'] == 'combine' and prev['args'][0] == obj
-                                  and prev['args'][1] == c['type'].split('_', 1)[1].lower()):
-            out.append({'tick': tick, 'kind': 'combine', 'args': [obj, c['type'].split('_', 1)[1].lower()], 'port': c})
+        item = c['type'].split('_', 1)[1].lower() if c.get('type') else None
+        if item and prev and prev['kind'] == 'combine' and prev['port'].get('item') == c['item'] and prev['args'][1] == item:
+            continue        # the take after the unlock: the PC's minigame success takes the item itself
+        if item:
+            out.append({'tick': tick, 'kind': 'combine', 'args': [combine_target(obj, item), item], 'port': c})
         else:
-            out.append({'tick': tick, 'kind': 'use', 'args': [obj], 'port': c})
+            out.append({'tick': tick, 'kind': 'use', 'args': [use_target(c['item'], obj)], 'port': c})
     else:
         wx, wy = c['world']
         z = lv.zone_at(wx, wy)

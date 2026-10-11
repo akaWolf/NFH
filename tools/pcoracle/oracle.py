@@ -11,11 +11,17 @@ WDBG_DUMMY, default 400 300 — a floor spot on screen); its GoToPosMsg is repla
 loop (GL+0x10044464) by a message built in scratch memory (inject2.py's layouts). The tick the game really
 took it at is in its own GameLogicLog (UTF-16, ~/nfh-bench/wine/nfh/drive_c/users/<user>/Documents/JoWooD/NFH2).
 
+WDBG_PLAN=<port plan file> runs the port's plan (tests/plans/pc/...) instead, its legs mapped by pcmap.py
+and its conditions read off the trace: a take / use / usewith / prime / unlock waits for Woody to stand
+idle, injects, and is done when his action on the object has run and he stands again (or he declined);
+park waits for his arrival in the zone's room; whenusing X for the neighbour's next action on X's object;
+await X for the next trick record paid; wait / until for the clock; sneak sets the walks' sneaking.
+
 The trace (~/nfh-bench/wine/logs/oracle_<level>.jsonl): per tick the actors' x/y/anim (GameLogic's actor
 object: +0x2c, +0x30, +0x40 — captured from the path finder fcn.1000a711), and the script elements — GoTo
-fcn.1000e3e0, DoAction fcn.10002cd5, icon fcn.100422a5, behaviour post fcn.1004000a, SHOUT fcn.1000f977 —
+fcn.1000e3e0, DoAction fcn.10002cd5, icon fcn.100422a5, behaviour post fcn.1004000a, SHOUT fcn.1000f977, a trick record paid fcn.100522e6 —
 with the calling step's return address. The level tick is fcn.10044234 (12 a second)."""
-import gdb, os, re, time, struct, json, subprocess, threading, signal
+import gdb, os, re, sys, time, struct, json, subprocess, threading, signal
 port = os.environ.get('WDBG_PORT', '33333'); want = os.environ.get('WDBG_LEVEL'); secs = float(os.environ.get('WDBG_SECS', '60'))
 HOME = os.path.expanduser('~')
 T = os.path.dirname(os.path.abspath(__file__))
@@ -26,7 +32,13 @@ for sig in ('SIGABRT', 'SIGUSR1', 'SIGUSR2', 'SIGPIPE', 'SIGALRM'):
 gdb.execute('target remote 127.0.0.1:%s' % port)
 inf = gdb.selected_inferior()
 def rd(a, n): return bytes(inf.read_memory(a, n))
-def wr(a, b): inf.write_memory(a, b)
+def wr(a, b):
+    # (winedbg's proxy garbles a memory write past 32 bytes — the chunk after the first repeated bytes
+    # 16..31 —: 16 bytes a packet, read back)
+    for i in range(0, len(b), 16):
+        inf.write_memory(a + i, b[i:i + 16])
+    if bytes(inf.read_memory(a, len(b))) != bytes(b):
+        raise RuntimeError('memory write mismatch at %#x' % a)
 def u32(a): return struct.unpack('<I', rd(a, 4))[0]
 lg = open(HOME + '/nfh-bench/wine/logs/winedbg.log').read()
 GL = int(re.search(r'GameLogic.dll @([0-9A-Fa-f]+)', lg).group(1), 16); DELTA = GL - 0x10000000
@@ -67,22 +79,129 @@ def make_string(text):
     return obj
 def msg_use(name):
     m = salloc(0x40); wr(m, struct.pack('<IIIII', 0x453b2c, make_string(name), make_string('oracle'), 0, 0x1000)); return m
-def msg_combine(obj, item):
-    m = salloc(0x40); wr(m, struct.pack('<IIIIIIII', 0x453b20, make_string(obj), make_string(item), make_string('oracle'), 0, 0, 0, 0x1000)); return m
-def msg_goto(room, x):
-    m = salloc(0x40); wr(m, struct.pack('<IIIIIII', 0x453b38, make_string(room), 0, int(x), 0, 0, 0x1000)); return m
+def msg_combine(obj, item, offset=(0, 0), flag18=0):
+    m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', 0x453b20, make_string(obj), make_string(item), make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
+def msg_goto(room, x, sneak=False):
+    m = salloc(0x40); wr(m, struct.pack('<IIIIIBBHI', 0x453b38, make_string(room), 0, int(x), 0, 1 if sneak else 0, 0, 0, 0x1000)); return m
 def build(step):
     k, a = step['kind'], step['args']
     if k == 'use': return msg_use(a[0])
-    if k == 'combine': return msg_combine(a[0], a[1])
-    if k == 'goto': return msg_goto(a[0], a[1])
+    if k == 'combine': return msg_combine(a[0], a[1], tuple(step.get('offset', (0, 0))), step.get('flag18', 0))
+    if k == 'goto': return msg_goto(a[0], a[1], step.get('sneak', False))
     raise ValueError(k)
 
 script = json.load(open(os.environ['WDBG_SCRIPT'])) if os.environ.get('WDBG_SCRIPT') else []
 script.sort(key=lambda s: s['tick'])
 pending = []          # messages built, waiting for a dummy click to replace
-state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0}
+state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0, 'actions': {}, 'credits': [], 'declines': [], 'caught': [], 'sneak': False}
 actors = {}
+
+class PlanRunner:
+    """the port's plan on the oracle: one leg at a time, its condition read off the trace each tick"""
+    # (Woody stands in ms0-3; after a trick's action he keeps its `smile` until the next command — the
+    # 202 pond's put_eel at tick 290 smiled 390 ticks, until the neighbour came up and caught him)
+    STANDS = ('ms0', 'ms1', 'ms2', 'ms3', 'smile')
+    TIMEOUT = 12 * 120
+    def __init__(self, path, n):
+        sys.path.insert(0, T)
+        import pcmap
+        self.m = pcmap.PCMap(n)
+        self.legs = [l.split('#')[0].split() for l in open(path) if l.split('#')[0].strip()]
+        self.i = 0; self.leg_start = 0; self.phase = 'idle'; self.target = None; self.results = []
+        self.last_input = -100; self.tricked = {}
+    def woody(self):
+        return actors.get('woody') and actor_states().get('woody')
+    def idle(self, w):
+        # (Woody is in `actors` from his first walk on; before it he stands where the level put him)
+        return w is None or w['anim'] in self.STANDS
+    def acts_on(self, obj, since=0):
+        """the actions logged on the object's family (the guarded / container variants) since a tick"""
+        fam = self.m.family(obj)
+        return sorted((t, a) for o, l in state['actions'].items() if '/' in o and self.m.family(o) == fam
+                      for t, a in l if t >= since)
+    def step(self, tick):
+        """returns the steps to inject this tick"""
+        if self.i >= len(self.legs): return []
+        leg = self.legs[self.i]; op, args = leg[0], leg[1:]
+        op = op.rstrip('!')
+        w = self.woody()
+        if self.phase == 'idle':
+            self.leg_start = tick
+            if op in ('take', 'use', 'usewith', 'prime', 'unlock'):
+                self.phase = 'wait_idle'
+            elif op == 'park':
+                room, x = self.m.zone_center(args[0])
+                if room is None: return self.done('no room for %s' % args[0])
+                self.phase = 'parking'; self.target = args[0]
+                return [{'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': state['sneak'], 'leg': ' '.join(leg)}]
+            elif op == 'whenusing':
+                self.phase = 'whenusing'; self.target = self.m.station(args[0])
+                if self.target is None: return self.done('no station for %s' % args[0])
+            elif op == 'await':
+                self.phase = 'await'; self.target = self.tricked.get(args[0], tick)
+            elif op == 'wait':
+                self.phase = 'wait'; self.target = tick + int(float(args[0]) * 12)
+            elif op == 'until':
+                self.phase = 'wait'; self.target = int(float(args[0]) * 12)
+            elif op == 'sneak':
+                state['sneak'] = args[0] == 'on'; return self.done('sneak %s' % args[0])
+            else:
+                return self.done('skipped')
+        if self.phase == 'wait_idle':
+            # (a take right after the item's unlock: the PC's minigame success took it already)
+            if op == 'take' and self.i > 0 and self.legs[self.i - 1][0].rstrip('!') == 'unlock' \
+                    and self.legs[self.i - 1][1] == args[0]:
+                obj = self.m.use_target(args[0])
+                if any(a == 'take' for t, a in self.acts_on(obj, self.results[-1].get('start', 0))):
+                    return self.done('taken with the unlock')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout waiting for Woody')
+            if not self.idle(w) or tick - self.last_input < 6: return []
+            if op in ('usewith', 'prime', 'unlock') and len(args) > 1:
+                obj, game = self.m.combine_target(args[0], self.m.pc_item(args[1]))
+                if obj is None: return self.done('no PC object for %s' % args[0])
+                step = {'tick': tick, 'kind': 'combine', 'args': [obj, self.m.pc_item(args[1])]}
+            else:
+                obj = self.m.use_target(args[0])
+                if obj is None: return self.done('no PC object for %s' % args[0])
+                step = {'tick': tick, 'kind': 'use', 'args': [obj]}
+            step['leg'] = ' '.join(leg); self.target = obj; self.phase = 'acting'; self.last_input = tick
+            self.acted = len(self.acts_on(obj)); self.declined = len(state['declines'])
+            return [step]
+        if self.phase == 'acting':
+            if len(state['declines']) > self.declined: return self.done('declined')
+            acts = self.acts_on(self.target)
+            if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w):
+                if op in ('usewith', 'use'): self.tricked[args[0]] = tick
+                return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'parking':
+            pr = self.m.rooms.get(self.target)
+            if w is not None and self.idle(w) and tick - self.last_input >= 6 and pr and \
+                    pr['x1'] - 120 <= w['x'] <= pr['x2'] + 120 and abs(w['y'] - pr['floor']) <= 150:
+                return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'whenusing':
+            acts = self.acts_on(self.target, self.leg_start)
+            if acts and acts[-1][1] != 'leave': return self.done('ok')
+            return []
+        if self.phase == 'await':
+            if any(t >= self.target for t in state['credits']): return self.done('ok')
+            if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
+            return []
+        if self.phase == 'wait':
+            if tick >= self.target: return self.done('ok')
+            return []
+        return []
+    def done(self, why):
+        leg = ' '.join(self.legs[self.i])
+        self.results.append({'leg': leg, 'why': why, 'start': self.leg_start, 'tick': state['tick']})
+        print('LEG %-40s %s at tick %d' % (leg, why, state['tick']), flush=True)
+        emit({'tick': state['tick'], 'ev': 'leg', 'leg': leg, 'why': why})
+        self.i += 1; self.phase = 'idle'; self.last_input = state['tick'] if why == 'ok' else self.last_input
+        return []
+plan = PlanRunner(os.environ['WDBG_PLAN'], int(os.environ['WDBG_LEVELNUM'])) if os.environ.get('WDBG_PLAN') else None
 log = open(HOME + '/nfh-bench/wine/logs/oracle_%s.jsonl' % (want or 'cur'), 'w')
 def emit(rec):
     log.write(json.dumps(rec) + '\n'); state['n'] += 1
@@ -115,12 +234,17 @@ class Tick(gdb.Breakpoint):
         state['tick'] += 1; now = time.time(); state['last'] = now
         if state['t0'] is None:
             state['t0'] = now; open(HOME + '/nfh-bench/wine/logs/level_started', 'w').write('%.3f' % now)
-        if state['tick'] == 20:
+        if state['tick'] == 1:
+            # (the level's setup flood is before the first tick; the loop hook is cheap from here)
             alloc_scratch(); state['loop'].enabled = True
-        # a dummy click two ticks ahead of each scripted message
+        # a dummy click LEAD ticks ahead of each scripted message; the plan's legs as they come due
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()
             emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
+        if plan is not None and state['tick'] > 2:
+            for step in plan.step(state['tick']):
+                pending.append(step); click_dummy()
+                emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
         emit({'tick': state['tick'], 'wall': round(now - state['t0'], 3), 'ev': 'tick', 'actors': actor_states()})
         return now - state['t0'] > secs
 class Loop(gdb.Breakpoint):
@@ -148,13 +272,71 @@ class PathHook(gdb.Breakpoint):
             if name and name not in actors: actors[name] = a
         except Exception: pass
         return False
+MINIGAME_TICKS = int(os.environ.get('WDBG_MINIGAME_TICKS', '36'))
+class Perfect(gdb.Breakpoint):
+    """the PC minigame played perfectly: the minigame object's update (fcn.100508a1) scores the thumb's
+    distance from the wobbling field's middle each tick — 4 within 200 of its 1000-unit radius, 3 / 2 / 1
+    farther out, a penalty beyond (0x1005099d-0x10050a17, [this+0x18]); the score accumulates (fcn.10001b2c,
+    [this+0x28]) into the progress [this+0x1c] the action reads. WDBG_MINIGAME=perfect writes the 4 at the
+    join 0x10050a1a: the game is won as fast as the rules allow, its length a property of the data"""
+    def __init__(self): super().__init__('*%#x' % gl(0x10050a1a), internal=True); self.n = 0
+    def stop(self):
+        try:
+            esi = int(gdb.parse_and_eval('$esi')); self.n += 1
+            wr(esi + 0x18, struct.pack('<I', 4))
+            if self.n == 1 or self.n % 24 == 0:
+                emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % esi, 'perfect': self.n, 'progress': u32(esi + 0x1c), 'acc': u32(esi + 0x28)})
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'perfect', 'err': repr(e)})
+        return False
+class Minigame(gdb.Breakpoint):
+    """a PC minigame won: the game action's update asks the minigame object's progress (fcn.100507f0:
+    [this+0x1c], 100 = done, 0x10004c63) every tick — the oracle writes 100 MINIGAME_TICKS calls in"""
+    def __init__(self): super().__init__('*%#x' % gl(0x100507f0), internal=True); self.calls = {}
+    def stop(self):
+        try:
+            ecx = int(gdb.parse_and_eval('$ecx'))
+            n = self.calls.get(ecx, 0) + 1; self.calls[ecx] = n
+            if n >= MINIGAME_TICKS:
+                # (the GUI pushes its own progress into the object every tick: written before each read)
+                wr(ecx + 0x1c, struct.pack('<I', 100))
+                if n == MINIGAME_TICKS:
+                    emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % ecx, 'won_after': n})
+                    print('MINIGAME won at tick %d' % state['tick'], flush=True)
+            elif n == 1:
+                emit({'tick': state['tick'], 'ev': 'minigame', 'obj': '%#x' % ecx, 'progress': u32(ecx + 0x1c)})
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'minigame', 'err': repr(e)})
+        return False
+class Setter(gdb.Breakpoint):
+    """the GUI's push of its minigame progress (fcn.100507dd: [this+0x1c] = arg): the first calls' return
+    addresses and values, to find the GUI's own progress variable"""
+    def __init__(self): super().__init__('*%#x' % gl(0x100507dd), internal=True); self.n = 0
+    def stop(self):
+        try:
+            self.n += 1
+            if self.n <= 8 or self.n % 50 == 0:
+                esp = int(gdb.parse_and_eval('$esp'))
+                emit({'tick': state['tick'], 'ev': 'setprogress', 'ret': '%#x' % ungl(u32(esp)), 'value': u32(esp + 4), 'n': self.n,
+                      'ebp': '%#x' % int(gdb.parse_and_eval('$ebp')), 'esi': '%#x' % int(gdb.parse_and_eval('$esi')), 'edi': '%#x' % int(gdb.parse_and_eval('$edi'))})
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'setprogress', 'err': repr(e)})
+        return False
 class Hook(gdb.Breakpoint):
     def __init__(self, addr, name, nargs=4):
         super().__init__('*%#x' % gl(addr), internal=True); self.name, self.nargs = name, nargs
     def stop(self):
         try:
             esp = int(gdb.parse_and_eval('$esp'))
-            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % ungl(u32(esp)), 'args': decode_args(esp, self.nargs)})
+            args = decode_args(esp, self.nargs)
+            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % ungl(u32(esp)), 'args': args})
+            if self.name == 'action' and isinstance(args[1], str):
+                state['actions'].setdefault(args[1], []).append((state['tick'], args[2]))
+                if args[1] == 'woody' and args[2] == 'decline': state['declines'].append(state['tick'])
+                if args[1] == 'woody' and args[2] in ('fight', 'respawn'):
+                    state['caught'].append((state['tick'], args[2])); print('CAUGHT tick %d: %s' % (state['tick'], args[2]), flush=True)
+            elif self.name == 'credit':
+                state['credits'].append(state['tick'])
         except Exception as e:
             emit({'tick': state['tick'], 'ev': 'error', 'name': self.name, 'err': repr(e)})
         return False
@@ -168,10 +350,16 @@ gdb.execute('delete')
 lp = Loop(); lp.enabled = False; state['loop'] = lp
 Tick(); PathHook()
 Hook(0x1000e3e0, 'goto'); Hook(0x10002cd5, 'action'); Hook(0x100422a5, 'icon'); Hook(0x1004000a, 'post'); Hook(0x1000f977, 'shout', 5)
+Hook(0x100522e6, 'credit', 3)       # a trick record paid (fcn.1000140b -> fcn.100522e6 on the record's tick)
+if os.environ.get('WDBG_MINIGAME', 'perfect') == 'perfect': Perfect()
+else: Minigame()
 try:
     gdb.execute('continue')
 except Exception as ex:
     print('continue ended:', repr(ex), flush=True)
 log.flush()
 print('done: %d ticks, %d records, %d script steps left' % (state['tick'], state['n'], len(script) + len(pending)), flush=True)
+if plan is not None:
+    json.dump(plan.results, open(HOME + '/nfh-bench/wine/logs/oracle_%s_legs.json' % (want or 'cur'), 'w'), indent=1)
+    print('plan: %d/%d legs, %s; caught %s' % (plan.i, len(plan.legs), [r['why'] for r in plan.results], state['caught']), flush=True)
 gdb.execute('kill')

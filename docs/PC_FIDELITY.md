@@ -4577,7 +4577,19 @@ plans' inputs replay through tools/pcoracle/port2script.py (the port's
 clicks.json by tick) and the two runs line up on one clock
 (cmp_run.py): the per-item keys of this document are measured against
 the original from here on, and the PC script engine (the lift) is to be
-validated the same way.
+validated the same way. The port's plans run on the original themselves
+(oracle.py WDBG_PLAN, tools/pcoracle/planrun.sh: the legs' conditions read
+off the trace, the minigame played perfectly by the scoring's own rule),
+the game's log of the inputs replays through the port (replay.sh,
+oracle2plan.py) and the pairing (cmp_pairs.py) gives the deltas. 202's
+first run (2026-10-02, replay202_planrun3): the port's neighbour a second
+a lap early, by block (PC / port, seconds) — the walk to the mat 5.08 /
+4.98, the mat 16.67 / 16.77, the walk to the shore 4.83 / 4.48, the sea
+19.00 / 18.59, the walk to the rail 14.42 / 14.28, the rail 10.84 / 10.95,
+the walk back 13.17 / 12.95; lap 2 the same shape (the sea 19.00 / 18.42).
+The fifth lap's mat comes 3.9 s early, before Woody's crayfish is on it —
+the PC's visit found it placed and caught him, the port's usewith failed
+and was retried: the lap drift decides a plan.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

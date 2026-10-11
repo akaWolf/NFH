@@ -26,8 +26,8 @@ def load_oracle(p):
             ic = r['args'][1]
             if ic != icon:
                 icon = ic; ev.append((t, 'PC', 'icon %r' % (ic,)))
-        elif r['ev'] in ('post', 'shout'):
-            ev.append((t, 'PC', '%s %s' % (r['ev'], r['args'][:3])))
+        elif r['ev'] in ('post', 'shout', 'credit'):
+            ev.append((t, 'PC', '%s %s' % (r['ev'].upper() if r['ev'] == 'credit' else r['ev'], r['args'][:3])))
         elif r['ev'] == 'injected':
             s = r['step']; ev.append((t, 'PC', 'INPUT %s %s' % (s['kind'], ' '.join(map(str, s['args'])))))
     return ev
