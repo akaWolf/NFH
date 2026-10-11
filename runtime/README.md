@@ -1005,7 +1005,13 @@ predicate, then the all-tricks win.
   109's bubble shows `bed` over the walk to the bed and `sleep` from the
   stay (PCIcon bubble_bed, PCIconClips; the mobile's HUD shows the Bed's
   active icon over both), its span to the alarm clock 328.2 ticks against
-  E09's 327.7 since 2026-10-11.
+  E09's 327.7 since 2026-10-11. A visit inside another item's case shows
+  that case's icon — the PC sets none between (PCIcon per visit,
+  tools/pcref/pc_durations.py: the visit's station's ICON where the
+  mobile has that picture): 104's pie eaten in the cream's case keeps
+  `whippedcream` (E04's bubble goes from the cream to the basin at
+  36.43 s, the port's at 36.49; it had shown the pie's 2.5 s first), 114's
+  medal box in the hat's case `hat`.
 - **The PC profile's Season 1 nearobj triggers on the PC's geometry**
   (`Routine._near_hit`, `Pawn.pc1_point_now`, `pcprofile.s1_leg_point`):
   game.exe tests a station's trigger as |the actor's x - the object's

@@ -126,6 +126,29 @@ SEARCHES = {111: ['DirtyCarpet']}
 EMPTIES = {109: ['PigKeys']}
 
 
+def bubbles(n):
+    """(the PC icons' bubbles by name — the icon's gfx in the level's or
+    generic objects.xml, spelled as the mobile's bubble of that picture
+    where it has one, case aside —, the mobile items' own bubbles by name)"""
+    import re
+    X = os.path.expanduser('~/nfh-bench/pcref/pc/nfh1/x')
+    d = json.load(open(os.path.join(ROOT, 'levels/s1/Level%d.json' % n)))
+    mob = {}
+    for o in d['objects'].values():
+        dd = o.get('data') or {}
+        nm = (dd.get('m_GameObject') or {}).get('name')
+        bi = dd.get('BubbleIconActivePath') or dd.get('BubbleIconPath')
+        if nm and bi:
+            mob.setdefault(nm, os.path.splitext(os.path.basename(bi))[0])
+    spell = {b.lower(): b for b in mob.values()}
+    pc = {}
+    for f in (os.path.join(X, 'generic/objects.xml'), os.path.join(X, canon.pc_level(n)['folder'], 'objects.xml')):
+        for m in re.finditer(r'<icon name="([^"]+)" gfx="([^"]+)"', open(f, encoding='utf-8', errors='replace').read()):
+            b = os.path.splitext(os.path.basename(m.group(2)))[0]
+            pc[m.group(1)] = spell.get(b.lower())
+    return pc, mob
+
+
 def pc_stations(n, toks, walks=None, leads=None, enters=None, rooms=None, wrap=True, intros=None,
                 empties=None, nexts=None):
     """icon -> [seconds of each visit], and icon -> [[(action, seconds)] of each visit]
@@ -277,6 +300,9 @@ def main(argv):
                                 empties=emps, nexts=nxs)
         cempty = {}
         cnext = {}
+        # per visit, the PC case's icon (the station's ICON: a visit inside
+        # another item's case shows that case's — the mobile its own)
+        cicon = {}
         # per visit, the seconds before the stay's end the next case's icon is
         # up: the leave the next case's walk job plays (0x475ce6), after that
         # case's ICON (PCIconLead; the last of a pair's visits)
@@ -325,6 +351,7 @@ def main(argv):
             # (the station's last visit: its stay's end is the station's)
             nxa = (nxs.get(icon) or [None] * (k + 1))[k] if last_of[(icon, k)] == i else None
             cnext.setdefault(item, []).extend([None] * (nv - 1) + [nxa])
+            cicon.setdefault(item, []).extend([icon] * nv)
             if isinstance(share, tuple):
                 # the station split by its actions, one mobile visit each (a
                 # name joined by '+' sums its actions into one visit); each of
@@ -487,6 +514,15 @@ def main(argv):
                 e['set']['PCNextAnim'] = cn if len(cn) > 1 else cn[0]
             else:
                 e['set'].pop('PCNextAnim', None)
+            # the bubble of a visit inside another item's case: that case's
+            # icon (PCIcon; set only — 109's bed is a hand patch), where the
+            # mobile has the picture (a name only the PC's art has —
+            # bubble_bildband, bubble_aquarium — is left to the mobile's)
+            ci = cicon.get(item) or []
+            pcb, mob = bubbles(n)
+            want = [pcb.get(ic) for ic in ci]
+            if len(ci) == len(vals) and all(want) and mob.get(item) and any(w != mob[item] for w in want):
+                e['set']['PCIcon'] = want if len(set(want)) > 1 else want[0]
             ce2 = cempty.get(item) or []
             if any(ce2) and len(ce2) == len(vals):
                 e['set']['PCCaseEmpty'] = ce2 if len(ce2) > 1 else ce2[0]

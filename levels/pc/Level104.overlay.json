@@ -65,6 +65,10 @@
     "PCNextAnim": [
      "ms0",
      "ms3"
+    ],
+    "PCIcon": [
+     "bubble_applepie",
+     "bubble_whippedcream"
     ]
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_pie's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ApplePie <- applepie#0 0.5 s; ApplePie <- whippedcream#0 eat 2.50 s"
