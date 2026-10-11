@@ -68,19 +68,20 @@
    "set": {
     "RequirePriming": false,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 2.833,
-    "PCFireAt": 2.167,
+    "PCUseSecondsTricked": 2.167,
     "PCFixPoint": [
      720,
      390,
      "lir"
     ],
-    "PCFireLead": true,
     "PCReactTail": 1,
     "PCPoseAfter": {
+     "PCAfterShout": "ms0",
      "PCUseSecondsTricked": "ms0",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCAfterShout": 0.5,
+    "PCAfterShoutFirst": false
    },
    "source": "PC objects.xml (level_hunter): the phonograph is lir/lockedphono until the neighbour's `open` on his first lap (57-63), then lir/phono_open for good — the nail (lir/phono_nail) goes in any time after; the remaster's priming toggle on every use has no PC counterpart, and a plain use never primes, so RequirePriming goes (2026-09-17)"
   },
@@ -190,17 +191,19 @@
    "set": {
     "PCUseSeconds": 5.33,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 6.083,
-    "PCFireAt": 5.417,
-    "PCFireLead": true,
+    "PCUseSecondsTricked": 5.417,
     "PCCaseGoto": true,
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0",
-     "PCUseSecondsCompound": "ms0"
+     "PCAfterShout": "ms0",
+     "PCUseSecondsTricked": "ms2",
+     "PCAfterShoutCompound": "ms0",
+     "PCUseSecondsCompound": "ms2"
     },
-    "PCUseSecondsCompound": 7.083,
-    "PCFireAtCompound": 6.417
+    "PCUseSecondsCompound": 6.417,
+    "PCAfterShout": 0.5,
+    "PCAfterShoutFirst": true,
+    "PCAfterShoutCompound": 0.5
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Shotgun <- gun#0 5.3 s"
   },
@@ -214,9 +217,7 @@
     ],
     "PCShoutIndex": 1,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 4.833,
-    "PCFireAt": 4.083,
-    "PCFireLead": true,
+    "PCUseSecondsTricked": 4.083,
     "PCCaseGoto": [
      true,
      false
@@ -226,12 +227,15 @@
      "ms0"
     ],
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0"
+     "PCAfterShout": "ms0",
+     "PCUseSecondsTricked": "riphat"
     },
     "PCNoIcon": [
      false,
      true
-    ]
+    ],
+    "PCAfterShout": 0.583,
+    "PCAfterShoutFirst": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Hat <- hat#0 take+takehat 4.83 s; Hat <- hat#0 putbackhat+give 1.75 s"
   },
@@ -241,14 +245,15 @@
    "set": {
     "PCUseSeconds": 6.25,
     "PCFixSeconds": 0,
-    "PCUseSecondsTricked": 5.417,
-    "PCFireAt": 4.75,
-    "PCFireLead": true,
+    "PCUseSecondsTricked": 4.75,
     "PCCaseGoto": true,
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0"
-    }
+     "PCAfterShout": "ms0",
+     "PCUseSecondsTricked": "ms1"
+    },
+    "PCAfterShout": 0.5,
+    "PCAfterShoutFirst": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_hunter's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Horn <- horn#0 6.2 s"
   },

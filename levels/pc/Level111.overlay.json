@@ -38,19 +38,19 @@
    "set": {
     "TrickScore": 12,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 0.833,
-    "PCFireAt": 0.167,
+    "PCUseSecondsTricked": 0.167,
     "PCFixPoint": [
      505,
      410,
      "bal"
     ],
-    "PCFireLead": true,
     "PCReactTail": 1,
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0",
+     "PCAfterShout": "ms0",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCAfterShout": 0.5,
+    "PCAfterShoutFirst": false
    }
   },
   {

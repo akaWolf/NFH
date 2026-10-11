@@ -1218,6 +1218,22 @@ predicate, then the all-tricks win.
   stuffed toilet fires after the slip's shout, before the rush's puke
   (E05: the doubletake 0.7 s after the slip's shout, the fire 13.0 s after
   the slip; the port's 12.5).
+- **The PC profile's steps after a shouting fire** (PCAfterShout,
+  PCAfterShoutFirst, PCAfterShoutCompound; `World.play_angry`'s S1 path):
+  the fire step builds its own list — its clip, the `shout` icon, the
+  shout, the StopMsg — and pushes it onto the neighbour's queue
+  (0x47c015-0x47c031, fcn.00444d30: the queue's head), above the case's
+  sequence, so the case's steps after a shouting OBJ2 or five-argument
+  step play after the shout: the guns' and the horn's `give` and the
+  hat's (114), the skipping rope's `take` (112), the chair kit's
+  `disassemble` and the grinder's `give` (113), and after the repair
+  where the case has it first — the gramophone's `close` (114), the
+  airer's `take` (111). The stand had played them before the shout; the
+  shout icon came 0.4-0.5 s late against E14's at the hat, the guns, the
+  horn and the gramophone and 0.8 s against E12's at the rope, now within
+  0.2-0.4 s like every other icon of the two levels (tools/pcref/
+  pc_reactions.py; a ReuseAfterFix station's are its redo already, a
+  flag-2 step's shouts nothing).
 - **The PC profile's case after the dead flower** (108; PCNextTricked,
   `Routine._pc_next_tricked`): Level_Suntan's case 16 answers the poisoned
   can by its tricked branch (the SWITCH to anc/deadflower, the shout) and

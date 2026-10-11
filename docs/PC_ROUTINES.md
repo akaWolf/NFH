@@ -94,10 +94,14 @@ time behind itself (fcn.00444d30 with the run-now flag clear, fcn.00478f90's app
 run(a1, a2) gets the level state (the fire reads its angrytime at +0x84 and asks it for the
 rage through fcn.004357e0) and the list owner. A DoAction (fcn.00477f60) is an action object
 (vtable 0x4e546c) whose run starts its animation when its step comes up and reports done when
-the engine ends it; an object never appended never plays. The fire appends its own steps — the
-+0x18 animation, the shout, the sync — to the tail of that list, behind whatever the script
-queued in the same case: the foam pudding's `repair`, OBJ1 and Switch come before its shout
-(the same sum either way). The
+the engine ends it; an object never appended never plays. The fire builds its own steps — the
++0x18 animation, the `shout` icon, the shout, the sync — into a list of its own and pushes it
+onto the actor's queue (0x47c015-0x47c031, fcn.00444d30: the queue's head), above the case's
+sequence, whose next step comes only once the fire's step is done: whatever the script queued
+after the fire in the same case — the guns' and the horn's `give`, the gramophone's repair and
+`close`, the skipping rope's `take` — plays after the shout (2026-10-11, PCAfterShout; read until
+then as appended behind them: E14's shout icon came 0.4-0.5 s sooner than that order put it at
+the hat, the guns, the horn and the gramophone, E12's 0.8 s at the rope). The
 bonus flag is `bl = (fcn.004357e0(level) != 0)`, the rage current above zero, and it also
 picks the face (4) and the +3. The repair is not in the step: the walk-trigger handlers call
 fcn.0047ae70(normal, tricked, …, 1) after it, which plays the tricked object's `repair`

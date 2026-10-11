@@ -10496,28 +10496,62 @@ class World:
                     tail(bool(seq))
 
             def tail(played_angry=True):
+                def done():
+                    if late_tail[0]:
+                        # the case's steps after its repair (the gramophone's
+                        # close after the repair helper's)
+                        late_tail[0] = False
+                        stand_late(lambda: after_run(played_angry))
+                    else:
+                        after_run(played_angry)
                 # the message step closing the handler's list or the repair
                 # helper's (PCReactTail: the object switched back, the floor
                 # object removed — fcn.0047ae70's fcn.0047add0, fcn.0047b610)
                 if item.pc_react_tail:
                     pawn.anim.time_scale = 1.0
                     pawn._stand()
-                    self.call_later(item.pc_react_tail / pcprofile.TICKS_PER_SECOND,
-                                    lambda: after_run(played_angry))
+                    self.call_later(item.pc_react_tail / pcprofile.TICKS_PER_SECOND, done)
                 else:
-                    after_run(played_angry)
+                    done()
+
+            # the case's steps after the fire, which wait for the fire's own
+            # list on his queue (PCAfterShout: the gun's give, the
+            # gramophone's close after its repair — PCAfterShoutFirst)
+            comp = bool(item.compound and item.compound_tricked and item.tricked
+                        and item.pc_after_shout_compound is not None)
+            late = (item.pc_after_shout_compound if comp else item.pc_after_shout) or 0.0
+            late_pose = pose.get('PCAfterShoutCompound' if comp else 'PCAfterShout')
+            late_first = bool(item.pc_after_shout_first)
+
+            def stand_late(then):
+                if late > 0.0:
+                    pawn.anim.time_scale = 1.0
+                    pawn.pc1_pose(late_pose)
+                    pawn._stand()
+                    self.call_later(late, then)
+                else:
+                    then()
+
+            def fixes_then_late():
+                if late > 0.0 and not late_first:
+                    late_tail[0] = True
+                play_fixes()
+
+            late_tail = [False]
 
             def shouted():
                 # the StopMsg closing the fire's list (_s1_fire_stands); its
                 # callback fcn.0047bc90 sets the level's check flag +0x8a
                 # (0x47bfdd), read on the same tick (World._pc_s1_success)
                 pawn.anim.time_scale = 1.0
+                nxt = (lambda: stand_late(play_fixes)) if (late > 0.0 and late_first) \
+                    else fixes_then_late
                 if fire_post > 0.0:
                     self._pc_end_check = True
                     pawn._stand()
-                    self.call_later(fire_post, play_fixes)
+                    self.call_later(fire_post, nxt)
                 else:
-                    play_fixes()
+                    nxt()
 
             def icon():
                 if pc_shout > 0.0 and routine is not None:

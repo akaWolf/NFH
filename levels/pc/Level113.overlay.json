@@ -43,21 +43,22 @@
    "set": {
     "PCUseSeconds": 6.58,
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 7.75,
-    "PCFireAt": 4.833,
+    "PCUseSecondsTricked": 4.833,
     "PCFixPoint": [
      660,
      425,
      "lir"
     ],
-    "PCFireLead": true,
     "PCReactTail": 1,
     "PCCaseGoto": true,
     "PCNextAnim": "ms3",
     "PCPoseAfter": {
+     "PCAfterShout": "ms0",
      "PCUseSecondsTricked": "ms0",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCAfterShout": 2.75,
+    "PCAfterShoutFirst": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): ChairAssembly <- chairkit#0 6.6 s"
   },
@@ -67,21 +68,22 @@
    "set": {
     "PCUseSeconds": 7.0,
     "PCFixSeconds": 1.167,
-    "PCUseSecondsTricked": 8.0,
-    "PCFireAt": 7.083,
+    "PCUseSecondsTricked": 7.083,
     "PCFixPoint": [
      540,
      420,
      "bal"
     ],
-    "PCFireLead": true,
     "PCReactTail": 1,
     "PCCaseGoto": true,
     "PCNextAnim": "ms0",
     "PCPoseAfter": {
-     "PCUseSecondsTricked": "ms0",
+     "PCAfterShout": "ms0",
+     "PCUseSecondsTricked": "ms1",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCAfterShout": 0.75,
+    "PCAfterShoutFirst": true
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_DIY's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): AngleGrinder <- powertool#0 7.0 s"
   },
@@ -174,19 +176,20 @@
      "IT_Painbook": 2.083
     },
     "PCFixSeconds": 1.083,
-    "PCUseSecondsTricked": 7.75,
-    "PCFireAt": 4.833,
+    "PCUseSecondsTricked": 4.833,
     "PCFixPoint": [
      660,
      425,
      "lir"
     ],
-    "PCFireLead": true,
     "PCReactTail": 1,
     "PCPoseAfter": {
+     "PCAfterShout": "ms0",
      "PCUseSecondsTricked": "ms0",
      "PCFixSeconds": "ms0"
-    }
+    },
+    "PCAfterShout": 2.75,
+    "PCAfterShoutFirst": true
    },
    "source": "Woody's trick action (level_DIY's objects.xml, the Loader's time at 12 a second, tools/pcref/pc_woody.py): IT_Painbook <- lir/stoolkit painbook 25 ticks"
   },

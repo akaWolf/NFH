@@ -377,7 +377,8 @@ KEYS = ('PCShoutIndex', 'PCShoutSkip', 'PCFixSeconds', 'PCUseSecondsTricked', 'P
         'PCShoutAfter', 'PCPrimeSecondsTricked', 'PCStopSkip', 'PCFireLead', 'PCReactLead', 'PCReactTail',
         'PCRedoSeconds', 'PCFallSeconds', 'PCSlideTo', 'PCEndAfter', 'PCToolShout', 'PCToolRepair',
         'PCPoseAfter', 'PCUseSecondsCompound', 'PCFireAtCompound', 'PCNearDx', 'PCLeaveTricked',
-        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout', 'PCWakePet')
+        'PCNextCaseSeconds', 'PCThenLook', 'PCNextTricked', 'PCRedoShout', 'PCWakePet', 'PCAfterShout',
+        'PCAfterShoutFirst', 'PCAfterShoutCompound')
 # a step without its StopMsg (flag 1, PCStopSkip) leaves the level's check
 # flag +0x8a to the class's own StopMsg further on (push fcn.0047bc90 before
 # fcn.0047c6c0), where the success of a last trick falls (fcn.00436bb0):
@@ -545,6 +546,22 @@ def _pose(L, parts, anim=None):
     for obj, name in parts:
         anim = L.next_anim(obj, name, anim)
     return anim
+
+
+def after_first(row):
+    """whether the case's actions after the fire step come before its repair
+    (fcn.0047ae70) in the case's order — the gramophone's repair comes first,
+    then its `close` (114's case 14)"""
+    steps = row.get('steps') or []
+    i = next((k for k, st in enumerate(steps) if st.get('fire')), None)
+    if i is None:
+        return True
+    for st in steps[i + 1:]:
+        if st.get('kind') == 'REPAIR':
+            return False
+        if st.get('kind') in ('ACTION', 'ENTER', 'GOTO', 'GOTOENTER', 'LEAVE'):
+            return True
+    return True
 
 
 def index_flags(row):
@@ -758,13 +775,30 @@ def specs(n):
                     if spec.get('back') else 0.0
             else:
                 pre = _sum(lv, spec['pre']) if spec.get('pre') else 0.0
-                total = pre + before + own + after
+                # the case's steps after a shouting OBJ2 or five-argument step
+                # (a station the mobile does not redo): the fire builds its own
+                # list — its clip, the `shout` icon, the shout, the StopMsg —
+                # and pushes it onto his queue (0x47c015-0x47c031, fcn.00444d30:
+                # the queue's head), above the case's sequence, whose next step
+                # comes once the fire's is done: they play after the shout
+                # (PCAfterShout; PCAfterShoutFirst where they come before the
+                # case's repair). E14: the shout icon 0.4-0.5 s sooner than the
+                # stand-first order had it at the hat, the guns, the horn and
+                # the gramophone; E12: 0.8 s at the skipping rope
+                late = after > 0 and not (fl & 2) and row['kind'] in ('OBJ2', 'FIRE5')
+                stand_after = 0.0 if late else after
+                if late:
+                    keys['PCAfterShout'] = round(after, 3)
+                    keys['PCAfterShoutFirst'] = after_first(row)
+                    pose['PCAfterShout'] = _pose(L, p_after)
+                total = pre + before + own + stand_after
                 keys['PCFixSeconds'] = round(fix, 3)
                 keys['PCUseSecondsTricked'] = round(total, 3)
                 # the stand: the case's steps before the fire, those queued
-                # behind it in its case, the step's own clip (its list's)
+                # behind it in its case that play before the shout, the step's
+                # own clip (its list's)
                 pose['PCUseSecondsTricked'] = _pose(L, (spec.get('pre') or []) + p_before
-                                                    + ([] if base in reuse else p_after) + p_own)
+                                                    + ([] if (base in reuse or late) else p_after) + p_own)
                 if p_fix:
                     pose['PCFixSeconds'] = _pose(L, p_fix)
                 if spec.get('redo') is not None:
@@ -791,11 +825,11 @@ def specs(n):
                     pt = fix_point(n, spec['fix'])
                     if pt:
                         keys['PCFixPoint'] = pt
-                if own + after > 0 or total == 0:
+                if own + stand_after > 0 or total == 0:
                     # the fire before the step's own clip or more actions,
                     # or on arrival when the stand plays nothing before it
                     keys['PCFireAt'] = round(pre + before, 3)
-                if own + after > 0:
+                if own + stand_after > 0:
                     # what follows the fire in the stand starts two ticks on
                     # (the step's own clip, its list's first element — or
                     # the stand's next step after its list; FIRE_LEAD)
@@ -820,12 +854,20 @@ def specs(n):
                     cb = sum(v for _, v in csm['before']) + csm.get('pre_fire', 0.0)
                     ca = sum(v for _, v in csm['after'])
                     co = (csm['own'][1] or 0.0) if csm['own'] else 0.0
-                    ctotal = cb + co + ca
-                    keys['PCUseSecondsCompound'] = round(ctotal + (FIRE_LEAD if co + ca > 0 else 0.0), 3)
-                    if co + ca > 0 or ctotal == 0:
+                    # (its steps after the fire after the shout, as the other
+                    # arm's: PCAfterShoutCompound)
+                    clate = ca > 0 and not (fl & 2) and crow['kind'] in ('OBJ2', 'FIRE5')
+                    cstand = 0.0 if clate else ca
+                    if clate:
+                        keys['PCAfterShoutCompound'] = round(ca, 3)
+                        pose['PCAfterShoutCompound'] = _pose(L, _parts(l for l, _ in csm['after']))
+                    ctotal = cb + co + cstand
+                    keys['PCUseSecondsCompound'] = round(ctotal + (FIRE_LEAD if co + cstand > 0 else 0.0), 3)
+                    if co + cstand > 0 or ctotal == 0:
                         keys['PCFireAtCompound'] = round(cb, 3)
                     pose['PCUseSecondsCompound'] = _pose(
-                        L, _parts(l for l, _ in csm['before']) + _parts(l for l, _ in csm['after'])
+                        L, _parts(l for l, _ in csm['before'])
+                        + ([] if clate else _parts(l for l, _ in csm['after']))
                         + (_parts([csm['own'][0]]) if csm['own'] else []))
         if base in RUNTO.get(n, ()):
             keys['PCRunTo'] = True

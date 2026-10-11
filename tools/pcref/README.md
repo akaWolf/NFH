@@ -115,7 +115,11 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
   (the bowl's look after the slip while it is stuffed, fcn.0047e000);
   NEXT_TRICKED the case a tricked branch hands the class where the
   mobile's routine goes elsewhere (PCNextTricked: 108's dead flower to the
-  coffee's case 3, past the can's return); REDO_SHOUT the ReuseAfterFix
+  coffee's case 3, past the can's return); PCAfterShout the case's
+  steps after a shouting OBJ2 or five-argument step, which play after the
+  shout (the fire's list on top of the case's sequence; PCAfterShoutFirst
+  where they come before the case's repair, `after_first` over the steps'
+  order; the compound arm's PCAfterShoutCompound); REDO_SHOUT the ReuseAfterFix
   stations whose redo runs no ICON case (PCRedoShout: the fire's shout
   icon stays over it — 104's microwave, 105's piano, 108's deck chair and
   toothbrush, 110's steak chair, 113's ladder); the skate's PCWakePet (its
