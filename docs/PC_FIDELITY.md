@@ -2761,6 +2761,16 @@ reads it, copies live in ~/nfh-bench/pcref/pc. What it settled:
   after the alarm: a PC action ends with its timer whatever its clip's
   loop flag (`AlerterFSM._play`), so the dog whines every 25 ticks while
   he is in the bedroom and sleeps 6 s after he leaves.
+- *Season 2's chains against the gauge, 2026-10-11 snapshot* (runs/
+  v1011e_pc, the credits' frames against the gauge's jumps at 4 fps, the
+  spans of the pairs both orders share): 202 -0.2, -0.2, -0.6, +0.2; 203
+  -0.2, +0.3, +0.1; 204 -0.1, +0.1, -0.1, +0.1, -0.5; 205 -0.3, -0.3; 206
+  -1.1, +0.5 (the errands' ticks, below); 207 -0.1, -0.2, +0.3, -0.1 and
+  the extra coin to the board -3.0 (the board's dive waits for the Mother
+  in her deck chair, and the plan pays it two laps after E07's: her phase,
+  not read); 208 -0.1, -0.6, 0.0, -0.1; 209 -0.2, -0.2, 0.0, 0.0; 211 0.0,
+  +0.2, -0.1, +0.2; 212 -1.1, -0.1, -0.4; 213 -0.1, -0.1, -0.3, +0.3
+  (210 and 214 pay other orders).
 - *Season 2's chains against Badinfos' gauge (2026-10-04, read and
   carried).* The anger gauge's jumps (the bar at the frame's left,
   tools/pcref/gauge.py at 4 fps) against the port's credits where the
