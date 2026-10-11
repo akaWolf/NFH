@@ -1116,7 +1116,18 @@ predicate, then the all-tricks win.
   front door's) and after the mobile's own clips where the PC data has
   none; a run that cuts a stay's action (the pets' alarm) starts from
   the action's own animation — whether game.exe lets the action end
-  first is not read.
+  first is not read. Woody's animation is not kept (his movers take the
+  `start` as before): the actor is made with `ms` as the neighbour is,
+  yet E01's entrance has his first move take it — the walk from fro's
+  380 to the front door's 56 in 19 moves (with it; 20 without) puts his
+  first command on tick 55, 4.58 s after the card, against the video's
+  first walk at 4.57 s (tick 56 would be 4.67) — so his animation is set
+  between, by a writer not found (+0x3c's setter, fcn.004450a0, has four
+  callers: the actor's creation, fcn.004377f0's set with its GFX message,
+  a listener's set-animation message, 0x440fd0, and a reset to none,
+  0x438d64; the message's sender is not read). The neighbour's first
+  walk from his made `ms` is 107's alone (to the balcony, right: none
+  taken), its segment 0.4 tick long against E07, 0.6 short with it.
 - **The PC profile's Season 1 tools and in-place stations**: a carried
   fixing tool's walk to its use goes to the tool's PCToolPoint
   (`Pawn._pc1_item_point`: 110's extinguisher to bal/barbecue_burn, where
