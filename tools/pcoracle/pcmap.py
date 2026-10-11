@@ -71,7 +71,7 @@ class PCMap(pcgeo.MapOps):
         are the item and an object of the mobile item's PC family — and the minigame it opens, if any.
         `item` None: a dexterity unlock without a tool (203's handbag, 205's duck cage) — the combination of
         the family with a `game` and a single object ingredient; its object is the one to use"""
-        obj = self.objs.get(mobile_item)
+        obj = self.objs.get(mobile_item) or self.stations.get(mobile_item)    # (209's cow: the neighbour's station, no Woody approach)
         if obj is None: return None, None
         base = obj.split('/')[-1].split('_')[0]
         for name, ings, game in self.combos:
@@ -84,7 +84,7 @@ class PCMap(pcgeo.MapOps):
 
     def use_target(self, mobile_item):
         """a bare-hand click: a SearchItem's take on the overlay's object, a trick item's own `use`"""
-        obj = self.objs.get(mobile_item)
+        obj = self.objs.get(mobile_item) or self.stations.get(mobile_item)
         if obj is None: return None
         if self.kinds.get(mobile_item) != 'SearchItem':
             base = obj.split('/')[-1].split('_')[0]

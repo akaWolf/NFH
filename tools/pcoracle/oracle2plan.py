@@ -58,8 +58,25 @@ rooms = {_room_of(z)['room']: z for z in lv.zones if _room_of(z)}
 def world_x(room, x):
     z = rooms[room]; pr = _room_of(z)
     return z.left + (x - pr['x1']) * (z.right - z.left) / float(pr['x2'] - pr['x1']), z.name
-s = open(logp, 'rb').read().decode('utf-16')
-t = None; t0 = None; out = []
+out = []
+if logp.endswith('.jsonl'):
+    # the oracle's own injections from its trace (`injected`: the plan's leg at its tick; `sneak` legs from
+    # their `leg` events) — the port's ops as the plan wrote them, no dependence on the game's log (NFH1
+    # stops writing GameLogicLogNN.xml past 99 files: every copy after 02:51 was a stale session's)
+    evs = []
+    for l in open(logp):
+        try: r = json.loads(l)
+        except ValueError: continue
+        if r.get('ev') == 'injected' and r['step'].get('leg'): evs.append((r['tick'], r['step']['leg']))
+        elif r.get('ev') == 'leg' and r['leg'].startswith('sneak'): evs.append((r['tick'], r['leg']))
+    for tick, leg in evs:
+        words = leg.split()
+        out.append('until %.4f' % (tick / 12.0))
+        out.append(' '.join([words[0] if words[0] == 'sneak' else words[0].rstrip('!') + '!'] + words[1:]))
+    s = ''
+else:
+    s = open(logp, 'rb').read().decode('utf-16')
+t = None; t0 = None
 for l in s.split('\n'):
     l = l.strip()
     if l.startswith('<time value='): t = int(l.split('"')[1])

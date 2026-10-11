@@ -98,6 +98,7 @@ class MapOps:
         if mx is None: return None, None, None, None
         room, px = self.geo.pc_x(z, mx)
         if room is None: return None, None, None, None
+        self.floor_y = (self.geo.pc_room(z) or {}).get('floor', 0)       # the room's path line (NFH1: y 420)
         want = self.pc_item(it_type); cands = []; result = None
         for name, ings, game in self.combos:
             if room in ings:

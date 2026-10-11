@@ -245,7 +245,9 @@ class PlanRunner:
                 room, px, pcname, result = self.m.floor_target(args[0].split('@', 1)[1], mx, args[1])
                 if room is None: return self.done('no floor for %s' % args[0])
                 if not ungated and self.gate_closed(room): return []
-                step = {'tick': tick, 'kind': 'combine', 'args': [room, pcname], 'offset': (int(round(px)), 0)}
+                # (the drop's y: the room's path line — a y of 0 was declined on the spot in 103; WDBG_FLOOR_Y overrides)
+                fy = int(os.environ.get('WDBG_FLOOR_Y', getattr(self.m, 'floor_y', 0) or 0))
+                step = {'tick': tick, 'kind': 'combine', 'args': [room, pcname], 'offset': (int(round(px)), fy)}
                 obj = result or room
             elif op in ('usewith', 'prime', 'unlock') and len(args) > 1:
                 pcname = self.m.item_name(args[0], args[1])
@@ -320,6 +322,7 @@ class PlanRunner:
         if self.phase == 'whenusing':
             acts = self.acts_on(self.target, self.leg_start)
             if acts and acts[-1][1] != 'leave': return self.done('ok')
+            if tick - self.leg_start > 2 * self.TIMEOUT: return self.done('timeout')   # (102's beer never used again after the laxative)
             return []
         if self.phase == 'whenzone':
             nb = actor_states().get('neighbor'); pr = self.target

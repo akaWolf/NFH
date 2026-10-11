@@ -4694,6 +4694,38 @@ walking neighbour and he was caught standing; ungated he walks into him
 in the living room. The port's replay of that run (replay.sh) is the
 measure of where its neighbour is at 108 s.
 
+**Uncatchable on both sides (2026-10-03 03:30):** a Season 1 catch ends
+the level, so a plan run gave a minute or two of trace; now NFH1 runs
+with its rooms test stubbed (s1_oracle.py WDBG_NOCATCH=1: the state
+function fcn.00436bb0 compares Woody's and the neighbour's room objects,
+the neighbour's pause byte +0x78 and the hideout flag 4 of either, and
+stores a `seen` byte at 0x436d2c — five NOPs there, and a breakpoint on
+them logs a `wouldcatch` event once a second), as NFH2 already did with
+its predicate fcn.1003f573, and the port replays such a run with
+NFH_NO_CATCH=1 (World._catch logs `WOULD CATCH` and plays nothing).
+Every replay is now the original's inputs and nothing else: the replay
+plan's legs are `!` (no gate), NFH_NO_DODGE=1 silences the runner's own
+flee clicks (104's port Woody had walked to the living room by himself
+at 71 s), and the run goes on to the trace's end. The reading of a run
+is catch_report.py: for each catch (or would-be catch) on the PC, the
+rooms of Woody and the catchers over the seconds before on both sides,
+whether the port's Woody shares a room with a catcher at that second,
+and the port's own would-be catches the PC has none for. The first
+gated Season 2 runs against the port's uncatchable replays: the first
+catch of a run is the port's too, within a second, on 202 (63.3 s, the
+pond), 204 (8.3 s — the port's Woody on the PC's click crosses the
+neighbour's room just as the PC's does: the route is the same, the
+port's own plan avoids it by its gate's timing), 205 (223.4 s) and 207
+(60.3 s); not on 203 (100.6 s, groundright: the port's neighbour is
+elsewhere) and 206 (265.3 s, topright: elsewhere) — the two to read. After
+a catch the PC's Woody respawns and the two runs part; the uncatchable
+batches on both instances (TAG=nocatch) are the clean set. Season 1 so
+far: 101 runs 13 of its 17 legs (the TV use is a single-object
+combination, lir/twistedantenna <- lir/tv — the GUI's NULL combine again,
+now sent), 102 its first 10 — the would-be catches are Woody parked in
+the hall while the laxative's rushes cross it, which the port's own run
+dodges by hand (its dodge loop) and the oracle's runner does not.
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 
