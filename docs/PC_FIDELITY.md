@@ -4556,6 +4556,29 @@ Plans (runs/sw18s2, all 14 at 100; 207's plan awaits the count 7 — the
   +0xc); Loader.dll parses the XML. The exact indicator length is the
   one number still to read, in GFXEngine.dll.
 
+**The oracle (2026-10-02).** The originals run here: the Steam NFH1/NFH2
+data (binaries byte-identical to the r2 dumps') under Wine on an Xvfb,
+fullscreen 800x600, with gdb on Wine's `winedbg --gdb` proxy tracing
+GameLogic.dll tick by tick and injecting the player's messages
+(tools/pcoracle/README.md: the level patched at game.exe's session start,
+the hooks on the level tick fcn.10044234, the path finder, GoTo, DoAction,
+icon, post and SHOUT, the actor object's x/y/anim at +0x2c/+0x30/+0x40,
+dummy clicks rewritten into UseObjectMsg / CombineMsg / GoToPosMsg at the
+message loop GL 0x10044464; the game's own GameLogicLog records the tick of
+every message). 202's idle lap, original against the port (PC profile,
+runtime/record.py, 2026-10-02): the mat's enter 5.33 / 5.13 s, the bar's
+icon 5.92 / 5.88, the beer 16.00 / 15.85, the get-up 21.50 / 21.27, the
+goswim icon 22.08 / 21.75, the sea's enter 32.67 / 31.92, the SeeSub icon
+35.83 / 35.09, the bridge's icon 44.00 / 43.14, the lookaround 60.17 /
+59.16, the second mat 84.25 / 83.07, the second beer 94.92 / 93.79 — the
+port runs 0.2 s early at the start and 1.2 s early a lap later, the sea
+and the bridge walk the largest steps (tools/pcoracle/cmp_idle.py). The
+plans' inputs replay through tools/pcoracle/port2script.py (the port's
+clicks.json by tick) and the two runs line up on one clock
+(cmp_run.py): the per-item keys of this document are measured against
+the original from here on, and the PC script engine (the lift) is to be
+validated the same way.
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 
