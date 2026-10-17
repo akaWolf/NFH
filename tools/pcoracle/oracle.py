@@ -201,6 +201,7 @@ class PlanRunner:
         """the actions logged on the object's family (the guarded / container variants) since a tick"""
         fam = self.m.family(obj)
         return sorted((t, a) for o, l in state['actions'].items() if '/' in o and self.m.family(o) == fam
+                      and not (o.endswith('_guarded') and not obj.endswith('_guarded'))     # (the keeper's own put / take)
                       for t, a in l if t >= since)
     def step(self, tick):
         """returns the steps to inject this tick"""
@@ -311,6 +312,7 @@ class PlanRunner:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
+                obj = next((o[4:] for o in args[1:] if o.startswith('obj=')), obj)      # (a probe names the object)
                 if op in ('use', 'prime', 'take') and self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()):
                     # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
@@ -334,6 +336,14 @@ class PlanRunner:
         if self.phase in ('acting', 'parking', 'walking') and w is not None and w['anim'] in self.GAITS:
             again = self.resneak(tick, w)
             if again: return again
+        if self.phase == 'acting' and op == 'take' and isinstance(self.target, str):
+            guarded = self.target.rsplit('_', 1)[0] + '_guarded' if '_' in self.target.split('/')[-1] else self.target + '_guarded'
+            keeper = state['actions'].get(guarded, [])
+            if keeper and keeper[-1][1] == 'put' and keeper[-1][0] > getattr(self, '_window_at', -1) and tick - self.last_input >= 6:
+                # the keeper has just put it down: the take again, now that it is there to take
+                self._window_at = keeper[-1][0]; self.last_input = tick
+                again = dict(self.cur_step); again['tick'] = tick; again['window'] = True
+                return [again]
         if self.phase == 'acting':
             if len(state['declines']) > self.declined: return self.done('declined')
             acts = self.acts_on(self.target)

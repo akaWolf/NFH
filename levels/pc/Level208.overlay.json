@@ -28,10 +28,10 @@
      0.08,
      "shout"
     ],
-    "PCUseSecondsTricked": 7.75,
+    "PCUseSecondsTricked": 10.42,
     "PCUseSecondsLinked": 10.17,
-    "PCShout": 1,
-    "PCFixSeconds": 0,
+    "PCShout": 3,
+    "PCFixSeconds": 1.67,
     "PCShoutTail": 0.08,
     "PCCreditAt": 3.25,
     "PCJingleAt": [

@@ -135,10 +135,10 @@
      0.17,
      "shout"
     ],
-    "PCUseSecondsTricked": 6.83,
+    "PCUseSecondsTricked": 9.42,
     "PCUseSecondsLinked": 9.25,
-    "PCShout": 1,
-    "PCFixSeconds": 1.83,
+    "PCShout": 2,
+    "PCFixSeconds": 0.0,
     "PCCreditAt": 4.5,
     "PCJingleAt": [
      3.83
@@ -154,7 +154,8 @@
     "PCUseSeconds": 11.0,
     "PCDepartTicks": {
      "Rottweiler": 1
-    }
+    },
+    "PCShoutTail": 2.75
    }
   },
   {

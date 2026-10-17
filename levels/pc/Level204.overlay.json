@@ -22,9 +22,9 @@
      0.17,
      "shout"
     ],
-    "PCUseSecondsTricked": 5.0,
+    "PCUseSecondsTricked": 7.0,
     "PCUseSecondsLinked": 6.83,
-    "PCShout": 0,
+    "PCShout": 2,
     "PCFixSeconds": 1.33,
     "PCCreditAt": 1.17,
     "PCJingleAt": [
@@ -60,7 +60,7 @@
     ],
     "PCUseSecondsTricked": 4.0,
     "PCShout": 0,
-    "PCFixSeconds": 2.0,
+    "PCFixSeconds": 1.67,
     "PCHitSeconds": {
      "Olga": 3.58
     },
@@ -96,7 +96,7 @@
     ],
     "PCUseSecondsTricked": 3.5,
     "PCShout": 1,
-    "PCFixSeconds": 1.83,
+    "PCFixSeconds": 0.0,
     "PCCreditAt": 1.33,
     "PCJingleAt": [
      1.33
@@ -104,7 +104,8 @@
     "PCUseSeconds": 4.5,
     "PCDepartTicks": {
      "Rottweiler": 3
-    }
+    },
+    "PCShoutTail": 2.08
    }
   },
   {

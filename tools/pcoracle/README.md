@@ -272,6 +272,15 @@ climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
   seconds or more between two bubbles names the visit between them (its
   tricked reaction or the walk on) — the per-station to-do list of a
   tricked lap (205's eel: the PC's 9.25 s against the port's 21.3).
+- `tricked_visits.py <n> <trace> [--write]` — the tricked visits of a
+  Season 2 run measured: per trick record paid, the neighbour's stand
+  around the credit (the station, the actions posted, the SHOUT level,
+  the animations with their lengths, the credit's second) next to the
+  item's PCUseSecondsTricked / PCCreditAt / PCShout / PCFixSeconds /
+  PCShoutTail; `--write` puts the measure into the overlay where it
+  differs by three ticks or more (a simple model only — not a pair, a
+  linked or a compound flow; a tail under a second and a repair the
+  model stands out elsewhere are left).
 - `WDBG_NOCATCH=1` on NFH1 (s1_oracle.py): Woody uncatchable — the state
   function's rooms test (fcn.00436bb0: the two room objects equal, the
   neighbour's pause byte +0x78 clear, no flag 4 on either, fcn.0043c2b0)

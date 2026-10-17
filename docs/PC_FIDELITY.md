@@ -4836,6 +4836,47 @@ combine on NFH1 too (the leg is `ok` where the UseObjectMsg stood 2
 minutes), and 214's first take of the carpet, which no gated run got
 past, is `ok` in the uncatchable one (18 of 42 legs).
 
+**The tricked visits measured (tools/pcoracle/tricked_visits.py, the
+2026-10-03 midday pass):** for each trick record the original pays (the
+trace's `credit`), the neighbour's stand around it — the station, the
+actions posted, the SHOUT level, his animations with their lengths, the
+credit's second — next to the item's PCUseSecondsTricked / PCCreditAt /
+PCShout / PCFixSeconds / PCShoutTail. The credit's second matches the
+overlays to a tick nearly everywhere (203's stage 7.33 against 7.25,
+the toilet pair 11.25 / 16.75 against 11.17 / 17.0, 205's skis 6.25,
+the rockets 2.50, 207's elephant 13.67 against 13.58); what the model
+had wrong is the stand before the SHOUT and the stand after it. The
+PC's SHOUT plays shout2 (27 ticks) at levels 0, 1 and 3 and shout2_hard
+(86) at level 2, a freakout (39-65) once the gauge is full — the
+tables of pcprofile. Written into the overlays from the measure
+(`--write`, a difference of three ticks or more): 202's bridge rail
+(the stand 9.42 with its lookaround, SHOUT 2, the repair a 2.75-s
+stand), 203's melons (a 2.08-s stand after the shout, 25 ticks, where
+the tail was 0.17), 204's jade (7.0, SHOUT 2 — the PC's shout2_hard
+7.17 s where the model shouted not at all), 204's kart (10.0: the
+`fear` 2.17 and a second `inv` 3.58 before the shout), 204's karate
+(no repair clip, a 2.08-s stand), 205's rockets (6.58: the
+`fireworkcrash` 3.08 after the 3.33-s stand), 207's shell (12.17: the
+`fear` 3.33 and a second `inv`), 208's platform (10.42, SHOUT 3, a
+1.67-s repair), 209's fakir (no repair, a 2.08-s stand after the
+freakout), 212's throne (10.33 and the credit 7.92: the 3.67-s
+lookaround the model skipped), 213's cement bath and carnivore (small).
+Kept as they were: 203's stage, whose 4.75-s "repair" stands in for the
+PC's 3-s walk to the generator and its 1.67-s repair there (the time is
+the same, the place is not), and the four-tick stands after a shout
+(the departure ticks' ground). 214's hatch has two tricked flows (the
+open hatch at 78.6 s, SHOUT 0, an 11.3-s stand; the closed one at 282.7
+s, SHOUT 2, 9.25 s) under one set of keys — a per-flow model is wanted.
+205's eel is no model fault: the oracle's `take Glasses` never took
+them (the chef's shop/glasses stays invisible; his put / take loop on
+shop/glasses_guarded is his own animation), the combine of the glasses
+on the statue went through without them (a CombineMsg bypasses the
+inventory), and the chef served seeing — the port's Woody takes the
+glasses at any `put`, so its chef is blind at the tyre; when the PC's
+chef lets go of them is unread. 203's melons likewise: the PC's
+cannonball landed 0.1 s after the neighbour's use had begun, so his
+first melon visit ran untricked (3.75 s) where the port's crashed.
+
 **Season 2 uncatchable, the whole set (05:35, tools/pcoracle/runs_table.py):**
 
 | level | legs run | PC would-be catches the port has within 2 s | bubble drift | jumps |
