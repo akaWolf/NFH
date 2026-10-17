@@ -85,6 +85,10 @@ def build(step):
 script = json.load(open(os.environ['WDBG_SCRIPT'])) if os.environ.get('WDBG_SCRIPT') else []
 script.sort(key=lambda s: s['tick'])
 pending = []
+try:
+    GLOBALS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'pcref', 'exe', 'nfh1_globals.json')))
+except Exception:
+    GLOBALS = {}
 state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0, 'actions': {}, 'credits': [], 'declines': [], 'caught': [], 'sneak': 'auto', 'patched': False}
 actors = {}
 import importlib.util
@@ -139,9 +143,14 @@ class PlanRunner:
         for c in self.CATCHERS:
             if c not in self.present: continue
             a = st.get(c)
-            if a is None: return True                   # (no state: he is in a door pass — a walk)
+            # under WDBG_NOCATCH the walking clause is dropped: a catcher on a walk anywhere held the gate
+            # for his whole station visit (114's park waited 17 s on his kitchen moves and its `whenzone
+            # Zone03` then missed him by a second — 120 s lost), and he cannot catch
+            uncatchable = bool(os.environ.get('WDBG_NOCATCH'))
+            if a is None: return not uncatchable        # (no state: he is in a door pass — a walk)
             if self.blind(c, a): continue
-            if self.room_of(a) in rooms or a['anim'] in self.GAITS: return True   # (NFH1: no GoTo hook — a walk's target is unknown)
+            if self.room_of(a) in rooms: return True
+            if a['anim'] in self.GAITS and not uncatchable: return True   # (NFH1: no GoTo hook — a walk's target is unknown)
         return False
     def sneak_now(self, w=None, to=None):
         """the sneaking flag of an input: the plan's on / off, or under auto (the port's default, tests/
@@ -314,10 +323,10 @@ class PlanRunner:
             # no level.xml entry) and a combination's results
             placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
                 | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
-            for _t, sa, sb in state.get('switches', ()):
-                # the Switch steps so far, in order: the object in the scene goes out, the other comes in (the
-                # trace gave 106's tub_full, 107's dove_free and 113's valve_off/outlet as `unplaced` before)
-                new, old = (sb, sa) if sa in placed and sb not in placed else (sa, sb)
+            for _t, old, new in state.get('switches', ()):
+                # the Switch steps so far, in order — fcn.00451de0's arguments are (old, new): 113's
+                # `bas/valve_on switch_off` queues [bas/valve_on, bas/valve_off], its `switch_on` the reverse
+                # (the trace gave 106's tub, 107's picture and 113's valve_off as `unplaced` before)
                 placed.discard(old); placed.add(new)
             fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
             guarded_fam = obj is not None and (obj + '_guarded' in placed or obj + '_guarded' in getattr(self.m, 'names', ()))
@@ -629,8 +638,10 @@ class Hook(gdb.Breakpoint):
             if self.name == 'action' and isinstance(args[1], str) and args[2] in ('enter', 'leave', 'sleep'):
                 state.setdefault('inside', {})[args[1]] = (args[2] != 'leave', state['tick'])     # a hideout's flag 4
             if self.name == 'switch':
-                # (the step's two names come as the addresses of the class's String globals, 0x51xxxx)
-                args = [as_string(u32(v)) or v if isinstance(v, int) and 0x500000 <= v < 0x600000 else v for v in args]
+                # the step's two names are the class's String globals (0x51xxxx): tools/pcref/exe/
+                # nfh1_globals.json names them (fire_sites.G); a runtime object pointer instead is read
+                args = [GLOBALS.get('%#x' % v) or (as_string(u32(v)) if 0x10000 < v < 0x7fffffff else None) or v
+                        if isinstance(v, int) else v for v in args]
             if self.name == 'switch' and isinstance(args[0], str) and isinstance(args[1], str):
                 # the level's Switch step (fcn.00451de0 queues the SwitchObjects job, vtable 0x4e1bd0: the
                 # case's `Switch new <- old`): the runner's picture of the scene follows it (placed_now)

@@ -4940,6 +4940,41 @@ runners' rules that made the runs possible are in tools/pcoracle/
 README.md; every reading above is reproducible from the traces and the
 replays under ~/nfh-bench (runs/replay<N>_nocatch, logs*/oracle_*_nocatch.jsonl).
 
+**Season 1 rerun on the fixed runner (2026-10-24, nocatch3).** The runner's
+defects read the same day (tools/pcoracle/README.md: a `singleuse` object's
+click is the GUI's NULL CombineMsg, the Switch steps' names, objects.xml's
+tab-separated action attributes, an `auto` action's ticks, the pets' alarm
+outside the rooms test) made every earlier Season 1 trace a different plan
+from the port's; rerun with them, the fourteen pair by their bubbles (the
+PC's icons against the port's thinks, the port's replay with its pets blind
+too, NFH_NO_CATCH) as follows — the legs are the trace's, WON the PC's own
+end of the level, the drift the first and the last pair's offset:
+
+| level | legs | bubbles paired / PC unpaired | drift | steps of 2 s |
+|---|---|---|---|---|
+| 101 | 13/13, WON 169 | 9 / 1 | -0.03 -> -0.39 | none |
+| 102 | 10/10 | 14 / 4 | -> -1.28 | none |
+| 103 | 19/19, WON 186 | 15 / 0 | -> -1.16 | none |
+| 104 | 19/20 | 13 / 4 | -> -0.99 | none (its egg was cut 1.2 s in, before the auto ticks: rerun pending) |
+| 105 | 14/16 | 18 / 2 | -> +0.16 | football -2.7 / +2.2 (the piano after the rush, PCRedoAfterUrgent — read above) |
+| 106 | 37/39 | 5 / 18 | -> +4.75 | candy +5.2 — the trace's full bottle was never taken (the tub `unplaced` before the Switch names): rerun pending |
+| 107 | 17/19 | 31 / 0 | -> +1.90 | none |
+| 108 | 31/31, WON 270 | 8 / 5 | -> -1.24 | none — the honey's bees on both sides now (the old +12 was the cut action) |
+| 109 | 20/20, the game stops at 227 | 24 / 1 | -> +7.42 | milk_bottle +3.9, teeth +4.2 — the PC lets the nitro land on the bottle he carries (159.3; his take 157.0, give 178.9), the port blocks the item until the give (182.3): Woody's pig key 168.2 / 186.0 and every pay after it shift. A PC rule to read before the profile takes it (the carried object's hotspot stays) |
+| 110 | 21/21, WON 200 | 16 / 0 | -> +0.09 | none |
+| 111 | 16/16 | 18 / 2 | -> -0.64 | none |
+| 112 | 12/14 | 14 / 7 | -> -0.70 | none (the skates' floor drop declined, the Zone01 marbles without a PC object) |
+| 113 | 17/19 | 11 / 4 | -> -4.21 | valve +4.2, fuse -6.4 — the plan's bare `use ValveMain` is two clicks in the port (close, then open: the flood), one on the PC (the close alone), so the lap-1 chains differ (the port's flooded sink and his run to the valve; the PC's plain basin and his reopen at 118.2 — and in lap 2 his close 252.8, the hot heater 268.8, the heat valve 283.9, the basin 300.1, every lap when the valve is on). The flood probe (the valve opened after his lap-1 close) is queued |
+| 114 | 10/11 | 22 / 0 | -> -0.72 | none (the park's gate lost 120 s at 57 — the gate's walking clause, off under NOCATCH since: rerun pending) |
+
+Ten of the fourteen pair with no step of 2 s over their runs; the four
+named are 105 (read), 106 and 113 (the traces' own departures from the
+plan, reruns queued) and 109 (the PC's carried-item combine). The pets'
+would-be catches after the stub: 108's parrot at 26.4 s, 109's chili at
+191.5 and 194.1, none elsewhere; the rooms test's 0-8 a level as before.
+109's game stops ticking at the teeth + tabasco combine right after his
+bed_sleep (227 s, three runs) — the plan's last coin is not in the trace.
+
 **The stations' places (2026-10-03, tools/pcoracle/station_positions.py).**
 Where the PC neighbour stands as each station's action starts, over the
 fourteen Season 2 uncatchable traces, against the overlay's PCApproach: the
