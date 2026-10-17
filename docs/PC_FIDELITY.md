@@ -4798,6 +4798,16 @@ leaves for the rockets at 304.0 — 9.25 s, no tantrum, no shout; the port
 plays WaitWatchSingle 2.7 s, EatTyre 11.3 s, AngryEasyUp 2.6 s and
 AngryHard 4.7 s — 21.3 s. The tricked chef visit of Level205's overlay
 is the first of these to settle; each jump is one such reading.
+Two Season 1 input findings on the way: NFH1 crashes (SIGSEGV at game.exe
+0x418131) on a CombineMsg whose object is not placed — 106's toi/tub_hair
+before the hair trick, 107's bal/dove_free before the cut, the `house`
+background on a floor drop — so a combination's target is the family's
+plain object, or the held item's own partner (107's dove is `aux` +
+scissors: a room-less helper object the level creates); and NFH1's GUI
+sends a floor drop (fcn.004077a0 @ 0x407ae6: an item in hand, the floor
+under the click) as a CombineMsg with the item at +4, the room's name at
++8 and the click's x/y at +0x10/+0x14 — the room at +4 is declined on
+the spot. The probe with the GUI's order is queued behind the re-runs.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

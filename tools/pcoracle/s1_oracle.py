@@ -70,7 +70,9 @@ def make_string(text):
 def msg_use(name, sneak=False):
     m = salloc(0x40); wr(m, struct.pack('<IIIII', VT_USE, make_string(name), make_string('oracle'), 1 if sneak else 0, 0x1000)); return m   # (+0xc sneaking, as NFH2's)
 def msg_combine(obj, item, offset=(0, 0), flag18=0):
-    m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', VT_COMBINE, make_string(obj), make_string(item), make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
+    # (item None: the GUI's click on a single-object combination — 101's TV, lir/twistedantenna <- lir/tv —
+    # a NULL second object, as NFH2's game.exe sends for a `game` object without a tool)
+    m = salloc(0x40); wr(m, struct.pack('<IIIIiiII', VT_COMBINE, make_string(obj), make_string(item) if item is not None else 0, make_string('oracle'), offset[0], offset[1], flag18, 0x1000)); return m
 def msg_goto(room, x, sneak=False):
     m = salloc(0x40); wr(m, struct.pack('<IIIIIII', VT_GOTO, make_string(room), 0, int(x), 0, 1 if sneak else 0, 0x1000)); return m
 def build(step):
@@ -275,7 +277,10 @@ class PlanRunner:
                 # (a probe's `obj=<name>` names the message's first object instead of the room: house / the
                 # result object — the room object `toi` with the drop's x and the path's y was declined on 105)
                 fobj = next((o[4:] for o in args[2:] if o.startswith('obj=')), room)
-                step = {'tick': tick, 'kind': 'combine', 'args': [fobj, pcname], 'offset': (int(round(px)), fy)}
+                fy = int(next((o[2:] for o in args[2:] if o.startswith('y=')), fy))
+                # NFH1's GUI (game.exe fcn.004077a0 @ 0x407ae6, a floor hit with an item in hand): the
+                # CombineMsg carries the ITEM at +4 and the room's name at +8, the click's x/y at +0x10/+0x14
+                step = {'tick': tick, 'kind': 'combine', 'args': [pcname, fobj], 'offset': (int(round(px)), fy)}
                 obj = result or room
             elif op in ('usewith', 'prime', 'unlock') and len(args) > 1:
                 pcname = self.m.item_name(args[0], args[1])

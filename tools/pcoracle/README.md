@@ -94,6 +94,11 @@ real thing without reading videos.
   loader and overlay give the zones' walking limits, runtime/world.py
   pc_room_x the x); `usewith Ground@Zone IT_X [x=]` is a floor trick (the
   CombineMsg of the zone's room object with the item at the drop's x);
+  (NFH1's GUI, game.exe fcn.004077a0 @ 0x407ae6 — a floor hit with an
+  item in hand: the message carries the item at +4, the room's name at
+  +8 and the click's x/y at +0x10/+0x14; the room at +4 was declined,
+  the `house` background object there crashed the game, as does any
+  combine on an object not placed yet — a variant before its trick);
   `whenin Role Zone` waits for the pawn in the zone's room; `activated X`
   is three seconds (the PC has no inactive objects); a tool-less `unlock`
   is the GUI's own click on a `game` object — a CombineMsg with a NULL

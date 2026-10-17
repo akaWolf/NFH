@@ -131,10 +131,11 @@ class PCMap(pcgeo.MapOps):
         # no combination on the item's family: the one the held item has with a single object, if it is
         # the only one (104's IT_Hairrestorer goes on toi/grease — the plan names the deodorant's spot)
         if item is not None:
-            alt = [(name, ings, game) for name, ings, game in self.combos if item in ings and sum(1 for i in ings if '/' in i) == 1]
+            # (the other ingredient is the object, a room-less helper too: 107's dove is `aux` + scissors)
+            alt = [(name, ings, game) for name, ings, game in self.combos if item in ings and len(ings) == 2]
             if len(alt) == 1:
                 name, ings, game = alt[0]
-                return next(i for i in ings if '/' in i), (game.group(1) if game else None)
+                return next(i for i in ings if i != item), (game.group(1) if game else None)
         return obj, None
 
     def use_target(self, mobile_item):
