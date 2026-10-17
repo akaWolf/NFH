@@ -129,7 +129,7 @@
       4
      ],
      "start": "0x46da22",
-     "paths": 1,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -166,7 +166,8 @@
        {
         "a": 4644044,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        },
        {
         "a": 4644118,
@@ -198,7 +199,8 @@
        {
         "a": 4644401,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        }
       ],
       "next": 5
@@ -209,7 +211,7 @@
       5
      ],
      "start": "0x46deae",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -222,7 +224,8 @@
        {
         "a": 4644588,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        }
       ],
       "next": "ret"
@@ -743,7 +746,7 @@
       20
      ],
      "start": "0x46ef49",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -756,7 +759,8 @@
        {
         "a": 4648839,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        }
       ],
       "next": 8

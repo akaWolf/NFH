@@ -44,7 +44,7 @@
       1
      ],
      "start": "0x468c93",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -55,22 +55,35 @@
          "edi",
          "esi"
         ]
-       },
-       {
-        "a": 4623566,
-        "kind": "ICON",
-        "args": [
-         "pig_key",
-         0
-        ]
-       },
-       {
-        "a": 4623615,
-        "kind": "GOTO",
-        "obj": "bed/keyboard"
        }
       ],
-      "next": 2
+      "test": {
+       "a": 4623529,
+       "fn": "fcn.00446020",
+       "variant": "pigkey"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4623566,
+         "kind": "ICON",
+         "args": [
+          "pig_key",
+          0
+         ]
+        },
+        {
+         "a": 4623615,
+         "kind": "GOTO",
+         "obj": "bed/keyboard"
+        }
+       ],
+       "next": 2
+      },
+      "false": {
+       "steps": [],
+       "next": 3
+      }
      }
     },
     {
@@ -78,7 +91,7 @@
       2
      ],
      "start": "0x468d1c",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -89,31 +102,44 @@
          "ebx",
          "dword [edi + 0xc]"
         ]
-       },
-       {
-        "a": 4623689,
-        "kind": "SUBSEQ",
-        "args": [
-         "addr",
-         0
-        ]
-       },
-       {
-        "a": 4623776,
-        "kind": "ACTION",
-        "obj": "bed/keyboard",
-        "act": "give"
-       },
-       {
-        "a": 4623912,
-        "kind": "MSG"
-       },
-       {
-        "a": 4624038,
-        "kind": "MSG"
        }
       ],
-      "next": 3
+      "test": {
+       "a": 4623666,
+       "fn": "fcn.00446020",
+       "variant": "pigkey"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4623689,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4623776,
+         "kind": "ACTION",
+         "obj": "bed/keyboard",
+         "act": "give"
+        },
+        {
+         "a": 4623912,
+         "kind": "MSG"
+        },
+        {
+         "a": 4624038,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [],
+       "next": 3
+      }
      }
     },
     {
@@ -580,7 +606,7 @@
       13
      ],
      "start": "0x469ef6",
-     "paths": 1,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -602,7 +628,8 @@
        {
         "a": 4628322,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        },
        {
         "a": 4628366,
@@ -610,23 +637,51 @@
         "args": [
          "pigkey"
         ]
-       },
-       {
-        "a": 4628421,
-        "kind": "ACTION",
-        "obj": "bed/keyboard",
-        "act": "take"
-       },
-       {
-        "a": 4628556,
-        "kind": "MSG"
-       },
-       {
-        "a": 4628678,
-        "kind": "MSG"
        }
       ],
-      "next": 14
+      "test": {
+       "a": 4628366,
+       "fn": "fcn.00446020",
+       "variant": "pigkey"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4628421,
+         "kind": "ACTION",
+         "obj": "bed/keyboard",
+         "act": "take"
+        },
+        {
+         "a": 4628556,
+         "kind": "MSG"
+        },
+        {
+         "a": 4628678,
+         "kind": "MSG"
+        }
+       ],
+       "next": 14
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4628421,
+         "kind": "ACTION",
+         "obj": "bed/keyboard",
+         "act": "take"
+        },
+        {
+         "a": 4628556,
+         "kind": "MSG"
+        },
+        {
+         "a": 4628678,
+         "kind": "MSG"
+        }
+       ],
+       "next": 14
+      }
      }
     },
     {
@@ -867,7 +922,7 @@
       19
      ],
      "start": "0x46a73e",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -880,7 +935,19 @@
         ]
        }
       ],
-      "next": 20
+      "test": {
+       "a": 4630358,
+       "fn": "fcn.00446020",
+       "variant": "pigkey"
+      },
+      "true": {
+       "steps": [],
+       "next": 20
+      },
+      "false": {
+       "steps": [],
+       "next": 21
+      }
      }
     },
     {
@@ -1649,6 +1716,12 @@
     "0x46a0c6": {
      "a": 4628678,
      "kind": "MSG"
+    },
+    "0x46a109": {
+     "a": 4628745,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
     },
     "0x46a1a2": {
      "a": 4628898,

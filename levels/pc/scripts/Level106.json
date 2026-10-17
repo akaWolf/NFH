@@ -358,7 +358,7 @@
       7
      ],
      "start": "0x46c74c",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -379,7 +379,8 @@
        {
         "a": 4635873,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        },
        {
         "a": 4638686,
@@ -1017,6 +1018,11 @@
      "a": 4638686,
      "kind": "GOTO",
      "obj": "toi/tub_empty"
+    },
+    "0x46c7ab": {
+     "a": 4638635,
+     "kind": "GOTOENTER",
+     "obj": "toi/shower"
     },
     "0x46c7f4": {
      "a": 4638708,

@@ -514,7 +514,18 @@ class Fiber(object):
                     # answers true once a Switch has taken it out of the
                     # world: the level fills the tub first, bathes after
                     lookup_present = any(x in gone for x in tk['args'])
-                    tokens.append(dict(a=a, kind='LOOKUPVAL', value='true' if lookup_present else 'false', fire=False))
+                    if decide is not None:
+                        # pc_scripts.py forks the lookup too (109's bed/keyboard: the key board's cases hang on it)
+                        val = decide(a, fn, tk['args'][-1] if tk['args'] else None, 'true' if lookup_present else 'false')
+                        lookup_present = (val == 'true'); lastcall = ('test', val)
+                    tokens.append(dict(a=a, kind='LOOKUPVAL', value='true' if lookup_present else 'false', fire=False, fn=fn))
+                if tk is not None and tk['kind'] == 'INV' and decide is not None:
+                    # the inventory test (fcn.00446020: the actor holds the named thing — 109's pigkey gates the
+                    # key board's take and give): forked like a variant test, the heuristic's `true` the default
+                    names = [x for x in tk['args'] if isinstance(x, str) and x not in ('eax', 'ecx', 'edx', 'ebx', 'esi', 'edi', 'ebp')]
+                    val = decide(a, fn, names[0] if names else None, 'true')
+                    lastcall = ('test', val)
+                    tokens.append(dict(a=a, kind='TESTVAL', value=val, variant=names[0] if names else None, fire=False, fn=fn))
                 if tk is not None and tk['kind'] == 'SWITCH':
                     objs = [x for x in tk['args'] if isinstance(x, str) and '/' in x]
                     if len(objs) == 2:
@@ -527,6 +538,10 @@ class Fiber(object):
                     if objs:
                         gone.add(objs[-1])
                 k += 1; continue
+            if t == 'test eax, eax' and isinstance(lastcall, tuple) and lastcall[0] == 'test' and decide is not None:
+                # the inventory test's count (fcn.00446020 returns how many the actor holds; the case asks
+                # `test eax, eax; jle`): the decided answer stands for eax > 0
+                pred = lastcall[1]; k += 1; continue
             if t == 'test al, al':
                 if lastcall is None:
                     pred = 'false'
@@ -551,12 +566,12 @@ class Fiber(object):
                 if tgt not in LINE:
                     return tokens, 'out'
                 k = LINE[tgt]; continue
-            m = re.match(r'j(e|ne|z|nz) (0x[0-9a-f]+)', t)
+            m = re.match(r'j(e|ne|z|nz|le|g) (0x[0-9a-f]+)', t)
             if m:
                 cc, tgt = m.group(1), int(m.group(2), 16)
                 if pred:
                     nat = pred; pred = False; lastcall = False
-                    jump_if_zero = cc in ('e', 'z')
+                    jump_if_zero = cc in ('e', 'z', 'le')      # (jle after `test eax, eax`: the count is 0 or none)
                     take = (jump_if_zero and nat == 'false') or ((not jump_if_zero) and nat == 'true')
                     if take and tgt in LINE:
                         k = LINE[tgt]; continue

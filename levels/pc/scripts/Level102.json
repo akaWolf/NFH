@@ -385,7 +385,7 @@
       11
      ],
      "start": "0x470078",
-     "paths": 1,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -407,7 +407,8 @@
        {
         "a": 4653293,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        },
        {
         "a": 4653334,
@@ -415,25 +416,55 @@
         "args": [
          "toiletpaper"
         ]
-       },
-       {
-        "a": 4653419,
-        "kind": "ACTION",
-        "obj": "dword [eax]",
-        "act": "shit_with_paper"
-       },
-       {
-        "a": 4653562,
-        "kind": "ACTION",
-        "obj": "dword [eax]",
-        "act": "grabpaper"
-       },
-       {
-        "a": 4653639,
-        "kind": "STOPMSG"
        }
       ],
-      "next": 12
+      "test": {
+       "a": 4653334,
+       "fn": "fcn.00446020",
+       "variant": "toiletpaper"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4653419,
+         "kind": "ACTION",
+         "obj": "dword [eax]",
+         "act": "shit_with_paper"
+        },
+        {
+         "a": 4653562,
+         "kind": "ACTION",
+         "obj": "dword [eax]",
+         "act": "grabpaper"
+        },
+        {
+         "a": 4653639,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 12
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4653419,
+         "kind": "ACTION",
+         "obj": "dword [eax]",
+         "act": "shit_with_paper"
+        },
+        {
+         "a": 4653562,
+         "kind": "ACTION",
+         "obj": "dword [eax]",
+         "act": "grabpaper"
+        },
+        {
+         "a": 4653639,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 12
+      }
      }
     },
     {
@@ -756,6 +787,27 @@
     "0x470247": {
      "a": 4653639,
      "kind": "STOPMSG"
+    },
+    "0x470288": {
+     "a": 4653704,
+     "kind": "STOPMSG"
+    },
+    "0x470309": {
+     "a": 4653833,
+     "kind": "ACTION",
+     "obj": "dword [eax]",
+     "act": "shit_without_paper"
+    },
+    "0x4703a1": {
+     "a": 4653985,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "toiletpaper",
+      2,
+      2,
+      "nopaper"
+     ]
     },
     "0x470473": {
      "a": 4654195,
@@ -1156,7 +1208,7 @@
       7
      ],
      "start": "0x46c74c",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -1177,7 +1229,8 @@
        {
         "a": 4635873,
         "kind": "LOOKUPVAL",
-        "value": "false"
+        "value": "false",
+        "fn": "fcn.00448bf0"
        },
        {
         "a": 4638686,
@@ -1815,6 +1868,11 @@
      "a": 4638686,
      "kind": "GOTO",
      "obj": "toi/tub_empty"
+    },
+    "0x46c7ab": {
+     "a": 4638635,
+     "kind": "GOTOENTER",
+     "obj": "toi/shower"
     },
     "0x46c7f4": {
      "a": 4638708,

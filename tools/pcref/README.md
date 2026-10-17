@@ -216,5 +216,8 @@ oracle trace over the script (a step's call is the event's ret - 5) and
 names the events that are no step (the steps' sub-calls and the GUI's
 handlers are known; the rest are helper functions and behaviours the engine
 still has to carry). The simulator's `decide` hook (trick_branches.Fiber.
-simulate) is what forks the paths; everything else in trick_branches is
-unchanged.
+simulate) is what forks the paths — the variant tests, the LOOKUP of an
+object (fcn.00448bf0) and the inventory test INV (fcn.00446020: how many of
+the named thing the actor holds, asked by `test eax, eax; jle` — 109's
+`pigkey` gates the key board's give (case 1-2), the feed (case 19) and the
+take (case 13)); everything else in trick_branches is unchanged.
