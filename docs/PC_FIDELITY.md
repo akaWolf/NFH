@@ -5048,14 +5048,18 @@ him 102.2, step5 at 105.6, the box closed at 111.7; his lap starts at
 124 s (bottomleft, bottomright 156, topright 176, topleft 187, ~120 s a
 lap). She sits back in her chair at 106.9 (`enter`: the chair's
 sitdown_pillow then sleep_pillow) and stays `inv` to the run's end
-(420 s). Woody stood in her room with the neighbour elsewhere twice,
-218-222 s and 339-343 s, and was not seen; every would-be catch of the
-run was the neighbour's, in his own room (ten, 157-399 s). The port's
-Mother alternates MotherSleepLoop 60 s and MotherLook 30 s from 92 s
-(the mobile's chair) — 334-364 is a look phase there, where the PC's
-Mother slept on: the port is the stricter one, the plan stands, and her
-look phases are an open question (a probe over her stays is queued,
-2026-10-03 13:20).
+(420 s) — `inv` is the chair's own animation, and her script's loop
+behind it is the one the port carries (pc_durations_others, the DeckChair's
+Mother clips): 0x1002b9fe's `enter` and fcn.1000e7f2's 720-tick bar asleep
+(the chair's `sleep`, her flag 4 set), 0x1002b972 clearing the flag for
+the chair's `look`, 0x1002b72a's 360 ticks, round again. A second probe
+(motherprobe7) put Woody in her room on both phases with the neighbour
+away, her clock from the chair's `enter` at 96.6 s: asleep 137-150 s and
+240.9-246.6 s he was not seen; the look that began at 246.6 caught him
+1.7 s in (248.3), the one of 336.6-366.6 as he arrived (360.8). Her
+sight is the look phase's and the port's MotherSleepLoop 60 s /
+MotherLook 30 s are hers (the port's clock starts at its own lesson's
+end, 13 s earlier than the paced oracle run's); the question is closed.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
