@@ -116,7 +116,13 @@ real thing without reading videos.
   (`woody fight` / `respawn`) are printed; the game's own log (a new
   GameLogicLogNN.xml per session) then gives the port the same inputs by
   tick (`oracle2plan.py`, `replay.sh <n> <level> <tag>`: the plan, the
-  port's run, the comparison).
+  port's run, the comparison). The replay plan now comes from the
+  oracle's own trace (`oracle2plan.py <n> <trace.jsonl>`: the `injected`
+  events' legs at their ticks, the `sneak` legs from their `leg`
+  events) — NFH1 stops writing GameLogicLogNN.xml past 99 files in its
+  Documents folder, and every copy after that was a stale session's
+  (the gated 106-114 and the first nocatch copies all said level_piano);
+  the game's log still serves as a check of what the game accepted.
 - `cmp_run.py <trace> <run dir>` — the two sides on one clock: the PC's
   station actions, icon changes, posts, SHOUTs and inputs against the
   port's routine transitions, think icon, trick count and clicks.

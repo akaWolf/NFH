@@ -4726,6 +4726,27 @@ now sent), 102 its first 10 — the would-be catches are Woody parked in
 the hall while the laxative's rushes cross it, which the port's own run
 dodges by hand (its dodge loop) and the oracle's runner does not.
 
+**The gated Season 1 runs against the port's replays (03:45, the
+replays rebuilt from the traces, the port uncatchable and not dodging):**
+the first catch of the run is the port's too within a second on 101,
+103, 104, 105, 106 and 114, and within two on 102 (the port's neighbour
+crosses the hall a second early on the laxative's rush); 113 ran its five
+minutes without one. 107-111 were the dog: `chili` / `dog` wakes and
+barks (wakeup, 12 ticks, bark) at Woody walking the living room — the
+runner's use and combine messages carried no sneak flag then (the
+plan's `sneak on` reached the floor clicks only), the port's replay had
+the sneak legs and its dog slept. 112: the PC neighbour walks through
+the hall at 92.9 s on his way from the mixer's coffee to the chest
+expander, the port's at 97.2 — four seconds, the one Season 1 timing
+divergence a catch showed; the uncatchable runs pair it. Season 2 the
+same way (the gated runs 202-211 against the trace-built replays): the
+first catch is the port's within a second on every level but 206 — 202
+63.3 s, 203 100.6 (the earlier reading of 203 was the port runner's own
+dodge, gone with NFH_NO_DODGE), 204 8.3, 205 223.4, 207 60.3, 208 19.3,
+209 81.5 (the port 82.1), 210 113.7, 211 115.1 (the Mother); 206's 265.3
+s in topright has no port catcher near — the pillow level whose laps
+already drifted -3.2 s per 100 s.
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 

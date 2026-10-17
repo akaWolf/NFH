@@ -14,6 +14,12 @@ class PCMap(pcgeo.MapOps):
     def __init__(self, n):
         self.n = n
         self.geo = pcgeo.Geo(n)           # the port's level: the zones' limits and PC rooms, the floor items
+        # the rooms a pet watches (the mobile's Alerter items' zones): the port's auto-sneak tiptoes there
+        self.alerter_rooms = set()
+        for it in self.geo.level.items.values():
+            z = self.geo.level.zone_by_pid(it.zone) if it.kind == 'Alerter' and it.zone is not None else None
+            pr = self.geo.pc_room(z) if z is not None else None
+            if pr: self.alerter_rooms.add(pr['room'])
         ov = json.load(open(os.path.join(ROOT, 'levels', 'pc', 'Level%d.overlay.json' % n)))
         self.objs = {}; self.rooms = {}; self.stations = {}
         for e in ov['patches']:
@@ -73,13 +79,24 @@ class PCMap(pcgeo.MapOps):
         the family with a `game` and a single object ingredient; its object is the one to use"""
         obj = self.objs.get(mobile_item) or self.stations.get(mobile_item)    # (209's cow: the neighbour's station, no Woody approach)
         if obj is None: return None, None
-        base = obj.split('/')[-1].split('_')[0]
+        base = obj.split('/')[-1].split('_')[0]; found = []
         for name, ings, game in self.combos:
             objs = [i for i in ings if '/' in i and i.split('/')[-1].split('_')[0] == base]
             if item is None:
                 if game and objs and all('/' in i for i in ings): return objs[0], game.group(1)
             elif item in ings and objs:
-                return objs[0], (game.group(1) if game else None)
+                found.append((objs[0], (game.group(1) if game else None)))
+        if found:
+            # the family's plain object first (a variant may not be placed yet — a combine on one crashes)
+            found.sort(key=lambda f: (f[0] != obj, len(f[0])))
+            return found[0]
+        # no combination on the item's family: the one the held item has with a single object, if it is
+        # the only one (104's IT_Hairrestorer goes on toi/grease — the plan names the deodorant's spot)
+        if item is not None:
+            alt = [(name, ings, game) for name, ings, game in self.combos if item in ings and sum(1 for i in ings if '/' in i) == 1]
+            if len(alt) == 1:
+                name, ings, game = alt[0]
+                return next(i for i in ings if '/' in i), (game.group(1) if game else None)
         return obj, None
 
     def use_target(self, mobile_item):
