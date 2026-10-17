@@ -4817,7 +4817,11 @@ within two seconds. 108 with the auto-sneak: 28 of 37 legs and no bark
 auto-sneak runs 16 of 29 legs past seven would-be catches and ends in a
 real fear at 191.5 s all the same: the pins in the neighbour's bed wake
 him into a catch of his own (the bed's behaviour, not the rooms test the
-stub covers) — a second Season 1 catch path, left as it is.
+stub covers) — a second Season 1 catch path, left as it is. The dog
+levels again with the auto-sneak, all without a bark: 106 39 of 48 legs
+(the tub primed at toi/tub, no crash), 107 11 of 27 (a crash on the free
+dove's combine, fixed as `aux`), 108 28 of 37, 109 16 of 29, 110 22 of
+27, 111 12 of 45.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

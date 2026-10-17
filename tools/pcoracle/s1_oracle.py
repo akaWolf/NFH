@@ -336,8 +336,19 @@ class PlanRunner:
                     if self.blind(role, a): return self.done('ok')
                 elif 'Walk' in anim:
                     if a['anim'] in self.GAITS: return self.done('ok')
-                elif a['anim'] != self._anim0 and a['anim'] not in self.GAITS and a['anim'] not in self.STANDS:
-                    return self.done('ok (approximate: his next animation)')
+                else:
+                    # the name's words (OlgaShowerWater: shower, water; MotherBawlLeft: bawl) in his
+                    # current animation or in the last action on his station (the goto hook's target)
+                    import re
+                    words = [w.lower() for w in re.findall(r'[A-Z][a-z]+', anim) if w.lower() not in ('olga', 'mother', 'rottweiler', 'woody', 'left', 'right', 'loop', 'single')]
+                    d = state.get('dest', {}).get(actors.get(role)); acts = state['actions'].get(d[1], []) if d and isinstance(d[1], str) else []
+                    last_act = acts[-1][1].lower() if acts else ''; station = d[1].lower() if d and isinstance(d[1], str) else ''
+                    at_station = a['anim'] not in self.GAITS and last_act not in ('leave', '')
+                    if words and (any(w in a['anim'].lower() for w in words) or any(w in last_act for w in words)
+                                  or (at_station and any(w in station for w in words))):
+                        return self.done('ok')              # (210's OlgaShowerWater: Olga at beachleft/shower, in it)
+                    if not words and a['anim'] != self._anim0 and a['anim'] not in self.GAITS and a['anim'] not in self.STANDS:
+                        return self.done('ok (approximate: his next animation)')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')
             return []
         if self.phase == 'whenin':
