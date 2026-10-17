@@ -4913,24 +4913,27 @@ auto-sneak, the placed variants, the takes by content):**
 |---|---|---|---|---|
 | 101 | 13/17 | 0 of 0 | -0.24 s/100 s (9 pairs) | none (the TV as the NULL combine) |
 | 102 | 10/24 | 8 of 8 | -0.43 (14) | none |
-| 103 | 20/25 | 0 of 0 | -0.71 (15) | none |
-| 104 | 20/26 | 3 of 6 | +7.41 (9) | basin +11.0 (the soap drop was declined then) |
-| 105 | 16/23 | 2 of 2 | +2.15 (18) | flower -4.2, football +9.6, piano +2.2 |
-| 106 | 39/48 | 5 of 8 | -0.21 (4) | none |
-| 107 | 19/27 | 8 of 8 | +0.11 (31) | none |
-| 108 | 28/37 | 2 of 6 | -1.68 (9) | the dog's bark on both sides at 29 s, then nobody's game |
-| 109 | 16/29 | 5 of 7 | +8.84 (23) | pig +3.9, the parrot's shout +16.7 |
-| 110 | 22/27 | 3 of 9 | -6.66 (13) | bbq -17.8 and +16.4, beer -14.1 (the second lap's order) |
-| 111 | 12/45 | 3 of 4 | -0.22 (18) | none |
+| 103 | 19/25 | 1 of 1 | -0.71 (15) | none |
+| 104 | 20/26 | 1 of 1 | -0.44 (13) | none (the soap laid and the hair restorer in the grease with today's map; the +11 s was the old trace's two declines) |
+| 105 | 16/23 | 2 of 2 | -2.27 (17) | flower -17.2, football +9.6, piano +2.2 |
+| 106 | 39/48 | 5 of 5 | +1.80 (5) | candy +5.2 |
+| 107 | 19/27 | 5 of 6 | +0.70 (30) | none |
+| 108 | 28/37 | 2 of 6 | -1.68 (9) | chili_shout -9.7, coffee +19.8 / -26.0 (a pairing swap), coffee +11.9 — the dog's bark on both sides at 29 s |
+| 109 | 16/29 | 5 of 7 | +8.84 (23) | pig +3.9, the parrot's shout +13.4 |
+| 110 | 21/27 | 3 of 3 | +0.07 (16) | none (the second lap's order with today's map) |
+| 111 | 16/45 | 4 of 4 | -0.22 (18) | none |
 | 112 | 12/29 | 4 of 4 | -0.24 (14) | none |
 | 113 | 9/30 | 3 of 5 | -0.06 (13) | basin +4.2, valve -6.4, powertool -13.2, basin +16.0 (the valve's water chain; the outlet before the water is `unplaced`) |
 | 114 | 21/43 | 3 of 3 | -0.37 (22) | none (the rat and the nail by their containers' contents) |
 
-Nine of the fourteen pair with no jump and within 0.7 s per 100 s over
-their runs; the catches are the port's within two seconds wherever the
-PC has them. What remains is named: 104's basin (to be read again with
-the soap laid), 105's flower and football, 109's pig visit and the
-parrot's shout, 110's second lap, 113's valve and basin. The two
+Rerun on 2026-10-03 with today's maps (nocatch2: the Deodrant's
+toi/grease, the floor drops at y 420, the runners' action wait and the
+`game` objects' NULL combine), nine of the fourteen pair with no jump —
+104 and 110 among them now — and within 1.3 s over their runs; the
+catches are the port's within two seconds wherever the PC has them but
+107 (5 of 6), 108 (2 of 6), 109 (5 of 7) and 113 (3 of 5). What remains
+is named: 105's flower and football, 106's candy, 108's chili shout and
+coffee, 109's pig visit and the parrot's shout, 113's valve and basin. The two
 runners' rules that made the runs possible are in tools/pcoracle/
 README.md; every reading above is reproducible from the traces and the
 replays under ~/nfh-bench (runs/replay<N>_nocatch, logs*/oracle_*_nocatch.jsonl).
@@ -5119,7 +5122,12 @@ MotherSleepLoop, 207's ladder swim, 208's and 209's dressing-room idle,
 MotherSleepBehaviour's own arm) and the port holds them while its scene
 flag is up (Routine.tick, AnimPlayer.pc_paused): 210's replay sleeps her
 353.2-393.4 for the PC's 356.5-397.8. Olga's bars (202's and 210's mat,
-210's shower) are the same object on the PC and unmeasured yet.
+210's shower) are the same object on the PC; 202's probe of her mat
+(the bar hook, nocatch7) is not conclusive yet: her stays on the mat
+run 63.7 s (37.3-101.0, 116.2-179.9, 195.2-258.8), the one holding his
+SHOUT 1 at 359.3 ran 66.6 (350.8-417.4) and the one holding his SHOUT 0
+at 331.7 ran 61.5 (274.1-335.6) — the mat's own bar is 120 ticks and
+the hook's objects there are not mapped to their actors. Unmarked.
 Two plans sat on the edge of their collapse and the holds pushed them
 over: 211's phone coin landed at 99.94 (its Mother's nap after her
 lap-3 visit to the child came 6 s later) — its final window opens on her
