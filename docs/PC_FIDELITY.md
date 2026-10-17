@@ -4747,6 +4747,58 @@ dodge, gone with NFH_NO_DODGE), 204 8.3, 205 223.4, 207 60.3, 208 19.3,
 s in topright has no port catcher near — the pillow level whose laps
 already drifted -3.2 s per 100 s.
 
+**The first whole plans on both sides uncatchable (04:15):** 203 runs
+all 16 legs on the original (the handbag's NULL combine, the five
+tricks) and the port replays its ten inputs clean once the harness
+walks on past a recorded catch (Pawn._complex_arrival had parked Woody
+on the entry catch check for good: he held the wallright door pair from
+109 s and the neighbour waited behind it to the end). The tricked lap
+then reads station by station: the stage's crash sequence 111.6-125.2
+on the PC (the enter, the crash, the leave, shout2) against the port's
+111.1-131.9 (StageEnter, StageCrash, StageLeave, AngryEasyUp, FixMid:
++5 s, and the PC's fix is the generator's `repair` at 130.4, 1.7 s,
+after the walk); the toilet's two tricks fire on one tick on the PC
+(145.1: shit_chili, flush_rice, repair, then shout2_hard at 165.7 —
+20.6 s) where the port plays them in turn (RiceToiletPaperChili 144.7,
+RiceToiletFlushFall 159.7, the angry, FixMid to 174.6 — 30 s); the walk
+to the melons is 28 s on the PC and 18.6 in the port, so the melons' use
+lands within half a second on both (193.6 / 193.2); the bike's crash
+206.0 / 210.1. 202 replays 17 of its legs within -0.42 s per 100 s. The
+reactions to a trick — their order, their sequences, the repair's place
+— are where the profile's lap model is thinnest; the uncatchable batches
+of both seasons give every level's tricked lap to read this way.
+Season 1 uncatchable, the first pass (04:20, the port's replays from
+the traces): 102 pairs 13 legs within -0.43 s per 100 s and its eight
+would-be catches (Woody parked in the hall, the laxative's rushes
+crossing it every ~35 s) are the port's too, 2-3 s earlier each; 106 and
+114 (22 legs, five minutes of tricks) within -0.25; 103 -0.71 with the
+soap drop declined on the PC (the port lays it); 101, 104 and 105 part
+where a PC leg went wrong and the port's did not — the TV use (nothing
+on the PC until it is the NULL combine), the deodorant (the PC
+combination is on the grease), the floor soap (declined at the room
+object with the drop's x and the path's y: the floor probe tries the
+house object and the result object) — their laps are tricked
+differently from there (+7.9, +7.4, +2.2 s per 100 s); 107-112 ran
+without the stub (a flag bug, fixed) and end at the dog's bark or the
+first catch — all queued again.
+
+**Where the drift jumps (tools/pcoracle/jumps_report.py, 04:25):** the
+bubble pairs of a replay (the HUD bubble's changes matched by name on
+both sides, the one pairing a tricked lap's extra sequences cannot
+shift) read as port-minus-PC offsets; a step of two seconds or more
+between one bubble and the next names the visit between them. The
+uncatchable runs so far: 102, 103, 106, 114, 202 — no jump (the steady
+-0.03..-0.13 s per bubble); 104 the basin +11.0 s (116.8 -> 146.7); 105
+flower -> football -4.2, football -> flower +9.6, piano +2.2; 203
+ricetoilet -> bike +4.5; 204 gong -> hotdog -6.1; 205 eel -> rockets
++11.8 and pingpong -> waterski +6.2. The eel's, read out: the PC
+neighbour reaches the chef at 294.75 with take_tyre, cut_eel and
+eat_eel posted on that tick, stands `wait` 6.9 s and `eat_eel` 2.1 s and
+leaves for the rockets at 304.0 — 9.25 s, no tantrum, no shout; the port
+plays WaitWatchSingle 2.7 s, EatTyre 11.3 s, AngryEasyUp 2.6 s and
+AngryHard 4.7 s — 21.3 s. The tricked chef visit of Level205's overlay
+is the first of these to settle; each jump is one such reading.
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 

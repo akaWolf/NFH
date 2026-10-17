@@ -262,6 +262,11 @@ sea -> rail 16.16 / 16.10 (the port stands 3.3 s at the stairs' foot and
 climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
 -0.28 in the sea, -0.1 the rest.
 
+- `jumps_report.py <pairs.txt...> [--jump=2]` — where a replay's drift
+  jumps: the bubble pairs read as port-minus-PC offsets, a step of two
+  seconds or more between two bubbles names the visit between them (its
+  tricked reaction or the walk on) — the per-station to-do list of a
+  tricked lap (205's eel: the PC's 9.25 s against the port's 21.3).
 - `WDBG_NOCATCH=1` on NFH1 (s1_oracle.py): Woody uncatchable — the state
   function's rooms test (fcn.00436bb0: the two room objects equal, the
   neighbour's pause byte +0x78 clear, no flag 4 on either, fcn.0043c2b0)
