@@ -7725,7 +7725,8 @@ class Routine:
             self._pending = 'skip'
         elif it is not None and it.got_tricked and not self.marbles_next and \
                 it.name not in ('WateringCan', 'ValveHot', 'ValveMain') \
-                and not (kind == 'surprise_near' and pcprofile.is_pc() and not nfh2):
+                and not (kind == 'surprise_near' and pcprofile.is_pc() and not nfh2) \
+                and not (pcprofile.is_pc() and it.pc_redo_after_urgent):
             # (the PC's walk-by is a trigger: the level class's handleTrigger
             # re-runs the interrupted case — Level_Laundry's 0x454726 sets
             # the case to the one last run — and that case decides on its own
@@ -7760,6 +7761,11 @@ class Routine:
         else:
             self._pending = 'start'
             replay = True
+            if pcprofile.is_pc() and it is not None and it.got_tricked and it.pc_redo_after_urgent:
+                # the PC's case plays the fired station again after the
+                # urgent (PCRedoAfterUrgent: 105's piano, play_piano_noangry
+                # after the toilet rush), its stand PCRedoSeconds
+                self._pc_redo = it
         if replay and orig is not None and orig is not self._entry():
             # StartAction(ActiveAction.OriginalAction) (cs:647) restarts the
             # interrupted action itself, not the routine's current entry:

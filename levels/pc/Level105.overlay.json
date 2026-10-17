@@ -64,7 +64,9 @@
      "PCUseSecondsTricked": "ms0",
      "PCFixSeconds": "ms0"
     },
-    "PCRedoShout": true
+    "PCRedoShout": true,
+    "PCRedoAfterUrgent": true,
+    "PCRedoSeconds": 6.25
    },
    "source": "the PC station's DoActions at 12 ticks a second (level_piano's objects.xml and anims.xml through tools/pcref/lap_model.py, paired in tools/pcref/pc_durations.py): Piano <- piano#0 8.8 s"
   },

@@ -4915,7 +4915,7 @@ auto-sneak, the placed variants, the takes by content):**
 | 102 | 10/24 | 8 of 8 | -0.43 (14) | none |
 | 103 | 19/25 | 1 of 1 | -0.71 (15) | none |
 | 104 | 20/26 | 1 of 1 | -0.44 (13) | none (the soap laid and the hair restorer in the grease with today's map; the +11 s was the old trace's two declines) |
-| 105 | 16/23 | 2 of 2 | -2.27 (17) | flower -17.2, football +9.6, piano +2.2 |
+| 105 | 16/23 | 2 of 2 | -0.73 (18) | piano -2.7 / +2.2 (the piano replayed after the rush since: PCRedoAfterUrgent) |
 | 106 | 39/48 | 5 of 5 | +1.80 (5) | candy +5.2 |
 | 107 | 19/27 | 5 of 6 | +0.70 (30) | none |
 | 108 | 28/37 | 2 of 6 | -1.68 (9) | chili_shout -9.7, coffee +19.8 / -26.0 (a pairing swap), coffee +11.9 — the dog's bark on both sides at 29 s |
@@ -4932,8 +4932,10 @@ toi/grease, the floor drops at y 420, the runners' action wait and the
 104 and 110 among them now — and within 1.3 s over their runs; the
 catches are the port's within two seconds wherever the PC has them but
 107 (5 of 6), 108 (2 of 6), 109 (5 of 7) and 113 (3 of 5). What remains
-is named: 105's flower and football, 106's candy, 108's chili shout and
-coffee, 109's pig visit and the parrot's shout, 113's valve and basin. The two
+is named: 106's candy, 108's chili shout and coffee, 109's pig visit and
+the parrot's shout (the awake parrot sees a sneaking Woody on both
+sides; the PC's neighbour reaches it 8 s earlier), 113's valve and basin;
+105's flower and football were the piano's replay after the rush. The two
 runners' rules that made the runs possible are in tools/pcoracle/
 README.md; every reading above is reproducible from the traces and the
 replays under ~/nfh-bench (runs/replay<N>_nocatch, logs*/oracle_*_nocatch.jsonl).
@@ -5191,6 +5193,23 @@ inventory at 185.3 (pond/statue_mani `glasses`, then pond/lionhead) —
 the PC had given them. The port's take at any put is the PC's; the
 runner's leg should read the inventory, not an action.
 
+**105's piano after the toilet rush (2026-10-03).** The season's rerun
+left 105 with -17.2 s between the flower and the football and +9.6 back:
+the stink flower's rush to the toilet (SniffBad, the run, the slip on the
+soap, two shouts, the unclog, the puke) cuts the neighbour's approach to
+the piano short on both sides, and after it the PC's case walks him to
+the piano and plays lir/score.play_piano_noangry (0x46db12: 230.7-236.9
+s, 6.2 s, the fired piano played without its look) before the window,
+where the mobile's StopUrgentAction skips a GotTricked action
+(ActionManager.cs:614-619) and the port went to the window at once. The
+Piano carries PCRedoAfterUrgent now — the urgent's end restarts it as
+the PC does, its stand PCRedoSeconds 6.25 — and the replay plays it
+226.3-232.5 (PlayPianoLong) with the bubbles 4.0-4.4 s behind the PC's
+all the way after (the piano 215.95 for 220.0, the football 232.5 for
+236.8); the run's offset -6.58 -> -2.18 s, the jumps left ±2.5 s at the
+piano's own look. Whether other Season 1 cases re-run a fired station
+after a rush the same way is read per level (E12's expander and weights,
+E14's shotgun and 106's pudding are skipped, as the port's rule says).
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 
