@@ -42,6 +42,10 @@ class PCMap(pcgeo.MapOps):
             self.combos.append((m.group(1), re.findall(r'<ingredient name="([^"]+)"', m.group(3)),
                                 re.search(r'game="([^"]+)"', m.group(2))))
         self.uses = set(); self.hideouts = {}
+        try:
+            self.placed = set(re.findall(r'<object [^>]*name="([^"]+)"', rd('level.xml')))   # placed at the start
+        except OSError:
+            self.placed = set()
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', rd('objects.xml'), re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
@@ -71,6 +75,17 @@ class PCMap(pcgeo.MapOps):
     def pc_item(it):
         """IT2_Sandbucketeel -> sandbucketeel"""
         return it.split('_', 1)[1].lower()
+
+    def placed_variant(self, obj, variant=None):
+        """the object of the family that is in the scene: the variant a combination left there (the runner's
+        record), else the one level.xml places at the start when the named one is not placed (113's ValveMain
+        is the alias valve_off, the level starts with bas/valve_on — a message on the unplaced one crashed)"""
+        if obj is None: return None
+        if variant is not None: return variant
+        if obj in self.placed or not self.placed: return obj
+        fam = self.family(obj)
+        same = [o for o in self.placed if '/' in o and self.family(o) == fam]
+        return same[0] if len(same) == 1 else obj
 
     def combine_result(self, obj, item):
         """the combination's own name — the object that stands in the family's place afterwards (213's
@@ -109,7 +124,7 @@ class PCMap(pcgeo.MapOps):
                 found.append((objs[0], (game.group(1) if game else None)))
         if found:
             # the family's plain object first (a variant may not be placed yet — a combine on one crashes)
-            found.sort(key=lambda f: (f[0] != obj, len(f[0])))
+            found.sort(key=lambda f: (f[0] != obj, f[0] not in self.placed, len(f[0])))
             return found[0]
         # the family read loosely: an object whose base contains the plain name (209's coal_area/hot_coal
         # takes the pants; its family by the first word is `hot`)

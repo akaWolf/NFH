@@ -297,6 +297,7 @@ class PlanRunner:
             else:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
+                obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
                 if op == 'use' and self.m.single_combo(obj):
                     # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
@@ -320,6 +321,11 @@ class PlanRunner:
                 self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w, strict=(op == 'unlock')):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
+                if op == 'use' and self.cur_step.get('kind') == 'combine' and self.cur_step['args'][1] is None:
+                    res = next((name for name, ings, game in self.m.combos if len(ings) == 1 and ings[0] == self.cur_step['args'][0] and '/' in name), None)
+                    if res:
+                        if not hasattr(self, 'variants'): self.variants = {}
+                        self.variants[self.m.family(res)] = res
                 if op in ('usewith', 'prime') and self.cur_step.get('kind') == 'combine' and self.cur_step['args'][1]:
                     # the combination's result is the family's variant from here on
                     res = self.m.combine_result(self.cur_step['args'][0], self.cur_step['args'][1])
