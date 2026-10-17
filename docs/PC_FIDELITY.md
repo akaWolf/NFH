@@ -4831,7 +4831,39 @@ readings. 108's is no divergence: the plan runs the key's take with
 `sneak off` through the dog's room, the dog wakes on both sides within
 0.3 s (29.1 / 28.8 s), and an uncatchable Woody left standing there
 keeps the PC's dog barking every five seconds while the port's calms —
-the run past the first bark is nobody's game.
+the run past the first bark is nobody's game. 101's TV runs as the NULL
+combine on NFH1 too (the leg is `ok` where the UseObjectMsg stood 2
+minutes), and 214's first take of the carpet, which no gated run got
+past, is `ok` in the uncatchable one (18 of 42 legs).
+
+**Season 2 uncatchable, the whole set (05:35, tools/pcoracle/runs_table.py):**
+
+| level | legs run | PC would-be catches the port has within 2 s | bubble drift | jumps |
+|---|---|---|---|---|
+| 202 | 22/27 | 0 of 0 | -0.42 s/100 s (27 pairs) | none |
+| 203 | 16/16 | 0 of 0 | +2.13 (7) | ricetoilet +4.5 |
+| 204 | 22/22 | 0 of 0 | -2.27 (18) | gong -6.1 |
+| 205 | 20/20 | 4 of 5 | +3.88 (17) | eel +11.8, rockets -3.1, pingpong +6.2 |
+| 206 | 12/18 | 0 of 0 | -1.00 (4) | none (the gate held Woody out of the Mother's room) |
+| 207 | 26/34 | 10 of 10 | -0.71 (25) | none |
+| 208 | 16/29 | 11 of 11 | -0.18 (25) | none |
+| 209 | 24/25 | 5 of 5 | -0.26 (28) | ice -2.0 |
+| 210 | 16/34 | 5 of 5 | -1.12 (27) | none |
+| 211 | 19/29 | 3 of 8 | -2.26 (25) | toilet -3.2, lifevest -3.7, fishing -2.1 |
+| 212 | 19/45 | 6 of 6 | +0.33 (20) | throne +3.2 |
+| 213 | 24/36 | 5 of 6 | -2.48 (16) | bullride_olga -5.6 |
+| 214 | 18/42 | 3 of 4 | -4.29 (19) | pistol -9.5 and -3.0, fishbox -2.9 |
+
+(202-204's PC side ran before the predicate-exit logging and shows no
+would-be catches of its own.) The catches are the port's nearly
+everywhere; the laps that drift carry one or two named visits each.
+The Mother of 206 on her deck chair, probed with Woody parked in her
+room from 40 s on, uncatchable: the predicate answers yes once, at his
+entry tick (478), and not again in the 150 s he stands there — she
+catches at the door, and her sleep phases are not in the trace. The
+floor drop in the GUI's order works: 103's soap lands on the toilet
+floor (`ok` at 179, the combine of `soap` with `toi` at 534/420; the
+result object as the first object is declined).
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
