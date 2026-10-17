@@ -4969,7 +4969,7 @@ end of the level, the drift the first and the last pair's offset:
 
 Twelve of the fourteen pair with no step of 2 s over their runs (104, 106,
 107, 109 and 114 after their reruns and the port's two 109 rules); the two
-named are 105 (read) and 113 (its plan re-laid round the flood — one step
+named are 105 (read) and 113 (its plan re-laid round the flood, all its coins on the original — one step
 of 4.5 s left at the fuse's shock). The pets'
 would-be catches after the stub: 108's parrot at 26.4 s, 109's chili at
 191.5 and 194.1, none elsewhere; the rooms test's 0-8 a level as before.
@@ -4992,9 +4992,13 @@ the trick at once) agrees for a click after his close and differs before
 it, so the plan's `use ValveMain` has to follow his lap-1 close (61-98 s):
 the probe's `whenzone Zone03` + `use! ValveMain` did, and paid; its later
 gates then shifted (the second `whenzone Zone03` timed out) — the plan
-needs its legs after the valve re-laid round that window. Open. The
-trap's `bas/outlet` is placed by the water's behaviour, not by a Switch
-step the hook sees — the runner still calls it `unplaced` (86.5, 229.2).
+needs its legs after the valve re-laid round that window. The
+trap's `bas/outlet` is no Switch step's object (the water's behaviour
+shows it; the switch-job hook sees no swap) — trusted as placed
+(WDBG_FORCE_PLACED=bas/outlet, 01:22), the cable lands (88.8), his run to
+the valve after the flood meets the trap (`bas/electrotrap repair` 114.3,
+shout2_extra) and the repair swaps it back (130.2): the plan's eight
+coins all fire on the original but the marbles' floor drop (the runner).
 
 **The level classes as scripts (B, begun 2026-10-25).** tools/pcref/
 pc_scripts.py walks every case of each Season 1 level class (the `run`
