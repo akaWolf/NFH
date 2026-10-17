@@ -346,7 +346,12 @@ climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
   reappears at x 295). Every Season 1 trace older than this is suspect;
   TAG=nocatch3 reruns them all (s1rerun_rest.sh, then 106/113/104 again). Known artefact: 109's game stops ticking at
   the teeth + tabasco combine right after his bed_sleep (227 s, WATCHDOG,
-  reproducible) — the plan's last coin is lost on the oracle.
+  reproducible) — the plan's last coin is lost on the oracle. The runner refuses a message on an object it does not know as placed
+  (a crash on NFH1); `WDBG_FORCE_PLACED=a,b` trusts the named objects —
+  113's bas/outlet is shown by the water's behaviour, no Switch step and no
+  switch job, and the trap's combine lands on it (88.8 s, the shock on his
+  valve run 114.3). The switch job itself (SwitchObjectsJobCallback::Do,
+  0x4792c0) is hooked as `switchjob` for the behaviours' swaps.
 - `WDBG_RAGE=1` on NFH2 (oracle.py Rage at 0x100447c4, the level update's
   `sub esi, [leveldata+0x28]`): the gauge once a second and at every jump.
   207's run: 20k/20k/30k for the castle's three, 30k for the board crash,
