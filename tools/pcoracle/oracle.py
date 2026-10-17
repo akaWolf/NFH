@@ -316,8 +316,13 @@ class PlanRunner:
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
-            placed = getattr(self.m, 'placed', set()); variants = set(getattr(self, 'variants', {}).values())
-            if obj and '/' in obj and placed and obj not in placed and obj not in variants and not (op == 'usewith' and args[0].startswith('Ground@')):
+            # the scene's objects as far as the oracle knows them: level.xml's, the trace's (an action or a
+            # walk target names an object that is there — 209's holy_cow/cow is the neighbour's station and
+            # no level.xml entry) and a combination's results
+            placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
+                | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
+            fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
+            if obj and '/' in obj and placed and obj not in placed and fam_placed and not (op == 'usewith' and args[0].startswith('Ground@')):
                 # (a message on an object not in the scene crashes NFH1 — 106's tub_hair, 107's dove_free,
                 # 113's valve_off; the level places it by a switch later, which the trace does not show)
                 return self.done('unplaced %s' % obj)

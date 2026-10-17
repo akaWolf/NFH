@@ -4847,7 +4847,7 @@ past, is `ok` in the uncatchable one (18 of 42 legs).
 | 206 | 12/18 | 0 of 0 | -1.00 (4) | none (the gate held Woody out of the Mother's room) |
 | 207 | 26/34 | 10 of 10 | -0.71 (25) | none |
 | 208 | 16/29 | 11 of 11 | -0.18 (25) | none |
-| 209 | 24/25 | 5 of 5 | -0.26 (28) | ice -2.0 |
+| 209 | 25/25 | 5 of 5 | -0.20 (22) | none (the pants on the hot coal, the flowers as the cow's `gras`; all 25 legs run) |
 | 210 | 16/34 | 5 of 5 | -1.12 (27) | none |
 | 211 | 19/29 | 3 of 8 | -2.26 (25) | toilet -3.2, lifevest -3.7, fishing -2.1 |
 | 212 | 19/45 | 6 of 6 | +0.33 (20) | throne +3.2 |
