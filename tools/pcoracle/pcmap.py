@@ -78,7 +78,14 @@ class PCMap(pcgeo.MapOps):
         `item` None: a dexterity unlock without a tool (203's handbag, 205's duck cage) — the combination of
         the family with a `game` and a single object ingredient; its object is the one to use"""
         obj = self.objs.get(mobile_item) or self.stations.get(mobile_item)    # (209's cow: the neighbour's station, no Woody approach)
-        if obj is None: return None, None
+        if obj is None:
+            # no PC object for the name: the held item's own partner, if it has one (208's IndianMagician
+            # has no approach in the overlay — the balloon's combination names amusement/fakir)
+            alt = [(name, ings, game) for name, ings, game in self.combos if item is not None and item in ings and len(ings) == 2]
+            if len(alt) == 1:
+                name, ings, game = alt[0]
+                return next(i for i in ings if i != item), (game.group(1) if game else None)
+            return None, None
         base = obj.split('/')[-1].split('_')[0]; found = []
         for name, ings, game in self.combos:
             objs = [i for i in ings if '/' in i and i.split('/')[-1].split('_')[0] == base]

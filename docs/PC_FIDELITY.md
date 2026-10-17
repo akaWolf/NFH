@@ -4808,6 +4808,16 @@ sends a floor drop (fcn.004077a0 @ 0x407ae6: an item in hand, the floor
 under the click) as a CombineMsg with the item at +4, the room's name at
 +8 and the click's x/y at +0x10/+0x14 — the room at +4 is declined on
 the spot. The probe with the GUI's order is queued behind the re-runs.
+207 uncatchable, with the Mother's deck chair read as her hideout (the
+PC's flag 4 — the gate lets Woody into the pool room while she is in
+it): 26 of 34 legs run, 25 bubbles pair with no jump (-0.10 -> -2.92 s
+over 390 s) and all ten of the PC's would-be catches are the port's
+within two seconds. 108 with the auto-sneak: 28 of 37 legs and no bark
+(its first uncatchable run ended in the dog's at 26 s). 109 with the
+auto-sneak runs 16 of 29 legs past seven would-be catches and ends in a
+real fear at 191.5 s all the same: the pins in the neighbour's bed wake
+him into a catch of his own (the bed's behaviour, not the rooms test the
+stub covers) — a second Season 1 catch path, left as it is.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
