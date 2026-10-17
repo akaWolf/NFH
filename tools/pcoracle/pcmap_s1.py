@@ -51,9 +51,10 @@ class PCMap(pcgeo.MapOps):
             return b.decode('utf-16') if b[:2] in (b'\xff\xfe', b'\xfe\xff') else b.decode('latin-1')
         objects_xml = rd('objects.xml')
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
-        self.uses = set(); self.hideouts = {}
+        self.uses = set(); self.hideouts = {}; self.contents = {}
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
+            self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
         self.combos = []
@@ -114,7 +115,21 @@ class PCMap(pcgeo.MapOps):
         """IT_Fartbag -> fartbag"""
         return it.split('_', 1)[1].lower()
 
-    def combine_target(self, mobile_item, item):
+    def combine_result(self, obj, item):
+        """the combination's own name — the object that stands in the family's place afterwards (213's
+        tortilla + tequila -> bottomright/tortilla_tequila; the runner records it as the family's variant)"""
+        for name, ings, game in self.combos:
+            if obj in ings and item in ings and '/' in name: return name
+        return None
+
+    def combine_target(self, mobile_item, item, variant=None):
+        if variant is not None and item is not None:
+            # the family's current variant first (the object a previous combination left in its place)
+            for name, ings, game in self.combos:
+                if item in ings and variant in ings: return variant, (game.group(1) if game else None)
+        return self._combine_target(mobile_item, item)
+
+    def _combine_target(self, mobile_item, item):
         obj = self.objs.get(mobile_item)
         if obj is None:
             # no PC object for the name: the held item's own partner, if it has one (208's IndianMagician
@@ -154,6 +169,14 @@ class PCMap(pcgeo.MapOps):
     def use_target(self, mobile_item):
         obj = self.objs.get(mobile_item)
         if obj is None: return None
+        if self.kinds.get(mobile_item) == 'SearchItem' and obj not in self.names:
+            # a take whose name maps to no object (114's MouseHole, BasementDrawer): the container in the
+            # walk point's room holding the type the item gives (bas/rat holds `rat`)
+            give = self.gives.get(mobile_item)
+            want = give.split('_', 1)[1].lower() if give and '_' in give else None
+            room = obj.split('/')[0]
+            cands = [o for o, c in self.contents.items() if want and want in c and o.split('/')[0] == room]
+            if cands: return cands[0]
         if self.kinds.get(mobile_item) != 'SearchItem':
             base = obj.split('/')[-1].split('_')[0]
             cands = sorted(u for u in self.uses if u.split('/')[-1].split('_')[0] == base and u.split('/')[0] == obj.split('/')[0])

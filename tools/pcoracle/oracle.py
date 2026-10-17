@@ -296,7 +296,9 @@ class PlanRunner:
                 obj = result or room
             elif op in ('usewith', 'prime', 'unlock') and len(args) > 1:
                 pcname = self.m.item_name(args[0], args[1])
-                obj, game = self.m.combine_target(args[0], pcname)
+                fam0 = self.m.use_target(args[0]) or self.m.station(args[0])
+                variant = getattr(self, 'variants', {}).get(self.m.family(fam0)) if fam0 else None
+                obj, game = self.m.combine_target(args[0], pcname, variant)
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 step = {'tick': tick, 'kind': 'combine', 'args': [obj, pcname]}
             elif op == 'unlock':
@@ -331,6 +333,12 @@ class PlanRunner:
                 self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w, strict=(op == 'unlock')):
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
+                if op in ('usewith', 'prime') and self.cur_step.get('kind') == 'combine' and self.cur_step['args'][1]:
+                    # the combination's result is the family's variant from here on
+                    res = self.m.combine_result(self.cur_step['args'][0], self.cur_step['args'][1])
+                    if res:
+                        if not hasattr(self, 'variants'): self.variants = {}
+                        self.variants[self.m.family(res)] = res
                 if w is not None and w['anim'] in self.STANDS: self.hidden = False
                 return self.done('ok')
             if tick - self.leg_start > self.TIMEOUT: return self.done('timeout')

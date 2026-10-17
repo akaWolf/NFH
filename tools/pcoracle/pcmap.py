@@ -72,7 +72,21 @@ class PCMap(pcgeo.MapOps):
         """IT2_Sandbucketeel -> sandbucketeel"""
         return it.split('_', 1)[1].lower()
 
-    def combine_target(self, mobile_item, item):
+    def combine_result(self, obj, item):
+        """the combination's own name — the object that stands in the family's place afterwards (213's
+        tortilla + tequila -> bottomright/tortilla_tequila; the runner records it as the family's variant)"""
+        for name, ings, game in self.combos:
+            if obj in ings and item in ings and '/' in name: return name
+        return None
+
+    def combine_target(self, mobile_item, item, variant=None):
+        if variant is not None and item is not None:
+            # the family's current variant first (the object a previous combination left in its place)
+            for name, ings, game in self.combos:
+                if item in ings and variant in ings: return variant, (game.group(1) if game else None)
+        return self._combine_target(mobile_item, item)
+
+    def _combine_target(self, mobile_item, item):
         """the PC object `item` (a PC inventory name) is combined with: the combination whose ingredients
         are the item and an object of the mobile item's PC family — and the minigame it opens, if any.
         `item` None: a dexterity unlock without a tool (203's handbag, 205's duck cage) — the combination of
