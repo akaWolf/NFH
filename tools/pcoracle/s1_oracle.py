@@ -298,7 +298,8 @@ class PlanRunner:
             else:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
-                obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
+                if obj + '_guarded' not in getattr(self.m, 'names', ()) and not any(o == obj + '_guarded' for o in getattr(self.m, 'placed', ())):
+                    obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
                 obj = next((o[4:] for o in args[1:] if o.startswith('obj=')), obj)      # (a probe names the object)
                 if op in ('use', 'prime', 'take') and self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()):
                     # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
@@ -311,7 +312,8 @@ class PlanRunner:
             placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
                 | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
             fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
-            if obj and '/' in obj and placed and obj not in placed and fam_placed and not (op == 'usewith' and args[0].startswith('Ground@')):
+            guarded_fam = obj is not None and (obj + '_guarded' in placed or obj + '_guarded' in getattr(self.m, 'names', ()))
+            if obj and '/' in obj and placed and obj not in placed and fam_placed and not guarded_fam and not (op == 'usewith' and args[0].startswith('Ground@')):
                 # (a message on an object not in the scene crashes NFH1 — 106's tub_hair, 107's dove_free,
                 # 113's valve_off; the level places it by a switch later, which the trace does not show)
                 return self.done('unplaced %s' % obj)
@@ -325,8 +327,10 @@ class PlanRunner:
             if again: return again
         if self.phase == 'acting' and op == 'take' and isinstance(self.target, str):
             guarded = self.target.rsplit('_', 1)[0] + '_guarded' if '_' in self.target.split('/')[-1] else self.target + '_guarded'
-            keeper = state['actions'].get(guarded, [])
-            if keeper and keeper[-1][1] == 'put' and keeper[-1][0] > getattr(self, '_window_at', -1) and tick - self.last_input >= 6:
+            base = self.target.split('/')[-1].split('_')[0]
+            keeper = sorted([x for x in state['actions'].get(guarded, []) if x[1] == 'put'] +
+                            [x for o, l in state['actions'].items() if '/' in o for x in l if x[1] == 'put' + base])
+            if keeper and keeper[-1][0] > getattr(self, '_window_at', -1) and tick - self.last_input >= 6:
                 # the keeper has just put it down: the take again, now that it is there to take
                 self._window_at = keeper[-1][0]; self.last_input = tick
                 again = dict(self.cur_step); again['tick'] = tick; again['window'] = True
@@ -340,6 +344,10 @@ class PlanRunner:
             if op == 'hide' and len(acts) > self.acted and tick - acts[-1][0] >= 3:
                 self.hidden = True; self.hidden_in = args[0]; return self.done('ok')
             if len(acts) > self.acted and tick - acts[-1][0] >= 3 and self.idle(w, strict=(op == 'unlock')):
+                # the action's own ticks first (objects.xml time="N", the job N + 2): its result is placed as
+                # the job ends and the next input cancels it — 206's fart bag on the pillows, `inflate` 37
+                need = self.m.woody_ticks(self.target, acts[-1][1]) if isinstance(self.target, str) else None
+                if need and tick - acts[-1][0] < need: return []
                 if op in ('usewith', 'use'): self.tricked[args[0]] = tick
                 if op == 'use' and self.cur_step.get('kind') == 'combine' and self.cur_step['args'][1] is None:
                     res = next((name for name, ings, game in self.m.combos if len(ings) == 1 and ings[0] == self.cur_step['args'][0] and '/' in name), None)

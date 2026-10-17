@@ -78,9 +78,17 @@
     "PCCreditAtLinked": 3.75,
     "PCShoutLinked": 1,
     "PCFixSecondsLinked": 0,
-    "PCShoutTailLinked": 0.08,
+    "PCShoutTailLinked": 3.92,
     "PCLinkedPaysAt": 5.25,
-    "PCUseSeconds": 2.92
+    "PCUseSeconds": 2.92,
+    "PCPrimeSecondsTricked": 1.08,
+    "PCWhenPrimed": {
+     "Pool": {
+      "PCUseSecondsLinked": 13.17,
+      "PCShoutLinked": 2,
+      "PCPrimeSecondsTricked": 2.5
+     }
+    }
    }
   },
   {

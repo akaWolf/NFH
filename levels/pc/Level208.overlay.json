@@ -848,7 +848,9 @@
         "Zone01",
         "Zone04"
        ]
-      }
+      },
+      "xt": 192,
+      "pxt": 5
      },
      "Woody": {
       "obj": "elephant/elephant",

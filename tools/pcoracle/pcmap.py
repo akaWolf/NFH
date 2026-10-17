@@ -41,7 +41,7 @@ class PCMap(pcgeo.MapOps):
             if 'wrong="true"' in m.group(2): continue
             self.combos.append((m.group(1), re.findall(r'<ingredient name="([^"]+)"', m.group(3)),
                                 re.search(r'game="([^"]+)"', m.group(2))))
-        self.uses = set(); self.hideouts = {}; self.contents = {}
+        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}
         try:
             self.placed = set(re.findall(r'<object [^>]*name="([^"]+)"', rd('level.xml')))   # placed at the start
         except OSError:
@@ -51,6 +51,13 @@ class PCMap(pcgeo.MapOps):
             self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
+            # Woody's actions' own ticks (time="N"; an `auto` one is its animation's and stays unknown): the
+            # runner waits them out before its next input — a combination's result is placed as the action's
+            # job ends, and an input in between cancels it (206's pillows_manip under the lesson)
+            for am in re.finditer(r'<action ([^>]*)/?>', m.group(2)):
+                at = dict(re.findall(r'(\w+)="([^"]*)"', am.group(1)))
+                if at.get('actor') == 'woody' and at.get('time', 'auto').isdigit():
+                    self.woody_time[(m.group(1), at['name'])] = int(at['time'])
         raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))
         self.kinds = {}; self.gives = {}
         for o in raw['objects'].values():
@@ -87,6 +94,21 @@ class PCMap(pcgeo.MapOps):
         fam = self.family(obj)
         same = [o for o in self.placed if '/' in o and self.family(o) == fam]
         return same[0] if len(same) == 1 else obj
+
+    def woody_ticks(self, obj, action):
+        """the ticks Woody's action on the object takes in his queue — objects.xml time="N" as N + 2, an
+        `auto` one its governing animation's frames (lap_model_s2.Data.action_ticks, the Loader's own rule:
+        206's pillows `fartbag` is `inflate`, 37 + 2); None if unknown"""
+        t = self.woody_time.get((obj, action))
+        if t is not None: return t + 2
+        if not hasattr(self, '_data'):
+            try:
+                import lap_model_s2; self._data = lap_model_s2.Data(self.n)
+            except Exception:
+                self._data = None
+        if self._data is None: return None
+        try: return self._data.action_ticks(obj, action, 'woody')
+        except Exception: return None
 
     def combine_result(self, obj, item):
         """the combination's own name — the object that stands in the family's place afterwards (213's

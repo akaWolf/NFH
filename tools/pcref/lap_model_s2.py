@@ -3348,11 +3348,14 @@ def _row_level(n, snaps, row):
     return lv, by
 
 
-def _tricked_run(n, lv, item, cur, trick, bytes0=None, latch=0):
-    """the step `cur` run with the item's trick in the scene (tricked_presence);
-    None when the trick changes none of its DoActions or hideout elements.
-    `latch`: the step polls its event latch on the lap (a POLL row: 213's
-    picnic waits for Olga's `boat`), taken as set as the lap's walk does"""
+def _tricked_events(n, lv, item, cur, trick, bytes0=None, latch=0):
+    """the step `cur` run with the item's trick in the scene (tricked_presence),
+    whatever the trick changes of it — its GoTo may take the trick's object
+    alone (208's elephant_line: the elephant's `fool`, the same DoActions,
+    from a hotspot 15 px left of the elephant's, 0x1001e000's IsVariant);
+    None for an item without a trick. `latch`: the step polls its event
+    latch on the lap (a POLL row: 213's picnic waits for Olga's `boat`),
+    taken as set as the lap's walk does"""
     shown, hidden = trick.get(item, (set(), set()))
     if not shown:
         return None
@@ -3360,6 +3363,16 @@ def _tricked_run(n, lv, item, cur, trick, bytes0=None, latch=0):
     lv2 = Level(n)
     lv2.present = (set(lv.present) - hidden) | shown
     ev2, _nx = run_step(lv2, cur, dict(by), latch=latch)
+    return ev2
+
+
+def _tricked_run(n, lv, item, cur, trick, bytes0=None, latch=0):
+    """_tricked_events, None as well when the trick changes none of the
+    step's DoActions or hideout elements"""
+    ev2 = _tricked_events(n, lv, item, cur, trick, bytes0, latch)
+    if ev2 is None:
+        return None
+    by = bytes0 if bytes0 is not None else (LAP_BYTES.get(n) or {})
     lv1 = Level(n)
     lv1.present = set(lv.present)
     ev1, _nx = run_step(lv1, cur, dict(by), latch=latch)
@@ -4160,6 +4173,11 @@ def code_targets_tricked(n):
     lap, pairs = _paired_parts(n)
     snaps = lap_state(n)
     trick = tricked_presence(n)
+    # (a scene-driven trick's objects are its SCENE_STEPS entry's: 208's
+    # elephant line, whose combination tricked_presence pairs with the tap's)
+    for item, spec in SCENE_STEPS.get(n, {}).items():
+        if spec[1]:
+            trick[item] = (set(spec[1]), set(spec[2] or ()))
     go = lambda ev: next((e[1] for e in ev if e[0] == 'GO'), None)
     out = {}
     for item, (many, visits) in pairs.items():
@@ -4170,7 +4188,9 @@ def code_targets_tricked(n):
             i = min(i for i, _j, _p in v)
             lvi, byi = _row_level(n, snaps, lap[i][0])
             lat = int(any(a == 'POLL' for _o, a, _t in lap[i][4]))
-            ev2 = _tricked_run(n, lvi, item, lap[i][1], trick, byi, latch=lat)
+            # (the trick's run whatever it changes: 208's elephant_line keeps
+            # the elephant's DoActions and moves its hotspot)
+            ev2 = _tricked_events(n, lvi, item, lap[i][1], trick, byi, latch=lat)
             ev1, _nx = run_step(lvi, lap[i][1], dict(byi), latch=lat)
             g1, g2 = go(ev1), (go(ev2) if ev2 else None)
             p1 = g.point(d.real.get(g1, g1), 'neighbor', exact=True) if g1 else None

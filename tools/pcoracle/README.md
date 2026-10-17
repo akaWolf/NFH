@@ -267,6 +267,14 @@ sea -> rail 16.16 / 16.10 (the port stands 3.3 s at the stairs' foot and
 climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
 -0.28 in the sea, -0.1 the rest.
 
+- `station_positions.py <n> <trace>` — where the PC neighbour stands as
+  each station's action starts (the mode over his visits) against the
+  overlay's PCApproach x / px, px read against the floor line of the
+  level.xml room that places the object (pc_walks_s2's frame; 203's
+  melons stand in groundleft, its toilet up in wallleft); a deviation of
+  10 px is flagged, an action played from elsewhere flags too (204's jade
+  `look`). 2026-10-03: every station of the fourteen runs matched but
+  208's tricked elephant (`xt` 192 now).
 - `jumps_report.py <pairs.txt...> [--jump=2]` — where a replay's drift
   jumps: the bubble pairs read as port-minus-PC offsets, a step of two
   seconds or more between two bubbles names the visit between them (its
@@ -299,7 +307,20 @@ climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
 
 Blind, the plans end in early catches on the original (212 at 7 s, 214 at
 11 s, each Season 1 level once — a Season 1 catch ends the level): the
-plans carry the port's timing and the port's predictive gate. The runner's
+plans carry the port's timing and the port's predictive gate. The 206
+runs never get past the lesson: the runner skips the `tutorial` leg and
+the director's gates (the bag held, the pillows manipulated, the pipe
+entered: TutorialPC206's b51c/b434/b28c) have not all passed on the
+oracle — the neighbour waits for her second call at (550, 340) in her
+room, and a probe of the Mother's sight there was his catch (2026-10-03,
+the `msg` hook on fcn.100101f3 logs the director's boxes since, and
+`WDBG_GATES=0x1002b4b5` the director's pillows gate). The gate failed
+because the runner's next input came inside Woody's `inflate` (an `auto`
+action, 37 frames) and cancelled the placement of pillows_manip at the
+job's end — the two-second pose rule had taken the leg as done. The
+runners wait an action's own ticks out now (PCMap.woody_ticks: time="N"
++ 2, `auto` through lap_model_s2.Data.action_ticks); a leg's `wait` is
+no longer needed for that. The runner's
 live-state gate (above) keeps Woody out of a catcher's room but cannot
 leave a room before the catcher arrives — 101's `park! Zone01` right after
 the binoculars (101 s): the PC neighbour leaves the sofa at 100 s and is in

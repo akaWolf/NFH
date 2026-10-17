@@ -255,7 +255,13 @@ class Recorder:
             'hud': hud,
             'game': {'caught': w.game.got_caught, 'ending': w.game.ending,
                      'tricks': w.game.completed,
-                     'time': round(w.game.time_seconds, 1)},
+                     'time': round(w.game.time_seconds, 1),
+                     # the neighbour's gauge and its overflows (the harness
+                     # reads where a plan's collapse comes from)
+                     'rage': round(getattr(w.pawns.get('Rottweiler'), 'angry_meter', 0.0), 3)
+                     if w.pawns.get('Rottweiler') is not None else None,
+                     'overflows': getattr(w.pawns.get('Rottweiler'), 'angry_count_ticks', None)
+                     if w.pawns.get('Rottweiler') is not None else None},
             'bars': [{'actor': pb.spec.get('actor'),
                       'progress': round(pb.progress, 3)}
                      for pb in getattr(w, 'progress_bars', ())

@@ -167,7 +167,25 @@ def pc_branch_of(items, it):
             if items is not None else None
         if o is not None and (o.tricked or o.got_tricked or o.already_tricked):
             return name, keys
+    # the arm while another item stands primed (Item.pc_when_primed: 210's
+    # basket with the pool drained — the pool's Primed swaps the linked
+    # flow's clips, Item.ChangeAnimation210 / TrickItem.cs:918-929, and
+    # GameLogic's basket step 0x1001adcc picks pool_pool_empty's
+    # `fall_empty` and SHOUT 2 by the same state)
+    for name, keys in (getattr(it, 'pc_when_primed', None) or {}).items():
+        o = next((x for x in items.values() if x.name == name), None) \
+            if items is not None else None
+        if o is not None and o.primed:
+            return name, keys
     return None, None
+
+
+def pc_branch_key(items, it, key, default):
+    """the overlay key of the item's PC case arm that plays (pc_branch), else
+    `default` — the item's own value (the linked flow's keys through a
+    PCWhenPrimed arm: 210's basket)"""
+    br = pc_branch(items, it)
+    return br[key] if br is not None and key in br else default
 
 
 def pc_branch(items, it):
@@ -652,6 +670,10 @@ class AnimPlayer:
             else:
                 if a.infinite and self.ignore_infinite_once:
                     self.ignore_infinite_once = self.ignore_infinite = False
+                    if os.environ.get('NFH_LOOP_LOG'):
+                        print('LOOP once consumed by clip %s' % a.name, flush=True)
+                elif a.infinite and self.ignore_infinite and os.environ.get('NFH_LOOP_LOG'):
+                    print('LOOP clip %s ends under ignore_infinite' % a.name, flush=True)
                 if a.hold:
                     if not (a.pattern or a.empty_pattern):   # !UsePattern
                         self.frame = a.end
@@ -1760,6 +1782,9 @@ class Pawn:
         # the hop's straight part: the complex path left of it, through its
         # transfer, against the PC movement's ticks
         secs = self._pc_piece_secs(st)
+        if os.environ.get('NFH_PASS_LOG') and self.role == 'Rottweiler' and 't0' not in st['pc_piece']:
+            st['pc_piece']['t0'] = round(getattr(getattr(self, 'world', None), 'time', 0.0), 2)
+            print('PASS t=%.2f piece starts: secs=%s steps=%d rest=%.3f kind=%s' % (st['pc_piece']['t0'], secs, len(self._pc_piece_steps(st['pc_piece'])), self._pc_rest(self._pc_piece_steps(st['pc_piece'])), st.get('kind')), flush=True)
         if not secs:
             self._pc_pass = None
             return None
@@ -1906,8 +1931,9 @@ class Pawn:
             holder = d.pc_claim
             if holder is not None and holder is not self:
                 if holder._pc_holds(d):
-                    if os.environ.get('NFH_CLAIM_LOG'):
-                        # (a harness trace of a pawn held at a door: who holds the pair and by which step)
+                    if os.environ.get('NFH_CLAIM_LOG') and getattr(self, '_pc_claim_logged', None) != (d.pid, holder.role):
+                        # (a harness trace of a pawn held at a door: who holds the pair and by which step — once per wait)
+                        self._pc_claim_logged = (d.pid, holder.role)
                         why = [(st.get('kind'), st.get('pc_hop') is not None, st.get('pc_hold_run') is not None, st.get('door') is not None, st.get('pc_claim') is not None)
                                for st in ([holder._step] if holder._step is not None else []) + list(holder.steps)
                                if st.get('pc_hop') in pair or (st.get('pc_hold_run') is not None and st['pc_hold_run'][1] in pair) or st.get('door') in pair or st.get('pc_claim') in pair]
@@ -3452,6 +3478,10 @@ class Pawn:
                 if self.adjacent_zones and self._complex_arrival():
                     return
                 if s.get('transfer') is not None:
+                    if os.environ.get('NFH_PASS_LOG') and self.role == 'Rottweiler':
+                        pc = s.get('pc_piece') or {}
+                        print('PASS t=%.2f transfer: piece secs=%s el=%.2f began=%s hold=%s nb=%s waited=%s' % (
+                            getattr(getattr(self, 'world', None), 'time', 0.0), pc.get('secs'), pc.get('el', 0.0), pc.get('t0'), s.get('pc_hold'), s.get('pc_nb'), s.get('pc_waited')), flush=True)
                     self._transfer_zone(s['transfer'])
                     if s.get('pc_hop') is not None:
                         self._pc_release()   # the far room set at `<actor>_out`
@@ -5228,13 +5258,17 @@ class Routine:
                 if self.role == 'Rottweiler' and seq and pcprofile.is_pc() \
                         and pcprofile.rule('durations'):
                     pc = self._pc_visit_seconds(it)
-                    if pc_tricked and getattr(it, 'pc_prime_secs_tricked', None) is not None:
+                    pst = pc_branch_key(self.level.items, it, 'PCPrimeSecondsTricked',
+                                        getattr(it, 'pc_prime_secs_tricked', None))
+                    if pc_tricked and pst is not None:
                         # the tricked station's part the prime leg stands for
                         # (PCPrimeSecondsTricked: 103's cake, tricked through
                         # its candle, Level_Mail's case 4 — put_tnt and
-                        # light_tnt before celebrate_boom and the fire); its
-                        # visit slot passes all the same
-                        pc = float(it.pc_prime_secs_tricked)
+                        # light_tnt before celebrate_boom and the fire; 210's
+                        # Fifi taken after the fall, `take` 13 ticks, with the
+                        # bone first over the drained pool, its PCWhenPrimed
+                        # arm); its visit slot passes all the same
+                        pc = float(pst)
                     if pc:
                         mobile = self.pawn.anim.sequence_seconds(seq)
                         if mobile > 0.0:
@@ -6270,7 +6304,8 @@ class Routine:
             and bool(it.use_tricked_linked)
         # (a station tricked through its DependsOn pays its dependency's
         # record: 206's pad shooting the rubber bear, the harpoon's)
-        at = it.pc_credit_at_linked if (it.pc_credit_at_linked is not None and both) \
+        cal = pc_branch_key(self.level.items, it, 'PCCreditAtLinked', it.pc_credit_at_linked)
+        at = cal if (cal is not None and both) \
             else getattr(self._pc_trick_item(it), 'pc_credit_at', None)
         comp = self._pc_compound(it) and it.pc_credit_at_compound is not None
         if comp:
@@ -6279,12 +6314,13 @@ class Routine:
         if at is not None and target is not None and not target.pc_credited:
             self.pc_credit_timer = float(at)
             self.pc_credit_item = target
-        if both and it.pc_linked_pays_at is not None and target is not None:
+        lpa = pc_branch_key(self.level.items, it, 'PCLinkedPaysAt', it.pc_linked_pays_at)
+        if both and lpa is not None and target is not None:
             # the linked trick's own record, its own tick of the linked
             # step (fcn.1000140b credits each named record at its `time`:
             # 202's bridge_electrify 22 ticks after bridge_crash)
             target.pc_linked_due = True
-            self.pc_credit2_timer = float(it.pc_linked_pays_at)
+            self.pc_credit2_timer = float(lpa)
             self.pc_credit2_item = target
         if both and it.pc_extra_pays_at_linked is not None and it.extra_coin_206 \
                 and target is not None:
@@ -6299,7 +6335,8 @@ class Routine:
             # 10 after tortilla_sharp): the mobile's extra coin
             self.pc_credit3_timer = float(it.pc_extra_pays_at)
             self.pc_credit3_item = target
-        js = it.pc_jingle_at_linked if (it.pc_jingle_at_linked is not None and both) \
+        jal = pc_branch_key(self.level.items, it, 'PCJingleAtLinked', it.pc_jingle_at_linked)
+        js = jal if (jal is not None and both) \
             else getattr(self._pc_trick_item(it), 'pc_jingle_at', None)
         if comp and it.pc_jingle_at_compound:
             js = it.pc_jingle_at_compound
@@ -6350,14 +6387,17 @@ class Routine:
             return float(vals[k % len(vals)])
         t = self._pc_trick_item(it)
         linked = self.level.items.get(it.linked_item_trick) if it.linked_item_trick else None
-        if getattr(it, 'pc_use_secs_linked', None) is not None and it.tricked \
+        usl = pc_branch_key(self.level.items, it, 'PCUseSecondsLinked',
+                            getattr(it, 'pc_use_secs_linked', None))
+        if usl is not None and it.tricked \
                 and linked is not None and linked.tricked and it.use_tricked_linked:
             # the linked-tricked stand (PCUseSecondsLinked: the use the
             # mobile plays as RottweilerUseLinkedTricked is the script's
-            # other step — 201's crash_long by the open rail); its visit slot
+            # other step — 201's crash_long by the open rail; a PCWhenPrimed
+            # arm's own — 210's basket over the drained pool); its visit slot
             # passes as any
             self._pc_visit_seconds(it)
-            return float(it.pc_use_secs_linked)
+            return float(usl)
         if getattr(t, 'pc_use_secs_compound', None) is not None and self._pc_compound(it):
             # the compound-tricked stand (PCUseSecondsCompound: the second
             # combination's action — 213's carnivore_bigmanip `use`)
@@ -6750,6 +6790,8 @@ class Routine:
         t = self._anim_by_pid(a.get('once_pawn'))
         if t is not None:
             t.ignore_infinite = t.ignore_infinite_once = True
+            if os.environ.get('NFH_LOOP_LOG'):
+                print('LOOP t=%.2f once on pid %s by %s (once_pawn)' % (getattr(self.pawn.world, 'time', -1), a.get('once_pawn'), it.name), flush=True)
         if not it.tricked:
             t = self._anim_by_pid(a.get('once_pawn_not_tricked'))
             if t is not None:
@@ -6770,6 +6812,13 @@ class Routine:
         def cut():
             if t.anim is not None and t.anim.infinite:
                 t._stop_single()
+                # the clip cut here is the round the mobile's once-on-end
+                # ignore would have ended (AnimPlayer: the flags consumed at
+                # that round's end, cs:213-217); cut before its round, the
+                # flags would wait for his next looping clip — 213's wait at
+                # the controls a lap later, ended after one round
+                if t.ignore_infinite_once:
+                    t.ignore_infinite = t.ignore_infinite_once = False
         if at and w is not None:
             w.call_later(float(at), cut)
         else:
@@ -6780,6 +6829,11 @@ class Routine:
         MoveOnly returns first; then the ignore flags reset, the once-on-end
         target fires, HideOwnerDuringUse unhides (cs:481-484), and a
         non-mutex action releases PawnToAbortMutexOnFinish's parked mutex."""
+        if os.environ.get('NFH_LOOP_LOG') and self.role == 'Rottweiler' and self.item is not None \
+                and self.item.name == 'MechanicalBullControlsWait':
+            import traceback
+            print('LOOP t=%.2f %s use of %s stopped; from %s' % (getattr(self.pawn.world, 'time', -1), self.role, self.item.name,
+                  ' <- '.join('%s:%d' % (f.name, f.lineno) for f in traceback.extract_stack(limit=6)[:-1])), flush=True)
         a = self.action
         self.pawn.anim.time_scale = 1.0
         self._pc_clip_end()
@@ -6807,6 +6861,8 @@ class Routine:
         t = self._anim_by_pid(a.get('once_pawn_on_end'))
         if t is not None:
             t.ignore_infinite = t.ignore_infinite_once = True
+            if os.environ.get('NFH_LOOP_LOG'):
+                print('LOOP t=%.2f once on pid %s by %s (once_pawn_on_end)' % (getattr(self.pawn.world, 'time', -1), a.get('once_pawn_on_end'), it.name if it is not None else None), flush=True)
             if it is not None:
                 self._pc_behaviour_cut(t, getattr(it, 'pc_behaviour_at_end', None))
         if a.get('hide_owner'):
@@ -9910,8 +9966,9 @@ class World:
         trick record's PCLaugh) — every flow it reads closes its scene right
         after its SHOUT (fcn.1000f5c9's end or fcn.1000ebbf after
         fcn.1000f977; lap_model_s2._scene_span)"""
-        span = item.pc_scene_linked if (both and item.pc_scene_linked is not None) \
-            else item.pc_scene
+        scl = pc_branch_key(self.level.items if self.level is not None else None, item,
+                            'PCSceneLinked', item.pc_scene_linked)
+        span = scl if (both and scl is not None) else item.pc_scene
         return [0.0, 'shout'] if span is None else span
 
     def pc_scene_start(self, routine, station, item, both):
@@ -10643,10 +10700,13 @@ class World:
         if nfh2 and pcprofile.is_pc():
             shout = getattr(self.level_script, 'pc_shout', None)
             level = shout(pawn, item) if shout is not None else None
-            if level is None and both and getattr(item, 'pc_shout_linked', None) is not None:
+            shl = pc_branch_key(self.level.items if self.level is not None else None, item,
+                                'PCShoutLinked', getattr(item, 'pc_shout_linked', None))
+            if level is None and both and shl is not None:
                 # the linked variant's own SHOUT (PCShoutLinked: 202's
-                # electrified rail pushes 2 where the crash alone pushes 1)
-                level = item.pc_shout_linked
+                # electrified rail pushes 2 where the crash alone pushes 1;
+                # 210's basket over the drained pool, its PCWhenPrimed arm)
+                level = shl
             elif level is None:
                 level = getattr(item, 'pc_shout', None)
         pair = None
@@ -10681,8 +10741,10 @@ class World:
             fixes = [a for a in fix_seq if pawn.anim.has(a)]
             head = [a for a in seq if a not in fixes] if level >= 0 else []
             fix_secs = getattr(item, 'pc_fix_secs', None)
-            if both and getattr(item, 'pc_fix_secs_linked', None) is not None:
-                fix_secs = item.pc_fix_secs_linked     # PCFixSecondsLinked
+            fxl = pc_branch_key(self.level.items if self.level is not None else None, item,
+                                'PCFixSecondsLinked', getattr(item, 'pc_fix_secs_linked', None))
+            if both and fxl is not None:
+                fix_secs = fxl                         # PCFixSecondsLinked
             if plain:
                 fix_secs = plain.get('repair')         # PCPlain: the plain flow's repair
             if pair is not None:
@@ -10690,8 +10752,10 @@ class World:
             if fix_secs is not None and fix_secs <= 0.0:
                 fixes = []
             tail_secs = getattr(item, 'pc_shout_tail', None)
-            if both and getattr(item, 'pc_shout_linked', None) is not None:
-                tail_secs = getattr(item, 'pc_shout_tail_linked', None)   # PCShoutTailLinked
+            if both and pc_branch_key(self.level.items if self.level is not None else None, item,
+                                      'PCShoutLinked', getattr(item, 'pc_shout_linked', None)) is not None:
+                tail_secs = pc_branch_key(self.level.items if self.level is not None else None, item,
+                                          'PCShoutTailLinked', getattr(item, 'pc_shout_tail_linked', None))
             if plain:
                 tail_secs = plain.get('tail')          # its switch back
             if pair is not None:

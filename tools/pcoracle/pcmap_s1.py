@@ -55,12 +55,19 @@ class PCMap(pcgeo.MapOps):
         except OSError:
             self.placed = set()
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
-        self.uses = set(); self.hideouts = {}; self.contents = {}
+        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
             self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
+            # Woody's actions' own ticks (time="N"; an `auto` one is its animation's and stays unknown): the
+            # runner waits them out before its next input — a combination's result is placed as the action's
+            # job ends, and an input in between cancels it (206's pillows_manip under the lesson)
+            for am in re.finditer(r'<action ([^>]*)/?>', m.group(2)):
+                at = dict(re.findall(r'(\w+)="([^"]*)"', am.group(1)))
+                if at.get('actor') == 'woody' and at.get('time', 'auto').isdigit():
+                    self.woody_time[(m.group(1), at['name'])] = int(at['time'])
         self.combos = []
         try:
             for m in re.finditer(r'<combination name="([^"]+)"([^>]*)>(.*?)</combination>', rd('combine.xml'), re.S):
@@ -129,6 +136,12 @@ class PCMap(pcgeo.MapOps):
         fam = self.family(obj)
         same = [o for o in self.placed if '/' in o and self.family(o) == fam]
         return same[0] if len(same) == 1 else obj
+
+    def woody_ticks(self, obj, action):
+        """the ticks Woody's action on the object takes (objects.xml time="N" as N + 2); None for an `auto`
+        one (its animation's frames) and the unknown"""
+        t = self.woody_time.get((obj, action))
+        return t + 2 if t is not None else None
 
     def combine_result(self, obj, item):
         """the combination's own name — the object that stands in the family's place afterwards (213's

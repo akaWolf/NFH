@@ -4935,6 +4935,128 @@ runners' rules that made the runs possible are in tools/pcoracle/
 README.md; every reading above is reproducible from the traces and the
 replays under ~/nfh-bench (runs/replay<N>_nocatch, logs*/oracle_*_nocatch.jsonl).
 
+**The stations' places (2026-10-03, tools/pcoracle/station_positions.py).**
+Where the PC neighbour stands as each station's action starts, over the
+fourteen Season 2 uncatchable traces, against the overlay's PCApproach: the
+x of every station he walked to is the overlay's to the pixel (the 57
+stations of the fourteen runs), and the height matches once it is read in
+pc_walks_s2's frame — against the floor line of the level.xml room that
+places the object, not the room its name carries (203's `wallleft/melons`
+stands in groundleft, 77 px above its line; its `groundleft/toilet` is up
+in wallleft, 30 px above; 213's tortilla and carnivore are in the room
+whose line is at 700; 214's pistol the same way). Three stations the tool
+flags are actions played from elsewhere (204's jade `look` from the
+necklace's other place, 205's skis from the ride's end, 210's chair from
+the hedgehog's put) and three have no approach record by design — the
+repairs the model holds at the station while the PC walks off to them
+(203's generator for the stage, 211's sign for the sweets' puke: the walk
+2.67 s and the `usemid` 2.08 s are the Sweets' PCFixSeconds 5.25, 209's
+trough for the coals). One was real: 208's tricked elephant. His GoTo
+walks to `elephant/elephant_line`, whose `neighbor` hotspot is 15 px left
+of the elephant's (192 against 207: level.xml -328/440 + objects.xml
+520/435), two ticks at 8 px — PCApproach `xt` 192 / `pxt` 5 now, written
+by pc_walks_s2 from lap_model_s2.code_targets_tricked, which runs the step
+with the trick's objects whatever they change (`_tricked_events`; the
+scene-driven tricks' objects from SCENE_STEPS — tricked_presence had paired
+the elephant with the tap's cable).
+
+**211's beating (2026-10-03).** The jump of -3.3 s between the two toilet
+bubbles of the sweets' lap was the hit: on the PC the puke's end (42
+ticks, the port's PukeFemale 3.48 s) is followed by his `mad` run 50 px
+down (6 ticks), the `fear` until Olga comes out of the stall (55) and her
+`fight` (42) — 106 ticks from the puke's end to the fight's end, 8.83 s,
+where the Sweets' PCHitSeconds held Olga's 6.5; the shout two ticks after.
+PCHitSeconds Olga 8.83; the lap's other pieces (the run to the stall 19
+ticks, the puke, the SHOUT 1, the walk to the sign and its repair) were
+within a tick.
+
+**210's basket over the drained pool (2026-10-03).** The fifi visit of the
+plan's second lap — the bone in the basket, the oiled board, the pool
+drained — ran 12 s shorter in the port: GameLogic's basket step
+(0x1001adcc, run in the lifted engine) picks `fall_water` with SHOUT 1 over
+a full pool and `fall_empty` with SHOUT 2 over the drained one (the
+`pool_pool` / `pool_pool_empty` IsVariant), its stand to the SHOUT 9.83 s
+against 13.17 (the trace: tickle 3.42, `inv` 9.5 with the three credits at
++3.83 / +5.33 / +5.75, the pool's enter and leave), the shout2_hard 87
+ticks, and the pool's `neighbor_out` (432, 286) is where both falls leave
+him — the next step's GoTo walks him back to the basket, 46 ticks at the
+mg records (2 down to the line, 215 along, 50 up), before `take_bone` (17)
+and the take of Fifi (13). The port's linked flow held one stand (9.83),
+one SHOUT (1), a tail of 0.08 and the mobile's FifiTakeRight unpaced
+(2.9 s). Now: PCShoutTailLinked 3.92 (the walk back held at the station —
+the time is the same, the place is not, as the stage's generator),
+PCPrimeSecondsTricked 1.08 (the take alone, both falls' next step over a
+full pool), and the drained pool's arm — `PCWhenPrimed {Pool:
+{PCUseSecondsLinked 13.17, PCShoutLinked 2, PCPrimeSecondsTricked 2.5}}` —
+read through the linked keys by world.pc_branch_key wherever the flow
+reads them (the stand, the SHOUT, the credits, the jingles, the scene, the
+repair, the tail, the prime), the arm chosen by the pool's Primed as
+Item.ChangeAnimation210 chooses the clips (TrickItem.cs:918-929). The
+replay's drift over the run went from -16.2 s to -4.2 s, the fifi jump
+gone. The plan was re-laid (v28): the 12 s put the hedgehog's and the
+bat's coins 12 s later on the gauge (PCRageDecay 30 a tick: 0.36 a
+second) and the bat's landed at 98.8 — the chair and the pylon, armed
+after his lap-3 chair now (the shop takes the first urchin, a second is
+taken for the chair: one hedgehog is held at a time), pay at his lap-4
+chair (366 s) and the octopus's coin at 427 s is the overflow (101.9),
+the collapse, 100 at 437.8 s.
+
+**213's bull wait and its stairs (2026-10-03).** His wait at the controls
+while Olga rides lasted 6.06 s on the first lap and 0.58 s on the second:
+Olga's MechanicalBull action ends with PawnToIgnoreInfiniteAnimationOnceOnEnd
+on him, and under the profile the behaviour's cut (`leave` posted as her
+ride's job ends, PCBehaviourAtEnd) stopped his StandUpInfinite at once —
+the once-ignore the mobile consumes at that clip's round end stayed set and
+ended his next looping clip after one round, a lap later. The cut consumes
+the flags now (Routine._pc_behaviour_cut); the second lap's wait is 6.06 s
+too (NFH_LOOP_LOG=1 prints the once-targets and their consumption). The
+stairs down to the boat (Zone03 -> Zone02): the port stands 2.16 s at the
+top (the `in` run held out, _pc_hop_steps) and moves 6.58 s; the PC walks
+the 8.75 s (317 px at 3 a tick) — the same time, the pose differs. The
+run's remaining jump, -15 s at the third lap's carnivore, is the
+uncatchable run's own: Woody stood on the plant's `neighbor` hotspot for
+his tricks and the PC neighbour circled him for 15 s (fcn.10009889's
+detour, a target inside the box) — in a real game that is a catch.
+
+**206's Mother: the probes read again (2026-10-03).** The two probes that
+had her see Woody at every entry into her room were caught by the
+neighbour: he waits at (550, 340) in her room for her second call, which
+never comes on the oracle — the plan runner skips the `tutorial` leg, and
+the PC's director (TutorialPC206's steps) had not passed the pillows' gate
+in those runs. The 206 trace of the uncatchable batch is the same run (12
+of 18 legs, the lesson never passed): its row below says nothing about
+her. The oracle logs the director's message boxes now (`msg` events,
+fcn.100101f3) and reads a step's gate where its result lands (`gate`
+events, WDBG_GATES: the director's `test al, al` at 0x1002b4b5 after
+isObjectPresent, fcn.1000ec67 — the object's flag 0x20). The gate had
+failed for a reason of the runner's own: the fart bag on the pillows is
+`inflate`, an `auto` action of 37 frames whose result, pillows_manip, is
+placed as the job ends, and the runner's next input (the sports bag, 6
+ticks before that end) cancelled it — the runner had judged the leg done
+on the two-second pose rule. Alone, the gate reads 1 on the job's last
+tick and the box goes to step3 (the gate probe: 42.6 s). Both runners
+wait an action's own ticks out before their next input now
+(PCMap.woody_ticks: objects.xml time="N" + 2, an `auto` one its
+animation's frames through lap_model_s2.Data.action_ticks — the Loader's
+rule); every trace before 2026-10-03 13:00 that had an input inside a
+Woody action's job may carry a cancelled placement the same way.
+With the lesson paced (a `wait` after each of its inputs) the PC runs it
+through: step3 at 45.8 s, step3a at 56 (Woody on the lower deck), step4
+at 73.2 as he enters the pipe (the director's `tutorial` to her and
+him), her second call 80.3, the order 84, the fart 97.2, her fight on
+him 102.2, step5 at 105.6, the box closed at 111.7; his lap starts at
+124 s (bottomleft, bottomright 156, topright 176, topleft 187, ~120 s a
+lap). She sits back in her chair at 106.9 (`enter`: the chair's
+sitdown_pillow then sleep_pillow) and stays `inv` to the run's end
+(420 s). Woody stood in her room with the neighbour elsewhere twice,
+218-222 s and 339-343 s, and was not seen; every would-be catch of the
+run was the neighbour's, in his own room (ten, 157-399 s). The port's
+Mother alternates MotherSleepLoop 60 s and MotherLook 30 s from 92 s
+(the mobile's chair) — 334-364 is a look phase there, where the PC's
+Mother slept on: the port is the stricter one, the plan stands, and her
+look phases are an open question (a probe over her stays is queued,
+2026-10-03 13:20).
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 
