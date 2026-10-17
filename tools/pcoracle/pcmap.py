@@ -41,13 +41,14 @@ class PCMap(pcgeo.MapOps):
             if 'wrong="true"' in m.group(2): continue
             self.combos.append((m.group(1), re.findall(r'<ingredient name="([^"]+)"', m.group(3)),
                                 re.search(r'game="([^"]+)"', m.group(2))))
-        self.uses = set(); self.hideouts = {}
+        self.uses = set(); self.hideouts = {}; self.contents = {}
         try:
             self.placed = set(re.findall(r'<object [^>]*name="([^"]+)"', rd('level.xml')))   # placed at the start
         except OSError:
             self.placed = set()
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', rd('objects.xml'), re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
+            self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
         raw = json.load(open(os.path.join(ROOT, 'levels', 's1' if n < 200 else 's2', 'Level%d.json' % n)))

@@ -311,11 +311,16 @@ class PlanRunner:
                 obj = self.m.use_target(args[0])
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
-                if op == 'use' and self.m.single_combo(obj):
+                if op in ('use', 'prime', 'take') and self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()):
                     # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
+            placed = getattr(self.m, 'placed', set()); variants = set(getattr(self, 'variants', {}).values())
+            if obj and '/' in obj and placed and obj not in placed and obj not in variants and not (op == 'usewith' and args[0].startswith('Ground@')):
+                # (a message on an object not in the scene crashes NFH1 — 106's tub_hair, 107's dove_free,
+                # 113's valve_off; the level places it by a switch later, which the trace does not show)
+                return self.done('unplaced %s' % obj)
             step['to'] = (obj or '').split('/')[0] if '/' in (obj or '') else (room if op == 'usewith' and args[0].startswith('Ground@') else None)
             step['leg'] = ' '.join(leg); step['sneak'] = self.sneak_now(w, step['to']); self.target = obj; self.phase = 'acting'; self.last_input = tick
             self.cur_step = step; self._sneak_room = self.room_of(w) if w else None
