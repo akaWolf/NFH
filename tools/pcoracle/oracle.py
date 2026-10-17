@@ -158,13 +158,17 @@ class PlanRunner:
                 dest = d[1].split('/')[0] if d and isinstance(d[1], str) and '/' in d[1] else None
                 if dest is None or dest in rooms: return True
         return False
-    def sneak_now(self, w=None):
+    def sneak_now(self, w=None, to=None):
         """the sneaking flag of an input: the plan's on / off, or under auto (the port's default, tests/
         run_tricks.py _auto_sneak_tick) Woody's current room being a pet's — the PC's flag is per input,
         for the whole walk, so the walk is re-issued at each room change (resneak)"""
         if state['sneak'] != 'auto': return bool(state['sneak'])
         w = w or self.woody(); room = self.room_of(w) if w else None
-        return room in self.m.alerter_rooms
+        # the pet wakes on the entry tick of a running Woody (111's dog at tick 233, the re-issue at 239 came
+        # late): an input whose way crosses a pet's room sneaks from the start, the port sets its flag
+        # before the door's warp; the walk is re-issued running once the pet's room is behind him
+        rooms = set(self.m.geo.route(room, to)) | {room} if to else {room}
+        return bool(rooms & self.m.alerter_rooms)
     def resneak(self, tick, w):
         """under auto: the pending input sent again with the flag of the room Woody has just entered"""
         step = getattr(self, 'cur_step', None)
@@ -172,7 +176,7 @@ class PlanRunner:
         room = self.room_of(w)
         if room == getattr(self, '_sneak_room', room): self._sneak_room = room; return []
         self._sneak_room = room
-        want = room in self.m.alerter_rooms
+        want = self.sneak_now(w, step.get('to'))
         if want == step.get('sneak', False): return []
         again = dict(step); again['tick'] = tick; again['sneak'] = want; again['resneak'] = True
         self.cur_step = again; self.last_input = tick
@@ -221,7 +225,7 @@ class PlanRunner:
                     if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
                     return []                      # the gate: the room free of the catchers first
                 self.phase = 'parking'; self.target = args[0]; self._sneak_room = self.room_of(w) if w else None
-                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': self.sneak_now(w), 'leg': ' '.join(leg)}
+                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': self.sneak_now(w, room), 'to': room, 'leg': ' '.join(leg)}
                 return [self.cur_step]
             elif op == 'walk':
                 # `walk x y`: the world point's zone on its PC room (pcgeo: the port's own geometry)
@@ -231,7 +235,7 @@ class PlanRunner:
                     if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
                     return []
                 self.phase = 'walking'; self.target = (room, px); self.last_input = tick; self._sneak_room = self.room_of(w) if w else None
-                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': self.sneak_now(w), 'leg': ' '.join(leg)}
+                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': self.sneak_now(w, room), 'to': room, 'leg': ' '.join(leg)}
                 return [self.cur_step]
             elif op == 'whenanim':
                 # `whenanim Role Anim` (tests/run_tricks.py leg_whenanim): the pawn's phase — a sleep or a hide
@@ -309,7 +313,8 @@ class PlanRunner:
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
-            step['leg'] = ' '.join(leg); step['sneak'] = self.sneak_now(w); self.target = obj; self.phase = 'acting'; self.last_input = tick
+            step['to'] = (obj or '').split('/')[0] if '/' in (obj or '') else (room if op == 'usewith' and args[0].startswith('Ground@') else None)
+            step['leg'] = ' '.join(leg); step['sneak'] = self.sneak_now(w, step['to']); self.target = obj; self.phase = 'acting'; self.last_input = tick
             self.cur_step = step; self._sneak_room = self.room_of(w) if w else None
             self.acted = len(self.acts_on(obj)); self.declined = len(state['declines'])
             return [step]
@@ -447,10 +452,12 @@ class Tick(gdb.Breakpoint):
             # (the level's setup flood is before the first tick; the loop hook is cheap from here)
             alloc_scratch(); state['loop'].enabled = True
             if os.environ.get('WDBG_NOCATCH'):
-                # an idle lap with Woody uncatchable: the trigger predicate of mode 1 (fcn.1003f573 — both
-                # objects in one room, the target placed, neither carrying flag 4: tools/pcref/pc_catch_s2.py)
-                # returns false — `xor eax, eax; ret 0x10` over its first bytes
-                wr(gl(0x1003f573), b'\x31\xc0\xc2\x10\x00'); print('NOCATCH: the catch predicate stubbed', flush=True)
+                # Woody uncatchable: the trigger predicate of mode 1 (fcn.1003f573 — both objects in one room,
+                # the target placed, neither carrying flag 4: tools/pcref/pc_catch_s2.py) answers through its
+                # one exit (0x1003f86a ret 0x10, al): the CatchExit breakpoint logs a `wouldcatch` when it
+                # would answer yes and clears the answer — the would-be catches stay in the trace; where the
+                # register write fails under the proxy, the entry stub (`xor eax, eax; ret 0x10`) instead
+                CatchExit(); print('NOCATCH: the catch predicate answered no at its exit', flush=True)
         # a dummy click LEAD ticks ahead of each scripted message; the plan's legs as they come due
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()
@@ -481,6 +488,26 @@ class Loop(gdb.Breakpoint):
                     emit({'tick': state['tick'], 'ev': 'click', 'vt': '%#x' % vt, 'a': as_string(u32(msg + 4)), 'b': as_string(u32(msg + 8)) or u32(msg + 0xc)})
         except Exception as e:
             print('loop err', repr(e), flush=True)
+        return False
+class CatchExit(gdb.Breakpoint):
+    """the catch predicate's exit: a yes becomes a no and is logged once a second (WDBG_NOCATCH)"""
+    def __init__(self): super().__init__('*%#x' % gl(0x1003f86a), internal=True); self.last = -100; self.n = 0
+    def stop(self):
+        try:
+            eax = int(gdb.parse_and_eval('$eax')) & 0xffffffff
+            if eax & 0xff:
+                gdb.execute('set $eax = 0', to_string=True)
+                if int(gdb.parse_and_eval('$eax')) & 0xff:
+                    # the proxy took no register write: the entry stub, and this hook retires
+                    wr(gl(0x1003f573), b'\x31\xc0\xc2\x10\x00'); self.enabled = False
+                    print('NOCATCH: no register write — the predicate stubbed at its entry', flush=True)
+                    return False
+                if state['tick'] - self.last >= 12:
+                    emit({'tick': state['tick'], 'ev': 'wouldcatch', 'actors': actor_states()}); print('WOULDCATCH tick %d' % state['tick'], flush=True)
+                    state.setdefault('wouldcatch', []).append(state['tick'])
+                self.last = state['tick']
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'catchexit', 'err': repr(e)})
         return False
 class PathHook(gdb.Breakpoint):
     def __init__(self): super().__init__('*%#x' % gl(0x1000a711), internal=True)
@@ -586,5 +613,5 @@ log.flush()
 print('done: %d ticks, %d records, %d script steps left' % (state['tick'], state['n'], len(script) + len(pending)), flush=True)
 if plan is not None:
     json.dump(plan.results, open(LOGS + '/oracle_%s_legs.json' % (want or 'cur'), 'w'), indent=1)
-    print('plan: %d/%d legs, %s; caught %s' % (plan.i, len(plan.legs), [r['why'] for r in plan.results], state['caught']), flush=True)
+    print('plan: %d/%d legs, %s; caught %s; would be caught at %s' % (plan.i, len(plan.legs), [r['why'] for r in plan.results], state['caught'], state.get('wouldcatch', [])), flush=True)
 gdb.execute('kill')

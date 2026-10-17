@@ -141,13 +141,17 @@ class PlanRunner:
             if self.blind(c, a): continue
             if self.room_of(a) in rooms or a['anim'] in self.GAITS: return True   # (NFH1: no GoTo hook — a walk's target is unknown)
         return False
-    def sneak_now(self, w=None):
+    def sneak_now(self, w=None, to=None):
         """the sneaking flag of an input: the plan's on / off, or under auto (the port's default, tests/
         run_tricks.py _auto_sneak_tick) Woody's current room being a pet's — the PC's flag is per input,
         for the whole walk, so the walk is re-issued at each room change (resneak)"""
         if state['sneak'] != 'auto': return bool(state['sneak'])
         w = w or self.woody(); room = self.room_of(w) if w else None
-        return room in self.m.alerter_rooms
+        # the pet wakes on the entry tick of a running Woody (111's dog at tick 233, the re-issue at 239 came
+        # late): an input whose way crosses a pet's room sneaks from the start, the port sets its flag
+        # before the door's warp; the walk is re-issued running once the pet's room is behind him
+        rooms = set(self.m.geo.route(room, to)) | {room} if to else {room}
+        return bool(rooms & self.m.alerter_rooms)
     def resneak(self, tick, w):
         """under auto: the pending input sent again with the flag of the room Woody has just entered"""
         step = getattr(self, 'cur_step', None)
@@ -155,7 +159,7 @@ class PlanRunner:
         room = self.room_of(w)
         if room == getattr(self, '_sneak_room', room): self._sneak_room = room; return []
         self._sneak_room = room
-        want = room in self.m.alerter_rooms
+        want = self.sneak_now(w, step.get('to'))
         if want == step.get('sneak', False): return []
         again = dict(step); again['tick'] = tick; again['sneak'] = want; again['resneak'] = True
         self.cur_step = again; self.last_input = tick
@@ -204,7 +208,7 @@ class PlanRunner:
                     if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
                     return []                      # the gate: the room free of the catchers first
                 self.phase = 'parking'; self.target = args[0]; self._sneak_room = self.room_of(w) if w else None
-                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': self.sneak_now(w), 'leg': ' '.join(leg)}
+                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, x], 'sneak': self.sneak_now(w, room), 'to': room, 'leg': ' '.join(leg)}
                 return [self.cur_step]
             elif op == 'walk':
                 # `walk x y`: the world point's zone on its PC room (pcgeo: the port's own geometry)
@@ -214,7 +218,7 @@ class PlanRunner:
                     if tick - self.leg_start > self.TIMEOUT: return self.done('timeout at the gate')
                     return []
                 self.phase = 'walking'; self.target = (room, px); self.last_input = tick; self._sneak_room = self.room_of(w) if w else None
-                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': self.sneak_now(w), 'leg': ' '.join(leg)}
+                self.cur_step = {'tick': tick, 'kind': 'goto', 'args': [room, int(round(px))], 'sneak': self.sneak_now(w, room), 'to': room, 'leg': ' '.join(leg)}
                 return [self.cur_step]
             elif op == 'whenanim':
                 # `whenanim Role Anim` (tests/run_tricks.py leg_whenanim): the pawn's phase — a sleep or a hide
@@ -291,7 +295,8 @@ class PlanRunner:
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
-            step['leg'] = ' '.join(leg); step['sneak'] = self.sneak_now(w); self.target = obj; self.phase = 'acting'; self.last_input = tick
+            step['to'] = (obj or '').split('/')[0] if '/' in (obj or '') else (room if op == 'usewith' and args[0].startswith('Ground@') else None)
+            step['leg'] = ' '.join(leg); step['sneak'] = self.sneak_now(w, step['to']); self.target = obj; self.phase = 'acting'; self.last_input = tick
             self.cur_step = step; self._sneak_room = self.room_of(w) if w else None
             self.acted = len(self.acts_on(obj)); self.declined = len(state['declines'])
             return [step]
@@ -448,8 +453,11 @@ class Tick(gdb.Breakpoint):
         state['tick'] += 1; now = time.time(); state['last'] = now
         if state['t0'] is None:
             state['t0'] = now; open(LOGS + '/level_started', 'w').write('%.3f' % now)
-        if state['tick'] == 1 and scratch['base'] is None:
-            alloc_scratch()
+        if state['tick'] == 1 and scratch['base'] is None: alloc_scratch()
+        if state['tick'] == 1 and not state.get('nocatch_done'):
+            # (on its own flag: the scratch may be allocated before the first tick, by the level-name patch —
+            # the runs of 107-112 went without the stub while it hung on `scratch is None`)
+            state['nocatch_done'] = True
             if os.environ.get('WDBG_NOCATCH'):
                 # Woody uncatchable: the state function's rooms test (fcn.00436bb0 — Woody's and the
                 # neighbour's room objects equal, the neighbour's pause byte +0x78 clear, neither carrying

@@ -1906,6 +1906,15 @@ class Pawn:
             holder = d.pc_claim
             if holder is not None and holder is not self:
                 if holder._pc_holds(d):
+                    if os.environ.get('NFH_CLAIM_LOG'):
+                        # (a harness trace of a pawn held at a door: who holds the pair and by which step)
+                        why = [(st.get('kind'), st.get('pc_hop') is not None, st.get('pc_hold_run') is not None, st.get('door') is not None, st.get('pc_claim') is not None)
+                               for st in ([holder._step] if holder._step is not None else []) + list(holder.steps)
+                               if st.get('pc_hop') in pair or (st.get('pc_hold_run') is not None and st['pc_hold_run'][1] in pair) or st.get('door') in pair or st.get('pc_claim') in pair]
+                        wt = getattr(getattr(self, 'world', None), 'time', None)
+                        print('CLAIM t=%.2f %s waits at door %s: held by %s (warping=%s exit_in_pair=%s steps=%s zone=%s)' % (
+                            wt if wt is not None else -1, self.role, d.pid, holder.role, holder.is_warping,
+                            getattr(holder, '_exit_door', None) in pair, why[:3], holder.zone.pid if holder.zone else None), flush=True)
                     return False
                 holder._pc_release()      # a path it has dropped (a stale hold)
         self._pc_release()
@@ -3208,7 +3217,11 @@ class Pawn:
             if w.can_rottweiler_see_woody() and not w.game.got_caught \
                     and not w._pc_catch_barred():
                 w._catch()
-                return True
+                if not os.environ.get('NFH_NO_CATCH'):
+                    return True
+                # (the harness switch records the catch and plays nothing: the
+                # walk goes on — parked here, Woody held the PC door pair for
+                # the rest of 203's replay and the neighbour waited behind it)
         self.passing_complex = True
         return False
 
