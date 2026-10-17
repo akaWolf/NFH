@@ -1,0 +1,1773 @@
+{
+ "level": 107,
+ "folder": "level_art",
+ "tricked": [
+  "bal/dove_free",
+  "bal/picture_smeared",
+  "bed/camera_flashy",
+  "kit/potterswheel_fast",
+  "kit/stool_pins",
+  "lir/footstool_unlocked"
+ ],
+ "classes": [
+  {
+   "class": "0x4576fc",
+   "cases": [
+    {
+     "index": [
+      0,
+      14
+     ],
+     "start": "0x4585f3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4556301,
+        "kind": "ICON",
+        "args": [
+         "painting",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 15
+     }
+    },
+    {
+     "index": [
+      1
+     ],
+     "start": "0x457703",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4552477,
+        "kind": "ICON",
+        "args": [
+         "camera",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4552526,
+        "kind": "GOTO",
+        "obj": "bed/posingspot"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x457760",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4552553,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         2
+        ]
+       },
+       {
+        "a": 4552644,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x104]",
+         "bed/camera",
+         "bed/camera_flashy"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4552644,
+       "fn": "fcn.0047a130",
+       "variant": "bed/camera_flashy"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4552673,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4552771,
+         "kind": "ACTION",
+         "obj": "bed/camera_flashy",
+         "act": "flash"
+        },
+        {
+         "a": 4552840,
+         "kind": "SWITCH",
+         "args": [
+          "bed/camera_flashy",
+          "bed/camera"
+         ]
+        },
+        {
+         "a": 4552900,
+         "kind": "MSG"
+        },
+        {
+         "a": 4553026,
+         "kind": "MSG"
+        },
+        {
+         "a": 4553102,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bed/camera_flashy",
+          2
+         ]
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4553183,
+         "kind": "ACTION",
+         "obj": "bed/camera",
+         "act": "flash"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x457a56",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4553328,
+        "kind": "ICON",
+        "args": [
+         "magnesium",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4553377,
+        "kind": "GOTO",
+        "obj": "bed/magnesiumbottle"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x457ab2",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x457b04",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4553502,
+        "kind": "ICON",
+        "args": [
+         "camera",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4553551,
+        "kind": "GOTO",
+        "obj": "bed/camera"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x457b61",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 7
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x457bb4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4553678,
+        "kind": "ICON",
+        "args": [
+         "potterswheel",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4553727,
+        "kind": "GOTO",
+        "obj": "kit/stool"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x457c11",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4553754,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4553904,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebp",
+         "kit/stool"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4553904,
+       "fn": "fcn.0047a130",
+       "variant": "kit/stool"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4553934,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4554018,
+         "kind": "ENTER",
+         "obj": "dword [esp + 0x1c]"
+        },
+        {
+         "a": 4554108,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "cry"
+        },
+        {
+         "a": 4554200,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "hurt"
+        },
+        {
+         "a": 4554277,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/stool_pins",
+          2
+         ]
+        },
+        {
+         "a": 4554393,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x11c]",
+          "esi",
+          "kit/stool_pins"
+         ]
+        },
+        {
+         "a": 4554435,
+         "kind": "ENTER",
+         "obj": "dword [esp + 0x18]"
+        }
+       ],
+       "next": 9
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4554435,
+         "kind": "ENTER",
+         "obj": "dword [esp + 0x18]"
+        }
+       ],
+       "next": 9
+      }
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x457f3c",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4554562,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4554650,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x108]",
+         "kit/potterswheel",
+         "kit/potterswheel_fast"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4554650,
+       "fn": "fcn.0047a130",
+       "variant": "kit/potterswheel_fast"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4554686,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4554781,
+         "kind": "ACTION",
+         "obj": "kit/potterswheel_fast",
+         "act": "potter_fast"
+        },
+        {
+         "a": 4554840,
+         "kind": "GOTO2",
+         "obj": "addr"
+        },
+        {
+         "a": 4555008,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/potterswheel_fast",
+          2
+         ]
+        },
+        {
+         "a": 4555082,
+         "kind": "GOTO",
+         "obj": "kit/potterswheel_fast"
+        },
+        {
+         "a": 4555200,
+         "kind": "REPAIR",
+         "args": [
+          "dword [esp + 0x11c]",
+          "ebp",
+          "esi",
+          "kit/potterswheel_fast"
+         ]
+        }
+       ],
+       "next": 10
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4555249,
+         "kind": "ACTION",
+         "obj": "kit/potterswheel",
+         "act": "potter"
+        }
+       ],
+       "next": 10
+      }
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x458255",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4555375,
+        "kind": "ICON",
+        "args": [
+         "statue",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4555424,
+        "kind": "GOTO",
+        "obj": "lir/statue"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x4582b2",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4555488,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x104]",
+         "lir/statue",
+         "lir/statue_broken"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4555488,
+       "fn": "fcn.0047a130",
+       "variant": "lir/statue_broken"
+      },
+      "true": {
+       "steps": [],
+       "next": 14
+      },
+      "false": {
+       "steps": [],
+       "next": 12
+      }
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x458345",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4555615,
+        "kind": "ICON",
+        "args": [
+         "statue",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4555664,
+        "kind": "GOTO",
+        "obj": "lir/footstool"
+       }
+      ],
+      "next": 13
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x4583a2",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4555691,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         13
+        ]
+       },
+       {
+        "a": 4555782,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x104]",
+         "lir/footstool",
+         "lir/footstool_unlocked"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4555782,
+       "fn": "fcn.0047a130",
+       "variant": "lir/footstool_unlocked"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4555811,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4555906,
+         "kind": "ACTION",
+         "obj": "lir/footstool_unlocked",
+         "act": "sculpt"
+        },
+        {
+         "a": 4555969,
+         "kind": "SWITCH",
+         "args": [
+          "lir/statue",
+          "lir/statue_broken"
+         ]
+        },
+        {
+         "a": 4556026,
+         "kind": "MSG"
+        },
+        {
+         "a": 4556099,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/footstool_unlocked",
+          0
+         ]
+        }
+       ],
+       "next": 14
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4556177,
+         "kind": "ACTION",
+         "obj": "lir/footstool",
+         "act": "sculpt"
+        }
+       ],
+       "next": 14
+      }
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x45864e",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4556397,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x104]",
+         "aux",
+         15
+        ]
+       }
+      ],
+      "test": {
+       "a": 4556397,
+       "fn": "fcn.00479ff0",
+       "variant": null
+      },
+      "true": {
+       "steps": [],
+       "next": 17
+      },
+      "false": {
+       "steps": [],
+       "next": 16
+      }
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x4586c4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4556490,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         16
+        ]
+       },
+       {
+        "a": 4556542,
+        "kind": "STOPMSG"
+       },
+       {
+        "a": 4556616,
+        "kind": "GOTO",
+        "obj": "bal/dove_free"
+       },
+       {
+        "a": 4556687,
+        "kind": "OBJ2",
+        "args": [
+         "addr",
+         "bal/dove_free",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x4587f3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4556813,
+        "kind": "ICON",
+        "args": [
+         "painting",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4556862,
+        "kind": "GOTO",
+        "obj": "bal/picture_empty"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x458850",
+     "paths": 15,
+     "tree": {
+      "steps": [
+       {
+        "a": 4556886,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         18
+        ]
+       },
+       {
+        "a": 4556959,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x104]",
+         "bal/picture_smeared"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4556959,
+       "fn": "fcn.00479ff0",
+       "variant": "bal/picture_smeared"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4557003,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "aux"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4557003,
+        "fn": "fcn.00479ff0",
+        "variant": null
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4557029,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4557105,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "bal/picture_smeared",
+           0
+          ]
+         },
+         {
+          "a": 4557199,
+          "kind": "ACTION",
+          "obj": "bal/picture_smeared",
+          "act": "clean"
+         },
+         {
+          "a": 4557268,
+          "kind": "SWITCH",
+          "args": [
+           "bal/picture_smeared",
+           "bal/picture_empty"
+          ]
+         },
+         {
+          "a": 4557331,
+          "kind": "MSG"
+         },
+         {
+          "a": 4557678,
+          "kind": "OBJ3",
+          "args": [
+           "ebp",
+           "bal/picture_smeared"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4557678,
+         "fn": "fcn.00479ff0",
+         "variant": "bal/picture_smeared"
+        },
+        "true": {
+         "steps": [],
+         "next": 1
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4557718,
+           "kind": "OBJ3",
+           "args": [
+            "ebp",
+            "aux"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4557718,
+          "fn": "fcn.00479ff0",
+          "variant": null
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4557758,
+            "kind": "OBJ3",
+            "args": [
+             "ebp",
+             "bal/picture"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4557758,
+           "fn": "fcn.00479ff0",
+           "variant": "bal/picture"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4557817,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "clean"
+            },
+            {
+             "a": 4558093,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "paint1"
+            }
+           ],
+           "next": 1
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4557886,
+             "kind": "OBJ3",
+             "args": [
+              "ebp",
+              "bal/picture_empty"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4557886,
+            "fn": "fcn.00479ff0",
+            "variant": "bal/picture_empty"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4557919,
+              "kind": "SWITCH",
+              "args": [
+               "bal/picture_empty",
+               "bal/picture"
+              ]
+             },
+             {
+              "a": 4557982,
+              "kind": "MSG"
+             },
+             {
+              "a": 4558093,
+              "kind": "ACTION",
+              "obj": "bal/picture",
+              "act": "paint1"
+             }
+            ],
+            "next": 1
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4558093,
+              "kind": "ACTION",
+              "obj": "bal/picture",
+              "act": "paint1"
+             }
+            ],
+            "next": 1
+           }
+          }
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4558258,
+            "kind": "ACTION",
+            "obj": "?",
+            "act": "paint_nonsense"
+           }
+          ],
+          "next": 1
+         }
+        }
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4557429,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4557508,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "bal/picture_smeared",
+           0
+          ]
+         },
+         {
+          "a": 4557602,
+          "kind": "ACTION",
+          "obj": "bal/picture_smeared",
+          "act": "paint_nonsense"
+         },
+         {
+          "a": 4557678,
+          "kind": "OBJ3",
+          "args": [
+           "ebp",
+           "bal/picture_smeared"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4557678,
+         "fn": "fcn.00479ff0",
+         "variant": "bal/picture_smeared"
+        },
+        "true": {
+         "steps": [],
+         "next": 1
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4557718,
+           "kind": "OBJ3",
+           "args": [
+            "ebp",
+            "aux"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4557718,
+          "fn": "fcn.00479ff0",
+          "variant": null
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4557758,
+            "kind": "OBJ3",
+            "args": [
+             "ebp",
+             "bal/picture"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4557758,
+           "fn": "fcn.00479ff0",
+           "variant": "bal/picture"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4557817,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "clean"
+            },
+            {
+             "a": 4558093,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "paint1"
+            }
+           ],
+           "next": 1
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4557886,
+             "kind": "OBJ3",
+             "args": [
+              "ebp",
+              "bal/picture_empty"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4557886,
+            "fn": "fcn.00479ff0",
+            "variant": "bal/picture_empty"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4557919,
+              "kind": "SWITCH",
+              "args": [
+               "bal/picture_empty",
+               "bal/picture"
+              ]
+             },
+             {
+              "a": 4557982,
+              "kind": "MSG"
+             },
+             {
+              "a": 4558093,
+              "kind": "ACTION",
+              "obj": "bal/picture",
+              "act": "paint1"
+             }
+            ],
+            "next": 1
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4558093,
+              "kind": "ACTION",
+              "obj": "bal/picture",
+              "act": "paint1"
+             }
+            ],
+            "next": 1
+           }
+          }
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4558258,
+            "kind": "ACTION",
+            "obj": "?",
+            "act": "paint_nonsense"
+           }
+          ],
+          "next": 1
+         }
+        }
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4557678,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "bal/picture_smeared"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4557678,
+        "fn": "fcn.00479ff0",
+        "variant": "bal/picture_smeared"
+       },
+       "true": {
+        "steps": [],
+        "next": 1
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4557718,
+          "kind": "OBJ3",
+          "args": [
+           "ebp",
+           "aux"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4557718,
+         "fn": "fcn.00479ff0",
+         "variant": null
+        },
+        "true": {
+         "steps": [
+          {
+           "a": 4557758,
+           "kind": "OBJ3",
+           "args": [
+            "ebp",
+            "bal/picture"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4557758,
+          "fn": "fcn.00479ff0",
+          "variant": "bal/picture"
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4557817,
+            "kind": "ACTION",
+            "obj": "bal/picture",
+            "act": "clean"
+           },
+           {
+            "a": 4558093,
+            "kind": "ACTION",
+            "obj": "bal/picture",
+            "act": "paint1"
+           }
+          ],
+          "next": 1
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4557886,
+            "kind": "OBJ3",
+            "args": [
+             "ebp",
+             "bal/picture_empty"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4557886,
+           "fn": "fcn.00479ff0",
+           "variant": "bal/picture_empty"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4557919,
+             "kind": "SWITCH",
+             "args": [
+              "bal/picture_empty",
+              "bal/picture"
+             ]
+            },
+            {
+             "a": 4557982,
+             "kind": "MSG"
+            },
+            {
+             "a": 4558093,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "paint1"
+            }
+           ],
+           "next": 1
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4558093,
+             "kind": "ACTION",
+             "obj": "bal/picture",
+             "act": "paint1"
+            }
+           ],
+           "next": 1
+          }
+         }
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4558258,
+           "kind": "ACTION",
+           "obj": "?",
+           "act": "paint_nonsense"
+          }
+         ],
+         "next": 1
+        }
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x458e27",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4558401,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x458ed1",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 21
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x458f0f",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x457a40",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x45860d": {
+     "a": 4556301,
+     "kind": "ICON",
+     "args": [
+      "painting",
+      "ebp"
+     ]
+    },
+    "0x45771d": {
+     "a": 4552477,
+     "kind": "ICON",
+     "args": [
+      "camera",
+      "ebp"
+     ]
+    },
+    "0x45774e": {
+     "a": 4552526,
+     "kind": "GOTO",
+     "obj": "bed/posingspot"
+    },
+    "0x457769": {
+     "a": 4552553,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      2
+     ]
+    },
+    "0x4577c4": {
+     "a": 4552644,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x104]",
+      "bed/camera",
+      "bed/camera_flashy"
+     ]
+    },
+    "0x4577e1": {
+     "a": 4552673,
+     "kind": "STOPMSG"
+    },
+    "0x457843": {
+     "a": 4552771,
+     "kind": "ACTION",
+     "obj": "bed/camera_flashy",
+     "act": "flash"
+    },
+    "0x457888": {
+     "a": 4552840,
+     "kind": "SWITCH",
+     "args": [
+      "bed/camera_flashy",
+      "bed/camera"
+     ]
+    },
+    "0x4578c4": {
+     "a": 4552900,
+     "kind": "MSG"
+    },
+    "0x457942": {
+     "a": 4553026,
+     "kind": "MSG"
+    },
+    "0x45798e": {
+     "a": 4553102,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bed/camera_flashy",
+      2
+     ]
+    },
+    "0x4579df": {
+     "a": 4553183,
+     "kind": "ACTION",
+     "obj": "bed/camera",
+     "act": "flash"
+    },
+    "0x457a70": {
+     "a": 4553328,
+     "kind": "ICON",
+     "args": [
+      "magnesium",
+      "ebp"
+     ]
+    },
+    "0x457aa1": {
+     "a": 4553377,
+     "kind": "GOTO",
+     "obj": "bed/magnesiumbottle"
+    },
+    "0x457b1e": {
+     "a": 4553502,
+     "kind": "ICON",
+     "args": [
+      "camera",
+      "ebp"
+     ]
+    },
+    "0x457b4f": {
+     "a": 4553551,
+     "kind": "GOTO",
+     "obj": "bed/camera"
+    },
+    "0x457bce": {
+     "a": 4553678,
+     "kind": "ICON",
+     "args": [
+      "potterswheel",
+      "ebp"
+     ]
+    },
+    "0x457bff": {
+     "a": 4553727,
+     "kind": "GOTO",
+     "obj": "kit/stool"
+    },
+    "0x457c1a": {
+     "a": 4553754,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x457cb0": {
+     "a": 4553904,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "kit/stool"
+     ]
+    },
+    "0x457cce": {
+     "a": 4553934,
+     "kind": "STOPMSG"
+    },
+    "0x457d22": {
+     "a": 4554018,
+     "kind": "ENTER",
+     "obj": "dword [esp + 0x1c]"
+    },
+    "0x457d7c": {
+     "a": 4554108,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "cry"
+    },
+    "0x457dd8": {
+     "a": 4554200,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "hurt"
+    },
+    "0x457e25": {
+     "a": 4554277,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/stool_pins",
+      2
+     ]
+    },
+    "0x457e99": {
+     "a": 4554393,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x11c]",
+      "esi",
+      "kit/stool_pins"
+     ]
+    },
+    "0x457ec3": {
+     "a": 4554435,
+     "kind": "ENTER",
+     "obj": "dword [esp + 0x18]"
+    },
+    "0x457f42": {
+     "a": 4554562,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x457f9a": {
+     "a": 4554650,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x108]",
+      "kit/potterswheel",
+      "kit/potterswheel_fast"
+     ]
+    },
+    "0x457fbe": {
+     "a": 4554686,
+     "kind": "STOPMSG"
+    },
+    "0x45801d": {
+     "a": 4554781,
+     "kind": "ACTION",
+     "obj": "kit/potterswheel_fast",
+     "act": "potter_fast"
+    },
+    "0x458058": {
+     "a": 4554840,
+     "kind": "GOTO2",
+     "obj": "addr"
+    },
+    "0x458100": {
+     "a": 4555008,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/potterswheel_fast",
+      2
+     ]
+    },
+    "0x45814a": {
+     "a": 4555082,
+     "kind": "GOTO",
+     "obj": "kit/potterswheel_fast"
+    },
+    "0x4581c0": {
+     "a": 4555200,
+     "kind": "REPAIR",
+     "args": [
+      "dword [esp + 0x11c]",
+      "ebp",
+      "esi",
+      "kit/potterswheel_fast"
+     ]
+    },
+    "0x4581f1": {
+     "a": 4555249,
+     "kind": "ACTION",
+     "obj": "kit/potterswheel",
+     "act": "potter"
+    },
+    "0x45826f": {
+     "a": 4555375,
+     "kind": "ICON",
+     "args": [
+      "statue",
+      "ebp"
+     ]
+    },
+    "0x4582a0": {
+     "a": 4555424,
+     "kind": "GOTO",
+     "obj": "lir/statue"
+    },
+    "0x4582e0": {
+     "a": 4555488,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x104]",
+      "lir/statue",
+      "lir/statue_broken"
+     ]
+    },
+    "0x45835f": {
+     "a": 4555615,
+     "kind": "ICON",
+     "args": [
+      "statue",
+      "ebp"
+     ]
+    },
+    "0x458390": {
+     "a": 4555664,
+     "kind": "GOTO",
+     "obj": "lir/footstool"
+    },
+    "0x4583ab": {
+     "a": 4555691,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      13
+     ]
+    },
+    "0x458406": {
+     "a": 4555782,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x104]",
+      "lir/footstool",
+      "lir/footstool_unlocked"
+     ]
+    },
+    "0x458423": {
+     "a": 4555811,
+     "kind": "STOPMSG"
+    },
+    "0x458482": {
+     "a": 4555906,
+     "kind": "ACTION",
+     "obj": "lir/footstool_unlocked",
+     "act": "sculpt"
+    },
+    "0x4584c1": {
+     "a": 4555969,
+     "kind": "SWITCH",
+     "args": [
+      "lir/statue",
+      "lir/statue_broken"
+     ]
+    },
+    "0x4584fa": {
+     "a": 4556026,
+     "kind": "MSG"
+    },
+    "0x458543": {
+     "a": 4556099,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/footstool_unlocked",
+      0
+     ]
+    },
+    "0x458591": {
+     "a": 4556177,
+     "kind": "ACTION",
+     "obj": "lir/footstool",
+     "act": "sculpt"
+    },
+    "0x45866d": {
+     "a": 4556397,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x104]",
+      "aux",
+      15
+     ]
+    },
+    "0x4586ca": {
+     "a": 4556490,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      16
+     ]
+    },
+    "0x4586fe": {
+     "a": 4556542,
+     "kind": "STOPMSG"
+    },
+    "0x458748": {
+     "a": 4556616,
+     "kind": "GOTO",
+     "obj": "bal/dove_free"
+    },
+    "0x45878f": {
+     "a": 4556687,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/dove_free",
+      "ebp"
+     ]
+    },
+    "0x45880d": {
+     "a": 4556813,
+     "kind": "ICON",
+     "args": [
+      "painting",
+      "ebp"
+     ]
+    },
+    "0x45883e": {
+     "a": 4556862,
+     "kind": "GOTO",
+     "obj": "bal/picture_empty"
+    },
+    "0x458856": {
+     "a": 4556886,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      18
+     ]
+    },
+    "0x45889f": {
+     "a": 4556959,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x104]",
+      "bal/picture_smeared"
+     ]
+    },
+    "0x4588cb": {
+     "a": 4557003,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "aux"
+     ]
+    },
+    "0x458a75": {
+     "a": 4557429,
+     "kind": "STOPMSG"
+    },
+    "0x458ac4": {
+     "a": 4557508,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/picture_smeared",
+      0
+     ]
+    },
+    "0x458b22": {
+     "a": 4557602,
+     "kind": "ACTION",
+     "obj": "bal/picture_smeared",
+     "act": "paint_nonsense"
+    },
+    "0x458b6e": {
+     "a": 4557678,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "bal/picture_smeared"
+     ]
+    },
+    "0x4588e5": {
+     "a": 4557029,
+     "kind": "STOPMSG"
+    },
+    "0x458931": {
+     "a": 4557105,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/picture_smeared",
+      0
+     ]
+    },
+    "0x45898f": {
+     "a": 4557199,
+     "kind": "ACTION",
+     "obj": "bal/picture_smeared",
+     "act": "clean"
+    },
+    "0x4589d4": {
+     "a": 4557268,
+     "kind": "SWITCH",
+     "args": [
+      "bal/picture_smeared",
+      "bal/picture_empty"
+     ]
+    },
+    "0x458a13": {
+     "a": 4557331,
+     "kind": "MSG"
+    },
+    "0x458b96": {
+     "a": 4557718,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "aux"
+     ]
+    },
+    "0x458db2": {
+     "a": 4558258,
+     "kind": "ACTION",
+     "obj": "?",
+     "act": "paint_nonsense"
+    },
+    "0x458bbe": {
+     "a": 4557758,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "bal/picture"
+     ]
+    },
+    "0x458c3e": {
+     "a": 4557886,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "bal/picture_empty"
+     ]
+    },
+    "0x458c5f": {
+     "a": 4557919,
+     "kind": "SWITCH",
+     "args": [
+      "bal/picture_empty",
+      "bal/picture"
+     ]
+    },
+    "0x458c9e": {
+     "a": 4557982,
+     "kind": "MSG"
+    },
+    "0x458d0d": {
+     "a": 4558093,
+     "kind": "ACTION",
+     "obj": "bal/picture",
+     "act": "paint1"
+    },
+    "0x458bf9": {
+     "a": 4557817,
+     "kind": "ACTION",
+     "obj": "bal/picture",
+     "act": "clean"
+    },
+    "0x458e41": {
+     "a": 4558401,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

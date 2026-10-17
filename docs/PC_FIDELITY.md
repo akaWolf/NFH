@@ -4955,25 +4955,74 @@ end of the level, the drift the first and the last pair's offset:
 | 101 | 13/13, WON 169 | 9 / 1 | -0.03 -> -0.39 | none |
 | 102 | 10/10 | 14 / 4 | -> -1.28 | none |
 | 103 | 19/19, WON 186 | 15 / 0 | -> -1.16 | none |
-| 104 | 19/20 | 13 / 4 | -> -0.99 | none (its egg was cut 1.2 s in, before the auto ticks: rerun pending) |
+| 104 | 19/19, WON 236 (rerun) | 18 / 0 | -> -1.00 | none (the first run's egg was cut 1.2 s in, before the auto ticks) |
 | 105 | 14/16 | 18 / 2 | -> +0.16 | football -2.7 / +2.2 (the piano after the rush, PCRedoAfterUrgent — read above) |
-| 106 | 37/39 | 5 / 18 | -> +4.75 | candy +5.2 — the trace's full bottle was never taken (the tub `unplaced` before the Switch names): rerun pending |
-| 107 | 17/19 | 31 / 0 | -> +1.90 | none |
+| 106 | 39/39 (rerun) | 27 / 0 | -> -0.85 | none — the old candy +5.2 was the trace's own (its full bottle never taken, its egg cut); every bubble of its four laps pairs within 0.9 s now (cmp_pairs' level aliases: milk_bottle = pudding, bath = badewanne, photo_album = book, towel = handtuch) |
+| 107 | 18/19 (rerun) | 33 / 1 | -> +1.87 | none (the dove's scissors leg still times out: the runner combines on the `aux` actor) |
 | 108 | 31/31, WON 270 | 8 / 5 | -> -1.24 | none — the honey's bees on both sides now (the old +12 was the cut action) |
-| 109 | 20/20, the game stops at 227 | 24 / 1 | -> +7.42 | milk_bottle +3.9, teeth +4.2 — the PC lets the nitro land on the bottle he carries (159.3; his take 157.0, give 178.9), the port blocks the item until the give (182.3): Woody's pig key 168.2 / 186.0 and every pay after it shift. A PC rule to read before the profile takes it (the carried object's hotspot stays) |
+| 109 | 18/18 (rerun) | 34 / 0 | -> +10.42 | milk_bottle +3.4, teeth +14.5, bed -6.8. The first run's nitro was clicked on the bottle he carries (159.3; his take 157.0, give 178.9): the PC takes the click and plays Woody's use, but the combination never lands (his lap-3 take stays kit/babybottle, the probe without the teeth, 2026-10-25) — the port refuses the click until his give, and the runner holds such a click now (`carried`: the rerun's nitro 181.3, his lap-3 take kit/babybottle_nitro 271.8). What remains is the port's: after the pig is found gone (167.2 / 167.8) the port reaches the bottle 15.0 s later (TakeInventory 182.3) for the PC's 11.2 (icon 169.8, give 178.9), and the port's lap-2 PigKeys visit (SurpriseNotFound at the empty board, 221.1, 14.9 s with its walk) has no PC counterpart: the PC's key-board cases (12-13 take, 1-2 give) are gated by `INV pigkey` and `LOOKUP bed/keyboard` and no `pig_key` icon shows in 300 s — the pen's key is for the locked pen, not the lap. Open: the port's PigKeys steps under the PC profile, the pig-out stand |
 | 110 | 21/21, WON 200 | 16 / 0 | -> +0.09 | none |
 | 111 | 16/16 | 18 / 2 | -> -0.64 | none |
 | 112 | 12/14 | 14 / 7 | -> -0.70 | none (the skates' floor drop declined, the Zone01 marbles without a PC object) |
-| 113 | 17/19 | 11 / 4 | -> -4.21 | valve +4.2, fuse -6.4 — the plan's bare `use ValveMain` is two clicks in the port (close, then open: the flood), one on the PC (the close alone), so the lap-1 chains differ (the port's flooded sink and his run to the valve; the PC's plain basin and his reopen at 118.2 — and in lap 2 his close 252.8, the hot heater 268.8, the heat valve 283.9, the basin 300.1, every lap when the valve is on). The flood probe (the valve opened after his lap-1 close) is queued |
-| 114 | 10/11 | 22 / 0 | -> -0.72 | none (the park's gate lost 120 s at 57 — the gate's walking clause, off under NOCATCH since: rerun pending) |
+| 113 | 17/19 | 13 / 4 | -> -4.37 | valve +4.2, fuse -6.4 — the plan's bare `use ValveMain` is two clicks in the port (close, then open: the trick armed at 24 s), one on the PC, and the PC arms nothing before his own close: see the flood probe below. The plan must move the click into his lap-1 window; open |
+| 114 | 21/21 (rerun) | 23 / 0 | -> -1.07 | none (the first run's park gate lost 120 s at 57 on the gate's walking clause, off under NOCATCH since) |
 
-Ten of the fourteen pair with no step of 2 s over their runs; the four
-named are 105 (read), 106 and 113 (the traces' own departures from the
-plan, reruns queued) and 109 (the PC's carried-item combine). The pets'
+Eleven of the fourteen pair with no step of 2 s over their runs (104, 106,
+107 and 114 after their reruns); the three named are 105 (read), 113 (the
+valve's two clicks: the flood probe below) and 109 (the port's key-board
+visits and its pig-out stand, named above). The pets'
 would-be catches after the stub: 108's parrot at 26.4 s, 109's chili at
 191.5 and 194.1, none elsewhere; the rooms test's 0-8 a level as before.
 109's game stops ticking at the teeth + tabasco combine right after his
 bed_sleep (227 s, three runs) — the plan's last coin is not in the trace.
+
+**113's flood (the probe, 2026-10-25).** The main valve's trick on the PC is
+the water turned back on after the neighbour has closed it: his lap-1
+chain closes `bas/valve_on` (61.3, case 1), vents the heater (77.3), and at
+the basin (98.8) the case asks `If toi/basin_flooded of toi/basin` — with
+the valve open again (Woody's `bas/valve_off use` at 84.8) the basin is
+flooded, `repair` plays its flooded set, the fire pays (shout2 104.3) and
+case 5's valve visit switches `bas/valve_on` into `bas/valve_fixed`
+(114.8): no main-valve step runs again (the port's BlockValveAfterFix). With
+Woody's click before his close (the plan's 11 s: the valve merely toggled)
+the lap is the plain one — the basin's repair at 100.4, his reopen at
+118.2, and the close/vent/repair/reopen every lap after (nocatch2/3). The
+port's mobile rule (Item.cs: a click on the closed valve opens it and arms
+the trick at once) agrees for a click after his close and differs before
+it, so the plan's `use ValveMain` has to follow his lap-1 close (61-98 s):
+the probe's `whenzone Zone03` + `use! ValveMain` did, and paid; its later
+gates then shifted (the second `whenzone Zone03` timed out) — the plan
+needs its legs after the valve re-laid round that window. Open. The
+trap's `bas/outlet` is placed by the water's behaviour, not by a Switch
+step the hook sees — the runner still calls it `unplaced` (86.5, 229.2).
+
+**The level classes as scripts (B, begun 2026-10-25).** tools/pcref/
+pc_scripts.py walks every case of each Season 1 level class (the `run`
+switch on the resume index, trick_branches.Fiber) down both answers of
+every variant test (IsVariant fcn.0047a130, IsTricked fcn.00413780, OBJ3
+fcn.00479ff0 — a `decide` hook on the simulator) and writes the decision
+trees to levels/pc/scripts/LevelNNN.json: 14 levels, 101 and 102 with two
+classes each (9+16 / 16+16 cases), the rest one (9-32 cases, 30-134
+steps). tools/pcref/pc_scripts_check.py lays a trace of the original over a
+script: every ICON / ACTION / SWITCH the nocatch3 runs logged from the
+cases is a step of its script in the cases' order (113: 42 of 42, the case
+chain 0 19 20 21 1 2 7 3 4 5 6 11 12 13 15 16 17 and round again), and
+what is not a step is the steps' own sub-calls (the fire's shout and icon,
+GOTOENTER's enter/leave, the walk's arrival action at 0x479ccf, the repair
+helper) or the GUI's handlers of Woody's clicks. Left for the engine: the
+actions inside the levels' helper functions the walker does not enter
+(105's piano play_piano_noangry 0x46db17, 103's cake put_tnt / light_tnt /
+celebrate_boom, 104's basin shave_glue / grow_hair, 108's water_to_death,
+110's pour_fuel, 114's cups blackpolish and three Switch steps), the
+behaviours outside the classes (the pets' wakeup / fallasleep / whine,
+the aux actor's flyout / flyin / try_to_flee, the triggers' doubletake1 /
+doubletake3), and the operands held in stack slots the extractor cannot
+read yet (the `take` actions on the drawers' slot objects, 109's and 108's
+GoTo slots, GOTO2's `addr`). The runtime interpreter is the next step: a
+step runner under the PC profile (GoTo = the walk to the PC hotspot,
+Action = the clip at the Loader's ticks, If / OBJ3 = the placed variants,
+Switch = the object swap, Icon = the bubble, OBJ2 = the fire with the shout
+tables), fed by these files, behind a flag until the 28 plans hold.
 
 **The stations' places (2026-10-03, tools/pcoracle/station_positions.py).**
 Where the PC neighbour stands as each station's action starts, over the

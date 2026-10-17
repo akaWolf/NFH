@@ -1,0 +1,603 @@
+{
+ "level": 103,
+ "folder": "level_mail",
+ "tricked": [
+  "anc/mailbox_trap",
+  "kit/candlebox_boom"
+ ],
+ "classes": [
+  {
+   "class": "0x45e7bc",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x45e7c3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4581341,
+        "kind": "ICON",
+        "args": [
+         "candle",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4581390,
+        "kind": "GOTO",
+        "obj": "kit/candlebox"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x45e81e",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4581500,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x1c]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4581500,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4581514,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          "ebp"
+         ]
+        },
+        {
+         "a": 4581600,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4581687,
+         "kind": "SWITCH",
+         "args": [
+          "kit/candlebox_boom",
+          "kit/candlebox"
+         ]
+        },
+        {
+         "a": 4581748,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4581514,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          "ebp"
+         ]
+        },
+        {
+         "a": 4581600,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x45e9f8",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4581906,
+        "kind": "ICON",
+        "args": [
+         "cake",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4581955,
+        "kind": "GOTO",
+        "obj": "kit/cake"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x45ea53",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4581977,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4582857,
+        "kind": "ACTION",
+        "obj": "kit/cake",
+        "act": "put_candle"
+       },
+       {
+        "a": 4582950,
+        "kind": "ACTION",
+        "obj": "kit/cake",
+        "act": "light_candle"
+       },
+       {
+        "a": 4583042,
+        "kind": "ACTION",
+        "obj": "kit/cake",
+        "act": "celebrate"
+       },
+       {
+        "a": 4583128,
+        "kind": "ACTION",
+        "obj": "kit/cake",
+        "act": "take_candle"
+       }
+      ],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x45ef50",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4583274,
+        "kind": "ICON",
+        "args": [
+         "mail",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4583323,
+        "kind": "GOTO",
+        "obj": "anc/mailbox"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x45efab",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4583345,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         6
+        ]
+       },
+       {
+        "a": 4583441,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0xb4]",
+         "anc/mailbox",
+         "anc/mailbox_trap"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4583441,
+       "fn": "fcn.0047a130",
+       "variant": "anc/mailbox_trap"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4583467,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4583553,
+         "kind": "ENTER",
+         "obj": "anc/mailbox_trap"
+        },
+        {
+         "a": 4583641,
+         "kind": "ACTION",
+         "obj": "anc/mailbox_trap",
+         "act": "search_mailbox"
+        },
+        {
+         "a": 4583744,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "anc/mailbox_trap",
+          2,
+          0,
+          "take_trap"
+         ]
+        },
+        {
+         "a": 4583807,
+         "kind": "SWITCH",
+         "args": [
+          "anc/mailbox_trap",
+          "anc/mailbox"
+         ]
+        },
+        {
+         "a": 4583864,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4584001,
+         "kind": "ENTER",
+         "obj": "anc/mailbox"
+        },
+        {
+         "a": 4584096,
+         "kind": "ACTION",
+         "obj": "anc/mailbox",
+         "act": "search_mailbox"
+        },
+        {
+         "a": 4584190,
+         "kind": "ACTION",
+         "obj": "anc/mailbox",
+         "act": "read_mail"
+        },
+        {
+         "a": 4584281,
+         "kind": "ACTION",
+         "obj": "anc/mailbox",
+         "act": "return_mail"
+        }
+       ],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x45f3be",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4584408,
+        "kind": "ICON",
+        "args": [
+         "first_aid",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4584464,
+        "kind": "GOTO",
+        "obj": "toi/firstaid"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x45f420",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4584496,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4584583,
+        "kind": "ACTION",
+        "obj": "toi/firstaid",
+        "act": "take3"
+       },
+       {
+        "a": 4584681,
+        "kind": "ACTION",
+        "obj": "toi/firstaid",
+        "act": "put_plaster"
+       }
+      ],
+      "next": 1
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x45ef3a",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x45e7dd": {
+     "a": 4581341,
+     "kind": "ICON",
+     "args": [
+      "candle",
+      "ebp"
+     ]
+    },
+    "0x45e80e": {
+     "a": 4581390,
+     "kind": "GOTO",
+     "obj": "kit/candlebox"
+    },
+    "0x45e87c": {
+     "a": 4581500,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x1c]"
+     ]
+    },
+    "0x45e88a": {
+     "a": 4581514,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x45e8e0": {
+     "a": 4581600,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x45e937": {
+     "a": 4581687,
+     "kind": "SWITCH",
+     "args": [
+      "kit/candlebox_boom",
+      "kit/candlebox"
+     ]
+    },
+    "0x45e974": {
+     "a": 4581748,
+     "kind": "MSG"
+    },
+    "0x45ea12": {
+     "a": 4581906,
+     "kind": "ICON",
+     "args": [
+      "cake",
+      "ebp"
+     ]
+    },
+    "0x45ea43": {
+     "a": 4581955,
+     "kind": "GOTO",
+     "obj": "kit/cake"
+    },
+    "0x45ea59": {
+     "a": 4581977,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x45edc9": {
+     "a": 4582857,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "put_candle"
+    },
+    "0x45ee26": {
+     "a": 4582950,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "light_candle"
+    },
+    "0x45ee82": {
+     "a": 4583042,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "celebrate"
+    },
+    "0x45eed8": {
+     "a": 4583128,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "take_candle"
+    },
+    "0x45ef6a": {
+     "a": 4583274,
+     "kind": "ICON",
+     "args": [
+      "mail",
+      "ebp"
+     ]
+    },
+    "0x45ef9b": {
+     "a": 4583323,
+     "kind": "GOTO",
+     "obj": "anc/mailbox"
+    },
+    "0x45efb1": {
+     "a": 4583345,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      6
+     ]
+    },
+    "0x45f011": {
+     "a": 4583441,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0xb4]",
+      "anc/mailbox",
+      "anc/mailbox_trap"
+     ]
+    },
+    "0x45f02b": {
+     "a": 4583467,
+     "kind": "STOPMSG"
+    },
+    "0x45f081": {
+     "a": 4583553,
+     "kind": "ENTER",
+     "obj": "anc/mailbox_trap"
+    },
+    "0x45f0d9": {
+     "a": 4583641,
+     "kind": "ACTION",
+     "obj": "anc/mailbox_trap",
+     "act": "search_mailbox"
+    },
+    "0x45f140": {
+     "a": 4583744,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "anc/mailbox_trap",
+      2,
+      0,
+      "take_trap"
+     ]
+    },
+    "0x45f17f": {
+     "a": 4583807,
+     "kind": "SWITCH",
+     "args": [
+      "anc/mailbox_trap",
+      "anc/mailbox"
+     ]
+    },
+    "0x45f1b8": {
+     "a": 4583864,
+     "kind": "MSG"
+    },
+    "0x45f241": {
+     "a": 4584001,
+     "kind": "ENTER",
+     "obj": "anc/mailbox"
+    },
+    "0x45f2a0": {
+     "a": 4584096,
+     "kind": "ACTION",
+     "obj": "anc/mailbox",
+     "act": "search_mailbox"
+    },
+    "0x45f2fe": {
+     "a": 4584190,
+     "kind": "ACTION",
+     "obj": "anc/mailbox",
+     "act": "read_mail"
+    },
+    "0x45f359": {
+     "a": 4584281,
+     "kind": "ACTION",
+     "obj": "anc/mailbox",
+     "act": "return_mail"
+    },
+    "0x45f3d8": {
+     "a": 4584408,
+     "kind": "ICON",
+     "args": [
+      "first_aid",
+      "ebp"
+     ]
+    },
+    "0x45f410": {
+     "a": 4584464,
+     "kind": "GOTO",
+     "obj": "toi/firstaid"
+    },
+    "0x45f430": {
+     "a": 4584496,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x45f487": {
+     "a": 4584583,
+     "kind": "ACTION",
+     "obj": "toi/firstaid",
+     "act": "take3"
+    },
+    "0x45f4e9": {
+     "a": 4584681,
+     "kind": "ACTION",
+     "obj": "toi/firstaid",
+     "act": "put_plaster"
+    }
+   }
+  }
+ ]
+}

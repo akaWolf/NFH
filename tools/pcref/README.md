@@ -199,3 +199,22 @@ The radare2 text listings live in `~/nfh-bench/pcref/r2/` (nfh1_game_text.txt, n
 - `pc_woody.py [--show]` — Woody's trick actions into the overlays (PCWoodySeconds by the inventory type he holds, or `use`): the PC object's action named after the item at the ACTION step's ticks, the containers' `take`, the hideouts' `enter` and `leave`, the floor's `laydown`; since 2026-10-11 a compound trick's second item (114's cork: bas/gun's `cork`) and the remaster's DirectUse whistle (114's DeskDrawer: the PC combination of the item alone names the actor, `dog` <- dogwhistle, and Woody's action of it named after the item is the step — PCWoodySeconds by IT_Dogwhistle, PCWhistlePet the Alerter of the record's behavioractor).
 - `pc_durations.py [--show]` — the Season 1 station stays: each PC station of `lap_model.py`'s lap paired with the mobile routine item that visits it (PAIRS), into the overlays as PCUseSeconds per visit, written in place beside the trick step's keys pc_reactions.py merges into the same entries (and PCCaseGoto per visit: whether the visit opens its PC case with the case's own GOTO — the first visit of a case that walks; a split case's later visits and another item's share of it go on). Since 2026-09-30 also PCIconLead: the seconds of the leave the next case's walk plays at the station's end (lap_model.WalkLeave), after that case's icon. Since 2026-10-11 PCNextAnim: per visit (a station's last), the animation the walk after its stay starts from (the next walk leg's `WalkText.anim`); PCWhenTricked's arm carries its own (PCNextAnim, PCPoseAfter); WHEN_TRICKED's entries name their instant tick, the arm's actions, the fire's part and PCOnce (105's window after the bowling ball's kick: the gait's message back, throw_bowling and the window's shout, the next visit only). A pair may split one station by its actions over consecutive mobile visits (111's machines: the prime, use and unprime legs are give, wash, get_clothes and give, dry, take). Left to the mobile: 106's bath, 104's shaving chain. Since 2026-10-11 also PCNoIcon per visit: a split case's later visits, another item's share of it, set no ICON of their own (a shout's icon before them stays: 113's ladder drill, 114's medal box, 111's wash and dry legs).
 - `routine_order.py` `LAPS=1` — prints each level's lap as tokens (`LAP <level> <n>: ICON x | GOTO obj | ACTION act + obj …`), the helpers of the class (the sofa's sit picker) descended into, the compound GoTo/DoAction helpers labelled (fcn.00479f10 GoTo+enter, fcn.0044ac80 GoTo with leave, fcn.00473e20/ea0 enter/leave, fcn.00479c70 DoAction+wait).
+
+## pc_scripts.py / pc_scripts_check.py (2026-10-25)
+
+`python3 tools/pcref/pc_scripts.py [levels] [--out levels/pc/scripts] [--print]`
+writes each Season 1 level class as a script: per case a decision tree over
+its variant tests (`test`: the call's address, function and variant;
+`true` / `false` subtrees; a leaf's `next` is the case the yield resumes),
+the steps as trick_branches' tokens (ACTION obj.act, GOTO/GOTOENTER/ENTER/
+LEAVE obj, SWITCH [old, new], ICON, OBJ2/FIRE5/FIRE4, REPAIR, LOOKUP, OBJ3/
+IFVARIANT/IFTRICKED, SUBSEQ, INV, MSG, STOPMSG), and a `steps` index by
+address. Operands that came out as a stack slot or a register are read
+through the globals loaded since the previous call; what stays unresolved
+is listed by `pc_scripts_check.py <level> <trace.jsonl>`, which also lays an
+oracle trace over the script (a step's call is the event's ret - 5) and
+names the events that are no step (the steps' sub-calls and the GUI's
+handlers are known; the rest are helper functions and behaviours the engine
+still has to carry). The simulator's `decide` hook (trick_branches.Fiber.
+simulate) is what forks the paths; everything else in trick_branches is
+unchanged.

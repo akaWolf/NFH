@@ -1,0 +1,1396 @@
+{
+ "level": 110,
+ "folder": "level_barbecue",
+ "tricked": [
+  "bal/fuelbeer",
+  "bal/growspray",
+  "bed/extinguisher_knotted",
+  "lir/chair_pins",
+  "lir/vinegar"
+ ],
+ "classes": [
+  {
+   "class": "0x45fa0c",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x45fa29",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4586051,
+        "kind": "ICON",
+        "args": [
+         "meatbowl",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4586100,
+        "kind": "GOTO",
+        "obj": "kit/meatbowl"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x45fa86",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x45fb18",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4586290,
+        "kind": "ICON",
+        "args": [
+         "bbq",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4586339,
+        "kind": "GOTO",
+        "obj": "bal/barbecue"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x45fb74",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x45fbc6",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4586464,
+        "kind": "ICON",
+        "args": [
+         "beer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4586513,
+        "kind": "GOTO",
+        "obj": "bal/beer"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x45fc23",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4586540,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         6
+        ]
+       },
+       {
+        "a": 4586631,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x13c]",
+         "bal/beer",
+         "bal/fuelbeer"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4586631,
+       "fn": "fcn.0047a130",
+       "variant": "bal/fuelbeer"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4586693,
+         "kind": "ACTION",
+         "obj": "bal/fuelbeer",
+         "act": "take"
+        },
+        {
+         "a": 4586766,
+         "kind": "SWITCH",
+         "args": [
+          "bal/fuelbeer",
+          "bal/beer"
+         ]
+        },
+        {
+         "a": 4586826,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4586896,
+         "kind": "ACTION",
+         "obj": "bal/beer",
+         "act": "take"
+        }
+       ],
+       "next": 7
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x45fdf5",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4587023,
+        "kind": "ICON",
+        "args": [
+         "bbq",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4587072,
+        "kind": "GOTO",
+        "obj": "bal/barbecue"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x45fe52",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4587096,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4587795,
+        "kind": "ACTION",
+        "obj": "bal/barbecue",
+        "act": "pour_beer"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x460192",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4587993,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4588076,
+        "kind": "ACTION",
+        "obj": "dword [esp + 0x30]",
+        "act": "take"
+       },
+       {
+        "a": 4588142,
+        "kind": "OBJ1",
+        "args": [
+         "addr"
+        ]
+       },
+       {
+        "a": 4588203,
+        "kind": "MSG"
+       },
+       {
+        "a": 4588278,
+        "kind": "GOTO",
+        "obj": "bal/barbecue_burn"
+       },
+       {
+        "a": 4588406,
+        "kind": "MSG"
+       },
+       {
+        "a": 4588487,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x24]",
+         "bed/extinguisher_knotted"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4588487,
+       "fn": "fcn.00413780",
+       "variant": "bed/extinguisher_knotted"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4588513,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4588605,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "extinguish_explo"
+        },
+        {
+         "a": 4588700,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "repair_extinguisher"
+        },
+        {
+         "a": 4588795,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "extinguish"
+        },
+        {
+         "a": 4588929,
+         "kind": "MSG"
+        },
+        {
+         "a": 4589009,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bed/extinguisher_knotted",
+          0
+         ]
+        },
+        {
+         "a": 4589515,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "repair"
+        },
+        {
+         "a": 4589579,
+         "kind": "SWITCH",
+         "args": [
+          "bal/barbecue_burn",
+          "bal/barbecue"
+         ]
+        },
+        {
+         "a": 4589637,
+         "kind": "MSG"
+        },
+        {
+         "a": 4589759,
+         "kind": "MSG"
+        }
+       ],
+       "next": 11
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4589096,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "extinguish"
+        },
+        {
+         "a": 4589227,
+         "kind": "MSG"
+        },
+        {
+         "a": 4589343,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "?"
+        },
+        {
+         "a": 4589426,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4589515,
+         "kind": "ACTION",
+         "obj": "bal/barbecue_burn",
+         "act": "repair"
+        },
+        {
+         "a": 4589579,
+         "kind": "SWITCH",
+         "args": [
+          "bal/barbecue_burn",
+          "bal/barbecue"
+         ]
+        },
+        {
+         "a": 4589637,
+         "kind": "MSG"
+        },
+        {
+         "a": 4589759,
+         "kind": "MSG"
+        }
+       ],
+       "next": 11
+      }
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x460944",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x460997",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4590001,
+        "kind": "ICON",
+        "args": [
+         "plant",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4590050,
+        "kind": "GOTO",
+        "obj": "bal/plant"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x4609f4",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4590074,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         12
+        ]
+       },
+       {
+        "a": 4590162,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x13c]",
+         "bal/spray",
+         "bal/growspray"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4590162,
+       "fn": "fcn.0047a130",
+       "variant": "bal/growspray"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4590188,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4590280,
+         "kind": "ACTION",
+         "obj": "bal/growspray",
+         "act": "growspray"
+        },
+        {
+         "a": 4590371,
+         "kind": "ACTION",
+         "obj": "bal/plant",
+         "act": "grow"
+        },
+        {
+         "a": 4590477,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "bal/growspray",
+          2,
+          0,
+          "fight"
+         ]
+        },
+        {
+         "a": 4590543,
+         "kind": "SWITCH",
+         "args": [
+          "bal/plant",
+          "bal/plant_dead"
+         ]
+        },
+        {
+         "a": 4590606,
+         "kind": "MSG"
+        }
+       ],
+       "next": 13
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4590706,
+         "kind": "ACTION",
+         "obj": "bal/spray",
+         "act": "spray"
+        }
+       ],
+       "next": 13
+      }
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x460cd7",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4590833,
+        "kind": "ICON",
+        "args": [
+         "bbq",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4590882,
+        "kind": "GOTO",
+        "obj": "bal/barbecue"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x460d34",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4590909,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         14
+        ]
+       },
+       {
+        "a": 4591058,
+        "kind": "ACTION",
+        "obj": "bal/barbecue",
+        "act": "take"
+       },
+       {
+        "a": 4591152,
+        "kind": "ACTION",
+        "obj": "bal/barbecue",
+        "act": "give"
+       }
+      ],
+      "next": 15
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x460e91",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4591275,
+        "kind": "ICON",
+        "args": [
+         "table",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4591324,
+        "kind": "GOTO",
+        "obj": "lir/table"
+       }
+      ],
+      "next": 16
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x460eee",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x460f41",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4591434,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         17
+        ]
+       },
+       {
+        "a": 4591525,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x13c]",
+         "lir/chair",
+         "lir/chair_pins"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4591525,
+       "fn": "fcn.0047a130",
+       "variant": "lir/chair_pins"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4591558,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4591646,
+         "kind": "ENTER",
+         "obj": "lir/table"
+        },
+        {
+         "a": 4591740,
+         "kind": "ACTION",
+         "obj": "lir/table",
+         "act": "cry"
+        },
+        {
+         "a": 4591819,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/chair_pins",
+          0
+         ]
+        },
+        {
+         "a": 4591913,
+         "kind": "ACTION",
+         "obj": "lir/table",
+         "act": "repair"
+        },
+        {
+         "a": 4591982,
+         "kind": "SWITCH",
+         "args": [
+          "lir/chair_pins",
+          "lir/chair"
+         ]
+        },
+        {
+         "a": 4592045,
+         "kind": "MSG"
+        },
+        {
+         "a": 4592133,
+         "kind": "ENTER",
+         "obj": "lir/table"
+        },
+        {
+         "a": 4592227,
+         "kind": "ACTION",
+         "obj": "lir/table",
+         "act": "eat"
+        }
+       ],
+       "next": 19
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4592133,
+         "kind": "ENTER",
+         "obj": "lir/table"
+        },
+        {
+         "a": 4592227,
+         "kind": "ACTION",
+         "obj": "lir/table",
+         "act": "eat"
+        }
+       ],
+       "next": 19
+      }
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x461657",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x4612c4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4592350,
+        "kind": "ICON",
+        "args": [
+         "wine",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4592399,
+        "kind": "GOTO",
+        "obj": "lir/wine"
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x461321",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4592426,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         20
+        ]
+       },
+       {
+        "a": 4592517,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x13c]",
+         "lir/wine",
+         "lir/vinegar"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4592517,
+       "fn": "fcn.0047a130",
+       "variant": "lir/vinegar"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4592546,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4592644,
+         "kind": "ACTION",
+         "obj": "lir/vinegar",
+         "act": "drink"
+        },
+        {
+         "a": 4592723,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/vinegar",
+          0
+         ]
+        },
+        {
+         "a": 4592841,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x154]",
+          "esi",
+          "lir/vinegar"
+         ]
+        }
+       ],
+       "next": 1
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4592893,
+         "kind": "ACTION",
+         "obj": "lir/wine",
+         "act": "drink"
+        }
+       ],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x461562",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4593020,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 22
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x46160c",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 23
+     }
+    },
+    {
+     "index": [
+      23
+     ],
+     "start": "0x46164a",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      24
+     ],
+     "start": "0x45fa13",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x45fa43": {
+     "a": 4586051,
+     "kind": "ICON",
+     "args": [
+      "meatbowl",
+      "ebp"
+     ]
+    },
+    "0x45fa74": {
+     "a": 4586100,
+     "kind": "GOTO",
+     "obj": "kit/meatbowl"
+    },
+    "0x45fb32": {
+     "a": 4586290,
+     "kind": "ICON",
+     "args": [
+      "bbq",
+      "ebp"
+     ]
+    },
+    "0x45fb63": {
+     "a": 4586339,
+     "kind": "GOTO",
+     "obj": "bal/barbecue"
+    },
+    "0x45fbe0": {
+     "a": 4586464,
+     "kind": "ICON",
+     "args": [
+      "beer",
+      "ebp"
+     ]
+    },
+    "0x45fc11": {
+     "a": 4586513,
+     "kind": "GOTO",
+     "obj": "bal/beer"
+    },
+    "0x45fc2c": {
+     "a": 4586540,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      6
+     ]
+    },
+    "0x45fc87": {
+     "a": 4586631,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x13c]",
+      "bal/beer",
+      "bal/fuelbeer"
+     ]
+    },
+    "0x45fcc5": {
+     "a": 4586693,
+     "kind": "ACTION",
+     "obj": "bal/fuelbeer",
+     "act": "take"
+    },
+    "0x45fd0e": {
+     "a": 4586766,
+     "kind": "SWITCH",
+     "args": [
+      "bal/fuelbeer",
+      "bal/beer"
+     ]
+    },
+    "0x45fd4a": {
+     "a": 4586826,
+     "kind": "MSG"
+    },
+    "0x45fd90": {
+     "a": 4586896,
+     "kind": "ACTION",
+     "obj": "bal/beer",
+     "act": "take"
+    },
+    "0x45fe0f": {
+     "a": 4587023,
+     "kind": "ICON",
+     "args": [
+      "bbq",
+      "ebp"
+     ]
+    },
+    "0x45fe40": {
+     "a": 4587072,
+     "kind": "GOTO",
+     "obj": "bal/barbecue"
+    },
+    "0x45fe58": {
+     "a": 4587096,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x460113": {
+     "a": 4587795,
+     "kind": "ACTION",
+     "obj": "bal/barbecue",
+     "act": "pour_beer"
+    },
+    "0x4601d9": {
+     "a": 4587993,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46022c": {
+     "a": 4588076,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x30]",
+     "act": "take"
+    },
+    "0x46026e": {
+     "a": 4588142,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x4602ab": {
+     "a": 4588203,
+     "kind": "MSG"
+    },
+    "0x4602f6": {
+     "a": 4588278,
+     "kind": "GOTO",
+     "obj": "bal/barbecue_burn"
+    },
+    "0x460376": {
+     "a": 4588406,
+     "kind": "MSG"
+    },
+    "0x4603c7": {
+     "a": 4588487,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x24]",
+      "bed/extinguisher_knotted"
+     ]
+    },
+    "0x4603e1": {
+     "a": 4588513,
+     "kind": "STOPMSG"
+    },
+    "0x46043d": {
+     "a": 4588605,
+     "kind": "ACTION",
+     "obj": "bal/barbecue_burn",
+     "act": "extinguish_explo"
+    },
+    "0x46049c": {
+     "a": 4588700,
+     "kind": "ACTION",
+     "obj": "bal/barbecue_burn",
+     "act": "repair_extinguisher"
+    },
+    "0x4604fb": {
+     "a": 4588795,
+     "kind": "ACTION",
+     "obj": "bal/barbecue_burn",
+     "act": "extinguish"
+    },
+    "0x460581": {
+     "a": 4588929,
+     "kind": "MSG"
+    },
+    "0x4605d1": {
+     "a": 4589009,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bed/extinguisher_knotted",
+      0
+     ]
+    },
+    "0x4607cb": {
+     "a": 4589515,
+     "kind": "ACTION",
+     "obj": "bal/barbecue_burn",
+     "act": "repair"
+    },
+    "0x46080b": {
+     "a": 4589579,
+     "kind": "SWITCH",
+     "args": [
+      "bal/barbecue_burn",
+      "bal/barbecue"
+     ]
+    },
+    "0x460845": {
+     "a": 4589637,
+     "kind": "MSG"
+    },
+    "0x4608bf": {
+     "a": 4589759,
+     "kind": "MSG"
+    },
+    "0x460628": {
+     "a": 4589096,
+     "kind": "ACTION",
+     "obj": "bal/barbecue_burn",
+     "act": "extinguish"
+    },
+    "0x4606ab": {
+     "a": 4589227,
+     "kind": "MSG"
+    },
+    "0x46071f": {
+     "a": 4589343,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "?"
+    },
+    "0x460772": {
+     "a": 4589426,
+     "kind": "STOPMSG"
+    },
+    "0x4609b1": {
+     "a": 4590001,
+     "kind": "ICON",
+     "args": [
+      "plant",
+      "ebp"
+     ]
+    },
+    "0x4609e2": {
+     "a": 4590050,
+     "kind": "GOTO",
+     "obj": "bal/plant"
+    },
+    "0x4609fa": {
+     "a": 4590074,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      12
+     ]
+    },
+    "0x460a52": {
+     "a": 4590162,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x13c]",
+      "bal/spray",
+      "bal/growspray"
+     ]
+    },
+    "0x460a6c": {
+     "a": 4590188,
+     "kind": "STOPMSG"
+    },
+    "0x460ac8": {
+     "a": 4590280,
+     "kind": "ACTION",
+     "obj": "bal/growspray",
+     "act": "growspray"
+    },
+    "0x460b23": {
+     "a": 4590371,
+     "kind": "ACTION",
+     "obj": "bal/plant",
+     "act": "grow"
+    },
+    "0x460b8d": {
+     "a": 4590477,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "bal/growspray",
+      2,
+      0,
+      "fight"
+     ]
+    },
+    "0x460bcf": {
+     "a": 4590543,
+     "kind": "SWITCH",
+     "args": [
+      "bal/plant",
+      "bal/plant_dead"
+     ]
+    },
+    "0x460c0e": {
+     "a": 4590606,
+     "kind": "MSG"
+    },
+    "0x460c72": {
+     "a": 4590706,
+     "kind": "ACTION",
+     "obj": "bal/spray",
+     "act": "spray"
+    },
+    "0x460cf1": {
+     "a": 4590833,
+     "kind": "ICON",
+     "args": [
+      "bbq",
+      "ebp"
+     ]
+    },
+    "0x460d22": {
+     "a": 4590882,
+     "kind": "GOTO",
+     "obj": "bal/barbecue"
+    },
+    "0x460d3d": {
+     "a": 4590909,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      14
+     ]
+    },
+    "0x460dd2": {
+     "a": 4591058,
+     "kind": "ACTION",
+     "obj": "bal/barbecue",
+     "act": "take"
+    },
+    "0x460e30": {
+     "a": 4591152,
+     "kind": "ACTION",
+     "obj": "bal/barbecue",
+     "act": "give"
+    },
+    "0x460eab": {
+     "a": 4591275,
+     "kind": "ICON",
+     "args": [
+      "table",
+      "ebp"
+     ]
+    },
+    "0x460edc": {
+     "a": 4591324,
+     "kind": "GOTO",
+     "obj": "lir/table"
+    },
+    "0x460f4a": {
+     "a": 4591434,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      17
+     ]
+    },
+    "0x460fa5": {
+     "a": 4591525,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x13c]",
+      "lir/chair",
+      "lir/chair_pins"
+     ]
+    },
+    "0x460fc6": {
+     "a": 4591558,
+     "kind": "STOPMSG"
+    },
+    "0x46101e": {
+     "a": 4591646,
+     "kind": "ENTER",
+     "obj": "lir/table"
+    },
+    "0x46107c": {
+     "a": 4591740,
+     "kind": "ACTION",
+     "obj": "lir/table",
+     "act": "cry"
+    },
+    "0x4610cb": {
+     "a": 4591819,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/chair_pins",
+      0
+     ]
+    },
+    "0x461129": {
+     "a": 4591913,
+     "kind": "ACTION",
+     "obj": "lir/table",
+     "act": "repair"
+    },
+    "0x46116e": {
+     "a": 4591982,
+     "kind": "SWITCH",
+     "args": [
+      "lir/chair_pins",
+      "lir/chair"
+     ]
+    },
+    "0x4611ad": {
+     "a": 4592045,
+     "kind": "MSG"
+    },
+    "0x461205": {
+     "a": 4592133,
+     "kind": "ENTER",
+     "obj": "lir/table"
+    },
+    "0x461263": {
+     "a": 4592227,
+     "kind": "ACTION",
+     "obj": "lir/table",
+     "act": "eat"
+    },
+    "0x4612de": {
+     "a": 4592350,
+     "kind": "ICON",
+     "args": [
+      "wine",
+      "ebp"
+     ]
+    },
+    "0x46130f": {
+     "a": 4592399,
+     "kind": "GOTO",
+     "obj": "lir/wine"
+    },
+    "0x46132a": {
+     "a": 4592426,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      20
+     ]
+    },
+    "0x461385": {
+     "a": 4592517,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x13c]",
+      "lir/wine",
+      "lir/vinegar"
+     ]
+    },
+    "0x4613a2": {
+     "a": 4592546,
+     "kind": "STOPMSG"
+    },
+    "0x461404": {
+     "a": 4592644,
+     "kind": "ACTION",
+     "obj": "lir/vinegar",
+     "act": "drink"
+    },
+    "0x461453": {
+     "a": 4592723,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/vinegar",
+      0
+     ]
+    },
+    "0x4614c9": {
+     "a": 4592841,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x154]",
+      "esi",
+      "lir/vinegar"
+     ]
+    },
+    "0x4614fd": {
+     "a": 4592893,
+     "kind": "ACTION",
+     "obj": "lir/wine",
+     "act": "drink"
+    },
+    "0x46157c": {
+     "a": 4593020,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1588 @@
+{
+ "level": 112,
+ "folder": "level_fitness",
+ "tricked": [
+  "anc/skippingrope_knotted",
+  "bas/barbell_sawed",
+  "bas/expander_elastic",
+  "bed/trampoline_elastic",
+  "kit/skate",
+  "lir/hometrainer_tonged",
+  "wor/book_replaced",
+  "wor/fishfood_steroid"
+ ],
+ "classes": [
+  {
+   "class": "0x4636bc",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x4636d9",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4601587,
+        "kind": "ICON",
+        "args": []
+       },
+       {
+        "a": 4601636,
+        "kind": "GOTO",
+        "obj": "wor/book"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x463736",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4601748,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4601748,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4601766,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4601852,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4601921,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4601982,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4601766,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4601852,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4601921,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4601982,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x4638f3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4602125,
+        "kind": "ICON",
+        "args": [
+         "aquarium",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4602174,
+        "kind": "GOTO",
+        "obj": "wor/aquarium"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x46394f",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4602200,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4602291,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x11c]",
+         "wor/fishfood",
+         "wor/fishfood_steroid"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4602291,
+       "fn": "fcn.0047a130",
+       "variant": "wor/fishfood_steroid"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4602317,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4602382,
+         "kind": "OBJ1",
+         "args": [
+          "wor/fishfood_steroid"
+         ]
+        },
+        {
+         "a": 4602442,
+         "kind": "MSG"
+        },
+        {
+         "a": 4602533,
+         "kind": "ACTION",
+         "obj": "wor/aquarium",
+         "act": "feed_steroid"
+        },
+        {
+         "a": 4602609,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "wor/fishfood_steroid",
+          0
+         ]
+        },
+        {
+         "a": 4602944,
+         "kind": "MSG"
+        }
+       ],
+       "next": 5
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4602663,
+         "kind": "OBJ1",
+         "args": [
+          "wor/fishfood"
+         ]
+        },
+        {
+         "a": 4602723,
+         "kind": "MSG"
+        },
+        {
+         "a": 4602818,
+         "kind": "ACTION",
+         "obj": "wor/aquarium",
+         "act": "feed"
+        },
+        {
+         "a": 4602944,
+         "kind": "MSG"
+        }
+       ],
+       "next": 5
+      }
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x463ca0",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4603066,
+        "kind": "ICON",
+        "args": [
+         "yoga_mat",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4603115,
+        "kind": "GOTO",
+        "obj": "lir/mat"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x463cfd",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4603139,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         6
+        ]
+       },
+       {
+        "a": 4603451,
+        "kind": "ACTION",
+        "obj": "lir/mat",
+        "act": "make_yoga"
+       }
+      ],
+      "next": 7
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x463ea3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4603581,
+        "kind": "ICON",
+        "args": [
+         "book",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4603630,
+        "kind": "GOTO",
+        "obj": "wor/book"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x463f00",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4603657,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4603742,
+        "kind": "ACTION",
+        "obj": "wor/book",
+        "act": "take"
+       },
+       {
+        "a": 4603875,
+        "kind": "MSG"
+       }
+      ],
+      "next": 19
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x464047",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4604001,
+        "kind": "ICON",
+        "args": [
+         "expander",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4604050,
+        "kind": "GOTO",
+        "obj": "bas/expander"
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x4640a4",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4604077,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         10
+        ]
+       },
+       {
+        "a": 4604168,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x11c]",
+         "bas/expander",
+         "bas/expander_elastic"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4604168,
+       "fn": "fcn.0047a130",
+       "variant": "bas/expander_elastic"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4604197,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4604295,
+         "kind": "ACTION",
+         "obj": "bas/expander_elastic",
+         "act": "train"
+        },
+        {
+         "a": 4604374,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bas/expander_elastic",
+          2
+         ]
+        },
+        {
+         "a": 4604492,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x134]",
+          "esi",
+          "bas/expander_elastic"
+         ]
+        }
+       ],
+       "next": 17
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4604541,
+         "kind": "ACTION",
+         "obj": "bas/expander",
+         "act": "train"
+        }
+       ],
+       "next": 17
+      }
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x4642df",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4604665,
+        "kind": "ICON",
+        "args": [
+         "home_trainer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4604714,
+        "kind": "GOTO",
+        "obj": "lir/hometrainer"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x46433c",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4604741,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         12
+        ]
+       },
+       {
+        "a": 4604832,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x11c]",
+         "lir/hometrainer",
+         "lir/hometrainer_tonged"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4604832,
+       "fn": "fcn.0047a130",
+       "variant": "lir/hometrainer_tonged"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4604861,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4604956,
+         "kind": "ACTION",
+         "obj": "lir/hometrainer_tonged",
+         "act": "train"
+        },
+        {
+         "a": 4605029,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/hometrainer_tonged",
+          0
+         ]
+        },
+        {
+         "a": 4605144,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x134]",
+          "esi",
+          "lir/hometrainer_tonged"
+         ]
+        }
+       ],
+       "next": 13
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4605193,
+         "kind": "ACTION",
+         "obj": "lir/hometrainer",
+         "act": "train"
+        }
+       ],
+       "next": 13
+      }
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x46456b",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4605317,
+        "kind": "ICON",
+        "args": [
+         "mixer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4605366,
+        "kind": "GOTO",
+        "obj": "kit/mixer"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x4645c8",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4605390,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         14
+        ]
+       },
+       {
+        "a": 4605469,
+        "kind": "ACTION",
+        "obj": "kit/mixer",
+        "act": "mix"
+       },
+       {
+        "a": 4605559,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "drink"
+       }
+      ],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x4646db",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4605685,
+        "kind": "ICON",
+        "args": [
+         "skipping_rope",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4605734,
+        "kind": "GOTO",
+        "obj": "anc/skippingrope"
+       }
+      ],
+      "next": 16
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x464738",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4605823,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4605903,
+        "kind": "ACTION",
+        "obj": "dword [esp + 0x2c]",
+        "act": "take"
+       },
+       {
+        "a": 4605966,
+        "kind": "OBJ1",
+        "args": [
+         "addr"
+        ]
+       },
+       {
+        "a": 4606024,
+        "kind": "MSG"
+       },
+       {
+        "a": 4606102,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]",
+         "anc/skippingrope_knotted"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4606102,
+       "fn": "fcn.00413780",
+       "variant": "anc/skippingrope_knotted"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4606128,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4606220,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "skip_knotted_rope"
+        },
+        {
+         "a": 4606300,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "anc/skippingrope_knotted",
+          2
+         ]
+        },
+        {
+         "a": 4606479,
+         "kind": "ACTION",
+         "obj": "anc/skippingrope",
+         "act": "take"
+        },
+        {
+         "a": 4606613,
+         "kind": "MSG"
+        }
+       ],
+       "next": 1
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4606384,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "skip_rope"
+        },
+        {
+         "a": 4606479,
+         "kind": "ACTION",
+         "obj": "anc/skippingrope",
+         "act": "take"
+        },
+        {
+         "a": 4606613,
+         "kind": "MSG"
+        }
+       ],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x464b0e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4606760,
+        "kind": "ICON",
+        "args": [
+         "barbell",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4606809,
+        "kind": "GOTO",
+        "obj": "bas/barbell"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x464b6b",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4606836,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         18
+        ]
+       },
+       {
+        "a": 4606927,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x11c]",
+         "bas/barbell",
+         "bas/barbell_sawed"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4606927,
+       "fn": "fcn.0047a130",
+       "variant": "bas/barbell_sawed"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4606956,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4607054,
+         "kind": "ACTION",
+         "obj": "bas/barbell_sawed",
+         "act": "use_sawed_barbell"
+        },
+        {
+         "a": 4607133,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bas/barbell_sawed",
+          0
+         ]
+        },
+        {
+         "a": 4607251,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x134]",
+          "esi",
+          "bas/barbell_sawed"
+         ]
+        }
+       ],
+       "next": 15
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4607303,
+         "kind": "ACTION",
+         "obj": "bas/barbell",
+         "act": "use_barbell"
+        }
+       ],
+       "next": 15
+      }
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x464dac",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4607430,
+        "kind": "ICON",
+        "args": [
+         "trampoline",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4607479,
+        "kind": "GOTO",
+        "obj": "bed/trampoline"
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x464e09",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4607506,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         20
+        ]
+       },
+       {
+        "a": 4607597,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x11c]",
+         "bed/trampoline",
+         "bed/trampoline_elastic"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4607597,
+       "fn": "fcn.0047a130",
+       "variant": "bed/trampoline_elastic"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4607626,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4607724,
+         "kind": "ACTION",
+         "obj": "bed/trampoline_elastic",
+         "act": "jump"
+        },
+        {
+         "a": 4607803,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bed/trampoline_elastic",
+          0
+         ]
+        },
+        {
+         "a": 4607921,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x134]",
+          "esi",
+          "bed/trampoline_elastic"
+         ]
+        }
+       ],
+       "next": 11
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4607973,
+         "kind": "ACTION",
+         "obj": "bed/trampoline",
+         "act": "jump"
+        }
+       ],
+       "next": 11
+      }
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x46504a",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4608100,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 22
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x4650f4",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 23
+     }
+    },
+    {
+     "index": [
+      23
+     ],
+     "start": "0x465132",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      24
+     ],
+     "start": "0x4636c3",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x4636f3": {
+     "a": 4601587,
+     "kind": "ICON",
+     "args": []
+    },
+    "0x463724": {
+     "a": 4601636,
+     "kind": "GOTO",
+     "obj": "wor/book"
+    },
+    "0x463794": {
+     "a": 4601748,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]"
+     ]
+    },
+    "0x4637a6": {
+     "a": 4601766,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x4637fc": {
+     "a": 4601852,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x463841": {
+     "a": 4601921,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x46387e": {
+     "a": 4601982,
+     "kind": "MSG"
+    },
+    "0x46390d": {
+     "a": 4602125,
+     "kind": "ICON",
+     "args": [
+      "aquarium",
+      "ebp"
+     ]
+    },
+    "0x46393e": {
+     "a": 4602174,
+     "kind": "GOTO",
+     "obj": "wor/aquarium"
+    },
+    "0x463958": {
+     "a": 4602200,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x4639b3": {
+     "a": 4602291,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x11c]",
+      "wor/fishfood",
+      "wor/fishfood_steroid"
+     ]
+    },
+    "0x4639cd": {
+     "a": 4602317,
+     "kind": "STOPMSG"
+    },
+    "0x463a0e": {
+     "a": 4602382,
+     "kind": "OBJ1",
+     "args": [
+      "wor/fishfood_steroid"
+     ]
+    },
+    "0x463a4a": {
+     "a": 4602442,
+     "kind": "MSG"
+    },
+    "0x463aa5": {
+     "a": 4602533,
+     "kind": "ACTION",
+     "obj": "wor/aquarium",
+     "act": "feed_steroid"
+    },
+    "0x463af1": {
+     "a": 4602609,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "wor/fishfood_steroid",
+      0
+     ]
+    },
+    "0x463c40": {
+     "a": 4602944,
+     "kind": "MSG"
+    },
+    "0x463b27": {
+     "a": 4602663,
+     "kind": "OBJ1",
+     "args": [
+      "wor/fishfood"
+     ]
+    },
+    "0x463b63": {
+     "a": 4602723,
+     "kind": "MSG"
+    },
+    "0x463bc2": {
+     "a": 4602818,
+     "kind": "ACTION",
+     "obj": "wor/aquarium",
+     "act": "feed"
+    },
+    "0x463cba": {
+     "a": 4603066,
+     "kind": "ICON",
+     "args": [
+      "yoga_mat",
+      "ebp"
+     ]
+    },
+    "0x463ceb": {
+     "a": 4603115,
+     "kind": "GOTO",
+     "obj": "lir/mat"
+    },
+    "0x463d03": {
+     "a": 4603139,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      6
+     ]
+    },
+    "0x463e3b": {
+     "a": 4603451,
+     "kind": "ACTION",
+     "obj": "lir/mat",
+     "act": "make_yoga"
+    },
+    "0x463ebd": {
+     "a": 4603581,
+     "kind": "ICON",
+     "args": [
+      "book",
+      "ebp"
+     ]
+    },
+    "0x463eee": {
+     "a": 4603630,
+     "kind": "GOTO",
+     "obj": "wor/book"
+    },
+    "0x463f09": {
+     "a": 4603657,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x463f5e": {
+     "a": 4603742,
+     "kind": "ACTION",
+     "obj": "wor/book",
+     "act": "take"
+    },
+    "0x463fe3": {
+     "a": 4603875,
+     "kind": "MSG"
+    },
+    "0x464061": {
+     "a": 4604001,
+     "kind": "ICON",
+     "args": [
+      "expander",
+      "ebp"
+     ]
+    },
+    "0x464092": {
+     "a": 4604050,
+     "kind": "GOTO",
+     "obj": "bas/expander"
+    },
+    "0x4640ad": {
+     "a": 4604077,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      10
+     ]
+    },
+    "0x464108": {
+     "a": 4604168,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x11c]",
+      "bas/expander",
+      "bas/expander_elastic"
+     ]
+    },
+    "0x464125": {
+     "a": 4604197,
+     "kind": "STOPMSG"
+    },
+    "0x464187": {
+     "a": 4604295,
+     "kind": "ACTION",
+     "obj": "bas/expander_elastic",
+     "act": "train"
+    },
+    "0x4641d6": {
+     "a": 4604374,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bas/expander_elastic",
+      2
+     ]
+    },
+    "0x46424c": {
+     "a": 4604492,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x134]",
+      "esi",
+      "bas/expander_elastic"
+     ]
+    },
+    "0x46427d": {
+     "a": 4604541,
+     "kind": "ACTION",
+     "obj": "bas/expander",
+     "act": "train"
+    },
+    "0x4642f9": {
+     "a": 4604665,
+     "kind": "ICON",
+     "args": [
+      "home_trainer",
+      "ebp"
+     ]
+    },
+    "0x46432a": {
+     "a": 4604714,
+     "kind": "GOTO",
+     "obj": "lir/hometrainer"
+    },
+    "0x464345": {
+     "a": 4604741,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      12
+     ]
+    },
+    "0x4643a0": {
+     "a": 4604832,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x11c]",
+      "lir/hometrainer",
+      "lir/hometrainer_tonged"
+     ]
+    },
+    "0x4643bd": {
+     "a": 4604861,
+     "kind": "STOPMSG"
+    },
+    "0x46441c": {
+     "a": 4604956,
+     "kind": "ACTION",
+     "obj": "lir/hometrainer_tonged",
+     "act": "train"
+    },
+    "0x464465": {
+     "a": 4605029,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/hometrainer_tonged",
+      0
+     ]
+    },
+    "0x4644d8": {
+     "a": 4605144,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x134]",
+      "esi",
+      "lir/hometrainer_tonged"
+     ]
+    },
+    "0x464509": {
+     "a": 4605193,
+     "kind": "ACTION",
+     "obj": "lir/hometrainer",
+     "act": "train"
+    },
+    "0x464585": {
+     "a": 4605317,
+     "kind": "ICON",
+     "args": [
+      "mixer",
+      "ebp"
+     ]
+    },
+    "0x4645b6": {
+     "a": 4605366,
+     "kind": "GOTO",
+     "obj": "kit/mixer"
+    },
+    "0x4645ce": {
+     "a": 4605390,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      14
+     ]
+    },
+    "0x46461d": {
+     "a": 4605469,
+     "kind": "ACTION",
+     "obj": "kit/mixer",
+     "act": "mix"
+    },
+    "0x464677": {
+     "a": 4605559,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "drink"
+    },
+    "0x4646f5": {
+     "a": 4605685,
+     "kind": "ICON",
+     "args": [
+      "skipping_rope",
+      "ebp"
+     ]
+    },
+    "0x464726": {
+     "a": 4605734,
+     "kind": "GOTO",
+     "obj": "anc/skippingrope"
+    },
+    "0x46477f": {
+     "a": 4605823,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x4647cf": {
+     "a": 4605903,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x2c]",
+     "act": "take"
+    },
+    "0x46480e": {
+     "a": 4605966,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x464848": {
+     "a": 4606024,
+     "kind": "MSG"
+    },
+    "0x464896": {
+     "a": 4606102,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]",
+      "anc/skippingrope_knotted"
+     ]
+    },
+    "0x4648b0": {
+     "a": 4606128,
+     "kind": "STOPMSG"
+    },
+    "0x46490c": {
+     "a": 4606220,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "skip_knotted_rope"
+    },
+    "0x46495c": {
+     "a": 4606300,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/skippingrope_knotted",
+      2
+     ]
+    },
+    "0x464a0f": {
+     "a": 4606479,
+     "kind": "ACTION",
+     "obj": "anc/skippingrope",
+     "act": "take"
+    },
+    "0x464a95": {
+     "a": 4606613,
+     "kind": "MSG"
+    },
+    "0x4649b0": {
+     "a": 4606384,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "skip_rope"
+    },
+    "0x464b28": {
+     "a": 4606760,
+     "kind": "ICON",
+     "args": [
+      "barbell",
+      "ebp"
+     ]
+    },
+    "0x464b59": {
+     "a": 4606809,
+     "kind": "GOTO",
+     "obj": "bas/barbell"
+    },
+    "0x464b74": {
+     "a": 4606836,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      18
+     ]
+    },
+    "0x464bcf": {
+     "a": 4606927,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x11c]",
+      "bas/barbell",
+      "bas/barbell_sawed"
+     ]
+    },
+    "0x464bec": {
+     "a": 4606956,
+     "kind": "STOPMSG"
+    },
+    "0x464c4e": {
+     "a": 4607054,
+     "kind": "ACTION",
+     "obj": "bas/barbell_sawed",
+     "act": "use_sawed_barbell"
+    },
+    "0x464c9d": {
+     "a": 4607133,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bas/barbell_sawed",
+      0
+     ]
+    },
+    "0x464d13": {
+     "a": 4607251,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x134]",
+      "esi",
+      "bas/barbell_sawed"
+     ]
+    },
+    "0x464d47": {
+     "a": 4607303,
+     "kind": "ACTION",
+     "obj": "bas/barbell",
+     "act": "use_barbell"
+    },
+    "0x464dc6": {
+     "a": 4607430,
+     "kind": "ICON",
+     "args": [
+      "trampoline",
+      "ebp"
+     ]
+    },
+    "0x464df7": {
+     "a": 4607479,
+     "kind": "GOTO",
+     "obj": "bed/trampoline"
+    },
+    "0x464e12": {
+     "a": 4607506,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      20
+     ]
+    },
+    "0x464e6d": {
+     "a": 4607597,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x11c]",
+      "bed/trampoline",
+      "bed/trampoline_elastic"
+     ]
+    },
+    "0x464e8a": {
+     "a": 4607626,
+     "kind": "STOPMSG"
+    },
+    "0x464eec": {
+     "a": 4607724,
+     "kind": "ACTION",
+     "obj": "bed/trampoline_elastic",
+     "act": "jump"
+    },
+    "0x464f3b": {
+     "a": 4607803,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bed/trampoline_elastic",
+      0
+     ]
+    },
+    "0x464fb1": {
+     "a": 4607921,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x134]",
+      "esi",
+      "bed/trampoline_elastic"
+     ]
+    },
+    "0x464fe5": {
+     "a": 4607973,
+     "kind": "ACTION",
+     "obj": "bed/trampoline",
+     "act": "jump"
+    },
+    "0x465064": {
+     "a": 4608100,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

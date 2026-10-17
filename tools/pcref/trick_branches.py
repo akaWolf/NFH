@@ -432,7 +432,7 @@ class Fiber(object):
                 return self._resolve(tt[5:], regs)
         return '?'
 
-    def simulate(self, start_a, objflags, tricked, flip=False, depth=0, present=None, gone=None):
+    def simulate(self, start_a, objflags, tricked, flip=False, depth=0, present=None, gone=None, decide=None):
         """(tokens, next case) along the path from start_a: the waits true,
         a variant test true when its variant is in `tricked` or `present`
         (the objects switched in so far — a Switch or the repair helper
@@ -471,7 +471,7 @@ class Fiber(object):
                     tokens.append(tk)
                 elif depth < 1 and self.lo - 0x2000 <= int(fn[4:], 16) < self.hi + 0x2000 and fn not in NATTRUE \
                         and fn not in NATFALSE_FN and fn not in CALLS and not YIELDS.search(t) and fn != 'fcn.0047f740':
-                    sub, _ = self.simulate(int(fn[4:], 16), objflags, tricked, False, depth + 1, present, gone)
+                    sub, _ = self.simulate(int(fn[4:], 16), objflags, tricked, False, depth + 1, present, gone, decide)
                     tokens.extend(sub)
                     vals = [t['value'] for t in sub if t['kind'] == 'TESTVAL']
                     lvals = [t['value'] for t in sub if t['kind'] == 'LOOKUPVAL']
@@ -503,8 +503,12 @@ class Fiber(object):
                         val = 'true'
                     else:
                         val = 'true' if variant in tricked or variant in present else 'false'
+                    if decide is not None:
+                        # pc_scripts.py's path enumeration: the caller picks the test's answer (both are
+                        # explored); the heuristic value above is the default it starts from
+                        val = decide(a, fn, variant, val)
                     lastcall = ('test', val)
-                    tokens.append(dict(a=a, kind='TESTVAL', value=lastcall[1], variant=variant, fire=False))
+                    tokens.append(dict(a=a, kind='TESTVAL', value=lastcall[1], variant=variant, fire=False, fn=fn))
                 if tk is not None and tk['kind'] == 'LOOKUP':
                     # a helper asking after an object (the bath's tub_empty)
                     # answers true once a Switch has taken it out of the

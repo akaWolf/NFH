@@ -85,10 +85,14 @@ def build(step):
 script = json.load(open(os.environ['WDBG_SCRIPT'])) if os.environ.get('WDBG_SCRIPT') else []
 script.sort(key=lambda s: s['tick'])
 pending = []
-try:
-    GLOBALS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'pcref', 'exe', 'nfh1_globals.json')))
-except Exception:
-    GLOBALS = {}
+GLOBALS = {}
+for _cand in ([os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'pcref', 'exe', 'nfh1_globals.json')] if '__file__' in dir() else []) \
+        + [os.path.expanduser('~/projects/own/NFH/tools/pcref/exe/nfh1_globals.json')]:
+    try:
+        GLOBALS = json.load(open(_cand)); break
+    except Exception:
+        pass
+if not GLOBALS: print('WARNING: nfh1_globals.json not loaded — the Switch names stay addresses', flush=True)
 state = {'tick': 0, 't0': None, 'last': time.time(), 'n': 0, 'actions': {}, 'credits': [], 'declines': [], 'caught': [], 'sneak': 'auto', 'patched': False}
 actors = {}
 import importlib.util
@@ -131,6 +135,25 @@ class PlanRunner:
             if pr['x1'] - 60 <= a['x'] <= pr['x2'] + 60 and abs(a['y'] - pr['floor']) <= 150: return pr['room']
         return None
     GAITS = ('mg0', 'mg1', 'mg2', 'mg3', 'mr0', 'mr1', 'mr2', 'mr3')
+    def placed_now(self):
+        """the scene's objects as far as the oracle knows them: level.xml's, the trace's (an action or a walk
+        target names an object that is there — 209's holy_cow/cow is the neighbour's station and no
+        level.xml entry), a combination's results, and the level's Switch steps so far in order —
+        fcn.00451de0's arguments are (old, new): 113's `bas/valve_on switch_off` queues [bas/valve_on,
+        bas/valve_off], its `switch_on` the reverse (106's tub, 107's picture and 113's valve_off were
+        `unplaced` before the hook)"""
+        placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
+            | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
+        for _t, old, new in state.get('switches', ()):
+            placed.discard(old); placed.add(new)
+        return placed
+    def carried(self, obj):
+        """the neighbour has the object in his hands: objects.xml gives it a neighbour `take` and `give`, and
+        the trace's last of the two on it is the take"""
+        acts = getattr(self.m, 'obj_actions', {}).get(obj, {})
+        if acts.get('take') != 'neighbor' or acts.get('give') != 'neighbor': return False
+        last = [a for t, a in state['actions'].get(obj, []) if a in ('take', 'give')]
+        return bool(last) and last[-1] == 'take'
     def gate_closed(self, room):
         """the port's runner walks into a room only when its gate is open — no catcher in it, none due there
         while Woody works (tests/run_tricks.py gate_open reads the routine's ETAs); here, without a model of
@@ -276,6 +299,13 @@ class PlanRunner:
             # the gate: the target's room free of the catchers before the input goes
             tgt = self.m.use_target(args[0]) if op not in ('usewith', 'prime', 'unlock') else (self.m.combine_target(args[0], self.m.item_name(args[0], args[1]) if len(args) > 1 else None)[0])
             if tgt and not ungated and self.gate_closed(tgt.split('/')[0]): return []
+            if tgt and self.carried(tgt):
+                # the neighbour carries the object (its `take` action without the `give` since: 109's baby
+                # bottle 157.0-178.9): the PC takes the click and plays Woody's use, but the combination never
+                # lands (his next take is still kit/babybottle, probe 2026-10-25), the port refuses the click
+                # until his give — the runner holds the input as the port does
+                if tick - self.leg_start > self.TIMEOUT: return self.done('timeout: carried')
+                return []
             if op == 'usewith' and args[0].startswith('Ground@'):
                 # a floor trick: the combination of the zone's room object with the item at the drop's x
                 mx = next((float(o[2:]) for o in args[2:] if o.startswith('x=')), None)
@@ -309,6 +339,12 @@ class PlanRunner:
                 if obj is None: return self.done('no PC object for %s' % args[0])
                 if obj + '_guarded' not in getattr(self.m, 'names', ()) and not any(o == obj + '_guarded' for o in getattr(self.m, 'placed', ())):
                     obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
+                    now = self.placed_now()
+                    if obj not in now:
+                        # the family's member the level's Switch steps placed (113's bas/valve_off after his
+                        # lap-1 close: the plan's `use! ValveMain` is a click on the valve as it stands)
+                        swapped = next((o for o in now if '/' in o and self.m.family(o) == self.m.family(obj)), None)
+                        if swapped: obj = swapped
                 obj = next((o[4:] for o in args[1:] if o.startswith('obj=')), obj)      # (a probe names the object)
                 if op in ('use', 'prime', 'take') and ((self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()))
                                                         or obj in getattr(self.m, 'games', ())):
@@ -318,16 +354,7 @@ class PlanRunner:
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
-            # the scene's objects as far as the oracle knows them: level.xml's, the trace's (an action or a
-            # walk target names an object that is there — 209's holy_cow/cow is the neighbour's station and
-            # no level.xml entry) and a combination's results
-            placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
-                | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
-            for _t, old, new in state.get('switches', ()):
-                # the Switch steps so far, in order — fcn.00451de0's arguments are (old, new): 113's
-                # `bas/valve_on switch_off` queues [bas/valve_on, bas/valve_off], its `switch_on` the reverse
-                # (the trace gave 106's tub, 107's picture and 113's valve_off as `unplaced` before)
-                placed.discard(old); placed.add(new)
+            placed = self.placed_now()
             fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
             guarded_fam = obj is not None and (obj + '_guarded' in placed or obj + '_guarded' in getattr(self.m, 'names', ()))
             if obj and '/' in obj and placed and obj not in placed and fam_placed and not guarded_fam and not (op == 'usewith' and args[0].startswith('Ground@')):
@@ -634,14 +661,14 @@ class Hook(gdb.Breakpoint):
         try:
             esp = reg('esp')
             args = decode_args(esp, self.nargs)
-            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % u32(esp), 'args': args})
-            if self.name == 'action' and isinstance(args[1], str) and args[2] in ('enter', 'leave', 'sleep'):
-                state.setdefault('inside', {})[args[1]] = (args[2] != 'leave', state['tick'])     # a hideout's flag 4
             if self.name == 'switch':
                 # the step's two names are the class's String globals (0x51xxxx): tools/pcref/exe/
                 # nfh1_globals.json names them (fire_sites.G); a runtime object pointer instead is read
                 args = [GLOBALS.get('%#x' % v) or (as_string(u32(v)) if 0x10000 < v < 0x7fffffff else None) or v
                         if isinstance(v, int) else v for v in args]
+            emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % u32(esp), 'args': args})
+            if self.name == 'action' and isinstance(args[1], str) and args[2] in ('enter', 'leave', 'sleep'):
+                state.setdefault('inside', {})[args[1]] = (args[2] != 'leave', state['tick'])     # a hideout's flag 4
             if self.name == 'switch' and isinstance(args[0], str) and isinstance(args[1], str):
                 # the level's Switch step (fcn.00451de0 queues the SwitchObjects job, vtable 0x4e1bd0: the
                 # case's `Switch new <- old`): the runner's picture of the scene follows it (placed_now)

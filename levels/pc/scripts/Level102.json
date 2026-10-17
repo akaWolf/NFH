@@ -1,0 +1,2038 @@
+{
+ "level": 102,
+ "folder": "level_sofa",
+ "tricked": [
+  "kit/laxativebeer",
+  "lir/sofa_broken",
+  "toi/toiletstuffed",
+  "toiletpaper"
+ ],
+ "classes": [
+  {
+   "class": "0x46f6a1",
+   "cases": [
+    {
+     "index": [
+      0,
+      6
+     ],
+     "start": "0x46f955",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4651370,
+        "kind": "ICON",
+        "args": [
+         "sofa",
+         0
+        ]
+       },
+       {
+        "a": 4651434,
+        "kind": "GOTOENTER",
+        "obj": "lir/sofa"
+       },
+       {
+        "a": 4651478,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebp",
+         "lir/sofa",
+         "lir/sofa_broken"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4651478,
+       "fn": "fcn.0047a130",
+       "variant": "lir/sofa_broken"
+      },
+      "true": {
+       "steps": [],
+       "next": 14
+      },
+      "false": {
+       "steps": [],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      1
+     ],
+     "start": "0x46fa06",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x46f6be",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4650712,
+        "kind": "ICON",
+        "args": [
+         "beer",
+         "edi"
+        ]
+       },
+       {
+        "a": 4650761,
+        "kind": "GOTO",
+        "obj": "kit/beer"
+       }
+      ],
+      "next": 3
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x46f718",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4650870,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x1c]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4650870,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4650888,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4650974,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x24]",
+         "act": "take"
+        }
+       ],
+       "next": 4
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4650888,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4650974,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x24]",
+         "act": "take"
+        }
+       ],
+       "next": 4
+      }
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x46f859",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4651123,
+        "kind": "ICON",
+        "args": [
+         "sofa",
+         "edi"
+        ]
+       }
+      ],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x46f8e6",
+     "paths": 3,
+     "tree": {
+      "steps": [
+       {
+        "a": 4651277,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebp",
+         "lir/tv",
+         "lir/twistedantenna"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4651277,
+       "fn": "fcn.0047a130",
+       "variant": "lir/twistedantenna"
+      },
+      "true": {
+       "steps": [],
+       "next": 8
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4651370,
+         "kind": "ICON",
+         "args": [
+          "sofa",
+          0
+         ]
+        },
+        {
+         "a": 4651434,
+         "kind": "GOTOENTER",
+         "obj": "lir/sofa"
+        },
+        {
+         "a": 4651478,
+         "kind": "IFVARIANT",
+         "args": [
+          "ebp",
+          "lir/sofa",
+          "lir/sofa_broken"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4651478,
+        "fn": "fcn.0047a130",
+        "variant": "lir/sofa_broken"
+       },
+       "true": {
+        "steps": [],
+        "next": 14
+       },
+       "false": {
+        "steps": [],
+        "next": 1
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x46fbb4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4651965,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "edi",
+         6
+        ]
+       },
+       {
+        "a": 4652020,
+        "kind": "STOPMSG"
+       },
+       {
+        "a": 4652155,
+        "kind": "ACTION",
+        "obj": "dword [eax]",
+        "act": "surprise"
+       },
+       {
+        "a": 4652228,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4652266,
+        "kind": "LEAVE",
+        "obj": "lir/sofa"
+       },
+       {
+        "a": 4652360,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "spit"
+       },
+       {
+        "a": 4652451,
+        "kind": "FIRE4",
+        "args": [
+         "addr",
+         "kit/laxativebeer",
+         0,
+         "ebx"
+        ]
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x46fe10",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4652586,
+        "kind": "ICON",
+        "args": [
+         "shout",
+         "edi"
+        ]
+       },
+       {
+        "a": 4652598,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4652720,
+        "kind": "MSG"
+       },
+       {
+        "a": 4652795,
+        "kind": "GOTO",
+        "obj": "lir/twistedantenna"
+       },
+       {
+        "a": 4652921,
+        "kind": "MSG"
+       }
+      ],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x46ffd8",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x47000b",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4653093,
+        "kind": "ICON",
+        "args": [
+         "toilet",
+         "edi"
+        ]
+       },
+       {
+        "a": 4653160,
+        "kind": "GOTOENTER",
+        "obj": "toi/toilet"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x470078",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4653192,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "edi",
+         11
+        ]
+       },
+       {
+        "a": 4653293,
+        "kind": "LOOKUP",
+        "args": [
+         "toi/paperbracket"
+        ]
+       },
+       {
+        "a": 4653293,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       },
+       {
+        "a": 4653334,
+        "kind": "INV",
+        "args": [
+         "toiletpaper"
+        ]
+       },
+       {
+        "a": 4653419,
+        "kind": "ACTION",
+        "obj": "dword [eax]",
+        "act": "shit_with_paper"
+       },
+       {
+        "a": 4653562,
+        "kind": "ACTION",
+        "obj": "dword [eax]",
+        "act": "grabpaper"
+       },
+       {
+        "a": 4653639,
+        "kind": "STOPMSG"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x470427",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4654195,
+        "kind": "LEAVE",
+        "obj": "dword [eax]"
+       },
+       {
+        "a": 4654311,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebp",
+         "toi/toilet",
+         "toi/toiletstuffed"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4654311,
+       "fn": "fcn.0047a130",
+       "variant": "toi/toiletstuffed"
+      },
+      "true": {
+       "steps": [],
+       "next": 13
+      },
+      "false": {
+       "steps": [],
+       "next": 2
+      }
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x4704fb",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x46fa61",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4651626,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "edi",
+         "dword [esi + 0xc]"
+        ]
+       },
+       {
+        "a": 4651681,
+        "kind": "STOPMSG"
+       },
+       {
+        "a": 4651788,
+        "kind": "FIRE5",
+        "args": [
+         "addr",
+         "lir/sofa_broken",
+         0,
+         2,
+         "fall"
+        ]
+       },
+       {
+        "a": 4651910,
+        "kind": "REPAIR",
+        "args": [
+         "dword [esp + 0xd0]",
+         "dword [esp + 0xc0]",
+         "edi",
+         "lir/sofa_broken"
+        ]
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x470570",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x46f6a8",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x46f96a": {
+     "a": 4651370,
+     "kind": "ICON",
+     "args": [
+      "sofa",
+      0
+     ]
+    },
+    "0x46f9aa": {
+     "a": 4651434,
+     "kind": "GOTOENTER",
+     "obj": "lir/sofa"
+    },
+    "0x46f9d6": {
+     "a": 4651478,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "lir/sofa",
+      "lir/sofa_broken"
+     ]
+    },
+    "0x46f6d8": {
+     "a": 4650712,
+     "kind": "ICON",
+     "args": [
+      "beer",
+      "edi"
+     ]
+    },
+    "0x46f709": {
+     "a": 4650761,
+     "kind": "GOTO",
+     "obj": "kit/beer"
+    },
+    "0x46f776": {
+     "a": 4650870,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x1c]"
+     ]
+    },
+    "0x46f788": {
+     "a": 4650888,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46f7de": {
+     "a": 4650974,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x24]",
+     "act": "take"
+    },
+    "0x46f873": {
+     "a": 4651123,
+     "kind": "ICON",
+     "args": [
+      "sofa",
+      "edi"
+     ]
+    },
+    "0x46f90d": {
+     "a": 4651277,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "lir/tv",
+      "lir/twistedantenna"
+     ]
+    },
+    "0x46fbbd": {
+     "a": 4651965,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "edi",
+      6
+     ]
+    },
+    "0x46fbf4": {
+     "a": 4652020,
+     "kind": "STOPMSG"
+    },
+    "0x46fc7b": {
+     "a": 4652155,
+     "kind": "ACTION",
+     "obj": "dword [eax]",
+     "act": "surprise"
+    },
+    "0x46fcc4": {
+     "a": 4652228,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46fcea": {
+     "a": 4652266,
+     "kind": "LEAVE",
+     "obj": "lir/sofa"
+    },
+    "0x46fd48": {
+     "a": 4652360,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "spit"
+    },
+    "0x46fda3": {
+     "a": 4652451,
+     "kind": "FIRE4",
+     "args": [
+      "addr",
+      "kit/laxativebeer",
+      0,
+      "ebx"
+     ]
+    },
+    "0x46fe2a": {
+     "a": 4652586,
+     "kind": "ICON",
+     "args": [
+      "shout",
+      "edi"
+     ]
+    },
+    "0x46fe36": {
+     "a": 4652598,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46feb0": {
+     "a": 4652720,
+     "kind": "MSG"
+    },
+    "0x46fefb": {
+     "a": 4652795,
+     "kind": "GOTO",
+     "obj": "lir/twistedantenna"
+    },
+    "0x46ff79": {
+     "a": 4652921,
+     "kind": "MSG"
+    },
+    "0x470025": {
+     "a": 4653093,
+     "kind": "ICON",
+     "args": [
+      "toilet",
+      "edi"
+     ]
+    },
+    "0x470068": {
+     "a": 4653160,
+     "kind": "GOTOENTER",
+     "obj": "toi/toilet"
+    },
+    "0x470088": {
+     "a": 4653192,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "edi",
+      11
+     ]
+    },
+    "0x4700ed": {
+     "a": 4653293,
+     "kind": "LOOKUP",
+     "args": [
+      "toi/paperbracket"
+     ]
+    },
+    "0x470116": {
+     "a": 4653334,
+     "kind": "INV",
+     "args": [
+      "toiletpaper"
+     ]
+    },
+    "0x47016b": {
+     "a": 4653419,
+     "kind": "ACTION",
+     "obj": "dword [eax]",
+     "act": "shit_with_paper"
+    },
+    "0x4701fa": {
+     "a": 4653562,
+     "kind": "ACTION",
+     "obj": "dword [eax]",
+     "act": "grabpaper"
+    },
+    "0x470247": {
+     "a": 4653639,
+     "kind": "STOPMSG"
+    },
+    "0x470473": {
+     "a": 4654195,
+     "kind": "LEAVE",
+     "obj": "dword [eax]"
+    },
+    "0x4704e7": {
+     "a": 4654311,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "toi/toilet",
+      "toi/toiletstuffed"
+     ]
+    },
+    "0x46fa6a": {
+     "a": 4651626,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "edi",
+      "dword [esi + 0xc]"
+     ]
+    },
+    "0x46faa1": {
+     "a": 4651681,
+     "kind": "STOPMSG"
+    },
+    "0x46fb0c": {
+     "a": 4651788,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "lir/sofa_broken",
+      0,
+      2,
+      "fall"
+     ]
+    },
+    "0x46fb86": {
+     "a": 4651910,
+     "kind": "REPAIR",
+     "args": [
+      "dword [esp + 0xd0]",
+      "dword [esp + 0xc0]",
+      "edi",
+      "lir/sofa_broken"
+     ]
+    }
+   }
+  },
+  {
+   "class": "0x46c57c",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x46c599",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4638131,
+        "kind": "ICON",
+        "args": []
+       },
+       {
+        "a": 4638180,
+        "kind": "GOTO",
+        "obj": "lir/book"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x46c5f4",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4635222,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "edi",
+         "edi"
+        ]
+       },
+       {
+        "a": 4635313,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [var_28h]",
+         "lir/book",
+         "lir/stickybook"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4635313,
+       "fn": "fcn.0047a130",
+       "variant": "lir/stickybook"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4635339,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4635423,
+         "kind": "ACTION",
+         "obj": "lir/stickybook",
+         "act": "read_stickybook"
+        },
+        {
+         "a": 4635493,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/stickybook",
+          2
+         ]
+        },
+        {
+         "a": 4635603,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [var_28h]",
+          "esi",
+          "lir/stickybook"
+         ]
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4635679,
+         "kind": "ACTION",
+         "obj": "lir/book",
+         "act": "read_book"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x46c625",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4638271,
+        "kind": "ICON",
+        "args": [
+         "candy",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4638320,
+        "kind": "GOTO",
+        "obj": "lir/candy"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x46c680",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4636051,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         "edi"
+        ]
+       },
+       {
+        "a": 4636142,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [var_24h]",
+         "lir/candy",
+         "lir/bathcandy"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4636142,
+       "fn": "fcn.0047a130",
+       "variant": "lir/bathcandy"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4636168,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4636254,
+         "kind": "ACTION",
+         "obj": "lir/bathcandy",
+         "act": "eat_bathcandy"
+        },
+        {
+         "a": 4636324,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/bathcandy",
+          0
+         ]
+        },
+        {
+         "a": 4636410,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "spit"
+        },
+        {
+         "a": 4636471,
+         "kind": "SWITCH",
+         "args": [
+          "lir/bathcandy",
+          "lir/candy"
+         ]
+        },
+        {
+         "a": 4636530,
+         "kind": "MSG"
+        }
+       ],
+       "next": 16
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4636703,
+         "kind": "ACTION",
+         "obj": "lir/candy",
+         "act": "eat_candy"
+        }
+       ],
+       "next": 5
+      }
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x46c6bf",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4638425,
+        "kind": "ICON",
+        "args": [
+         "milk_bottle",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4638474,
+        "kind": "GOTO",
+        "obj": "kit/milkbottle"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x46c71a",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4636888,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         "edi"
+        ]
+       },
+       {
+        "a": 4636979,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [arg_3ch]",
+         "kit/milkbottle",
+         "kit/foambottle"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4636979,
+       "fn": "fcn.0047a130",
+       "variant": "kit/foambottle"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4637005,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4637089,
+         "kind": "ACTION",
+         "obj": "kit/foambottle",
+         "act": "make_foampudding"
+        },
+        {
+         "a": 4637209,
+         "kind": "MSG"
+        },
+        {
+         "a": 4637280,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/foambottle",
+          2
+         ]
+        },
+        {
+         "a": 4637366,
+         "kind": "ACTION",
+         "obj": "kit/foampudding",
+         "act": "repair"
+        },
+        {
+         "a": 4637422,
+         "kind": "OBJ1",
+         "args": [
+          "kit/foampudding"
+         ]
+        },
+        {
+         "a": 4637493,
+         "kind": "MSG"
+        },
+        {
+         "a": 4637554,
+         "kind": "SWITCH",
+         "args": [
+          "kit/foambottle",
+          "kit/milkbottle"
+         ]
+        },
+        {
+         "a": 4637626,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4637701,
+         "kind": "ACTION",
+         "obj": "kit/milkbottle",
+         "act": "make_pudding"
+        }
+       ],
+       "next": 7
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x46c74c",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4638566,
+        "kind": "ICON",
+        "args": [
+         "bath",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4635873,
+        "kind": "LOOKUP",
+        "args": [
+         "toi/tub_empty"
+        ]
+       },
+       {
+        "a": 4635873,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       },
+       {
+        "a": 4638686,
+        "kind": "GOTO",
+        "obj": "toi/tub_empty"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x46c7ee",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4638708,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4638790,
+        "kind": "ACTION",
+        "obj": "toi/tub_empty",
+        "act": "give"
+       },
+       {
+        "a": 4638863,
+        "kind": "SWITCH",
+        "args": [
+         "toi/tub_empty",
+         "toi/tub"
+        ]
+       },
+       {
+        "a": 4638926,
+        "kind": "MSG"
+       }
+      ],
+      "next": 1
+     }
+    },
+    {
+     "index": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      19
+     ],
+     "start": "0x46d2f7",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x46c933",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4639036,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         1
+        ]
+       },
+       {
+        "a": 4639127,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0xb0]",
+         "toi/tub",
+         "toi/tub_hair"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4639127,
+       "fn": "fcn.0047a130",
+       "variant": "toi/tub_hair"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4639157,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4639259,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "toi/tub_hair",
+          0,
+          "ebx",
+          "show_hair"
+         ]
+        }
+       ],
+       "next": 15
+      },
+      "false": {
+       "steps": [],
+       "next": 15
+      }
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x46ca77",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4639377,
+        "kind": "ICON",
+        "args": [
+         "towel",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4639389,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4639470,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebp",
+         "toi/towel",
+         "toi/dirtytowel"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4639470,
+       "fn": "fcn.0047a130",
+       "variant": "toi/dirtytowel"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4639499,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4639594,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "take_towel"
+        },
+        {
+         "a": 4639714,
+         "kind": "MSG"
+        },
+        {
+         "a": 4639805,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "dry"
+        },
+        {
+         "a": 4639910,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "toi/dirtytowel",
+          0,
+          "ebx",
+          "show_black"
+         ]
+        },
+        {
+         "a": 4640001,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "take_towel"
+        },
+        {
+         "a": 4640064,
+         "kind": "SWITCH",
+         "args": [
+          "toi/dirtytowel",
+          "toi/towel"
+         ]
+        },
+        {
+         "a": 4640124,
+         "kind": "MSG"
+        },
+        {
+         "a": 4640747,
+         "kind": "SWITCH",
+         "args": [
+          "eax"
+         ]
+        },
+        {
+         "a": 4640821,
+         "kind": "MSG"
+        },
+        {
+         "a": 4640880,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 1
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4640208,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "take_towel"
+        },
+        {
+         "a": 4640332,
+         "kind": "MSG"
+        },
+        {
+         "a": 4640420,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "dry"
+        },
+        {
+         "a": 4640508,
+         "kind": "ACTION",
+         "obj": "toi/shower",
+         "act": "take_towel"
+        },
+        {
+         "a": 4640628,
+         "kind": "MSG"
+        },
+        {
+         "a": 4640747,
+         "kind": "SWITCH",
+         "args": [
+          "eax"
+         ]
+        },
+        {
+         "a": 4640821,
+         "kind": "MSG"
+        },
+        {
+         "a": 4640880,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x46d0cc",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4640998,
+        "kind": "ICON",
+        "args": [
+         "toilet",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4641050,
+        "kind": "GOTO",
+        "obj": "toi/toilet"
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x46d12a",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4641087,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         17
+        ]
+       },
+       {
+        "a": 4641171,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "puke"
+       },
+       {
+        "a": 4641237,
+        "kind": "STOPMSG"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x46d236",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4641380,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0xbc]",
+         "toi/toilet",
+         "toi/toiletstuffed"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4641380,
+       "fn": "fcn.0047a130",
+       "variant": "toi/toiletstuffed"
+      },
+      "true": {
+       "steps": [],
+       "next": 20
+      },
+      "false": {
+       "steps": [],
+       "next": 5
+      }
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x46d282",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x46c583",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x46c5b3": {
+     "a": 4638131,
+     "kind": "ICON",
+     "args": []
+    },
+    "0x46c5e4": {
+     "a": 4638180,
+     "kind": "GOTO",
+     "obj": "lir/book"
+    },
+    "0x46ba56": {
+     "a": 4635222,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "edi",
+      "edi"
+     ]
+    },
+    "0x46bab1": {
+     "a": 4635313,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [var_28h]",
+      "lir/book",
+      "lir/stickybook"
+     ]
+    },
+    "0x46bc1f": {
+     "a": 4635679,
+     "kind": "ACTION",
+     "obj": "lir/book",
+     "act": "read_book"
+    },
+    "0x46bacb": {
+     "a": 4635339,
+     "kind": "STOPMSG"
+    },
+    "0x46bb1f": {
+     "a": 4635423,
+     "kind": "ACTION",
+     "obj": "lir/stickybook",
+     "act": "read_stickybook"
+    },
+    "0x46bb65": {
+     "a": 4635493,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/stickybook",
+      2
+     ]
+    },
+    "0x46bbd3": {
+     "a": 4635603,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [var_28h]",
+      "esi",
+      "lir/stickybook"
+     ]
+    },
+    "0x46c63f": {
+     "a": 4638271,
+     "kind": "ICON",
+     "args": [
+      "candy",
+      "ebp"
+     ]
+    },
+    "0x46c670": {
+     "a": 4638320,
+     "kind": "GOTO",
+     "obj": "lir/candy"
+    },
+    "0x46bd93": {
+     "a": 4636051,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      "edi"
+     ]
+    },
+    "0x46bdee": {
+     "a": 4636142,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [var_24h]",
+      "lir/candy",
+      "lir/bathcandy"
+     ]
+    },
+    "0x46c01f": {
+     "a": 4636703,
+     "kind": "ACTION",
+     "obj": "lir/candy",
+     "act": "eat_candy"
+    },
+    "0x46be08": {
+     "a": 4636168,
+     "kind": "STOPMSG"
+    },
+    "0x46be5e": {
+     "a": 4636254,
+     "kind": "ACTION",
+     "obj": "lir/bathcandy",
+     "act": "eat_bathcandy"
+    },
+    "0x46bea4": {
+     "a": 4636324,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/bathcandy",
+      0
+     ]
+    },
+    "0x46befa": {
+     "a": 4636410,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "spit"
+    },
+    "0x46bf37": {
+     "a": 4636471,
+     "kind": "SWITCH",
+     "args": [
+      "lir/bathcandy",
+      "lir/candy"
+     ]
+    },
+    "0x46bf72": {
+     "a": 4636530,
+     "kind": "MSG"
+    },
+    "0x46c6d9": {
+     "a": 4638425,
+     "kind": "ICON",
+     "args": [
+      "milk_bottle",
+      "ebp"
+     ]
+    },
+    "0x46c70a": {
+     "a": 4638474,
+     "kind": "GOTO",
+     "obj": "kit/milkbottle"
+    },
+    "0x46c0d8": {
+     "a": 4636888,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      "edi"
+     ]
+    },
+    "0x46c133": {
+     "a": 4636979,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [arg_3ch]",
+      "kit/milkbottle",
+      "kit/foambottle"
+     ]
+    },
+    "0x46c405": {
+     "a": 4637701,
+     "kind": "ACTION",
+     "obj": "kit/milkbottle",
+     "act": "make_pudding"
+    },
+    "0x46c14d": {
+     "a": 4637005,
+     "kind": "STOPMSG"
+    },
+    "0x46c1a1": {
+     "a": 4637089,
+     "kind": "ACTION",
+     "obj": "kit/foambottle",
+     "act": "make_foampudding"
+    },
+    "0x46c219": {
+     "a": 4637209,
+     "kind": "MSG"
+    },
+    "0x46c260": {
+     "a": 4637280,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/foambottle",
+      2
+     ]
+    },
+    "0x46c2b6": {
+     "a": 4637366,
+     "kind": "ACTION",
+     "obj": "kit/foampudding",
+     "act": "repair"
+    },
+    "0x46c2ee": {
+     "a": 4637422,
+     "kind": "OBJ1",
+     "args": [
+      "kit/foampudding"
+     ]
+    },
+    "0x46c335": {
+     "a": 4637493,
+     "kind": "MSG"
+    },
+    "0x46c372": {
+     "a": 4637554,
+     "kind": "SWITCH",
+     "args": [
+      "kit/foambottle",
+      "kit/milkbottle"
+     ]
+    },
+    "0x46c3ba": {
+     "a": 4637626,
+     "kind": "MSG"
+    },
+    "0x46c766": {
+     "a": 4638566,
+     "kind": "ICON",
+     "args": [
+      "bath",
+      "ebp"
+     ]
+    },
+    "0x46bce1": {
+     "a": 4635873,
+     "kind": "LOOKUP",
+     "args": [
+      "toi/tub_empty"
+     ]
+    },
+    "0x46c7de": {
+     "a": 4638686,
+     "kind": "GOTO",
+     "obj": "toi/tub_empty"
+    },
+    "0x46c7f4": {
+     "a": 4638708,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x46c846": {
+     "a": 4638790,
+     "kind": "ACTION",
+     "obj": "toi/tub_empty",
+     "act": "give"
+    },
+    "0x46c88f": {
+     "a": 4638863,
+     "kind": "SWITCH",
+     "args": [
+      "toi/tub_empty",
+      "toi/tub"
+     ]
+    },
+    "0x46c8ce": {
+     "a": 4638926,
+     "kind": "MSG"
+    },
+    "0x46c93c": {
+     "a": 4639036,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      1
+     ]
+    },
+    "0x46c997": {
+     "a": 4639127,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0xb0]",
+      "toi/tub",
+      "toi/tub_hair"
+     ]
+    },
+    "0x46c9b5": {
+     "a": 4639157,
+     "kind": "STOPMSG"
+    },
+    "0x46ca1b": {
+     "a": 4639259,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "toi/tub_hair",
+      0,
+      "ebx",
+      "show_hair"
+     ]
+    },
+    "0x46ca91": {
+     "a": 4639377,
+     "kind": "ICON",
+     "args": [
+      "towel",
+      "ebp"
+     ]
+    },
+    "0x46ca9d": {
+     "a": 4639389,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46caee": {
+     "a": 4639470,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "toi/towel",
+      "toi/dirtytowel"
+     ]
+    },
+    "0x46cdd0": {
+     "a": 4640208,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "take_towel"
+    },
+    "0x46ce4c": {
+     "a": 4640332,
+     "kind": "MSG"
+    },
+    "0x46cea4": {
+     "a": 4640420,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "dry"
+    },
+    "0x46cefc": {
+     "a": 4640508,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "take_towel"
+    },
+    "0x46cf74": {
+     "a": 4640628,
+     "kind": "MSG"
+    },
+    "0x46cfeb": {
+     "a": 4640747,
+     "kind": "SWITCH",
+     "args": [
+      "eax"
+     ]
+    },
+    "0x46d035": {
+     "a": 4640821,
+     "kind": "MSG"
+    },
+    "0x46d070": {
+     "a": 4640880,
+     "kind": "STOPMSG"
+    },
+    "0x46cb0b": {
+     "a": 4639499,
+     "kind": "STOPMSG"
+    },
+    "0x46cb6a": {
+     "a": 4639594,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "take_towel"
+    },
+    "0x46cbe2": {
+     "a": 4639714,
+     "kind": "MSG"
+    },
+    "0x46cc3d": {
+     "a": 4639805,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "dry"
+    },
+    "0x46cca6": {
+     "a": 4639910,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "toi/dirtytowel",
+      0,
+      "ebx",
+      "show_black"
+     ]
+    },
+    "0x46cd01": {
+     "a": 4640001,
+     "kind": "ACTION",
+     "obj": "toi/shower",
+     "act": "take_towel"
+    },
+    "0x46cd40": {
+     "a": 4640064,
+     "kind": "SWITCH",
+     "args": [
+      "toi/dirtytowel",
+      "toi/towel"
+     ]
+    },
+    "0x46cd7c": {
+     "a": 4640124,
+     "kind": "MSG"
+    },
+    "0x46d0e6": {
+     "a": 4640998,
+     "kind": "ICON",
+     "args": [
+      "toilet",
+      "ebp"
+     ]
+    },
+    "0x46d11a": {
+     "a": 4641050,
+     "kind": "GOTO",
+     "obj": "toi/toilet"
+    },
+    "0x46d13f": {
+     "a": 4641087,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      17
+     ]
+    },
+    "0x46d193": {
+     "a": 4641171,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "puke"
+    },
+    "0x46d1d5": {
+     "a": 4641237,
+     "kind": "STOPMSG"
+    },
+    "0x46d264": {
+     "a": 4641380,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0xbc]",
+      "toi/toilet",
+      "toi/toiletstuffed"
+     ]
+    }
+   }
+  }
+ ]
+}

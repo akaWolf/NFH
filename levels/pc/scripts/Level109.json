@@ -1,0 +1,1944 @@
+{
+ "level": 109,
+ "folder": "level_pig",
+ "tricked": [
+  "anc/pigout",
+  "bed/bed_pins",
+  "bed/cactusclock",
+  "bed/teeth_tabasco",
+  "kit/babybottle_nitro",
+  "kit/cookiebox_hot"
+ ],
+ "classes": [
+  {
+   "class": "0x468c8c",
+   "cases": [
+    {
+     "index": [
+      0,
+      3
+     ],
+     "start": "0x468f23",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4624187,
+        "kind": "ICON",
+        "args": [
+         "teeth",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4624243,
+        "kind": "GOTO",
+        "obj": "bed/teeth_empty"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      1
+     ],
+     "start": "0x468c93",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4623529,
+        "kind": "INV",
+        "args": [
+         "pigkey",
+         "edi",
+         "esi"
+        ]
+       },
+       {
+        "a": 4623566,
+        "kind": "ICON",
+        "args": [
+         "pig_key",
+         0
+        ]
+       },
+       {
+        "a": 4623615,
+        "kind": "GOTO",
+        "obj": "bed/keyboard"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x468d1c",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4623666,
+        "kind": "INV",
+        "args": [
+         "pigkey",
+         "ebx",
+         "dword [edi + 0xc]"
+        ]
+       },
+       {
+        "a": 4623689,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4623776,
+        "kind": "ACTION",
+        "obj": "bed/keyboard",
+        "act": "give"
+       },
+       {
+        "a": 4623912,
+        "kind": "MSG"
+       },
+       {
+        "a": 4624038,
+        "kind": "MSG"
+       }
+      ],
+      "next": 3
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x468f84",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4624266,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4624350,
+        "kind": "ACTION",
+        "obj": "bed/teeth_empty",
+        "act": "give"
+       },
+       {
+        "a": 4624420,
+        "kind": "SWITCH",
+        "args": [
+         "bed/teeth_empty",
+         "bed/teeth"
+        ]
+       },
+       {
+        "a": 4624480,
+        "kind": "MSG"
+       }
+      ],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x4690c7",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4624609,
+        "kind": "ICON",
+        "args": [
+         "bed",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4624658,
+        "kind": "GOTO",
+        "obj": "bed/bed"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x469124",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4624722,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x1cc]",
+         "bed/bed",
+         "bed/bed_pins"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4624722,
+       "fn": "fcn.0047a130",
+       "variant": "bed/bed_pins"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4624745,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4624800,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4624895,
+         "kind": "ACTION",
+         "obj": "bed/bed_pins",
+         "act": "sleep"
+        },
+        {
+         "a": 4624971,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bed/bed_pins",
+          2
+         ]
+        },
+        {
+         "a": 4625110,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [],
+       "next": 7
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x46933e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4625238,
+        "kind": "ICON",
+        "args": [
+         "sleep",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4625250,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         1
+        ]
+       },
+       {
+        "a": 4625382,
+        "kind": "MSG"
+       },
+       {
+        "a": 4625471,
+        "kind": "ENTER",
+        "obj": "bed/bed_sleep"
+       },
+       {
+        "a": 4625565,
+        "kind": "ACTION",
+        "obj": "bed/bed_sleep",
+        "act": "sleep"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x469502",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x46950d",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4625703,
+        "kind": "ICON",
+        "args": [
+         "alarm_clock",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4625718,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4625802,
+        "kind": "IFVARIANT",
+        "args": [
+         "esi",
+         "bed/alarmclock",
+         "bed/cactusclock"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4625802,
+       "fn": "fcn.0047a130",
+       "variant": "bed/cactusclock"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4625828,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4625923,
+         "kind": "ACTION",
+         "obj": "bed/cactusclock",
+         "act": "ring"
+        },
+        {
+         "a": 4626017,
+         "kind": "ACTION",
+         "obj": "bed/bed_sleep",
+         "act": "hit_cactus"
+        },
+        {
+         "a": 4626076,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4626114,
+         "kind": "LEAVE",
+         "obj": "bed/bed_sleep"
+        },
+        {
+         "a": 4626263,
+         "kind": "MSG"
+        },
+        {
+         "a": 4626358,
+         "kind": "FIRE4",
+         "args": [
+          "addr",
+          "bed/cactusclock",
+          0,
+          2
+         ]
+        },
+        {
+         "a": 4626444,
+         "kind": "SWITCH",
+         "args": [
+          "bed/cactusclock",
+          "bed/alarmclock"
+         ]
+        },
+        {
+         "a": 4626507,
+         "kind": "MSG"
+        }
+       ],
+       "next": 10
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4626594,
+         "kind": "ACTION",
+         "obj": "bed/alarmclock",
+         "act": "ring"
+        },
+        {
+         "a": 4626692,
+         "kind": "ACTION",
+         "obj": "bed/bed_sleep",
+         "act": "hit_alarm"
+        },
+        {
+         "a": 4626767,
+         "kind": "LEAVE",
+         "obj": "bed/bed_sleep"
+        },
+        {
+         "a": 4626912,
+         "kind": "MSG"
+        }
+       ],
+       "next": 10
+      }
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x469a48",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4627040,
+        "kind": "ICON",
+        "args": [
+         "teeth",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4627161,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x1d0]"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x469afe",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4627292,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x18]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4627292,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4627318,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4627377,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4627474,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4627544,
+         "kind": "SWITCH",
+         "args": [
+          "addr",
+          "bed/teeth_empty"
+         ]
+        },
+        {
+         "a": 4627608,
+         "kind": "MSG"
+        },
+        {
+         "a": 4627716,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "bed/teeth_tabasco",
+          2,
+          0,
+          "spit_fire"
+         ]
+        }
+       ],
+       "next": 12
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4627769,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4627855,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4627929,
+         "kind": "SWITCH",
+         "args": [
+          "addr",
+          "bed/teeth_empty"
+         ]
+        },
+        {
+         "a": 4627993,
+         "kind": "MSG"
+        }
+       ],
+       "next": 12
+      }
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x469e99",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4628147,
+        "kind": "ICON",
+        "args": [
+         "pig_key",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4628196,
+        "kind": "GOTO",
+        "obj": "bed/keyboard"
+       }
+      ],
+      "next": 13
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x469ef6",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4628220,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         13
+        ]
+       },
+       {
+        "a": 4628322,
+        "kind": "LOOKUP",
+        "args": [
+         "bed/keyboard"
+        ]
+       },
+       {
+        "a": 4628322,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       },
+       {
+        "a": 4628366,
+        "kind": "INV",
+        "args": [
+         "pigkey"
+        ]
+       },
+       {
+        "a": 4628421,
+        "kind": "ACTION",
+        "obj": "bed/keyboard",
+        "act": "take"
+       },
+       {
+        "a": 4628556,
+        "kind": "MSG"
+       },
+       {
+        "a": 4628678,
+        "kind": "MSG"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x46a18a",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4628898,
+        "kind": "ICON",
+        "args": [
+         "milk_bottle",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4629016,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x1d0]"
+       }
+      ],
+      "next": 15
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x46a23a",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4629144,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x18]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4629144,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4629159,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4629239,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4629302,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4629360,
+         "kind": "MSG"
+        }
+       ],
+       "next": 16
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4629159,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4629239,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4629302,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4629360,
+         "kind": "MSG"
+        }
+       ],
+       "next": 16
+      }
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x46a3ed",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4629509,
+        "kind": "ICON",
+        "args": [
+         "pig",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x46a47e",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4629656,
+        "kind": "ICON",
+        "args": [
+         "pig",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4629700,
+        "kind": "IFVARIANT",
+        "args": [
+         "ebx",
+         "anc/pig",
+         "anc/pigout"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4629700,
+       "fn": "fcn.0047a130",
+       "variant": "anc/pigout"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4629756,
+         "kind": "GOTO",
+         "obj": "anc/pigout"
+        }
+       ],
+       "next": 18
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4629802,
+         "kind": "GOTO",
+         "obj": "anc/pig"
+        }
+       ],
+       "next": 19
+      }
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x46a53c",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4629826,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         19
+        ]
+       },
+       {
+        "a": 4629881,
+        "kind": "STOPMSG"
+       },
+       {
+        "a": 4629964,
+        "kind": "OBJ2",
+        "args": [
+         "addr",
+         "anc/pigout",
+         0
+        ]
+       },
+       {
+        "a": 4630058,
+        "kind": "ACTION",
+        "obj": "anc/pigout",
+        "act": "catch_pig"
+       },
+       {
+        "a": 4630127,
+        "kind": "SWITCH",
+        "args": [
+         "anc/pigout",
+         "anc/pig"
+        ]
+       },
+       {
+        "a": 4630190,
+        "kind": "MSG"
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x46a73e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4630358,
+        "kind": "INV",
+        "args": [
+         "pigkey",
+         17,
+         "dword [edi + 0xc]"
+        ]
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x46a7aa",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4630451,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         21
+        ]
+       },
+       {
+        "a": 4630894,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "shake_bottle"
+       },
+       {
+        "a": 4630992,
+        "kind": "ACTION",
+        "obj": "anc/pig",
+        "act": "feed"
+       }
+      ],
+      "next": 21
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x46aa38",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4631122,
+        "kind": "ICON",
+        "args": [
+         "milk_bottle",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4631171,
+        "kind": "GOTO",
+        "obj": "kit/babybottle"
+       }
+      ],
+      "next": 22
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x46aa95",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4631198,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         22
+        ]
+       },
+       {
+        "a": 4631285,
+        "kind": "ACTION",
+        "obj": "kit/babybottle",
+        "act": "give"
+       },
+       {
+        "a": 4631434,
+        "kind": "MSG"
+       }
+      ],
+      "next": 23
+     }
+    },
+    {
+     "index": [
+      23
+     ],
+     "start": "0x46abf2",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4631562,
+        "kind": "ICON",
+        "args": [
+         "cookies",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4631683,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x1d0]"
+       }
+      ],
+      "next": 24
+     }
+    },
+    {
+     "index": [
+      24
+     ],
+     "start": "0x46aca8",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4631814,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x18]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4631814,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4631832,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4631918,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "open"
+        },
+        {
+         "a": 4632015,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x24]",
+         "act": "take"
+        },
+        {
+         "a": 4632108,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "close"
+        },
+        {
+         "a": 4632189,
+         "kind": "SWITCH",
+         "args": [
+          "kit/cookiebox_hot",
+          "kit/cookiebox"
+         ]
+        },
+        {
+         "a": 4632253,
+         "kind": "MSG"
+        }
+       ],
+       "next": 25
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4631832,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4631918,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "open"
+        },
+        {
+         "a": 4632015,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x24]",
+         "act": "take"
+        },
+        {
+         "a": 4632108,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "close"
+        }
+       ],
+       "next": 25
+      }
+     }
+    },
+    {
+     "index": [
+      25
+     ],
+     "start": "0x46af3d",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4632405,
+        "kind": "ICON",
+        "args": [
+         "parrot",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 26
+     }
+    },
+    {
+     "index": [
+      26
+     ],
+     "start": "0x46afd1",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4632553,
+        "kind": "ICON",
+        "args": [
+         "parrot",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4632716,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x1c4]"
+       }
+      ],
+      "next": 27
+     }
+    },
+    {
+     "index": [
+      27
+     ],
+     "start": "0x46b09e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4633384,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr"
+        ]
+       },
+       {
+        "a": 4633471,
+        "kind": "ACTION",
+        "obj": "chili",
+        "act": "give"
+       },
+       {
+        "a": 4633569,
+        "kind": "ACTION",
+        "obj": "chili",
+        "act": "eat"
+       }
+      ],
+      "next": 28
+     }
+    },
+    {
+     "index": [
+      28
+     ],
+     "start": "0x46b449",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 1
+     }
+    },
+    {
+     "index": [
+      29
+     ],
+     "start": "0x46b4c1",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4633817,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 30
+     }
+    },
+    {
+     "index": [
+      30
+     ],
+     "start": "0x46b574",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 31
+     }
+    },
+    {
+     "index": [
+      31
+     ],
+     "start": "0x46b5b2",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      32
+     ],
+     "start": "0x468f0d",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x468f3b": {
+     "a": 4624187,
+     "kind": "ICON",
+     "args": [
+      "teeth",
+      "ebp"
+     ]
+    },
+    "0x468f73": {
+     "a": 4624243,
+     "kind": "GOTO",
+     "obj": "bed/teeth_empty"
+    },
+    "0x468ca9": {
+     "a": 4623529,
+     "kind": "INV",
+     "args": [
+      "pigkey",
+      "edi",
+      "esi"
+     ]
+    },
+    "0x468cce": {
+     "a": 4623566,
+     "kind": "ICON",
+     "args": [
+      "pig_key",
+      0
+     ]
+    },
+    "0x468cff": {
+     "a": 4623615,
+     "kind": "GOTO",
+     "obj": "bed/keyboard"
+    },
+    "0x468d32": {
+     "a": 4623666,
+     "kind": "INV",
+     "args": [
+      "pigkey",
+      "ebx",
+      "dword [edi + 0xc]"
+     ]
+    },
+    "0x468d49": {
+     "a": 4623689,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x468da0": {
+     "a": 4623776,
+     "kind": "ACTION",
+     "obj": "bed/keyboard",
+     "act": "give"
+    },
+    "0x468e28": {
+     "a": 4623912,
+     "kind": "MSG"
+    },
+    "0x468ea6": {
+     "a": 4624038,
+     "kind": "MSG"
+    },
+    "0x468f8a": {
+     "a": 4624266,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x468fde": {
+     "a": 4624350,
+     "kind": "ACTION",
+     "obj": "bed/teeth_empty",
+     "act": "give"
+    },
+    "0x469024": {
+     "a": 4624420,
+     "kind": "SWITCH",
+     "args": [
+      "bed/teeth_empty",
+      "bed/teeth"
+     ]
+    },
+    "0x469060": {
+     "a": 4624480,
+     "kind": "MSG"
+    },
+    "0x4690e1": {
+     "a": 4624609,
+     "kind": "ICON",
+     "args": [
+      "bed",
+      "ebp"
+     ]
+    },
+    "0x469112": {
+     "a": 4624658,
+     "kind": "GOTO",
+     "obj": "bed/bed"
+    },
+    "0x469152": {
+     "a": 4624722,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x1cc]",
+      "bed/bed",
+      "bed/bed_pins"
+     ]
+    },
+    "0x469169": {
+     "a": 4624745,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x4691a0": {
+     "a": 4624800,
+     "kind": "STOPMSG"
+    },
+    "0x4691ff": {
+     "a": 4624895,
+     "kind": "ACTION",
+     "obj": "bed/bed_pins",
+     "act": "sleep"
+    },
+    "0x46924b": {
+     "a": 4624971,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bed/bed_pins",
+      2
+     ]
+    },
+    "0x4692d6": {
+     "a": 4625110,
+     "kind": "MSG"
+    },
+    "0x469356": {
+     "a": 4625238,
+     "kind": "ICON",
+     "args": [
+      "sleep",
+      "ebp"
+     ]
+    },
+    "0x469362": {
+     "a": 4625250,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      1
+     ]
+    },
+    "0x4693e6": {
+     "a": 4625382,
+     "kind": "MSG"
+    },
+    "0x46943f": {
+     "a": 4625471,
+     "kind": "ENTER",
+     "obj": "bed/bed_sleep"
+    },
+    "0x46949d": {
+     "a": 4625565,
+     "kind": "ACTION",
+     "obj": "bed/bed_sleep",
+     "act": "sleep"
+    },
+    "0x469527": {
+     "a": 4625703,
+     "kind": "ICON",
+     "args": [
+      "alarm_clock",
+      "ebp"
+     ]
+    },
+    "0x469536": {
+     "a": 4625718,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46958a": {
+     "a": 4625802,
+     "kind": "IFVARIANT",
+     "args": [
+      "esi",
+      "bed/alarmclock",
+      "bed/cactusclock"
+     ]
+    },
+    "0x4695a4": {
+     "a": 4625828,
+     "kind": "STOPMSG"
+    },
+    "0x469603": {
+     "a": 4625923,
+     "kind": "ACTION",
+     "obj": "bed/cactusclock",
+     "act": "ring"
+    },
+    "0x469661": {
+     "a": 4626017,
+     "kind": "ACTION",
+     "obj": "bed/bed_sleep",
+     "act": "hit_cactus"
+    },
+    "0x46969c": {
+     "a": 4626076,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x4696c2": {
+     "a": 4626114,
+     "kind": "LEAVE",
+     "obj": "bed/bed_sleep"
+    },
+    "0x469757": {
+     "a": 4626263,
+     "kind": "MSG"
+    },
+    "0x4697b6": {
+     "a": 4626358,
+     "kind": "FIRE4",
+     "args": [
+      "addr",
+      "bed/cactusclock",
+      0,
+      2
+     ]
+    },
+    "0x46980c": {
+     "a": 4626444,
+     "kind": "SWITCH",
+     "args": [
+      "bed/cactusclock",
+      "bed/alarmclock"
+     ]
+    },
+    "0x46984b": {
+     "a": 4626507,
+     "kind": "MSG"
+    },
+    "0x4698a2": {
+     "a": 4626594,
+     "kind": "ACTION",
+     "obj": "bed/alarmclock",
+     "act": "ring"
+    },
+    "0x469904": {
+     "a": 4626692,
+     "kind": "ACTION",
+     "obj": "bed/bed_sleep",
+     "act": "hit_alarm"
+    },
+    "0x46994f": {
+     "a": 4626767,
+     "kind": "LEAVE",
+     "obj": "bed/bed_sleep"
+    },
+    "0x4699e0": {
+     "a": 4626912,
+     "kind": "MSG"
+    },
+    "0x469a60": {
+     "a": 4627040,
+     "kind": "ICON",
+     "args": [
+      "teeth",
+      "ebp"
+     ]
+    },
+    "0x469ad9": {
+     "a": 4627161,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x1d0]"
+    },
+    "0x469b5c": {
+     "a": 4627292,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]"
+     ]
+    },
+    "0x469b76": {
+     "a": 4627318,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x469bb1": {
+     "a": 4627377,
+     "kind": "STOPMSG"
+    },
+    "0x469c12": {
+     "a": 4627474,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "take"
+    },
+    "0x469c58": {
+     "a": 4627544,
+     "kind": "SWITCH",
+     "args": [
+      "addr",
+      "bed/teeth_empty"
+     ]
+    },
+    "0x469c98": {
+     "a": 4627608,
+     "kind": "MSG"
+    },
+    "0x469d04": {
+     "a": 4627716,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "bed/teeth_tabasco",
+      2,
+      0,
+      "spit_fire"
+     ]
+    },
+    "0x469d39": {
+     "a": 4627769,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x469d8f": {
+     "a": 4627855,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "take"
+    },
+    "0x469dd9": {
+     "a": 4627929,
+     "kind": "SWITCH",
+     "args": [
+      "addr",
+      "bed/teeth_empty"
+     ]
+    },
+    "0x469e19": {
+     "a": 4627993,
+     "kind": "MSG"
+    },
+    "0x469eb3": {
+     "a": 4628147,
+     "kind": "ICON",
+     "args": [
+      "pig_key",
+      "ebp"
+     ]
+    },
+    "0x469ee4": {
+     "a": 4628196,
+     "kind": "GOTO",
+     "obj": "bed/keyboard"
+    },
+    "0x469efc": {
+     "a": 4628220,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      13
+     ]
+    },
+    "0x469f62": {
+     "a": 4628322,
+     "kind": "LOOKUP",
+     "args": [
+      "bed/keyboard"
+     ]
+    },
+    "0x469f8e": {
+     "a": 4628366,
+     "kind": "INV",
+     "args": [
+      "pigkey"
+     ]
+    },
+    "0x469fc5": {
+     "a": 4628421,
+     "kind": "ACTION",
+     "obj": "bed/keyboard",
+     "act": "take"
+    },
+    "0x46a04c": {
+     "a": 4628556,
+     "kind": "MSG"
+    },
+    "0x46a0c6": {
+     "a": 4628678,
+     "kind": "MSG"
+    },
+    "0x46a1a2": {
+     "a": 4628898,
+     "kind": "ICON",
+     "args": [
+      "milk_bottle",
+      "ebp"
+     ]
+    },
+    "0x46a218": {
+     "a": 4629016,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x1d0]"
+    },
+    "0x46a298": {
+     "a": 4629144,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]"
+     ]
+    },
+    "0x46a2a7": {
+     "a": 4629159,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46a2f7": {
+     "a": 4629239,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "take"
+    },
+    "0x46a336": {
+     "a": 4629302,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x46a370": {
+     "a": 4629360,
+     "kind": "MSG"
+    },
+    "0x46a405": {
+     "a": 4629509,
+     "kind": "ICON",
+     "args": [
+      "pig",
+      "ebp"
+     ]
+    },
+    "0x46a498": {
+     "a": 4629656,
+     "kind": "ICON",
+     "args": [
+      "pig",
+      "ebp"
+     ]
+    },
+    "0x46a4c4": {
+     "a": 4629700,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebx",
+      "anc/pig",
+      "anc/pigout"
+     ]
+    },
+    "0x46a4fc": {
+     "a": 4629756,
+     "kind": "GOTO",
+     "obj": "anc/pigout"
+    },
+    "0x46a52a": {
+     "a": 4629802,
+     "kind": "GOTO",
+     "obj": "anc/pig"
+    },
+    "0x46a542": {
+     "a": 4629826,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      19
+     ]
+    },
+    "0x46a579": {
+     "a": 4629881,
+     "kind": "STOPMSG"
+    },
+    "0x46a5cc": {
+     "a": 4629964,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/pigout",
+      0
+     ]
+    },
+    "0x46a62a": {
+     "a": 4630058,
+     "kind": "ACTION",
+     "obj": "anc/pigout",
+     "act": "catch_pig"
+    },
+    "0x46a66f": {
+     "a": 4630127,
+     "kind": "SWITCH",
+     "args": [
+      "anc/pigout",
+      "anc/pig"
+     ]
+    },
+    "0x46a6ae": {
+     "a": 4630190,
+     "kind": "MSG"
+    },
+    "0x46a756": {
+     "a": 4630358,
+     "kind": "INV",
+     "args": [
+      "pigkey",
+      17,
+      "dword [edi + 0xc]"
+     ]
+    },
+    "0x46a7b3": {
+     "a": 4630451,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      21
+     ]
+    },
+    "0x46a96e": {
+     "a": 4630894,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "shake_bottle"
+    },
+    "0x46a9d0": {
+     "a": 4630992,
+     "kind": "ACTION",
+     "obj": "anc/pig",
+     "act": "feed"
+    },
+    "0x46aa52": {
+     "a": 4631122,
+     "kind": "ICON",
+     "args": [
+      "milk_bottle",
+      "ebp"
+     ]
+    },
+    "0x46aa83": {
+     "a": 4631171,
+     "kind": "GOTO",
+     "obj": "kit/babybottle"
+    },
+    "0x46aa9e": {
+     "a": 4631198,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      22
+     ]
+    },
+    "0x46aaf5": {
+     "a": 4631285,
+     "kind": "ACTION",
+     "obj": "kit/babybottle",
+     "act": "give"
+    },
+    "0x46ab8a": {
+     "a": 4631434,
+     "kind": "MSG"
+    },
+    "0x46ac0a": {
+     "a": 4631562,
+     "kind": "ICON",
+     "args": [
+      "cookies",
+      "ebp"
+     ]
+    },
+    "0x46ac83": {
+     "a": 4631683,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x1d0]"
+    },
+    "0x46ad06": {
+     "a": 4631814,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]"
+     ]
+    },
+    "0x46ad18": {
+     "a": 4631832,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46ad6e": {
+     "a": 4631918,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "open"
+    },
+    "0x46adcf": {
+     "a": 4632015,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x24]",
+     "act": "take"
+    },
+    "0x46ae2c": {
+     "a": 4632108,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "close"
+    },
+    "0x46ae7d": {
+     "a": 4632189,
+     "kind": "SWITCH",
+     "args": [
+      "kit/cookiebox_hot",
+      "kit/cookiebox"
+     ]
+    },
+    "0x46aebd": {
+     "a": 4632253,
+     "kind": "MSG"
+    },
+    "0x46af55": {
+     "a": 4632405,
+     "kind": "ICON",
+     "args": [
+      "parrot",
+      "ebp"
+     ]
+    },
+    "0x46afe9": {
+     "a": 4632553,
+     "kind": "ICON",
+     "args": [
+      "parrot",
+      "ebp"
+     ]
+    },
+    "0x46b08c": {
+     "a": 4632716,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x1c4]"
+    },
+    "0x46b328": {
+     "a": 4633384,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x46b37f": {
+     "a": 4633471,
+     "kind": "ACTION",
+     "obj": "chili",
+     "act": "give"
+    },
+    "0x46b3e1": {
+     "a": 4633569,
+     "kind": "ACTION",
+     "obj": "chili",
+     "act": "eat"
+    },
+    "0x46b4d9": {
+     "a": 4633817,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

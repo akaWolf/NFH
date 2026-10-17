@@ -1,0 +1,1999 @@
+{
+ "level": 113,
+ "folder": "level_DIY",
+ "tricked": [
+  "anc/fuse",
+  "bal/anglegrinder_manipulated",
+  "kit/heater_hot",
+  "lir/stoolkit_pain",
+  "toi/basin_flooded",
+  "wor/ladder_cut"
+ ],
+ "classes": [
+  {
+   "class": "0x451ffa",
+   "cases": [
+    {
+     "index": [
+      0,
+      18
+     ],
+     "start": "0x453904",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4536606,
+        "kind": "ICON",
+        "args": [
+         "chairkit",
+         "esi"
+        ]
+       },
+       {
+        "a": 4536655,
+        "kind": "GOTO",
+        "obj": "lir/stoolkit"
+       }
+      ],
+      "next": 19
+     }
+    },
+    {
+     "index": [
+      1
+     ],
+     "start": "0x452017",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4530225,
+        "kind": "ICON",
+        "args": [
+         "valve",
+         "esi"
+        ]
+       },
+       {
+        "a": 4530274,
+        "kind": "GOTO",
+        "obj": "bas/valve_on"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x452074",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4530301,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         2
+        ]
+       },
+       {
+        "a": 4530377,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x180]",
+         "bas/valve_on"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4530377,
+       "fn": "fcn.00479ff0",
+       "variant": "bas/valve_on"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4530435,
+         "kind": "ACTION",
+         "obj": "bas/valve_on",
+         "act": "switch_off"
+        },
+        {
+         "a": 4530508,
+         "kind": "SWITCH",
+         "args": [
+          "bas/valve_on",
+          "bas/valve_off"
+         ]
+        },
+        {
+         "a": 4530568,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4530638,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        }
+       ],
+       "next": 7
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x452774",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4532110,
+        "kind": "ICON",
+        "args": [
+         "basin",
+         "esi"
+        ]
+       },
+       {
+        "a": 4532159,
+        "kind": "GOTO",
+        "obj": "toi/basin_flooded"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x4527d0",
+     "paths": 4,
+     "tree": {
+      "steps": [
+       {
+        "a": 4532182,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         4
+        ]
+       },
+       {
+        "a": 4532270,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x180]",
+         "toi/basin",
+         "toi/basin_flooded"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4532270,
+       "fn": "fcn.0047a130",
+       "variant": "toi/basin_flooded"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4532299,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4532397,
+         "kind": "ACTION",
+         "obj": "toi/basin_flooded",
+         "act": "repair"
+        },
+        {
+         "a": 4532473,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "toi/basin_flooded",
+          2
+         ]
+        },
+        {
+         "a": 4532682,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "bas/valve_fixed"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4532682,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_fixed"
+       },
+       "true": {
+        "steps": [],
+        "next": 11
+       },
+       "false": {
+        "steps": [],
+        "next": 5
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4532573,
+         "kind": "ACTION",
+         "obj": "toi/basin",
+         "act": "repair"
+        },
+        {
+         "a": 4532682,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "bas/valve_fixed"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4532682,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_fixed"
+       },
+       "true": {
+        "steps": [],
+        "next": 11
+       },
+       "false": {
+        "steps": [],
+        "next": 5
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x4529ef",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4532745,
+        "kind": "ICON",
+        "args": [
+         "valve",
+         "esi"
+        ]
+       },
+       {
+        "a": 4532808,
+        "kind": "GOTO",
+        "obj": "bas/valve_off"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x452a5a",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4532845,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         6
+        ]
+       },
+       {
+        "a": 4533494,
+        "kind": "OBJ3",
+        "args": [
+         "ebp"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4533494,
+       "fn": "fcn.00479ff0",
+       "variant": "bas/valve_off"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4533552,
+         "kind": "ACTION",
+         "obj": "bas/valve_off",
+         "act": "switch_on"
+        },
+        {
+         "a": 4533625,
+         "kind": "SWITCH",
+         "args": [
+          "bas/valve_off",
+          "bas/valve_on"
+         ]
+        },
+        {
+         "a": 4533688,
+         "kind": "MSG"
+        }
+       ],
+       "next": 11
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4533761,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        }
+       ],
+       "next": 11
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x452233",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4530765,
+        "kind": "ICON",
+        "args": [
+         "heater",
+         "esi"
+        ]
+       },
+       {
+        "a": 4530814,
+        "kind": "GOTO",
+        "obj": "kit/heater"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x452290",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4530838,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         8
+        ]
+       },
+       {
+        "a": 4530926,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x180]",
+         "kit/heater",
+         "kit/heater_hot"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4530926,
+       "fn": "fcn.0047a130",
+       "variant": "kit/heater_hot"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4530955,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4531050,
+         "kind": "ACTION",
+         "obj": "kit/heater_hot",
+         "act": "vent"
+        },
+        {
+         "a": 4531126,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/heater_hot",
+          2
+         ]
+        }
+       ],
+       "next": 9
+      },
+      "false": {
+       "steps": [],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x45246e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4531336,
+        "kind": "ICON",
+        "args": [
+         "heat_valve",
+         "dword [esp + 0x18]"
+        ]
+       },
+       {
+        "a": 4531392,
+        "kind": "GOTO",
+        "obj": "bas/heatvalve_off"
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x4524d2",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4531431,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         10
+        ]
+       },
+       {
+        "a": 4531504,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x188]",
+         "bas/heatvalve_on"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4531504,
+       "fn": "fcn.00479ff0",
+       "variant": "bas/heatvalve_on"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4531562,
+         "kind": "ACTION",
+         "obj": "bas/heatvalve_on",
+         "act": "switch_off"
+        },
+        {
+         "a": 4531632,
+         "kind": "SWITCH",
+         "args": [
+          "bas/heatvalve_on",
+          "bas/heatvalve_fixed"
+         ]
+        },
+        {
+         "a": 4531692,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4531765,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        },
+        {
+         "a": 4531860,
+         "kind": "ACTION",
+         "obj": "bas/heatvalve_off",
+         "act": "switch_off"
+        },
+        {
+         "a": 4531926,
+         "kind": "SWITCH",
+         "args": [
+          "bas/heatvalve_off",
+          "bas/heatvalve_fixed"
+         ]
+        },
+        {
+         "a": 4531986,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x452e66",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4533888,
+        "kind": "ICON",
+        "args": [
+         "fuse",
+         "esi"
+        ]
+       },
+       {
+        "a": 4533937,
+        "kind": "GOTO",
+        "obj": "anc/fuse"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x452ec3",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4533964,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         12
+        ]
+       },
+       {
+        "a": 4534040,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x180]",
+         "anc/fuse"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4534040,
+       "fn": "fcn.00479ff0",
+       "variant": "anc/fuse"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4534098,
+         "kind": "ACTION",
+         "obj": "anc/fuse",
+         "act": "get_fuse"
+        },
+        {
+         "a": 4534171,
+         "kind": "SWITCH",
+         "args": [
+          "anc/fuse",
+          "anc/no_fuse"
+         ]
+        },
+        {
+         "a": 4534234,
+         "kind": "MSG"
+        }
+       ],
+       "next": 13
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4534307,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        }
+       ],
+       "next": 13
+      }
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x453088",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4534434,
+        "kind": "ICON",
+        "args": [
+         "ladder",
+         "esi"
+        ]
+       },
+       {
+        "a": 4534498,
+        "kind": "GOTOENTER",
+        "obj": "wor/ladder"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x4530f4",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4534562,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x18c]",
+         "wor/ladder",
+         "wor/ladder_cut"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4534562,
+       "fn": "fcn.0047a130",
+       "variant": "wor/ladder_cut"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4534584,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          "esi"
+         ]
+        },
+        {
+         "a": 4534639,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4534712,
+         "kind": "GOTO2",
+         "obj": "addr"
+        },
+        {
+         "a": 4534877,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "wor/ladder_cut",
+          0
+         ]
+        },
+        {
+         "a": 4534992,
+         "kind": "REPAIR",
+         "args": [
+          "dword [esp + 0x198]",
+          "ebp",
+          "esi",
+          "wor/ladder_cut"
+         ]
+        },
+        {
+         "a": 4535032,
+         "kind": "ENTER",
+         "obj": "wor/ladder"
+        }
+       ],
+       "next": 15
+      },
+      "false": {
+       "steps": [],
+       "next": 15
+      }
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x453358",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4535134,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         15
+        ]
+       },
+       {
+        "a": 4535207,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x180]",
+         "anc/fuse"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4535207,
+       "fn": "fcn.00479ff0",
+       "variant": "anc/fuse"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4535233,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4535325,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "drill"
+        },
+        {
+         "a": 4535413,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "touch_electricity"
+        },
+        {
+         "a": 4535501,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "climb_down"
+        },
+        {
+         "a": 4535589,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "wheeze"
+        },
+        {
+         "a": 4535665,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "anc/fuse",
+          2
+         ]
+        }
+       ],
+       "next": 16
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4535749,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "drill"
+        },
+        {
+         "a": 4535844,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "touch"
+        },
+        {
+         "a": 4535938,
+         "kind": "ACTION",
+         "obj": "wor/ladder",
+         "act": "climb_down"
+        }
+       ],
+       "next": 16
+      }
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x4536e3",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4536061,
+        "kind": "ICON",
+        "args": [
+         "fuse",
+         "esi"
+        ]
+       },
+       {
+        "a": 4536110,
+        "kind": "GOTO",
+        "obj": "anc/fuse"
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x453740",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4536137,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         17
+        ]
+       },
+       {
+        "a": 4536213,
+        "kind": "OBJ3",
+        "args": [
+         "dword [esp + 0x180]",
+         "anc/fuse"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4536213,
+       "fn": "fcn.00479ff0",
+       "variant": "anc/fuse"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4536267,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        }
+       ],
+       "next": 18
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4536347,
+         "kind": "ACTION",
+         "obj": "anc/no_fuse",
+         "act": "put_fuse"
+        },
+        {
+         "a": 4536420,
+         "kind": "SWITCH",
+         "args": [
+          "anc/no_fuse",
+          "anc/fuse"
+         ]
+        },
+        {
+         "a": 4536483,
+         "kind": "MSG"
+        }
+       ],
+       "next": 18
+      }
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x453961",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4536682,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         19
+        ]
+       },
+       {
+        "a": 4536773,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x180]",
+         "lir/stoolkit",
+         "lir/stoolkit_pain"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4536773,
+       "fn": "fcn.0047a130",
+       "variant": "lir/stoolkit_pain"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4536802,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4536900,
+         "kind": "ACTION",
+         "obj": "lir/pieces",
+         "act": "assemble_electrochair"
+        },
+        {
+         "a": 4536979,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/stoolkit_pain",
+          0
+         ]
+        },
+        {
+         "a": 4537073,
+         "kind": "ACTION",
+         "obj": "lir/pieces",
+         "act": "disassemble"
+        },
+        {
+         "a": 4537191,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x198]",
+          "esi",
+          "lir/stoolkit_pain"
+         ]
+        }
+       ],
+       "next": 20
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4537246,
+         "kind": "ACTION",
+         "obj": "lir/pieces",
+         "act": "assemble"
+        },
+        {
+         "a": 4537344,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "surprise"
+        }
+       ],
+       "next": 20
+      }
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x453c61",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4537467,
+        "kind": "ICON",
+        "args": [
+         "powertool",
+         "esi"
+        ]
+       },
+       {
+        "a": 4537516,
+        "kind": "GOTO",
+        "obj": "bal/anglegrinder"
+       }
+      ],
+      "next": 21
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x453cbe",
+     "paths": 4,
+     "tree": {
+      "steps": [
+       {
+        "a": 4537543,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "esi",
+         21
+        ]
+       },
+       {
+        "a": 4537695,
+        "kind": "ACTION",
+        "obj": "dword [esp + 0x1c]",
+        "act": "take"
+       },
+       {
+        "a": 4537764,
+        "kind": "OBJ1",
+        "args": [
+         "addr"
+        ]
+       },
+       {
+        "a": 4537828,
+        "kind": "MSG"
+       },
+       {
+        "a": 4537909,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x14]",
+         "bal/anglegrinder_manipulated"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4537909,
+       "fn": "fcn.00413780",
+       "variant": "bal/anglegrinder_manipulated"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4537938,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4538033,
+         "kind": "ACTION",
+         "obj": "bal/anglegrinder_manipulated",
+         "act": "grind"
+        },
+        {
+         "a": 4538113,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bal/anglegrinder_manipulated",
+          0
+         ]
+        },
+        {
+         "a": 4538208,
+         "kind": "ACTION",
+         "obj": "bal/anglegrinder_manipulated",
+         "act": "give"
+        },
+        {
+         "a": 4538342,
+         "kind": "MSG"
+        },
+        {
+         "a": 4538461,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x198]",
+          "esi",
+          "bal/anglegrinder_manipulated"
+         ]
+        },
+        {
+         "a": 4538854,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "bas/valve_fixed"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4538854,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_fixed"
+       },
+       "true": {
+        "steps": [],
+        "next": 7
+       },
+       "false": {
+        "steps": [],
+        "next": 1
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4538516,
+         "kind": "ACTION",
+         "obj": "bal/anglegrinder",
+         "act": "grind"
+        },
+        {
+         "a": 4538611,
+         "kind": "ACTION",
+         "obj": "bal/anglegrinder",
+         "act": "give"
+        },
+        {
+         "a": 4538745,
+         "kind": "MSG"
+        },
+        {
+         "a": 4538854,
+         "kind": "OBJ3",
+         "args": [
+          "ebp",
+          "bas/valve_fixed"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4538854,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_fixed"
+       },
+       "true": {
+        "steps": [],
+        "next": 7
+       },
+       "false": {
+        "steps": [],
+        "next": 1
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x45421e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4538936,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "esi"
+        ]
+       }
+      ],
+      "next": 23
+     }
+    },
+    {
+     "index": [
+      23
+     ],
+     "start": "0x4542c8",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 24
+     }
+    },
+    {
+     "index": [
+      24
+     ],
+     "start": "0x454306",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      25
+     ],
+     "start": "0x452001",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x45391e": {
+     "a": 4536606,
+     "kind": "ICON",
+     "args": [
+      "chairkit",
+      "esi"
+     ]
+    },
+    "0x45394f": {
+     "a": 4536655,
+     "kind": "GOTO",
+     "obj": "lir/stoolkit"
+    },
+    "0x452031": {
+     "a": 4530225,
+     "kind": "ICON",
+     "args": [
+      "valve",
+      "esi"
+     ]
+    },
+    "0x452062": {
+     "a": 4530274,
+     "kind": "GOTO",
+     "obj": "bas/valve_on"
+    },
+    "0x45207d": {
+     "a": 4530301,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      2
+     ]
+    },
+    "0x4520c9": {
+     "a": 4530377,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x180]",
+      "bas/valve_on"
+     ]
+    },
+    "0x4521ce": {
+     "a": 4530638,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x452103": {
+     "a": 4530435,
+     "kind": "ACTION",
+     "obj": "bas/valve_on",
+     "act": "switch_off"
+    },
+    "0x45214c": {
+     "a": 4530508,
+     "kind": "SWITCH",
+     "args": [
+      "bas/valve_on",
+      "bas/valve_off"
+     ]
+    },
+    "0x452188": {
+     "a": 4530568,
+     "kind": "MSG"
+    },
+    "0x45278e": {
+     "a": 4532110,
+     "kind": "ICON",
+     "args": [
+      "basin",
+      "esi"
+     ]
+    },
+    "0x4527bf": {
+     "a": 4532159,
+     "kind": "GOTO",
+     "obj": "toi/basin_flooded"
+    },
+    "0x4527d6": {
+     "a": 4532182,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      4
+     ]
+    },
+    "0x45282e": {
+     "a": 4532270,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x180]",
+      "toi/basin",
+      "toi/basin_flooded"
+     ]
+    },
+    "0x45284b": {
+     "a": 4532299,
+     "kind": "STOPMSG"
+    },
+    "0x4528ad": {
+     "a": 4532397,
+     "kind": "ACTION",
+     "obj": "toi/basin_flooded",
+     "act": "repair"
+    },
+    "0x4528f9": {
+     "a": 4532473,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "toi/basin_flooded",
+      2
+     ]
+    },
+    "0x4529ca": {
+     "a": 4532682,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "bas/valve_fixed"
+     ]
+    },
+    "0x45295d": {
+     "a": 4532573,
+     "kind": "ACTION",
+     "obj": "toi/basin",
+     "act": "repair"
+    },
+    "0x452a09": {
+     "a": 4532745,
+     "kind": "ICON",
+     "args": [
+      "valve",
+      "esi"
+     ]
+    },
+    "0x452a48": {
+     "a": 4532808,
+     "kind": "GOTO",
+     "obj": "bas/valve_off"
+    },
+    "0x452a6d": {
+     "a": 4532845,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      6
+     ]
+    },
+    "0x452cf6": {
+     "a": 4533494,
+     "kind": "OBJ3",
+     "args": [
+      "ebp"
+     ]
+    },
+    "0x452e01": {
+     "a": 4533761,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x452d30": {
+     "a": 4533552,
+     "kind": "ACTION",
+     "obj": "bas/valve_off",
+     "act": "switch_on"
+    },
+    "0x452d79": {
+     "a": 4533625,
+     "kind": "SWITCH",
+     "args": [
+      "bas/valve_off",
+      "bas/valve_on"
+     ]
+    },
+    "0x452db8": {
+     "a": 4533688,
+     "kind": "MSG"
+    },
+    "0x45224d": {
+     "a": 4530765,
+     "kind": "ICON",
+     "args": [
+      "heater",
+      "esi"
+     ]
+    },
+    "0x45227e": {
+     "a": 4530814,
+     "kind": "GOTO",
+     "obj": "kit/heater"
+    },
+    "0x452296": {
+     "a": 4530838,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      8
+     ]
+    },
+    "0x4522ee": {
+     "a": 4530926,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x180]",
+      "kit/heater",
+      "kit/heater_hot"
+     ]
+    },
+    "0x45230b": {
+     "a": 4530955,
+     "kind": "STOPMSG"
+    },
+    "0x45236a": {
+     "a": 4531050,
+     "kind": "ACTION",
+     "obj": "kit/heater_hot",
+     "act": "vent"
+    },
+    "0x4523b6": {
+     "a": 4531126,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/heater_hot",
+      2
+     ]
+    },
+    "0x452488": {
+     "a": 4531336,
+     "kind": "ICON",
+     "args": [
+      "heat_valve",
+      "dword [esp + 0x18]"
+     ]
+    },
+    "0x4524c0": {
+     "a": 4531392,
+     "kind": "GOTO",
+     "obj": "bas/heatvalve_off"
+    },
+    "0x4524e7": {
+     "a": 4531431,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      10
+     ]
+    },
+    "0x452530": {
+     "a": 4531504,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x188]",
+      "bas/heatvalve_on"
+     ]
+    },
+    "0x452635": {
+     "a": 4531765,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x452694": {
+     "a": 4531860,
+     "kind": "ACTION",
+     "obj": "bas/heatvalve_off",
+     "act": "switch_off"
+    },
+    "0x4526d6": {
+     "a": 4531926,
+     "kind": "SWITCH",
+     "args": [
+      "bas/heatvalve_off",
+      "bas/heatvalve_fixed"
+     ]
+    },
+    "0x452712": {
+     "a": 4531986,
+     "kind": "MSG"
+    },
+    "0x45256a": {
+     "a": 4531562,
+     "kind": "ACTION",
+     "obj": "bas/heatvalve_on",
+     "act": "switch_off"
+    },
+    "0x4525b0": {
+     "a": 4531632,
+     "kind": "SWITCH",
+     "args": [
+      "bas/heatvalve_on",
+      "bas/heatvalve_fixed"
+     ]
+    },
+    "0x4525ec": {
+     "a": 4531692,
+     "kind": "MSG"
+    },
+    "0x452e80": {
+     "a": 4533888,
+     "kind": "ICON",
+     "args": [
+      "fuse",
+      "esi"
+     ]
+    },
+    "0x452eb1": {
+     "a": 4533937,
+     "kind": "GOTO",
+     "obj": "anc/fuse"
+    },
+    "0x452ecc": {
+     "a": 4533964,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      12
+     ]
+    },
+    "0x452f18": {
+     "a": 4534040,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x180]",
+      "anc/fuse"
+     ]
+    },
+    "0x452f52": {
+     "a": 4534098,
+     "kind": "ACTION",
+     "obj": "anc/fuse",
+     "act": "get_fuse"
+    },
+    "0x452f9b": {
+     "a": 4534171,
+     "kind": "SWITCH",
+     "args": [
+      "anc/fuse",
+      "anc/no_fuse"
+     ]
+    },
+    "0x452fda": {
+     "a": 4534234,
+     "kind": "MSG"
+    },
+    "0x453023": {
+     "a": 4534307,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x4530a2": {
+     "a": 4534434,
+     "kind": "ICON",
+     "args": [
+      "ladder",
+      "esi"
+     ]
+    },
+    "0x4530e2": {
+     "a": 4534498,
+     "kind": "GOTOENTER",
+     "obj": "wor/ladder"
+    },
+    "0x453122": {
+     "a": 4534562,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x18c]",
+      "wor/ladder",
+      "wor/ladder_cut"
+     ]
+    },
+    "0x453138": {
+     "a": 4534584,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi"
+     ]
+    },
+    "0x45316f": {
+     "a": 4534639,
+     "kind": "STOPMSG"
+    },
+    "0x4531b8": {
+     "a": 4534712,
+     "kind": "GOTO2",
+     "obj": "addr"
+    },
+    "0x45325d": {
+     "a": 4534877,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "wor/ladder_cut",
+      0
+     ]
+    },
+    "0x4532d0": {
+     "a": 4534992,
+     "kind": "REPAIR",
+     "args": [
+      "dword [esp + 0x198]",
+      "ebp",
+      "esi",
+      "wor/ladder_cut"
+     ]
+    },
+    "0x4532f8": {
+     "a": 4535032,
+     "kind": "ENTER",
+     "obj": "wor/ladder"
+    },
+    "0x45335e": {
+     "a": 4535134,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      15
+     ]
+    },
+    "0x4533a7": {
+     "a": 4535207,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x180]",
+      "anc/fuse"
+     ]
+    },
+    "0x4533c1": {
+     "a": 4535233,
+     "kind": "STOPMSG"
+    },
+    "0x45341d": {
+     "a": 4535325,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "drill"
+    },
+    "0x453475": {
+     "a": 4535413,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "touch_electricity"
+    },
+    "0x4534cd": {
+     "a": 4535501,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "climb_down"
+    },
+    "0x453525": {
+     "a": 4535589,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "wheeze"
+    },
+    "0x453571": {
+     "a": 4535665,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/fuse",
+      2
+     ]
+    },
+    "0x4535c5": {
+     "a": 4535749,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "drill"
+    },
+    "0x453624": {
+     "a": 4535844,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "touch"
+    },
+    "0x453682": {
+     "a": 4535938,
+     "kind": "ACTION",
+     "obj": "wor/ladder",
+     "act": "climb_down"
+    },
+    "0x4536fd": {
+     "a": 4536061,
+     "kind": "ICON",
+     "args": [
+      "fuse",
+      "esi"
+     ]
+    },
+    "0x45372e": {
+     "a": 4536110,
+     "kind": "GOTO",
+     "obj": "anc/fuse"
+    },
+    "0x453749": {
+     "a": 4536137,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      17
+     ]
+    },
+    "0x453795": {
+     "a": 4536213,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x180]",
+      "anc/fuse"
+     ]
+    },
+    "0x4537cb": {
+     "a": 4536267,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x45381b": {
+     "a": 4536347,
+     "kind": "ACTION",
+     "obj": "anc/no_fuse",
+     "act": "put_fuse"
+    },
+    "0x453864": {
+     "a": 4536420,
+     "kind": "SWITCH",
+     "args": [
+      "anc/no_fuse",
+      "anc/fuse"
+     ]
+    },
+    "0x4538a3": {
+     "a": 4536483,
+     "kind": "MSG"
+    },
+    "0x45396a": {
+     "a": 4536682,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      19
+     ]
+    },
+    "0x4539c5": {
+     "a": 4536773,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x180]",
+      "lir/stoolkit",
+      "lir/stoolkit_pain"
+     ]
+    },
+    "0x4539e2": {
+     "a": 4536802,
+     "kind": "STOPMSG"
+    },
+    "0x453a44": {
+     "a": 4536900,
+     "kind": "ACTION",
+     "obj": "lir/pieces",
+     "act": "assemble_electrochair"
+    },
+    "0x453a93": {
+     "a": 4536979,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/stoolkit_pain",
+      0
+     ]
+    },
+    "0x453af1": {
+     "a": 4537073,
+     "kind": "ACTION",
+     "obj": "lir/pieces",
+     "act": "disassemble"
+    },
+    "0x453b67": {
+     "a": 4537191,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x198]",
+      "esi",
+      "lir/stoolkit_pain"
+     ]
+    },
+    "0x453b9e": {
+     "a": 4537246,
+     "kind": "ACTION",
+     "obj": "lir/pieces",
+     "act": "assemble"
+    },
+    "0x453c00": {
+     "a": 4537344,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x453c7b": {
+     "a": 4537467,
+     "kind": "ICON",
+     "args": [
+      "powertool",
+      "esi"
+     ]
+    },
+    "0x453cac": {
+     "a": 4537516,
+     "kind": "GOTO",
+     "obj": "bal/anglegrinder"
+    },
+    "0x453cc7": {
+     "a": 4537543,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "esi",
+      21
+     ]
+    },
+    "0x453d5f": {
+     "a": 4537695,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x1c]",
+     "act": "take"
+    },
+    "0x453da4": {
+     "a": 4537764,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x453de4": {
+     "a": 4537828,
+     "kind": "MSG"
+    },
+    "0x453e35": {
+     "a": 4537909,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x14]",
+      "bal/anglegrinder_manipulated"
+     ]
+    },
+    "0x453e52": {
+     "a": 4537938,
+     "kind": "STOPMSG"
+    },
+    "0x453eb1": {
+     "a": 4538033,
+     "kind": "ACTION",
+     "obj": "bal/anglegrinder_manipulated",
+     "act": "grind"
+    },
+    "0x453f01": {
+     "a": 4538113,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/anglegrinder_manipulated",
+      0
+     ]
+    },
+    "0x453f60": {
+     "a": 4538208,
+     "kind": "ACTION",
+     "obj": "bal/anglegrinder_manipulated",
+     "act": "give"
+    },
+    "0x453fe6": {
+     "a": 4538342,
+     "kind": "MSG"
+    },
+    "0x45405d": {
+     "a": 4538461,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x198]",
+      "esi",
+      "bal/anglegrinder_manipulated"
+     ]
+    },
+    "0x4541e6": {
+     "a": 4538854,
+     "kind": "OBJ3",
+     "args": [
+      "ebp",
+      "bas/valve_fixed"
+     ]
+    },
+    "0x454094": {
+     "a": 4538516,
+     "kind": "ACTION",
+     "obj": "bal/anglegrinder",
+     "act": "grind"
+    },
+    "0x4540f3": {
+     "a": 4538611,
+     "kind": "ACTION",
+     "obj": "bal/anglegrinder",
+     "act": "give"
+    },
+    "0x454179": {
+     "a": 4538745,
+     "kind": "MSG"
+    },
+    "0x454238": {
+     "a": 4538936,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "esi"
+     ]
+    }
+   }
+  }
+ ]
+}

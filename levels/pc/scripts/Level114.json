@@ -1,0 +1,3598 @@
+{
+ "level": 114,
+ "folder": "level_hunter",
+ "tricked": [
+  "bal/balloonhorn",
+  "bas/gun_loaded",
+  "bas/gun_loaded_plugged",
+  "bed/medalbox_rat",
+  "bed/stickyhat",
+  "kit/blackpolish",
+  "lir/phono_nail",
+  "lir/tabacbox_explosive"
+ ],
+ "classes": [
+  {
+   "class": "0x4659ec",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x465a09",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4610595,
+        "kind": "ICON",
+        "args": [
+         "polish",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4610644,
+        "kind": "GOTO",
+        "obj": "kit/polish"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x465a66",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4610756,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4610756,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4610774,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4610860,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4610929,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4610993,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4610774,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4610860,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4610929,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4610993,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x465c19",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4611121,
+        "kind": "ICON",
+        "args": [
+         "cups",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4611177,
+        "kind": "GOTO",
+        "obj": "wor/cups"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x465c7a",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4611200,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4611741,
+        "kind": "ACTION",
+        "obj": "wor/cups",
+        "act": "polish"
+       }
+      ],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x465f05",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4611871,
+        "kind": "ICON",
+        "args": [
+         "polish",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4611920,
+        "kind": "GOTO",
+        "obj": "kit/polish"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x465f62",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4611947,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         6
+        ]
+       },
+       {
+        "a": 4612031,
+        "kind": "ACTION",
+        "obj": "kit/polish",
+        "act": "give"
+       },
+       {
+        "a": 4612161,
+        "kind": "MSG"
+       }
+      ],
+      "next": 7
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x4660a6",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4612286,
+        "kind": "ICON",
+        "args": [
+         "smoke",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x466162",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4612456,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4612540,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "give"
+       },
+       {
+        "a": 4612670,
+        "kind": "MSG"
+       }
+      ],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x4662a6",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4612800,
+        "kind": "ICON",
+        "args": [
+         "phonograph",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4612849,
+        "kind": "GOTO",
+        "obj": "lir/lockedphono"
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x466303",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4612873,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         10
+        ]
+       },
+       {
+        "a": 4612957,
+        "kind": "ACTION",
+        "obj": "lir/lockedphono",
+        "act": "open"
+       },
+       {
+        "a": 4613030,
+        "kind": "SWITCH",
+        "args": [
+         "lir/lockedphono",
+         "lir/phono_open"
+        ]
+       },
+       {
+        "a": 4613090,
+        "kind": "MSG"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x46644a",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4613220,
+        "kind": "ICON",
+        "args": [
+         "records",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4613269,
+        "kind": "GOTO",
+        "obj": "lir/records"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x4664a7",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 13
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x4664fa",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4613396,
+        "kind": "ICON",
+        "args": [
+         "phonograph",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4613445,
+        "kind": "GOTO",
+        "obj": "lir/phono_open"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x466557",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4613472,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         14
+        ]
+       },
+       {
+        "a": 4613611,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4613611,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4613640,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4613737,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "put_record"
+        },
+        {
+         "a": 4613832,
+         "kind": "ACTION",
+         "obj": "lir/phono_nail",
+         "act": "play"
+        },
+        {
+         "a": 4613912,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/phono_nail",
+          0
+         ]
+        },
+        {
+         "a": 4614031,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x1e4]",
+          "esi",
+          "lir/phono_nail"
+         ]
+        },
+        {
+         "a": 4614081,
+         "kind": "ACTION",
+         "obj": "lir/phono_open",
+         "act": "close"
+        },
+        {
+         "a": 4614151,
+         "kind": "SWITCH",
+         "args": [
+          "lir/phono_open",
+          "lir/lockedphono"
+         ]
+        },
+        {
+         "a": 4614215,
+         "kind": "MSG"
+        }
+       ],
+       "next": 15
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4614300,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "put_record"
+        },
+        {
+         "a": 4614374,
+         "kind": "SWITCH",
+         "args": [
+          "lir/phono_open",
+          "lir/phono_play"
+         ]
+        },
+        {
+         "a": 4614438,
+         "kind": "MSG"
+        }
+       ],
+       "next": 15
+      }
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x46698f",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4614569,
+        "kind": "ICON",
+        "args": [
+         "smoke",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4614618,
+        "kind": "GOTO",
+        "obj": "lir/tabacbox"
+       }
+      ],
+      "next": 16
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x4669ec",
+     "paths": 4,
+     "tree": {
+      "steps": [
+       {
+        "a": 4614645,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         16
+        ]
+       },
+       {
+        "a": 4614784,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4614784,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4614813,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4614910,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4614975,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4615039,
+         "kind": "MSG"
+        },
+        {
+         "a": 4615134,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "smokepipe_explosive"
+        },
+        {
+         "a": 4615214,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/tabacbox_explosive",
+          0
+         ]
+        },
+        {
+         "a": 4615650,
+         "kind": "OBJ3",
+         "args": [
+          "dword [esp + 0x1d4]",
+          "lir/phono_play"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4615650,
+        "fn": "fcn.00479ff0",
+        "variant": "lir/phono_play"
+       },
+       "true": {
+        "steps": [],
+        "next": 17
+       },
+       "false": {
+        "steps": [],
+        "next": 19
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4615299,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4615368,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4615432,
+         "kind": "MSG"
+        },
+        {
+         "a": 4615527,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "smokepipe"
+        },
+        {
+         "a": 4615650,
+         "kind": "OBJ3",
+         "args": [
+          "dword [esp + 0x1d4]",
+          "lir/phono_play"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4615650,
+        "fn": "fcn.00479ff0",
+        "variant": "lir/phono_play"
+       },
+       "true": {
+        "steps": [],
+        "next": 17
+       },
+       "false": {
+        "steps": [],
+        "next": 19
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x466e08",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4615714,
+        "kind": "ICON",
+        "args": [
+         "phonograph",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4615763,
+        "kind": "GOTO",
+        "obj": "lir/phono_play"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x466e65",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4615790,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         18
+        ]
+       },
+       {
+        "a": 4615877,
+        "kind": "ACTION",
+        "obj": "lir/phono_play",
+        "act": "close"
+       },
+       {
+        "a": 4615950,
+        "kind": "SWITCH",
+        "args": [
+         "lir/phono_play",
+         "lir/lockedphono"
+        ]
+       },
+       {
+        "a": 4616010,
+        "kind": "MSG"
+       }
+      ],
+      "next": 19
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x466faf",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4616137,
+        "kind": "ICON",
+        "args": [
+         "gun",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4616186,
+        "kind": "GOTO",
+        "obj": "bas/gun"
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x46700c",
+     "paths": 25,
+     "tree": {
+      "steps": [
+       {
+        "a": 4616213,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         20
+        ]
+       },
+       {
+        "a": 4608803,
+        "kind": "OBJ3",
+        "args": []
+       }
+      ],
+      "test": {
+       "a": 4608803,
+       "fn": "fcn.00479ff0",
+       "variant": "bas/gun"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4616344,
+         "kind": "IFTRICKED",
+         "args": [
+          "dword [esp + 0x20]",
+          "bas/gun_loaded"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4616344,
+        "fn": "fcn.00413780",
+        "variant": "bas/gun_loaded"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4616373,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4616467,
+          "kind": "ACTION",
+          "obj": "dword [esp + 0x28]",
+          "act": "take"
+         },
+         {
+          "a": 4616526,
+          "kind": "OBJ1",
+          "args": [
+           "addr"
+          ]
+         },
+         {
+          "a": 4616584,
+          "kind": "MSG"
+         },
+         {
+          "a": 4616673,
+          "kind": "ACTION",
+          "obj": "neighbor",
+          "act": "shoot_loaded"
+         },
+         {
+          "a": 4616747,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "bas/gun_loaded",
+           0
+          ]
+         },
+         {
+          "a": 4617750,
+          "kind": "ACTION",
+          "obj": "neighbor",
+          "act": "give"
+         },
+         {
+          "a": 4617884,
+          "kind": "MSG"
+         }
+        ],
+        "next": 21
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4616844,
+          "kind": "IFTRICKED",
+          "args": [
+           "dword [esp + 0x20]",
+           "bas/gun_loaded_plugged"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4616844,
+         "fn": "fcn.00413780",
+         "variant": "bas/gun_loaded_plugged"
+        },
+        "true": {
+         "steps": [
+          {
+           "a": 4616870,
+           "kind": "STOPMSG"
+          },
+          {
+           "a": 4616961,
+           "kind": "ACTION",
+           "obj": "dword [esp + 0x28]",
+           "act": "take"
+          },
+          {
+           "a": 4617020,
+           "kind": "OBJ1",
+           "args": [
+            "addr"
+           ]
+          },
+          {
+           "a": 4617078,
+           "kind": "MSG"
+          },
+          {
+           "a": 4617170,
+           "kind": "ACTION",
+           "obj": "neighbor",
+           "act": "shoot_loaded_plugged"
+          },
+          {
+           "a": 4617247,
+           "kind": "OBJ2",
+           "args": [
+            "addr",
+            "bas/gun_loaded_plugged",
+            0
+           ]
+          },
+          {
+           "a": 4617750,
+           "kind": "ACTION",
+           "obj": "neighbor",
+           "act": "give"
+          },
+          {
+           "a": 4617884,
+           "kind": "MSG"
+          }
+         ],
+         "next": 21
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4617317,
+           "kind": "IFTRICKED",
+           "args": [
+            "dword [esp + 0x20]",
+            "bas/gun"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4617317,
+          "fn": "fcn.00413780",
+          "variant": "bas/gun"
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4617427,
+            "kind": "ACTION",
+            "obj": "dword [esp + 0x28]",
+            "act": "take"
+           },
+           {
+            "a": 4617496,
+            "kind": "OBJ1",
+            "args": [
+             "addr"
+            ]
+           },
+           {
+            "a": 4617560,
+            "kind": "MSG"
+           },
+           {
+            "a": 4617655,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "shoot_klick"
+           },
+           {
+            "a": 4617750,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "give"
+           },
+           {
+            "a": 4617884,
+            "kind": "MSG"
+           }
+          ],
+          "next": 21
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4617357,
+            "kind": "IFTRICKED",
+            "args": [
+             "dword [esp + 0x20]",
+             "bas/gun_plugged"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4617357,
+           "fn": "fcn.00413780",
+           "variant": "bas/gun_plugged"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4617427,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4617496,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4617560,
+             "kind": "MSG"
+            },
+            {
+             "a": 4617655,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_klick"
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4617427,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4617496,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4617560,
+             "kind": "MSG"
+            },
+            {
+             "a": 4617655,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_klick"
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          }
+         }
+        }
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4608862,
+         "kind": "OBJ3",
+         "args": [
+          "dword [arg_20h]",
+          "bas/gun_loaded"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4608862,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/gun_loaded"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4616344,
+          "kind": "IFTRICKED",
+          "args": [
+           "dword [esp + 0x20]",
+           "bas/gun_loaded"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4616344,
+         "fn": "fcn.00413780",
+         "variant": "bas/gun_loaded"
+        },
+        "true": {
+         "steps": [
+          {
+           "a": 4616373,
+           "kind": "STOPMSG"
+          },
+          {
+           "a": 4616467,
+           "kind": "ACTION",
+           "obj": "dword [esp + 0x28]",
+           "act": "take"
+          },
+          {
+           "a": 4616526,
+           "kind": "OBJ1",
+           "args": [
+            "addr"
+           ]
+          },
+          {
+           "a": 4616584,
+           "kind": "MSG"
+          },
+          {
+           "a": 4616673,
+           "kind": "ACTION",
+           "obj": "neighbor",
+           "act": "shoot_loaded"
+          },
+          {
+           "a": 4616747,
+           "kind": "OBJ2",
+           "args": [
+            "addr",
+            "bas/gun_loaded",
+            0
+           ]
+          },
+          {
+           "a": 4617750,
+           "kind": "ACTION",
+           "obj": "neighbor",
+           "act": "give"
+          },
+          {
+           "a": 4617884,
+           "kind": "MSG"
+          }
+         ],
+         "next": 21
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4616844,
+           "kind": "IFTRICKED",
+           "args": [
+            "dword [esp + 0x20]",
+            "bas/gun_loaded_plugged"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4616844,
+          "fn": "fcn.00413780",
+          "variant": "bas/gun_loaded_plugged"
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4616870,
+            "kind": "STOPMSG"
+           },
+           {
+            "a": 4616961,
+            "kind": "ACTION",
+            "obj": "dword [esp + 0x28]",
+            "act": "take"
+           },
+           {
+            "a": 4617020,
+            "kind": "OBJ1",
+            "args": [
+             "addr"
+            ]
+           },
+           {
+            "a": 4617078,
+            "kind": "MSG"
+           },
+           {
+            "a": 4617170,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "shoot_loaded_plugged"
+           },
+           {
+            "a": 4617247,
+            "kind": "OBJ2",
+            "args": [
+             "addr",
+             "bas/gun_loaded_plugged",
+             0
+            ]
+           },
+           {
+            "a": 4617750,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "give"
+           },
+           {
+            "a": 4617884,
+            "kind": "MSG"
+           }
+          ],
+          "next": 21
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4617317,
+            "kind": "IFTRICKED",
+            "args": [
+             "dword [esp + 0x20]",
+             "bas/gun"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4617317,
+           "fn": "fcn.00413780",
+           "variant": "bas/gun"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4617427,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4617496,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4617560,
+             "kind": "MSG"
+            },
+            {
+             "a": 4617655,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_klick"
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4617357,
+             "kind": "IFTRICKED",
+             "args": [
+              "dword [esp + 0x20]",
+              "bas/gun_plugged"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4617357,
+            "fn": "fcn.00413780",
+            "variant": "bas/gun_plugged"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4617427,
+              "kind": "ACTION",
+              "obj": "dword [esp + 0x28]",
+              "act": "take"
+             },
+             {
+              "a": 4617496,
+              "kind": "OBJ1",
+              "args": [
+               "addr"
+              ]
+             },
+             {
+              "a": 4617560,
+              "kind": "MSG"
+             },
+             {
+              "a": 4617655,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "shoot_klick"
+             },
+             {
+              "a": 4617750,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "give"
+             },
+             {
+              "a": 4617884,
+              "kind": "MSG"
+             }
+            ],
+            "next": 21
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4617427,
+              "kind": "ACTION",
+              "obj": "dword [esp + 0x28]",
+              "act": "take"
+             },
+             {
+              "a": 4617496,
+              "kind": "OBJ1",
+              "args": [
+               "addr"
+              ]
+             },
+             {
+              "a": 4617560,
+              "kind": "MSG"
+             },
+             {
+              "a": 4617655,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "shoot_klick"
+             },
+             {
+              "a": 4617750,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "give"
+             },
+             {
+              "a": 4617884,
+              "kind": "MSG"
+             }
+            ],
+            "next": 21
+           }
+          }
+         }
+        }
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4608918,
+          "kind": "OBJ3",
+          "args": [
+           "dword [arg_20h]",
+           "bas/gun_plugged"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4608918,
+         "fn": "fcn.00479ff0",
+         "variant": "bas/gun_plugged"
+        },
+        "true": {
+         "steps": [
+          {
+           "a": 4616344,
+           "kind": "IFTRICKED",
+           "args": [
+            "dword [esp + 0x20]",
+            "bas/gun_loaded"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4616344,
+          "fn": "fcn.00413780",
+          "variant": "bas/gun_loaded"
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4616373,
+            "kind": "STOPMSG"
+           },
+           {
+            "a": 4616467,
+            "kind": "ACTION",
+            "obj": "dword [esp + 0x28]",
+            "act": "take"
+           },
+           {
+            "a": 4616526,
+            "kind": "OBJ1",
+            "args": [
+             "addr"
+            ]
+           },
+           {
+            "a": 4616584,
+            "kind": "MSG"
+           },
+           {
+            "a": 4616673,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "shoot_loaded"
+           },
+           {
+            "a": 4616747,
+            "kind": "OBJ2",
+            "args": [
+             "addr",
+             "bas/gun_loaded",
+             0
+            ]
+           },
+           {
+            "a": 4617750,
+            "kind": "ACTION",
+            "obj": "neighbor",
+            "act": "give"
+           },
+           {
+            "a": 4617884,
+            "kind": "MSG"
+           }
+          ],
+          "next": 21
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4616844,
+            "kind": "IFTRICKED",
+            "args": [
+             "dword [esp + 0x20]",
+             "bas/gun_loaded_plugged"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4616844,
+           "fn": "fcn.00413780",
+           "variant": "bas/gun_loaded_plugged"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4616870,
+             "kind": "STOPMSG"
+            },
+            {
+             "a": 4616961,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4617020,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4617078,
+             "kind": "MSG"
+            },
+            {
+             "a": 4617170,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_loaded_plugged"
+            },
+            {
+             "a": 4617247,
+             "kind": "OBJ2",
+             "args": [
+              "addr",
+              "bas/gun_loaded_plugged",
+              0
+             ]
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4617317,
+             "kind": "IFTRICKED",
+             "args": [
+              "dword [esp + 0x20]",
+              "bas/gun"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4617317,
+            "fn": "fcn.00413780",
+            "variant": "bas/gun"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4617427,
+              "kind": "ACTION",
+              "obj": "dword [esp + 0x28]",
+              "act": "take"
+             },
+             {
+              "a": 4617496,
+              "kind": "OBJ1",
+              "args": [
+               "addr"
+              ]
+             },
+             {
+              "a": 4617560,
+              "kind": "MSG"
+             },
+             {
+              "a": 4617655,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "shoot_klick"
+             },
+             {
+              "a": 4617750,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "give"
+             },
+             {
+              "a": 4617884,
+              "kind": "MSG"
+             }
+            ],
+            "next": 21
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4617357,
+              "kind": "IFTRICKED",
+              "args": [
+               "dword [esp + 0x20]",
+               "bas/gun_plugged"
+              ]
+             }
+            ],
+            "test": {
+             "a": 4617357,
+             "fn": "fcn.00413780",
+             "variant": "bas/gun_plugged"
+            },
+            "true": {
+             "steps": [
+              {
+               "a": 4617427,
+               "kind": "ACTION",
+               "obj": "dword [esp + 0x28]",
+               "act": "take"
+              },
+              {
+               "a": 4617496,
+               "kind": "OBJ1",
+               "args": [
+                "addr"
+               ]
+              },
+              {
+               "a": 4617560,
+               "kind": "MSG"
+              },
+              {
+               "a": 4617655,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "shoot_klick"
+              },
+              {
+               "a": 4617750,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "give"
+              },
+              {
+               "a": 4617884,
+               "kind": "MSG"
+              }
+             ],
+             "next": 21
+            },
+            "false": {
+             "steps": [
+              {
+               "a": 4617427,
+               "kind": "ACTION",
+               "obj": "dword [esp + 0x28]",
+               "act": "take"
+              },
+              {
+               "a": 4617496,
+               "kind": "OBJ1",
+               "args": [
+                "addr"
+               ]
+              },
+              {
+               "a": 4617560,
+               "kind": "MSG"
+              },
+              {
+               "a": 4617655,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "shoot_klick"
+              },
+              {
+               "a": 4617750,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "give"
+              },
+              {
+               "a": 4617884,
+               "kind": "MSG"
+              }
+             ],
+             "next": 21
+            }
+           }
+          }
+         }
+        },
+        "false": {
+         "steps": [
+          {
+           "a": 4608979,
+           "kind": "OBJ3",
+           "args": [
+            "dword [arg_20h]",
+            "bas/gun_loaded_plugged",
+            "str.Level_Hunter::getGunName_:_No_gun_present"
+           ]
+          }
+         ],
+         "test": {
+          "a": 4608979,
+          "fn": "fcn.00479ff0",
+          "variant": "bas/gun_loaded_plugged"
+         },
+         "true": {
+          "steps": [
+           {
+            "a": 4616344,
+            "kind": "IFTRICKED",
+            "args": [
+             "dword [esp + 0x20]",
+             "bas/gun_loaded"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4616344,
+           "fn": "fcn.00413780",
+           "variant": "bas/gun_loaded"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4616373,
+             "kind": "STOPMSG"
+            },
+            {
+             "a": 4616467,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4616526,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4616584,
+             "kind": "MSG"
+            },
+            {
+             "a": 4616673,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_loaded"
+            },
+            {
+             "a": 4616747,
+             "kind": "OBJ2",
+             "args": [
+              "addr",
+              "bas/gun_loaded",
+              0
+             ]
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4616844,
+             "kind": "IFTRICKED",
+             "args": [
+              "dword [esp + 0x20]",
+              "bas/gun_loaded_plugged"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4616844,
+            "fn": "fcn.00413780",
+            "variant": "bas/gun_loaded_plugged"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4616870,
+              "kind": "STOPMSG"
+             },
+             {
+              "a": 4616961,
+              "kind": "ACTION",
+              "obj": "dword [esp + 0x28]",
+              "act": "take"
+             },
+             {
+              "a": 4617020,
+              "kind": "OBJ1",
+              "args": [
+               "addr"
+              ]
+             },
+             {
+              "a": 4617078,
+              "kind": "MSG"
+             },
+             {
+              "a": 4617170,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "shoot_loaded_plugged"
+             },
+             {
+              "a": 4617247,
+              "kind": "OBJ2",
+              "args": [
+               "addr",
+               "bas/gun_loaded_plugged",
+               0
+              ]
+             },
+             {
+              "a": 4617750,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "give"
+             },
+             {
+              "a": 4617884,
+              "kind": "MSG"
+             }
+            ],
+            "next": 21
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4617317,
+              "kind": "IFTRICKED",
+              "args": [
+               "dword [esp + 0x20]",
+               "bas/gun"
+              ]
+             }
+            ],
+            "test": {
+             "a": 4617317,
+             "fn": "fcn.00413780",
+             "variant": "bas/gun"
+            },
+            "true": {
+             "steps": [
+              {
+               "a": 4617427,
+               "kind": "ACTION",
+               "obj": "dword [esp + 0x28]",
+               "act": "take"
+              },
+              {
+               "a": 4617496,
+               "kind": "OBJ1",
+               "args": [
+                "addr"
+               ]
+              },
+              {
+               "a": 4617560,
+               "kind": "MSG"
+              },
+              {
+               "a": 4617655,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "shoot_klick"
+              },
+              {
+               "a": 4617750,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "give"
+              },
+              {
+               "a": 4617884,
+               "kind": "MSG"
+              }
+             ],
+             "next": 21
+            },
+            "false": {
+             "steps": [
+              {
+               "a": 4617357,
+               "kind": "IFTRICKED",
+               "args": [
+                "dword [esp + 0x20]",
+                "bas/gun_plugged"
+               ]
+              }
+             ],
+             "test": {
+              "a": 4617357,
+              "fn": "fcn.00413780",
+              "variant": "bas/gun_plugged"
+             },
+             "true": {
+              "steps": [
+               {
+                "a": 4617427,
+                "kind": "ACTION",
+                "obj": "dword [esp + 0x28]",
+                "act": "take"
+               },
+               {
+                "a": 4617496,
+                "kind": "OBJ1",
+                "args": [
+                 "addr"
+                ]
+               },
+               {
+                "a": 4617560,
+                "kind": "MSG"
+               },
+               {
+                "a": 4617655,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "shoot_klick"
+               },
+               {
+                "a": 4617750,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "give"
+               },
+               {
+                "a": 4617884,
+                "kind": "MSG"
+               }
+              ],
+              "next": 21
+             },
+             "false": {
+              "steps": [
+               {
+                "a": 4617427,
+                "kind": "ACTION",
+                "obj": "dword [esp + 0x28]",
+                "act": "take"
+               },
+               {
+                "a": 4617496,
+                "kind": "OBJ1",
+                "args": [
+                 "addr"
+                ]
+               },
+               {
+                "a": 4617560,
+                "kind": "MSG"
+               },
+               {
+                "a": 4617655,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "shoot_klick"
+               },
+               {
+                "a": 4617750,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "give"
+               },
+               {
+                "a": 4617884,
+                "kind": "MSG"
+               }
+              ],
+              "next": 21
+             }
+            }
+           }
+          }
+         },
+         "false": {
+          "steps": [
+           {
+            "a": 4616344,
+            "kind": "IFTRICKED",
+            "args": [
+             "dword [esp + 0x20]",
+             "bas/gun_loaded"
+            ]
+           }
+          ],
+          "test": {
+           "a": 4616344,
+           "fn": "fcn.00413780",
+           "variant": "bas/gun_loaded"
+          },
+          "true": {
+           "steps": [
+            {
+             "a": 4616373,
+             "kind": "STOPMSG"
+            },
+            {
+             "a": 4616467,
+             "kind": "ACTION",
+             "obj": "dword [esp + 0x28]",
+             "act": "take"
+            },
+            {
+             "a": 4616526,
+             "kind": "OBJ1",
+             "args": [
+              "addr"
+             ]
+            },
+            {
+             "a": 4616584,
+             "kind": "MSG"
+            },
+            {
+             "a": 4616673,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "shoot_loaded"
+            },
+            {
+             "a": 4616747,
+             "kind": "OBJ2",
+             "args": [
+              "addr",
+              "bas/gun_loaded",
+              0
+             ]
+            },
+            {
+             "a": 4617750,
+             "kind": "ACTION",
+             "obj": "neighbor",
+             "act": "give"
+            },
+            {
+             "a": 4617884,
+             "kind": "MSG"
+            }
+           ],
+           "next": 21
+          },
+          "false": {
+           "steps": [
+            {
+             "a": 4616844,
+             "kind": "IFTRICKED",
+             "args": [
+              "dword [esp + 0x20]",
+              "bas/gun_loaded_plugged"
+             ]
+            }
+           ],
+           "test": {
+            "a": 4616844,
+            "fn": "fcn.00413780",
+            "variant": "bas/gun_loaded_plugged"
+           },
+           "true": {
+            "steps": [
+             {
+              "a": 4616870,
+              "kind": "STOPMSG"
+             },
+             {
+              "a": 4616961,
+              "kind": "ACTION",
+              "obj": "dword [esp + 0x28]",
+              "act": "take"
+             },
+             {
+              "a": 4617020,
+              "kind": "OBJ1",
+              "args": [
+               "addr"
+              ]
+             },
+             {
+              "a": 4617078,
+              "kind": "MSG"
+             },
+             {
+              "a": 4617170,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "shoot_loaded_plugged"
+             },
+             {
+              "a": 4617247,
+              "kind": "OBJ2",
+              "args": [
+               "addr",
+               "bas/gun_loaded_plugged",
+               0
+              ]
+             },
+             {
+              "a": 4617750,
+              "kind": "ACTION",
+              "obj": "neighbor",
+              "act": "give"
+             },
+             {
+              "a": 4617884,
+              "kind": "MSG"
+             }
+            ],
+            "next": 21
+           },
+           "false": {
+            "steps": [
+             {
+              "a": 4617317,
+              "kind": "IFTRICKED",
+              "args": [
+               "dword [esp + 0x20]",
+               "bas/gun"
+              ]
+             }
+            ],
+            "test": {
+             "a": 4617317,
+             "fn": "fcn.00413780",
+             "variant": "bas/gun"
+            },
+            "true": {
+             "steps": [
+              {
+               "a": 4617427,
+               "kind": "ACTION",
+               "obj": "dword [esp + 0x28]",
+               "act": "take"
+              },
+              {
+               "a": 4617496,
+               "kind": "OBJ1",
+               "args": [
+                "addr"
+               ]
+              },
+              {
+               "a": 4617560,
+               "kind": "MSG"
+              },
+              {
+               "a": 4617655,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "shoot_klick"
+              },
+              {
+               "a": 4617750,
+               "kind": "ACTION",
+               "obj": "neighbor",
+               "act": "give"
+              },
+              {
+               "a": 4617884,
+               "kind": "MSG"
+              }
+             ],
+             "next": 21
+            },
+            "false": {
+             "steps": [
+              {
+               "a": 4617357,
+               "kind": "IFTRICKED",
+               "args": [
+                "dword [esp + 0x20]",
+                "bas/gun_plugged"
+               ]
+              }
+             ],
+             "test": {
+              "a": 4617357,
+              "fn": "fcn.00413780",
+              "variant": "bas/gun_plugged"
+             },
+             "true": {
+              "steps": [
+               {
+                "a": 4617427,
+                "kind": "ACTION",
+                "obj": "dword [esp + 0x28]",
+                "act": "take"
+               },
+               {
+                "a": 4617496,
+                "kind": "OBJ1",
+                "args": [
+                 "addr"
+                ]
+               },
+               {
+                "a": 4617560,
+                "kind": "MSG"
+               },
+               {
+                "a": 4617655,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "shoot_klick"
+               },
+               {
+                "a": 4617750,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "give"
+               },
+               {
+                "a": 4617884,
+                "kind": "MSG"
+               }
+              ],
+              "next": 21
+             },
+             "false": {
+              "steps": [
+               {
+                "a": 4617427,
+                "kind": "ACTION",
+                "obj": "dword [esp + 0x28]",
+                "act": "take"
+               },
+               {
+                "a": 4617496,
+                "kind": "OBJ1",
+                "args": [
+                 "addr"
+                ]
+               },
+               {
+                "a": 4617560,
+                "kind": "MSG"
+               },
+               {
+                "a": 4617655,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "shoot_klick"
+               },
+               {
+                "a": 4617750,
+                "kind": "ACTION",
+                "obj": "neighbor",
+                "act": "give"
+               },
+               {
+                "a": 4617884,
+                "kind": "MSG"
+               }
+              ],
+              "next": 21
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x46772d",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4618055,
+        "kind": "ICON",
+        "args": [
+         "hat",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4618104,
+        "kind": "GOTO",
+        "obj": "bed/hat"
+       }
+      ],
+      "next": 22
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x46778a",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4618131,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         22
+        ]
+       },
+       {
+        "a": 4618270,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x14]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4618270,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4618325,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x1c]",
+         "act": "take"
+        },
+        {
+         "a": 4618394,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4618458,
+         "kind": "MSG"
+        },
+        {
+         "a": 4618553,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "takehat"
+        }
+       ],
+       "next": 23
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4618325,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x1c]",
+         "act": "take"
+        },
+        {
+         "a": 4618394,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4618458,
+         "kind": "MSG"
+        },
+        {
+         "a": 4618553,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "takehat"
+        }
+       ],
+       "next": 23
+      }
+     }
+    },
+    {
+     "index": [
+      23
+     ],
+     "start": "0x4679b9",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4618690,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4618781,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x1d8]",
+         "bed/medalbox",
+         "bed/medalbox_rat"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4618781,
+       "fn": "fcn.0047a130",
+       "variant": "bed/medalbox_rat"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4618810,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4618878,
+         "kind": "OBJ1",
+         "args": [
+          "bed/medalbox_rat"
+         ]
+        },
+        {
+         "a": 4618941,
+         "kind": "MSG"
+        },
+        {
+         "a": 4619047,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "bed/medalbox_rat",
+          0,
+          "ebx",
+          "ratdance"
+         ]
+        },
+        {
+         "a": 4619179,
+         "kind": "MSG"
+        }
+       ],
+       "next": 24
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4619236,
+         "kind": "OBJ1",
+         "args": [
+          "bed/medalbox"
+         ]
+        },
+        {
+         "a": 4619299,
+         "kind": "MSG"
+        },
+        {
+         "a": 4619397,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "wearmedals"
+        },
+        {
+         "a": 4619529,
+         "kind": "MSG"
+        }
+       ],
+       "next": 24
+      }
+     }
+    },
+    {
+     "index": [
+      24
+     ],
+     "start": "0x467d71",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4609737,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         "edi"
+        ]
+       },
+       {
+        "a": 4610050,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "putbackhat"
+       },
+       {
+        "a": 4610136,
+        "kind": "ACTION",
+        "obj": "bed/hat",
+        "act": "give"
+       },
+       {
+        "a": 4610256,
+        "kind": "MSG"
+       },
+       {
+        "a": 4610313,
+        "kind": "STOPMSG"
+       }
+      ],
+      "next": 25
+     }
+    },
+    {
+     "index": [
+      25
+     ],
+     "start": "0x467da5",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4619711,
+        "kind": "ICON",
+        "args": [
+         "horn",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4619760,
+        "kind": "GOTO",
+        "obj": "bal/woodhorn"
+       }
+      ],
+      "next": 26
+     }
+    },
+    {
+     "index": [
+      26
+     ],
+     "start": "0x467e02",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4619787,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         26
+        ]
+       },
+       {
+        "a": 4619926,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x20]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4619926,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4619955,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4620052,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4620117,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4620181,
+         "kind": "MSG"
+        },
+        {
+         "a": 4620276,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "blowballoon"
+        },
+        {
+         "a": 4620356,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bal/balloonhorn",
+          0
+         ]
+        },
+        {
+         "a": 4620791,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "give"
+        },
+        {
+         "a": 4620925,
+         "kind": "MSG"
+        }
+       ],
+       "next": 1
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4620468,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x28]",
+         "act": "take"
+        },
+        {
+         "a": 4620537,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4620601,
+         "kind": "MSG"
+        },
+        {
+         "a": 4620696,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "blowhorn"
+        },
+        {
+         "a": 4620791,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "give"
+        },
+        {
+         "a": 4620925,
+         "kind": "MSG"
+        }
+       ],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      27
+     ],
+     "start": "0x4682fd",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4621077,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 28
+     }
+    },
+    {
+     "index": [
+      28
+     ],
+     "start": "0x4683b0",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 29
+     }
+    },
+    {
+     "index": [
+      29
+     ],
+     "start": "0x4683ee",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      30
+     ],
+     "start": "0x4659f3",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x465a23": {
+     "a": 4610595,
+     "kind": "ICON",
+     "args": [
+      "polish",
+      "ebp"
+     ]
+    },
+    "0x465a54": {
+     "a": 4610644,
+     "kind": "GOTO",
+     "obj": "kit/polish"
+    },
+    "0x465ac4": {
+     "a": 4610756,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]"
+     ]
+    },
+    "0x465ad6": {
+     "a": 4610774,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x465b2c": {
+     "a": 4610860,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x465b71": {
+     "a": 4610929,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x465bb1": {
+     "a": 4610993,
+     "kind": "MSG"
+    },
+    "0x465c31": {
+     "a": 4611121,
+     "kind": "ICON",
+     "args": [
+      "cups",
+      "ebp"
+     ]
+    },
+    "0x465c69": {
+     "a": 4611177,
+     "kind": "GOTO",
+     "obj": "wor/cups"
+    },
+    "0x465c80": {
+     "a": 4611200,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x465e9d": {
+     "a": 4611741,
+     "kind": "ACTION",
+     "obj": "wor/cups",
+     "act": "polish"
+    },
+    "0x465f1f": {
+     "a": 4611871,
+     "kind": "ICON",
+     "args": [
+      "polish",
+      "ebp"
+     ]
+    },
+    "0x465f50": {
+     "a": 4611920,
+     "kind": "GOTO",
+     "obj": "kit/polish"
+    },
+    "0x465f6b": {
+     "a": 4611947,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      6
+     ]
+    },
+    "0x465fbf": {
+     "a": 4612031,
+     "kind": "ACTION",
+     "obj": "kit/polish",
+     "act": "give"
+    },
+    "0x466041": {
+     "a": 4612161,
+     "kind": "MSG"
+    },
+    "0x4660be": {
+     "a": 4612286,
+     "kind": "ICON",
+     "args": [
+      "smoke",
+      "ebp"
+     ]
+    },
+    "0x466168": {
+     "a": 4612456,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x4661bc": {
+     "a": 4612540,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "give"
+    },
+    "0x46623e": {
+     "a": 4612670,
+     "kind": "MSG"
+    },
+    "0x4662c0": {
+     "a": 4612800,
+     "kind": "ICON",
+     "args": [
+      "phonograph",
+      "ebp"
+     ]
+    },
+    "0x4662f1": {
+     "a": 4612849,
+     "kind": "GOTO",
+     "obj": "lir/lockedphono"
+    },
+    "0x466309": {
+     "a": 4612873,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      10
+     ]
+    },
+    "0x46635d": {
+     "a": 4612957,
+     "kind": "ACTION",
+     "obj": "lir/lockedphono",
+     "act": "open"
+    },
+    "0x4663a6": {
+     "a": 4613030,
+     "kind": "SWITCH",
+     "args": [
+      "lir/lockedphono",
+      "lir/phono_open"
+     ]
+    },
+    "0x4663e2": {
+     "a": 4613090,
+     "kind": "MSG"
+    },
+    "0x466464": {
+     "a": 4613220,
+     "kind": "ICON",
+     "args": [
+      "records",
+      "ebp"
+     ]
+    },
+    "0x466495": {
+     "a": 4613269,
+     "kind": "GOTO",
+     "obj": "lir/records"
+    },
+    "0x466514": {
+     "a": 4613396,
+     "kind": "ICON",
+     "args": [
+      "phonograph",
+      "ebp"
+     ]
+    },
+    "0x466545": {
+     "a": 4613445,
+     "kind": "GOTO",
+     "obj": "lir/phono_open"
+    },
+    "0x466560": {
+     "a": 4613472,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      14
+     ]
+    },
+    "0x4665eb": {
+     "a": 4613611,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]"
+     ]
+    },
+    "0x466608": {
+     "a": 4613640,
+     "kind": "STOPMSG"
+    },
+    "0x466669": {
+     "a": 4613737,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "put_record"
+    },
+    "0x4666c8": {
+     "a": 4613832,
+     "kind": "ACTION",
+     "obj": "lir/phono_nail",
+     "act": "play"
+    },
+    "0x466718": {
+     "a": 4613912,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/phono_nail",
+      0
+     ]
+    },
+    "0x46678f": {
+     "a": 4614031,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x1e4]",
+      "esi",
+      "lir/phono_nail"
+     ]
+    },
+    "0x4667c1": {
+     "a": 4614081,
+     "kind": "ACTION",
+     "obj": "lir/phono_open",
+     "act": "close"
+    },
+    "0x466807": {
+     "a": 4614151,
+     "kind": "SWITCH",
+     "args": [
+      "lir/phono_open",
+      "lir/lockedphono"
+     ]
+    },
+    "0x466847": {
+     "a": 4614215,
+     "kind": "MSG"
+    },
+    "0x46689c": {
+     "a": 4614300,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "put_record"
+    },
+    "0x4668e6": {
+     "a": 4614374,
+     "kind": "SWITCH",
+     "args": [
+      "lir/phono_open",
+      "lir/phono_play"
+     ]
+    },
+    "0x466926": {
+     "a": 4614438,
+     "kind": "MSG"
+    },
+    "0x4669a9": {
+     "a": 4614569,
+     "kind": "ICON",
+     "args": [
+      "smoke",
+      "ebp"
+     ]
+    },
+    "0x4669da": {
+     "a": 4614618,
+     "kind": "GOTO",
+     "obj": "lir/tabacbox"
+    },
+    "0x4669f5": {
+     "a": 4614645,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      16
+     ]
+    },
+    "0x466a80": {
+     "a": 4614784,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]"
+     ]
+    },
+    "0x466a9d": {
+     "a": 4614813,
+     "kind": "STOPMSG"
+    },
+    "0x466afe": {
+     "a": 4614910,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x466b3f": {
+     "a": 4614975,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x466b7f": {
+     "a": 4615039,
+     "kind": "MSG"
+    },
+    "0x466bde": {
+     "a": 4615134,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "smokepipe_explosive"
+    },
+    "0x466c2e": {
+     "a": 4615214,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/tabacbox_explosive",
+      0
+     ]
+    },
+    "0x466de2": {
+     "a": 4615650,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x1d4]",
+      "lir/phono_play"
+     ]
+    },
+    "0x466c83": {
+     "a": 4615299,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x466cc8": {
+     "a": 4615368,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x466d08": {
+     "a": 4615432,
+     "kind": "MSG"
+    },
+    "0x466d67": {
+     "a": 4615527,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "smokepipe"
+    },
+    "0x466e22": {
+     "a": 4615714,
+     "kind": "ICON",
+     "args": [
+      "phonograph",
+      "ebp"
+     ]
+    },
+    "0x466e53": {
+     "a": 4615763,
+     "kind": "GOTO",
+     "obj": "lir/phono_play"
+    },
+    "0x466e6e": {
+     "a": 4615790,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      18
+     ]
+    },
+    "0x466ec5": {
+     "a": 4615877,
+     "kind": "ACTION",
+     "obj": "lir/phono_play",
+     "act": "close"
+    },
+    "0x466f0e": {
+     "a": 4615950,
+     "kind": "SWITCH",
+     "args": [
+      "lir/phono_play",
+      "lir/lockedphono"
+     ]
+    },
+    "0x466f4a": {
+     "a": 4616010,
+     "kind": "MSG"
+    },
+    "0x466fc9": {
+     "a": 4616137,
+     "kind": "ICON",
+     "args": [
+      "gun",
+      "ebp"
+     ]
+    },
+    "0x466ffa": {
+     "a": 4616186,
+     "kind": "GOTO",
+     "obj": "bas/gun"
+    },
+    "0x467015": {
+     "a": 4616213,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      20
+     ]
+    },
+    "0x465323": {
+     "a": 4608803,
+     "kind": "OBJ3",
+     "args": []
+    },
+    "0x46535e": {
+     "a": 4608862,
+     "kind": "OBJ3",
+     "args": [
+      "dword [arg_20h]",
+      "bas/gun_loaded"
+     ]
+    },
+    "0x467098": {
+     "a": 4616344,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]",
+      "bas/gun_loaded"
+     ]
+    },
+    "0x4670b5": {
+     "a": 4616373,
+     "kind": "STOPMSG"
+    },
+    "0x467113": {
+     "a": 4616467,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x46714e": {
+     "a": 4616526,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x467188": {
+     "a": 4616584,
+     "kind": "MSG"
+    },
+    "0x4671e1": {
+     "a": 4616673,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "shoot_loaded"
+    },
+    "0x46722b": {
+     "a": 4616747,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bas/gun_loaded",
+      0
+     ]
+    },
+    "0x467616": {
+     "a": 4617750,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "give"
+    },
+    "0x46769c": {
+     "a": 4617884,
+     "kind": "MSG"
+    },
+    "0x465396": {
+     "a": 4608918,
+     "kind": "OBJ3",
+     "args": [
+      "dword [arg_20h]",
+      "bas/gun_plugged"
+     ]
+    },
+    "0x4653d3": {
+     "a": 4608979,
+     "kind": "OBJ3",
+     "args": [
+      "dword [arg_20h]",
+      "bas/gun_loaded_plugged",
+      "str.Level_Hunter::getGunName_:_No_gun_present"
+     ]
+    },
+    "0x46728c": {
+     "a": 4616844,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]",
+      "bas/gun_loaded_plugged"
+     ]
+    },
+    "0x4672a6": {
+     "a": 4616870,
+     "kind": "STOPMSG"
+    },
+    "0x467301": {
+     "a": 4616961,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x46733c": {
+     "a": 4617020,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x467376": {
+     "a": 4617078,
+     "kind": "MSG"
+    },
+    "0x4673d2": {
+     "a": 4617170,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "shoot_loaded_plugged"
+    },
+    "0x46741f": {
+     "a": 4617247,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bas/gun_loaded_plugged",
+      0
+     ]
+    },
+    "0x467465": {
+     "a": 4617317,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]",
+      "bas/gun"
+     ]
+    },
+    "0x46748d": {
+     "a": 4617357,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]",
+      "bas/gun_plugged"
+     ]
+    },
+    "0x4674d3": {
+     "a": 4617427,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x467518": {
+     "a": 4617496,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x467558": {
+     "a": 4617560,
+     "kind": "MSG"
+    },
+    "0x4675b7": {
+     "a": 4617655,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "shoot_klick"
+    },
+    "0x467747": {
+     "a": 4618055,
+     "kind": "ICON",
+     "args": [
+      "hat",
+      "ebp"
+     ]
+    },
+    "0x467778": {
+     "a": 4618104,
+     "kind": "GOTO",
+     "obj": "bed/hat"
+    },
+    "0x467793": {
+     "a": 4618131,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      22
+     ]
+    },
+    "0x46781e": {
+     "a": 4618270,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x14]"
+     ]
+    },
+    "0x467855": {
+     "a": 4618325,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x1c]",
+     "act": "take"
+    },
+    "0x46789a": {
+     "a": 4618394,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x4678da": {
+     "a": 4618458,
+     "kind": "MSG"
+    },
+    "0x467939": {
+     "a": 4618553,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "takehat"
+    },
+    "0x4679c2": {
+     "a": 4618690,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x467a1d": {
+     "a": 4618781,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x1d8]",
+      "bed/medalbox",
+      "bed/medalbox_rat"
+     ]
+    },
+    "0x467a3a": {
+     "a": 4618810,
+     "kind": "STOPMSG"
+    },
+    "0x467a7e": {
+     "a": 4618878,
+     "kind": "OBJ1",
+     "args": [
+      "bed/medalbox_rat"
+     ]
+    },
+    "0x467abd": {
+     "a": 4618941,
+     "kind": "MSG"
+    },
+    "0x467b27": {
+     "a": 4619047,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "bed/medalbox_rat",
+      0,
+      "ebx",
+      "ratdance"
+     ]
+    },
+    "0x467bab": {
+     "a": 4619179,
+     "kind": "MSG"
+    },
+    "0x467be4": {
+     "a": 4619236,
+     "kind": "OBJ1",
+     "args": [
+      "bed/medalbox"
+     ]
+    },
+    "0x467c23": {
+     "a": 4619299,
+     "kind": "MSG"
+    },
+    "0x467c85": {
+     "a": 4619397,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "wearmedals"
+    },
+    "0x467d09": {
+     "a": 4619529,
+     "kind": "MSG"
+    },
+    "0x4656c9": {
+     "a": 4609737,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      "edi"
+     ]
+    },
+    "0x465802": {
+     "a": 4610050,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "putbackhat"
+    },
+    "0x465858": {
+     "a": 4610136,
+     "kind": "ACTION",
+     "obj": "bed/hat",
+     "act": "give"
+    },
+    "0x4658d0": {
+     "a": 4610256,
+     "kind": "MSG"
+    },
+    "0x465909": {
+     "a": 4610313,
+     "kind": "STOPMSG"
+    },
+    "0x467dbf": {
+     "a": 4619711,
+     "kind": "ICON",
+     "args": [
+      "horn",
+      "ebp"
+     ]
+    },
+    "0x467df0": {
+     "a": 4619760,
+     "kind": "GOTO",
+     "obj": "bal/woodhorn"
+    },
+    "0x467e0b": {
+     "a": 4619787,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      26
+     ]
+    },
+    "0x467e96": {
+     "a": 4619926,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x20]"
+     ]
+    },
+    "0x467eb3": {
+     "a": 4619955,
+     "kind": "STOPMSG"
+    },
+    "0x467f14": {
+     "a": 4620052,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x467f55": {
+     "a": 4620117,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x467f95": {
+     "a": 4620181,
+     "kind": "MSG"
+    },
+    "0x467ff4": {
+     "a": 4620276,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "blowballoon"
+    },
+    "0x468044": {
+     "a": 4620356,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/balloonhorn",
+      0
+     ]
+    },
+    "0x4681f7": {
+     "a": 4620791,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "give"
+    },
+    "0x46827d": {
+     "a": 4620925,
+     "kind": "MSG"
+    },
+    "0x4680b4": {
+     "a": 4620468,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x28]",
+     "act": "take"
+    },
+    "0x4680f9": {
+     "a": 4620537,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x468139": {
+     "a": 4620601,
+     "kind": "MSG"
+    },
+    "0x468198": {
+     "a": 4620696,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "blowhorn"
+    },
+    "0x468315": {
+     "a": 4621077,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

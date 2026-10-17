@@ -290,11 +290,18 @@ def show_segments(pc, port):
 BUBBLE_ALIASES = {'zahnbuerste': 'toothbrush', 'kaffee': 'coffee', 'what': 'noise',   # (108's German names; 'what' is the PC's noise icon)
                   'milkbottle': 'babybottle', 'cookies': 'cookiebox', 'parrot': 'chili', 'mail': 'mailbox',
                   'klavier': 'piano', 'blume': 'flower', 'fussball': 'football'}
+# a level's own names (the PC's icon on the left, the mobile's think on the right): 106's milk_bottle is the
+# port's pudding (109's is its babybottle), its bath / photo_album / towel the German badewanne / book /
+# handtuch; the PC's `shout` icon is the port's `wut` think everywhere (the reaction bubble)
+LEVEL_ALIASES = {106: {'milkbottle': 'pudding', 'bath': 'badewanne', 'photoalbum': 'book', 'towel': 'handtuch'}}
+BUBBLE_LEVEL = [None]
 def bubble_key(v):
     """the PC's icon name and the port's think name (bubble_<mobile name>) on one key: the prefix and the
     underscores dropped (alarm_clock / alarmclock), the few the mobile names otherwise aliased"""
     k = (v or '').replace('bubble_', '').replace('_', '').lower()
-    return BUBBLE_ALIASES.get(k, k)
+    if k == 'shout': k = 'wut'
+    lv = LEVEL_ALIASES.get(BUBBLE_LEVEL[0], {})
+    return lv.get(k, BUBBLE_ALIASES.get(k, k))
 
 def pair_by_value(pc, port, key=lambda v: v, window=20.0):
     """both sides in order; a value missing on one side is skipped (listed as a slip) — a match is taken
@@ -328,6 +335,7 @@ def main(argv):
     argv = [a for a in argv if not a.startswith('--')] + [a for a in argv if a.startswith('--')]
     pc_in, pc_ic, pc_st, pc_cr, pc_ca = load_pc(argv[1])
     po_in, po_th, po_cl, po_tr, po_ca = load_port(argv[2])
+    m = re.search(r'Level(\d+)', argv[2]); BUBBLE_LEVEL[0] = int(m.group(1)) if m else None     # (the level's bubble aliases)
     show('inputs', [((a[0], a[1]), (b[0], b[1])) for a, b in zip(pc_in, po_in)] + [((a[0], a[1]), None) for a in pc_in[len(po_in):]] + [(None, (b[0], b[1])) for b in po_in[len(pc_in):]])
     show('bubble (PC icon / port think)', pair_by_value(pc_ic, po_th, key=bubble_key))
     mapped = [(t, STATION_CLIPS[(f, a)]) for t, f, a in pc_st if (f, a) in STATION_CLIPS]

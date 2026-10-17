@@ -1,0 +1,1493 @@
+{
+ "level": 108,
+ "folder": "level_suntan",
+ "tricked": [
+  "anc/deadflower",
+  "bal/foldingchair_pins",
+  "bal/suncream_sweet",
+  "kit/coffeebox_soil",
+  "toi/shoebrushset"
+ ],
+ "classes": [
+  {
+   "class": "0x45cb3c",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x45cb43",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4574045,
+        "kind": "ICON",
+        "args": [
+         "toothbrush",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4574152,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x130]"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x45cbed",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4574213,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         2
+        ]
+       },
+       {
+        "a": 4574304,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x12c]",
+         "toi/toothbrushset",
+         "toi/shoebrushset"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4574304,
+       "fn": "fcn.0047a130",
+       "variant": "toi/shoebrushset"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4574333,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4574431,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take3"
+        },
+        {
+         "a": 4574557,
+         "kind": "MSG"
+        },
+        {
+         "a": 4574648,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "brush_black_teeth"
+        },
+        {
+         "a": 4574752,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "toi/shoebrushset",
+          2,
+          0,
+          "show_black_teeth"
+         ]
+        },
+        {
+         "a": 4574843,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "brush_teeth"
+        },
+        {
+         "a": 4574934,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take3"
+        },
+        {
+         "a": 4575000,
+         "kind": "SWITCH",
+         "args": [
+          "toi/shoebrushset",
+          "toi/toothbrushset"
+         ]
+        },
+        {
+         "a": 4575060,
+         "kind": "MSG"
+        },
+        {
+         "a": 4575186,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4575270,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take3"
+        },
+        {
+         "a": 4575400,
+         "kind": "MSG"
+        },
+        {
+         "a": 4575491,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "brush_teeth"
+        },
+        {
+         "a": 4575582,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take3"
+        },
+        {
+         "a": 4575708,
+         "kind": "MSG"
+        }
+       ],
+       "next": 3
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x45d251",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4575851,
+        "kind": "ICON",
+        "args": [
+         "coffee",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4575958,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x130]"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x45d2fa",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4576000,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4576088,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x120]",
+         "kit/coffeebox",
+         "kit/coffeebox_soil"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4576088,
+       "fn": "fcn.0047a130",
+       "variant": "kit/coffeebox_soil"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4576142,
+         "kind": "ACTION",
+         "obj": "kit/coffeebox_soil",
+         "act": "make_coffee"
+        }
+       ],
+       "next": 5
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4576204,
+         "kind": "ACTION",
+         "obj": "?",
+         "act": "?"
+        }
+       ],
+       "next": 5
+      }
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x45d430",
+     "paths": 4,
+     "tree": {
+      "steps": [
+       {
+        "a": 4576313,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         5
+        ]
+       },
+       {
+        "a": 4576404,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x120]",
+         "kit/coffeebox",
+         "kit/coffeebox_soil"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4576404,
+       "fn": "fcn.0047a130",
+       "variant": "kit/coffeebox_soil"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4576433,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4576531,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "drink_soil_coffee"
+        },
+        {
+         "a": 4576635,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "kit/coffeebox_soil",
+          0,
+          2,
+          "spit"
+         ]
+        },
+        {
+         "a": 4576701,
+         "kind": "SWITCH",
+         "args": [
+          "kit/coffeebox_soil",
+          "kit/coffeebox"
+         ]
+        },
+        {
+         "a": 4576764,
+         "kind": "MSG"
+        }
+       ],
+       "next": 6
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4576899,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "drink_coffee"
+        },
+        {
+         "a": 4572811,
+         "kind": "OBJ3",
+         "args": []
+        }
+       ],
+       "test": {
+        "a": 4572811,
+        "fn": "fcn.00479ff0",
+        "variant": "bal/ewer"
+       },
+       "true": {
+        "steps": [],
+        "next": 7
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4572847,
+          "kind": "OBJ3",
+          "args": [
+           "esi",
+           "bal/ewer_poisoned"
+          ]
+         }
+        ],
+        "test": {
+         "a": 4572847,
+         "fn": "fcn.00479ff0",
+         "variant": "bal/ewer_poisoned"
+        },
+        "true": {
+         "steps": [],
+         "next": 7
+        },
+        "false": {
+         "steps": [],
+         "next": 9
+        }
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x45d703",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4577053,
+        "kind": "ICON",
+        "args": [
+         "toothbrush",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4577167,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x130]"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x45d7b1",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4577227,
+        "kind": "ICON",
+        "args": [
+         "foldingchair",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4577276,
+        "kind": "GOTO",
+        "obj": "bal/ewer"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x45d80e",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4573584,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         "edi"
+        ]
+       },
+       {
+        "a": 4573671,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "take_low"
+       },
+       {
+        "a": 4573791,
+        "kind": "MSG"
+       }
+      ],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x45d842",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4577372,
+        "kind": "ICON",
+        "args": [
+         "foldingchair",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4577421,
+        "kind": "GOTO",
+        "obj": "bal/foldingchair"
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x45d89f",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4577485,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x120]",
+         "bal/foldingchair",
+         "bal/foldingchair_pins"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4577485,
+       "fn": "fcn.0047a130",
+       "variant": "bal/foldingchair_pins"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4577508,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4577560,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4577652,
+         "kind": "ACTION",
+         "obj": "bal/foldingchair_pins",
+         "act": "sunbath"
+        },
+        {
+         "a": 4577740,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "hurt"
+        },
+        {
+         "a": 4577813,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bal/foldingchair_pins",
+          0
+         ]
+        },
+        {
+         "a": 4577928,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0x124]",
+          "esi",
+          "bal/foldingchair_pins"
+         ]
+        }
+       ],
+       "next": 11
+      },
+      "false": {
+       "steps": [],
+       "next": 11
+      }
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x45dab8",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x45dac3",
+     "paths": 3,
+     "tree": {
+      "steps": [
+       {
+        "a": 4577993,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         12
+        ]
+       },
+       {
+        "a": 4578081,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x120]",
+         "bal/sunshade",
+         "bal/sunshade_closed"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4578081,
+       "fn": "fcn.0047a130",
+       "variant": "bal/sunshade_closed"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4578136,
+         "kind": "IFVARIANT",
+         "args": [
+          "ebp",
+          "bal/suncream",
+          "bal/suncream_sweet"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4578136,
+        "fn": "fcn.0047a130",
+        "variant": "bal/suncream_sweet"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4578162,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4578254,
+          "kind": "ACTION",
+          "obj": "bal/foldingchair",
+          "act": "sunbath_cream_sweet"
+         },
+         {
+          "a": 4578345,
+          "kind": "ACTION",
+          "obj": "bal/foldingchair",
+          "act": "beeattack"
+         },
+         {
+          "a": 4578436,
+          "kind": "ACTION",
+          "obj": "neighbor",
+          "act": "hurt"
+         },
+         {
+          "a": 4578512,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "bal/suncream_sweet",
+           2
+          ]
+         },
+         {
+          "a": 4578581,
+          "kind": "SWITCH",
+          "args": [
+           "bal/suncream_sweet",
+           "bal/suncream"
+          ]
+         },
+         {
+          "a": 4578644,
+          "kind": "MSG"
+         }
+        ],
+        "next": 13
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4578731,
+          "kind": "ACTION",
+          "obj": "bal/foldingchair",
+          "act": "sunbath_cream"
+         }
+        ],
+        "next": 13
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4578819,
+         "kind": "ACTION",
+         "obj": "bal/foldingchair",
+         "act": "sunbath"
+        }
+       ],
+       "next": 13
+      }
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x45de79",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4578963,
+        "kind": "ICON",
+        "args": [
+         "ewer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4579012,
+        "kind": "GOTO",
+        "obj": "bal/ewer"
+       }
+      ],
+      "next": 14
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x45ded6",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4579056,
+        "kind": "ICON",
+        "args": [
+         "ewer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4579148,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x14]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4579148,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4579166,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4579254,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take_low"
+        },
+        {
+         "a": 4579323,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4579387,
+         "kind": "MSG"
+        }
+       ],
+       "next": 15
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4579166,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4579254,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "take_low"
+        },
+        {
+         "a": 4579323,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4579387,
+         "kind": "MSG"
+        }
+       ],
+       "next": 15
+      }
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x45e0b4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4579534,
+        "kind": "ICON",
+        "args": [
+         "flower",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4579583,
+        "kind": "GOTO",
+        "obj": "anc/flower"
+       }
+      ],
+      "next": 16
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x45e111",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4579610,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         16
+        ]
+       },
+       {
+        "a": 4580089,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "water"
+       }
+      ],
+      "next": 17
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x45e36b",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4580229,
+        "kind": "ICON",
+        "args": [
+         "ewer",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4580278,
+        "kind": "GOTO",
+        "obj": "bal/ewer"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x45e3c8",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4573584,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         "edi"
+        ]
+       },
+       {
+        "a": 4573671,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "take_low"
+       },
+       {
+        "a": 4573791,
+        "kind": "MSG"
+       }
+      ],
+      "next": 3
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x45e3fb",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4580373,
+        "kind": "ICON",
+        "args": [
+         "noise",
+         "ebp"
+        ]
+       }
+      ],
+      "next": 20
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x45e4a5",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 21
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x45e4e3",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      22
+     ],
+     "start": "0x45d23b",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x45cb5d": {
+     "a": 4574045,
+     "kind": "ICON",
+     "args": [
+      "toothbrush",
+      "ebp"
+     ]
+    },
+    "0x45cbc8": {
+     "a": 4574152,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x130]"
+    },
+    "0x45cc05": {
+     "a": 4574213,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      2
+     ]
+    },
+    "0x45cc60": {
+     "a": 4574304,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x12c]",
+      "toi/toothbrushset",
+      "toi/shoebrushset"
+     ]
+    },
+    "0x45cc7d": {
+     "a": 4574333,
+     "kind": "STOPMSG"
+    },
+    "0x45ccdf": {
+     "a": 4574431,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take3"
+    },
+    "0x45cd5d": {
+     "a": 4574557,
+     "kind": "MSG"
+    },
+    "0x45cdb8": {
+     "a": 4574648,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "brush_black_teeth"
+    },
+    "0x45ce20": {
+     "a": 4574752,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "toi/shoebrushset",
+      2,
+      0,
+      "show_black_teeth"
+     ]
+    },
+    "0x45ce7b": {
+     "a": 4574843,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "brush_teeth"
+    },
+    "0x45ced6": {
+     "a": 4574934,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take3"
+    },
+    "0x45cf18": {
+     "a": 4575000,
+     "kind": "SWITCH",
+     "args": [
+      "toi/shoebrushset",
+      "toi/toothbrushset"
+     ]
+    },
+    "0x45cf54": {
+     "a": 4575060,
+     "kind": "MSG"
+    },
+    "0x45cfd2": {
+     "a": 4575186,
+     "kind": "MSG"
+    },
+    "0x45d026": {
+     "a": 4575270,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take3"
+    },
+    "0x45d0a8": {
+     "a": 4575400,
+     "kind": "MSG"
+    },
+    "0x45d103": {
+     "a": 4575491,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "brush_teeth"
+    },
+    "0x45d15e": {
+     "a": 4575582,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take3"
+    },
+    "0x45d1dc": {
+     "a": 4575708,
+     "kind": "MSG"
+    },
+    "0x45d26b": {
+     "a": 4575851,
+     "kind": "ICON",
+     "args": [
+      "coffee",
+      "ebp"
+     ]
+    },
+    "0x45d2d6": {
+     "a": 4575958,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x130]"
+    },
+    "0x45d300": {
+     "a": 4576000,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x45d358": {
+     "a": 4576088,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x120]",
+      "kit/coffeebox",
+      "kit/coffeebox_soil"
+     ]
+    },
+    "0x45d38e": {
+     "a": 4576142,
+     "kind": "ACTION",
+     "obj": "kit/coffeebox_soil",
+     "act": "make_coffee"
+    },
+    "0x45d3cc": {
+     "a": 4576204,
+     "kind": "ACTION",
+     "obj": "?",
+     "act": "?"
+    },
+    "0x45d439": {
+     "a": 4576313,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      5
+     ]
+    },
+    "0x45d494": {
+     "a": 4576404,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x120]",
+      "kit/coffeebox",
+      "kit/coffeebox_soil"
+     ]
+    },
+    "0x45d4b1": {
+     "a": 4576433,
+     "kind": "STOPMSG"
+    },
+    "0x45d513": {
+     "a": 4576531,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "drink_soil_coffee"
+    },
+    "0x45d57b": {
+     "a": 4576635,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "kit/coffeebox_soil",
+      0,
+      2,
+      "spit"
+     ]
+    },
+    "0x45d5bd": {
+     "a": 4576701,
+     "kind": "SWITCH",
+     "args": [
+      "kit/coffeebox_soil",
+      "kit/coffeebox"
+     ]
+    },
+    "0x45d5fc": {
+     "a": 4576764,
+     "kind": "MSG"
+    },
+    "0x45d683": {
+     "a": 4576899,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "drink_coffee"
+    },
+    "0x45c68b": {
+     "a": 4572811,
+     "kind": "OBJ3",
+     "args": []
+    },
+    "0x45c6af": {
+     "a": 4572847,
+     "kind": "OBJ3",
+     "args": [
+      "esi",
+      "bal/ewer_poisoned"
+     ]
+    },
+    "0x45d71d": {
+     "a": 4577053,
+     "kind": "ICON",
+     "args": [
+      "toothbrush",
+      "ebp"
+     ]
+    },
+    "0x45d78f": {
+     "a": 4577167,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x130]"
+    },
+    "0x45d7cb": {
+     "a": 4577227,
+     "kind": "ICON",
+     "args": [
+      "foldingchair",
+      "ebp"
+     ]
+    },
+    "0x45d7fc": {
+     "a": 4577276,
+     "kind": "GOTO",
+     "obj": "bal/ewer"
+    },
+    "0x45c990": {
+     "a": 4573584,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      "edi"
+     ]
+    },
+    "0x45c9e7": {
+     "a": 4573671,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take_low"
+    },
+    "0x45ca5f": {
+     "a": 4573791,
+     "kind": "MSG"
+    },
+    "0x45d85c": {
+     "a": 4577372,
+     "kind": "ICON",
+     "args": [
+      "foldingchair",
+      "ebp"
+     ]
+    },
+    "0x45d88d": {
+     "a": 4577421,
+     "kind": "GOTO",
+     "obj": "bal/foldingchair"
+    },
+    "0x45d8cd": {
+     "a": 4577485,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x120]",
+      "bal/foldingchair",
+      "bal/foldingchair_pins"
+     ]
+    },
+    "0x45d8e4": {
+     "a": 4577508,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x45d918": {
+     "a": 4577560,
+     "kind": "STOPMSG"
+    },
+    "0x45d974": {
+     "a": 4577652,
+     "kind": "ACTION",
+     "obj": "bal/foldingchair_pins",
+     "act": "sunbath"
+    },
+    "0x45d9cc": {
+     "a": 4577740,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "hurt"
+    },
+    "0x45da15": {
+     "a": 4577813,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/foldingchair_pins",
+      0
+     ]
+    },
+    "0x45da88": {
+     "a": 4577928,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0x124]",
+      "esi",
+      "bal/foldingchair_pins"
+     ]
+    },
+    "0x45dac9": {
+     "a": 4577993,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      12
+     ]
+    },
+    "0x45db21": {
+     "a": 4578081,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x120]",
+      "bal/sunshade",
+      "bal/sunshade_closed"
+     ]
+    },
+    "0x45de03": {
+     "a": 4578819,
+     "kind": "ACTION",
+     "obj": "bal/foldingchair",
+     "act": "sunbath"
+    },
+    "0x45db58": {
+     "a": 4578136,
+     "kind": "IFVARIANT",
+     "args": [
+      "ebp",
+      "bal/suncream",
+      "bal/suncream_sweet"
+     ]
+    },
+    "0x45db72": {
+     "a": 4578162,
+     "kind": "STOPMSG"
+    },
+    "0x45dbce": {
+     "a": 4578254,
+     "kind": "ACTION",
+     "obj": "bal/foldingchair",
+     "act": "sunbath_cream_sweet"
+    },
+    "0x45dc29": {
+     "a": 4578345,
+     "kind": "ACTION",
+     "obj": "bal/foldingchair",
+     "act": "beeattack"
+    },
+    "0x45dc84": {
+     "a": 4578436,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "hurt"
+    },
+    "0x45dcd0": {
+     "a": 4578512,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bal/suncream_sweet",
+      2
+     ]
+    },
+    "0x45dd15": {
+     "a": 4578581,
+     "kind": "SWITCH",
+     "args": [
+      "bal/suncream_sweet",
+      "bal/suncream"
+     ]
+    },
+    "0x45dd54": {
+     "a": 4578644,
+     "kind": "MSG"
+    },
+    "0x45ddab": {
+     "a": 4578731,
+     "kind": "ACTION",
+     "obj": "bal/foldingchair",
+     "act": "sunbath_cream"
+    },
+    "0x45de93": {
+     "a": 4578963,
+     "kind": "ICON",
+     "args": [
+      "ewer",
+      "ebp"
+     ]
+    },
+    "0x45dec4": {
+     "a": 4579012,
+     "kind": "GOTO",
+     "obj": "bal/ewer"
+    },
+    "0x45def0": {
+     "a": 4579056,
+     "kind": "ICON",
+     "args": [
+      "ewer",
+      "ebp"
+     ]
+    },
+    "0x45df4c": {
+     "a": 4579148,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x14]"
+     ]
+    },
+    "0x45df5e": {
+     "a": 4579166,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x45dfb6": {
+     "a": 4579254,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take_low"
+    },
+    "0x45dffb": {
+     "a": 4579323,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x45e03b": {
+     "a": 4579387,
+     "kind": "MSG"
+    },
+    "0x45e0ce": {
+     "a": 4579534,
+     "kind": "ICON",
+     "args": [
+      "flower",
+      "ebp"
+     ]
+    },
+    "0x45e0ff": {
+     "a": 4579583,
+     "kind": "GOTO",
+     "obj": "anc/flower"
+    },
+    "0x45e11a": {
+     "a": 4579610,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      16
+     ]
+    },
+    "0x45e2f9": {
+     "a": 4580089,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "water"
+    },
+    "0x45e385": {
+     "a": 4580229,
+     "kind": "ICON",
+     "args": [
+      "ewer",
+      "ebp"
+     ]
+    },
+    "0x45e3b6": {
+     "a": 4580278,
+     "kind": "GOTO",
+     "obj": "bal/ewer"
+    },
+    "0x45e415": {
+     "a": 4580373,
+     "kind": "ICON",
+     "args": [
+      "noise",
+      "ebp"
+     ]
+    }
+   }
+  }
+ ]
+}

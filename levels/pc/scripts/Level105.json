@@ -1,0 +1,1222 @@
+{
+ "level": 105,
+ "folder": "level_piano",
+ "tricked": [
+  "anc/phone",
+  "anc/stinkflower",
+  "kit/bowlingball",
+  "lir/scoresmeared"
+ ],
+ "classes": [
+  {
+   "class": "0x46d6ec",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x46d709",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4642595,
+        "kind": "ICON",
+        "args": [
+         "piano",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4642659,
+        "kind": "GOTOENTER",
+        "obj": "lir/score"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x46d77c",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4642730,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x140]",
+         "lir/score",
+         "lir/scoresmeared"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4642730,
+       "fn": "fcn.0047a130",
+       "variant": "lir/scoresmeared"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4642755,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          "ebp"
+         ]
+        },
+        {
+         "a": 4642813,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4642909,
+         "kind": "ACTION",
+         "obj": "lir/scoresmeared",
+         "act": "play_piano_offkey"
+        },
+        {
+         "a": 4642978,
+         "kind": "GOTO2",
+         "obj": "addr"
+        },
+        {
+         "a": 4643149,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "lir/scoresmeared",
+          0
+         ]
+        },
+        {
+         "a": 4643264,
+         "kind": "REPAIR",
+         "args": [
+          "dword [esp + 0x14c]",
+          "ebp",
+          "esi",
+          "lir/scoresmeared"
+         ]
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [],
+       "next": 4
+      }
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x46da11",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x46da22",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4643371,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4643720,
+        "kind": "GOTO2",
+        "obj": "addr"
+       },
+       {
+        "a": 4643785,
+        "kind": "ENTER",
+        "obj": "lir/score"
+       },
+       {
+        "a": 4643874,
+        "kind": "ACTION",
+        "obj": "lir/score",
+        "act": "play_piano_normally"
+       },
+       {
+        "a": 4644044,
+        "kind": "LOOKUP",
+        "args": [
+         "kit/football"
+        ]
+       },
+       {
+        "a": 4644044,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       },
+       {
+        "a": 4644118,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4644173,
+        "kind": "ACTION",
+        "obj": "kit/football",
+        "act": "inv"
+       },
+       {
+        "a": 4644267,
+        "kind": "ACTION",
+        "obj": "kit/football",
+        "act": "fly_into_kitchen"
+       },
+       {
+        "a": 4644401,
+        "kind": "LOOKUP",
+        "args": [
+         "kit/football"
+        ]
+       },
+       {
+        "a": 4644401,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       }
+      ],
+      "next": 5
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x46deae",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4644588,
+        "kind": "LOOKUP",
+        "args": [
+         "kit/football"
+        ]
+       },
+       {
+        "a": 4644588,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       }
+      ],
+      "next": "ret"
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x46e68b",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4646565,
+        "kind": "ICON",
+        "args": [
+         "football",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4646614,
+        "kind": "GOTO",
+        "obj": "kit/window"
+       }
+      ],
+      "next": 7
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x46e6ef",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x46dfc1",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4644827,
+        "kind": "ICON",
+        "args": [
+         "football",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4644934,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x144]"
+       }
+      ],
+      "next": 9
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x46e072",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4645024,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x134]",
+         "kit/football",
+         "kit/bowlingball"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4645024,
+       "fn": "fcn.0047a130",
+       "variant": "kit/bowlingball"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4645050,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4645108,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4645206,
+         "kind": "ACTION",
+         "obj": "kit/bowlingball",
+         "act": "kick"
+        },
+        {
+         "a": 4645285,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/bowlingball",
+          2
+         ]
+        }
+       ],
+       "next": 10
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4645401,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4645488,
+         "kind": "ACTION",
+         "obj": "kit/football",
+         "act": "kick"
+        },
+        {
+         "a": 4645553,
+         "kind": "OBJ1",
+         "args": [
+          "kit/football"
+         ]
+        },
+        {
+         "a": 4645613,
+         "kind": "MSG"
+        }
+       ],
+       "next": 6
+      }
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x46e355",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4645743,
+        "kind": "ICON",
+        "args": [
+         "football",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4645792,
+        "kind": "GOTO",
+        "obj": "kit/bowlingball"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x46e3b9",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4645826,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4645911,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "take_low"
+       },
+       {
+        "a": 4645976,
+        "kind": "OBJ1",
+        "args": [
+         "kit/bowlingball"
+        ]
+       },
+       {
+        "a": 4646033,
+        "kind": "MSG"
+       },
+       {
+        "a": 4646156,
+        "kind": "MSG"
+       },
+       {
+        "a": 4646227,
+        "kind": "GOTO",
+        "obj": "kit/window"
+       },
+       {
+        "a": 4646346,
+        "kind": "MSG"
+       },
+       {
+        "a": 4646432,
+        "kind": "ACTION",
+        "obj": "kit/window",
+        "act": "throw_bowling"
+       }
+      ],
+      "next": 7
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x46e749",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4646755,
+        "kind": "ICON",
+        "args": [
+         "flower",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4646862,
+        "kind": "GOTO",
+        "obj": "dword [esp + 0x144]"
+       }
+      ],
+      "next": 13
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x46e7f7",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4646949,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x134]",
+         "anc/flower",
+         "anc/stinkflower"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4646949,
+       "fn": "fcn.0047a130",
+       "variant": "anc/stinkflower"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4646972,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4647027,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4647125,
+         "kind": "ACTION",
+         "obj": "anc/stinkflower",
+         "act": "sniff"
+        },
+        {
+         "a": 4647203,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "anc/stinkflower",
+          0
+         ]
+        },
+        {
+         "a": 4647272,
+         "kind": "SWITCH",
+         "args": [
+          "anc/stinkflower",
+          "anc/flower"
+         ]
+        },
+        {
+         "a": 4647335,
+         "kind": "MSG"
+        }
+       ],
+       "next": 14
+      },
+      "false": {
+       "steps": [],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      14
+     ],
+     "start": "0x46ea61",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4647547,
+        "kind": "ICON",
+        "args": [
+         "toilet",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4647599,
+        "kind": "GOTO",
+        "obj": "toi/toilet"
+       }
+      ],
+      "next": 15
+     }
+    },
+    {
+     "index": [
+      15
+     ],
+     "start": "0x46eac8",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4647648,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0
+        ]
+       },
+       {
+        "a": 4647735,
+        "kind": "ACTION",
+        "obj": "neighbor",
+        "act": "puke"
+       },
+       {
+        "a": 4647804,
+        "kind": "STOPMSG"
+       }
+      ],
+      "next": 16
+     }
+    },
+    {
+     "index": [
+      16
+     ],
+     "start": "0x46ebe6",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4647956,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0x134]",
+         "toi/toilet",
+         "toi/toiletstuffed"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4647956,
+       "fn": "fcn.0047a130",
+       "variant": "toi/toiletstuffed"
+      },
+      "true": {
+       "steps": [],
+       "next": 1
+      },
+      "false": {
+       "steps": [],
+       "next": 1
+      }
+     }
+    },
+    {
+     "index": [
+      17
+     ],
+     "start": "0x46ec9f",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4648137,
+        "kind": "ICON",
+        "args": [
+         "phone",
+         0
+        ]
+       },
+       {
+        "a": 4648203,
+        "kind": "GOTO",
+        "obj": "anc/phoneringing"
+       }
+      ],
+      "next": 18
+     }
+    },
+    {
+     "index": [
+      18
+     ],
+     "start": "0x46ed26",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4648250,
+        "kind": "ICON",
+        "args": [
+         "ebp",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4648288,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         0,
+         0
+        ]
+       },
+       {
+        "a": 4648346,
+        "kind": "STOPMSG"
+       },
+       {
+        "a": 4648444,
+        "kind": "ACTION",
+        "obj": "anc/phoneringing",
+        "act": "phone"
+       },
+       {
+        "a": 4648513,
+        "kind": "SWITCH",
+        "args": [
+         "anc/phoneringing",
+         "anc/phone"
+        ]
+       },
+       {
+        "a": 4648576,
+        "kind": "MSG"
+       },
+       {
+        "a": 4648655,
+        "kind": "OBJ2",
+        "args": [
+         "addr",
+         "anc/phone",
+         0
+        ]
+       }
+      ],
+      "next": 19
+     }
+    },
+    {
+     "index": [
+      19
+     ],
+     "start": "0x46ef37",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "eax"
+     }
+    },
+    {
+     "index": [
+      20
+     ],
+     "start": "0x46ef49",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4648839,
+        "kind": "LOOKUP",
+        "args": [
+         "kit/football"
+        ]
+       },
+       {
+        "a": 4648839,
+        "kind": "LOOKUPVAL",
+        "value": "false"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      21
+     ],
+     "start": "0x46d6f3",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x46d723": {
+     "a": 4642595,
+     "kind": "ICON",
+     "args": [
+      "piano",
+      "ebp"
+     ]
+    },
+    "0x46d763": {
+     "a": 4642659,
+     "kind": "GOTOENTER",
+     "obj": "lir/score"
+    },
+    "0x46d7aa": {
+     "a": 4642730,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x140]",
+      "lir/score",
+      "lir/scoresmeared"
+     ]
+    },
+    "0x46d7c3": {
+     "a": 4642755,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x46d7fd": {
+     "a": 4642813,
+     "kind": "STOPMSG"
+    },
+    "0x46d85d": {
+     "a": 4642909,
+     "kind": "ACTION",
+     "obj": "lir/scoresmeared",
+     "act": "play_piano_offkey"
+    },
+    "0x46d8a2": {
+     "a": 4642978,
+     "kind": "GOTO2",
+     "obj": "addr"
+    },
+    "0x46d94d": {
+     "a": 4643149,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "lir/scoresmeared",
+      0
+     ]
+    },
+    "0x46d9c0": {
+     "a": 4643264,
+     "kind": "REPAIR",
+     "args": [
+      "dword [esp + 0x14c]",
+      "ebp",
+      "esi",
+      "lir/scoresmeared"
+     ]
+    },
+    "0x46da2b": {
+     "a": 4643371,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x46db88": {
+     "a": 4643720,
+     "kind": "GOTO2",
+     "obj": "addr"
+    },
+    "0x46dbc9": {
+     "a": 4643785,
+     "kind": "ENTER",
+     "obj": "lir/score"
+    },
+    "0x46dc22": {
+     "a": 4643874,
+     "kind": "ACTION",
+     "obj": "lir/score",
+     "act": "play_piano_normally"
+    },
+    "0x46dccc": {
+     "a": 4644044,
+     "kind": "LOOKUP",
+     "args": [
+      "kit/football"
+     ]
+    },
+    "0x46dd16": {
+     "a": 4644118,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46dd4d": {
+     "a": 4644173,
+     "kind": "ACTION",
+     "obj": "kit/football",
+     "act": "inv"
+    },
+    "0x46ddab": {
+     "a": 4644267,
+     "kind": "ACTION",
+     "obj": "kit/football",
+     "act": "fly_into_kitchen"
+    },
+    "0x46de31": {
+     "a": 4644401,
+     "kind": "LOOKUP",
+     "args": [
+      "kit/football"
+     ]
+    },
+    "0x46deec": {
+     "a": 4644588,
+     "kind": "LOOKUP",
+     "args": [
+      "kit/football"
+     ]
+    },
+    "0x46e6a5": {
+     "a": 4646565,
+     "kind": "ICON",
+     "args": [
+      "football",
+      "ebp"
+     ]
+    },
+    "0x46e6d6": {
+     "a": 4646614,
+     "kind": "GOTO",
+     "obj": "kit/window"
+    },
+    "0x46dfdb": {
+     "a": 4644827,
+     "kind": "ICON",
+     "args": [
+      "football",
+      "ebp"
+     ]
+    },
+    "0x46e046": {
+     "a": 4644934,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x144]"
+    },
+    "0x46e0a0": {
+     "a": 4645024,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x134]",
+      "kit/football",
+      "kit/bowlingball"
+     ]
+    },
+    "0x46e0ba": {
+     "a": 4645050,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46e0f4": {
+     "a": 4645108,
+     "kind": "STOPMSG"
+    },
+    "0x46e156": {
+     "a": 4645206,
+     "kind": "ACTION",
+     "obj": "kit/bowlingball",
+     "act": "kick"
+    },
+    "0x46e1a5": {
+     "a": 4645285,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/bowlingball",
+      2
+     ]
+    },
+    "0x46e219": {
+     "a": 4645401,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x46e270": {
+     "a": 4645488,
+     "kind": "ACTION",
+     "obj": "kit/football",
+     "act": "kick"
+    },
+    "0x46e2b1": {
+     "a": 4645553,
+     "kind": "OBJ1",
+     "args": [
+      "kit/football"
+     ]
+    },
+    "0x46e2ed": {
+     "a": 4645613,
+     "kind": "MSG"
+    },
+    "0x46e36f": {
+     "a": 4645743,
+     "kind": "ICON",
+     "args": [
+      "football",
+      "ebp"
+     ]
+    },
+    "0x46e3a0": {
+     "a": 4645792,
+     "kind": "GOTO",
+     "obj": "kit/bowlingball"
+    },
+    "0x46e3c2": {
+     "a": 4645826,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp"
+     ]
+    },
+    "0x46e417": {
+     "a": 4645911,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "take_low"
+    },
+    "0x46e458": {
+     "a": 4645976,
+     "kind": "OBJ1",
+     "args": [
+      "kit/bowlingball"
+     ]
+    },
+    "0x46e491": {
+     "a": 4646033,
+     "kind": "MSG"
+    },
+    "0x46e50c": {
+     "a": 4646156,
+     "kind": "MSG"
+    },
+    "0x46e553": {
+     "a": 4646227,
+     "kind": "GOTO",
+     "obj": "kit/window"
+    },
+    "0x46e5ca": {
+     "a": 4646346,
+     "kind": "MSG"
+    },
+    "0x46e620": {
+     "a": 4646432,
+     "kind": "ACTION",
+     "obj": "kit/window",
+     "act": "throw_bowling"
+    },
+    "0x46e763": {
+     "a": 4646755,
+     "kind": "ICON",
+     "args": [
+      "flower",
+      "ebp"
+     ]
+    },
+    "0x46e7ce": {
+     "a": 4646862,
+     "kind": "GOTO",
+     "obj": "dword [esp + 0x144]"
+    },
+    "0x46e825": {
+     "a": 4646949,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x134]",
+      "anc/flower",
+      "anc/stinkflower"
+     ]
+    },
+    "0x46e83c": {
+     "a": 4646972,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46e873": {
+     "a": 4647027,
+     "kind": "STOPMSG"
+    },
+    "0x46e8d5": {
+     "a": 4647125,
+     "kind": "ACTION",
+     "obj": "anc/stinkflower",
+     "act": "sniff"
+    },
+    "0x46e923": {
+     "a": 4647203,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/stinkflower",
+      0
+     ]
+    },
+    "0x46e968": {
+     "a": 4647272,
+     "kind": "SWITCH",
+     "args": [
+      "anc/stinkflower",
+      "anc/flower"
+     ]
+    },
+    "0x46e9a7": {
+     "a": 4647335,
+     "kind": "MSG"
+    },
+    "0x46ea7b": {
+     "a": 4647547,
+     "kind": "ICON",
+     "args": [
+      "toilet",
+      "ebp"
+     ]
+    },
+    "0x46eaaf": {
+     "a": 4647599,
+     "kind": "GOTO",
+     "obj": "toi/toilet"
+    },
+    "0x46eae0": {
+     "a": 4647648,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46eb37": {
+     "a": 4647735,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "puke"
+    },
+    "0x46eb7c": {
+     "a": 4647804,
+     "kind": "STOPMSG"
+    },
+    "0x46ec14": {
+     "a": 4647956,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0x134]",
+      "toi/toilet",
+      "toi/toiletstuffed"
+     ]
+    },
+    "0x46ecc9": {
+     "a": 4648137,
+     "kind": "ICON",
+     "args": [
+      "phone",
+      0
+     ]
+    },
+    "0x46ed0b": {
+     "a": 4648203,
+     "kind": "GOTO",
+     "obj": "anc/phoneringing"
+    },
+    "0x46ed3a": {
+     "a": 4648250,
+     "kind": "ICON",
+     "args": [
+      "ebp",
+      "ebp"
+     ]
+    },
+    "0x46ed60": {
+     "a": 4648288,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0,
+      0
+     ]
+    },
+    "0x46ed9a": {
+     "a": 4648346,
+     "kind": "STOPMSG"
+    },
+    "0x46edfc": {
+     "a": 4648444,
+     "kind": "ACTION",
+     "obj": "anc/phoneringing",
+     "act": "phone"
+    },
+    "0x46ee41": {
+     "a": 4648513,
+     "kind": "SWITCH",
+     "args": [
+      "anc/phoneringing",
+      "anc/phone"
+     ]
+    },
+    "0x46ee80": {
+     "a": 4648576,
+     "kind": "MSG"
+    },
+    "0x46eecf": {
+     "a": 4648655,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/phone",
+      0
+     ]
+    },
+    "0x46ef87": {
+     "a": 4648839,
+     "kind": "LOOKUP",
+     "args": [
+      "kit/football"
+     ]
+    }
+   }
+  }
+ ]
+}

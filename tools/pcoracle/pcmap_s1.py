@@ -55,7 +55,7 @@ class PCMap(pcgeo.MapOps):
         except OSError:
             self.placed = set()
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
-        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}; self.games = set()
+        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}; self.games = set(); self.obj_actions = {}
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
             # (objects.xml separates an action's attributes by tabs as well as spaces: bal/suncream's `honey`)
             if re.search(r'<action\s+name="use"\s+actor="woody"', m.group(2)): self.uses.add(m.group(1))
@@ -75,6 +75,7 @@ class PCMap(pcgeo.MapOps):
             # job ends, and an input in between cancels it (206's pillows_manip under the lesson)
             for am in re.finditer(r'<action\s+([^>]*)/?>', m.group(2)):
                 at = dict(re.findall(r'(\w+)="([^"]*)"', am.group(1)))
+                self.obj_actions.setdefault(m.group(1), {})[at.get('name')] = at.get('actor')     # (every action: name -> actor)
                 if at.get('actor') == 'woody' and at.get('time', 'auto').isdigit():
                     self.woody_time[(m.group(1), at['name'])] = int(at['time'])
         # an `auto` action's ticks are its animations' (the Loader's time, docs/PC_FIDELITY.md): the overlay's

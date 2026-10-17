@@ -1,0 +1,987 @@
+{
+ "level": 104,
+ "folder": "level_pie",
+ "tricked": [
+  "kit/foamcream",
+  "kit/microwavedirty",
+  "toi/aftershave_glue",
+  "toi/grease_exchanged"
+ ],
+ "classes": [
+  {
+   "class": "0x46198c",
+   "cases": [
+    {
+     "index": [
+      0,
+      1
+     ],
+     "start": "0x461993",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4594093,
+        "kind": "ICON",
+        "args": [
+         "applepie",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4594142,
+        "kind": "GOTO",
+        "obj": "kit/applepie"
+       }
+      ],
+      "next": 2
+     }
+    },
+    {
+     "index": [
+      2
+     ],
+     "start": "0x461a04",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4594186,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         2
+        ]
+       },
+       {
+        "a": 4594268,
+        "kind": "ACTION",
+        "obj": "kit/applepie",
+        "act": "take"
+       }
+      ],
+      "next": 3
+     }
+    },
+    {
+     "index": [
+      3
+     ],
+     "start": "0x461ac4",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4594398,
+        "kind": "ICON",
+        "args": [
+         "microwave",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4594461,
+        "kind": "GOTO",
+        "obj": "kit/microwave"
+       }
+      ],
+      "next": 4
+     }
+    },
+    {
+     "index": [
+      4
+     ],
+     "start": "0x461b61",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4594538,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         4
+        ]
+       },
+       {
+        "a": 4594629,
+        "kind": "IFVARIANT",
+        "args": [
+         "dword [esp + 0xe0]",
+         "kit/microwave",
+         "kit/microwavedirty"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4594629,
+       "fn": "fcn.0047a130",
+       "variant": "kit/microwavedirty"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4594659,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4594735,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/microwavedirty",
+          0
+         ]
+        },
+        {
+         "a": 4594853,
+         "kind": "REPAIR",
+         "args": [
+          "ebp",
+          "dword [esp + 0xf8]",
+          "esi",
+          "kit/microwavedirty"
+         ]
+        },
+        {
+         "a": 4594930,
+         "kind": "MSG"
+        },
+        {
+         "a": 4595021,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "put_apple_pie"
+        },
+        {
+         "a": 4595112,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "cook"
+        },
+        {
+         "a": 4595203,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "take_apple_pie"
+        }
+       ],
+       "next": 5
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4595021,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "put_apple_pie"
+        },
+        {
+         "a": 4595112,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "cook"
+        },
+        {
+         "a": 4595203,
+         "kind": "ACTION",
+         "obj": "kit/microwave",
+         "act": "take_apple_pie"
+        }
+       ],
+       "next": 5
+      }
+     }
+    },
+    {
+     "index": [
+      5
+     ],
+     "start": "0x461e5f",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4595321,
+        "kind": "ICON",
+        "args": [
+         "whippedcream",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4595370,
+        "kind": "GOTO",
+        "obj": "kit/whippedcream"
+       }
+      ],
+      "next": 6
+     }
+    },
+    {
+     "index": [
+      6
+     ],
+     "start": "0x461eee",
+     "paths": 2,
+     "tree": {
+      "steps": [
+       {
+        "a": 4595444,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         6
+        ]
+       },
+       {
+        "a": 4595607,
+        "kind": "ACTION",
+        "obj": "dword [esp + 0x20]",
+        "act": "put_cream"
+       },
+       {
+        "a": 4595692,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x18]",
+         "kit/foamcream"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4595692,
+       "fn": "fcn.00413780",
+       "variant": "kit/foamcream"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4595718,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4595810,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "eat_foam"
+        },
+        {
+         "a": 4595887,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/foamcream",
+          2
+         ]
+        },
+        {
+         "a": 4595954,
+         "kind": "SWITCH",
+         "args": [
+          "kit/foamcream",
+          "kit/whippedcream"
+         ]
+        },
+        {
+         "a": 4596015,
+         "kind": "MSG"
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4596096,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "eat"
+        }
+       ],
+       "next": 7
+      }
+     }
+    },
+    {
+     "index": [
+      7
+     ],
+     "start": "0x4621f9",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4596243,
+        "kind": "ICON",
+        "args": [
+         "basin",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4596292,
+        "kind": "GOTO",
+        "obj": "toi/aftershave"
+       }
+      ],
+      "next": 8
+     }
+    },
+    {
+     "index": [
+      8
+     ],
+     "start": "0x462254",
+     "paths": 4,
+     "tree": {
+      "steps": [
+       {
+        "a": 4596314,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         8
+        ]
+       },
+       {
+        "a": 4596450,
+        "kind": "IFTRICKED",
+        "args": [
+         "dword [esp + 0x18]"
+        ]
+       }
+      ],
+      "test": {
+       "a": 4596450,
+       "fn": "fcn.00413780",
+       "variant": null
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4596473,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4596534,
+         "kind": "MSG"
+        },
+        {
+         "a": 4596625,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4596790,
+         "kind": "IFTRICKED",
+         "args": [
+          "dword [esp + 0x18]",
+          "toi/grease_exchanged"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4596790,
+        "fn": "fcn.00413780",
+        "variant": "toi/grease_exchanged"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4596810,
+          "kind": "OBJ1",
+          "args": [
+           "addr"
+          ]
+         },
+         {
+          "a": 4596868,
+          "kind": "MSG"
+         },
+         {
+          "a": 4596955,
+          "kind": "ACTION",
+          "obj": "dword [esp + 0x20]",
+          "act": "take"
+         }
+        ],
+        "next": 9
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4596810,
+          "kind": "OBJ1",
+          "args": [
+           "addr"
+          ]
+         },
+         {
+          "a": 4596868,
+          "kind": "MSG"
+         },
+         {
+          "a": 4596955,
+          "kind": "ACTION",
+          "obj": "dword [esp + 0x20]",
+          "act": "take"
+         }
+        ],
+        "next": 9
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4596473,
+         "kind": "OBJ1",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4596534,
+         "kind": "MSG"
+        },
+        {
+         "a": 4596625,
+         "kind": "ACTION",
+         "obj": "dword [esp + 0x20]",
+         "act": "take"
+        },
+        {
+         "a": 4596790,
+         "kind": "IFTRICKED",
+         "args": [
+          "dword [esp + 0x18]",
+          "toi/grease_exchanged"
+         ]
+        }
+       ],
+       "test": {
+        "a": 4596790,
+        "fn": "fcn.00413780",
+        "variant": "toi/grease_exchanged"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4596810,
+          "kind": "OBJ1",
+          "args": [
+           "addr"
+          ]
+         },
+         {
+          "a": 4596868,
+          "kind": "MSG"
+         },
+         {
+          "a": 4596955,
+          "kind": "ACTION",
+          "obj": "dword [esp + 0x20]",
+          "act": "take"
+         }
+        ],
+        "next": 9
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4596810,
+          "kind": "OBJ1",
+          "args": [
+           "addr"
+          ]
+         },
+         {
+          "a": 4596868,
+          "kind": "MSG"
+         },
+         {
+          "a": 4596955,
+          "kind": "ACTION",
+          "obj": "dword [esp + 0x20]",
+          "act": "take"
+         }
+        ],
+        "next": 9
+       }
+      }
+     }
+    },
+    {
+     "index": [
+      9
+     ],
+     "start": "0x46254f",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4597097,
+        "kind": "ICON",
+        "args": [
+         "basin",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4597146,
+        "kind": "GOTO",
+        "obj": "toi/basin"
+       }
+      ],
+      "next": 10
+     }
+    },
+    {
+     "index": [
+      10
+     ],
+     "start": "0x4625aa",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4597168,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         10
+        ]
+       },
+       {
+        "a": 4597485,
+        "kind": "ACTION",
+        "obj": "toi/basin",
+        "act": "shave"
+       },
+       {
+        "a": 4597821,
+        "kind": "ACTION",
+        "obj": "toi/basin",
+        "act": "grease_hair"
+       }
+      ],
+      "next": 11
+     }
+    },
+    {
+     "index": [
+      11
+     ],
+     "start": "0x4628a2",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4597948,
+        "kind": "ICON",
+        "args": [
+         "basin",
+         "ebp"
+        ]
+       },
+       {
+        "a": 4597997,
+        "kind": "GOTO",
+        "obj": "toi/aftershave"
+       }
+      ],
+      "next": 12
+     }
+    },
+    {
+     "index": [
+      12
+     ],
+     "start": "0x4628fd",
+     "paths": 1,
+     "tree": {
+      "steps": [
+       {
+        "a": 4598022,
+        "kind": "SUBSEQ",
+        "args": [
+         "addr",
+         "ebp",
+         12
+        ]
+       },
+       {
+        "a": 4598107,
+        "kind": "ACTION",
+        "obj": "toi/aftershave",
+        "act": "give"
+       },
+       {
+        "a": 4598243,
+        "kind": "MSG"
+       },
+       {
+        "a": 4598335,
+        "kind": "ACTION",
+        "obj": "toi/grease",
+        "act": "give"
+       },
+       {
+        "a": 4598464,
+        "kind": "MSG"
+       }
+      ],
+      "next": 1
+     }
+    },
+    {
+     "index": [
+      13
+     ],
+     "start": "0x4619ee",
+     "paths": 1,
+     "tree": {
+      "steps": [],
+      "next": "ret"
+     }
+    }
+   ],
+   "steps": {
+    "0x4619ad": {
+     "a": 4594093,
+     "kind": "ICON",
+     "args": [
+      "applepie",
+      "ebp"
+     ]
+    },
+    "0x4619de": {
+     "a": 4594142,
+     "kind": "GOTO",
+     "obj": "kit/applepie"
+    },
+    "0x461a0a": {
+     "a": 4594186,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      2
+     ]
+    },
+    "0x461a5c": {
+     "a": 4594268,
+     "kind": "ACTION",
+     "obj": "kit/applepie",
+     "act": "take"
+    },
+    "0x461ade": {
+     "a": 4594398,
+     "kind": "ICON",
+     "args": [
+      "microwave",
+      "ebp"
+     ]
+    },
+    "0x461b1d": {
+     "a": 4594461,
+     "kind": "GOTO",
+     "obj": "kit/microwave"
+    },
+    "0x461b6a": {
+     "a": 4594538,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      4
+     ]
+    },
+    "0x461bc5": {
+     "a": 4594629,
+     "kind": "IFVARIANT",
+     "args": [
+      "dword [esp + 0xe0]",
+      "kit/microwave",
+      "kit/microwavedirty"
+     ]
+    },
+    "0x461be3": {
+     "a": 4594659,
+     "kind": "STOPMSG"
+    },
+    "0x461c2f": {
+     "a": 4594735,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/microwavedirty",
+      0
+     ]
+    },
+    "0x461ca5": {
+     "a": 4594853,
+     "kind": "REPAIR",
+     "args": [
+      "ebp",
+      "dword [esp + 0xf8]",
+      "esi",
+      "kit/microwavedirty"
+     ]
+    },
+    "0x461cf2": {
+     "a": 4594930,
+     "kind": "MSG"
+    },
+    "0x461d4d": {
+     "a": 4595021,
+     "kind": "ACTION",
+     "obj": "kit/microwave",
+     "act": "put_apple_pie"
+    },
+    "0x461da8": {
+     "a": 4595112,
+     "kind": "ACTION",
+     "obj": "kit/microwave",
+     "act": "cook"
+    },
+    "0x461e03": {
+     "a": 4595203,
+     "kind": "ACTION",
+     "obj": "kit/microwave",
+     "act": "take_apple_pie"
+    },
+    "0x461e79": {
+     "a": 4595321,
+     "kind": "ICON",
+     "args": [
+      "whippedcream",
+      "ebp"
+     ]
+    },
+    "0x461eaa": {
+     "a": 4595370,
+     "kind": "GOTO",
+     "obj": "kit/whippedcream"
+    },
+    "0x461ef4": {
+     "a": 4595444,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      6
+     ]
+    },
+    "0x461f97": {
+     "a": 4595607,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "put_cream"
+    },
+    "0x461fec": {
+     "a": 4595692,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]",
+      "kit/foamcream"
+     ]
+    },
+    "0x462006": {
+     "a": 4595718,
+     "kind": "STOPMSG"
+    },
+    "0x462062": {
+     "a": 4595810,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "eat_foam"
+    },
+    "0x4620af": {
+     "a": 4595887,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/foamcream",
+      2
+     ]
+    },
+    "0x4620f2": {
+     "a": 4595954,
+     "kind": "SWITCH",
+     "args": [
+      "kit/foamcream",
+      "kit/whippedcream"
+     ]
+    },
+    "0x46212f": {
+     "a": 4596015,
+     "kind": "MSG"
+    },
+    "0x462180": {
+     "a": 4596096,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "eat"
+    },
+    "0x462213": {
+     "a": 4596243,
+     "kind": "ICON",
+     "args": [
+      "basin",
+      "ebp"
+     ]
+    },
+    "0x462244": {
+     "a": 4596292,
+     "kind": "GOTO",
+     "obj": "toi/aftershave"
+    },
+    "0x46225a": {
+     "a": 4596314,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      8
+     ]
+    },
+    "0x4622e2": {
+     "a": 4596450,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]"
+     ]
+    },
+    "0x4622f9": {
+     "a": 4596473,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x462336": {
+     "a": 4596534,
+     "kind": "MSG"
+    },
+    "0x462391": {
+     "a": 4596625,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "take"
+    },
+    "0x462436": {
+     "a": 4596790,
+     "kind": "IFTRICKED",
+     "args": [
+      "dword [esp + 0x18]",
+      "toi/grease_exchanged"
+     ]
+    },
+    "0x46244a": {
+     "a": 4596810,
+     "kind": "OBJ1",
+     "args": [
+      "addr"
+     ]
+    },
+    "0x462484": {
+     "a": 4596868,
+     "kind": "MSG"
+    },
+    "0x4624db": {
+     "a": 4596955,
+     "kind": "ACTION",
+     "obj": "dword [esp + 0x20]",
+     "act": "take"
+    },
+    "0x462569": {
+     "a": 4597097,
+     "kind": "ICON",
+     "args": [
+      "basin",
+      "ebp"
+     ]
+    },
+    "0x46259a": {
+     "a": 4597146,
+     "kind": "GOTO",
+     "obj": "toi/basin"
+    },
+    "0x4625b0": {
+     "a": 4597168,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      10
+     ]
+    },
+    "0x4626ed": {
+     "a": 4597485,
+     "kind": "ACTION",
+     "obj": "toi/basin",
+     "act": "shave"
+    },
+    "0x46283d": {
+     "a": 4597821,
+     "kind": "ACTION",
+     "obj": "toi/basin",
+     "act": "grease_hair"
+    },
+    "0x4628bc": {
+     "a": 4597948,
+     "kind": "ICON",
+     "args": [
+      "basin",
+      "ebp"
+     ]
+    },
+    "0x4628ed": {
+     "a": 4597997,
+     "kind": "GOTO",
+     "obj": "toi/aftershave"
+    },
+    "0x462906": {
+     "a": 4598022,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      "ebp",
+      12
+     ]
+    },
+    "0x46295b": {
+     "a": 4598107,
+     "kind": "ACTION",
+     "obj": "toi/aftershave",
+     "act": "give"
+    },
+    "0x4629e3": {
+     "a": 4598243,
+     "kind": "MSG"
+    },
+    "0x462a3f": {
+     "a": 4598335,
+     "kind": "ACTION",
+     "obj": "toi/grease",
+     "act": "give"
+    },
+    "0x462ac0": {
+     "a": 4598464,
+     "kind": "MSG"
+    }
+   }
+  }
+ ]
+}
