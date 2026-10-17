@@ -315,8 +315,10 @@ class PlanRunner:
                 if obj + '_guarded' not in getattr(self.m, 'names', ()) and not any(o == obj + '_guarded' for o in getattr(self.m, 'placed', ())):
                     obj = self.m.placed_variant(obj, getattr(self, 'variants', {}).get(self.m.family(obj)))
                 obj = next((o[4:] for o in args[1:] if o.startswith('obj=')), obj)      # (a probe names the object)
-                if op in ('use', 'prime', 'take') and self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()):
-                    # a bare trick that is a single-object combination (101's TV): the GUI's NULL combine
+                if op in ('use', 'prime', 'take') and ((self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()))
+                                                        or obj in getattr(self.m, 'games', ())):
+                    # a bare trick that is a single-object combination (101's TV), or a `game` object (206's
+                    # kukidentomat: its `use` action is the game's own clip): the GUI's NULL combine
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}

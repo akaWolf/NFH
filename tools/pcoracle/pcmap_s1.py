@@ -55,9 +55,12 @@ class PCMap(pcgeo.MapOps):
         except OSError:
             self.placed = set()
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
-        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}
+        self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}; self.games = set()
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
             if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
+            # a `game` object (its flag): the GUI's click on it is the minigame's CombineMsg with no second
+            # object whatever its `use` action says (game.exe fcn.00408161 @ 0x40828a) — 206's kukidentomat
+            if re.search(r'<flag name="game"\s*/?>', m.group(2)): self.games.add(m.group(1))
             self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)

@@ -324,8 +324,13 @@ no longer needed for that. The Season 2 runner's gate reads a catcher's
 blindness off the actor's own flag word (+0x14, the `flags` field of the
 tick's actors; flag 4 the hideout state the predicate skips — 206's
 Mother asleep in her chair, which is no hideout object): the 206 plan
-runs 18 of 18 legs since (nocatch3), its one timeout the kukidentomat's
-dexterity game the minigame handler does not win. The runner's
+runs 18 of 18 legs since (nocatch3), its one timeout the kukidentomat:
+a `game` object (objects.xml's flag) whose `use` action is the game's own
+clip — the runner had sent a UseObjectMsg, which only walks Woody to it;
+the GUI's click on a `game` object is the minigame's CombineMsg with no
+second object (game.exe fcn.00408161 @ 0x40828a), which the runners send
+for any `game` object now (PCMap.games: 206's kukidentomat, 205's duck
+cage, 214's closed hatch). The runner's
 live-state gate (above) keeps Woody out of a catcher's room but cannot
 leave a room before the catcher arrives — 101's `park! Zone01` right after
 the binoculars (101 s): the PC neighbour leaves the sofa at 100 s and is in

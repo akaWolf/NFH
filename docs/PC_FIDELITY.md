@@ -5062,13 +5062,17 @@ MotherLook 30 s are hers (the port's clock starts at its own lesson's
 end, 13 s earlier than the paced oracle run's); the question is closed.
 The level's uncatchable run then went through (nocatch3: 18 of 18 legs,
 the six records paid, the runner's gate reading her flag 4 off the actor
-word — +0x14, fcn.100450dc's — since the chair is no hideout object): the
-PC's six would-be catches have the port's within two seconds but one
-(296.2 s, the port's Woody with no catcher near; the port's own at
-290.8), the Mother's two among them (165.1, 248.3). Its one gap is the
-oracle's: the denture adhesive's take is the kukidentomat's dexterity
-game, which the harness's minigame handler does not win — the leg timed
-out after 120 s and the run's later inputs sit 100 s behind the port's.
+word — +0x14, fcn.100450dc's — since the chair is no hideout object), and
+through once more with the kukidentomat clicked as the GUI clicks a
+`game` object (the minigame's CombineMsg with no second object; the
+runner's UseObjectMsg had only walked Woody to it): nocatch4 — 18 of 18
+legs, the six records paid by 250 s, the PC's three would-be catches with
+the port's within two seconds (the neighbour's 153.5, the Mother's 165.1
+in her look, the port's at 238.2 for the PC's 236.7). What the run shows
+of the port is the game's length: the oracle plays the kukidentomat
+perfectly in 6 s (167.2 -> 173.3, the thumb scored 4 a tick) where the
+port's driver takes 32 s (155.8 -> 188.2) — a player's length, not a
+rule's, and the run's inputs drift by it from there (+11.7 s).
 
 **214's pistol waits for the Mother (2026-10-03, open).** The run's
 jumps — pistol -> fishbox -9.47 s on the first lap, -2.98 on the second,
