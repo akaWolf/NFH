@@ -63,12 +63,19 @@ if logp.endswith('.jsonl'):
     # the oracle's own injections from its trace (`injected`: the plan's leg at its tick; `sneak` legs from
     # their `leg` events) — the port's ops as the plan wrote them, no dependence on the game's log (NFH1
     # stops writing GameLogicLogNN.xml past 99 files: every copy after 02:51 was a stale session's)
-    evs = []
+    # each input carries the sneaking flag the oracle sent (the auto-sneak's per-input decision, or the
+    # plan's on / off): the port's manual toggle before the leg makes its Woody walk as the PC's did —
+    # the port's own auto-sneak decides per zone and 109's replay ran the kitchen while the PC's sneaked
+    # it (its dog woke in the port alone); a re-issued walk (resneak) is the toggle alone, the port's
+    # flag is read live
+    evs = []; flag = None
     for l in open(logp):
         try: r = json.loads(l)
         except ValueError: continue
-        if r.get('ev') == 'injected' and r['step'].get('leg'): evs.append((r['tick'], r['step']['leg']))
-        elif r.get('ev') == 'leg' and r['leg'].startswith('sneak'): evs.append((r['tick'], r['leg']))
+        if r.get('ev') == 'injected' and r['step'].get('leg'):
+            st = r['step']; sn = bool(st.get('sneak', False))
+            if sn != flag: evs.append((r['tick'], 'sneak on' if sn else 'sneak off')); flag = sn
+            if not st.get('resneak'): evs.append((r['tick'], st['leg']))
     for tick, leg in evs:
         words = leg.split()
         out.append('until %.4f' % (tick / 12.0))

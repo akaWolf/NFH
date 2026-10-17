@@ -4821,7 +4821,13 @@ stub covers) — a second Season 1 catch path, left as it is. The dog
 levels again with the auto-sneak, all without a bark: 106 39 of 48 legs
 (the tub primed at toi/tub, no crash), 107 11 of 27 (a crash on the free
 dove's combine, fixed as `aux`), 108 28 of 37, 109 16 of 29, 110 22 of
-27, 111 12 of 45.
+27, 111 12 of 45. The replays then carried each input's sneaking flag
+(the port's own auto-sneak had run 109's kitchen where the PC's Woody
+sneaked it, and its dog woke in the port alone): 107 and 111 pair with
+no jump (-0.20, -0.22 s per 100 s), 109's chili shout is gone and its
+jumps are the pig +3.9 and the parrot +13.4; 108 keeps a chili shout
+and 110 its barbecue (bbq -17.8 and +16.4, beer -14.1) — the next
+readings.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
