@@ -4827,7 +4827,11 @@ sneaked it, and its dog woke in the port alone): 107 and 111 pair with
 no jump (-0.20, -0.22 s per 100 s), 109's chili shout is gone and its
 jumps are the pig +3.9 and the parrot +13.4; 108 keeps a chili shout
 and 110 its barbecue (bbq -17.8 and +16.4, beer -14.1) — the next
-readings.
+readings. 108's is no divergence: the plan runs the key's take with
+`sneak off` through the dog's room, the dog wakes on both sides within
+0.3 s (29.1 / 28.8 s), and an uncatchable Woody left standing there
+keeps the PC's dog barking every five seconds while the port's calms —
+the run past the first bark is nobody's game.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

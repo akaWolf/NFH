@@ -287,7 +287,8 @@ def show_segments(pc, port):
         else:
             print('  %7.2f port %-18s %5s,%-4s' % (b[0], b[1], b[2], b[3])); j += 1
 
-BUBBLE_ALIASES = {'milkbottle': 'babybottle', 'cookies': 'cookiebox', 'parrot': 'chili', 'mail': 'mailbox',
+BUBBLE_ALIASES = {'zahnbuerste': 'toothbrush', 'kaffee': 'coffee', 'what': 'noise',   # (108's German names; 'what' is the PC's noise icon)
+                  'milkbottle': 'babybottle', 'cookies': 'cookiebox', 'parrot': 'chili', 'mail': 'mailbox',
                   'klavier': 'piano', 'blume': 'flower', 'fussball': 'football'}
 def bubble_key(v):
     """the PC's icon name and the port's think name (bubble_<mobile name>) on one key: the prefix and the
