@@ -4865,6 +4865,35 @@ floor drop in the GUI's order works: 103's soap lands on the toilet
 floor (`ok` at 179, the combine of `soap` with `toi` at 534/420; the
 result object as the first object is declined).
 
+**Season 1 uncatchable, the whole set (05:55, after the re-runs with the
+auto-sneak, the placed variants, the takes by content):**
+
+| level | legs run | PC would-be catches the port has within 2 s | bubble drift | jumps |
+|---|---|---|---|---|
+| 101 | 13/17 | 0 of 0 | -0.24 s/100 s (9 pairs) | none (the TV as the NULL combine) |
+| 102 | 10/24 | 8 of 8 | -0.43 (14) | none |
+| 103 | 20/25 | 0 of 0 | -0.71 (15) | none |
+| 104 | 20/26 | 3 of 6 | +7.41 (9) | basin +11.0 (the soap drop was declined then) |
+| 105 | 16/23 | 2 of 2 | +2.15 (18) | flower -4.2, football +9.6, piano +2.2 |
+| 106 | 39/48 | 5 of 8 | -0.21 (4) | none |
+| 107 | 19/27 | 8 of 8 | +0.11 (31) | none |
+| 108 | 28/37 | 2 of 6 | -1.68 (9) | the dog's bark on both sides at 29 s, then nobody's game |
+| 109 | 16/29 | 5 of 7 | +8.84 (23) | pig +3.9, the parrot's shout +16.7 |
+| 110 | 22/27 | 3 of 9 | -6.66 (13) | bbq -17.8 and +16.4, beer -14.1 (the second lap's order) |
+| 111 | 12/45 | 3 of 4 | -0.22 (18) | none |
+| 112 | 12/29 | 4 of 4 | -0.24 (14) | none |
+| 113 | 9/30 | 3 of 5 | -0.06 (13) | basin +4.2, valve -6.4, powertool -13.2, basin +16.0 (the valve's water chain; the outlet before the water is `unplaced`) |
+| 114 | 21/43 | 3 of 3 | -0.37 (22) | none (the rat and the nail by their containers' contents) |
+
+Nine of the fourteen pair with no jump and within 0.7 s per 100 s over
+their runs; the catches are the port's within two seconds wherever the
+PC has them. What remains is named: 104's basin (to be read again with
+the soap laid), 105's flower and football, 109's pig visit and the
+parrot's shout, 110's second lap, 113's valve and basin. The two
+runners' rules that made the runs possible are in tools/pcoracle/
+README.md; every reading above is reproducible from the traces and the
+replays under ~/nfh-bench (runs/replay<N>_nocatch, logs*/oracle_*_nocatch.jsonl).
+
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:
 
