@@ -5125,23 +5125,47 @@ MotherSleepBehaviour's own arm) and the port holds them while its scene
 flag is up (Routine.tick, AnimPlayer.pc_paused): 210's replay sleeps her
 353.2-393.4 for the PC's 356.5-397.8. Olga's bars (202's and 210's mat,
 210's shower) are the same object on the PC; 202's probe of her mat
-(the bar hook, nocatch7) is not conclusive yet: her stays on the mat
-run 63.7 s (37.3-101.0, 116.2-179.9, 195.2-258.8), the one holding his
-SHOUT 1 at 359.3 ran 66.6 (350.8-417.4) and the one holding his SHOUT 0
-at 331.7 ran 61.5 (274.1-335.6) — the mat's own bar is 120 ticks and
-the hook's objects there are not mapped to their actors. Unmarked.
+(the bar hook with the object's name, nocatch8, 2026-10-24) is conclusive:
+Olga's bars are the mat (beachright/mat_hn_guarded, 120 ticks) and the
+ocean (theocean 97, theocean_shark 119), and every stay ran exactly its
+ticks (eleven stays, spans 120/97/120/97/120/97/120/97/120/119/120) — the
+kid's `tongue` posts at each mat stay's start and his `kid_cry` 6 s after
+its end, his two scenes (the SHOUT 1 at 331.7, the shark's credit at 349.3)
+fall between stays. No hold to mark on 202; the rule stands for the
+Mother's bars.
 Two plans sat on the edge of their collapse and the holds pushed them
 over: 211's phone coin landed at 99.94 (its Mother's nap after her
 lap-3 visit to the child came 6 s later) — its final window opens on her
 sit clip now, a second before her sleep, 100.0 at 264.8; 207's board
 crash at 98.9 (the castle's three at 447, her sit for his dive 7 s later
-than before). 207's marks are withheld until its plan is re-laid: the two
-re-lays tried (the elephant's bucket after the second spring, the
-shell's crayfish after his lap-5 shell) put that coin 50 and 65 s after
-the crash, where the gauge had lost it — the lap is ~100 s and the decay
-0.36 a second, so the collapse needs the castle's three and the crash
-within 40 s on a base of 20; the plan needs its coins re-ordered round
-her cycle, not one moved. Open, with the numbers.
+than before). 207's marks (DeckChair MotherSleepLoop, PoolLadder
+MotherPoolLadderSwim) are restored since 2026-10-24: the PC's own run of
+the plan (600 s, the bar hook and the gauge hook WDBG_RAGE, nocatch9/10)
+has her cycle exactly as the port holds it — deckchair 240 ticks, pool 200,
+her flag 0x100000 while held: 8.3 s under the awning's scene (122.5-130.8),
+18.5 s under the elephant's (376.3-394.8, in the pool), 14.3 s under the
+crayfish's (408.8-423.1) and 28 s under the castle's (440.8-468.8, on the
+chair) — and the port's replay of it sits and swims her within 4 s all the
+way (her final sit 498.2 for the PC's 502.4, his crash 504.1 / 506.7). The
+gauge: fires of 20k (the elephant 389.8, the crayfish 412.8, the towel and
+the castle 441.5 / 444.9), 30k (the castle's extra 459.0) and 30k (the
+crash's credit 504.75), 360 a second off, so the crash peaks at 98 600 of
+the 100 000 the collapse takes — no COLLAPSE! on the PC either, GOOD JOB!
+(the port 98.9 / rating 90). The plan's structure cannot reach it: the
+crash is his lap-5 board, 38.3 s after the castle's third credit plus
+2.3 s to the credit, and he waits 5.1 s more for her sit because the
+castle's scene held her chair — with her sitting as he arrives the peak
+would be 100 170 (a 0.5 s margin), and every lever (the awning's coin
+moved to lap 3 so its hold goes, the elephant's to lap 5) either keeps
+that margin or loses the base (the elephant's and the crayfish's residue
+is what makes 85 070 at 459: without one of them 72 540 / 64 980). The
+collapse needs the castle's three on his lap-3 visit (337) and the second
+spring's crash on his lap-4 board (348, while she sits 331.7-352): the
+gauge then crosses 100 000 at the castle's third credit, 9 s after the
+crash (74 000 + 30 000), a 5 s margin — a plan compressed by a lap
+(the elephant's bucket before his 276, the crayfish before his 308, the
+towel and the castle before 337, the spring before 346). Open: the
+re-lay; the marks stay.
 
 **213's picnic exit (2026-10-03).** The third lap's walk from the
 tricked picnic to the pinata was 2.2 s short in the port: the PC's leave

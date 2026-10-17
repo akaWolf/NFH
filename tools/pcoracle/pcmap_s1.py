@@ -57,20 +57,35 @@ class PCMap(pcgeo.MapOps):
         self.names = re.findall(r'<object name="([^"]+)"', objects_xml)
         self.uses = set(); self.hideouts = {}; self.contents = {}; self.woody_time = {}; self.games = set()
         for m in re.finditer(r'<object name="([^"]+)"[^>]*>(.*?)</object>', objects_xml, re.S):
-            if re.search(r'<action name="use" actor="woody"', m.group(2)): self.uses.add(m.group(1))
+            # (objects.xml separates an action's attributes by tabs as well as spaces: bal/suncream's `honey`)
+            if re.search(r'<action\s+name="use"\s+actor="woody"', m.group(2)): self.uses.add(m.group(1))
             # a `game` object (its flag): the GUI's click on it is the minigame's CombineMsg with no second
             # object whatever its `use` action says (game.exe fcn.00408161 @ 0x40828a) — 206's kukidentomat
             if re.search(r'<flag name="game"\s*/?>', m.group(2)): self.games.add(m.group(1))
+            # a `singleuse` object (flag 0x80 — the valves, the tatter, the grinder of level_DIY, 101's TV,
+            # 108's sunshade, 110's extinguisher): the GUI's click handler tests the flag (the virtual at +0x14
+            # with 0x80, 0x4078fe) and sends the NULL CombineMsg (fcn.00409760 at 0x407922), not the
+            # UseObjectMsg (fcn.004097a0 at 0x4079ed) — a UseObjectMsg only walks him to such an object
+            if re.search(r'<flag name="singleuse"\s*/?>', m.group(2)): self.games.add(m.group(1))
             self.contents[m.group(1)] = re.findall(r'<content name="([^"]+)"', m.group(2))
             h = re.search(r'<flag name="(neighbor_hideout|hideout)"', m.group(2))
             if h: self.hideouts[m.group(1)] = h.group(1)        # (the PC's flag 4: the enter step sets it, the leave clears)
             # Woody's actions' own ticks (time="N"; an `auto` one is its animation's and stays unknown): the
             # runner waits them out before its next input — a combination's result is placed as the action's
             # job ends, and an input in between cancels it (206's pillows_manip under the lesson)
-            for am in re.finditer(r'<action ([^>]*)/?>', m.group(2)):
+            for am in re.finditer(r'<action\s+([^>]*)/?>', m.group(2)):
                 at = dict(re.findall(r'(\w+)="([^"]*)"', am.group(1)))
                 if at.get('actor') == 'woody' and at.get('time', 'auto').isdigit():
                     self.woody_time[(m.group(1), at['name'])] = int(at['time'])
+        # an `auto` action's ticks are its animations' (the Loader's time, docs/PC_FIDELITY.md): the overlay's
+        # PCWoodySeconds sources carry them (tools/pcref/pc_woody.py: "IT_Egg <- kit/microwave egg 26 ticks"
+        # is the Loader's time, objects.xml's N + 2) — without them the runner's next input cancelled the
+        # action (106's egg under the full bottle's click 1.25 s later: no dirty microwave on the PC)
+        for e in ov.get('patches', []):
+            src = e.get('source') or ''
+            for am in re.finditer(r'<- (\S+) (\w+) (\d+) ticks', src):
+                key = (am.group(1), am.group(2))
+                if key not in self.woody_time and '/' in am.group(1): self.woody_time[key] = max(0, int(am.group(3)) - 2)
         self.combos = []
         try:
             for m in re.finditer(r'<combination name="([^"]+)"([^>]*)>(.*?)</combination>', rd('combine.xml'), re.S):

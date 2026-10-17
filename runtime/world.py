@@ -3755,7 +3755,19 @@ class AlerterFSM:
         if w is None or w.zone is None or w.zone.pid != self.item.zone:
             return False
         sneaking = w.sneaking or not self._woody_moving()
-        return not w.is_warping and not w.hiding and (not sneaking or self.awake)
+        seen = not w.is_warping and not w.hiding and (not sneaking or self.awake)
+        if seen and os.environ.get('NFH_NO_CATCH'):
+            # the harness switch (World._catch): the originals run with the pet blind too — NFH1's
+            # pet update (fcn.0045bfa0) has its `Woody in my room` byte cleared at 0x45c161 before
+            # the bark and the neighbour's catch — so the port's replay records the sighting once a
+            # second as a would-be catch and the pet stays quiet
+            g = self.world.game
+            lst = getattr(g, 'would_catch', None)
+            if lst is None: lst = g.would_catch = []
+            if not lst or self.world.time - lst[-1][0] >= 1.0:
+                lst.append((self.world.time, 'pet'))
+            return False
+        return seen
 
     def _alert_pair(self):
         w = self._woody()

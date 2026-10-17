@@ -303,8 +303,9 @@ class PlanRunner:
                 obj = next((o[4:] for o in args[1:] if o.startswith('obj=')), obj)      # (a probe names the object)
                 if op in ('use', 'prime', 'take') and ((self.m.single_combo(obj) and obj not in getattr(self.m, 'uses', ()))
                                                         or obj in getattr(self.m, 'games', ())):
-                    # a bare trick that is a single-object combination (101's TV), or a `game` object (206's
-                    # kukidentomat: its `use` action is the game's own clip): the GUI's NULL combine
+                    # a bare trick that is a single-object combination (101's TV), or a `game` / `singleuse`
+                    # object (206's kukidentomat: its `use` action is the game's own clip; 113's valves and
+                    # tatter, pcmap_s1.games): the GUI's NULL combine
                     step = {'tick': tick, 'kind': 'combine', 'args': [obj, None]}
                 else:
                     step = {'tick': tick, 'kind': 'use', 'args': [obj]}
@@ -313,6 +314,11 @@ class PlanRunner:
             # no level.xml entry) and a combination's results
             placed = set(getattr(self.m, 'placed', set())) | set(o for o in state['actions'] if '/' in o) \
                 | set(d[1] for d in state.get('dest', {}).values() if isinstance(d[1], str)) | set(getattr(self, 'variants', {}).values())
+            for _t, sa, sb in state.get('switches', ()):
+                # the Switch steps so far, in order: the object in the scene goes out, the other comes in (the
+                # trace gave 106's tub_full, 107's dove_free and 113's valve_off/outlet as `unplaced` before)
+                new, old = (sb, sa) if sa in placed and sb not in placed else (sa, sb)
+                placed.discard(old); placed.add(new)
             fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
             guarded_fam = obj is not None and (obj + '_guarded' in placed or obj + '_guarded' in getattr(self.m, 'names', ()))
             if obj and '/' in obj and placed and obj not in placed and fam_placed and not guarded_fam and not (op == 'usewith' and args[0].startswith('Ground@')):
@@ -523,7 +529,7 @@ class Tick(gdb.Breakpoint):
                 # neighbour's room objects equal, the neighbour's pause byte +0x78 clear, neither carrying
                 # flag 4, fcn.0043c2b0) sets its `seen` byte at 0x436d2c; five NOPs there, and the
                 # WouldCatch breakpoint on them logs each tick the test passes
-                wr(0x436d2c, b'\x90' * 5); WouldCatch(); print('NOCATCH: the rooms test stubbed', flush=True)
+                wr(0x436d2c, b'\x90' * 5); WouldCatch(); PetAlarm(); print('NOCATCH: the rooms test and the pet stubbed', flush=True)
         while script and script[0]['tick'] - LEAD <= state['tick']:
             step = script.pop(0); pending.append(step); click_dummy()
             emit({'tick': state['tick'], 'ev': 'dummy', 'for': step})
@@ -545,6 +551,21 @@ class WouldCatch(gdb.Breakpoint):
             emit({'tick': state['tick'], 'ev': 'wouldcatch', 'actors': actor_states()}); print('WOULDCATCH tick %d' % state['tick'], flush=True)
             state.setdefault('wouldcatch', []).append(state['tick'])
         self.last = state['tick']
+        return False
+class PetAlarm(gdb.Breakpoint):
+    """the pet's update (fcn.0045bfa0) in its awake state (0x45c161): bl = Woody's room is the pet's
+    (0x45c0ad) and he carries no flag 4 (fcn.0043c2b0 at 0x45c0c2); set, the pet barks (DoAction
+    0x45c1d7) and hands the neighbour the catch (fcn.004728d0 at 0x45c280 — fcn.00447b70 then plays
+    Woody's fear at 0x447cff); the stub clears bl, so the pet idles on, and logs the tick"""
+    def __init__(self): super().__init__('*0x45c161', internal=True); self.last = -100
+    def stop(self):
+        if reg('ebx') & 0xff:
+            gdb.execute('set $ebx = $ebx & ~0xff', to_string=True)
+            if reg('ebx') & 0xff: print('PETALARM: bl not cleared', flush=True)
+            if state['tick'] - self.last >= 12:
+                emit({'tick': state['tick'], 'ev': 'wouldcatch', 'by': 'pet', 'actors': actor_states()}); print('WOULDCATCH (pet) tick %d' % state['tick'], flush=True)
+                state.setdefault('wouldcatch', []).append(state['tick'])
+            self.last = state['tick']
         return False
 class Loop(gdb.Breakpoint):
     """the message loop after the pop (0x43b165): the message at [esp+0x18]; a player's message with a
@@ -607,6 +628,13 @@ class Hook(gdb.Breakpoint):
             emit({'tick': state['tick'], 'ev': self.name, 'ret': '%#x' % u32(esp), 'args': args})
             if self.name == 'action' and isinstance(args[1], str) and args[2] in ('enter', 'leave', 'sleep'):
                 state.setdefault('inside', {})[args[1]] = (args[2] != 'leave', state['tick'])     # a hideout's flag 4
+            if self.name == 'switch':
+                # (the step's two names come as the addresses of the class's String globals, 0x51xxxx)
+                args = [as_string(u32(v)) or v if isinstance(v, int) and 0x500000 <= v < 0x600000 else v for v in args]
+            if self.name == 'switch' and isinstance(args[0], str) and isinstance(args[1], str):
+                # the level's Switch step (fcn.00451de0 queues the SwitchObjects job, vtable 0x4e1bd0: the
+                # case's `Switch new <- old`): the runner's picture of the scene follows it (placed_now)
+                state.setdefault('switches', []).append((state['tick'], args[0], args[1]))
             if self.name == 'action' and isinstance(args[1], str):
                 state['actions'].setdefault(args[1], []).append((state['tick'], args[2]))
                 if args[1] == 'woody' and args[2] == 'decline': state['declines'].append(state['tick'])
@@ -618,7 +646,7 @@ class Hook(gdb.Breakpoint):
         return False
 
 LevelName(); Tick(); Loop(); Mover()
-Hook(0x477f60, 'action'); Hook(0x437f70, 'icon', 2)
+Hook(0x477f60, 'action'); Hook(0x437f70, 'icon', 2); Hook(0x451de0, 'switch', 2)
 try:
     gdb.execute('continue')
 except Exception as ex:

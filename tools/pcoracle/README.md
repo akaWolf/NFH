@@ -308,7 +308,50 @@ climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
   the trace's end (replay.sh UNTIL=<secs>) or the port's state is frozen at
   its last leg; the port's replay of an uncatchable run takes NFH_NO_CATCH=1
   (runtime/world.py _catch: the catch logged as `WOULD CATCH t= by` once a
-  second and not played — a harness switch like NFH_NO_DEPART).
+  second and not played — a harness switch like NFH_NO_DEPART). Since
+  2026-10-24 the stub covers the pets too: the pet update (fcn.0045bfa0)
+  sets bl = Woody in the pet's room without flag 4 (0x45c0ad, fcn.0043c2b0
+  at 0x45c0c2) and in its awake state (0x45c161) barks (DoAction 0x45c1d7)
+  and hands the neighbour the catch (fcn.004728d0 at 0x45c280 —
+  fcn.00447b70 plays Woody's fear at 0x447cff, outside the rooms test);
+  PetAlarm clears bl there and logs `wouldcatch` with by:'pet'; the port's
+  NFH_NO_CATCH makes AlerterFSM.can_see_woody record the sighting
+  (would_catch 'pet') and return False, so a replay's pets stay quiet like
+  the stubbed original's. s1tagreplay.sh does not set NFH_NO_CATCH — pass
+  it in the environment.
+- Clicks the Season 1 runner sends as the GUI does (2026-10-24): a
+  `singleuse` object (flag 0x80 — level_DIY's valves, tatter and grinder,
+  101/102's tv, 107's footstool, 108's sunshade, 110's extinguisher, 111's
+  ironing board, 112's rope) gets the NULL CombineMsg: the click handler
+  tests the flag (the object's virtual at +0x14 with 0x80, 0x4078fe) and
+  builds a CombineMsg (fcn.00409760 at 0x407922), not a UseObjectMsg
+  (fcn.004097a0 at 0x4079ed) — a UseObjectMsg only walked him there
+  (113's valve clicks did nothing in every trace before). Hook(0x451de0,
+  'switch') follows the level's Switch steps (fcn.00451de0 queues the
+  SwitchObjects job; its two names are the class's String globals, read as
+  as_string(u32(arg))) and the runner's placed set follows them, so a
+  switched-in variant is no longer `unplaced` (106's tub_full, 113's
+  valve_off; 113's bas/outlet still is — the water must be on). objects.xml
+  separates some action attributes by tabs (`<action\tname=`): pcmap_s1
+  reads them now (the old regex missed 108's honey/poison/pins/sunshade,
+  109's pigkey/pins/cactus/tabasco, 101/102's tv, 107/110/111/112's
+  singleuse uses), so the runner waits those actions out — before, the next
+  input cancelled them (108's honey: no bees on the PC, the port fired them).
+  An `auto` action's ticks are its animations' and objects.xml does not
+  say them: pcmap_s1 takes them from the overlay's PCWoodySeconds sources
+  ("IT_Egg <- kit/microwave egg 26 ticks", the Loader's time) — before, the
+  egg of 104/106 and the fridge takes were cut by the next click 1.2 s
+  later (no dirty microwave on the PC: its `dirty_microwave` trigger,
+  `nearobj` once, fires at the kitchen's door pass, 101's at 107.17 as he
+  reappears at x 295). Every Season 1 trace older than this is suspect;
+  TAG=nocatch3 reruns them all (s1rerun_rest.sh, then 106/113/104 again). Known artefact: 109's game stops ticking at
+  the teeth + tabasco combine right after his bed_sleep (227 s, WATCHDOG,
+  reproducible) — the plan's last coin is lost on the oracle.
+- `WDBG_RAGE=1` on NFH2 (oracle.py Rage at 0x100447c4, the level update's
+  `sub esi, [leveldata+0x28]`): the gauge once a second and at every jump.
+  207's run: 20k/20k/30k for the castle's three, 30k for the board crash,
+  360 a second off, the crash's peak 98 600 of 100 000 — no collapse on the
+  PC either, which the port reproduces with PCBarClips restored (98.9).
 
 ## What the plan batches found (2026-10-03 03:00)
 

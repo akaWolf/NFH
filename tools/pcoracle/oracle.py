@@ -689,15 +689,33 @@ class Bar(gdb.Breakpoint):
     def __init__(self): super().__init__('*%#x' % gl(0x1000b312), internal=True); self.last = {}
     def stop(self):
         try:
-            ecx = int(gdb.parse_and_eval('$ecx')); c = u32(ecx + 0xc); t = u32(ecx + 0x10)
+            ecx = int(gdb.parse_and_eval('$ecx')); c = u32(ecx + 0xc); t = u32(ecx + 8)
             prev = self.last.get(ecx)
             if prev is None or c < prev or c % 60 == 0 or c == t:
-                emit({'tick': state['tick'], 'ev': 'bar', 'obj': '%#x' % ecx, 'count': c, 'of': t})
+                # (+8 the pushed ticks the count runs to, +0x14 the name of the object the stay is on)
+                try: who = as_string(u32(ecx + 0x14))
+                except Exception: who = None
+                emit({'tick': state['tick'], 'ev': 'bar', 'obj': '%#x' % ecx, 'count': c, 'of': t, 'on': who})
             self.last[ecx] = c
         except Exception as e:
             emit({'tick': state['tick'], 'ev': 'error', 'name': 'bar', 'err': repr(e)})
         return False
 if os.environ.get('WDBG_BARS'): Bar()
+class Rage(gdb.Breakpoint):
+    """WDBG_RAGE=1: the gauge — the level update's decay (0x100447c4: `sub esi, [leveldata+0x28]`, esi
+    the current, 30 a tick off a 100 000 gauge) runs while the current is above zero; `rage` events
+    once a second and at every jump (a fire's amount)"""
+    def __init__(self): super().__init__('*%#x' % gl(0x100447c4), internal=True); self.last = None; self.last_t = -100
+    def stop(self):
+        try:
+            cur = int(gdb.parse_and_eval('$esi'))
+            if self.last is None or state['tick'] - self.last_t >= 12 or cur > self.last:
+                emit({'tick': state['tick'], 'ev': 'rage', 'cur': cur}); self.last_t = state['tick']
+            self.last = cur
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'rage', 'err': repr(e)})
+        return False
+if os.environ.get('WDBG_RAGE'): Rage()
 if os.environ.get('WDBG_MINIGAME', 'perfect') == 'perfect': Perfect()
 else: Minigame()
 try:

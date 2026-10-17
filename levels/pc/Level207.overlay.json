@@ -256,7 +256,10 @@
     },
     "PCDepartTicks": {
      "Mother": 1
-    }
+    },
+    "PCBarClips": [
+     "MotherPoolLadderSwim"
+    ]
    }
   },
   {
@@ -281,7 +284,10 @@
     },
     "PCDepartTicks": {
      "Mother": 1
-    }
+    },
+    "PCBarClips": [
+     "MotherSleepLoop"
+    ]
    }
   },
   {
