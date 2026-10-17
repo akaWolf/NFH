@@ -208,7 +208,7 @@
       8
      ],
      "start": "0x45fe52",
-     "paths": 1,
+     "paths": 3,
      "tree": {
       "steps": [
        {
@@ -219,15 +219,82 @@
          "ebp",
          8
         ]
-       },
-       {
-        "a": 4587795,
-        "kind": "ACTION",
-        "obj": "bal/barbecue",
-        "act": "pour_beer"
        }
       ],
-      "next": 11
+      "test": {
+       "a": 4587138,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4587162,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4587255,
+         "kind": "ACTION",
+         "obj": "bal/barbecue",
+         "act": "pour_fuel"
+        },
+        {
+         "a": 4587321,
+         "kind": "SWITCH",
+         "args": [
+          "bal/barbecue",
+          "bal/barbecue_burn"
+         ]
+        },
+        {
+         "a": 4587384,
+         "kind": "MSG"
+        },
+        {
+         "a": 4587432,
+         "kind": "FIRE4",
+         "args": [
+          "addr",
+          "bal/fuelbeer",
+          "ebp",
+          "ebx"
+         ]
+        },
+        {
+         "a": 4587578,
+         "kind": "MSG"
+        },
+        {
+         "a": 4587651,
+         "kind": "GOTO",
+         "obj": "bed/extinguisher"
+        }
+       ],
+       "next": 9
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4587795,
+         "kind": "ACTION",
+         "obj": "bal/barbecue",
+         "act": "pour_beer"
+        }
+       ],
+       "test": {
+        "a": 4587889,
+        "fn": "flag",
+        "variant": "flag 0x1d"
+       },
+       "true": {
+        "steps": [],
+        "next": 10
+       },
+       "false": {
+        "steps": [],
+        "next": 11
+       }
+      }
      }
     },
     {
@@ -235,7 +302,7 @@
       9
      ],
      "start": "0x460192",
-     "paths": 2,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -346,7 +413,19 @@
          "kind": "MSG"
         }
        ],
-       "next": 11
+       "test": {
+        "a": 4589841,
+        "fn": "flag",
+        "variant": "flag 0x1d"
+       },
+       "true": {
+        "steps": [],
+        "next": 10
+       },
+       "false": {
+        "steps": [],
+        "next": 11
+       }
       },
       "false": {
        "steps": [
@@ -393,7 +472,19 @@
          "kind": "MSG"
         }
        ],
-       "next": 11
+       "test": {
+        "a": 4589841,
+        "fn": "flag",
+        "variant": "flag 0x1d"
+       },
+       "true": {
+        "steps": [],
+        "next": 10
+       },
+       "false": {
+        "steps": [],
+        "next": 11
+       }
       }
      }
     },
@@ -997,11 +1088,66 @@
       8
      ]
     },
+    "0x45fe82": {
+     "a": 4587138,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x460113": {
      "a": 4587795,
      "kind": "ACTION",
      "obj": "bal/barbecue",
      "act": "pour_beer"
+    },
+    "0x460171": {
+     "a": 4587889,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1d",
+     "fn": "flag"
+    },
+    "0x45fe9a": {
+     "a": 4587162,
+     "kind": "STOPMSG"
+    },
+    "0x45fef7": {
+     "a": 4587255,
+     "kind": "ACTION",
+     "obj": "bal/barbecue",
+     "act": "pour_fuel"
+    },
+    "0x45ff39": {
+     "a": 4587321,
+     "kind": "SWITCH",
+     "args": [
+      "bal/barbecue",
+      "bal/barbecue_burn"
+     ]
+    },
+    "0x45ff78": {
+     "a": 4587384,
+     "kind": "MSG"
+    },
+    "0x45ffa8": {
+     "a": 4587432,
+     "kind": "FIRE4",
+     "args": [
+      "addr",
+      "bal/fuelbeer",
+      "ebp",
+      "ebx"
+     ]
+    },
+    "0x46003a": {
+     "a": 4587578,
+     "kind": "MSG"
+    },
+    "0x460083": {
+     "a": 4587651,
+     "kind": "GOTO",
+     "obj": "bed/extinguisher"
     },
     "0x4601d9": {
      "a": 4587993,
@@ -1101,6 +1247,13 @@
     "0x4608bf": {
      "a": 4589759,
      "kind": "MSG"
+    },
+    "0x460911": {
+     "a": 4589841,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1d",
+     "fn": "flag"
     },
     "0x460628": {
      "a": 4589096,

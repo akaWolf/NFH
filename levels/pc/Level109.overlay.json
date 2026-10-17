@@ -1229,6 +1229,25 @@
     }
    },
    "source": "the pet's visit (tools/pcref/pc_pets_s1.py VISIT_POSTS): the behaviours the level class posts to it as the neighbour comes into its room, starts the stay and ends it"
+  },
+  {
+   "object": "PigKeys",
+   "component": "SearchItem",
+   "set": {
+    "PCVisitNeedsHeld": [
+     false,
+     true
+    ]
+   },
+   "source": "the pig class's key-board cases (game.exe): case 12-13 GoTo bed/keyboard, `INV pigkey` on the board (fcn.00446020 at 0x469f8e) -> take; case 1 `INV pigkey` on himself (0x468ca9) -> case 2's give, else case 3's teeth — the original's run of the plan (nocatch3, 2026-10-25) makes no second board visit in the lap after Woody takes the key (no pig_key icon 160-230 s), the port's routine walked there for a SurpriseNotFound (221.1, 14.9 s)"
+  },
+  {
+   "object": "Pig",
+   "component": "TrickItem",
+   "set": {
+    "PCSurpriseSeconds": 2.0
+   },
+   "source": "the pig class's case 17-18 (game.exe): the pig gone (`IFVARIANT anc/pigout` 0x46a4c4) is the neighbour's `surprise` through the DoAction wrapper (0x479c13), 24 ticks in the original's run of the plan (167.92-169.92, nocatch3 2026-10-25) where the port's SurpriseNotFound ran 6.0 s (167.2-173.2) — the walk to the bottle after it is 9.0 s on both"
   }
  ]
 }

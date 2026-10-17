@@ -955,7 +955,7 @@
       20
      ],
      "start": "0x46a7aa",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -966,21 +966,60 @@
          "ebp",
          21
         ]
-       },
-       {
-        "a": 4630894,
-        "kind": "ACTION",
-        "obj": "neighbor",
-        "act": "shake_bottle"
-       },
-       {
-        "a": 4630992,
-        "kind": "ACTION",
-        "obj": "anc/pig",
-        "act": "feed"
        }
       ],
-      "next": 21
+      "test": {
+       "a": 4630496,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4630520,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4630618,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "shake_bottle"
+        },
+        {
+         "a": 4630712,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "bottle_explode"
+        },
+        {
+         "a": 4630791,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/babybottle_nitro",
+          2
+         ]
+        }
+       ],
+       "next": 21
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4630894,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "shake_bottle"
+        },
+        {
+         "a": 4630992,
+         "kind": "ACTION",
+         "obj": "anc/pig",
+         "act": "feed"
+        }
+       ],
+       "next": 21
+      }
      }
     },
     {
@@ -1013,7 +1052,7 @@
       22
      ],
      "start": "0x46aa95",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -1030,13 +1069,31 @@
         "kind": "ACTION",
         "obj": "kit/babybottle",
         "act": "give"
-       },
-       {
-        "a": 4631434,
-        "kind": "MSG"
        }
       ],
-      "next": 23
+      "test": {
+       "a": 4631341,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4631434,
+         "kind": "MSG"
+        }
+       ],
+       "next": 23
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4631434,
+         "kind": "MSG"
+        }
+       ],
+       "next": 23
+      }
      }
     },
     {
@@ -1211,30 +1268,84 @@
       27
      ],
      "start": "0x46b09e",
-     "paths": 1,
+     "paths": 2,
      "tree": {
-      "steps": [
-       {
-        "a": 4633384,
-        "kind": "SUBSEQ",
-        "args": [
-         "addr"
-        ]
-       },
-       {
-        "a": 4633471,
-        "kind": "ACTION",
-        "obj": "chili",
-        "act": "give"
-       },
-       {
-        "a": 4633569,
-        "kind": "ACTION",
-        "obj": "chili",
-        "act": "eat"
-       }
-      ],
-      "next": 28
+      "steps": [],
+      "test": {
+       "a": 4632841,
+       "fn": "flag",
+       "variant": "flag 0x1d"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4632862,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4632920,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4633018,
+         "kind": "ACTION",
+         "obj": "chili",
+         "act": "give"
+        },
+        {
+         "a": 4633112,
+         "kind": "ACTION",
+         "obj": "chili",
+         "act": "eat"
+        },
+        {
+         "a": 4633206,
+         "kind": "ACTION",
+         "obj": "chili",
+         "act": "get_hot"
+        },
+        {
+         "a": 4633315,
+         "kind": "FIRE5",
+         "args": [
+          "addr",
+          "kit/cookiebox_hot",
+          0,
+          0,
+          "spit_fire"
+         ]
+        }
+       ],
+       "next": 28
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4633384,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr"
+         ]
+        },
+        {
+         "a": 4633471,
+         "kind": "ACTION",
+         "obj": "chili",
+         "act": "give"
+        },
+        {
+         "a": 4633569,
+         "kind": "ACTION",
+         "obj": "chili",
+         "act": "eat"
+        }
+       ],
+       "next": 28
+      }
      }
     },
     {
@@ -1861,6 +1972,13 @@
       21
      ]
     },
+    "0x46a7e0": {
+     "a": 4630496,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x46a96e": {
      "a": 4630894,
      "kind": "ACTION",
@@ -1872,6 +1990,31 @@
      "kind": "ACTION",
      "obj": "anc/pig",
      "act": "feed"
+    },
+    "0x46a7f8": {
+     "a": 4630520,
+     "kind": "STOPMSG"
+    },
+    "0x46a85a": {
+     "a": 4630618,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "shake_bottle"
+    },
+    "0x46a8b8": {
+     "a": 4630712,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "bottle_explode"
+    },
+    "0x46a907": {
+     "a": 4630791,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/babybottle_nitro",
+      2
+     ]
     },
     "0x46aa52": {
      "a": 4631122,
@@ -1900,6 +2043,13 @@
      "kind": "ACTION",
      "obj": "kit/babybottle",
      "act": "give"
+    },
+    "0x46ab2d": {
+     "a": 4631341,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
     },
     "0x46ab8a": {
      "a": 4631434,
@@ -1984,6 +2134,13 @@
      "kind": "GOTO",
      "obj": "dword [esp + 0x1c4]"
     },
+    "0x46b109": {
+     "a": 4632841,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1d",
+     "fn": "flag"
+    },
     "0x46b328": {
      "a": 4633384,
      "kind": "SUBSEQ",
@@ -2002,6 +2159,47 @@
      "kind": "ACTION",
      "obj": "chili",
      "act": "eat"
+    },
+    "0x46b11e": {
+     "a": 4632862,
+     "kind": "SUBSEQ",
+     "args": [
+      "addr",
+      0
+     ]
+    },
+    "0x46b158": {
+     "a": 4632920,
+     "kind": "STOPMSG"
+    },
+    "0x46b1ba": {
+     "a": 4633018,
+     "kind": "ACTION",
+     "obj": "chili",
+     "act": "give"
+    },
+    "0x46b218": {
+     "a": 4633112,
+     "kind": "ACTION",
+     "obj": "chili",
+     "act": "eat"
+    },
+    "0x46b276": {
+     "a": 4633206,
+     "kind": "ACTION",
+     "obj": "chili",
+     "act": "get_hot"
+    },
+    "0x46b2e3": {
+     "a": 4633315,
+     "kind": "FIRE5",
+     "args": [
+      "addr",
+      "kit/cookiebox_hot",
+      0,
+      0,
+      "spit_fire"
+     ]
     },
     "0x46b4d9": {
      "a": 4633817,

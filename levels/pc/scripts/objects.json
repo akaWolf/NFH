@@ -1,0 +1,1386 @@
+{
+ "101": {
+  "folder": "level_peep",
+  "items": {
+   "Binoculars": {
+    "object": "kit/binoculars",
+    "base": "kit/binoculars",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "Sofa": {
+    "object": "lir/sofa",
+    "base": "lir/sofa",
+    "kind": "TrickItem"
+   },
+   "Television": {
+    "object": "lir/tv",
+    "base": "lir/tv",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "Binoculars",
+   "Sofa"
+  ]
+ },
+ "102": {
+  "folder": "level_sofa",
+  "items": {
+   "Beer": {
+    "object": "kit/beer",
+    "base": "kit/beer",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "Sofa": {
+    "object": "lir/sofa",
+    "base": "lir/sofa",
+    "kind": "TrickItem"
+   },
+   "Television": {
+    "object": "lir/tv",
+    "base": "lir/tv",
+    "kind": "TrickItem"
+   },
+   "Toilet": {
+    "object": "toi/toilet",
+    "base": "toi/toilet",
+    "kind": "TrickItem"
+   },
+   "ToiletPaper": {
+    "object": "toi/paperbracket",
+    "base": "toi/paperbracket",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "Beer",
+   "Sofa",
+   "Toilet"
+  ]
+ },
+ "103": {
+  "folder": "level_mail",
+  "items": {
+   "BirthdayCake": {
+    "object": "kit/cake",
+    "base": "kit/cake",
+    "kind": "ItemAnimationController"
+   },
+   "Candle": {
+    "object": "kit/candlebox",
+    "base": "kit/candlebox",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "LetterBox": {
+    "object": "anc/mailbox",
+    "base": "anc/mailbox",
+    "kind": "TrickItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "MumPicture": {
+    "object": "anc/mum",
+    "base": "anc/mum",
+    "kind": "TrickItem"
+   },
+   "SoapDish": {
+    "object": "toi/soapbracket",
+    "base": "toi/soapbracket",
+    "kind": "SearchItem"
+   },
+   "Toilet": {
+    "object": "toi/toilet",
+    "base": "toi/toilet",
+    "kind": "TrickItem"
+   },
+   "ToiletPaper": {
+    "object": "toi/paperbracket",
+    "base": "toi/paperbracket",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "BirthdayCake",
+   "Candle",
+   "FirstAid",
+   "LetterBox"
+  ]
+ },
+ "104": {
+  "folder": "level_pie",
+  "items": {
+   "AfterShave": {
+    "object": "toi/aftershave",
+    "base": "toi/aftershave",
+    "kind": "TrickItem"
+   },
+   "ApplePie": {
+    "object": "kit/applepie",
+    "base": "kit/applepie",
+    "kind": "TrickItem"
+   },
+   "Deodrant": {
+    "object": "toi/deodrant",
+    "base": "toi/deodrant",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "MumPicture": {
+    "object": "anc/mum",
+    "base": "anc/mum",
+    "kind": "TrickItem"
+   },
+   "SinkAftershave": {
+    "object": "toi/sinkaftershave",
+    "base": "toi/sinkaftershave",
+    "kind": "TrickItem"
+   },
+   "SinkDeodrant": {
+    "object": "toi/sinkdeodrant",
+    "base": "toi/sinkdeodrant",
+    "kind": "TrickItem"
+   },
+   "SoapDish": {
+    "object": "toi/soapbracket",
+    "base": "toi/soapbracket",
+    "kind": "SearchItem"
+   },
+   "Toilet": {
+    "object": "toi/toilet",
+    "base": "toi/toilet",
+    "kind": "TrickItem"
+   },
+   "ToiletPaper": {
+    "object": "toi/paperbracket",
+    "base": "toi/paperbracket",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   },
+   "WhippedCream": {
+    "object": "kit/whippedcream",
+    "base": "kit/whippedcream",
+    "kind": "TrickItem"
+   }
+  },
+  "stations": [
+   "AfterShave",
+   "ApplePie",
+   "Deodrant",
+   "Microwave",
+   "SinkAftershave",
+   "SinkDeodrant",
+   "WhippedCream"
+  ]
+ },
+ "105": {
+  "folder": "level_piano",
+  "items": {
+   "BowlingBag": {
+    "object": "anc/bowlingbag",
+    "base": "anc/bowlingbag",
+    "kind": "SearchItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Football": {
+    "object": "kit/football",
+    "base": "kit/football",
+    "kind": "TrickItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "Mobile": {
+    "object": "lir/handyholder",
+    "base": "lir/handyholder",
+    "kind": "SearchItem"
+   },
+   "MumPicture": {
+    "object": "anc/mum",
+    "base": "anc/mum",
+    "kind": "TrickItem"
+   },
+   "Phone": {
+    "object": "anc/phone",
+    "base": "anc/phone",
+    "kind": "TrickItem"
+   },
+   "Piano": {
+    "object": "lir/score",
+    "base": "lir/score",
+    "kind": "TrickItem"
+   },
+   "PlantStink": {
+    "object": "anc/flower",
+    "base": "anc/flower",
+    "kind": "TrickItem"
+   },
+   "SoapDish": {
+    "object": "toi/soapbracket",
+    "base": "toi/soapbracket",
+    "kind": "SearchItem"
+   },
+   "Toilet": {
+    "object": "toi/toilet",
+    "base": "toi/toilet",
+    "kind": "TrickItem"
+   },
+   "ToiletPaper": {
+    "object": "toi/paperbracket",
+    "base": "toi/paperbracket",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   },
+   "Window": {
+    "object": "kit/window",
+    "base": "kit/window",
+    "kind": "TrickItem"
+   }
+  },
+  "stations": [
+   "Football",
+   "Phone",
+   "Piano",
+   "PlantStink",
+   "Toilet",
+   "Window"
+  ]
+ },
+ "106": {
+  "folder": "level_bath",
+  "items": {
+   "BathTub": {
+    "object": "toi/tub",
+    "base": "toi/tub",
+    "kind": "ItemAnimationController"
+   },
+   "Candy": {
+    "object": "lir/candy",
+    "base": "lir/candy",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Microwave": {
+    "object": "kit/microwave",
+    "base": "kit/microwave",
+    "kind": "TrickItem"
+   },
+   "MumPicture": {
+    "object": "anc/mum",
+    "base": "anc/mum",
+    "kind": "TrickItem"
+   },
+   "PhotoAlbum": {
+    "object": "lir/book",
+    "base": "lir/book",
+    "kind": "TrickItem"
+   },
+   "Pudding": {
+    "object": "kit/foampudding",
+    "base": "kit/foampudding",
+    "kind": "ItemAnimationController"
+   },
+   "RubbishBinBottle": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "SoapDish": {
+    "object": "toi/soapbracket",
+    "base": "toi/soapbracket",
+    "kind": "SearchItem"
+   },
+   "Toilet": {
+    "object": "toi/toilet",
+    "base": "toi/toilet",
+    "kind": "TrickItem"
+   },
+   "ToiletPaper": {
+    "object": "toi/paperbracket",
+    "base": "toi/paperbracket",
+    "kind": "SearchItem"
+   },
+   "Towel": {
+    "object": "toi/towel",
+    "base": "toi/towel",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "BathTub",
+   "Candy",
+   "PhotoAlbum",
+   "Pudding",
+   "Toilet",
+   "Towel"
+  ]
+ },
+ "107": {
+  "folder": "level_art",
+  "items": {
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "Camera": {
+    "object": "bed/camera",
+    "base": "bed/camera",
+    "kind": "TrickItem"
+   },
+   "Chili": {
+    "object": "lir/chili",
+    "base": "lir/chili",
+    "kind": "ItemAnimationController"
+   },
+   "DieselChair": {
+    "object": "kit/stool",
+    "base": "kit/stool",
+    "kind": "TrickItem"
+   },
+   "DieselGenerator": {
+    "object": "kit/potterswheel",
+    "base": "kit/potterswheel",
+    "kind": "TrickItem"
+   },
+   "Dove": {
+    "object": "bal/dove_free",
+    "base": "bal/dove_free",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "Drawing": {
+    "object": "bal/picture",
+    "base": "bal/picture",
+    "kind": "ItemAnimationController"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "MagnesiumBottle": {
+    "object": "bed/magnesiumbottle",
+    "base": "bed/magnesiumbottle",
+    "kind": "SearchItem"
+   },
+   "MumStatueDummy": {
+    "object": "lir/statue",
+    "base": "lir/statue",
+    "kind": "TrickItem"
+   },
+   "MumStatueFootStool": {
+    "object": "lir/footstool",
+    "base": "lir/footstool",
+    "kind": "ItemAnimationController"
+   },
+   "PinsBoard": {
+    "object": "anc/pinboard",
+    "base": "anc/pinboard",
+    "kind": "SearchItem"
+   },
+   "RubbishBinBanana": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "Camera",
+   "Chili",
+   "DieselChair",
+   "DieselGenerator",
+   "Dove",
+   "Drawing",
+   "MagnesiumBottle",
+   "MumStatueFootStool"
+  ]
+ },
+ "108": {
+  "folder": "level_suntan",
+  "items": {
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "BedDrawer": {
+    "object": "bed/bedbox",
+    "base": "bed/bedbox",
+    "kind": "SearchItem"
+   },
+   "BeeHive": {
+    "object": "bal/bees",
+    "base": "bal/bees",
+    "kind": "TrickItem"
+   },
+   "Chili": {
+    "object": "lir/chili",
+    "base": "lir/chili",
+    "kind": "ItemAnimationController"
+   },
+   "CoffeeMaker": {
+    "object": "kit/coffeebox",
+    "base": "kit/coffeebox",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "PinsBoard": {
+    "object": "anc/pinboard",
+    "base": "anc/pinboard",
+    "kind": "SearchItem"
+   },
+   "Plant": {
+    "object": "anc/flower",
+    "base": "anc/flower",
+    "kind": "TrickItem"
+   },
+   "RubbishBinBanana2": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "Shezlong": {
+    "object": "bal/foldingchair",
+    "base": "bal/foldingchair",
+    "kind": "ItemAnimationController"
+   },
+   "SoilBag": {
+    "object": "bal/soil",
+    "base": "bal/soil",
+    "kind": "SearchItem"
+   },
+   "SunLotion": {
+    "object": "bal/suncream",
+    "base": "bal/suncream",
+    "kind": "TrickItem"
+   },
+   "SunShade": {
+    "object": "bal/sunshade",
+    "base": "bal/sunshade",
+    "kind": "TrickItem"
+   },
+   "ToothBrush": {
+    "object": "toi/toothbrushset",
+    "base": "toi/toothbrushset",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   },
+   "WateringCan": {
+    "object": "bal/ewer",
+    "base": "bal/ewer",
+    "kind": "TrickItem"
+   }
+  },
+  "stations": [
+   "Chili",
+   "CoffeeMaker",
+   "Plant",
+   "Shezlong",
+   "ToothBrush",
+   "WateringCan"
+  ]
+ },
+ "109": {
+  "folder": "level_pig",
+  "items": {
+   "AlarmClock": {
+    "object": "bed/alarmclock",
+    "base": "bed/alarmclock",
+    "kind": "ItemAnimationController"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "Cactus": {
+    "object": "bal/cactus",
+    "base": "bal/cactus",
+    "kind": "SearchItem"
+   },
+   "ChemicalSet": {
+    "object": "lir/chemicalkit",
+    "base": "lir/chemicalkit",
+    "kind": "SearchItem"
+   },
+   "Chili": {
+    "object": "kit/chili",
+    "base": "kit/chili",
+    "kind": "ItemAnimationController"
+   },
+   "CornChips": {
+    "object": "kit/cookiebox",
+    "base": "kit/cookiebox",
+    "kind": "TrickItem"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Pig": {
+    "object": "anc/pig",
+    "base": "anc/pig",
+    "kind": "ItemAnimationController"
+   },
+   "PigKeys": {
+    "object": "bed/keyboard",
+    "base": "bed/keyboard",
+    "kind": "SearchItem"
+   },
+   "PigMilk": {
+    "object": "kit/babybottle",
+    "base": "kit/babybottle",
+    "kind": "TrickItem"
+   },
+   "PinsBoard": {
+    "object": "anc/pinboard",
+    "base": "anc/pinboard",
+    "kind": "SearchItem"
+   },
+   "RubbishBinBanana2": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "SpicyChips": {
+    "object": "lir/chips",
+    "base": "lir/chips",
+    "kind": "SearchItem"
+   },
+   "Teeth": {
+    "object": "bed/teeth",
+    "base": "bed/teeth",
+    "kind": "ItemAnimationController"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "AlarmClock",
+   "Bed",
+   "Chili",
+   "CornChips",
+   "Pig",
+   "PigKeys",
+   "PigMilk",
+   "Teeth"
+  ]
+ },
+ "110": {
+  "folder": "level_barbecue",
+  "items": {
+   "BBQ": {
+    "object": "bal/barbecue",
+    "base": "bal/barbecue",
+    "kind": "TrickItem"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "Beer": {
+    "object": "bal/beer",
+    "base": "bal/beer",
+    "kind": "TrickItem"
+   },
+   "CarnivorPlant": {
+    "object": "bal/plant",
+    "base": "bal/plant",
+    "kind": "InspectItem"
+   },
+   "CarnivorPlantSpray": {
+    "object": "bal/spray",
+    "base": "bal/spray",
+    "kind": "ItemAnimationController"
+   },
+   "Chili": {
+    "object": "lir/chili",
+    "base": "lir/chili",
+    "kind": "ItemAnimationController"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "FireExtinguisher": {
+    "object": "bed/extinguisher",
+    "base": "bed/extinguisher",
+    "kind": "TrickItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "PigPen": {
+    "object": "anc/pigcage",
+    "base": "anc/pigcage",
+    "kind": "TrickItem"
+   },
+   "PinsBoard": {
+    "object": "anc/pinboard",
+    "base": "anc/pinboard",
+    "kind": "SearchItem"
+   },
+   "RubbishBinBanana2": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "SteakChair": {
+    "object": "lir/chair",
+    "base": "lir/chair",
+    "kind": "TrickItem"
+   },
+   "SteakMeat": {
+    "object": "kit/meatbowl",
+    "base": "kit/meatbowl",
+    "kind": "TrickItem"
+   },
+   "SteakTable": {
+    "object": "lir/table",
+    "base": "lir/table",
+    "kind": "ItemAnimationController"
+   },
+   "SteakWine": {
+    "object": "lir/wine",
+    "base": "lir/wine",
+    "kind": "TrickItem"
+   },
+   "SteakWineGlass": {
+    "object": "lir/glass",
+    "base": "lir/glass",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "BBQ",
+   "Beer",
+   "CarnivorPlantSpray",
+   "Chili",
+   "FireExtinguisher",
+   "SteakChair",
+   "SteakMeat",
+   "SteakWine"
+  ]
+ },
+ "111": {
+  "folder": "level_laundry",
+  "items": {
+   "Airer": {
+    "object": "bal/clothes",
+    "base": "bal/clothes",
+    "kind": "TrickItem"
+   },
+   "Aquarium": {
+    "object": "wor/aquarium",
+    "base": "wor/aquarium",
+    "kind": "TrickItem"
+   },
+   "BasementDrawer": {
+    "object": "bas/workbench",
+    "base": "bas/basementdrawer",
+    "kind": "SearchItem"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "DeskDrawer": {
+    "object": "wor/ark",
+    "base": "wor/ark",
+    "kind": "SearchItem"
+   },
+   "Detergent": {
+    "object": "kit/detergent",
+    "base": "kit/detergent",
+    "kind": "SearchItem"
+   },
+   "DirtyCarpet": {
+    "object": "lir/dirtycarpet",
+    "base": "lir/dirtycarpet",
+    "kind": "TrickItem"
+   },
+   "Dog": {
+    "object": "lir/dog",
+    "base": "lir/dog",
+    "kind": "ItemAnimationController"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "Drier": {
+    "object": "bas/tumbledrier",
+    "base": "bas/tumbledrier",
+    "kind": "ItemAnimationController"
+   },
+   "ElectricTrap": {
+    "object": "bas/electrotrap",
+    "base": "bas/electrotrap",
+    "kind": "TrickItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "FishTank": {
+    "object": "wor/aquarium",
+    "base": "wor/aquarium",
+    "kind": "TrickItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Iron": {
+    "object": "bed/ironingboard_clothes",
+    "base": "bed/ironingboard",
+    "kind": "TrickItem"
+   },
+   "Perch": {
+    "object": "lir/birdpole",
+    "base": "lir/birdpole",
+    "kind": "SearchItem"
+   },
+   "PlantSoil": {
+    "object": "lir/flower",
+    "base": "lir/flower",
+    "kind": "TrickItem"
+   },
+   "RubbishBinCable": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "TableShovel": {
+    "object": "bal/shovel",
+    "base": "bal/shovel",
+    "kind": "SearchItem"
+   },
+   "Vacuum": {
+    "object": "lir/vacuum",
+    "base": "lir/vacuum",
+    "kind": "ItemAnimationController"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   },
+   "WashingMachine": {
+    "object": "bas/washingmachine",
+    "base": "bas/washingmachine",
+    "kind": "TrickItem"
+   },
+   "WineCellar": {
+    "object": "bas/wine",
+    "base": "bas/wine",
+    "kind": "SearchItem"
+   }
+  },
+  "stations": [
+   "Airer",
+   "Detergent",
+   "DirtyCarpet",
+   "Dog",
+   "Drier",
+   "FishTank",
+   "Iron",
+   "Vacuum",
+   "WashingMachine"
+  ]
+ },
+ "112": {
+  "folder": "level_fitness",
+  "items": {
+   "Aquarium": {
+    "object": "wor/aquarium",
+    "base": "wor/aquarium",
+    "kind": "TrickItem"
+   },
+   "BasementDrawer": {
+    "object": "bas/workbench",
+    "base": "bas/basementdrawer",
+    "kind": "SearchItem"
+   },
+   "BasementSpring": {
+    "object": "bas/carstuff",
+    "base": "bas/basementspring",
+    "kind": "SearchItem"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "BedDrawer": {
+    "object": "bed/bedbox",
+    "base": "bed/bedbox",
+    "kind": "SearchItem"
+   },
+   "Bicycle": {
+    "object": "lir/hometrainer",
+    "base": "lir/hometrainer",
+    "kind": "TrickItem"
+   },
+   "ChestExpander": {
+    "object": "bas/expander",
+    "base": "bas/expander",
+    "kind": "TrickItem"
+   },
+   "DeskDrawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "Dog": {
+    "object": "kit/dog",
+    "base": "kit/dog",
+    "kind": "ItemAnimationController"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "ElectricTrap": {
+    "object": "bas/electrotrap",
+    "base": "bas/electrotrap",
+    "kind": "TrickItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "FishTank": {
+    "object": "wor/aquarium",
+    "base": "wor/aquarium",
+    "kind": "TrickItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "Mixer": {
+    "object": "kit/mixer",
+    "base": "kit/mixer",
+    "kind": "TrickItem"
+   },
+   "Rope": {
+    "object": "anc/skippingrope",
+    "base": "anc/skippingrope",
+    "kind": "TrickItem"
+   },
+   "RubbishBinCable": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "SportsBag": {
+    "object": "anc/bag",
+    "base": "anc/bag",
+    "kind": "SearchItem"
+   },
+   "TableSaw": {
+    "object": "bal/saw",
+    "base": "bal/saw",
+    "kind": "SearchItem"
+   },
+   "Trampoline": {
+    "object": "bed/trampoline",
+    "base": "bed/trampoline",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   },
+   "Weights": {
+    "object": "bas/barbell",
+    "base": "bas/barbell",
+    "kind": "ItemAnimationController"
+   },
+   "Yoga": {
+    "object": "lir/mat",
+    "base": "lir/mat",
+    "kind": "TrickItem"
+   },
+   "YogaBook": {
+    "object": "wor/book",
+    "base": "wor/book",
+    "kind": "TrickItem"
+   },
+   "YogaExercise": {
+    "object": "lir/mat",
+    "base": "lir/mat",
+    "kind": "TrickItem"
+   }
+  },
+  "stations": [
+   "Bicycle",
+   "ChestExpander",
+   "Dog",
+   "FishTank",
+   "Mixer",
+   "Rope",
+   "Trampoline",
+   "Weights",
+   "Yoga",
+   "YogaBook"
+  ]
+ },
+ "113": {
+  "folder": "level_DIY",
+  "items": {
+   "AngleGrinder": {
+    "object": "bal/anglegrinder",
+    "base": "bal/anglegrinder",
+    "kind": "TrickItem"
+   },
+   "BasementDrawer": {
+    "object": "bas/workbench",
+    "base": "bas/basementdrawer",
+    "kind": "SearchItem"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "BedDrawer": {
+    "object": "bed/bedbox",
+    "base": "bed/bedbox",
+    "kind": "SearchItem"
+   },
+   "ChairAssembly": {
+    "object": "lir/stoolkit",
+    "base": "lir/stoolkit",
+    "kind": "ItemAnimationController"
+   },
+   "ChairAssemblyBook": {
+    "object": "lir/pieces",
+    "base": "lir/pieces",
+    "kind": "TrickItem"
+   },
+   "DeskDrawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "Dog": {
+    "object": "lir/dog",
+    "base": "lir/dog",
+    "kind": "ItemAnimationController"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "ElectricTrap": {
+    "object": "bas/electrotrap",
+    "base": "bas/electrotrap",
+    "kind": "ItemAnimationController"
+   },
+   "ElectricTrapTatter": {
+    "object": "bas/tatter",
+    "base": "bas/tatter",
+    "kind": "TrickItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "FuseBox": {
+    "object": "anc/fuse",
+    "base": "anc/fuse",
+    "kind": "TrickItem"
+   },
+   "Ladder": {
+    "object": "wor/ladder",
+    "base": "wor/ladder",
+    "kind": "ItemAnimationController"
+   },
+   "LadderDrill": {
+    "object": "wor/ladder",
+    "base": "wor/ladder",
+    "kind": "TrickItem"
+   },
+   "Radiator": {
+    "object": "kit/heater",
+    "base": "kit/heater",
+    "kind": "ItemAnimationController"
+   },
+   "RubbishBinCable": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "Sink": {
+    "object": "toi/basin",
+    "base": "toi/basin",
+    "kind": "ItemAnimationController"
+   },
+   "ValveHot": {
+    "object": "bas/heatvalve_off",
+    "base": "bas/heatvalve_off",
+    "kind": "TrickItem"
+   },
+   "ValveMain": {
+    "object": "bas/valve_off",
+    "base": "bas/valve_off",
+    "kind": "TrickItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "AngleGrinder",
+   "ChairAssembly",
+   "Dog",
+   "FuseBox",
+   "Ladder",
+   "LadderDrill",
+   "Radiator",
+   "Sink",
+   "ValveMain"
+  ]
+ },
+ "114": {
+  "folder": "level_hunter",
+  "items": {
+   "Aquarium": {
+    "object": "wor/aquarium",
+    "base": "wor/aquarium",
+    "kind": "TrickItem"
+   },
+   "BasementDrawer": {
+    "object": "bas/workbench",
+    "base": "bas/basementdrawer",
+    "kind": "SearchItem"
+   },
+   "Bed": {
+    "object": "bed/bed",
+    "base": "bed/bed",
+    "kind": "ItemAnimationController"
+   },
+   "BedDrawer": {
+    "object": "bed/bedbox",
+    "base": "bed/bedbox",
+    "kind": "SearchItem"
+   },
+   "CDs": {
+    "object": "lir/records",
+    "base": "lir/records",
+    "kind": "TrickItem"
+   },
+   "DeskDrawer": {
+    "object": "wor/ark",
+    "base": "wor/ark",
+    "kind": "SearchItem"
+   },
+   "Dog": {
+    "object": "bed/dog",
+    "base": "bed/dog",
+    "kind": "ItemAnimationController"
+   },
+   "Drawer": {
+    "object": "anc/ark",
+    "base": "anc/ark",
+    "kind": "SearchItem"
+   },
+   "ElectricTrap": {
+    "object": "bas/electrotrap",
+    "base": "bas/electrotrap",
+    "kind": "TrickItem"
+   },
+   "FirstAid": {
+    "object": "toi/firstaid",
+    "base": "toi/firstaid",
+    "kind": "SearchItem"
+   },
+   "Fridge": {
+    "object": "kit/fridge",
+    "base": "kit/fridge",
+    "kind": "SearchItem"
+   },
+   "GoldCup": {
+    "object": "wor/cups",
+    "base": "wor/cups",
+    "kind": "TrickItem"
+   },
+   "Gramaphone": {
+    "object": "lir/lockedphono",
+    "base": "lir/lockedphono",
+    "kind": "ItemAnimationController"
+   },
+   "Hat": {
+    "object": "bed/hat",
+    "base": "bed/hat",
+    "kind": "TrickItem"
+   },
+   "Horn": {
+    "object": "bal/woodhorn",
+    "base": "bal/woodhorn",
+    "kind": "TrickItem"
+   },
+   "MedalBox": {
+    "object": "bed/medalbox",
+    "base": "bed/medalbox",
+    "kind": "ItemAnimationController"
+   },
+   "MouseHole": {
+    "object": "bas/rat",
+    "base": "bas/mousehole",
+    "kind": "SearchItem"
+   },
+   "Pipe": {
+    "object": "lir/tabacbox",
+    "base": "lir/tabacbox",
+    "kind": "TrickItem"
+   },
+   "Polish": {
+    "object": "kit/polish",
+    "base": "kit/polish",
+    "kind": "ItemAnimationController"
+   },
+   "RubbishBinCable": {
+    "object": "kit/trashcan",
+    "base": "kit/trashcan",
+    "kind": "SearchItem"
+   },
+   "Shotgun": {
+    "object": "bas/gun",
+    "base": "bas/gun",
+    "kind": "ItemAnimationController"
+   },
+   "ShotgunShells": {
+    "object": "bed/munition",
+    "base": "bed/munition",
+    "kind": "SearchItem"
+   },
+   "Wardrobe": {
+    "object": "anc/wardrobe",
+    "base": "anc/wardrobe",
+    "kind": "HideItem"
+   }
+  },
+  "stations": [
+   "CDs",
+   "Dog",
+   "GoldCup",
+   "Gramaphone",
+   "Hat",
+   "Horn",
+   "MedalBox",
+   "Pipe",
+   "Polish",
+   "Shotgun"
+  ]
+ }
+}

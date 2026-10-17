@@ -550,7 +550,7 @@
       10
      ],
      "start": "0x4625aa",
-     "paths": 1,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -561,21 +561,126 @@
          "ebp",
          10
         ]
-       },
-       {
-        "a": 4597485,
-        "kind": "ACTION",
-        "obj": "toi/basin",
-        "act": "shave"
-       },
-       {
-        "a": 4597821,
-        "kind": "ACTION",
-        "obj": "toi/basin",
-        "act": "grease_hair"
        }
       ],
-      "next": 11
+      "test": {
+       "a": 4597210,
+       "fn": "flag",
+       "variant": "flag 0x14"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4597231,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4597321,
+         "kind": "ACTION",
+         "obj": "toi/basin",
+         "act": "shave_glue"
+        },
+        {
+         "a": 4597393,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "toi/aftershave_glue",
+          2
+         ]
+        }
+       ],
+       "test": {
+        "a": 4597538,
+        "fn": "flag",
+        "variant": "flag 0x15"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4597559,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4597648,
+          "kind": "ACTION",
+          "obj": "toi/basin",
+          "act": "grow_hair"
+         },
+         {
+          "a": 4597723,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "toi/grease_exchanged",
+           2
+          ]
+         }
+        ],
+        "next": 11
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4597821,
+          "kind": "ACTION",
+          "obj": "toi/basin",
+          "act": "grease_hair"
+         }
+        ],
+        "next": 11
+       }
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4597485,
+         "kind": "ACTION",
+         "obj": "toi/basin",
+         "act": "shave"
+        }
+       ],
+       "test": {
+        "a": 4597538,
+        "fn": "flag",
+        "variant": "flag 0x15"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4597559,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4597648,
+          "kind": "ACTION",
+          "obj": "toi/basin",
+          "act": "grow_hair"
+         },
+         {
+          "a": 4597723,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "toi/grease_exchanged",
+           2
+          ]
+         }
+        ],
+        "next": 11
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4597821,
+          "kind": "ACTION",
+          "obj": "toi/basin",
+          "act": "grease_hair"
+         }
+        ],
+        "next": 11
+       }
+      }
      }
     },
     {
@@ -927,17 +1032,69 @@
       10
      ]
     },
+    "0x4625da": {
+     "a": 4597210,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x14",
+     "fn": "flag"
+    },
     "0x4626ed": {
      "a": 4597485,
      "kind": "ACTION",
      "obj": "toi/basin",
      "act": "shave"
     },
+    "0x462722": {
+     "a": 4597538,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x15",
+     "fn": "flag"
+    },
     "0x46283d": {
      "a": 4597821,
      "kind": "ACTION",
      "obj": "toi/basin",
      "act": "grease_hair"
+    },
+    "0x4625ef": {
+     "a": 4597231,
+     "kind": "STOPMSG"
+    },
+    "0x462649": {
+     "a": 4597321,
+     "kind": "ACTION",
+     "obj": "toi/basin",
+     "act": "shave_glue"
+    },
+    "0x462691": {
+     "a": 4597393,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "toi/aftershave_glue",
+      2
+     ]
+    },
+    "0x462737": {
+     "a": 4597559,
+     "kind": "STOPMSG"
+    },
+    "0x462790": {
+     "a": 4597648,
+     "kind": "ACTION",
+     "obj": "toi/basin",
+     "act": "grow_hair"
+    },
+    "0x4627db": {
+     "a": 4597723,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "toi/grease_exchanged",
+      2
+     ]
     },
     "0x4628bc": {
      "a": 4597948,

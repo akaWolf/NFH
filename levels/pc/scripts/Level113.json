@@ -270,7 +270,7 @@
       5
      ],
      "start": "0x4529ef",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -280,14 +280,33 @@
          "valve",
          "esi"
         ]
-       },
-       {
-        "a": 4532808,
-        "kind": "GOTO",
-        "obj": "bas/valve_off"
        }
       ],
-      "next": 6
+      "test": {
+       "a": 4532750,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4532808,
+         "kind": "GOTO",
+         "obj": "bas/valve_off"
+        }
+       ],
+       "next": 6
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4532808,
+         "kind": "GOTO",
+         "obj": "bas/valve_off"
+        }
+       ],
+       "next": 6
+      }
      }
     },
     {
@@ -295,7 +314,7 @@
       6
      ],
      "start": "0x452a5a",
-     "paths": 2,
+     "paths": 4,
      "tree": {
       "steps": [
        {
@@ -306,53 +325,131 @@
          "esi",
          6
         ]
-       },
-       {
-        "a": 4533494,
-        "kind": "OBJ3",
-        "args": [
-         "ebp"
-        ]
        }
       ],
       "test": {
-       "a": 4533494,
-       "fn": "fcn.00479ff0",
-       "variant": "bas/valve_off"
+       "a": 4532890,
+       "fn": "flag",
+       "variant": "flag 0x1c"
       },
       "true": {
        "steps": [
         {
-         "a": 4533552,
-         "kind": "ACTION",
-         "obj": "bas/valve_off",
-         "act": "switch_on"
-        },
-        {
-         "a": 4533625,
-         "kind": "SWITCH",
+         "a": 4532932,
+         "kind": "OBJ3",
          "args": [
-          "bas/valve_off",
+          "dword [esp + 0x180]",
           "bas/valve_on"
          ]
-        },
-        {
-         "a": 4533688,
-         "kind": "MSG"
         }
        ],
-       "next": 11
+       "test": {
+        "a": 4532932,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_on"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4532990,
+          "kind": "ACTION",
+          "obj": "bas/valve_on",
+          "act": "switch_off"
+         },
+         {
+          "a": 4533063,
+          "kind": "SWITCH",
+          "args": [
+           "bas/valve_on",
+           "bas/valve_fixed"
+          ]
+         },
+         {
+          "a": 4533126,
+          "kind": "MSG"
+         }
+        ],
+        "next": 11
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4533202,
+          "kind": "ACTION",
+          "obj": "neighbor",
+          "act": "surprise"
+         },
+         {
+          "a": 4533300,
+          "kind": "ACTION",
+          "obj": "bas/valve_off",
+          "act": "switch_off"
+         },
+         {
+          "a": 4533369,
+          "kind": "SWITCH",
+          "args": [
+           "bas/valve_off",
+           "bas/valve_fixed"
+          ]
+         },
+         {
+          "a": 4533432,
+          "kind": "MSG"
+         }
+        ],
+        "next": 11
+       }
       },
       "false": {
        "steps": [
         {
-         "a": 4533761,
-         "kind": "ACTION",
-         "obj": "neighbor",
-         "act": "surprise"
+         "a": 4533494,
+         "kind": "OBJ3",
+         "args": [
+          "ebp"
+         ]
         }
        ],
-       "next": 11
+       "test": {
+        "a": 4533494,
+        "fn": "fcn.00479ff0",
+        "variant": "bas/valve_off"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4533552,
+          "kind": "ACTION",
+          "obj": "bas/valve_off",
+          "act": "switch_on"
+         },
+         {
+          "a": 4533625,
+          "kind": "SWITCH",
+          "args": [
+           "bas/valve_off",
+           "bas/valve_on"
+          ]
+         },
+         {
+          "a": 4533688,
+          "kind": "MSG"
+         }
+        ],
+        "next": 11
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4533761,
+          "kind": "ACTION",
+          "obj": "neighbor",
+          "act": "surprise"
+         }
+        ],
+        "next": 11
+       }
       }
      }
     },
@@ -1400,6 +1497,13 @@
       "esi"
      ]
     },
+    "0x452a0e": {
+     "a": 4532750,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x452a48": {
      "a": 4532808,
      "kind": "GOTO",
@@ -1414,6 +1518,13 @@
       6
      ]
     },
+    "0x452a9a": {
+     "a": 4532890,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x452cf6": {
      "a": 4533494,
      "kind": "OBJ3",
@@ -1426,6 +1537,38 @@
      "kind": "ACTION",
      "obj": "neighbor",
      "act": "surprise"
+    },
+    "0x452ac4": {
+     "a": 4532932,
+     "kind": "OBJ3",
+     "args": [
+      "dword [esp + 0x180]",
+      "bas/valve_on"
+     ]
+    },
+    "0x452bd2": {
+     "a": 4533202,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "surprise"
+    },
+    "0x452c34": {
+     "a": 4533300,
+     "kind": "ACTION",
+     "obj": "bas/valve_off",
+     "act": "switch_off"
+    },
+    "0x452c79": {
+     "a": 4533369,
+     "kind": "SWITCH",
+     "args": [
+      "bas/valve_off",
+      "bas/valve_fixed"
+     ]
+    },
+    "0x452cb8": {
+     "a": 4533432,
+     "kind": "MSG"
     },
     "0x452d30": {
      "a": 4533552,
@@ -1443,6 +1586,24 @@
     },
     "0x452db8": {
      "a": 4533688,
+     "kind": "MSG"
+    },
+    "0x452afe": {
+     "a": 4532990,
+     "kind": "ACTION",
+     "obj": "bas/valve_on",
+     "act": "switch_off"
+    },
+    "0x452b47": {
+     "a": 4533063,
+     "kind": "SWITCH",
+     "args": [
+      "bas/valve_on",
+      "bas/valve_fixed"
+     ]
+    },
+    "0x452b86": {
+     "a": 4533126,
      "kind": "MSG"
     },
     "0x45224d": {

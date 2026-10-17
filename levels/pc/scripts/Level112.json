@@ -275,7 +275,7 @@
       6
      ],
      "start": "0x463cfd",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -286,15 +286,48 @@
          "ebp",
          6
         ]
-       },
-       {
-        "a": 4603451,
-        "kind": "ACTION",
-        "obj": "lir/mat",
-        "act": "make_yoga"
        }
       ],
-      "next": 7
+      "test": {
+       "a": 4603181,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4603205,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4603298,
+         "kind": "ACTION",
+         "obj": "lir/mat",
+         "act": "knot_yoga"
+        },
+        {
+         "a": 4603372,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "wor/book_replaced",
+          "ebp"
+         ]
+        }
+       ],
+       "next": 7
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4603451,
+         "kind": "ACTION",
+         "obj": "lir/mat",
+         "act": "make_yoga"
+        }
+       ],
+       "next": 7
+      }
      }
     },
     {
@@ -1157,11 +1190,37 @@
       6
      ]
     },
+    "0x463d2d": {
+     "a": 4603181,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x463e3b": {
      "a": 4603451,
      "kind": "ACTION",
      "obj": "lir/mat",
      "act": "make_yoga"
+    },
+    "0x463d45": {
+     "a": 4603205,
+     "kind": "STOPMSG"
+    },
+    "0x463da2": {
+     "a": 4603298,
+     "kind": "ACTION",
+     "obj": "lir/mat",
+     "act": "knot_yoga"
+    },
+    "0x463dec": {
+     "a": 4603372,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "wor/book_replaced",
+      "ebp"
+     ]
     },
     "0x463ebd": {
      "a": 4603581,

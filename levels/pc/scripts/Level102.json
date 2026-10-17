@@ -63,10 +63,22 @@
       1
      ],
      "start": "0x46fa06",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [],
-      "next": 2
+      "test": {
+       "a": 4651565,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [],
+       "next": 7
+      },
+      "false": {
+       "steps": [],
+       "next": 2
+      }
      }
     },
     {
@@ -607,6 +619,13 @@
       "lir/sofa",
       "lir/sofa_broken"
      ]
+    },
+    "0x46fa2d": {
+     "a": 4651565,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
     },
     "0x46f6d8": {
      "a": 4650712,

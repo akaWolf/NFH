@@ -568,7 +568,7 @@
       12
      ],
      "start": "0x45dac3",
-     "paths": 3,
+     "paths": 6,
      "tree": {
       "steps": [
        {
@@ -658,7 +658,19 @@
           "kind": "MSG"
          }
         ],
-        "next": 13
+        "test": {
+         "a": 4578907,
+         "fn": "flag",
+         "variant": "flag 0x1d"
+        },
+        "true": {
+         "steps": [],
+         "next": 3
+        },
+        "false": {
+         "steps": [],
+         "next": 13
+        }
        },
        "false": {
         "steps": [
@@ -669,7 +681,19 @@
           "act": "sunbath_cream"
          }
         ],
-        "next": 13
+        "test": {
+         "a": 4578907,
+         "fn": "flag",
+         "variant": "flag 0x1d"
+        },
+        "true": {
+         "steps": [],
+         "next": 3
+        },
+        "false": {
+         "steps": [],
+         "next": 13
+        }
        }
       },
       "false": {
@@ -681,7 +705,19 @@
          "act": "sunbath"
         }
        ],
-       "next": 13
+       "test": {
+        "a": 4578907,
+        "fn": "flag",
+        "variant": "flag 0x1d"
+       },
+       "true": {
+        "steps": [],
+        "next": 3
+       },
+       "false": {
+        "steps": [],
+        "next": 13
+       }
       }
      }
     },
@@ -831,7 +867,7 @@
       16
      ],
      "start": "0x45e111",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -842,15 +878,60 @@
          "ebp",
          16
         ]
-       },
-       {
-        "a": 4580089,
-        "kind": "ACTION",
-        "obj": "neighbor",
-        "act": "water"
        }
       ],
-      "next": 17
+      "test": {
+       "a": 4579655,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4579679,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4579775,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "water_to_death"
+        },
+        {
+         "a": 4579844,
+         "kind": "SWITCH",
+         "args": [
+          "anc/flower",
+          "anc/deadflower"
+         ]
+        },
+        {
+         "a": 4579907,
+         "kind": "MSG"
+        },
+        {
+         "a": 4579984,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "anc/deadflower",
+          "ebp"
+         ]
+        }
+       ],
+       "next": 3
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4580089,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "water"
+        }
+       ],
+       "next": 17
+      }
      }
     },
     {
@@ -1327,6 +1408,13 @@
      "obj": "bal/foldingchair",
      "act": "sunbath"
     },
+    "0x45de5b": {
+     "a": 4578907,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1d",
+     "fn": "flag"
+    },
     "0x45db58": {
      "a": 4578136,
      "kind": "IFVARIANT",
@@ -1460,11 +1548,49 @@
       16
      ]
     },
+    "0x45e147": {
+     "a": 4579655,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x45e2f9": {
      "a": 4580089,
      "kind": "ACTION",
      "obj": "neighbor",
      "act": "water"
+    },
+    "0x45e15f": {
+     "a": 4579679,
+     "kind": "STOPMSG"
+    },
+    "0x45e1bf": {
+     "a": 4579775,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "water_to_death"
+    },
+    "0x45e204": {
+     "a": 4579844,
+     "kind": "SWITCH",
+     "args": [
+      "anc/flower",
+      "anc/deadflower"
+     ]
+    },
+    "0x45e243": {
+     "a": 4579907,
+     "kind": "MSG"
+    },
+    "0x45e290": {
+     "a": 4579984,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "anc/deadflower",
+      "ebp"
+     ]
     },
     "0x45e385": {
      "a": 4580229,

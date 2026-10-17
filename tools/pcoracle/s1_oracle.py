@@ -151,9 +151,11 @@ class PlanRunner:
         """the neighbour has the object in his hands: objects.xml gives it a neighbour `take` and `give`, and
         the trace's last of the two on it is the take"""
         acts = getattr(self.m, 'obj_actions', {}).get(obj, {})
-        if acts.get('take') != 'neighbor' or acts.get('give') != 'neighbor': return False
-        last = [a for t, a in state['actions'].get(obj, []) if a in ('take', 'give')]
-        return bool(last) and last[-1] == 'take'
+        if acts.get('take') != 'neighbor': return False
+        # the give may land on the family's other variant (109's teeth: `bed/teeth take`, `bed/teeth_empty give`)
+        fam = self.m.family(obj)
+        last = sorted((t, a) for o, l in state['actions'].items() if '/' in o and self.m.family(o) == fam for t, a in l if a in ('take', 'give'))
+        return bool(last) and last[-1][1] == 'take' and any(self.m.obj_actions.get(o, {}).get('give') == 'neighbor' for o in self.m.names if self.m.family(o) == fam)
     def gate_closed(self, room):
         """the port's runner walks into a room only when its gate is open — no catcher in it, none due there
         while Woody works (tests/run_tricks.py gate_open reads the routine's ETAs); here, without a model of
@@ -357,7 +359,8 @@ class PlanRunner:
             placed = self.placed_now()
             fam_placed = any(self.m.family(o) == self.m.family(obj) for o in placed) if obj and '/' in obj else False
             guarded_fam = obj is not None and (obj + '_guarded' in placed or obj + '_guarded' in getattr(self.m, 'names', ()))
-            if obj and '/' in obj and placed and obj not in placed and fam_placed and not guarded_fam and not (op == 'usewith' and args[0].startswith('Ground@')):
+            forced = set(x for x in os.environ.get('WDBG_FORCE_PLACED', '').split(',') if x)     # (a probe: the objects to trust as placed)
+            if obj and '/' in obj and placed and obj not in placed and obj not in forced and fam_placed and not guarded_fam and not (op == 'usewith' and args[0].startswith('Ground@')):
                 # (a message on an object not in the scene crashes NFH1 — 106's tub_hair, 107's dove_free,
                 # 113's valve_off; the level places it by a switch later, which the trace does not show)
                 return self.done('unplaced %s' % obj)
@@ -603,6 +606,23 @@ class PetAlarm(gdb.Breakpoint):
                 state.setdefault('wouldcatch', []).append(state['tick'])
             self.last = state['tick']
         return False
+class SwitchJob(gdb.Breakpoint):
+    """every object swap: SwitchObjectsJobCallback::Do (fcn.004792c0; the job's +4 is the old name's String,
+    +8 the new's — fcn.00479230) runs for the level's Switch steps and for the behaviours' swaps alike (113's
+    bas/outlet_no_water <-> bas/outlet under the water, the step hook never saw it): `switchjob` events, and
+    the runner's placed set takes the pair unless the Switch step just queued the same one"""
+    def __init__(self): super().__init__('*0x4792c0', internal=True)
+    def stop(self):
+        try:
+            job = reg('ecx'); old = as_string(u32(job + 4)); new = as_string(u32(job + 8))
+            emit({'tick': state['tick'], 'ev': 'switchjob', 'args': [old, new]})
+            if isinstance(old, str) and isinstance(new, str):
+                sw = state.setdefault('switches', [])
+                if not any(t >= state['tick'] - 24 and a == old and b == new for t, a, b in sw[-4:]):
+                    sw.append((state['tick'], old, new))
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'switchjob', 'err': repr(e)})
+        return False
 class Loop(gdb.Breakpoint):
     """the message loop after the pop (0x43b165): the message at [esp+0x18]; a player's message with a
     step pending is replaced by the built one"""
@@ -684,7 +704,7 @@ class Hook(gdb.Breakpoint):
         return False
 
 LevelName(); Tick(); Loop(); Mover()
-Hook(0x477f60, 'action'); Hook(0x437f70, 'icon', 2); Hook(0x451de0, 'switch', 2)
+Hook(0x477f60, 'action'); Hook(0x437f70, 'icon', 2); Hook(0x451de0, 'switch', 2); SwitchJob()
 try:
     gdb.execute('continue')
 except Exception as ex:

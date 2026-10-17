@@ -154,7 +154,7 @@
       4
      ],
      "start": "0x465c7a",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -165,15 +165,70 @@
          "ebp",
          4
         ]
-       },
-       {
-        "a": 4611741,
-        "kind": "ACTION",
-        "obj": "wor/cups",
-        "act": "polish"
        }
       ],
-      "next": 5
+      "test": {
+       "a": 4611242,
+       "fn": "flag",
+       "variant": "flag 0x1c"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4611266,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4611361,
+         "kind": "ACTION",
+         "obj": "wor/cups",
+         "act": "blackpolish"
+        },
+        {
+         "a": 4611427,
+         "kind": "SWITCH",
+         "args": [
+          "wor/cups",
+          "wor/cups_black"
+         ]
+        },
+        {
+         "a": 4611487,
+         "kind": "MSG"
+        },
+        {
+         "a": 4611563,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "kit/blackpolish",
+          0
+         ]
+        },
+        {
+         "a": 4611688,
+         "kind": "REPAIR",
+         "args": [
+          "dword [esp + 0x1d8]",
+          "dword [esp + 0x1e4]",
+          "esi",
+          "wor/cups_black"
+         ]
+        }
+       ],
+       "next": 5
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4611741,
+         "kind": "ACTION",
+         "obj": "wor/cups",
+         "act": "polish"
+        }
+       ],
+       "next": 5
+      }
      }
     },
     {
@@ -2490,7 +2545,7 @@
       24
      ],
      "start": "0x467d71",
-     "paths": 1,
+     "paths": 2,
      "tree": {
       "steps": [
        {
@@ -2501,29 +2556,76 @@
          0,
          "edi"
         ]
-       },
-       {
-        "a": 4610050,
-        "kind": "ACTION",
-        "obj": "neighbor",
-        "act": "putbackhat"
-       },
-       {
-        "a": 4610136,
-        "kind": "ACTION",
-        "obj": "bed/hat",
-        "act": "give"
-       },
-       {
-        "a": 4610256,
-        "kind": "MSG"
-       },
-       {
-        "a": 4610313,
-        "kind": "STOPMSG"
        }
       ],
-      "next": 25
+      "test": {
+       "a": 4609785,
+       "fn": "flag",
+       "variant": "flag 0x1e"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4609806,
+         "kind": "STOPMSG"
+        },
+        {
+         "a": 4609892,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "riphat"
+        },
+        {
+         "a": 4609962,
+         "kind": "OBJ2",
+         "args": [
+          "addr",
+          "bed/stickyhat",
+          "ebx"
+         ]
+        },
+        {
+         "a": 4610136,
+         "kind": "ACTION",
+         "obj": "bed/hat",
+         "act": "give"
+        },
+        {
+         "a": 4610256,
+         "kind": "MSG"
+        },
+        {
+         "a": 4610313,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 25
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4610050,
+         "kind": "ACTION",
+         "obj": "neighbor",
+         "act": "putbackhat"
+        },
+        {
+         "a": 4610136,
+         "kind": "ACTION",
+         "obj": "bed/hat",
+         "act": "give"
+        },
+        {
+         "a": 4610256,
+         "kind": "MSG"
+        },
+        {
+         "a": 4610313,
+         "kind": "STOPMSG"
+        }
+       ],
+       "next": 25
+      }
      }
     },
     {
@@ -2794,11 +2896,59 @@
       4
      ]
     },
+    "0x465caa": {
+     "a": 4611242,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1c",
+     "fn": "flag"
+    },
     "0x465e9d": {
      "a": 4611741,
      "kind": "ACTION",
      "obj": "wor/cups",
      "act": "polish"
+    },
+    "0x465cc2": {
+     "a": 4611266,
+     "kind": "STOPMSG"
+    },
+    "0x465d21": {
+     "a": 4611361,
+     "kind": "ACTION",
+     "obj": "wor/cups",
+     "act": "blackpolish"
+    },
+    "0x465d63": {
+     "a": 4611427,
+     "kind": "SWITCH",
+     "args": [
+      "wor/cups",
+      "wor/cups_black"
+     ]
+    },
+    "0x465d9f": {
+     "a": 4611487,
+     "kind": "MSG"
+    },
+    "0x465deb": {
+     "a": 4611563,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/blackpolish",
+      0
+     ]
+    },
+    "0x465e68": {
+     "a": 4611688,
+     "kind": "REPAIR",
+     "args": [
+      "dword [esp + 0x1d8]",
+      "dword [esp + 0x1e4]",
+      "esi",
+      "wor/cups_black"
+     ]
     },
     "0x465f1f": {
      "a": 4611871,
@@ -3466,6 +3616,13 @@
       "edi"
      ]
     },
+    "0x4656f9": {
+     "a": 4609785,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x1e",
+     "fn": "flag"
+    },
     "0x465802": {
      "a": 4610050,
      "kind": "ACTION",
@@ -3485,6 +3642,25 @@
     "0x465909": {
      "a": 4610313,
      "kind": "STOPMSG"
+    },
+    "0x46570e": {
+     "a": 4609806,
+     "kind": "STOPMSG"
+    },
+    "0x465764": {
+     "a": 4609892,
+     "kind": "ACTION",
+     "obj": "neighbor",
+     "act": "riphat"
+    },
+    "0x4657aa": {
+     "a": 4609962,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "bed/stickyhat",
+      "ebx"
+     ]
     },
     "0x467dbf": {
      "a": 4619711,

@@ -4681,6 +4681,17 @@ class Routine:
             it = self.level.items.get(a['item']) if a else None
             if it is not None and it.name == skip:
                 self.index = self._next_index(self.index)
+        if pcprofile.is_pc() and not self.pawn.nfh2 and self.actions:
+            # a visit the PC's case gates by the neighbour's own inventory (PCVisitNeedsHeld, per visit):
+            # 109's key return (case 1, `INV pigkey` at 0x468ca9 -> case 2's give, else case 3's teeth) is
+            # skipped when Woody has the key — the first visit found the board empty (the item tricked) and
+            # he took nothing; the skipped visit still counts in the station order
+            a = self.actions[self.index]
+            it = self.level.items.get(a.get('item')) if a and a.get('item') is not None else None
+            flags = getattr(it, 'pc_visit_needs_held', None) if it is not None else None
+            if flags and flags[pc_visit_ix(it, len(flags))] and it.is_tricked(self.level.items):
+                it.pc_use_visit += 1
+                self.index = self._next_index(self.index)
         if not self._pc_keeps_shout(self.item):
             self.pc_shout_icon = None
 
@@ -5535,6 +5546,13 @@ class Routine:
             # `pause`, 0x46b0bd) before the feeding
             self.pawn.world.pc_visit_post(it, 'use')
         pc = self._pc_use_seconds(it)
+        if pc and pcprofile.is_pc() and self.role == 'Rottweiler' and it.rott_surprise \
+                and list(seq or []) == [a for a in it.rott_surprise if self.pawn.anim.has(a)] \
+                and getattr(it, 'pc_surprise_secs', None):
+            # the station's own surprise set in place of its use (109's pig gone: the DependsPigKeys arm
+            # of _pick_use_sequence) is the PC class's `surprise` action, not the station's stand —
+            # PCSurpriseSeconds (24 ticks at 167.9 in the original's run), where PCUseSeconds is the feed's
+            pc = float(it.pc_surprise_secs)
         if pc > 0.0:
             # the stay's actions: his animation is theirs (no neighbour
             # record of objects.xml plays ms1 or ms3 but a zero-time
@@ -7408,6 +7426,19 @@ class Routine:
                                 2 / pcprofile.TICKS_PER_SECOND, searched)
                             return
                         searched()
+            pc_secs = getattr(it, 'pc_surprise_secs', None) if pcprofile.is_pc() and it.kind != 'Alerter' else None
+            if seq and pc_secs:
+                # a station's own surprise at the PC's seconds (PCSurpriseSeconds): 109's pig gone is the
+                # class's `surprise` through the DoAction wrapper, 24 ticks (0x479c13 at 167.9 in the
+                # original's run), where the mobile's SurpriseNotFound runs 6.0 s
+                mobile = self.pawn.anim.sequence_seconds(seq)
+                if mobile > 0.0:
+                    self.pawn.anim.time_scale = mobile / float(pc_secs)
+                    inner = done
+
+                    def done():
+                        self.pawn.anim.time_scale = 1.0
+                        inner()
             if seq:
                 self.pawn.anim.play_sequence(seq, on_end=done)
             else:

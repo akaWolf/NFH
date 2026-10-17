@@ -138,7 +138,7 @@
       4
      ],
      "start": "0x45ea53",
-     "paths": 1,
+     "paths": 3,
      "tree": {
       "steps": [
        {
@@ -149,33 +149,115 @@
          "ebp",
          4
         ]
-       },
-       {
-        "a": 4582857,
-        "kind": "ACTION",
-        "obj": "kit/cake",
-        "act": "put_candle"
-       },
-       {
-        "a": 4582950,
-        "kind": "ACTION",
-        "obj": "kit/cake",
-        "act": "light_candle"
-       },
-       {
-        "a": 4583042,
-        "kind": "ACTION",
-        "obj": "kit/cake",
-        "act": "celebrate"
-       },
-       {
-        "a": 4583128,
-        "kind": "ACTION",
-        "obj": "kit/cake",
-        "act": "take_candle"
        }
       ],
-      "next": 5
+      "test": {
+       "a": 4582023,
+       "fn": "flag",
+       "variant": "flag 0x19"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4582078,
+         "kind": "ACTION",
+         "obj": "kit/cake",
+         "act": "put_candle_dead"
+        },
+        {
+         "a": 4582171,
+         "kind": "ACTION",
+         "obj": "kit/cake",
+         "act": "light_candle_dead"
+        },
+        {
+         "a": 4582260,
+         "kind": "ACTION",
+         "obj": "kit/cake",
+         "act": "celebrate"
+        },
+        {
+         "a": 4582349,
+         "kind": "ACTION",
+         "obj": "kit/cake",
+         "act": "take_candle_dead"
+        }
+       ],
+       "next": 5
+      },
+      "false": {
+       "steps": [],
+       "test": {
+        "a": 4582391,
+        "fn": "flag",
+        "variant": "flag 0x18"
+       },
+       "true": {
+        "steps": [
+         {
+          "a": 4582412,
+          "kind": "STOPMSG"
+         },
+         {
+          "a": 4582502,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "put_tnt"
+         },
+         {
+          "a": 4582591,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "light_tnt"
+         },
+         {
+          "a": 4582680,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "celebrate_boom"
+         },
+         {
+          "a": 4582755,
+          "kind": "OBJ2",
+          "args": [
+           "addr",
+           "kit/candlebox_boom",
+           2
+          ]
+         }
+        ],
+        "next": 5
+       },
+       "false": {
+        "steps": [
+         {
+          "a": 4582857,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "put_candle"
+         },
+         {
+          "a": 4582950,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "light_candle"
+         },
+         {
+          "a": 4583042,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "celebrate"
+         },
+         {
+          "a": 4583128,
+          "kind": "ACTION",
+          "obj": "kit/cake",
+          "act": "take_candle"
+         }
+        ],
+        "next": 5
+       }
+      }
      }
     },
     {
@@ -447,6 +529,20 @@
       4
      ]
     },
+    "0x45ea87": {
+     "a": 4582023,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x19",
+     "fn": "flag"
+    },
+    "0x45ebf7": {
+     "a": 4582391,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x18",
+     "fn": "flag"
+    },
     "0x45edc9": {
      "a": 4582857,
      "kind": "ACTION",
@@ -470,6 +566,61 @@
      "kind": "ACTION",
      "obj": "kit/cake",
      "act": "take_candle"
+    },
+    "0x45eabe": {
+     "a": 4582078,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "put_candle_dead"
+    },
+    "0x45eb1b": {
+     "a": 4582171,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "light_candle_dead"
+    },
+    "0x45eb74": {
+     "a": 4582260,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "celebrate"
+    },
+    "0x45ebcd": {
+     "a": 4582349,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "take_candle_dead"
+    },
+    "0x45ec0c": {
+     "a": 4582412,
+     "kind": "STOPMSG"
+    },
+    "0x45ec66": {
+     "a": 4582502,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "put_tnt"
+    },
+    "0x45ecbf": {
+     "a": 4582591,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "light_tnt"
+    },
+    "0x45ed18": {
+     "a": 4582680,
+     "kind": "ACTION",
+     "obj": "kit/cake",
+     "act": "celebrate_boom"
+    },
+    "0x45ed63": {
+     "a": 4582755,
+     "kind": "OBJ2",
+     "args": [
+      "addr",
+      "kit/candlebox_boom",
+      2
+     ]
     },
     "0x45ef6a": {
      "a": 4583274,

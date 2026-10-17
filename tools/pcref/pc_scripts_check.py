@@ -36,7 +36,9 @@ def main(argv):
              '0x4739a5': 'GOTOENTER enter', '0x473c8b': 'GOTOENTER leave', '0x479ccf': "the walk's arrival action",
              '0x45c1dc': 'the pet', '0x47a718': 'the noise case', '0x47a81b': 'the noise case', '0x47a88c': 'the noise case',
              '0x4790ed': 'woody idle', '0x478a99': 'woody triumph', '0x47afdf': 'the repair helper', '0x47b064': 'the repair helper',
-             '0x47bb8a': 'the slip', '0x47db7b': 'the slip'}
+             '0x47bb8a': 'the slip', '0x47db7b': 'the slip', '0x47bbaf': "the fire's own animation (FIRE5's +0x18)",
+             '0x47d8be': "a room trigger's behaviour", '0x47d686': "a room trigger's behaviour", '0x47d8e6': "a room trigger's behaviour",
+             '0x47d65e': "a room trigger's behaviour", '0x47d271': "a room trigger's behaviour", '0x479c13': 'the DoAction wrapper (behaviours)'}
     known = {}
     for l in open(trace):
         r = json.loads(l); ev = r.get('ev')

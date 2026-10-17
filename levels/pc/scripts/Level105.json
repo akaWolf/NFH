@@ -129,7 +129,7 @@
       4
      ],
      "start": "0x46da22",
-     "paths": 4,
+     "paths": 5,
      "tree": {
       "steps": [
        {
@@ -139,71 +139,101 @@
          "addr",
          "ebp"
         ]
-       },
-       {
-        "a": 4643720,
-        "kind": "GOTO2",
-        "obj": "addr"
-       },
-       {
-        "a": 4643785,
-        "kind": "ENTER",
-        "obj": "lir/score"
-       },
-       {
-        "a": 4643874,
-        "kind": "ACTION",
-        "obj": "lir/score",
-        "act": "play_piano_normally"
-       },
-       {
-        "a": 4644044,
-        "kind": "LOOKUP",
-        "args": [
-         "kit/football"
-        ]
-       },
-       {
-        "a": 4644044,
-        "kind": "LOOKUPVAL",
-        "value": "false",
-        "fn": "fcn.00448bf0"
-       },
-       {
-        "a": 4644118,
-        "kind": "SUBSEQ",
-        "args": [
-         "addr",
-         0
-        ]
-       },
-       {
-        "a": 4644173,
-        "kind": "ACTION",
-        "obj": "kit/football",
-        "act": "inv"
-       },
-       {
-        "a": 4644267,
-        "kind": "ACTION",
-        "obj": "kit/football",
-        "act": "fly_into_kitchen"
-       },
-       {
-        "a": 4644401,
-        "kind": "LOOKUP",
-        "args": [
-         "kit/football"
-        ]
-       },
-       {
-        "a": 4644401,
-        "kind": "LOOKUPVAL",
-        "value": "false",
-        "fn": "fcn.00448bf0"
        }
       ],
-      "next": 5
+      "test": {
+       "a": 4643416,
+       "fn": "flag",
+       "variant": "flag 0x18"
+      },
+      "true": {
+       "steps": [
+        {
+         "a": 4643441,
+         "kind": "GOTO2",
+         "obj": "addr"
+        },
+        {
+         "a": 4643511,
+         "kind": "ENTER",
+         "obj": "lir/score"
+        },
+        {
+         "a": 4643602,
+         "kind": "ACTION",
+         "obj": "lir/score",
+         "act": "play_piano_noangry"
+        }
+       ],
+       "next": 6
+      },
+      "false": {
+       "steps": [
+        {
+         "a": 4643720,
+         "kind": "GOTO2",
+         "obj": "addr"
+        },
+        {
+         "a": 4643785,
+         "kind": "ENTER",
+         "obj": "lir/score"
+        },
+        {
+         "a": 4643874,
+         "kind": "ACTION",
+         "obj": "lir/score",
+         "act": "play_piano_normally"
+        },
+        {
+         "a": 4644044,
+         "kind": "LOOKUP",
+         "args": [
+          "kit/football"
+         ]
+        },
+        {
+         "a": 4644044,
+         "kind": "LOOKUPVAL",
+         "value": "false",
+         "fn": "fcn.00448bf0"
+        },
+        {
+         "a": 4644118,
+         "kind": "SUBSEQ",
+         "args": [
+          "addr",
+          0
+         ]
+        },
+        {
+         "a": 4644173,
+         "kind": "ACTION",
+         "obj": "kit/football",
+         "act": "inv"
+        },
+        {
+         "a": 4644267,
+         "kind": "ACTION",
+         "obj": "kit/football",
+         "act": "fly_into_kitchen"
+        },
+        {
+         "a": 4644401,
+         "kind": "LOOKUP",
+         "args": [
+          "kit/football"
+         ]
+        },
+        {
+         "a": 4644401,
+         "kind": "LOOKUPVAL",
+         "value": "false",
+         "fn": "fcn.00448bf0"
+        }
+       ],
+       "next": 5
+      }
      }
     },
     {
@@ -851,6 +881,13 @@
       "ebp"
      ]
     },
+    "0x46da58": {
+     "a": 4643416,
+     "kind": "TESTVAL",
+     "value": "false",
+     "variant": "flag 0x18",
+     "fn": "flag"
+    },
     "0x46db88": {
      "a": 4643720,
      "kind": "GOTO2",
@@ -900,6 +937,22 @@
      "args": [
       "kit/football"
      ]
+    },
+    "0x46da71": {
+     "a": 4643441,
+     "kind": "GOTO2",
+     "obj": "addr"
+    },
+    "0x46dab7": {
+     "a": 4643511,
+     "kind": "ENTER",
+     "obj": "lir/score"
+    },
+    "0x46db12": {
+     "a": 4643602,
+     "kind": "ACTION",
+     "obj": "lir/score",
+     "act": "play_piano_noangry"
     },
     "0x46deec": {
      "a": 4644588,

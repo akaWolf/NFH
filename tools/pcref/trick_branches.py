@@ -596,7 +596,13 @@ class Fiber(object):
             else:
                 mm = re.match(r'mov al, byte \[e[ds]i \+ (0x[0-9a-f]+)\]', t)
                 if mm:
-                    lastcall = ('flag', 'true' if objflags.get(mm.group(1), 0) else 'false')
+                    val = 'true' if objflags.get(mm.group(1), 0) else 'false'
+                    if decide is not None and mm.group(1) not in objflags:
+                        # a class byte the path has not set (105's rush flag before the piano's angry look,
+                        # 103's candle box bytes): pc_scripts.py forks on it like a test
+                        val = decide(a, 'flag', mm.group(1), val)
+                        tokens.append(dict(a=a, kind='TESTVAL', value=val, variant='flag ' + mm.group(1), fire=False, fn='flag'))
+                    lastcall = ('flag', val)
                 elif t.startswith('mov al,'):
                     lastcall = ('flag', 'false')
             mm = re.match(r'mov byte \[e[ds]i \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+)$', t)
@@ -613,6 +619,9 @@ class Fiber(object):
             mm = re.match(r'cmp byte \[e[ds]i \+ (0x[0-9a-f]+)\], (0x[0-9a-f]+|[0-9]+)$', t)
             if mm:
                 pred = 'true' if objflags.get(mm.group(1), 0) != int(mm.group(2), 0) else 'false'
+                if decide is not None and mm.group(1) not in objflags:
+                    pred = decide(a, 'flag', mm.group(1), pred)
+                    tokens.append(dict(a=a, kind='TESTVAL', value=pred, variant='flag ' + mm.group(1), fire=False, fn='flag'))
                 k += 1; continue
             if re.match(r'(cmp |xor eax|movzx eax)', t):
                 lastcall = None

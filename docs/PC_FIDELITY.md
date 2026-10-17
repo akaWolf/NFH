@@ -4960,17 +4960,17 @@ end of the level, the drift the first and the last pair's offset:
 | 106 | 39/39 (rerun) | 27 / 0 | -> -0.85 | none — the old candy +5.2 was the trace's own (its full bottle never taken, its egg cut); every bubble of its four laps pairs within 0.9 s now (cmp_pairs' level aliases: milk_bottle = pudding, bath = badewanne, photo_album = book, towel = handtuch) |
 | 107 | 18/19 (rerun) | 33 / 1 | -> +1.87 | none (the dove's scissors leg still times out: the runner combines on the `aux` actor) |
 | 108 | 31/31, WON 270 | 8 / 5 | -> -1.24 | none — the honey's bees on both sides now (the old +12 was the cut action) |
-| 109 | 18/18 (rerun) | 34 / 0 | -> +10.42 | milk_bottle +3.4, teeth +14.5, bed -6.8. The first run's nitro was clicked on the bottle he carries (159.3; his take 157.0, give 178.9): the PC takes the click and plays Woody's use, but the combination never lands (his lap-3 take stays kit/babybottle, the probe without the teeth, 2026-10-25) — the port refuses the click until his give, and the runner holds such a click now (`carried`: the rerun's nitro 181.3, his lap-3 take kit/babybottle_nitro 271.8). What remains is the port's: after the pig is found gone (167.2 / 167.8) the port reaches the bottle 15.0 s later (TakeInventory 182.3) for the PC's 11.2 (icon 169.8, give 178.9), and the port's lap-2 PigKeys visit (SurpriseNotFound at the empty board, 221.1, 14.9 s with its walk) has no PC counterpart: the PC's key-board cases (12-13 take, 1-2 give) are gated by `INV pigkey` and `LOOKUP bed/keyboard` and no `pig_key` icon shows in 300 s — the pen's key is for the locked pen, not the lap. Open: the port's PigKeys steps under the PC profile, the pig-out stand |
+| 109 | 18/18 (rerun) | 34 / 0 | -> -1.36 | none. The first run's nitro was clicked on the bottle he carries (159.3; his take 157.0, give 178.9): the PC takes the click and plays Woody's use, but the combination never lands (his lap-3 take stays kit/babybottle, the probe without the teeth, 2026-10-25) — the port refuses the click until his give, and the runner holds such a click now (`carried`, by the object's family: the rerun's nitro 181.3, his lap-3 take kit/babybottle_nitro 271.8). Two port rules then closed it: the key's return visit is gated by his own inventory as case 1 does (PCVisitNeedsHeld — the port walked to the empty board for a SurpriseNotFound, 221.1, 14.9 s), and the pig-gone surprise plays at the class's `surprise` seconds (PCSurpriseSeconds 2.0: the port ran the mobile's SurpriseNotFound 6.0 s at the feed's pace) |
 | 110 | 21/21, WON 200 | 16 / 0 | -> +0.09 | none |
 | 111 | 16/16 | 18 / 2 | -> -0.64 | none |
 | 112 | 12/14 | 14 / 7 | -> -0.70 | none (the skates' floor drop declined, the Zone01 marbles without a PC object) |
-| 113 | 17/19 | 13 / 4 | -> -4.37 | valve +4.2, fuse -6.4 — the plan's bare `use ValveMain` is two clicks in the port (close, then open: the trick armed at 24 s), one on the PC, and the PC arms nothing before his own close: see the flood probe below. The plan must move the click into his lap-1 window; open |
+| 113 | 20/22 (the v3 plan, 400 s) | 25 / 0 | -> -9.05 | shout -4.5 at 309 (the fuse's shock scene: the PC's ladder icon 284.0 to its shout 309.4 is 25.4 s, the port's 20.9). The plan is re-laid: `use! ValveMain` from Woody's basement trip right after `whenzone Zone03 (68)` — the water back on after his lap-1 close (61.3) — and the early double click dropped; the PC floods the basin (98.8), pays (104.3), fixes the valve (114.8), then the chair (180.6 / 185.5), the manipulated grinder (207.2 / 214.3), the hot heater (240.6 / 244.1), the heat valve (255.7), the cut ladder (314.4 / 323.2) — six of the plan's eight on the original within 400 s, the trap and the marbles being the runner's (`unplaced bas/outlet`, the floor drop); the port runs it at 100 |
 | 114 | 21/21 (rerun) | 23 / 0 | -> -1.07 | none (the first run's park gate lost 120 s at 57 on the gate's walking clause, off under NOCATCH since) |
 
-Eleven of the fourteen pair with no step of 2 s over their runs (104, 106,
-107 and 114 after their reruns); the three named are 105 (read), 113 (the
-valve's two clicks: the flood probe below) and 109 (the port's key-board
-visits and its pig-out stand, named above). The pets'
+Twelve of the fourteen pair with no step of 2 s over their runs (104, 106,
+107, 109 and 114 after their reruns and the port's two 109 rules); the two
+named are 105 (read) and 113 (its plan re-laid round the flood — one step
+of 4.5 s left at the fuse's shock). The pets'
 would-be catches after the stub: 108's parrot at 26.4 s, 109's chili at
 191.5 and 194.1, none elsewhere; the rooms test's 0-8 a level as before.
 109's game stops ticking at the teeth + tabasco combine right after his
@@ -5009,20 +5009,34 @@ cases is a step of its script in the cases' order (113: 42 of 42, the case
 chain 0 19 20 21 1 2 7 3 4 5 6 11 12 13 15 16 17 and round again), and
 what is not a step is the steps' own sub-calls (the fire's shout and icon,
 GOTOENTER's enter/leave, the walk's arrival action at 0x479ccf, the repair
-helper) or the GUI's handlers of Woody's clicks. Left for the engine: the
-actions inside the levels' helper functions the walker does not enter
-(105's piano play_piano_noangry 0x46db17, 103's cake put_tnt / light_tnt /
-celebrate_boom, 104's basin shave_glue / grow_hair, 108's water_to_death,
-110's pour_fuel, 114's cups blackpolish and three Switch steps), the
-behaviours outside the classes (the pets' wakeup / fallasleep / whine,
-the aux actor's flyout / flyin / try_to_flee, the triggers' doubletake1 /
-doubletake3), and the operands held in stack slots the extractor cannot
-read yet (the `take` actions on the drawers' slot objects, 109's and 108's
-GoTo slots, GOTO2's `addr`). The runtime interpreter is the next step: a
-step runner under the PC profile (GoTo = the walk to the PC hotspot,
-Action = the clip at the Loader's ticks, If / OBJ3 = the placed variants,
-Switch = the object swap, Icon = the bubble, OBJ2 = the fire with the shout
-tables), fed by these files, behind a flag until the 28 plans hold.
+helper) or the GUI's handlers of Woody's clicks. The walker forks on
+the inventory test too (INV, fcn.00446020: the count of a name an actor
+or an object holds, asked by `test eax, eax; jle` — 109's key board), on
+the LOOKUP of an object, and on a class byte the path has not set (`mov al,
+byte [esi+X]` / `cmp byte [esi+X], N`: 105's rush flag before the piano's
+angry look, 103's candle box bytes) — the actions that seemed to live in
+helpers (105's play_piano_noangry, 103's put_tnt / light_tnt /
+celebrate_boom, 104's shave_glue / grow_hair, 108's water_to_death, 110's
+pour_fuel, 114's blackpolish) were in-class branches behind such bytes. With
+them, 12 of the 14 traces have every case event on a script step (the
+checker, 01:05); left are 105's look_angry (0x46df7c, one more untracked
+predicate), 109's pet whine (the pet class, no case), the behaviours outside
+the classes (the pets, the aux actor, the room triggers — the checker names
+their rets) and the operands held in stack slots the extractor cannot read
+yet (the `take` actions on the drawers' slot objects, 109's and 108's GoTo
+slots, GOTO2's `addr`). runtime/pcscript.py is the
+walker over these files (Script: the cases by index, the steps by address,
+the port item of a PC object through levels/pc/scripts/objects.json;
+Walker: the node and the step within the case, the test it ends on, the
+branch taken, the case the leaf resumes) and, as a module, drives itself
+with an oracle trace: 113's 42 and 106's 50 case events in order with the
+trace's resyncs where a test's answer is not visible in the next event
+(109's inventory tests defeat that lookahead — the runner answers them
+from the items' state instead). The step runner on the port's pawns is the
+next step: GoTo = the walk to the PC hotspot, Action = the clip at the
+Loader's ticks, the tests = the placed variants, the inventories and the
+class bytes, Switch = the object swap, Icon = the bubble, OBJ2 = the fire
+with the shout tables — behind a flag until the 28 plans hold.
 
 **The stations' places (2026-10-03, tools/pcoracle/station_positions.py).**
 Where the PC neighbour stands as each station's action starts, over the
@@ -5248,8 +5262,17 @@ spring's crash on his lap-4 board (348, while she sits 331.7-352): the
 gauge then crosses 100 000 at the castle's third credit, 9 s after the
 crash (74 000 + 30 000), a 5 s margin — a plan compressed by a lap
 (the elephant's bucket before his 276, the crayfish before his 308, the
-towel and the castle before 337, the spring before 346). Open: the
-re-lay; the marks stay.
+towel and the castle before 337, the spring before 346) — but the sum
+there is 63 700 at the third credit without a crash inside his own castle
+scene (he cannot dive while he reacts), so that structure does not reach
+it either. Three re-lays tried in the port on 2026-10-25: the awning's
+pedal held back for his lap-3 board (her chair's 8.3 s hold at 122 gone,
+her final sit 7 s earlier) — the awning's predicate never holds past his
+lap-2 board (the first tricked board use unlocks it for that lap alone),
+so the pedal cannot move; the whole plan a lap later (v4: the fires at
+495-564, the crash 609.0, 98.9 again — her holds follow his scenes, the
+phase does not drift in the port). What is left is a plan with another
+coin order; the marks stay and 207 is GOOD JOB! as on the PC.
 
 **213's picnic exit (2026-10-03).** The third lap's walk from the
 tricked picnic to the pinata was 2.2 s short in the port: the PC's leave

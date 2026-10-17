@@ -220,4 +220,7 @@ simulate) is what forks the paths — the variant tests, the LOOKUP of an
 object (fcn.00448bf0) and the inventory test INV (fcn.00446020: how many of
 the named thing the actor holds, asked by `test eax, eax; jle` — 109's
 `pigkey` gates the key board's give (case 1-2), the feed (case 19) and the
-take (case 13)); everything else in trick_branches is unchanged.
+take (case 13)) and a class byte the path has not set (`mov al, byte
+[esi+X]` / `cmp byte [esi+X], N` — a 'flag' test: 105's rush flag before the
+piano's angry look); with those, 12 of the 14 nocatch3 traces have every case
+event on a script step. Everything else in trick_branches is unchanged.
