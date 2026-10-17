@@ -320,7 +320,12 @@ action, 37 frames) and cancelled the placement of pillows_manip at the
 job's end — the two-second pose rule had taken the leg as done. The
 runners wait an action's own ticks out now (PCMap.woody_ticks: time="N"
 + 2, `auto` through lap_model_s2.Data.action_ticks); a leg's `wait` is
-no longer needed for that. The runner's
+no longer needed for that. The Season 2 runner's gate reads a catcher's
+blindness off the actor's own flag word (+0x14, the `flags` field of the
+tick's actors; flag 4 the hideout state the predicate skips — 206's
+Mother asleep in her chair, which is no hideout object): the 206 plan
+runs 18 of 18 legs since (nocatch3), its one timeout the kukidentomat's
+dexterity game the minigame handler does not win. The runner's
 live-state gate (above) keeps Woody out of a catcher's room but cannot
 leave a room before the catcher arrives — 101's `park! Zone01` right after
 the binoculars (101 s): the PC neighbour leaves the sofa at 100 s and is in

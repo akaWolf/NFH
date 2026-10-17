@@ -2067,8 +2067,20 @@ class Pawn:
                     # down into it, lap_model_s2.code_places_linked)
                     tx = visit(ap['txtl']) or 0
                     dpx = visit(ap.get('dpxtl'))
+            # (the tricked move resolved now, with this visit's slot, for a
+            # trick that lands during the visit: 213's termites on the picnic
+            # as he steps aboard — the step re-picks the manip variant on the
+            # `boat` post, 0x100393ee, and its exit is the water's)
+            late = None
+            if 'txt' in ap and not it.is_tricked(self.level.items):
+                late = (pc_ap_x(ap, it) + (visit(ap['txt']) or 0), visit(ap.get('dpxt')))
             self._pc_depart = (pc_ap_x(ap, it) + tx, dpx if dpx is not None else pc_ap_px(ap, it),
-                               self.sprite.x, self.sprite.y, it)
+                               self.sprite.x, self.sprite.y, it, late)
+            if os.environ.get('NFH_DEPART_LOG') and self.role == 'Rottweiler':
+                import traceback
+                print('DEPART t=%.2f arrived %s tricked=%s tx=%s dpx=%s late=%s visit=%s from %s' % (
+                    getattr(self.world, 'time', -1), it.name, it.is_tricked(self.level.items), tx, dpx, late, it.pc_use_visit,
+                    ' <- '.join('%s:%d' % (f.name, f.lineno) for f in traceback.extract_stack(limit=4)[:-1])), flush=True)
         else:
             self._pc_depart = None
         self._pc_from_x = None
@@ -2083,7 +2095,7 @@ class Pawn:
         dep = self._pc_depart
         if dep is None or self.zone is None:
             return None
-        pcx, px, x0, y0, src = dep
+        pcx, px, x0, y0, src = dep[:5]
         if abs(self.sprite.x - x0) > 0.1 or abs(self.sprite.y - y0) > 0.1:
             return None
         last = final_step[-1] if isinstance(final_step, list) and final_step else final_step
@@ -2116,6 +2128,11 @@ class Pawn:
             pos = (dep[0], z.pc_room['floor'] + dep[1])
         else:
             pos = (pc_room_x(z, self.sprite.x), z.pc_room['floor'])
+        if os.environ.get('NFH_DEPART_LOG') and self.role == 'Rottweiler':
+            print('DEPART t=%.2f route from %s: dep=%s sprite=(%.3f, %.3f) -> pos %s' % (
+                getattr(self.world, 'time', -1), dest.name if dest is not None else None,
+                None if dep is None else (dep[0], dep[1], round(dep[2], 3), round(dep[3], 3), dep[4].name if dep[4] is not None else None),
+                self.sprite.x, self.sprite.y, pos), flush=True)
         last = final_step[-1] if isinstance(final_step, list) and final_step else final_step
         return pc_route(self.level, self.role, z, pos, dest, pc_target(self.role, dest, last))
 
@@ -2140,7 +2157,7 @@ class Pawn:
         # remaster's offsets, 212's bench, 205's ski ride — while the PC actor
         # stands at the hotspot, or where the actions' translations left it:
         # nothing but the use has run since the station was reached)
-        pcx, px, _x0, _y0, src = dep
+        pcx, px, _x0, _y0, src = dep[:5]
         if src is None or self.zone is None or src.zone != self.zone.pid:
             return None                   # put in another room since (a use's warp)
         last = steps[-1]
@@ -6224,7 +6241,24 @@ class Routine:
 
     def _pc_clip_end(self):
         """the per-clip timing, the hold and the credit watch end with the use"""
-        self.pawn.anim.clip_pace = None
+        p = self.pawn
+        dep = getattr(p, '_pc_depart', None)
+        if dep is not None and dep[4] is self.item:
+            # the use's clips may have moved the pawn (213's picnic boat: its
+            # enter and leave carry him in and out) while the PC actor is at
+            # the hotspot or where the actions' translations put him (`txt`,
+            # the water's `neighbor_out` 200 px on): the record stays his
+            # departure, re-stamped where the pawn stands as the use ends —
+            # and a trick that landed during the visit takes the tricked
+            # move (213's termites as he steps aboard)
+            pcx, px = dep[0], dep[1]
+            late = dep[5] if len(dep) > 5 else None
+            if late is not None and self.item.is_tricked(self.level.items):
+                pcx, px = late[0], late[1] if late[1] is not None else px
+            p._pc_depart = (pcx, px, p.sprite.x, p.sprite.y, dep[4], None)
+            if os.environ.get('NFH_DEPART_LOG'):
+                print('DEPART t=%.2f restamp %s at (%.3f, %.3f) pc (%s, %s)' % (getattr(p.world, 'time', -1), self.item.name, p.sprite.x, p.sprite.y, pcx, px), flush=True)
+        p.anim.clip_pace = None
         self.pawn.anim.skip_clip = False
         self._pc_credit = None
         self._pc_credit_linked = None
@@ -11191,6 +11225,22 @@ class World:
         else:
             item.compound_required = 'IT_NONE'
 
+    def _pc_swap_second_tricked(self, item):
+        """the PC keys of an item's second tricked identity swap in with its
+        tricked set (PCSecondTricked: 214's hatch — the shards' crash through
+        the closed hatch is the step's other arm, hatch_closed_manip: the
+        stand 9.08 s, SHOUT 2, the credit 1.5 s in), the first's kept for a
+        swap back; the swaps are DoubleRequiredItemsBehavior's (Item.cs:
+        1734-1758) and HatchFixBehavior's first pass (Item.cs:2550-2579)"""
+        if not pcprofile.is_pc() or not getattr(item, 'pc_second_tricked', None):
+            return
+        for key, attr in (('PCUseSecondsTricked', 'pc_use_secs_tricked'), ('PCShout', 'pc_shout'),
+                          ('PCCreditAt', 'pc_credit_at'), ('PCJingleAt', 'pc_jingle_at'),
+                          ('PCShoutTail', 'pc_shout_tail'), ('PCFixSeconds', 'pc_fix_secs')):
+            if key in item.pc_second_tricked:
+                item.pc_second_tricked[key], cur = getattr(item, attr, None), item.pc_second_tricked[key]
+                setattr(item, attr, cur)
+
     def _hatch_fix_behavior(self, item):
         """Item.HatchFixBehavior (Item.cs:2550-2579): the first fix turns
         the hatch into its dexterity round, the second writes it off"""
@@ -11211,6 +11261,7 @@ class World:
             item.use_once = False
             item.use_tricked_anim['Rottweiler'] = \
                 list(item.rott_use_second_tricked)
+            self._pc_swap_second_tricked(item)      # (the PC keys with the set)
             # cs:2567-2569: Woody's spot for the round moves 1.5 to the
             # right (onto the hatch itself) and 0.3 lower — the original
             # stands him at (3.14, -2.86) for the shards round and the
@@ -12516,6 +12567,7 @@ class World:
                 item.second_idle_tricked, item.idle_tricked
             item.already_tricked, item.second_already_tricked = \
                 item.second_already_tricked, item.already_tricked
+            self._pc_swap_second_tricked(item)
         # the Mouse/AngryElephant/ArmsBowl/Snake primed toggles at the head
         # (Item.cs:1385-1410) — the held mouse arms by target and type
         if held_pre := (self.level.items.get(inv.used.get('item'))

@@ -5060,6 +5060,61 @@ away, her clock from the chair's `enter` at 96.6 s: asleep 137-150 s and
 sight is the look phase's and the port's MotherSleepLoop 60 s /
 MotherLook 30 s are hers (the port's clock starts at its own lesson's
 end, 13 s earlier than the paced oracle run's); the question is closed.
+The level's uncatchable run then went through (nocatch3: 18 of 18 legs,
+the six records paid, the runner's gate reading her flag 4 off the actor
+word — +0x14, fcn.100450dc's — since the chair is no hideout object): the
+PC's six would-be catches have the port's within two seconds but one
+(296.2 s, the port's Woody with no catcher near; the port's own at
+290.8), the Mother's two among them (165.1, 248.3). Its one gap is the
+oracle's: the denture adhesive's take is the kukidentomat's dexterity
+game, which the harness's minigame handler does not win — the leg timed
+out after 120 s and the run's later inputs sit 100 s behind the port's.
+
+**214's pistol waits for the Mother (2026-10-03, open).** The run's
+jumps — pistol -> fishbox -9.47 s on the first lap, -2.98 on the second,
+fishbox -> shower -2.88 — are his wait at the pistol: the step 0x1003aa93
+walks him there and polls, every tick (the GoTo re-posted), the actor
+`mother` placed on `topright_deckchair` with her flag 4 (the globals
+0x100e1b30 / 0x100e08b0, fcn.10049190 and fcn.100450dc(actor, 4)); his
+`use` follows her chair's `enter` by 11 ticks (157.67 -> 158.58, 252.92 ->
+253.83). He stood in `wait` 9.4 s and 6.2 s; the port's PistolPlay starts
+as he arrives (148.55). Her chair itself differs: the PC's Mother sits
+3.4-123.5 s (Woody in the chair beside hers from 108.7 ends it at 122.0),
+157.8-218.8 and 253.0-330.2 (the shot's `standup` at 167.0 and 262.2 in
+them), the port's 3.6-109.2, 143.4-208.2 and 242.4-302.1 — her script's
+sleep step 0x1003a0b8 waits for `sleep` on the chair 600 ticks (the
+lifted step: WAITEVENT, then the reling step 0x10039f34). The port's
+WaitWatch before PistolPlay could hold on her (PCWaitFor on the Mother's
+chair, `at` the use's start) once her stays are read; her stays first.
+Not fixed: the stretch is 3 s a lap and the plan stands.
+
+**213's picnic exit (2026-10-03).** The third lap's walk from the
+tricked picnic to the pinata was 2.2 s short in the port: the PC's leave
+puts him at (1175, 1072), the water's `neighbor_out` (PCApproach `txt`
+200 / `dpxt` 22 was in the overlay), but the termites land as he steps
+aboard — the PC's step re-picks the manip variant on the `boat` post
+(0x100393ee, his GoTo to picnic_manip at 336.3) while the port's
+departure record was written at his arrival, untricked (`tx` -5, `dpx`
+75). The record now keeps the tricked move resolved at the arrival and
+takes it as the use ends if the trick has landed (Pawn._pc_arrived,
+Routine._pc_clip_end; NFH_DEPART_LOG=1 prints the records): the walk
+leaves from 1175 (the along 3.15 s where 1.0 was) and runs down 22 px
+where it ran 75. The run's remaining 1.5 s there is the door he shares
+with Olga on her way to the bull: the PC's neighbour stood 17 ticks at
+the pass behind her (376.0 s), the port's Olga was elsewhere by then.
+
+**214's hatch, the second flow (2026-10-03).** The shards' crash through
+the closed hatch is the hatch step's other arm — hatch_closed_manip in
+the scene (the lifted step): the stand 9.08 s, SHOUT 2, the credit 1.5 s
+in — where the carpet's fall (hatch_open_manip) is 11.33 s, SHOUT 0 and
+1.0 (the overlay's one set). The mobile swaps the hatch's tricked set for
+its second (RottweilerUseSecondTrickedAnimation: HatchCrash,
+RottComeBackHatch) at HatchFixBehavior's first pass and at
+DoubleRequiredItemsBehavior's; PCSecondTricked {PCUseSecondsTricked
+9.08, PCShout 2, PCCreditAt 1.5, PCJingleAt [1.5]} swaps in with it
+(World._pc_swap_second_tricked). The replay's shout after the crash is
+the hard one (7.2 s) and the fishbox -> shower jump (-2.88 s) is gone;
+the run's offset -15.2 -> -12.6 s, the rest the pistol's waits above.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

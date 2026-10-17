@@ -245,7 +245,7 @@ class Item:
                  'collider',
                  'use_anim', 'use_tricked_anim', 'idle', 'idle_tricked', 'animating',
                  'required_inventory', 'trick_score', 'pc_angry_time', 'pc_use_secs', 'pc_use_visit', 'pc_visit_from', 'pc_use_secs_role', 'pc_use_visit_role',
-                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_when_tricked', 'pc_when_primed', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_whistle_pet', 'pc_near_dx', 'pc_redo_goto', 'pc_leave_tricked', 'pc_next_case_secs', 'pc_branch_done', 'pc_then_look', 'pc_next_tricked', 'pc_redo_shout', 'pc_no_icon', 'pc_wake_pet', 'pc_visit_posts', 'pc_after_shout', 'pc_after_shout_first', 'pc_after_shout_compound', 'pc_own_before_shout', 'pc_fix_icon', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_at_compound', 'pc_fire_before',
+                 'pc_shout_index', 'pc_shout_skip', 'pc_stop_skip', 'pc_end_after', 'pc_fire_lead', 'pc_lead_stood', 'pc_fire_points', 'pc_react_lead', 'pc_react_tail', 'pc_case_handler', 'pc_fix_secs', 'pc_when_tricked', 'pc_when_primed', 'pc_second_tricked', 'pc_use_secs_tricked', 'pc_redo_secs', 'pc_fall_secs', 'pc_slide_to', 'pc_alarm_shout_secs', 'pc_drop_x', 'pc_drop_dx', 'pc_leave_secs', 'pc_woody_secs', 'pc_whistle_pet', 'pc_near_dx', 'pc_redo_goto', 'pc_leave_tricked', 'pc_next_case_secs', 'pc_branch_done', 'pc_then_look', 'pc_next_tricked', 'pc_redo_shout', 'pc_no_icon', 'pc_wake_pet', 'pc_visit_posts', 'pc_after_shout', 'pc_after_shout_first', 'pc_after_shout_compound', 'pc_own_before_shout', 'pc_fix_icon', 'pc_use_secs_linked', 'pc_fire_at', 'pc_fire_at_compound', 'pc_fire_before',
                  'pc_slip_secs', 'pc_surprise_secs', 'pc_fire_wait', 'pc_grab_secs', 'pc_fix_use_secs', 'pc_tool_use_secs', 'pc_tool_shout', 'pc_tool_repair',
                  'pc_return_secs', 'pc_icon_lead', 'pc_icon_clip', 'pc_icon', 'pc_icon_sched', 'pc_icon_clips', 'pc_icon_role', 'pc_icon_clips_role', 'pc_hurt_icon',
                  'pc_station_ends_on_trick', 'pc_run_to', 'pc_minigame_ticks', 'pc_minigame_levels',
@@ -874,6 +874,12 @@ class Item:
         # it (PCVisitPosts {'enter', 'use', 'end'}: 109's parrot)
         self.pc_visit_posts = d.get('PCVisitPosts') or {}
         self.pc_use_secs_tricked = _f('PCUseSecondsTricked')
+        # the keys of the second tricked identity (PCSecondTricked: 214's hatch
+        # once the carpet's fall has been fixed — the shards' crash through the
+        # closed hatch, GameLogic's hatch step with hatch_closed_manip in the
+        # scene: the stand 9.08 s, SHOUT 2, the credit 1.5 s in), swapped in
+        # with the tricked set by DoubleRequiredItemsBehavior (world.py)
+        self.pc_second_tricked = dict(d.get('PCSecondTricked') or {}) or None
         # the PC's part of a ReuseAfterFix station after the fire (PCRedoSeconds:
         # the case's actions after the repair and the station's tail — 110's
         # table redoes no `give`, 108's brush no first `take3`), which the

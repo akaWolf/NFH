@@ -187,6 +187,7 @@ class PlanRunner:
         either object carrying it): his last walk's target on NFH2 (the goto hook), on NFH1 any neighbor_hideout
         object whose last action is an enter or a sleep, while he stands"""
         if a['anim'] in self.GAITS: return False
+        if 'flags' in a: return bool(a['flags'] & 4)    # the actor's own flag 4 (actor_states), the predicate's test
         ins = state.get('inside', {}); d = state.get('dest', {}).get(actors.get(c))
         objs = [d[1]] if d and isinstance(d[1], str) else [o for o, k in self.m.hideouts.items() if k == 'neighbor_hideout']
         fams = set(self.m.family(o) for o in objs if o in self.m.hideouts or self.m.family(o) in set(self.m.family(h) for h in self.m.hideouts))
@@ -460,7 +461,9 @@ def actor_states():
     out = {}
     for name, a in actors.items():
         try:
-            out[name] = {'x': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'y': struct.unpack('<i', rd(a + 0x30, 4))[0], 'anim': as_string(u32(a + 0x40))}
+            # (+0x14 the object's flag word — fcn.100450dc(obj, mask) reads it: flag 4 is the hideout state the
+            # catch predicate skips, set by a script too — 206's Mother asleep in her chair, 0x1002b9fe)
+            out[name] = {'x': struct.unpack('<i', rd(a + 0x2c, 4))[0], 'y': struct.unpack('<i', rd(a + 0x30, 4))[0], 'anim': as_string(u32(a + 0x40)), 'flags': u32(a + 0x14)}
         except Exception: pass
     return out
 LEAD = int(os.environ.get('WDBG_LEAD', '4'))      # ticks between the dummy's dispatch and the scripted tick

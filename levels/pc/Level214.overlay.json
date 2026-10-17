@@ -150,6 +150,14 @@
     "PCUseSeconds": 5.42,
     "PCDepartTicks": {
      "Rottweiler": 1
+    },
+    "PCSecondTricked": {
+     "PCUseSecondsTricked": 9.08,
+     "PCShout": 2,
+     "PCCreditAt": 1.5,
+     "PCJingleAt": [
+      1.5
+     ]
     }
    }
   },
