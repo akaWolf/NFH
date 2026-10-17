@@ -56,7 +56,6 @@
      0.17,
      "shout"
     ],
-    "PCUseSecondsTricked": 8.42,
     "PCShout": 0,
     "PCFixSeconds": 6.08,
     "PCHitSeconds": {
@@ -68,15 +67,10 @@
     "PCHitRun": {
      "Mother": 1.42
     },
-    "PCCreditAt": 5.75,
-    "PCJingleAt": [
-     5.75
-    ],
     "PCFixDepart": [
      805,
      -30
     ],
-    "PCUseSeconds": 8.5,
     "PCHurtIcon": {
      "wait": "being_hit",
      "shout": "being_hit",
@@ -84,7 +78,22 @@
     },
     "PCDepartTicks": {
      "Rottweiler": 2
-    }
+    },
+    "PCClipSeconds": {
+     "PistolPlay": 8.5,
+     "PistolFire": 8.42
+    },
+    "PCWaitFor": {
+     "clip": "WaitWatch",
+     "role": "Mother",
+     "item": "DeckChairMother",
+     "at": "inside",
+     "then": 0.92
+    },
+    "PCCreditInClip": {
+     "PistolFire": 5.75
+    },
+    "PCJingle": true
    }
   },
   {

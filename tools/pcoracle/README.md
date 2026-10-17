@@ -275,6 +275,13 @@ climbs faster: the same sum). The lap-1 drift is these: -0.5 at the shore,
   10 px is flagged, an action played from elsewhere flags too (204's jade
   `look`). 2026-10-03: every station of the fourteen runs matched but
   208's tricked elephant (`xt` 192 now).
+- `WDBG_BARS=1` — the oracle logs a timed stay's bar (fcn.1000b154's
+  object: its count every 60 ticks, its starts and falls): 214's Mother in
+  her chair, 600 ticks, standing still through the neighbour's reaction
+  scenes. `WDBG_GATES=addr,…` reads a step's `test al` after a call (206's
+  director's pillows gate). The port's own diagnostics: NFH_LOOP_LOG (the
+  once-ignore targets), NFH_DEPART_LOG (the departure records), NFH_PASS_LOG
+  / NFH_CLAIM_LOG (passes, door waits).
 - `jumps_report.py <pairs.txt...> [--jump=2]` — where a replay's drift
   jumps: the bubble pairs read as port-minus-PC offsets, a step of two
   seconds or more between two bubbles names the visit between them (its

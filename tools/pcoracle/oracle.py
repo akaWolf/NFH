@@ -682,6 +682,22 @@ class Gate(gdb.Breakpoint):
             emit({'tick': state['tick'], 'ev': 'error', 'name': 'gate', 'err': repr(e)})
         return False
 for _a in [a for a in os.environ.get('WDBG_GATES', '').split(',') if a]: Gate(int(_a, 16))
+class Bar(gdb.Breakpoint):
+    """WDBG_BARS=1: a timed stay's bar (fcn.1000e7f2 pushes fcn.1000b154's object: its update 0x1000b312
+    counts +0xc up to the pushed ticks +8 a level tick while the actor is there) — `bar` events as the
+    count starts, every 60 ticks, and whenever it falls (a restart): 214's Mother in her chair"""
+    def __init__(self): super().__init__('*%#x' % gl(0x1000b312), internal=True); self.last = {}
+    def stop(self):
+        try:
+            ecx = int(gdb.parse_and_eval('$ecx')); c = u32(ecx + 0xc); t = u32(ecx + 0x10)
+            prev = self.last.get(ecx)
+            if prev is None or c < prev or c % 60 == 0 or c == t:
+                emit({'tick': state['tick'], 'ev': 'bar', 'obj': '%#x' % ecx, 'count': c, 'of': t})
+            self.last[ecx] = c
+        except Exception as e:
+            emit({'tick': state['tick'], 'ev': 'error', 'name': 'bar', 'err': repr(e)})
+        return False
+if os.environ.get('WDBG_BARS'): Bar()
 if os.environ.get('WDBG_MINIGAME', 'perfect') == 'perfect': Perfect()
 else: Minigame()
 try:

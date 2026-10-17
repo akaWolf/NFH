@@ -2313,7 +2313,16 @@ class MotherSleepBehaviour(Behavior):
         self.target_item = self.item('TargetItem')
         self.repeat_sleep = bool(self.value('RepeatSleep', True))
         self._pc_sleep_scale = None      # the PC bar's pace, from the sleep after a sit on
+        self._pc_bar = False             # her sleeps under way (the PC's bar, 0x1003a1e0)
         world.subscribe('mother_sleep', self.force_sleep)    # OnEnable, cs:63-66
+
+    def update(self, dt):
+        # the PC's bar (fcn.1000b154's object, its update 0x1000b312) counts
+        # no tick while the neighbour's reaction scene is up: the oracle's
+        # count stood from 78.3 to 96.9 s through his hatch fall (the bar
+        # probe, 2026-10-03) — her sleeps hold through the port's scene
+        if self.mother is not None and pcprofile.is_pc():
+            self.mother.anim.pc_paused = bool(self._pc_bar and getattr(self.world, '_pc_scene', False))
 
     def play_animation(self, name):
         super().play_animation(name)
@@ -2326,10 +2335,13 @@ class MotherSleepBehaviour(Behavior):
             # the awake loop at its own, the sleeps after a sit at the bar's
             # (_force_sleep_after_trick)
             if name == self.first_animation:
+                self._pc_bar = False
                 mobile = self.mother.anim.sequence_seconds([name])
                 if mobile > 0.0:
                     self.mother.anim.time_scale = mobile / self.mother_item.pc_sit_secs
             elif name == self.last_animation and self.mother_item.pc_getup_secs:
+                self._pc_bar = False
+                self.mother.anim.pc_paused = False
                 # the chair's `leave` before her walk to the reling
                 mobile = self.mother.anim.sequence_seconds([name])
                 if mobile > 0.0:
@@ -2382,6 +2394,7 @@ class MotherSleepBehaviour(Behavior):
                 [a for a in seq if a != self.last_animation])
             if mobile > 0.0:
                 self.mother.anim.time_scale = mobile / self.mother_item.pc_sleep_secs
+            self._pc_bar = True
         if seq:
             self._resequence(seq)
 
@@ -2402,6 +2415,7 @@ class MotherSleepBehaviour(Behavior):
             mobile = self.mother.anim.sequence_seconds(rest)
             if mobile > 0.0:
                 self._pc_sleep_scale = mobile / self.mother_item.pc_sleep_secs
+            self._pc_bar = True
         if seq:
             self._resequence(seq)
 

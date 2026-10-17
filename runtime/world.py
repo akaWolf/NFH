@@ -285,6 +285,7 @@ class AnimPlayer:
         self.clip_pace = None            # the profile's per-clip seconds of a use (PCClipSeconds)
         self.skip_clip = False           # the profile's clip of 0 seconds: ended on the next tick
         self.hold_clip = None            # the profile's held clip (PCWaitFor): it loops until released
+        self.pc_paused = False           # the profile's bar stay held through a reaction scene
         self.ignore_infinite = False     # SetIgnoreInfiniteLoop
         self.ignore_infinite_once = False
         self.sound_sink = sound_sink
@@ -612,6 +613,12 @@ class AnimPlayer:
         CurrentAnimation refreshes nothing either (cs:179-185: both Refresh
         arms need `CurrentAnimation != null`)."""
         if self.sprite.hidden or self.sprite.current is None:
+            return
+        if self.pc_paused:
+            # the profile's held clock: a timed stay's bar on the original
+            # (fcn.1000b154's object) counts no tick while another actor's
+            # reaction scene is up — 214's Mother asleep in her chair through
+            # his hatch fall, 13.6 s (MotherSleepBehaviour's PC arm)
             return
         if self.skip_clip:
             # a clip the PC does not play (clip_pace 0): the sequence goes on
@@ -6295,6 +6302,16 @@ class Routine:
         arrival at her chair), the clip plays on for the `then` seconds, then
         the sequence goes on"""
         wt = self._pc_wait
+        if wt['released'] is None and wt.get('at') == 'inside':
+            # released while the awaited role is at its use of the item (214's
+            # pistol: the step 0x1003aa93 polls the Mother placed on
+            # topright_deckchair with her flag 4 — her sitting, not a mark of
+            # a sit gone by — and fires 11 ticks after she sits)
+            w = self.pawn.world
+            rt = next((r for r in (w.routines if w is not None else ()) if r.role == wt['role']), None)
+            if rt is None or rt.state != rt.USING or rt.item is None or rt.item.name != wt['item']:
+                return
+            wt['released'] = 0.0
         if wt['released'] is None:
             src = next((i for i in self.level.items.values()
                         if i.name == wt['item']), None)

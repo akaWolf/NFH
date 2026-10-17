@@ -5074,23 +5074,38 @@ perfectly in 6 s (167.2 -> 173.3, the thumb scored 4 a tick) where the
 port's driver takes 32 s (155.8 -> 188.2) — a player's length, not a
 rule's, and the run's inputs drift by it from there (+11.7 s).
 
-**214's pistol waits for the Mother (2026-10-03, open).** The run's
-jumps — pistol -> fishbox -9.47 s on the first lap, -2.98 on the second,
-fishbox -> shower -2.88 — are his wait at the pistol: the step 0x1003aa93
-walks him there and polls, every tick (the GoTo re-posted), the actor
-`mother` placed on `topright_deckchair` with her flag 4 (the globals
-0x100e1b30 / 0x100e08b0, fcn.10049190 and fcn.100450dc(actor, 4)); his
-`use` follows her chair's `enter` by 11 ticks (157.67 -> 158.58, 252.92 ->
-253.83). He stood in `wait` 9.4 s and 6.2 s; the port's PistolPlay starts
-as he arrives (148.55). Her chair itself differs: the PC's Mother sits
-3.4-123.5 s (Woody in the chair beside hers from 108.7 ends it at 122.0),
-157.8-218.8 and 253.0-330.2 (the shot's `standup` at 167.0 and 262.2 in
-them), the port's 3.6-109.2, 143.4-208.2 and 242.4-302.1 — her script's
-sleep step 0x1003a0b8 waits for `sleep` on the chair 600 ticks (the
-lifted step: WAITEVENT, then the reling step 0x10039f34). The port's
-WaitWatch before PistolPlay could hold on her (PCWaitFor on the Mother's
-chair, `at` the use's start) once her stays are read; her stays first.
-Not fixed: the stretch is 3 s a lap and the plan stands.
+**214's pistol waits for the Mother, and her chair through his scenes
+(2026-10-03).** The run's jumps — pistol -> fishbox -9.47 s on the first
+lap, -2.98 on the second — were his wait at the pistol: the step
+0x1003aa93 walks him there and polls, every tick (the GoTo re-posted),
+the actor `mother` placed on `topright_deckchair` with her flag 4 (the
+globals 0x100e1b30 / 0x100e08b0, fcn.10049190 and fcn.100450dc(actor,
+4)); his `use` follows her chair's `enter` by 11 ticks (157.67 ->
+158.58, 252.92 -> 253.83), in `wait` 9.4 s and 6.2 s. Her chair, read
+with the oracle's bar hook (WDBG_BARS=1: fcn.1000b154's object, its
+update 0x1000b312 counting +0xc to the pushed 600) and her flag word:
+she sits at 3.3 and looks (flag 4 off from 4.2) until his pistol's
+`standup` (58.2) — then flag 4 on and the bar from 0; it reaches 600 at
+121.9 and she leaves at 122.0; the second sit 157.7, his shot's standup
+167.0, the bar 167.2 -> 217.2, the leave; the third 252.9, 262.4 ->
+328.7. A bar of 600 ticks is 50 s, and the first ran 63.6, the third
+66.3: the count stood from 78.3 to 96.9 and from 282.4 to 303.7 — his
+hatch fall and his crash through the hatch, the reaction scenes, 13.6 s
+and 16.3 s to the tick. So the port's rule is hers already (the look
+until the shot's end, the sleep 49.8 s, pc_durations_others' BARS) but
+for the scene: her sleep holds while the neighbour's scene is up now
+(MotherSleepBehaviour's PC arm, AnimPlayer.pc_paused), and his wait is
+the Pistol's `PCWaitFor` on her sitting — `at` "inside": the WaitWatch
+loops while her routine is not at its chair use, 0.92 s on from it (a
+sit gone by releases nothing: Routine._pc_wait_tick) — its clips at their
+PC seconds (PCClipSeconds PistolPlay 8.5 / PistolFire 8.42, the credit
+5.75 s into the fire, PCCreditInClip; the plain keys dropped as 202's
+swim has it). The replay: her second sit 156.9 (the PC 157.7), his
+WaitWatch 148.6 -> 156.9 (the PC 149.1 -> 158.6), her sleep 165.3 (167.2),
+the run's offset -12.6 -> -4.7 s; the second lap's -2.98 is her walk
+back three seconds early there. Whether every bar stay holds through a
+scene (208/209's dressing room, 206's and 210's chair) is read the same
+way; 210's is queued.
 
 **213's picnic exit (2026-10-03).** The third lap's walk from the
 tricked picnic to the pinata was 2.2 s short in the port: the PC's leave
