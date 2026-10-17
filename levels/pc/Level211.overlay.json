@@ -209,7 +209,10 @@
     },
     "PCDepartTicks": {
      "Mother": 1
-    }
+    },
+    "PCBarClips": [
+     "MotherSleepSingle"
+    ]
    }
   },
   {

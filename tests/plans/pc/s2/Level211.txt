@@ -29,7 +29,9 @@ unlock LifeBoat IT2_Rasp               # Zone01, before his lap-3 boat (218 s un
 park Zone02                            # off his way to the boat (Zone01) and the Mother's to the child (Zone04)
 whenanim Mother MotherSleepSingle      # (~198) asleep in her chair after her lap-2 visit to the child
 whenanim Mother MotherBawlLeft         # (~229) her lap-3 visit to the child
-whenanim Mother MotherSleepSingle      # (~238) back asleep in her chair, he at the boat's reaction
+whenanim Mother MotherSitPillow        # (~243) back in her chair, he at the boat's reaction: the walk starts on her sit, a
+                                       # second before her sleep (v2, 2026-10-03: her bars hold through his scenes; the
+                                       # phone's coin landed at 99.94)
 usewith! OlgaChild IT2_Pressuretank    # Zone04 through her room (the Mother's action; LinkedItemTrick of the CabinPhone)
 usewith! PayPhone IT2_Coin             # Zone04: ActivateItemTrick -> CabinPhone (Zone05) + AlarmItem/CauseAlarm: the phone rings and he runs to answer it (AnswerPhoneNFH2) — 30 on the boat's 20 before they decay
 await LifeJacket 0

@@ -5103,9 +5103,35 @@ PC seconds (PCClipSeconds PistolPlay 8.5 / PistolFire 8.42, the credit
 swim has it). The replay: her second sit 156.9 (the PC 157.7), his
 WaitWatch 148.6 -> 156.9 (the PC 149.1 -> 158.6), her sleep 165.3 (167.2),
 the run's offset -12.6 -> -4.7 s; the second lap's -2.98 is her walk
-back three seconds early there. Whether every bar stay holds through a
-scene (208/209's dressing room, 206's and 210's chair) is read the same
-way; 210's is queued.
+back three seconds early there.
+
+**Every bar holds through his scene (2026-10-03).** 210's Mother read
+the same way (the bar hook over her naps, 240 ticks each): asleep 1.8-24.2,
+34.3-55.3 … 320.8-340.8 s, then 356.5-397.8 — 41.3 s for the 20.5 — with
+his fall into the empty pool (the tickle at 348, the hard shout to 369)
+inside it; her flag 4 and the bar's count stood together. The rule is the
+bar object's (fcn.1000b154's update 0x1000b312 counts a level tick only
+while its actor's object test holds, and a scene takes the actor out of
+it), not one chair's: the overlays mark the bar clips of every Mother
+stay the lifted model reads as a bar (PCBarClips — 206's and 207's chair
+MotherSleepLoop, 207's ladder swim, 208's and 209's dressing-room idle,
+210's nap and its awake loop, 211's nap; 214's chair through
+MotherSleepBehaviour's own arm) and the port holds them while its scene
+flag is up (Routine.tick, AnimPlayer.pc_paused): 210's replay sleeps her
+353.2-393.4 for the PC's 356.5-397.8. Olga's bars (202's and 210's mat,
+210's shower) are the same object on the PC and unmeasured yet.
+Two plans sat on the edge of their collapse and the holds pushed them
+over: 211's phone coin landed at 99.94 (its Mother's nap after her
+lap-3 visit to the child came 6 s later) — its final window opens on her
+sit clip now, a second before her sleep, 100.0 at 264.8; 207's board
+crash at 98.9 (the castle's three at 447, her sit for his dive 7 s later
+than before). 207's marks are withheld until its plan is re-laid: the two
+re-lays tried (the elephant's bucket after the second spring, the
+shell's crayfish after his lap-5 shell) put that coin 50 and 65 s after
+the crash, where the gauge had lost it — the lap is ~100 s and the decay
+0.36 a second, so the collapse needs the castle's three and the crash
+within 40 s on a base of 20; the plan needs its coins re-ordered round
+her cycle, not one moved. Open, with the numbers.
 
 **213's picnic exit (2026-10-03).** The third lap's walk from the
 tricked picnic to the pinata was 2.2 s short in the port: the PC's leave
@@ -5134,6 +5160,28 @@ DoubleRequiredItemsBehavior's; PCSecondTricked {PCUseSecondsTricked
 (World._pc_swap_second_tricked). The replay's shout after the crash is
 the hard one (7.2 s) and the fishbox -> shower jump (-2.88 s) is gone;
 the run's offset -15.2 -> -12.6 s, the rest the pistol's waits above.
+
+**Season 1's 104 read again (2026-10-03).** The +11 s between the two
+basin bubbles was the oracle's own: its run of 104 predated two fixes of
+the runner's map — the Deodrant's PC object is `toi/grease` (the
+combination toi/grease_exchanged with the hair restorer), not a
+`toi/deodrant` the level has none of, and a floor drop's y is the room's
+path line (420), not 0 — so the PC had declined both the hair restorer
+and the soap, and its neighbour never slipped at the basin where the
+port's did. Rerun with today's map (nocatch2), both inputs go through and
+the level pairs with no jump: 13 bubbles, the offset -0.03 -> -0.99 s
+over 300 s. The other Season 1 traces are of the same date; the whole
+season is being rerun (the queue after 104) before its table is read
+again.
+
+**205's glasses (2026-10-03).** The chef's glasses are the counter's
+put/take loop (shop/glasses_guarded: put at 0.2, take 6.5, put 12.8 …,
+12.6 s round) and the takeable `shop/glasses` is a container Woody opens
+in a put window: the runner's take leg at 165.4 (a put at 164.8) logged
+no action and timed out, yet the lion statue took the glasses from his
+inventory at 185.3 (pond/statue_mani `glasses`, then pond/lionhead) —
+the PC had given them. The port's take at any put is the PC's; the
+runner's leg should read the inventory, not an action.
 
 **The canon audit (tools/pcref/canon.py, 2026-09-10).** Every level of
 both games, the PC data next to the mobile's, category by category:

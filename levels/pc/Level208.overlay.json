@@ -194,7 +194,10 @@
     },
     "PCDepartTicks": {
      "Mother": 1
-    }
+    },
+    "PCBarClips": [
+     "MotherRoomIdle"
+    ]
    }
   },
   {

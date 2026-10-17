@@ -228,7 +228,11 @@
       "MotherLookLoop": "",
       "MotherGetUpPillow": "neighbor"
      }
-    }
+    },
+    "PCBarClips": [
+     "MotherSleepSingle",
+     "MotherLookLoop"
+    ]
    }
   },
   {

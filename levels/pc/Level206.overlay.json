@@ -82,7 +82,10 @@
     },
     "PCDepartTicks": {
      "Rottweiler": 0
-    }
+    },
+    "PCBarClips": [
+     "MotherSleepLoop"
+    ]
    }
   },
   {

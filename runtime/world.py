@@ -6263,6 +6263,8 @@ class Routine:
             if late is not None and self.item.is_tricked(self.level.items):
                 pcx, px = late[0], late[1] if late[1] is not None else px
             p._pc_depart = (pcx, px, p.sprite.x, p.sprite.y, dep[4], None)
+        p.anim.pc_paused = False          # (a bar stay's hold ends with the use)
+        if dep is not None and dep[4] is self.item:
             if os.environ.get('NFH_DEPART_LOG'):
                 print('DEPART t=%.2f restamp %s at (%.3f, %.3f) pc (%s, %s)' % (getattr(p.world, 'time', -1), self.item.name, p.sprite.x, p.sprite.y, pcx, px), flush=True)
         p.anim.clip_pace = None
@@ -8839,6 +8841,15 @@ class Routine:
             return
         if self.state == self.USING and self._pc_wait is not None:
             self._pc_wait_tick(dt)
+        if self.state == self.USING and pcprofile.is_pc() and self.item is not None \
+                and self.item.pc_bar_clips:
+            # a bar stay's clips hold while the neighbour's reaction scene is
+            # up (PCBarClips: the PC's bar counts no tick then — 210's
+            # Mother's nap 41.3 s for 20.5 through his fall into the empty
+            # pool, the bar probe of 2026-10-03)
+            a = self.pawn.anim.anim
+            self.pawn.anim.pc_paused = bool(a is not None and a.name in self.item.pc_bar_clips
+                                            and getattr(self.pawn.world, '_pc_scene', False))
         if self.state == self.USING and self._pc_credit is not None:
             # the record pays so far into its clip (PCCreditInClip), the
             # reaction still waiting for the use; a clip paced short of that
@@ -9503,6 +9514,12 @@ class ProgressBarState:
         s = self.spec['seqs'][idx]
         if s['AnimationStartIndex'] <= self.item.current_seq_index \
                 < s['AnimationEndIndex']:                      # cs:148
+            if pcprofile.is_pc() and getattr(w, '_pc_scene', False):
+                # the PC's bar (fcn.1000b154's object) counts no tick while
+                # the neighbour's reaction scene is up: 210's Mother's nap ran
+                # 41.3 s for its 20.5 through his fall into the empty pool
+                # (the bar probe, 2026-10-03), 214's chair sleep 63.6 for 50
+                return
             self.seconds += dt
             if self.executed_once:
                 self.set_sleeping(True)
