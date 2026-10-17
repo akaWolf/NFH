@@ -135,6 +135,12 @@ class PCMap(pcgeo.MapOps):
             # latter is not placed until the hair trick, and a combine on it crashed the game)
             found.sort(key=lambda f: (f[0] != obj, len(f[0])))
             return found[0]
+        # the family read loosely: an object whose base contains the plain name (209's coal_area/hot_coal
+        # takes the pants; its family by the first word is `hot`)
+        for name, ings, game in self.combos:
+            if item in ings:
+                objs = [i for i in ings if '/' in i and base in i.split('/')[-1]]
+                if objs: return objs[0], (game.group(1) if game else None)
         # no combination on the item's family: the one the held item has with a single object, if it is
         # the only one (104's IT_Hairrestorer goes on toi/grease — the plan names the deodorant's spot)
         if item is not None:

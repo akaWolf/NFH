@@ -125,6 +125,9 @@ class MapOps:
         the object's family that is no object — the type's own lower-cased name where it is one, the single
         candidate else, the one sharing the name else, the type's name as a last resort"""
         want = self.pc_item(it_type)
+        # the type's own name where any combination takes it (209's pants on the hot coal: the coal family's
+        # other combination, the air pump's, is no reason to rename the pants)
+        if any(want in ings for name, ings, game in self.combos): return want
         obj = self.objs.get(mobile_item)
         if obj is None: return want
         base = obj.split('/')[-1].split('_')[0]
